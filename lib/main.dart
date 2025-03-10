@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poortak/common/blocs/bottom_nav_cubit/bottom_nav_cubit.dart';
+import 'package:poortak/config/my_theme.dart';
 import 'package:poortak/featueres/feature_intro/presentation/bloc/splash_bloc/splash_cubit.dart';
+import 'package:poortak/featueres/feature_intro/presentation/screens/intro_main_wrapper.dart';
+import 'package:poortak/featueres/feature_intro/presentation/screens/splash_screen.dart';
 import 'package:poortak/locator.dart';
+import 'package:poortak/test_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
