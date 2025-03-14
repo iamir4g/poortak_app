@@ -1,0 +1,2 @@
+/Users/macbookpro/StudioProjects/Poortak_new/android/app/.cxx/Debug/316v386l/armeabi-v7a/CMakeFiles/edit_cache.dir
+/Users/macbookpro/StudioProjects/Poortak_new/android/app/.cxx/Debug/316v386l/armeabi-v7a/CMakeFiles/rebuild_cache.dir

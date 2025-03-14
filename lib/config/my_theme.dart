@@ -11,6 +11,9 @@ class MyThemes {
       bodyMedium: TextStyle(
           fontFamily: "IranSans", fontSize: 15, fontWeight: FontWeight.w400),
     ),
+
+    primaryColor: Color.fromRGBO(255, 167, 63, 1.0),
+    // secondryColor:Color.fromRGBO(66, 129, 236, 1.0),
     // highlightColor: Colors.indigo,
     // backgroundColor: Colors.black,
     // canvasColor: Colors.grey,

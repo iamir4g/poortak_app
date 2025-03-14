@@ -7,6 +7,7 @@ import 'package:poortak/featueres/feature_intro/presentation/screens/intro_main_
 import 'package:poortak/featueres/feature_intro/presentation/screens/splash_screen.dart';
 import 'package:poortak/locator.dart';
 import 'package:poortak/test_screen.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
