@@ -20,8 +20,8 @@ class BottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var primaryColor = Theme.of(context).primaryColor;
-    TextTheme textTheme = Theme.of(context).textTheme;
+    // var primaryColor = Theme.of(context).primaryColor;
+    // TextTheme textTheme = Theme.of(context).textTheme;
 
     return BottomAppBar(
       shape: const CircularNotchedRectangle(),
@@ -49,28 +49,30 @@ class BottomNav extends StatelessWidget {
                   context: context,
                   state: state,
                   index: 1,
-                  icon: "mage:search",
+                  icon: "mage:search", //mdi:text-box-search-outline
                   label: 'دسته بندی',
                   controller: controller,
-                  useCustomIcon: false,
+                  // useCustomIcon: false,
                 ),
                 _buildNavItem(
                   context: context,
                   state: state,
                   index: 2,
                   label: 'سبد خرید',
+                  icon: "hugeicons:shopping-cart-02", //"mage:shopping-cart",
                   controller: controller,
-                  useCustomIcon: true,
-                  materialIcon: Icons.shopping_cart_outlined,
+                  // useCustomIcon: false,
+                  // materialIcon: Icons.shopping_cart_outlined,
                 ),
                 _buildNavItem(
                   context: context,
                   state: state,
                   index: 3,
-                  label: 'پوشه ها',
+                  label: 'لایتنر',
+                  icon: "hugeicons:book-open-02", //"mage:book",
                   controller: controller,
-                  useCustomIcon: true,
-                  materialIcon: Icons.folder_outlined,
+                  // useCustomIcon: false,
+                  // materialIcon: Icons.folder_outlined,
                 ),
                 _buildNavItem(
                   context: context,
@@ -78,8 +80,9 @@ class BottomNav extends StatelessWidget {
                   index: 4,
                   label: 'پروفایل',
                   controller: controller,
-                  useCustomIcon: true,
-                  materialIcon: Icons.account_box_outlined,
+                  icon: "mynaui:user-square", //"mage:user",
+                  // useCustomIcon: false,
+                  // materialIcon: Icons.account_box_outlined,
                 ),
               ],
             );
@@ -96,8 +99,8 @@ class BottomNav extends StatelessWidget {
     required String label,
     required PageController controller,
     String icon = "",
-    bool useCustomIcon = false,
-    IconData materialIcon = Icons.circle,
+    // bool useCustomIcon = false,
+    // IconData materialIcon = Icons.circle,
   }) {
     return Expanded(
       child: InkWell(
@@ -116,18 +119,23 @@ class BottomNav extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              useCustomIcon
-                  ? FaIcon(
-                      materialIcon,
-                      color: state == index ? MyColors.primary : Colors.grey,
-                      size: 24,
-                    )
-                  : (state == index
-                      ? IconifyIcon(
-                          icon: icon,
-                          color:
-                              index == 1 ? MyColors.primary : MyColors.primary)
-                      : IconifyIcon(icon: icon, color: Colors.grey)),
+              (state == index
+                  ? IconifyIcon(
+                      icon: icon,
+                      color: index == 1 ? MyColors.primary : MyColors.primary)
+                  : IconifyIcon(icon: icon, color: Colors.grey)),
+              // useCustomIcon
+              //     ? FaIcon(
+              //         materialIcon,
+              //         color: state == index ? MyColors.primary : Colors.grey,
+              //         size: 24,
+              //       )
+              //     : (state == index
+              //         ? IconifyIcon(
+              //             icon: icon,
+              //             color:
+              //                 index == 1 ? MyColors.primary : MyColors.primary)
+              //         : IconifyIcon(icon: icon, color: Colors.grey)),
               if (state == index)
                 Padding(
                   padding: const EdgeInsets.only(top: 4.0),

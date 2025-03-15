@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poortak/common/blocs/bottom_nav_cubit/bottom_nav_cubit.dart';
+import 'package:poortak/common/widgets/main_wrapper.dart';
 import 'package:poortak/config/my_theme.dart';
 import 'package:poortak/featueres/feature_intro/presentation/bloc/splash_bloc/splash_cubit.dart';
 import 'package:poortak/featueres/feature_intro/presentation/screens/intro_main_wrapper.dart';
@@ -41,9 +42,17 @@ class MyApp extends StatelessWidget {
       routes: {
         IntroMainWrapper.routeName: (context) => IntroMainWrapper(),
         TestScreen.routeName: (context) => TestScreen(),
+        MainWrapper.routeName: (context) => MainWrapper(),
       },
       debugShowCheckedModeBanner: false,
       title: 'Poortak',
+
+      // actions: <Widget>[
+      //   IconButton(
+      //     onPressed: () {},
+      //     icon: Icon(Icons.search),
+      //   ),
+      // ],
       home: SplashScreen(),
     );
   }

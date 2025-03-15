@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 import 'package:poortak/common/utils/prefs_operator.dart';
+import 'package:poortak/common/widgets/main_wrapper.dart';
 import 'package:poortak/featueres/feature_intro/presentation/bloc/splash_bloc/splash_cubit.dart';
 import 'package:poortak/featueres/feature_intro/presentation/screens/intro_main_wrapper.dart';
 import 'package:poortak/locator.dart';
@@ -119,8 +120,8 @@ class _SplashScreenState extends State<SplashScreen> {
         // Navigator.pushNamedAndRemoveUntil(context, MainWrapper.routeName, ModalRoute.withName("main_wrapper"),);
         Navigator.pushNamedAndRemoveUntil(
           context,
-          TestScreen.routeName,
-          ModalRoute.withName("test_screen"),
+          MainWrapper.routeName,
+          ModalRoute.withName("main_wrapper"),
         );
       }
     });
