@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:iconify_design/iconify_design.dart';
+import 'package:poortak/config/myColors.dart';
+import 'package:poortak/config/myTextStyle.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../blocs/bottom_nav_cubit/bottom_nav_cubit.dart';
@@ -24,110 +27,59 @@ class BottomNav extends StatelessWidget {
       shape: const CircularNotchedRectangle(),
       notchMargin: 5,
       color: Colors.white,
-      child: SizedBox(
-        height: 64,
+      elevation: 0,
+      child: Container(
+        height: 50,
+        padding: EdgeInsets.only(bottom: 8),
         child: BlocBuilder<BottomNavCubit, int>(
           builder: (context, int state) {
             return Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center, // Center items vertically
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    IconButton(
-                      padding: EdgeInsets.zero,
-                      onPressed: () {
-                        /// change selected index
-                        BlocProvider.of<BottomNavCubit>(context).changeSelectedIndex(0);
-                        controller.animateToPage(0, duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
-                      },
-                      icon: state == 0 ? FaIcon(FontAwesomeIcons.video,color: Colors.amber,) : FaIcon(FontAwesomeIcons.video,color: Colors.grey),
-
-                    ),
-                    Text(
-
-                      state == 0 ? 'کاوش' : '',
-                      style: TextStyle(fontSize: 14,fontFamily: 'Yekan',color: Colors.grey.shade700),
-                    ),
-                  ],
+                _buildNavItem(
+                  context: context,
+                  state: state,
+                  index: 0,
+                  icon: "mage:video-player",
+                  label: 'کاوش',
+                  controller: controller,
                 ),
-                Column(
-                  children: [
-                    IconButton(
-                        padding: EdgeInsets.zero,
-                        onPressed: () {
-                          BlocProvider.of<BottomNavCubit>(context).changeSelectedIndex(1);
-                          controller.animateToPage(1, duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
-                        },
-                        icon: state == 1 ? FaIcon(FontAwesomeIcons.searchengin,color: Colors.amber) : FaIcon(FontAwesomeIcons.searchengin,color: Colors.grey,)
-                    ),
-                    Text(
-                      state == 1 ?'دسته بندی' :'',
-                      style: TextStyle(fontSize: 14,fontFamily: 'Yekan',color: Colors.grey.shade700),
-                    ),
-                  ],
+                _buildNavItem(
+                  context: context,
+                  state: state,
+                  index: 1,
+                  icon: "mage:search",
+                  label: 'دسته بندی',
+                  controller: controller,
+                  useCustomIcon: false,
                 ),
-                Column(
-                  children: [
-                    IconButton(
-                      onPressed: () async {
-                        BlocProvider.of<BottomNavCubit>(context).changeSelectedIndex(2);
-                        controller.animateToPage(2, duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
-                      },
-                      // icon: SvgPicture.asset(state == 2 ? "assets/images/person_icon.svg" : "assets/images/person_icon2.svg", color: state == 2 ? Colors.red : Colors.grey.shade700,width: 48,),
-                      icon: state == 2 ? FaIcon(Icons.shopping_cart_outlined,color: Colors.amber,) : FaIcon(Icons.shopping_cart_outlined,color: Colors.grey,),
-
-                    ),
-                    // Text(
-                    //   state == 2 ? 'سبد خرید' : '',
-                    //   style: TextStyle(fontSize: 14,fontFamily: 'Yekan',color: Colors.grey.shade700),
-                    // ),
-                  ],
+                _buildNavItem(
+                  context: context,
+                  state: state,
+                  index: 2,
+                  label: 'سبد خرید',
+                  controller: controller,
+                  useCustomIcon: true,
+                  materialIcon: Icons.shopping_cart_outlined,
                 ),
-                Column(
-                  children: [
-                    IconButton(
-                        onPressed: () async {
-                          BlocProvider.of<BottomNavCubit>(context).changeSelectedIndex(3);
-                          controller.animateToPage(3, duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
-                        },
-                        icon: FaIcon(
-                          state == 3
-                              ? Icons.folder_outlined
-                              : Icons.folder_outlined,
-                          color: state == 3 ? Colors.amber : Colors.grey,
-                          size: 27,
-                        )
-                    ),
-                    // Text(
-                    //   state == 3
-                    //       ?'سبد خرید' : '',
-                    //   style: TextStyle(fontSize: 14,fontFamily: 'Yekan',color: Colors.grey.shade700),
-                    // ),
-                  ],
+                _buildNavItem(
+                  context: context,
+                  state: state,
+                  index: 3,
+                  label: 'پوشه ها',
+                  controller: controller,
+                  useCustomIcon: true,
+                  materialIcon: Icons.folder_outlined,
                 ),
-                Column(
-                  children: [
-                    IconButton(
-                        onPressed: () async {
-                          BlocProvider.of<BottomNavCubit>(context).changeSelectedIndex(4);
-                          controller.animateToPage(4, duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
-                        },
-                        icon: FaIcon(
-                          state == 4
-                              ? Icons.account_box_outlined
-                              : Icons.account_box_outlined,
-                          color: state == 4 ? Colors.amber : Colors.grey,
-                          size: 27,
-                        )
-                    ),
-                    // Text(
-                    //   state == 4
-                    //       ?'پروفایل':'',
-                    //   style: TextStyle(fontSize: 14,fontFamily: 'Yekan',color: Colors.grey.shade700),
-                    // ),
-                  ],
+                _buildNavItem(
+                  context: context,
+                  state: state,
+                  index: 4,
+                  label: 'پروفایل',
+                  controller: controller,
+                  useCustomIcon: true,
+                  materialIcon: Icons.account_box_outlined,
                 ),
               ],
             );
@@ -137,6 +89,61 @@ class BottomNav extends StatelessWidget {
     );
   }
 
+  Widget _buildNavItem({
+    required BuildContext context,
+    required int state,
+    required int index,
+    required String label,
+    required PageController controller,
+    String icon = "",
+    bool useCustomIcon = false,
+    IconData materialIcon = Icons.circle,
+  }) {
+    return Expanded(
+      child: InkWell(
+        onTap: () {
+          BlocProvider.of<BottomNavCubit>(context).changeSelectedIndex(index);
+          controller.animateToPage(
+            index,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+          );
+        },
+        child: SizedBox(
+          height: 70,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              useCustomIcon
+                  ? FaIcon(
+                      materialIcon,
+                      color: state == index ? MyColors.primary : Colors.grey,
+                      size: 24,
+                    )
+                  : (state == index
+                      ? IconifyIcon(
+                          icon: icon,
+                          color:
+                              index == 1 ? MyColors.primary : MyColors.primary)
+                      : IconifyIcon(icon: icon, color: Colors.grey)),
+              if (state == index)
+                Padding(
+                  padding: const EdgeInsets.only(top: 4.0),
+                  child: Text(
+                    label,
+                    style: MyTextStyle.bottomNavEnabledTextStyle,
+                    maxLines: 1,
+                    overflow: TextOverflow.visible,
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
   Future<bool> getDataFromPrefs() async {
     // Obtain shared preferences.
