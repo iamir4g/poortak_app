@@ -7,7 +7,7 @@ class MyColors {
   static const Color primaryTint2 = Color.fromRGBO(255, 213, 163, 1);
   static const Color primaryTint3 = Color.fromRGBO(255, 236, 214, 1);
   static const Color primaryTint4 = Color.fromRGBO(255, 248, 240, 1);
-
+  static const Color primaryTint5 = Color.fromRGBO(242, 246, 253, 1);
   static const Color primaryShade1 = Color.fromRGBO(255, 167, 63, 1);
   static const Color primaryShade2 = Color.fromRGBO(255, 142, 10, 1);
   static const Color primaryShade3 = Color.fromRGBO(214, 116, 0, 1);
@@ -35,7 +35,7 @@ class MyColors {
   static const Color textPrimary = Color(0xFF000000); // Black
   static const Color textSecondary = Color(0xFF757575); // Grey
   static const Color textLight = Color(0xFFFFFFFF); // White
-
+  static const Color text3 = Color.fromRGBO(82, 97, 122, 1);
   // Status Colors
   static const Color success = Color(0xFF4CAF50); // Green
   static const Color error = Color(0xFFE53935); // Red
@@ -50,4 +50,6 @@ class MyColors {
   // Brand Colors (you can customize these based on your brand)
   static const Color brandPrimary = primary;
   static const Color brandSecondary = secondary;
+
+  static const Color background1 = Color(0xffF2F5FA);
 }
