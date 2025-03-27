@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:poortak/common/blocs/bottom_nav_cubit/bottom_nav_cubit.dart';
 import 'package:poortak/common/widgets/main_wrapper.dart';
 import 'package:poortak/config/my_theme.dart';
@@ -8,7 +9,8 @@ import 'package:poortak/featueres/feature_intro/presentation/screens/intro_main_
 import 'package:poortak/featueres/feature_intro/presentation/screens/splash_screen.dart';
 import 'package:poortak/locator.dart';
 import 'package:poortak/test_screen.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
+// import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,12 +35,13 @@ class MyApp extends StatelessWidget {
       darkTheme: MyThemes.darkTheme,
       initialRoute: "/",
       localizationsDelegates: const [
+        AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
       locale: const Locale("fa", ""),
-      supportedLocales: [Locale("en", ""), Locale("fa", "")],
+      supportedLocales: const [Locale("en", ""), Locale("fa", "")],
       routes: {
         IntroMainWrapper.routeName: (context) => IntroMainWrapper(),
         TestScreen.routeName: (context) => TestScreen(),
