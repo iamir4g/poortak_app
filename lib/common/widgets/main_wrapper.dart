@@ -1,30 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconify_design/iconify_design.dart';
 import 'package:poortak/common/widgets/bottom_nav.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/sayareh_screen.dart';
+import 'package:poortak/featueres/feature_shopping_cart/screens/shopping_cart_screen.dart';
 
 class MainWrapper extends StatelessWidget {
   static const routeName = "/main_wrapper";
   MainWrapper({super.key});
 
-  PageController controller = PageController();
+  // Using late init to ensure PageController is created only once
+  final PageController controller = PageController();
 
-  List<Widget> topLevelScreens = [
-    SayarehScreen(),
-    Container(
-      color: Colors.blue,
-    ),
-    Container(
-      color: Colors.green,
-    ),
-    Container(
-      color: Colors.yellow,
-    ),
-    Container(
-      color: Colors.purple,
-    ),
-  ];
+  // Define screens as getters to ensure they're created when needed
+  List<Widget> get topLevelScreens => [
+        const SayarehScreen(),
+        Container(
+          color: Colors.blue,
+        ),
+        const ShoppingCartScreen(),
+        Container(
+          color: Colors.yellow,
+        ),
+        Container(
+          color: Colors.purple,
+        ),
+      ];
 
   @override
   Widget build(BuildContext context) {

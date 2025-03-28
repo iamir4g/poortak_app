@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poortak/common/widgets/dot_loading_widget.dart';
 import 'package:poortak/config/myColors.dart';
-import 'package:poortak/featueres/fetures_shopping_cart/data/models/shopping_cart_model.dart';
-import 'package:poortak/featueres/fetures_shopping_cart/presentation/bloc/shopping_cart_cubit.dart';
+import 'package:poortak/featueres/feature_shopping_cart/data/models/shopping_cart_model.dart';
+import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_cubit.dart';
 import 'package:poortak/locator.dart';
 
 class ShoppingCartScreen extends StatelessWidget {
+  static const routeName = "/shopping_cart_screen";
   const ShoppingCartScreen({super.key});
 
   @override

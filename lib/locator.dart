@@ -3,7 +3,7 @@ import 'package:get_it/get_it.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/data_source/sayareh_api_provider.dart';
 import 'package:poortak/featueres/fetures_sayareh/repositories/sayareh_repository.dart';
-import 'package:poortak/featueres/fetures_shopping_cart/repositories/shopping_cart_repository.dart';
+import 'package:poortak/featueres/feature_shopping_cart/repositories/shopping_cart_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 GetIt locator = GetIt.instance;

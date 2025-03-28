@@ -45,7 +45,7 @@ class SayarehApiProvider {
             description: "پورتک به سیاره آی نو می رود",
             image:
                 "https://www.namava.ir/mag/wp-content/uploads/2019/06/Amin-Hayai-1-1200x675.jpg",
-            isLock: true,
+            isLock: false,
           ),
           Sayareh(
             title: "درس سوم",

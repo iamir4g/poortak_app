@@ -1,4 +1,4 @@
-import 'package:badges/badges.dart';
+import 'dart:developer';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -7,7 +7,11 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:iconify_design/iconify_design.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
+import 'package:poortak/featueres/feature_shopping_cart/data/models/shopping_cart_model.dart';
+import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_cubit.dart';
+import 'package:poortak/locator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:badges/badges.dart' as badges;
 
 import '../blocs/bottom_nav_cubit/bottom_nav_cubit.dart';
 
@@ -29,66 +33,81 @@ class BottomNav extends StatelessWidget {
       color: Colors.white,
       elevation: 0,
       child: Container(
-        height: 50,
-        padding: EdgeInsets.only(bottom: 8),
-        child: BlocBuilder<BottomNavCubit, int>(
-          builder: (context, int state) {
-            return Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                _buildNavItem(
-                  context: context,
-                  state: state,
-                  index: 0,
-                  icon: "mage:video-player",
-                  label: 'کاوش',
-                  controller: controller,
+          height: 50,
+          padding: EdgeInsets.only(bottom: 8),
+          child: MultiBlocProvider(
+              providers: [
+                BlocProvider(
+                  create: (context) => BottomNavCubit(),
                 ),
-                _buildNavItem(
-                  context: context,
-                  state: state,
-                  index: 1,
-                  icon: "mage:search", //mdi:text-box-search-outline
-                  label: 'دسته بندی',
-                  controller: controller,
-                  // useCustomIcon: false,
-                ),
-                _buildNavItem(
-                  context: context,
-                  state: state,
-                  index: 2,
-                  label: 'سبد خرید',
-                  icon: "hugeicons:shopping-cart-02", //"mage:shopping-cart",
-                  controller: controller,
-                  // useCustomIcon: false,
-                  // materialIcon: Icons.shopping_cart_outlined,
-                ),
-                _buildNavItem(
-                  context: context,
-                  state: state,
-                  index: 3,
-                  label: 'لایتنر',
-                  icon: "hugeicons:book-open-02", //"mage:book",
-                  controller: controller,
-                  // useCustomIcon: false,
-                  // materialIcon: Icons.folder_outlined,
-                ),
-                _buildNavItem(
-                  context: context,
-                  state: state,
-                  index: 4,
-                  label: 'پروفایل',
-                  controller: controller,
-                  icon: "mynaui:user-square", //"mage:user",
-                  // useCustomIcon: false,
-                  // materialIcon: Icons.account_box_outlined,
-                ),
+                BlocProvider(
+                  create: (context) {
+                    final cubit =
+                        ShoppingCartCubit(shoppingCartRepository: locator());
+                    // Load cart data when the cubit is created
+                    cubit.getCart();
+                    return cubit;
+                  },
+                )
               ],
-            );
-          },
-        ),
-      ),
+              child: Builder(builder: (context) {
+                return BlocBuilder<BottomNavCubit, int>(
+                    builder: (context, state) {
+                  return Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        _buildNavItem(
+                          context: context,
+                          state: state,
+                          index: 0,
+                          icon: "mage:video-player",
+                          label: 'کاوش',
+                          controller: controller,
+                        ),
+                        _buildNavItem(
+                          context: context,
+                          state: state,
+                          index: 1,
+                          icon: "mage:search", //mdi:text-box-search-outline
+                          label: 'دسته بندی',
+                          controller: controller,
+                          // useCustomIcon: false,
+                        ),
+                        _buildNavItem(
+                          context: context,
+                          state: state,
+                          index: 2,
+                          label: 'سبد خرید',
+                          icon:
+                              "hugeicons:shopping-cart-02", //"mage:shopping-cart",
+                          controller: controller,
+                          // useCustomIcon: false,
+                          // materialIcon: Icons.shopping_cart_outlined,
+                        ),
+                        _buildNavItem(
+                          context: context,
+                          state: state,
+                          index: 3,
+                          label: 'لایتنر',
+                          icon: "hugeicons:book-open-02", //"mage:book",
+                          controller: controller,
+                          // useCustomIcon: false,
+                          // materialIcon: Icons.folder_outlined,
+                        ),
+                        _buildNavItem(
+                          context: context,
+                          state: state,
+                          index: 4,
+                          label: 'پروفایل',
+                          controller: controller,
+                          icon: "mynaui:user-square", //"mage:user",
+                          // useCustomIcon: false,
+                          // materialIcon: Icons.account_box_outlined,
+                        ),
+                      ]);
+                });
+              }))),
     );
   }
 
@@ -99,8 +118,6 @@ class BottomNav extends StatelessWidget {
     required String label,
     required PageController controller,
     String icon = "",
-    // bool useCustomIcon = false,
-    // IconData materialIcon = Icons.circle,
   }) {
     return Expanded(
       child: InkWell(
@@ -120,22 +137,85 @@ class BottomNav extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               (state == index
-                  ? IconifyIcon(
-                      icon: icon,
-                      color: index == 1 ? MyColors.primary : MyColors.primary)
-                  : IconifyIcon(icon: icon, color: Colors.grey)),
-              // useCustomIcon
-              //     ? FaIcon(
-              //         materialIcon,
-              //         color: state == index ? MyColors.primary : Colors.grey,
-              //         size: 24,
-              //       )
-              //     : (state == index
-              //         ? IconifyIcon(
-              //             icon: icon,
-              //             color:
-              //                 index == 1 ? MyColors.primary : MyColors.primary)
-              //         : IconifyIcon(icon: icon, color: Colors.grey)),
+                  ? state == 2 && index == 2
+                      ? BlocBuilder<ShoppingCartCubit, ShoppingCartState>(
+                          builder: (context, cartState) {
+                            if (cartState.cartDataStatus
+                                is ShoppingCartDataInitial) {
+                              return IconifyIcon(
+                                  icon: icon, color: Colors.grey);
+                            }
+
+                            if (cartState.cartDataStatus
+                                is ShoppingCartDataLoading) {
+                              return IconifyIcon(
+                                  icon: icon, color: Colors.grey);
+                            }
+
+                            if (cartState.cartDataStatus
+                                is ShoppingCartDataCompleted) {
+                              final ShoppingCartDataCompleted
+                                  cartDataCompleted = cartState.cartDataStatus
+                                      as ShoppingCartDataCompleted;
+                              final ShoppingCart cart = cartDataCompleted.data;
+
+                              if (cart.items.isNotEmpty) {
+                                return badges.Badge(
+                                  badgeContent:
+                                      Text(cart.items.length.toString()),
+                                  child: IconifyIcon(
+                                      icon: icon, color: MyColors.primary),
+                                );
+                              }
+                              return IconifyIcon(
+                                  icon: icon, color: Colors.grey);
+                            }
+
+                            return IconifyIcon(icon: icon, color: Colors.grey);
+                          },
+                        )
+                      : IconifyIcon(
+                          icon: icon,
+                          color:
+                              index == 1 ? MyColors.primary : MyColors.primary)
+                  : index == 2
+                      ? BlocBuilder<ShoppingCartCubit, ShoppingCartState>(
+                          builder: (context, cartState) {
+                            if (cartState.cartDataStatus
+                                is ShoppingCartDataInitial) {
+                              return IconifyIcon(
+                                  icon: icon, color: Colors.grey);
+                            }
+
+                            if (cartState.cartDataStatus
+                                is ShoppingCartDataLoading) {
+                              return IconifyIcon(
+                                  icon: icon, color: Colors.grey);
+                            }
+
+                            if (cartState.cartDataStatus
+                                is ShoppingCartDataCompleted) {
+                              final ShoppingCartDataCompleted
+                                  cartDataCompleted = cartState.cartDataStatus
+                                      as ShoppingCartDataCompleted;
+                              final ShoppingCart cart = cartDataCompleted.data;
+
+                              if (cart.items.isNotEmpty) {
+                                return badges.Badge(
+                                  badgeContent:
+                                      Text(cart.items.length.toString()),
+                                  child: IconifyIcon(
+                                      icon: icon, color: Colors.grey),
+                                );
+                              }
+                              return IconifyIcon(
+                                  icon: icon, color: Colors.grey);
+                            }
+
+                            return IconifyIcon(icon: icon, color: Colors.grey);
+                          },
+                        )
+                      : IconifyIcon(icon: icon, color: Colors.grey)),
               if (state == index)
                 Padding(
                   padding: const EdgeInsets.only(top: 4.0),

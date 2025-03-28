@@ -36,6 +36,7 @@ class MyColors {
   static const Color textSecondary = Color(0xFF757575); // Grey
   static const Color textLight = Color(0xFFFFFFFF); // White
   static const Color text3 = Color.fromRGBO(82, 97, 122, 1);
+  static const Color text4 = Color.fromRGBO(163, 175, 194, 1);
   // Status Colors
   static const Color success = Color(0xFF4CAF50); // Green
   static const Color error = Color(0xFFE53935); // Red

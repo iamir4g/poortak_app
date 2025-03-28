@@ -4,11 +4,13 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:poortak/common/widgets/dot_loading_widget.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/sayareh_cubit.dart';
-import 'package:poortak/featueres/fetures_shopping_cart/data/models/shopping_cart_model.dart';
-import 'package:poortak/featueres/fetures_shopping_cart/presentation/bloc/shopping_cart_cubit.dart';
+import 'package:poortak/featueres/fetures_sayareh/screens/lesson_screen.dart';
+import 'package:poortak/featueres/feature_shopping_cart/data/models/shopping_cart_model.dart';
+import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_cubit.dart';
 import 'package:poortak/locator.dart';
 
 class SayarehScreen extends StatelessWidget {
+  static const routeName = "/sayareh_screen";
   const SayarehScreen({super.key});
 
   @override
@@ -74,15 +76,19 @@ class SayarehScreen extends StatelessWidget {
                   children: [
                     Text(l10n?.sayareh ?? ""),
                     // Sayareh List Section
-                    ListView.builder(
+
+                    ListView.separated(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: sayarehDataCompleted.data.sayareh.length,
+                      separatorBuilder: (context, index) {
+                        return const SizedBox(height: 12);
+                      },
                       itemBuilder: (context, index) {
                         final item = sayarehDataCompleted.data.sayareh[index];
                         return GestureDetector(
                             onTap: () {
-                              if (!item.isLock) {
+                              if (item.isLock) {
                                 final cartItem = ShoppingCartItem(
                                   title: item.title,
                                   description: item.description,
@@ -92,6 +98,13 @@ class SayarehScreen extends StatelessWidget {
                                 context
                                     .read<ShoppingCartCubit>()
                                     .addToCart(cartItem);
+                              } else {
+                                Navigator.pushNamed(
+                                    context, LessonScreen.routeName,
+                                    arguments: {
+                                      'index': index,
+                                      'title': item.title,
+                                    });
                               }
                             },
                             child: Container(
@@ -158,7 +171,7 @@ class SayarehScreen extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
-                              color: Colors.amber.withOpacity(0.2),
+                              color: Colors.amber,
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: const Row(
@@ -176,7 +189,7 @@ class SayarehScreen extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
-                              color: Colors.blue.withOpacity(0.2),
+                              color: Colors.blue,
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: const Row(

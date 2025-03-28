@@ -1,5 +1,5 @@
 import 'package:poortak/common/resources/data_state.dart';
-import 'package:poortak/featueres/fetures_shopping_cart/data/models/shopping_cart_model.dart';
+import 'package:poortak/featueres/feature_shopping_cart/data/models/shopping_cart_model.dart';
 
 class ShoppingCartRepository {
   ShoppingCart _cart = ShoppingCart();
