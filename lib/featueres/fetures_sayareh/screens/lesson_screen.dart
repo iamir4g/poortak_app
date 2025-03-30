@@ -1,6 +1,8 @@
+// import 'package:appinio_video_player/appinio_video_player.dart';
 import 'package:flutter/material.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/common/utils/custom_textStyle.dart';
+import 'package:poortak/featueres/fetures_sayareh/widgets/custom_video_player.dart';
 
 class LessonScreen extends StatefulWidget {
   static const routeName = "/lesson_screen";
@@ -18,6 +20,8 @@ class LessonScreen extends StatefulWidget {
 }
 
 class _LessonScreenState extends State<LessonScreen> {
+  String videoTestPath = "assets/videos/poortak_test.mp4";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,24 +36,19 @@ class _LessonScreenState extends State<LessonScreen> {
       ),
       body: SingleChildScrollView(
         child: Column(
-          // mainAxisAlignment: MainAxisAlignment.center,
-          // crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Image.network(widget.image),
-
             Center(
-              child: Container(
+              child: CustomVideoPlayer(
+                videoPath: videoTestPath,
+                isNetworkVideo: false,
                 width: 350,
                 height: 240,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(37)),
-                    color: Colors.red),
+                borderRadius: 37,
+                autoPlay: true,
+                showControls: true,
               ),
             ),
-
-            SizedBox(
-              height: 18,
-            ),
+            const SizedBox(height: 18),
             //card lesons
             Container(
               width: 350,
@@ -83,10 +82,7 @@ class _LessonScreenState extends State<LessonScreen> {
                 ),
               ),
             ),
-
-            SizedBox(
-              height: 12,
-            ),
+            const SizedBox(height: 12),
             Container(
               width: 350,
               height: 104,
@@ -119,9 +115,7 @@ class _LessonScreenState extends State<LessonScreen> {
                 ),
               ),
             ),
-            SizedBox(
-              height: 12,
-            ),
+            const SizedBox(height: 12),
             Container(
               width: 350,
               height: 104,
@@ -152,27 +146,6 @@ class _LessonScreenState extends State<LessonScreen> {
                 ),
               ),
             ),
-            SizedBox(
-              height: 12,
-            ),
-            // Padding(
-            //   padding: const EdgeInsets.all(16.0),
-            //   child: Column(
-            //     crossAxisAlignment: CrossAxisAlignment.start,
-            //     children: [
-            //       Text(
-            //         widget.title,
-            //         style: CustomTextStyle.lessonTitle,
-            //       ),
-            //       const SizedBox(height: 8),
-
-            //       const SizedBox(height: 16),
-            //       Text("Lesson ${widget.index + 1}",
-            //           style: CustomTextStyle.lessonNumber),
-            //       // Add more content as needed
-            //     ],
-            //   ),
-            // ),
           ],
         ),
       ),
