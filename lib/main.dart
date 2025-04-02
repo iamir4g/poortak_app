@@ -8,10 +8,10 @@ import 'package:poortak/featueres/fetures_sayareh/screens/lesson_screen.dart';
 import 'package:poortak/featueres/feature_intro/presentation/bloc/splash_bloc/splash_cubit.dart';
 import 'package:poortak/featueres/feature_intro/presentation/screens/intro_main_wrapper.dart';
 import 'package:poortak/featueres/feature_intro/presentation/screens/splash_screen.dart';
-import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_cubit.dart';
+import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
+import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
 import 'package:poortak/locator.dart';
 import 'package:poortak/test_screen.dart';
-// import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 void main() async {
@@ -24,10 +24,10 @@ void main() async {
     BlocProvider(create: (_) => BottomNavCubit()),
     BlocProvider(
       create: (_) {
-        final cubit = ShoppingCartCubit(shoppingCartRepository: locator());
+        final bloc = ShoppingCartBloc(repository: locator());
         // Load cart data when the app starts
-        cubit.getCart();
-        return cubit;
+        bloc.add(GetCartEvent());
+        return bloc;
       },
     ),
   ], child: const MyApp()));

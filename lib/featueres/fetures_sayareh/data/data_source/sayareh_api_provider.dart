@@ -33,61 +33,69 @@ class SayarehApiProvider {
       ok: true,
       data: Data(
         sayareh: [
-          Sayareh(
+          SayarehLessonItem(
             title: "درس اول",
             description: "پورتک به سیاره آی نو می رود",
             image:
                 "https://www.namava.ir/mag/wp-content/uploads/2019/06/Amin-Hayai-1-1200x675.jpg",
             isLock: false,
+            price: 75000,
           ),
-          Sayareh(
+          SayarehLessonItem(
             title: "درس دوم",
             description: "پورتک به سیاره آی نو می رود",
             image:
                 "https://www.namava.ir/mag/wp-content/uploads/2019/06/Amin-Hayai-1-1200x675.jpg",
             isLock: false,
+            price: 75000,
           ),
-          Sayareh(
+          SayarehLessonItem(
             title: "درس سوم",
             description: "پورتک به سیاره آی نو می رود",
             image:
                 "https://www.namava.ir/mag/wp-content/uploads/2019/06/Amin-Hayai-1-1200x675.jpg",
             isLock: true,
+            price: 75000,
           ),
-          Sayareh(
+          SayarehLessonItem(
             title: "درس چهارم",
             description: "پورتک به سیاره آی نو می رود",
             image:
                 "https://www.namava.ir/mag/wp-content/uploads/2019/06/Amin-Hayai-1-1200x675.jpg",
             isLock: true,
+            price: 75000,
           ),
-          Sayareh(
+          SayarehLessonItem(
             title: "درس پنجم",
             description: "پورتک به سیاره آی نو می رود",
             image:
                 "https://www.namava.ir/mag/wp-content/uploads/2019/06/Amin-Hayai-1-1200x675.jpg",
             isLock: true,
+            price: 75000,
           ),
-          Sayareh(
+          SayarehLessonItem(
             title: "درس ششم",
             description: "پورتک به سیاره آی نو می رود",
             image:
                 "https://www.namava.ir/mag/wp-content/uploads/2019/06/Amin-Hayai-1-1200x675.jpg",
             isLock: true,
+            price: 75000,
           ),
-          Sayareh(
+          SayarehLessonItem(
             title: "درس هفتم",
             description: "پورتک به سیاره آی نو می رود",
             image:
                 "https://www.namava.ir/mag/wp-content/uploads/2019/06/Amin-Hayai-1-1200x675.jpg",
             isLock: true,
+            price: 75000,
           ),
-          Sayareh(
+          SayarehLessonItem(
             title: "درس هشتم",
             description: "پورتک به سیاره آی نو می رود",
             image:
                 "https://www.namava.ir/mag/wp-content/uploads/2019/06/Amin-Hayai-1-1200x675.jpg",
             isLock: true,
+            price: 75000,
           ),
         ],
       ),

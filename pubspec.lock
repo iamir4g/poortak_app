@@ -469,6 +469,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.4"
+  persian_tools:
+    dependency: "direct main"
+    description:
+      name: persian_tools
+      sha256: f7f03b786f2bca07e2fb96bb56310218708ce9b049e0fe56cac71317f92afab0
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.3"
   petitparser:
     dependency: transitive
     description:

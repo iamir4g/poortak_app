@@ -8,7 +8,9 @@ import 'package:iconify_design/iconify_design.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/models/shopping_cart_model.dart';
-import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_cubit.dart';
+import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
+import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
+import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_state.dart';
 import 'package:poortak/locator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:badges/badges.dart' as badges;
@@ -42,11 +44,9 @@ class BottomNav extends StatelessWidget {
                 ),
                 BlocProvider(
                   create: (context) {
-                    final cubit =
-                        ShoppingCartCubit(shoppingCartRepository: locator());
-                    // Load cart data when the cubit is created
-                    cubit.getCart();
-                    return cubit;
+                    final bloc = ShoppingCartBloc(repository: locator());
+                    bloc.add(GetCartEvent());
+                    return bloc;
                   },
                 )
               ],
@@ -138,27 +138,26 @@ class BottomNav extends StatelessWidget {
             children: [
               (state == index
                   ? state == 2 && index == 2
-                      ? BlocBuilder<ShoppingCartCubit, ShoppingCartState>(
+                      ? BlocConsumer<ShoppingCartBloc, ShoppingCartState>(
+                          listener: (context, state) {
+                            if (state is ShoppingCartLoaded) {
+                              // You can add any side effects here when cart changes
+                              // For example, showing a snackbar or updating other UI elements
+                            }
+                          },
                           builder: (context, cartState) {
-                            if (cartState.cartDataStatus
-                                is ShoppingCartDataInitial) {
+                            if (cartState is ShoppingCartInitial) {
                               return IconifyIcon(
                                   icon: icon, color: Colors.grey);
                             }
 
-                            if (cartState.cartDataStatus
-                                is ShoppingCartDataLoading) {
+                            if (cartState is ShoppingCartLoading) {
                               return IconifyIcon(
                                   icon: icon, color: Colors.grey);
                             }
 
-                            if (cartState.cartDataStatus
-                                is ShoppingCartDataCompleted) {
-                              final ShoppingCartDataCompleted
-                                  cartDataCompleted = cartState.cartDataStatus
-                                      as ShoppingCartDataCompleted;
-                              final ShoppingCart cart = cartDataCompleted.data;
-
+                            if (cartState is ShoppingCartLoaded) {
+                              final cart = cartState.cart;
                               if (cart.items.isNotEmpty) {
                                 return badges.Badge(
                                   badgeContent:
@@ -179,27 +178,26 @@ class BottomNav extends StatelessWidget {
                           color:
                               index == 1 ? MyColors.primary : MyColors.primary)
                   : index == 2
-                      ? BlocBuilder<ShoppingCartCubit, ShoppingCartState>(
+                      ? BlocConsumer<ShoppingCartBloc, ShoppingCartState>(
+                          listener: (context, state) {
+                            if (state is ShoppingCartLoaded) {
+                              // You can add any side effects here when cart changes
+                              // For example, showing a snackbar or updating other UI elements
+                            }
+                          },
                           builder: (context, cartState) {
-                            if (cartState.cartDataStatus
-                                is ShoppingCartDataInitial) {
+                            if (cartState is ShoppingCartInitial) {
                               return IconifyIcon(
                                   icon: icon, color: Colors.grey);
                             }
 
-                            if (cartState.cartDataStatus
-                                is ShoppingCartDataLoading) {
+                            if (cartState is ShoppingCartLoading) {
                               return IconifyIcon(
                                   icon: icon, color: Colors.grey);
                             }
 
-                            if (cartState.cartDataStatus
-                                is ShoppingCartDataCompleted) {
-                              final ShoppingCartDataCompleted
-                                  cartDataCompleted = cartState.cartDataStatus
-                                      as ShoppingCartDataCompleted;
-                              final ShoppingCart cart = cartDataCompleted.data;
-
+                            if (cartState is ShoppingCartLoaded) {
+                              final cart = cartState.cart;
                               if (cart.items.isNotEmpty) {
                                 return badges.Badge(
                                   badgeContent:

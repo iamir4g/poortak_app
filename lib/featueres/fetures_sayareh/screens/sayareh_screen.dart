@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:persian_tools/persian_tools.dart';
 import 'package:poortak/common/widgets/dot_loading_widget.dart';
+import 'package:poortak/common/widgets/primaryButton.dart';
 import 'package:poortak/config/myColors.dart';
+import 'package:poortak/config/myTextStyle.dart';
+import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_home_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/sayareh_cubit.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/lesson_screen.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/models/shopping_cart_model.dart';
-import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_cubit.dart';
+import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
+import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
 import 'package:poortak/locator.dart';
 
 class SayarehScreen extends StatelessWidget {
@@ -22,8 +27,11 @@ class SayarehScreen extends StatelessWidget {
           create: (context) => SayarehCubit(sayarehRepository: locator()),
         ),
         BlocProvider(
-          create: (context) =>
-              ShoppingCartCubit(shoppingCartRepository: locator()),
+          create: (context) {
+            final bloc = ShoppingCartBloc(repository: locator());
+            bloc.add(GetCartEvent());
+            return bloc;
+          },
         ),
       ],
       child: Builder(builder: (context) {
@@ -89,15 +97,11 @@ class SayarehScreen extends StatelessWidget {
                         return GestureDetector(
                             onTap: () {
                               if (item.isLock) {
-                                final cartItem = ShoppingCartItem(
-                                  title: item.title,
-                                  description: item.description,
-                                  image: item.image,
-                                  isLock: item.isLock,
-                                );
-                                context
-                                    .read<ShoppingCartCubit>()
-                                    .addToCart(cartItem);
+                                showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return buildDialog(context, item);
+                                    });
                               } else {
                                 Navigator.pushNamed(
                                     context, LessonScreen.routeName,
@@ -259,5 +263,138 @@ class SayarehScreen extends StatelessWidget {
         });
       }),
     );
+  }
+
+  Widget buildDialog(BuildContext context, dynamic item) {
+    final cartItem = ShoppingCartItem(
+      title: item.title,
+      description: item.description,
+      image: item.image,
+      isLock: item.isLock,
+      price: item.price,
+    );
+
+    final l10n = AppLocalizations.of(context);
+    return Dialog(
+        backgroundColor: MyColors.background,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxHeight: 700),
+          child: DefaultTabController(
+              length: 2,
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+                child: Column(
+                  children: [
+                    SizedBox(
+                      height: 18,
+                    ),
+                    TabBar(
+                        dividerHeight: 0.0,
+                        labelStyle: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.w500),
+                        indicatorColor: Colors.transparent,
+                        labelColor: Colors.white,
+                        unselectedLabelColor: Colors.grey,
+                        indicator: BoxDecoration(
+                          color: MyColors.darkBackground,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        indicatorSize: TabBarIndicatorSize.tab,
+                        tabs: [
+                          Tab(text: "خرید تکی"),
+                          Tab(text: "خرید مجموعه"),
+                        ]),
+                    Expanded(
+                        child: Padding(
+                      padding: EdgeInsets.fromLTRB(0, 16, 0, 0),
+                      child: TabBarView(
+                        children: [
+                          Expanded(
+                              child: Column(
+                            children: [
+                              Container(
+                                width: 286,
+                                height: 177,
+                                decoration: BoxDecoration(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(27)),
+                                    color: Colors.redAccent),
+                              ),
+                              SizedBox(
+                                height: 26,
+                              ),
+                              Center(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Image(
+                                        image: AssetImage(
+                                            "assets/images/lock_image.png")),
+                                    SizedBox(
+                                      width: 8,
+                                    ),
+                                    Text("درس اول انیمیشن سیاره آی نو")
+                                  ],
+                                ),
+                              ),
+                              SizedBox(
+                                height: 18,
+                              ),
+                              Container(
+                                  height: 54,
+                                  decoration: BoxDecoration(
+                                    color: MyColors.cardBackground1,
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10)),
+                                  ),
+                                  child: Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 16),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          l10n!.price,
+                                          style: MyTextStyle.textMatn15,
+                                        ),
+                                        Row(
+                                          children: [
+                                            Text(
+                                                style: MyTextStyle.textMatn16,
+                                                "${item.price.toString().addComma} "),
+                                            Text(
+                                              "${l10n!.toman}",
+                                              style: MyTextStyle.textMatn13,
+                                            )
+                                          ],
+                                        )
+                                      ],
+                                    ),
+                                  )),
+                              SizedBox(
+                                height: 20,
+                              ),
+                              PrimaryButton(
+                                  width: 286,
+                                  height: 65,
+                                  lable: l10n.add_to_cart,
+                                  onPressed: () {
+                                    context
+                                        .read<ShoppingCartBloc>()
+                                        .add(AddToCartEvent(cartItem));
+                                    Navigator.pop(context);
+                                  })
+                            ],
+                          )),
+                          Expanded(
+                              child: Container(child: Text("خرید مجموعه"))),
+                        ],
+                      ),
+                    )),
+                  ],
+                ),
+              )),
+        ));
   }
 }

@@ -3,7 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poortak/common/widgets/dot_loading_widget.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/models/shopping_cart_model.dart';
-import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_cubit.dart';
+import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
+import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
+import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_state.dart';
 import 'package:poortak/locator.dart';
 
 class ShoppingCartScreen extends StatelessWidget {
@@ -14,18 +16,12 @@ class ShoppingCartScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) =>
-          ShoppingCartCubit(shoppingCartRepository: locator())..getCart(),
+          ShoppingCartBloc(repository: locator())..add(GetCartEvent()),
       child: Builder(
         builder: (context) {
-          return BlocBuilder<ShoppingCartCubit, ShoppingCartState>(
-            buildWhen: (previous, current) {
-              if (previous.cartDataStatus == current.cartDataStatus) {
-                return false;
-              }
-              return true;
-            },
+          return BlocBuilder<ShoppingCartBloc, ShoppingCartState>(
             builder: (context, state) {
-              if (state.cartDataStatus is ShoppingCartDataLoading) {
+              if (state is ShoppingCartLoading) {
                 return Container(
                   decoration: const BoxDecoration(
                     gradient: LinearGradient(
@@ -43,10 +39,8 @@ class ShoppingCartScreen extends StatelessWidget {
                 );
               }
 
-              if (state.cartDataStatus is ShoppingCartDataCompleted) {
-                final ShoppingCartDataCompleted cartDataCompleted =
-                    state.cartDataStatus as ShoppingCartDataCompleted;
-                final ShoppingCart cart = cartDataCompleted.data;
+              if (state is ShoppingCartLoaded) {
+                final ShoppingCart cart = state.cart;
 
                 return Container(
                   decoration: const BoxDecoration(
@@ -99,7 +93,7 @@ class ShoppingCartScreen extends StatelessWidget {
                                         children: [
                                           Text(item.title),
                                           Text(item.description),
-                                          Text('Quantity: ${item.quantity}'),
+                                          // Text('Quantity: ${item.quantity}'),
                                         ],
                                       ),
                                     ],
@@ -109,33 +103,31 @@ class ShoppingCartScreen extends StatelessWidget {
                                       IconButton(
                                         icon: const Icon(Icons.remove),
                                         onPressed: () {
-                                          if (item.quantity > 1) {
-                                            context
-                                                .read<ShoppingCartCubit>()
-                                                .updateQuantity(item.title,
-                                                    item.quantity - 1);
-                                          } else {
-                                            context
-                                                .read<ShoppingCartCubit>()
-                                                .removeFromCart(item.title);
-                                          }
+                                          // if (item.quantity > 1) {
+                                          //   context
+                                          //       .read<ShoppingCartBloc>()
+                                          //       .add(UpdateQuantityEvent(
+                                          //           item.title,
+                                          //           item.quantity - 1));
+                                          // } else {
+                                          context.read<ShoppingCartBloc>().add(
+                                              RemoveFromCartEvent(item.title));
+                                          // }
                                         },
                                       ),
-                                      IconButton(
-                                        icon: const Icon(Icons.add),
-                                        onPressed: () {
-                                          context
-                                              .read<ShoppingCartCubit>()
-                                              .updateQuantity(item.title,
-                                                  item.quantity + 1);
-                                        },
-                                      ),
+                                      // IconButton(
+                                      //   icon: const Icon(Icons.add),
+                                      //   onPressed: () {
+                                      //     context.read<ShoppingCartBloc>().add(
+                                      //         UpdateQuantityEvent(item.title,
+                                      //             item.quantity + 1));
+                                      //   },
+                                      // ),
                                       IconButton(
                                         icon: const Icon(Icons.delete),
                                         onPressed: () {
-                                          context
-                                              .read<ShoppingCartCubit>()
-                                              .removeFromCart(item.title);
+                                          context.read<ShoppingCartBloc>().add(
+                                              RemoveFromCartEvent(item.title));
                                         },
                                       ),
                                     ],
@@ -160,22 +152,24 @@ class ShoppingCartScreen extends StatelessWidget {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  'Total Items: ${cart.totalItems}',
-                                  style: const TextStyle(fontSize: 16),
-                                ),
-                                Text(
-                                  'Total Amount: \$${cart.totalAmount.toStringAsFixed(2)}',
-                                  style: const TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
+                                // Text(
+                                //   'Total Items: ${cart.totalItems}',
+                                //   style: const TextStyle(fontSize: 16),
+                                // ),
+                                // Text(
+                                //   'Total Amount: \$${cart.totalAmount.toStringAsFixed(2)}',
+                                //   style: const TextStyle(
+                                //     fontSize: 20,
+                                //     fontWeight: FontWeight.bold,
+                                //   ),
+                                // ),
                               ],
                             ),
                             ElevatedButton(
                               onPressed: () {
-                                context.read<ShoppingCartCubit>().clearCart();
+                                context
+                                    .read<ShoppingCartBloc>()
+                                    .add(ClearCartEvent());
                               },
                               child: const Text('Clear Cart'),
                             ),
@@ -187,10 +181,7 @@ class ShoppingCartScreen extends StatelessWidget {
                 );
               }
 
-              if (state.cartDataStatus is ShoppingCartDataError) {
-                final ShoppingCartDataError cartDataError =
-                    state.cartDataStatus as ShoppingCartDataError;
-
+              if (state is ShoppingCartError) {
                 return Container(
                   decoration: const BoxDecoration(
                     gradient: LinearGradient(
@@ -209,7 +200,7 @@ class ShoppingCartScreen extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          cartDataError.errorMessage,
+                          state.message,
                           style: const TextStyle(color: Colors.white),
                         ),
                         const SizedBox(height: 10),
@@ -217,7 +208,9 @@ class ShoppingCartScreen extends StatelessWidget {
                           style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.amber.shade800),
                           onPressed: () {
-                            context.read<ShoppingCartCubit>().getCart();
+                            context
+                                .read<ShoppingCartBloc>()
+                                .add(GetCartEvent());
                           },
                           child: const Text("Try Again"),
                         ),

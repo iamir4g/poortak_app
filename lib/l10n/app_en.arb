@@ -1,6 +1,9 @@
 {
   "buy": "Buy",
+  "toman": "Toman",
   "welcome": "Welcome",
   "settings": "Settings",
-  "sayareh": "Sayareh Iyno"
+  "sayareh": "Sayareh Iyno",
+  "price": "Product Price : ",
+  "add_to_cart": "Add to Cart"
 }

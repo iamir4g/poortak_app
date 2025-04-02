@@ -32,15 +32,15 @@ class SayarehHomeModel {
 }
 
 class Data {
-  List<Sayareh> sayareh;
+  List<SayarehLessonItem> sayareh;
 
   Data({
     required this.sayareh,
   });
 
   factory Data.fromJson(Map<String, dynamic> json) => Data(
-        sayareh:
-            List<Sayareh>.from(json["sayareh"].map((x) => Sayareh.fromJson(x))),
+        sayareh: List<SayarehLessonItem>.from(
+            json["sayareh"].map((x) => SayarehLessonItem.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
@@ -48,24 +48,28 @@ class Data {
       };
 }
 
-class Sayareh {
+class SayarehLessonItem {
   String title;
   String description;
   String image;
+  int price;
   bool isLock;
 
-  Sayareh({
+  SayarehLessonItem({
     required this.title,
     required this.description,
     required this.image,
     required this.isLock,
+    required this.price,
   });
 
-  factory Sayareh.fromJson(Map<String, dynamic> json) => Sayareh(
+  factory SayarehLessonItem.fromJson(Map<String, dynamic> json) =>
+      SayarehLessonItem(
         title: json["title"],
         description: json["description"],
         image: json["image"],
         isLock: json["isLock"],
+        price: json["price"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -73,5 +77,6 @@ class Sayareh {
         "description": description,
         "image": image,
         "isLock": isLock,
+        "price": price,
       };
 }

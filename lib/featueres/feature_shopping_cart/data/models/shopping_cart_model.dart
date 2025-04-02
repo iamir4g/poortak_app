@@ -3,17 +3,19 @@ class ShoppingCartItem {
   final String description;
   final String image;
   final bool isLock;
-  int quantity;
+  // int quantity;
+  final int price;
 
   ShoppingCartItem({
     required this.title,
     required this.description,
     required this.image,
     required this.isLock,
-    this.quantity = 1,
+    required this.price,
+    // this.quantity = 1,
   });
 
-  double get totalPrice => quantity * 100; // Assuming each item costs 100
+  // double get totalPrice => quantity * 100; // Assuming each item costs 100
 }
 
 class ShoppingCart {
@@ -21,14 +23,14 @@ class ShoppingCart {
 
   ShoppingCart({this.items = const []});
 
-  double get totalAmount => items.fold(0, (sum, item) => sum + item.totalPrice);
+  // double get totalAmount => items.fold(0, (sum, item) => sum + item.totalPrice);
 
-  int get totalItems => items.fold(0, (sum, item) => sum + item.quantity);
+  // int get totalItems => items.fold(0, (sum, item) => sum + item.quantity);
 
   void addItem(ShoppingCartItem item) {
     final existingItemIndex = items.indexWhere((i) => i.title == item.title);
     if (existingItemIndex != -1) {
-      items[existingItemIndex].quantity++;
+      // items[existingItemIndex].quantity++;
     } else {
       items = [...items, item];
     }
@@ -41,7 +43,7 @@ class ShoppingCart {
   void updateQuantity(String title, int quantity) {
     final index = items.indexWhere((item) => item.title == title);
     if (index != -1) {
-      items[index].quantity = quantity;
+      // items[index].quantity = quantity;
     }
   }
 }

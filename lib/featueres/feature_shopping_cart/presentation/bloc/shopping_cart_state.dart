@@ -1,13 +1,17 @@
-part of 'shopping_cart_cubit.dart';
+import 'package:poortak/featueres/feature_shopping_cart/data/models/shopping_cart_model.dart';
 
-class ShoppingCartState {
-  ShoppingCartDataStatus cartDataStatus;
+abstract class ShoppingCartState {}
 
-  ShoppingCartState({required this.cartDataStatus});
+class ShoppingCartInitial extends ShoppingCartState {}
 
-  ShoppingCartState copyWith({ShoppingCartDataStatus? cartDataStatus}) {
-    return ShoppingCartState(
-      cartDataStatus: cartDataStatus ?? this.cartDataStatus,
-    );
-  }
+class ShoppingCartLoading extends ShoppingCartState {}
+
+class ShoppingCartLoaded extends ShoppingCartState {
+  final ShoppingCart cart;
+  ShoppingCartLoaded(this.cart);
+}
+
+class ShoppingCartError extends ShoppingCartState {
+  final String message;
+  ShoppingCartError(this.message);
 }

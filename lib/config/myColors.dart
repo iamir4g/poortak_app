@@ -37,6 +37,8 @@ class MyColors {
   static const Color textLight = Color(0xFFFFFFFF); // White
   static const Color text3 = Color.fromRGBO(82, 97, 122, 1);
   static const Color text4 = Color.fromRGBO(163, 175, 194, 1);
+  static const Color textMatn1 = Color.fromRGBO(54, 58, 83, 1);
+
   // Status Colors
   static const Color success = Color(0xFF4CAF50); // Green
   static const Color error = Color(0xFFE53935); // Red
@@ -46,6 +48,7 @@ class MyColors {
   // Common UI Colors
   static const Color divider = Color(0xFFE0E0E0); // Light Grey
   static const Color cardBackground = Color(0xFFFAFAFA); // Very Light Grey
+  static const Color cardBackground1 = Color.fromRGBO(245, 247, 250, 1);
   static const Color shadow = Color(0x1F000000); // Black with opacity
 
   // Brand Colors (you can customize these based on your brand)
