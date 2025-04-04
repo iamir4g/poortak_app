@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:iconify_design/iconify_design.dart';
 import 'package:persian_tools/persian_tools.dart';
 import 'package:poortak/common/widgets/dot_loading_widget.dart';
 import 'package:poortak/common/widgets/primaryButton.dart';
@@ -12,6 +13,7 @@ import 'package:poortak/featueres/fetures_sayareh/screens/lesson_screen.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/models/shopping_cart_model.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
+import 'package:poortak/featueres/fetures_sayareh/widgets/item_multi_card.dart';
 import 'package:poortak/locator.dart';
 
 class SayarehScreen extends StatelessWidget {
@@ -280,18 +282,20 @@ class SayarehScreen extends StatelessWidget {
         child: ConstrainedBox(
           constraints: BoxConstraints(maxHeight: 700),
           child: DefaultTabController(
-              length: 2,
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: 18,
-                    ),
-                    TabBar(
+            length: 2,
+            child: Column(
+              children: [
+                SizedBox(
+                  height: 18,
+                ),
+                Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    child: TabBar(
                         dividerHeight: 0.0,
                         labelStyle: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.w500),
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            fontFamily: "IranSans"),
                         indicatorColor: Colors.transparent,
                         labelColor: Colors.white,
                         unselectedLabelColor: Colors.grey,
@@ -301,24 +305,66 @@ class SayarehScreen extends StatelessWidget {
                         ),
                         indicatorSize: TabBarIndicatorSize.tab,
                         tabs: [
-                          Tab(text: "خرید تکی"),
+                          Tab(
+                            text: "خرید تکی",
+                          ),
                           Tab(text: "خرید مجموعه"),
-                        ]),
-                    Expanded(
+                        ])),
+                Expanded(
+                  child: TabBarView(
+                    children: [
+                      Expanded(
                         child: Padding(
-                      padding: EdgeInsets.fromLTRB(0, 16, 0, 0),
-                      child: TabBarView(
-                        children: [
-                          Expanded(
-                              child: Column(
+                          padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
+                          child: Column(
                             children: [
-                              Container(
-                                width: 286,
-                                height: 177,
-                                decoration: BoxDecoration(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(27)),
-                                    color: Colors.redAccent),
+                              Stack(
+                                children: [
+                                  Container(
+                                    width: 286,
+                                    height: 177,
+                                    decoration: BoxDecoration(
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(27)),
+                                      color: Colors.redAccent,
+                                    ),
+                                  ),
+                                  Positioned(
+                                    bottom: 5,
+                                    left: 8,
+                                    child: Container(
+                                      width: 104,
+                                      height: 30,
+                                      decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(20)),
+                                          color: Colors.white),
+                                      child: Padding(
+                                        padding:
+                                            EdgeInsets.fromLTRB(4, 0, 4, 0),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceAround,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            Image.asset(
+                                                "assets/images/star_icon.png"),
+                                            Text(
+                                              convertEnToFa("+5"),
+                                              style: MyTextStyle
+                                                  .textMatn13PrimaryShade1,
+                                            ),
+                                            Text(
+                                              l10n?.coin_with_buy ?? "",
+                                              style: MyTextStyle.textMatn9,
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                               SizedBox(
                                 height: 26,
@@ -333,7 +379,10 @@ class SayarehScreen extends StatelessWidget {
                                     SizedBox(
                                       width: 8,
                                     ),
-                                    Text("درس اول انیمیشن سیاره آی نو")
+                                    Text(
+                                      "درس اول انیمیشن سیاره آی نو",
+                                      style: MyTextStyle.textMatn12W500,
+                                    )
                                   ],
                                 ),
                               ),
@@ -386,15 +435,170 @@ class SayarehScreen extends StatelessWidget {
                                     Navigator.pop(context);
                                   })
                             ],
-                          )),
-                          Expanded(
-                              child: Container(child: Text("خرید مجموعه"))),
-                        ],
+                          ),
+                        ),
                       ),
-                    )),
-                  ],
+                      Expanded(
+                          child: SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            SizedBox(
+                              height: 16,
+                            ),
+                            Stack(
+                              children: [
+                                Container(
+                                  width: 286,
+                                  height: 177,
+                                  decoration: BoxDecoration(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(27)),
+                                    color: Colors.redAccent,
+                                  ),
+                                ),
+                                Positioned(
+                                  bottom: 5,
+                                  left: 8,
+                                  child: Container(
+                                    width: 104,
+                                    height: 30,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(20)),
+                                        color: Colors.white),
+                                    child: Padding(
+                                      padding: EdgeInsets.fromLTRB(4, 0, 4, 0),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceAround,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Image.asset(
+                                              "assets/images/star_icon.png"),
+                                          Text(
+                                            convertEnToFa("+50"),
+                                            style: MyTextStyle
+                                                .textMatn13PrimaryShade1,
+                                          ),
+                                          Text(
+                                            l10n?.coin_with_buy ?? "",
+                                            style: MyTextStyle.textMatn9,
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 26,
+                            ),
+                            Container(
+                              decoration:
+                                  BoxDecoration(color: MyColors.background1),
+                              child: Column(
+                                children: [
+                                  SizedBox(
+                                    height: 16,
+                                  ),
+                                  Center(
+                                      child: Text(
+                                    "انیمیشن سیاره آی نو",
+                                    style: MyTextStyle.textMatn14Bold,
+                                  )),
+                                  SizedBox(
+                                    height: 18,
+                                  ),
+                                  //items in shopping cart
+                                  SizedBox(
+                                    width: 248,
+                                    child: ListView.separated(
+                                        shrinkWrap: true,
+                                        physics:
+                                            const NeverScrollableScrollPhysics(),
+                                        itemCount: 10,
+                                        separatorBuilder: (context, index) {
+                                          return const SizedBox(height: 6);
+                                        },
+                                        itemBuilder: (context, index) {
+                                          return ItemMultiCard(
+                                            title:
+                                                "درس ${index + 1} سیاره آی نو",
+                                            price: "75000",
+                                          );
+                                        }),
+                                  ),
+
+                                  SizedBox(
+                                    height: 20,
+                                  ),
+                                  Center(
+                                      child: Text(
+                                    "کتاب های الکترونیکی",
+                                    style: MyTextStyle.textMatn14Bold,
+                                  )),
+                                  SizedBox(
+                                    height: 16,
+                                  ),
+                                  ItemMultiCard(
+                                    title: "فرهنگ لغت پورتک ",
+                                    price: "75000",
+                                  ),
+                                  SizedBox(
+                                    height: 4,
+                                  ),
+                                  ItemMultiCard(
+                                    title: "گرامر پورتک",
+                                    price: "75000",
+                                  ),
+                                  // ListView.separated(
+                                  //     shrinkWrap: true,
+                                  //     physics: const ScrollPhysics(),
+                                  //     itemCount: 2,
+                                  //     separatorBuilder: (context, index) {
+                                  //       return const SizedBox(height: 4);
+                                  //     },
+                                  //     itemBuilder: (context, index) {
+                                  //       return ItemMultiCard(
+                                  //         title:
+                                  //             "درس ${index + 1} سیاره آی نو",
+                                  //         price: "75000",
+                                  //       );
+                                  //     }),
+
+                                  SizedBox(
+                                    height: 14,
+                                  )
+                                ],
+                              ),
+                            ),
+                            SizedBox(
+                              height: 16,
+                            ),
+                            PrimaryButton(
+                                width: 286,
+                                height: 65,
+                                lable: l10n.add_to_cart,
+                                onPressed: () {
+                                  context
+                                      .read<ShoppingCartBloc>()
+                                      .add(AddToCartEvent(cartItem));
+                                  Navigator.pop(context);
+                                }),
+                            SizedBox(
+                              height: 20,
+                            )
+                          ],
+                        ),
+                      )),
+                    ],
+                  ),
                 ),
-              )),
+              ],
+            ),
+          ),
         ));
   }
 }
