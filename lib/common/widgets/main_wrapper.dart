@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconify_design/iconify_design.dart';
 import 'package:poortak/common/widgets/bottom_nav.dart';
 import 'package:poortak/config/myColors.dart';
+import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/sayareh_screen.dart';
 import 'package:poortak/featueres/feature_shopping_cart/screens/shopping_cart_screen.dart';
 
@@ -87,7 +88,10 @@ class MainWrapper extends StatelessWidget {
                       height: 50,
                       color: Colors.red,
                     ),
-                    Text("امیر فراهانی")
+                    Text(
+                      "امیر فراهانی",
+                      style: MyTextStyle.textMatn14Bold,
+                    )
                   ],
                 ),
               ),
@@ -110,7 +114,10 @@ class MainWrapper extends StatelessWidget {
                   ),
                 ),
               ),
-              title: Text("حالت شب"),
+              title: Text(
+                "حالت شب",
+                style: MyTextStyle.textMatn14Bold,
+              ),
             ),
             ListTile(
               leading: Container(
@@ -127,7 +134,10 @@ class MainWrapper extends StatelessWidget {
                   ),
                 ),
               ),
-              title: Text("یادآور مطالعه"),
+              title: Text(
+                "یادآور مطالعه",
+                style: MyTextStyle.textMatn14Bold,
+              ),
             ),
             ListTile(
               leading: Container(
@@ -144,7 +154,10 @@ class MainWrapper extends StatelessWidget {
                   ),
                 ),
               ),
-              title: Text("تنظیمات"),
+              title: Text(
+                "تنظیمات",
+                style: MyTextStyle.textMatn14Bold,
+              ),
             ),
             ListTile(
               leading: Container(
@@ -161,7 +174,10 @@ class MainWrapper extends StatelessWidget {
                   ),
                 ),
               ),
-              title: Text("سوالات رایج"),
+              title: Text(
+                "سوالات رایج",
+                style: MyTextStyle.textMatn14Bold,
+              ),
             ),
             ListTile(
               leading: Container(
@@ -179,7 +195,10 @@ class MainWrapper extends StatelessWidget {
                   ),
                 ),
               ),
-              title: Text("پشتیبانی"),
+              title: Text(
+                "پشتیبانی",
+                style: MyTextStyle.textMatn14Bold,
+              ),
             ),
             ListTile(
               leading: Container(
@@ -196,7 +215,10 @@ class MainWrapper extends StatelessWidget {
                   ),
                 ),
               ),
-              title: Text("تماس با ما"),
+              title: Text(
+                "تماس با ما",
+                style: MyTextStyle.textMatn14Bold,
+              ),
             ),
             // ListTile(
             //   leading: IconifyIcon(icon: "tdesign:moon"),
@@ -217,7 +239,10 @@ class MainWrapper extends StatelessWidget {
                   ),
                 ),
               ),
-              title: Text("درباره ی ما"),
+              title: Text(
+                "درباره ی ما",
+                style: MyTextStyle.textMatn14Bold,
+              ),
             ),
             ListTile(
               leading: Container(
@@ -234,7 +259,10 @@ class MainWrapper extends StatelessWidget {
                   ),
                 ),
               ),
-              title: Text("اشتراک گذاری به دوستان"),
+              title: Text(
+                "اشتراک گذاری به دوستان",
+                style: MyTextStyle.textMatn14Bold,
+              ),
             ),
           ],
         ),

@@ -84,7 +84,16 @@ class SayarehScreen extends StatelessWidget {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    Text(l10n?.sayareh ?? ""),
+                    SizedBox(
+                      height: 28,
+                    ),
+                    Text(
+                      l10n?.sayareh ?? "",
+                      style: MyTextStyle.textMatn14Bold,
+                    ),
+                    SizedBox(
+                      height: 12,
+                    ),
                     // Sayareh List Section
 
                     ListView.separated(
@@ -170,15 +179,39 @@ class SayarehScreen extends StatelessWidget {
                     // Additional Boxes Section
                     const SizedBox(height: 20),
                     Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 16),
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Color(0xFFFFF7F1), //#FFF7F1
+                            Color(0xFFFFE2CE), //#FFE2CE
+                          ],
+                          stops: [0.0, 1.0],
+                        ),
+                      ),
+                      // margin: const EdgeInsets.symmetric(horizontal: 16),
                       child: Column(
                         children: [
+                          SizedBox(
+                            height: 30,
+                          ),
+                          Text(
+                            "کتاب های سیاره آی نو",
+                            style: MyTextStyle.textMatn14Bold,
+                          ),
+                          SizedBox(
+                            height: 12,
+                          ),
                           // Example Box 1
                           Container(
+                            width: 360,
+                            height: 100,
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
-                              color: Colors.amber,
-                              borderRadius: BorderRadius.circular(12),
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20),
                             ),
                             child: const Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -193,10 +226,12 @@ class SayarehScreen extends StatelessWidget {
                           const SizedBox(height: 12),
                           // Example Box 2
                           Container(
+                            width: 360,
+                            height: 100,
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
-                              color: Colors.blue,
-                              borderRadius: BorderRadius.circular(12),
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20),
                             ),
                             child: const Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
