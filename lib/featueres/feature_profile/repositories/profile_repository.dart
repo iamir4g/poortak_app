@@ -1,34 +1,54 @@
 import 'package:dio/dio.dart';
 import 'package:poortak/common/resources/data_state.dart';
 import 'package:poortak/featueres/feature_profile/data/data_sorce/profile_api_provider.dart';
+import 'package:poortak/featueres/feature_profile/data/models/login_with_otp_model.dart';
 import 'package:poortak/featueres/feature_profile/data/models/request_otp_model.dart';
+import 'dart:developer';
 
+// import 'package:poortak/featueres/feature_profile/data/models/login_otp_model.dart';
 class ProfileRepository {
   ProfileApiProvider profileApiProvider;
 
   ProfileRepository(this.profileApiProvider);
 
-  Future<DataState<RequestOtpModel>> callRequestOtp() async {
+  Future<DataState<AuthRequestOtpModel>> callRequestOtp(String phone) async {
     try {
-      Response response = await profileApiProvider.callRequestOtp();
-      // final response = await profileApiProvider.callRequestOtp();
-      if (response.statusCode == 200) {
-        final RequestOtpModel requestOtpModel =
-            RequestOtpModel.fromJson(response.data);
+      Response response = await profileApiProvider.callRequestOtp(phone);
+      log("Repository Response: ${response.data}");
+
+      if ((response.statusCode == 200 || response.statusCode == 201) &&
+          response.data['ok'] == true) {
+        final AuthRequestOtpModel requestOtpModel =
+            AuthRequestOtpModel.fromJson(response.data);
+        log("Repository Success - Parsed Model: ${requestOtpModel.data.result.otp}");
         return DataSuccess(requestOtpModel);
       } else {
-        return DataFailed(response.data['message']);
+        log("Repository Error - Status: ${response.statusCode}, Data: ${response.data}");
+        return DataFailed(response.data['message'] ?? "خطا در دریافت کد تایید");
       }
     } catch (e) {
+      log("Repository Error: $e");
       return DataFailed(e.toString());
     }
   }
 
-  Future<DataState<dynamic>> callLoginWithOtp() async {
+  Future<DataState<AuthLoginOtpModel>> callLoginWithOtp(String otp) async {
     try {
-      final response = await profileApiProvider.callLoginWithOtp();
-      return DataSuccess(response);
+      final response = await profileApiProvider.callLoginWithOtp(otp);
+      log("Login Response: ${response.data}");
+
+      if ((response.statusCode == 200 || response.statusCode == 201) &&
+          response.data['ok'] == true) {
+        final AuthLoginOtpModel loginOtpModel =
+            AuthLoginOtpModel.fromJson(response.data);
+        log("Login Success - Parsed Model: ${loginOtpModel.data.result.accessToken}");
+        return DataSuccess(loginOtpModel);
+      } else {
+        log("Login Error - Status: ${response.statusCode}, Data: ${response.data}");
+        return DataFailed(response.data['message'] ?? "خطا در ورود");
+      }
     } catch (e) {
+      log("Login Error: $e");
       return DataFailed(e.toString());
     }
   }

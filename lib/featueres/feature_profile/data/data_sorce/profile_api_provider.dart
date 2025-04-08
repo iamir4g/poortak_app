@@ -1,15 +1,25 @@
 import 'package:dio/dio.dart';
 import 'package:poortak/config/constants.dart';
+import 'dart:developer';
 
 class ProfileApiProvider {
   Dio dio;
   ProfileApiProvider({required this.dio});
 
-  dynamic callRequestOtp() async {
-    final response = await dio.get("${Constants.baseUrl}/auth/otp");
+  dynamic callRequestOtp(String phone) async {
+    final response = await dio.post(
+      "${Constants.baseUrl}auth/otp",
+      data: {"phone": phone},
+    );
+    log(response.data.toString());
+    return response;
   }
 
-  dynamic callLoginWithOtp() async {
-    final response = await dio.get("${Constants.baseUrl}/otp/login");
+  dynamic callLoginWithOtp(String otp) async {
+    final response = await dio.post(
+      "${Constants.baseUrl}auth/otp/login",
+      data: {"otp": otp},
+    );
+    return response;
   }
 }

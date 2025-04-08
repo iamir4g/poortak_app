@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:poortak/common/error_handling/check_exception.dart';
 import 'package:poortak/config/constants.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_home_model.dart';
+import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_storage_test_model.dart';
 
 class SayarehApiProvider {
   Dio dio;
@@ -102,5 +103,13 @@ class SayarehApiProvider {
     );
 
     return fakeData;
+  }
+
+  Future<SayarehStorageTest> callSayarehStorageApi() async {
+    final response = await dio.get(
+      "${Constants.baseUrl}/api/v1/storage",
+    );
+
+    return SayarehStorageTest.fromJson(response.data);
   }
 }

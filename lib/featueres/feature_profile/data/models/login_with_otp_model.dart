@@ -1,26 +1,26 @@
 // To parse this JSON data, do
 //
-//     final authRequestOtpModel = authRequestOtpModelFromJson(jsonString);
+//     final authLoginOtpModel = authLoginOtpModelFromJson(jsonString);
 
 import 'dart:convert';
 
-AuthRequestOtpModel authRequestOtpModelFromJson(String str) =>
-    AuthRequestOtpModel.fromJson(json.decode(str));
+AuthLoginOtpModel authLoginOtpModelFromJson(String str) =>
+    AuthLoginOtpModel.fromJson(json.decode(str));
 
-String authRequestOtpModelToJson(AuthRequestOtpModel data) =>
+String authLoginOtpModelToJson(AuthLoginOtpModel data) =>
     json.encode(data.toJson());
 
-class AuthRequestOtpModel {
+class AuthLoginOtpModel {
   bool ok;
   Data data;
 
-  AuthRequestOtpModel({
+  AuthLoginOtpModel({
     required this.ok,
     required this.data,
   });
 
-  factory AuthRequestOtpModel.fromJson(Map<String, dynamic> json) =>
-      AuthRequestOtpModel(
+  factory AuthLoginOtpModel.fromJson(Map<String, dynamic> json) =>
+      AuthLoginOtpModel(
         ok: json["ok"],
         data: Data.fromJson(json["data"]),
       );
@@ -48,17 +48,21 @@ class Data {
 }
 
 class Result {
-  String otp;
+  String accessToken;
+  String refreshToken;
 
   Result({
-    required this.otp,
+    required this.accessToken,
+    required this.refreshToken,
   });
 
   factory Result.fromJson(Map<String, dynamic> json) => Result(
-        otp: json["otp"],
+        accessToken: json["accessToken"],
+        refreshToken: json["refreshToken"],
       );
 
   Map<String, dynamic> toJson() => {
-        "otp": otp,
+        "accessToken": accessToken,
+        "refreshToken": refreshToken,
       };
 }

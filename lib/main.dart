@@ -4,6 +4,9 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:poortak/common/blocs/bottom_nav_cubit/bottom_nav_cubit.dart';
 import 'package:poortak/common/widgets/main_wrapper.dart';
 import 'package:poortak/config/my_theme.dart';
+import 'package:poortak/featueres/feature_profile/data/data_sorce/profile_api_provider.dart';
+import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
+import 'package:poortak/featueres/feature_profile/screens/profile_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/lesson_screen.dart';
 import 'package:poortak/featueres/feature_intro/presentation/bloc/splash_bloc/splash_cubit.dart';
 import 'package:poortak/featueres/feature_intro/presentation/screens/intro_main_wrapper.dart';
@@ -64,6 +67,8 @@ class MyApp extends StatelessWidget {
             title: args['title'],
           );
         },
+        LoginScreen.routeName: (context) => LoginScreen(),
+        ProfileScreen.routeName: (context) => ProfileScreen(),
       },
       debugShowCheckedModeBanner: false,
       title: 'Poortak',

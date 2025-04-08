@@ -4,6 +4,7 @@ import 'package:iconify_design/iconify_design.dart';
 import 'package:poortak/common/widgets/bottom_nav.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
+import 'package:poortak/featueres/feature_profile/screens/profile_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/sayareh_screen.dart';
 import 'package:poortak/featueres/feature_shopping_cart/screens/shopping_cart_screen.dart';
 
@@ -24,9 +25,10 @@ class MainWrapper extends StatelessWidget {
         Container(
           color: Colors.yellow,
         ),
-        Container(
-          color: Colors.purple,
-        ),
+        const ProfileScreen(),
+        // Container(
+        //   color: Colors.purple,
+        // ),
       ];
 
   @override
