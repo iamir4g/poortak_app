@@ -22,4 +22,18 @@ class ProfileApiProvider {
     );
     return response;
   }
+
+  dynamic callGetDownloadLink(String key) async {
+    final response = await dio.get(
+      "${Constants.baseUrl}storage/download/$key",
+    );
+    return response;
+  }
+
+  dynamic callGetDecryptKey(String fileId) async {
+    final response = await dio.get(
+      "${Constants.baseUrl}storage/key/$fileId",
+    );
+    return response;
+  }
 }

@@ -105,11 +105,12 @@ class SayarehApiProvider {
     return fakeData;
   }
 
-  Future<SayarehStorageTest> callSayarehStorageApi() async {
+  dynamic callSayarehStorageApi() async {
     final response = await dio.get(
-      "${Constants.baseUrl}/api/v1/storage",
+      "${Constants.baseUrl}storage",
     );
 
-    return SayarehStorageTest.fromJson(response.data);
+    log("Sayareh Storage Response: ${response.data}");
+    return response; //SayarehStorageTest.fromJson(response.data);
   }
 }

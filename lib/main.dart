@@ -13,6 +13,7 @@ import 'package:poortak/featueres/feature_intro/presentation/screens/intro_main_
 import 'package:poortak/featueres/feature_intro/presentation/screens/splash_screen.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
+import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/sayareh_cubit.dart';
 import 'package:poortak/locator.dart';
 import 'package:poortak/test_screen.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -62,9 +63,12 @@ class MyApp extends StatelessWidget {
         LessonScreen.routeName: (context) {
           final args = ModalRoute.of(context)?.settings.arguments
               as Map<String, dynamic>;
-          return LessonScreen(
-            index: args['index'],
-            title: args['title'],
+          return BlocProvider(
+            create: (context) => SayarehCubit(sayarehRepository: locator()),
+            child: LessonScreen(
+              index: args['index'],
+              title: args['title'],
+            ),
           );
         },
         LoginScreen.routeName: (context) => LoginScreen(),

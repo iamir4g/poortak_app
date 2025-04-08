@@ -16,3 +16,13 @@ class SayarehDataError extends SayarehDataStatus {
   final String errorMessage;
   SayarehDataError(this.errorMessage);
 }
+
+class SayarehStorageCompleted extends SayarehDataStatus {
+  final dynamic data;
+  SayarehStorageCompleted(this.data);
+}
+
+class SayarehStorageError extends SayarehDataStatus {
+  final String errorMessage;
+  SayarehStorageError(this.errorMessage);
+}

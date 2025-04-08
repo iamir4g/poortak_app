@@ -9,4 +9,9 @@ class SayarehState {
     return SayarehState(
         sayarehDataStatus: sayarehDataStatus ?? this.sayarehDataStatus);
   }
+
+  SayarehState copyWithStorage({SayarehDataStatus? sayarehDataStatus}) {
+    return SayarehState(
+        sayarehDataStatus: sayarehDataStatus ?? this.sayarehDataStatus);
+  }
 }
