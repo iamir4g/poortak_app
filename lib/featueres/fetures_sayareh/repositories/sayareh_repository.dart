@@ -31,6 +31,7 @@ class SayarehRepository {
       if (response.statusCode == 200 || response.statusCode == 201) {
         log("Sayareh Storage Response: ${response.data}");
         final data = SayarehStorageTest.fromJson(response.data);
+
         return DataSuccess(data);
       } else {
         return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");

@@ -113,4 +113,13 @@ class SayarehApiProvider {
     log("Sayareh Storage Response: ${response.data}");
     return response; //SayarehStorageTest.fromJson(response.data);
   }
+
+  dynamic callGetDownloadUrl(String key) async {
+    final response = await dio.get(
+      "${Constants.baseUrl}storage/download/$key",
+    );
+
+    log("Sayareh Storage Download URL: ${response.data}");
+    return response; //SayarehStorageTest.fromJson(response.data);
+  }
 }

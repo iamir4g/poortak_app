@@ -18,7 +18,8 @@ class SayarehDataError extends SayarehDataStatus {
 }
 
 class SayarehStorageCompleted extends SayarehDataStatus {
-  final dynamic data;
+  //final dynamic data;
+  final SayarehStorageTest data;
   SayarehStorageCompleted(this.data);
 }
 

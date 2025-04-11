@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
 import 'package:poortak/common/resources/data_state.dart';
+import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_storage_test_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/repositories/sayareh_repository.dart';
 
 part 'sayareh_state.dart';
@@ -24,23 +25,6 @@ class SayarehCubit extends Cubit<SayarehState> {
       // emit error
       emit(state.copyWith(
           sayarehDataStatus: SayarehDataError(dataState.error ?? "")));
-    }
-  }
-
-  void callSayarehStorageEvent() async {
-    // Only emit loading if we're not already loading
-    if (!(state.sayarehDataStatus is SayarehDataLoading)) {
-      emit(state.copyWith(sayarehDataStatus: SayarehDataLoading()));
-    }
-
-    DataState dataState = await sayarehRepository.fetchSayarehStorage();
-
-    if (dataState is DataSuccess) {
-      emit(state.copyWith(
-          sayarehDataStatus: SayarehStorageCompleted(dataState.data)));
-    } else if (dataState is DataFailed) {
-      emit(state.copyWith(
-          sayarehDataStatus: SayarehStorageError(dataState.error ?? "")));
     }
   }
 }

@@ -17,6 +17,7 @@ import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/sayareh_cubi
 import 'package:poortak/locator.dart';
 import 'package:poortak/test_screen.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/bloc_storage_bloc.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -63,8 +64,16 @@ class MyApp extends StatelessWidget {
         LessonScreen.routeName: (context) {
           final args = ModalRoute.of(context)?.settings.arguments
               as Map<String, dynamic>;
-          return BlocProvider(
-            create: (context) => SayarehCubit(sayarehRepository: locator()),
+          return MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (context) => SayarehCubit(sayarehRepository: locator()),
+              ),
+              BlocProvider(
+                create: (context) =>
+                    BlocStorageBloc(sayarehRepository: locator()),
+              ),
+            ],
             child: LessonScreen(
               index: args['index'],
               title: args['title'],

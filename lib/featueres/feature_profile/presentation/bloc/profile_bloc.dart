@@ -22,26 +22,18 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     emit(ProfileLoading());
     try {
       final response = await repository.callRequestOtp(event.mobile);
-      log("_onRequestOtp - Response Type: ${response.runtimeType}");
-      log("_onRequestOtp - Response: $response");
 
       if (response is DataSuccess) {
-        log("_onRequestOtp - DataSuccess: ${response.data}");
         if (response.data != null) {
-          log("_onRequestOtp - Emitting ProfileSuccessRequestOtp");
           emit(ProfileSuccessRequestOtp(response.data!));
         } else {
-          log("_onRequestOtp - Emitting ProfileErrorRequestOtp (null data)");
           emit(ProfileErrorRequestOtp("Invalid response data"));
         }
       } else if (response is DataFailed) {
-        log("_onRequestOtp - DataFailed: ${response.error}");
-        log("_onRequestOtp - Emitting ProfileErrorRequestOtp");
         emit(
             ProfileErrorRequestOtp(response.error ?? "خطا در دریافت کد تایید"));
       }
     } catch (e) {
-      log("_onRequestOtp - Error: $e");
       emit(ProfileErrorRequestOtp(e.toString()));
     }
   }

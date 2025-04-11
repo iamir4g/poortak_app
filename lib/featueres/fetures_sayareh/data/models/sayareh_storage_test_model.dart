@@ -13,7 +13,7 @@ String sayarehStorageTestToJson(SayarehStorageTest data) =>
 class SayarehStorageTest {
   bool ok;
   Meta meta;
-  List<Datum> data;
+  List<StorageFile> data;
 
   SayarehStorageTest({
     required this.ok,
@@ -25,7 +25,8 @@ class SayarehStorageTest {
       SayarehStorageTest(
         ok: json["ok"],
         meta: Meta.fromJson(json["meta"]),
-        data: List<Datum>.from(json["data"].map((x) => Datum.fromJson(x))),
+        data: List<StorageFile>.from(
+            json["data"].map((x) => StorageFile.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
@@ -35,7 +36,7 @@ class SayarehStorageTest {
       };
 }
 
-class Datum {
+class StorageFile {
   String id;
   String name;
   String key;
@@ -46,7 +47,7 @@ class Datum {
   DateTime createdAt;
   DateTime updatedAt;
 
-  Datum({
+  StorageFile({
     required this.id,
     required this.name,
     required this.key,
@@ -58,7 +59,7 @@ class Datum {
     required this.updatedAt,
   });
 
-  factory Datum.fromJson(Map<String, dynamic> json) => Datum(
+  factory StorageFile.fromJson(Map<String, dynamic> json) => StorageFile(
         id: json["id"],
         name: json["name"],
         key: json["key"],
