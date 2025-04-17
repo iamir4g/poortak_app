@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:dio/dio.dart';
+import 'package:poortak/common/models/decerypt_key_response.dart';
 import 'package:poortak/config/constants.dart';
 // import '../models/storage_file.dart';
 import '../models/download_url_response.dart';
@@ -16,6 +17,16 @@ class StorageService {
 
     log("Download URL Response: ${response.data}");
     return GetDownloadUrl.fromJson(response.data);
+  }
+  // 'https://api.poortak.ir/api/v1/storage/key/{fileId}'
+
+  Future<GetDeceryptKey> callGetDecryptedFile(String fileId) async {
+    final response = await dio.get(
+      "${Constants.baseUrl}storage/key/$fileId",
+    );
+
+    log("Sayareh Storage File URL: ${response.data}");
+    return GetDeceryptKey.fromJson(response.data);
   }
 
   /// Fetches the download URL for a file using its key

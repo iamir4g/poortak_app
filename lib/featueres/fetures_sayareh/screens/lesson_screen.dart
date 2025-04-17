@@ -14,6 +14,9 @@ import 'package:poortak/featueres/fetures_sayareh/widgets/custom_video_player.da
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/sayareh_cubit.dart';
 import 'package:poortak/locator.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:encrypt/encrypt.dart' as encrypt;
+import 'dart:typed_data';
+import 'package:poortak/common/utils/decryption.dart';
 
 class LessonScreen extends StatefulWidget {
   static const routeName = "/lesson_screen";
@@ -39,10 +42,114 @@ class _LessonScreenState extends State<LessonScreen> {
   double downloadProgress = 0.0;
   final StorageService _storageService = locator<StorageService>();
 
-  Future<void> _downloadAndStoreVideo(String key, String name) async {
-    print("Starting download process for key: $key, name: $name");
+  Future<void> _checkExistingFiles(String name) async {
+    try {
+      final directory = await getApplicationDocumentsDirectory();
+      final videoDir = Directory('${directory.path}/videos');
+      final encryptedDir = Directory('${directory.path}/encrypted');
+
+      // Check in videos directory first
+      if (await videoDir.exists()) {
+        final files = await videoDir.list().toList();
+        for (var file in files) {
+          if (file.path.contains(name)) {
+            print(
+                "Found existing video file in videos directory: ${file.path}");
+            setState(() {
+              localVideoPath = file.path;
+            });
+            return;
+          }
+        }
+      }
+
+      // Check in encrypted directory
+      if (await encryptedDir.exists()) {
+        final files = await encryptedDir.list().toList();
+        for (var encryptedFile in files) {
+          if (encryptedFile.path.contains(name)) {
+            print("Found existing encrypted file: ${encryptedFile.path}");
+            // Try to decrypt it
+            try {
+              final decryptionKeyResponse = await _storageService
+                  .callGetDecryptedFile(widget.index.toString());
+              final decryptedFile = File(
+                  '${videoDir.path}/${encryptedFile.path.split('/').last}');
+              final decryptedPath = await decryptFile(
+                encryptedFile.path,
+                decryptedFile.path,
+                decryptionKeyResponse.data.key,
+              );
+              if (await File(decryptedPath).exists()) {
+                setState(() {
+                  localVideoPath = decryptedPath;
+                });
+                return;
+              }
+            } catch (e) {
+              print("Error decrypting existing file: $e");
+            }
+          }
+        }
+      }
+
+      // Check in Downloads directory
+      final downloadsDir = Directory('/storage/emulated/0/Download');
+      if (await downloadsDir.exists()) {
+        final files = await downloadsDir.list().toList();
+        for (var downloadedFile in files) {
+          if (downloadedFile.path.contains(name) &&
+              !downloadedFile.path.contains('-')) {
+            print("Found existing file in Downloads: ${downloadedFile.path}");
+            // Copy to encrypted directory
+            final encryptedFile = File(
+                '${encryptedDir.path}/${downloadedFile.path.split('/').last}');
+            await File(downloadedFile.path).copy(encryptedFile.path);
+
+            // Try to decrypt it
+            try {
+              final decryptionKeyResponse = await _storageService
+                  .callGetDecryptedFile(widget.index.toString());
+              final decryptedFile = File(
+                  '${videoDir.path}/${downloadedFile.path.split('/').last}');
+              final decryptedPath = await decryptFile(
+                encryptedFile.path,
+                decryptedFile.path,
+                decryptionKeyResponse.data.key,
+              );
+              if (await File(decryptedPath).exists()) {
+                setState(() {
+                  localVideoPath = decryptedPath;
+                });
+                return;
+              }
+            } catch (e) {
+              print("Error processing file from Downloads: $e");
+            }
+          }
+        }
+      }
+
+      // If we reach here, file doesn't exist anywhere - return false to indicate download needed
+      return;
+    } catch (e) {
+      print("Error checking existing files: $e");
+      return;
+    }
+  }
+
+  Future<void> _downloadAndStoreVideo(
+      String key, String name, String fileId, bool isEncrypted) async {
+    print(
+        "Starting download process for key: $key, name: $name, isEncrypted: $isEncrypted");
     if (isDownloading) {
       print("Download already in progress");
+      return;
+    }
+
+    // First check if we already have the file
+    if (localVideoPath != null) {
+      print("File already exists at: $localVideoPath");
       return;
     }
 
@@ -55,26 +162,112 @@ class _LessonScreenState extends State<LessonScreen> {
       // Get the application documents directory
       final directory = await getApplicationDocumentsDirectory();
       final videoDir = Directory('${directory.path}/videos');
+      final encryptedDir = Directory('${directory.path}/encrypted');
       print("Video directory path: ${videoDir.path}");
 
-      // Create videos directory if it doesn't exist
+      // Create directories if they don't exist
       if (!await videoDir.exists()) {
         print("Creating video directory");
         await videoDir.create(recursive: true);
       }
+      if (!await encryptedDir.exists()) {
+        print("Creating encrypted directory");
+        await encryptedDir.create(recursive: true);
+      }
 
-      // Create a file with the key as name
-      final file = File('${videoDir.path}/$name');
-      print("Target file path: ${file.path}");
+      // Create file paths
+      final encryptedFile = File('${encryptedDir.path}/$name');
+      final decryptedFile = File('${videoDir.path}/$name');
+      print("Encrypted file path: ${encryptedFile.path}");
+      print("Decrypted file path: ${decryptedFile.path}");
 
-      // Check if file already exists in app directory
-      if (await file.exists()) {
-        print("File already exists in app directory, using local path");
+      // Check if decrypted file already exists
+      if (await decryptedFile.exists()) {
+        print("Decrypted file already exists, using local path");
         setState(() {
-          localVideoPath = file.path;
+          localVideoPath = decryptedFile.path;
           isDownloading = false;
         });
         return;
+      }
+
+      // Check in Downloads directory first
+      final downloadsDir = Directory('/storage/emulated/0/Download');
+      if (await downloadsDir.exists()) {
+        final files = await downloadsDir.list().toList();
+        for (var file in files) {
+          if (file.path.contains(name) && !file.path.contains('-')) {
+            print("Found existing file in Downloads: ${file.path}");
+            // Copy to encrypted directory
+            await File(file.path).copy(encryptedFile.path);
+
+            // If file is encrypted, get decryption key and decrypt
+            if (isEncrypted) {
+              print("File is encrypted, getting decryption key");
+              final decryptionKeyResponse =
+                  await _storageService.callGetDecryptedFile(fileId);
+              print(
+                  "Decryption key received: ${decryptionKeyResponse.data.key}");
+
+              // Decrypt the file using the utility function
+              print("Starting decryption process");
+              final decryptedPath = await decryptFile(
+                file.path,
+                decryptedFile.path,
+                decryptionKeyResponse.data.key,
+              );
+              if (await File(decryptedPath).exists()) {
+                print("File successfully processed from Downloads");
+                setState(() {
+                  localVideoPath = decryptedPath;
+                  videoUrl = null; // Clear the URL since we now have local file
+                  isDownloading = false;
+                });
+
+                // Show success snackbar
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('فایل دانلود شد'),
+                      backgroundColor: Colors.green,
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                }
+              } else {
+                print("Failed to process file");
+                throw Exception("Failed to process file");
+              }
+            } else {
+              // If not encrypted, just copy to video directory
+              await encryptedFile.copy(decryptedFile.path);
+            }
+
+            // Verify the file was processed successfully
+            if (await decryptedFile.exists()) {
+              print("File successfully processed from Downloads");
+              setState(() {
+                localVideoPath = decryptedFile.path;
+                videoUrl = null; // Clear the URL since we now have local file
+                isDownloading = false;
+              });
+
+              // Show success snackbar
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('فایل دانلود شد'),
+                    backgroundColor: Colors.green,
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              }
+            } else {
+              print("Failed to process file");
+              throw Exception("Failed to process file");
+            }
+          }
+        }
       }
 
       print("Getting download URL from StorageService");
@@ -101,19 +294,61 @@ class _LessonScreenState extends State<LessonScreen> {
           print("Download completed, file saved to: $path");
           try {
             // Delete the target file if it exists
-            if (await file.exists()) {
-              await file.delete();
+            if (await encryptedFile.exists()) {
+              await encryptedFile.delete();
             }
 
-            // Copy the file from Downloads to app directory
+            // Copy the file from Downloads to encrypted directory
             final downloadedFile = File(path);
-            await downloadedFile.copy(file.path);
+            await downloadedFile.copy(encryptedFile.path);
 
-            // Verify the file was copied successfully
-            if (await file.exists()) {
-              print("File successfully copied to app directory");
+            // If file is encrypted, get decryption key and decrypt
+            if (isEncrypted) {
+              print("File is encrypted, getting decryption key");
+              final decryptionKeyResponse =
+                  await _storageService.callGetDecryptedFile(fileId);
+              print(
+                  "Decryption key received: ${decryptionKeyResponse.data.key}");
+
+              // Decrypt the file using the utility function
+              print("Starting decryption process");
+              final decryptedPath = await decryptFile(
+                path,
+                decryptedFile.path,
+                decryptionKeyResponse.data.key,
+              );
+              if (await File(decryptedPath).exists()) {
+                print("File successfully processed");
+                setState(() {
+                  localVideoPath = decryptedPath;
+                  videoUrl = null; // Clear the URL since we now have local file
+                  isDownloading = false;
+                });
+
+                // Show success snackbar
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('فایل دانلود شد'),
+                      backgroundColor: Colors.green,
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                }
+              } else {
+                print("Failed to process file");
+                throw Exception("Failed to process file");
+              }
+            } else {
+              // If not encrypted, just copy to video directory
+              await encryptedFile.copy(decryptedFile.path);
+            }
+
+            // Verify the file was processed successfully
+            if (await decryptedFile.exists()) {
+              print("File successfully processed");
               setState(() {
-                localVideoPath = file.path;
+                localVideoPath = decryptedFile.path;
                 videoUrl = null; // Clear the URL since we now have local file
                 isDownloading = false;
               });
@@ -129,18 +364,18 @@ class _LessonScreenState extends State<LessonScreen> {
                 );
               }
             } else {
-              print("Failed to copy file to app directory");
-              throw Exception("Failed to copy file to app directory");
+              print("Failed to process file");
+              throw Exception("Failed to process file");
             }
           } catch (e) {
-            print("Error copying downloaded file: $e");
+            print("Error processing file: $e");
             setState(() {
               isDownloading = false;
             });
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('خطا در کپی فایل: $e'),
+                  content: Text('خطا در پردازش فایل: $e'),
                   backgroundColor: Colors.red,
                   duration: const Duration(seconds: 2),
                 ),
@@ -209,10 +444,19 @@ class _LessonScreenState extends State<LessonScreen> {
           if (state is BlocStorageCompleted) {
             print("BlocStorageCompleted");
             print("Sayareh Storage Response: ${state.data}");
-            _downloadAndStoreVideo(
-              state.data.data[6].key,
-              state.data.data[6].name,
-            );
+
+            // Check for existing files first
+            _checkExistingFiles(state.data.data[7].name).then((_) {
+              // Only start download if we don't have a local file
+              if (localVideoPath == null) {
+                _downloadAndStoreVideo(
+                  state.data.data[7].key,
+                  state.data.data[7].name,
+                  state.data.data[7].id,
+                  state.data.data[7].isEncrypted,
+                );
+              }
+            });
           } else if (state is BlocStorageError) {
             print("BlocStorageError: ${state.message}");
           }
@@ -228,11 +472,6 @@ class _LessonScreenState extends State<LessonScreen> {
                 print("Data is not empty, calling download");
                 print("Key: ${storageData.data.data[0].key}");
                 print("Name: ${storageData.data.data[0].name}");
-                // Call download function directly
-                // _downloadAndStoreVideo(
-                //   storageData.data.data[0].key,
-                //   storageData.data.data[0].name,
-                // );
               }
             }
           },
