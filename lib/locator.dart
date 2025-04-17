@@ -10,6 +10,7 @@ import 'package:poortak/featueres/feature_profile/data/data_sorce/profile_api_pr
 import 'package:poortak/featueres/feature_profile/repositories/profile_repository.dart';
 import 'package:poortak/featueres/feature_shopping_cart/repositories/shopping_cart_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:poortak/common/bloc/permission/permission_bloc.dart';
 
 GetIt locator = GetIt.instance;
 
@@ -47,4 +48,7 @@ Future<void> initLocator() async {
   locator.registerSingleton<ProfileRepository>(ProfileRepository(locator()));
   locator.registerSingleton<BlocStorageBloc>(
       BlocStorageBloc(sayarehRepository: locator()));
+
+  // Register PermissionBloc
+  locator.registerSingleton<PermissionBloc>(PermissionBloc());
 }

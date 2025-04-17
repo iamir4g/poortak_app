@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:video_player/video_player.dart';
 import 'dart:async';
+import 'dart:io';
 
 class CustomVideoPlayer extends StatefulWidget {
   final String videoPath;
@@ -72,7 +73,7 @@ class _CustomVideoPlayerState extends State<CustomVideoPlayer> {
     try {
       _videoPlayerController = widget.isNetworkVideo
           ? VideoPlayerController.network(widget.videoPath)
-          : VideoPlayerController.asset(widget.videoPath);
+          : VideoPlayerController.file(File(widget.videoPath));
 
       await _videoPlayerController.initialize();
       if (mounted) {

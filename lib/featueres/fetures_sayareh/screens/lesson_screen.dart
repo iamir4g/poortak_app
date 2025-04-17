@@ -13,6 +13,7 @@ import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/bloc_storage
 import 'package:poortak/featueres/fetures_sayareh/widgets/custom_video_player.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/sayareh_cubit.dart';
 import 'package:poortak/locator.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class LessonScreen extends StatefulWidget {
   static const routeName = "/lesson_screen";
@@ -76,22 +77,14 @@ class _LessonScreenState extends State<LessonScreen> {
         return;
       }
 
-      // Check if file exists in Downloads directory
-      final downloadsDir = Directory('/storage/emulated/0/Download');
-      final downloadFile = File('${downloadsDir.path}/$name');
-      if (await downloadFile.exists()) {
-        print("File exists in Downloads directory, copying to app directory");
-        await downloadFile.copy(file.path);
-        setState(() {
-          localVideoPath = file.path;
-          isDownloading = false;
-        });
-        return;
-      }
-
       print("Getting download URL from StorageService");
       final downloadUrl = await _storageService.callGetDownloadUrl(key);
       print("Download URL received: ${downloadUrl.data}");
+
+      // Set the video URL for immediate playback while downloading
+      setState(() {
+        videoUrl = downloadUrl.data;
+      });
 
       print("Starting file download");
       // Download using flutter_file_downloader
@@ -106,24 +99,53 @@ class _LessonScreenState extends State<LessonScreen> {
         },
         onDownloadCompleted: (path) async {
           print("Download completed, file saved to: $path");
-          // Copy the file from Downloads to app directory
-          final downloadedFile = File(path);
-          await downloadedFile.copy(file.path);
+          try {
+            // Delete the target file if it exists
+            if (await file.exists()) {
+              await file.delete();
+            }
 
-          setState(() {
-            localVideoPath = file.path;
-            isDownloading = false;
-          });
+            // Copy the file from Downloads to app directory
+            final downloadedFile = File(path);
+            await downloadedFile.copy(file.path);
 
-          // Show success snackbar
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('فایل دانلود شد'),
-                backgroundColor: Colors.green,
-                duration: Duration(seconds: 10),
-              ),
-            );
+            // Verify the file was copied successfully
+            if (await file.exists()) {
+              print("File successfully copied to app directory");
+              setState(() {
+                localVideoPath = file.path;
+                videoUrl = null; // Clear the URL since we now have local file
+                isDownloading = false;
+              });
+
+              // Show success snackbar
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('فایل دانلود شد'),
+                    backgroundColor: Colors.green,
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              }
+            } else {
+              print("Failed to copy file to app directory");
+              throw Exception("Failed to copy file to app directory");
+            }
+          } catch (e) {
+            print("Error copying downloaded file: $e");
+            setState(() {
+              isDownloading = false;
+            });
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('خطا در کپی فایل: $e'),
+                  backgroundColor: Colors.red,
+                  duration: const Duration(seconds: 2),
+                ),
+              );
+            }
           }
         },
         onDownloadError: (error) {
@@ -138,7 +160,7 @@ class _LessonScreenState extends State<LessonScreen> {
               SnackBar(
                 content: Text('خطا در دانلود فایل: $error'),
                 backgroundColor: Colors.red,
-                duration: const Duration(seconds: 10),
+                duration: const Duration(seconds: 2),
               ),
             );
           }
@@ -188,8 +210,8 @@ class _LessonScreenState extends State<LessonScreen> {
             print("BlocStorageCompleted");
             print("Sayareh Storage Response: ${state.data}");
             _downloadAndStoreVideo(
-              state.data.data[0].key,
-              state.data.data[0].name,
+              state.data.data[6].key,
+              state.data.data[6].name,
             );
           } else if (state is BlocStorageError) {
             print("BlocStorageError: ${state.message}");
@@ -281,17 +303,45 @@ class _LessonScreenState extends State<LessonScreen> {
           Center(
             child: Stack(
               children: [
-                CustomVideoPlayer(
-                  videoPath: localVideoPath ??
-                      videoUrl ??
-                      "assets/videos/poortak_test.mp4",
-                  isNetworkVideo: localVideoPath == null && videoUrl != null,
-                  width: 350,
-                  height: 240,
-                  borderRadius: 37,
-                  autoPlay: true,
-                  showControls: true,
-                ),
+                if (localVideoPath == null && videoUrl == null)
+                  Container(
+                    width: 350,
+                    height: 240,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(37),
+                      color: MyColors.brandSecondary,
+                    ),
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.error_outline,
+                            color: Colors.white,
+                            size: 48,
+                          ),
+                          SizedBox(height: 16),
+                          Text(
+                            'خطا در بارگذاری ویدیو',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                else
+                  CustomVideoPlayer(
+                    videoPath: localVideoPath ?? videoUrl!,
+                    isNetworkVideo: localVideoPath == null && videoUrl != null,
+                    width: 350,
+                    height: 240,
+                    borderRadius: 37,
+                    autoPlay: true,
+                    showControls: true,
+                  ),
                 if (isDownloading)
                   Positioned.fill(
                     child: Container(
@@ -322,17 +372,7 @@ class _LessonScreenState extends State<LessonScreen> {
               ],
             ),
           ),
-          // BlocBuilder<BlocStorageBloc, BlocStorageState>(
-          //   builder: (context, state) {
-          //     if (state is BlocStorageCompleted && state.data.data.isNotEmpty) {
-          //       return Text(
-          //         state.data.data[0].name,
-          //         style: CustomTextStyle.titleLesonText,
-          //       );
-          //     }
-          //     return const SizedBox.shrink();
-          //   },
-          // ),
+
           const SizedBox(height: 18),
           //card lesons
           Container(
