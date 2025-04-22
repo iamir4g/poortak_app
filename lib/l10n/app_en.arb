@@ -6,5 +6,7 @@
   "sayareh": "Sayareh Iyno",
   "price": "Product Price : ",
   "add_to_cart": "Add to Cart",
-  "coin_with_buy": "سکه با خرید"
+  "coin_with_buy": "Coin with Buy",
+  "total_price": "Total Price : ",
+  "pay_now": "Pay Now"
 }

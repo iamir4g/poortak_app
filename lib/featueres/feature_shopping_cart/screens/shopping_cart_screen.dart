@@ -1,19 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:iconify_design/iconify_design.dart';
+import 'package:persian_tools/persian_tools.dart';
 import 'package:poortak/common/widgets/dot_loading_widget.dart';
+import 'package:poortak/common/widgets/primaryButton.dart';
+import 'package:poortak/common/services/payment_service.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/models/shopping_cart_model.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_state.dart';
 import 'package:poortak/locator.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:zarinpal/zarinpal.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class ShoppingCartScreen extends StatelessWidget {
+class ShoppingCartScreen extends StatefulWidget {
   static const routeName = "/shopping_cart_screen";
   const ShoppingCartScreen({super.key});
 
   @override
+  State<ShoppingCartScreen> createState() => _ShoppingCartScreenState();
+}
+
+class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
+  @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return BlocProvider(
       create: (context) =>
           ShoppingCartBloc(repository: locator())..add(GetCartEvent()),
@@ -64,25 +77,51 @@ class ShoppingCartScreen extends StatelessWidget {
                             final item = cart.items[index];
                             return Container(
                               width: 360,
-                              height: 80,
+                              height: 144,
                               margin: const EdgeInsets.symmetric(
                                   horizontal: 16, vertical: 8),
-                              padding: const EdgeInsets.all(16),
+                              padding: const EdgeInsets.only(
+                                  left: 16, right: 16, top: 16, bottom: 16),
                               decoration: BoxDecoration(
                                 color: MyColors.background,
-                                borderRadius: BorderRadius.circular(40),
+                                borderRadius: BorderRadius.circular(16),
                               ),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                              child: Stack(
                                 children: [
+                                  Positioned(
+                                    top: -10,
+                                    left: -10,
+                                    child: IconButton(
+                                      iconSize: 18,
+                                      icon: const Icon(Icons.close),
+                                      onPressed: () {
+                                        context.read<ShoppingCartBloc>().add(
+                                            RemoveFromCartEvent(item.title));
+                                        // }
+                                      },
+                                    ),
+                                  ),
                                   Row(
                                     children: [
-                                      CircleAvatar(
-                                        maxRadius: 30,
-                                        minRadius: 30,
-                                        backgroundImage:
-                                            NetworkImage(item.image),
+                                      Container(
+                                        width: 100,
+                                        height: 100,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          color: Colors.red,
+                                          // shape: BoxShape.circle,
+                                        ),
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          child: Image.network(
+                                            item.image,
+                                            fit: BoxFit.cover,
+                                            width: 100,
+                                            height: 100,
+                                          ),
+                                        ),
                                       ),
                                       const SizedBox(width: 8),
                                       Column(
@@ -93,44 +132,19 @@ class ShoppingCartScreen extends StatelessWidget {
                                         children: [
                                           Text(item.title),
                                           Text(item.description),
-                                          // Text('Quantity: ${item.quantity}'),
                                         ],
                                       ),
                                     ],
                                   ),
-                                  Row(
-                                    children: [
-                                      IconButton(
-                                        icon: const Icon(Icons.remove),
-                                        onPressed: () {
-                                          // if (item.quantity > 1) {
-                                          //   context
-                                          //       .read<ShoppingCartBloc>()
-                                          //       .add(UpdateQuantityEvent(
-                                          //           item.title,
-                                          //           item.quantity - 1));
-                                          // } else {
-                                          context.read<ShoppingCartBloc>().add(
-                                              RemoveFromCartEvent(item.title));
-                                          // }
-                                        },
-                                      ),
-                                      // IconButton(
-                                      //   icon: const Icon(Icons.add),
-                                      //   onPressed: () {
-                                      //     context.read<ShoppingCartBloc>().add(
-                                      //         UpdateQuantityEvent(item.title,
-                                      //             item.quantity + 1));
-                                      //   },
-                                      // ),
-                                      IconButton(
-                                        icon: const Icon(Icons.delete),
-                                        onPressed: () {
-                                          context.read<ShoppingCartBloc>().add(
-                                              RemoveFromCartEvent(item.title));
-                                        },
-                                      ),
-                                    ],
+                                  Positioned(
+                                    bottom: 0,
+                                    left: 0,
+                                    child: Row(
+                                      children: [
+                                        Text(item.price.toString().addComma),
+                                        Text("تومان"),
+                                      ],
+                                    ),
                                   ),
                                 ],
                               ),
@@ -152,26 +166,61 @@ class ShoppingCartScreen extends StatelessWidget {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                // Text(
-                                //   'Total Items: ${cart.totalItems}',
-                                //   style: const TextStyle(fontSize: 16),
-                                // ),
-                                // Text(
-                                //   'Total Amount: \$${cart.totalAmount.toStringAsFixed(2)}',
-                                //   style: const TextStyle(
-                                //     fontSize: 20,
-                                //     fontWeight: FontWeight.bold,
-                                //   ),
-                                // ),
+                                Text(
+                                  '${l10n?.total_price} ${cart.items.fold(0, (sum, item) => sum + item.price).addComma}',
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                               ],
                             ),
-                            ElevatedButton(
+                            PrimaryButton(
+                              width: 208,
+                              height: 60,
+                              lable: l10n?.pay_now ?? "Pay Now",
                               onPressed: () {
-                                context
-                                    .read<ShoppingCartBloc>()
-                                    .add(ClearCartEvent());
+                                final totalAmount = cart.items
+                                    .fold(0, (sum, item) => sum + item.price);
+                                PaymentService paymentService =
+                                    PaymentService();
+
+                                paymentService.startPayment(
+                                  amount: totalAmount *
+                                      10, // Convert to Rials (1 Toman = 10 Rials)
+                                  description: "پرداخت سفارش از پورتک",
+                                  callbackUrl: "poortak://payment",
+                                  onPaymentComplete: (isSuccess, refId) async {
+                                    print(
+                                        'Payment completion status: $isSuccess');
+                                    print('Payment reference ID: $refId');
+
+                                    if (isSuccess) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                              'پرداخت با موفقیت انجام شد. کد پیگیری: $refId'),
+                                          backgroundColor: Colors.green,
+                                        ),
+                                      );
+                                      // Clear cart after successful payment
+                                      context
+                                          .read<ShoppingCartBloc>()
+                                          .add(ClearCartEvent());
+                                    } else {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                              'پرداخت با خطا مواجه شد. لطفا دوباره تلاش کنید.'),
+                                          backgroundColor: Colors.red,
+                                        ),
+                                      );
+                                    }
+                                  },
+                                );
                               },
-                              child: const Text('Clear Cart'),
                             ),
                           ],
                         ),
@@ -227,4 +276,43 @@ class ShoppingCartScreen extends StatelessWidget {
       ),
     );
   }
+
+  Future<void> _launchUrl(String url) async {
+    final Uri uri = Uri.parse(url);
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      throw Exception('Could not launch $url');
+    }
+  }
 }
+
+// paymentService.startPayment(
+                                //   amount:
+                                //       totalAmount, // Convert to Rials (1 Toman = 10 Rials)
+                                //   description: "پرداخت سفارش از پورتک",
+                                //   callbackUrl: "poortak://payment",
+                                //   onPaymentComplete: (isSuccess, refId) {
+                                //     if (isSuccess) {
+                                //       ScaffoldMessenger.of(context)
+                                //           .showSnackBar(
+                                //         SnackBar(
+                                //           content: Text(
+                                //               'پرداخت با موفقیت انجام شد. کد پیگیری: $refId'),
+                                //           backgroundColor: Colors.green,
+                                //         ),
+                                //       );
+                                //       // Clear cart after successful payment
+                                //       context
+                                //           .read<ShoppingCartBloc>()
+                                //           .add(ClearCartEvent());
+                                //     } else {
+                                //       ScaffoldMessenger.of(context)
+                                //           .showSnackBar(
+                                //         const SnackBar(
+                                //           content: Text(
+                                //               'پرداخت با خطا مواجه شد. لطفا دوباره تلاش کنید.'),
+                                //           backgroundColor: Colors.red,
+                                //         ),
+                                //       );
+                                //     }
+                                //   },
+                                // );

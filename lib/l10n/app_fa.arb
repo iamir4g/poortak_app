@@ -6,5 +6,7 @@
   "sayareh": "سیاره آی نو",
   "price": "قیمت محصول:",
   "add_to_cart": "اضافه به سبد خرید",
-  "coin_with_buy": "سکه با خرید"
+  "coin_with_buy": "سکه با خرید",
+  "total_price": "مبلغ کل:",
+  "pay_now": "ادامه پرداخت"
 }
