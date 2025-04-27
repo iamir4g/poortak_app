@@ -12,71 +12,89 @@ String sayarehHomeModelToJson(SayarehHomeModel data) =>
 
 class SayarehHomeModel {
   bool ok;
-  Data data;
+  Meta meta;
+  List<Datum> data;
 
   SayarehHomeModel({
     required this.ok,
+    required this.meta,
     required this.data,
   });
 
   factory SayarehHomeModel.fromJson(Map<String, dynamic> json) =>
       SayarehHomeModel(
         ok: json["ok"],
-        data: Data.fromJson(json["data"]),
+        meta: Meta.fromJson(json["meta"]),
+        data: List<Datum>.from(json["data"].map((x) => Datum.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
         "ok": ok,
-        "data": data.toJson(),
+        "meta": meta.toJson(),
+        "data": List<dynamic>.from(data.map((x) => x.toJson())),
       };
 }
 
-class Data {
-  List<SayarehLessonItem> sayareh;
-
-  Data({
-    required this.sayareh,
-  });
-
-  factory Data.fromJson(Map<String, dynamic> json) => Data(
-        sayareh: List<SayarehLessonItem>.from(
-            json["sayareh"].map((x) => SayarehLessonItem.fromJson(x))),
-      );
-
-  Map<String, dynamic> toJson() => {
-        "sayareh": List<dynamic>.from(sayareh.map((x) => x.toJson())),
-      };
-}
-
-class SayarehLessonItem {
-  String title;
+class Datum {
+  String id;
+  String name;
   String description;
-  String image;
-  int price;
-  bool isLock;
+  String thumbnail;
+  String price;
+  String video;
+  String trailerVideo;
+  int order;
+  DateTime createdAt;
+  DateTime updatedAt;
+  DateTime publishedAt;
 
-  SayarehLessonItem({
-    required this.title,
+  Datum({
+    required this.id,
+    required this.name,
     required this.description,
-    required this.image,
-    required this.isLock,
+    required this.thumbnail,
     required this.price,
+    required this.video,
+    required this.trailerVideo,
+    required this.order,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.publishedAt,
   });
 
-  factory SayarehLessonItem.fromJson(Map<String, dynamic> json) =>
-      SayarehLessonItem(
-        title: json["title"],
+  factory Datum.fromJson(Map<String, dynamic> json) => Datum(
+        id: json["id"],
+        name: json["name"],
         description: json["description"],
-        image: json["image"],
-        isLock: json["isLock"],
+        thumbnail: json["thumbnail"],
         price: json["price"],
+        video: json["video"],
+        trailerVideo: json["trailerVideo"],
+        order: json["order"],
+        createdAt: DateTime.parse(json["createdAt"]),
+        updatedAt: DateTime.parse(json["updatedAt"]),
+        publishedAt: DateTime.parse(json["publishedAt"]),
       );
 
   Map<String, dynamic> toJson() => {
-        "title": title,
+        "id": id,
+        "name": name,
         "description": description,
-        "image": image,
-        "isLock": isLock,
+        "thumbnail": thumbnail,
         "price": price,
+        "video": video,
+        "trailerVideo": trailerVideo,
+        "order": order,
+        "createdAt": createdAt.toIso8601String(),
+        "updatedAt": updatedAt.toIso8601String(),
+        "publishedAt": publishedAt.toIso8601String(),
       };
+}
+
+class Meta {
+  Meta();
+
+  factory Meta.fromJson(Map<String, dynamic> json) => Meta();
+
+  Map<String, dynamic> toJson() => {};
 }

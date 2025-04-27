@@ -15,10 +15,34 @@ import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shoppi
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
 import 'package:poortak/featueres/fetures_sayareh/widgets/item_multi_card.dart';
 import 'package:poortak/locator.dart';
+import 'package:poortak/common/services/storage_service.dart';
 
-class SayarehScreen extends StatelessWidget {
+class SayarehScreen extends StatefulWidget {
   static const routeName = "/sayareh_screen";
   const SayarehScreen({super.key});
+
+  @override
+  State<SayarehScreen> createState() => _SayarehScreenState();
+}
+
+class _SayarehScreenState extends State<SayarehScreen> {
+  final StorageService _storageService = locator<StorageService>();
+  Map<String, String> _imageUrls = {};
+
+  Future<String> _getImageUrl(String thumbnailId) async {
+    if (_imageUrls.containsKey(thumbnailId)) {
+      return _imageUrls[thumbnailId]!;
+    }
+
+    try {
+      final response = await _storageService.callGetDownloadUrl(thumbnailId);
+      _imageUrls[thumbnailId] = response.data;
+      return response.data;
+    } catch (e) {
+      print('Error getting image URL: $e');
+      return ''; // Return empty string or a placeholder image URL
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +50,12 @@ class SayarehScreen extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => SayarehCubit(sayarehRepository: locator()),
+          create: (context) {
+            final cubit = SayarehCubit(sayarehRepository: locator());
+            // Initialize the cubit right after creation
+            cubit.callSayarehDataEvent();
+            return cubit;
+          },
         ),
         BlocProvider(
           create: (context) {
@@ -36,15 +65,14 @@ class SayarehScreen extends StatelessWidget {
           },
         ),
       ],
-      child: Builder(builder: (context) {
-        BlocProvider.of<SayarehCubit>(context).callSayarehDataEvent();
-        return BlocBuilder<SayarehCubit, SayarehState>(
-            buildWhen: (previous, current) {
+      child: BlocBuilder<SayarehCubit, SayarehState>(
+        buildWhen: (previous, current) {
           if (previous.sayarehDataStatus == current.sayarehDataStatus) {
             return false;
           }
           return true;
-        }, builder: (context, state) {
+        },
+        builder: (context, state) {
           /// loading
           if (state.sayarehDataStatus is SayarehDataLoading) {
             return Container(
@@ -99,15 +127,15 @@ class SayarehScreen extends StatelessWidget {
                     ListView.separated(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      itemCount: sayarehDataCompleted.data.sayareh.length,
+                      itemCount: sayarehDataCompleted.data.data.length,
                       separatorBuilder: (context, index) {
                         return const SizedBox(height: 12);
                       },
                       itemBuilder: (context, index) {
-                        final item = sayarehDataCompleted.data.sayareh[index];
+                        final item = sayarehDataCompleted.data.data[index];
                         return GestureDetector(
                             onTap: () {
-                              if (item.isLock) {
+                              if (item.price != "0") {
                                 showDialog(
                                     context: context,
                                     builder: (context) {
@@ -118,7 +146,7 @@ class SayarehScreen extends StatelessWidget {
                                     context, LessonScreen.routeName,
                                     arguments: {
                                       'index': index,
-                                      'title': item.title,
+                                      'title': item.name,
                                     });
                               }
                             },
@@ -141,8 +169,30 @@ class SayarehScreen extends StatelessWidget {
                                         CircleAvatar(
                                           maxRadius: 30,
                                           minRadius: 30,
-                                          backgroundImage:
-                                              NetworkImage(item.image),
+                                          child: FutureBuilder<String>(
+                                            future:
+                                                _getImageUrl(item.thumbnail),
+                                            builder: (context, snapshot) {
+                                              if (snapshot.connectionState ==
+                                                  ConnectionState.waiting) {
+                                                return const CircularProgressIndicator();
+                                              }
+                                              if (snapshot.hasError ||
+                                                  !snapshot.hasData ||
+                                                  snapshot.data!.isEmpty) {
+                                                return const Icon(Icons.error);
+                                              }
+                                              return Image.network(
+                                                snapshot.data!,
+                                                fit: BoxFit.cover,
+                                                errorBuilder: (context, error,
+                                                    stackTrace) {
+                                                  return const Icon(
+                                                      Icons.error);
+                                                },
+                                              );
+                                            },
+                                          ),
                                         ),
                                         const SizedBox(width: 8),
                                         Column(
@@ -151,7 +201,7 @@ class SayarehScreen extends StatelessWidget {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                            Text(item.title),
+                                            Text(item.name),
                                             Text(item.description),
                                           ],
                                         )
@@ -159,7 +209,7 @@ class SayarehScreen extends StatelessWidget {
                                     ),
                                     Row(
                                       children: [
-                                        item.isLock
+                                        item.price != "0"
                                             ? Image(
                                                 image: AssetImage(
                                                     "assets/images/lock_image.png"))
@@ -297,18 +347,18 @@ class SayarehScreen extends StatelessWidget {
             );
           }
           return Container();
-        });
-      }),
+        },
+      ),
     );
   }
 
   Widget buildDialog(BuildContext context, dynamic item) {
     final cartItem = ShoppingCartItem(
-      title: item.title,
+      title: item.name,
       description: item.description,
-      image: item.image,
-      isLock: item.isLock,
-      price: item.price,
+      image: item.thumbnail,
+      isLock: item.price != "0",
+      price: int.parse(item.price),
     );
 
     final l10n = AppLocalizations.of(context);
@@ -345,10 +395,13 @@ class SayarehScreen extends StatelessWidget {
                           ),
                           Tab(text: "خرید مجموعه"),
                         ])),
+                SizedBox(
+                  height: 16,
+                ),
                 Expanded(
                   child: TabBarView(
                     children: [
-                      Expanded(
+                      SingleChildScrollView(
                         child: Padding(
                           padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
                           child: Column(
@@ -473,8 +526,7 @@ class SayarehScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-                      Expanded(
-                          child: SingleChildScrollView(
+                      SingleChildScrollView(
                         child: Column(
                           children: [
                             SizedBox(
@@ -588,21 +640,6 @@ class SayarehScreen extends StatelessWidget {
                                     title: "گرامر پورتک",
                                     price: "75000",
                                   ),
-                                  // ListView.separated(
-                                  //     shrinkWrap: true,
-                                  //     physics: const ScrollPhysics(),
-                                  //     itemCount: 2,
-                                  //     separatorBuilder: (context, index) {
-                                  //       return const SizedBox(height: 4);
-                                  //     },
-                                  //     itemBuilder: (context, index) {
-                                  //       return ItemMultiCard(
-                                  //         title:
-                                  //             "درس ${index + 1} سیاره آی نو",
-                                  //         price: "75000",
-                                  //       );
-                                  //     }),
-
                                   SizedBox(
                                     height: 14,
                                   )
@@ -627,7 +664,7 @@ class SayarehScreen extends StatelessWidget {
                             )
                           ],
                         ),
-                      )),
+                      ),
                     ],
                   ),
                 ),

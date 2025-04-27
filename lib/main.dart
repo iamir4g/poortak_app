@@ -7,7 +7,9 @@ import 'package:poortak/config/my_theme.dart';
 import 'package:poortak/featueres/feature_profile/data/data_sorce/profile_api_provider.dart';
 import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/profile_screen.dart';
+import 'package:poortak/featueres/fetures_sayareh/screens/converstion_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/lesson_screen.dart';
+import 'package:poortak/featueres/fetures_sayareh/screens/vocabulary_screen.dart';
 import 'package:poortak/featueres/feature_intro/presentation/bloc/splash_bloc/splash_cubit.dart';
 import 'package:poortak/featueres/feature_intro/presentation/screens/intro_main_wrapper.dart';
 import 'package:poortak/featueres/feature_intro/presentation/screens/splash_screen.dart';
@@ -82,6 +84,8 @@ class MyApp extends StatelessWidget {
         },
         LoginScreen.routeName: (context) => LoginScreen(),
         ProfileScreen.routeName: (context) => ProfileScreen(),
+        VocabularyScreen.routeName: (context) => VocabularyScreen(),
+        ConversationScreen.routeName: (context) => ConversationScreen(),
       },
       debugShowCheckedModeBanner: false,
       title: 'Poortak',

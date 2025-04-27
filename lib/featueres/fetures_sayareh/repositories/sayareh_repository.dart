@@ -4,6 +4,7 @@ import 'package:poortak/common/error_handling/app_exception.dart';
 import 'package:poortak/common/error_handling/check_exception.dart';
 import 'package:poortak/common/resources/data_state.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/data_source/sayareh_api_provider.dart';
+import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_home_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_storage_test_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/sayareh_cubit.dart';
 
@@ -12,12 +13,16 @@ class SayarehRepository {
 
   SayarehRepository(this.sayarehApiProvider);
 
-  Future<DataState<dynamic>> fetchSayarehData() async {
+  Future<DataState<SayarehHomeModel>> fetchAllCourses() async {
     // Response response = await sayarehApiProvider.callSayarehApi();
     try {
-      final response = await sayarehApiProvider.callSayarehApi();
-      final data = response.data;
-      return DataSuccess(data);
+      Response response = await sayarehApiProvider.callGetAllCourses();
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = SayarehHomeModel.fromJson(response.data);
+        return DataSuccess(data);
+      } else {
+        return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
+      }
     } on AppException catch (e) {
       return await CheckExceptions.getError(e);
     }

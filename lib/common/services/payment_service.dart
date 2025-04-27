@@ -13,7 +13,7 @@ class PaymentService {
   }) async {
     // Initialize payment request
     _paymentRequest
-      // ..setIsSandBox(true) // Enable sandbox mode for testing
+      ..setIsSandBox(true) // Enable sandbox mode for testing
       // ..setMerchantID("60eaaca9-81aa-4920-83b5-c08a20d27635")
       ..setMerchantID("89ed112e-44c7-4701-a484-07a9695d955e")
       ..setAmount(amount)

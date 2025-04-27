@@ -15,7 +15,7 @@ class SayarehCubit extends Cubit<SayarehState> {
   void callSayarehDataEvent() async {
     emit(state.copyWith(sayarehDataStatus: SayarehDataLoading()));
 
-    DataState dataState = await sayarehRepository.fetchSayarehData();
+    DataState dataState = await sayarehRepository.fetchAllCourses();
 
     if (dataState is DataSuccess) {
       // emit completed

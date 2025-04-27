@@ -10,6 +10,8 @@ import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/common/utils/custom_textStyle.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/bloc_storage_bloc.dart';
+import 'package:poortak/featueres/fetures_sayareh/screens/converstion_screen.dart';
+import 'package:poortak/featueres/fetures_sayareh/screens/vocabulary_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/widgets/custom_video_player.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/sayareh_cubit.dart';
 import 'package:poortak/locator.dart';
@@ -423,15 +425,12 @@ class _LessonScreenState extends State<LessonScreen> {
   @override
   void initState() {
     super.initState();
-    print("initState called");
     // Call the storage API when the screen initializes
     context.read<BlocStorageBloc>().add(RequestStorageEvent());
-    print("RequestStorageEvent dispatched");
   }
 
   @override
   Widget build(BuildContext context) {
-    print("build called");
     return MultiBlocProvider(
       providers: [
         BlocProvider(
@@ -442,9 +441,6 @@ class _LessonScreenState extends State<LessonScreen> {
         listener: (context, state) {
           print("BlocStorageBloc state changed: $state");
           if (state is BlocStorageCompleted) {
-            print("BlocStorageCompleted");
-            print("Sayareh Storage Response: ${state.data}");
-
             // Check for existing files first
             _checkExistingFiles(state.data.data[7].name).then((_) {
               // Only start download if we don't have a local file
@@ -614,68 +610,83 @@ class _LessonScreenState extends State<LessonScreen> {
 
           const SizedBox(height: 18),
           //card lesons
-          Container(
-            width: 350,
-            height: 104,
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(40)),
-                color: MyColors.background),
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 22, horizontal: 28),
-              child: Row(
-                children: [
-                  Image.asset(
-                    "assets/images/chat_icon.png",
-                    width: 48.0,
-                    height: 48.0,
-                  ),
-                  SizedBox(
-                    width: 18,
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("conversation",
-                          style: CustomTextStyle.titleLesonText),
-                      Text("مکالمه", style: CustomTextStyle.subTitleLeasonText)
-                    ],
-                  )
-                ],
+          InkWell(
+            onTap: () {
+              Navigator.pushNamed(context, ConversationScreen.routeName);
+            },
+            child: Container(
+              width: 350,
+              height: 104,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(40)),
+                  color: MyColors.background),
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 22, horizontal: 28),
+                child: Row(
+                  children: [
+                    Image.asset(
+                      "assets/images/chat_icon.png",
+                      width: 48.0,
+                      height: 48.0,
+                    ),
+                    SizedBox(
+                      width: 18,
+                    ),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("conversation",
+                            style: CustomTextStyle.titleLesonText),
+                        Text("مکالمه",
+                            style: CustomTextStyle.subTitleLeasonText)
+                      ],
+                    )
+                  ],
+                ),
               ),
             ),
           ),
+
           const SizedBox(height: 12),
-          Container(
-            width: 350,
-            height: 104,
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(40)),
-                color: MyColors.background),
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 22, horizontal: 28),
-              child: Row(
-                children: [
-                  Image.asset(
-                    "assets/images/words_icon.png",
-                    width: 48.0,
-                    height: 48.0,
-                  ),
-                  SizedBox(
-                    width: 18,
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("vocabulary", style: CustomTextStyle.titleLesonText),
-                      Text("واژگان", style: CustomTextStyle.subTitleLeasonText)
-                    ],
-                  )
-                ],
+          InkWell(
+            onTap: () {
+              Navigator.pushNamed(context, VocabularyScreen.routeName);
+            },
+            child: Container(
+              width: 350,
+              height: 104,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(40)),
+                  color: MyColors.background),
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 22, horizontal: 28),
+                child: Row(
+                  children: [
+                    Image.asset(
+                      "assets/images/words_icon.png",
+                      width: 48.0,
+                      height: 48.0,
+                    ),
+                    SizedBox(
+                      width: 18,
+                    ),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("vocabulary",
+                            style: CustomTextStyle.titleLesonText),
+                        Text("واژگان",
+                            style: CustomTextStyle.subTitleLeasonText)
+                      ],
+                    )
+                  ],
+                ),
               ),
             ),
           ),
+
           const SizedBox(height: 12),
           Container(
             width: 350,

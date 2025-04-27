@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:poortak/common/bloc/storage/storage_bloc.dart';
 import 'package:poortak/common/services/storage_service.dart';
+import 'package:poortak/common/services/tts_service.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/data_source/sayareh_api_provider.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/bloc_storage_bloc.dart';
@@ -35,6 +36,9 @@ Future<void> initLocator() async {
 
   // Register StorageService
   locator.registerSingleton<StorageService>(StorageService(dio: locator()));
+
+  // Register TTSService
+  locator.registerSingleton<TTSService>(TTSService());
 
   //api provider
   locator.registerSingleton<SayarehApiProvider>(
