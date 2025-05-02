@@ -6,6 +6,7 @@ import 'package:poortak/common/services/tts_service.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/data_source/sayareh_api_provider.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/bloc_storage_bloc.dart';
+import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/lesson_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/repositories/sayareh_repository.dart';
 import 'package:poortak/featueres/feature_profile/data/data_sorce/profile_api_provider.dart';
 import 'package:poortak/featueres/feature_profile/repositories/profile_repository.dart';
@@ -52,7 +53,8 @@ Future<void> initLocator() async {
   locator.registerSingleton<ProfileRepository>(ProfileRepository(locator()));
   locator.registerSingleton<BlocStorageBloc>(
       BlocStorageBloc(sayarehRepository: locator()));
-
+  locator
+      .registerSingleton<LessonBloc>(LessonBloc(sayarehRepository: locator()));
   // Register PermissionBloc
   locator.registerSingleton<PermissionBloc>(PermissionBloc());
 }

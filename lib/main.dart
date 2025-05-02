@@ -7,6 +7,7 @@ import 'package:poortak/config/my_theme.dart';
 import 'package:poortak/featueres/feature_profile/data/data_sorce/profile_api_provider.dart';
 import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/profile_screen.dart';
+import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/lesson_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/converstion_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/lesson_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/vocabulary_screen.dart';
@@ -72,20 +73,28 @@ class MyApp extends StatelessWidget {
                 create: (context) => SayarehCubit(sayarehRepository: locator()),
               ),
               BlocProvider(
-                create: (context) =>
-                    BlocStorageBloc(sayarehRepository: locator()),
+                create: (context) => LessonBloc(sayarehRepository: locator()),
               ),
+              // BlocProvider(
+              //   create: (context) =>
+              //       BlocStorageBloc(sayarehRepository: locator()),
+              // ),
             ],
             child: LessonScreen(
               index: args['index'],
               title: args['title'],
+              lessonId: args['lessonId'],
             ),
           );
         },
         LoginScreen.routeName: (context) => LoginScreen(),
         ProfileScreen.routeName: (context) => ProfileScreen(),
         VocabularyScreen.routeName: (context) => VocabularyScreen(),
-        ConversationScreen.routeName: (context) => ConversationScreen(),
+        ConversationScreen.routeName: (context) {
+          final args = ModalRoute.of(context)?.settings.arguments
+              as Map<String, dynamic>;
+          return ConversationScreen(conversationId: args['conversationId']);
+        },
       },
       debugShowCheckedModeBanner: false,
       title: 'Poortak',

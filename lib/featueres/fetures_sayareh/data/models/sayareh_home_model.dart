@@ -13,7 +13,7 @@ String sayarehHomeModelToJson(SayarehHomeModel data) =>
 class SayarehHomeModel {
   bool ok;
   Meta meta;
-  List<Datum> data;
+  List<Lesson> data;
 
   SayarehHomeModel({
     required this.ok,
@@ -25,7 +25,7 @@ class SayarehHomeModel {
       SayarehHomeModel(
         ok: json["ok"],
         meta: Meta.fromJson(json["meta"]),
-        data: List<Datum>.from(json["data"].map((x) => Datum.fromJson(x))),
+        data: List<Lesson>.from(json["data"].map((x) => Lesson.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
@@ -35,7 +35,7 @@ class SayarehHomeModel {
       };
 }
 
-class Datum {
+class Lesson {
   String id;
   String name;
   String description;
@@ -48,7 +48,7 @@ class Datum {
   DateTime updatedAt;
   DateTime publishedAt;
 
-  Datum({
+  Lesson({
     required this.id,
     required this.name,
     required this.description,
@@ -62,7 +62,7 @@ class Datum {
     required this.publishedAt,
   });
 
-  factory Datum.fromJson(Map<String, dynamic> json) => Datum(
+  factory Lesson.fromJson(Map<String, dynamic> json) => Lesson(
         id: json["id"],
         name: json["name"],
         description: json["description"],

@@ -147,6 +147,7 @@ class _SayarehScreenState extends State<SayarehScreen> {
                                     arguments: {
                                       'index': index,
                                       'title': item.name,
+                                      'lessonId': item.id,
                                     });
                               }
                             },

@@ -9,7 +9,9 @@ import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/common/utils/custom_textStyle.dart';
+import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/bloc_storage_bloc.dart';
+import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/lesson_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/converstion_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/vocabulary_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/widgets/custom_video_player.dart';
@@ -23,6 +25,7 @@ import 'package:poortak/common/utils/decryption.dart';
 class LessonScreen extends StatefulWidget {
   static const routeName = "/lesson_screen";
   final int index;
+  final String lessonId;
   final String title;
   // final String name;
 
@@ -30,6 +33,7 @@ class LessonScreen extends StatefulWidget {
     super.key,
     required this.index,
     required this.title,
+    required this.lessonId,
     // required this.name,
   });
 
@@ -426,7 +430,7 @@ class _LessonScreenState extends State<LessonScreen> {
   void initState() {
     super.initState();
     // Call the storage API when the screen initializes
-    context.read<BlocStorageBloc>().add(RequestStorageEvent());
+    context.read<LessonBloc>().add(GetLessonEvenet(id: widget.lessonId));
   }
 
   @override
@@ -434,26 +438,27 @@ class _LessonScreenState extends State<LessonScreen> {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => SayarehCubit(sayarehRepository: locator()),
+          create: (context) => LessonBloc(sayarehRepository: locator()),
         ),
       ],
-      child: BlocListener<BlocStorageBloc, BlocStorageState>(
+      child: BlocListener<LessonBloc, LessonState>(
         listener: (context, state) {
           print("BlocStorageBloc state changed: $state");
-          if (state is BlocStorageCompleted) {
+          if (state is LessonSuccess) {
             // Check for existing files first
-            _checkExistingFiles(state.data.data[7].name).then((_) {
+            _checkExistingFiles(state.lesson.video).then((_) {
               // Only start download if we don't have a local file
               if (localVideoPath == null) {
                 _downloadAndStoreVideo(
-                  state.data.data[7].key,
-                  state.data.data[7].name,
-                  state.data.data[7].id,
-                  state.data.data[7].isEncrypted,
+                  state.lesson.video,
+                  state.lesson.name,
+                  state.lesson.id,
+                  // state.lesson.isEncrypted,
+                  false,
                 );
               }
             });
-          } else if (state is BlocStorageError) {
+          } else if (state is LessonError) {
             print("BlocStorageError: ${state.message}");
           }
         },
@@ -479,7 +484,17 @@ class _LessonScreenState extends State<LessonScreen> {
                   bottomLeft: Radius.circular(30),
                 ),
               ),
-              title: Text(widget.title),
+              title: BlocBuilder<LessonBloc, LessonState>(
+                builder: (context, state) {
+                  if (state is LessonSuccess) {
+                    return Text(state.lesson.name);
+                  }
+                  return Text(
+                    widget.title,
+                    style: MyTextStyle.textMatn16,
+                  );
+                },
+              ),
             ),
             body: BlocBuilder<SayarehCubit, SayarehState>(
               builder: (context, state) {
@@ -488,7 +503,7 @@ class _LessonScreenState extends State<LessonScreen> {
                 if (state.sayarehDataStatus is SayarehDataLoading) {
                   return Stack(
                     children: [
-                      _buildContent(),
+                      _buildContent(null),
                       const Center(child: CircularProgressIndicator()),
                     ],
                   );
@@ -499,7 +514,7 @@ class _LessonScreenState extends State<LessonScreen> {
                   final error = state.sayarehDataStatus as SayarehDataError;
                   return Stack(
                     children: [
-                      _buildContent(),
+                      _buildContent(null),
                       Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -522,7 +537,7 @@ class _LessonScreenState extends State<LessonScreen> {
                 }
 
                 // For all other states (including initial and completed), show the content
-                return _buildContent();
+                return _buildContent(widget.lessonId);
               },
             ),
           ),
@@ -531,7 +546,7 @@ class _LessonScreenState extends State<LessonScreen> {
     );
   }
 
-  Widget _buildContent() {
+  Widget _buildContent(String? conversationId) {
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -612,7 +627,10 @@ class _LessonScreenState extends State<LessonScreen> {
           //card lesons
           InkWell(
             onTap: () {
-              Navigator.pushNamed(context, ConversationScreen.routeName);
+              print("ConversationScreen");
+              print("conversationId: $conversationId");
+              Navigator.pushNamed(context, ConversationScreen.routeName,
+                  arguments: {"conversationId": conversationId});
             },
             child: Container(
               width: 350,
