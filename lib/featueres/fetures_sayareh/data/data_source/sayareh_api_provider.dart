@@ -28,6 +28,15 @@ class SayarehApiProvider {
     return response;
   }
 
+  dynamic callGetVocabulary(String id) async {
+    final response = await dio.get(
+      "${Constants.baseUrl}iknow/courses/$id/vocabulary",
+    );
+
+    log("Sayareh Vocabulary Response: ${response.data}");
+    return response;
+  }
+
   dynamic callSayarehStorageApi() async {
     final response = await dio.get(
       "${Constants.baseUrl}storage",

@@ -627,8 +627,6 @@ class _LessonScreenState extends State<LessonScreen> {
           //card lesons
           InkWell(
             onTap: () {
-              print("ConversationScreen");
-              print("conversationId: $conversationId");
               Navigator.pushNamed(context, ConversationScreen.routeName,
                   arguments: {"conversationId": conversationId});
             },
@@ -669,7 +667,8 @@ class _LessonScreenState extends State<LessonScreen> {
           const SizedBox(height: 12),
           InkWell(
             onTap: () {
-              Navigator.pushNamed(context, VocabularyScreen.routeName);
+              Navigator.pushNamed(context, VocabularyScreen.routeName,
+                  arguments: {"id": conversationId});
             },
             child: Container(
               width: 350,

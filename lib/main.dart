@@ -8,6 +8,7 @@ import 'package:poortak/featueres/feature_profile/data/data_sorce/profile_api_pr
 import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/profile_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/lesson_bloc.dart';
+import 'package:poortak/featueres/fetures_sayareh/presentation/vocabulary_bloc/vocabulary_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/converstion_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/lesson_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/vocabulary_screen.dart';
@@ -21,6 +22,7 @@ import 'package:poortak/locator.dart';
 import 'package:poortak/test_screen.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/bloc_storage_bloc.dart';
+import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/converstion_bloc.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -75,10 +77,6 @@ class MyApp extends StatelessWidget {
               BlocProvider(
                 create: (context) => LessonBloc(sayarehRepository: locator()),
               ),
-              // BlocProvider(
-              //   create: (context) =>
-              //       BlocStorageBloc(sayarehRepository: locator()),
-              // ),
             ],
             child: LessonScreen(
               index: args['index'],
@@ -89,7 +87,17 @@ class MyApp extends StatelessWidget {
         },
         LoginScreen.routeName: (context) => LoginScreen(),
         ProfileScreen.routeName: (context) => ProfileScreen(),
-        VocabularyScreen.routeName: (context) => VocabularyScreen(),
+        VocabularyScreen.routeName: (context) {
+          final args = ModalRoute.of(context)?.settings.arguments
+              as Map<String, dynamic>;
+          // return VocabularyScreen(id: args['id']);
+
+          return BlocProvider(
+            create: (context) => locator<
+                VocabularyBloc>(), // VocabularyBloc(sayarehRepository: locator()),
+            child: VocabularyScreen(id: args['id']),
+          );
+        },
         ConversationScreen.routeName: (context) {
           final args = ModalRoute.of(context)?.settings.arguments
               as Map<String, dynamic>;
