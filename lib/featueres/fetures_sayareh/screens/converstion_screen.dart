@@ -101,7 +101,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
           ),
           title: const Text(
             'مکالمه',
-            style: MyTextStyle.textMatn16,
+            style: MyTextStyle.textHeader16Bold,
           ),
         ),
         bottomNavigationBar: Container(

@@ -9,6 +9,12 @@ class MyTextStyle {
     color: MyColors.primary,
   );
 
+  static const TextStyle textHeader16Bold = TextStyle(
+    fontFamily: "IranSans",
+    fontSize: 16,
+    fontWeight: FontWeight.bold,
+    color: MyColors.textMatn1,
+  );
   static const TextStyle textMatn16 = TextStyle(
     fontFamily: "IranSans",
     fontSize: 16,

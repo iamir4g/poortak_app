@@ -378,11 +378,14 @@ class _LessonScreenState extends State<LessonScreen> {
           title: BlocBuilder<LessonBloc, LessonState>(
             builder: (context, state) {
               if (state is LessonSuccess) {
-                return Text(state.lesson.name);
+                return Text(
+                  state.lesson.name,
+                  style: MyTextStyle.textHeader16Bold,
+                );
               }
               return Text(
                 widget.title,
-                style: MyTextStyle.textMatn16,
+                style: MyTextStyle.textHeader16Bold,
               );
             },
           ),

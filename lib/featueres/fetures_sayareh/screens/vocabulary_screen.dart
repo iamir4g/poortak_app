@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:iconify_design/iconify_design.dart';
+import 'package:poortak/common/widgets/step_progress.dart';
 import 'package:poortak/config/myColors.dart';
+import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/vocabulary_bloc/vocabulary_bloc.dart';
 import 'package:poortak/locator.dart';
 import 'package:poortak/common/services/storage_service.dart';
@@ -18,6 +21,7 @@ class VocabularyScreen extends StatefulWidget {
 
 class _VocabularyScreenState extends State<VocabularyScreen> {
   int currentIndex = 0;
+  int totalWords = 0;
   final TTSService ttsService = locator<TTSService>();
   final StorageService storageService = locator<StorageService>();
 
@@ -42,6 +46,14 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
     });
   }
 
+  void _previousWord(int totalWords) {
+    setState(() {
+      if (currentIndex > 0) {
+        currentIndex--;
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -55,7 +67,10 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
               bottomLeft: Radius.circular(30),
             ),
           ),
-          title: const Text('واژگان'),
+          title: const Text(
+            'واژگان',
+            style: MyTextStyle.textHeader16Bold,
+          ),
         ),
         body: BlocBuilder<VocabularyBloc, VocabularyState>(
           builder: (context, state) {
@@ -68,14 +83,25 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
               }
 
               final currentWord = state.vocabulary.data[currentIndex];
-
+              totalWords = state.vocabulary.data.length;
               return Column(
                 children: [
                   Expanded(
                     child: Center(
                       child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
+                          SizedBox(
+                            height: 20,
+                          ),
+                          //step progress bar
+                          StepProgress(
+                              currentIndex: currentIndex,
+                              totalSteps: totalWords),
+
+                          SizedBox(
+                            height: 85,
+                          ),
                           FutureBuilder<GetDownloadUrl>(
                             future: storageService
                                 .callGetDownloadUrl(currentWord.thumbnail),
@@ -90,8 +116,8 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                               if (snapshot.hasData) {
                                 return Image.network(
                                   snapshot.data!.data,
-                                  height: 200,
-                                  width: 200,
+                                  height: 264,
+                                  width: 264,
                                   fit: BoxFit.cover,
                                 );
                               }
@@ -124,18 +150,26 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         IconButton(
+                          onPressed: () =>
+                              _nextWord(state.vocabulary.data.length),
+                          icon: const Icon(Icons.arrow_back),
+                          iconSize: 32,
+                        ),
+                        IconButton(
                           onPressed: _addToListener,
                           icon: const Icon(Icons.add_circle_outline),
                           iconSize: 32,
                         ),
                         IconButton(
                           onPressed: () => _readWord(currentWord.word),
-                          icon: const Icon(Icons.volume_up),
-                          iconSize: 32,
+                          icon: IconifyIcon(
+                            icon: "cuida:volume-2-outline",
+                            size: 32,
+                          ),
                         ),
                         IconButton(
                           onPressed: () =>
-                              _nextWord(state.vocabulary.data.length),
+                              _previousWord(state.vocabulary.data.length),
                           icon: const Icon(Icons.arrow_forward),
                           iconSize: 32,
                         ),

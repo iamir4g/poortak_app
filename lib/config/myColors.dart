@@ -38,7 +38,7 @@ class MyColors {
   static const Color text3 = Color.fromRGBO(82, 97, 122, 1);
   static const Color text4 = Color.fromRGBO(163, 175, 194, 1);
   static const Color textMatn1 = Color.fromRGBO(54, 58, 83, 1);
-
+  static const Color textMatn2 = Color.fromRGBO(33, 41, 55, 1);
   // Status Colors
   static const Color success = Color(0xFF4CAF50); // Green
   static const Color error = Color(0xFFE53935); // Red
@@ -56,4 +56,5 @@ class MyColors {
   static const Color brandSecondary = secondary;
 
   static const Color background1 = Color(0xffF2F5FA);
+  static const Color background2 = Color(0xFFF3F5F7);
 }
