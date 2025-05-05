@@ -197,85 +197,6 @@ class _LessonScreenState extends State<LessonScreen> {
         return;
       }
 
-      // Check in Downloads directory first
-      final downloadsDir = Directory('/storage/emulated/0/Download');
-      if (await downloadsDir.exists()) {
-        final files = await downloadsDir.list().toList();
-        for (var file in files) {
-          if (file.path.contains(name) && !file.path.contains('-')) {
-            print("Found existing file in Downloads: ${file.path}");
-            // Copy to encrypted directory
-            await File(file.path).copy(encryptedFile.path);
-
-            // If file is encrypted, get decryption key and decrypt
-            if (isEncrypted) {
-              print("File is encrypted, getting decryption key");
-              final decryptionKeyResponse =
-                  await _storageService.callGetDecryptedFile(fileId);
-              print(
-                  "Decryption key received: ${decryptionKeyResponse.data.key}");
-
-              // Decrypt the file using the utility function
-              print("Starting decryption process");
-              final decryptedPath = await decryptFile(
-                file.path,
-                decryptedFile.path,
-                decryptionKeyResponse.data.key,
-              );
-              if (await File(decryptedPath).exists()) {
-                print("File successfully processed from Downloads");
-                setState(() {
-                  localVideoPath = decryptedPath;
-                  videoUrl = null; // Clear the URL since we now have local file
-                  isDownloading = false;
-                });
-
-                // Show success snackbar
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('فایل دانلود شد'),
-                      backgroundColor: Colors.green,
-                      duration: Duration(seconds: 2),
-                    ),
-                  );
-                }
-              } else {
-                print("Failed to process file");
-                throw Exception("Failed to process file");
-              }
-            } else {
-              // If not encrypted, just copy to video directory
-              await encryptedFile.copy(decryptedFile.path);
-            }
-
-            // Verify the file was processed successfully
-            if (await decryptedFile.exists()) {
-              print("File successfully processed from Downloads");
-              setState(() {
-                localVideoPath = decryptedFile.path;
-                videoUrl = null; // Clear the URL since we now have local file
-                isDownloading = false;
-              });
-
-              // Show success snackbar
-              if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('فایل دانلود شد'),
-                    backgroundColor: Colors.green,
-                    duration: Duration(seconds: 2),
-                  ),
-                );
-              }
-            } else {
-              print("Failed to process file");
-              throw Exception("Failed to process file");
-            }
-          }
-        }
-      }
-
       print("Getting download URL from StorageService");
       final downloadUrl = await _storageService.callGetDownloadUrl(key);
       print("Download URL received: ${downloadUrl.data}");
@@ -319,10 +240,11 @@ class _LessonScreenState extends State<LessonScreen> {
               // Decrypt the file using the utility function
               print("Starting decryption process");
               final decryptedPath = await decryptFile(
-                path,
+                encryptedFile.path,
                 decryptedFile.path,
                 decryptionKeyResponse.data.key,
               );
+
               if (await File(decryptedPath).exists()) {
                 print("File successfully processed");
                 setState(() {
@@ -348,30 +270,11 @@ class _LessonScreenState extends State<LessonScreen> {
             } else {
               // If not encrypted, just copy to video directory
               await encryptedFile.copy(decryptedFile.path);
-            }
-
-            // Verify the file was processed successfully
-            if (await decryptedFile.exists()) {
-              print("File successfully processed");
               setState(() {
                 localVideoPath = decryptedFile.path;
-                videoUrl = null; // Clear the URL since we now have local file
+                videoUrl = null;
                 isDownloading = false;
               });
-
-              // Show success snackbar
-              if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('فایل دانلود شد'),
-                    backgroundColor: Colors.green,
-                    duration: Duration(seconds: 2),
-                  ),
-                );
-              }
-            } else {
-              print("Failed to process file");
-              throw Exception("Failed to process file");
             }
           } catch (e) {
             print("Error processing file: $e");
@@ -435,113 +338,56 @@ class _LessonScreenState extends State<LessonScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(
-          create: (context) => LessonBloc(sayarehRepository: locator()),
-        ),
-      ],
-      child: BlocListener<LessonBloc, LessonState>(
-        listener: (context, state) {
-          print("BlocStorageBloc state changed: $state");
-          if (state is LessonSuccess) {
-            // Check for existing files first
-            _checkExistingFiles(state.lesson.video).then((_) {
-              // Only start download if we don't have a local file
-              if (localVideoPath == null) {
-                _downloadAndStoreVideo(
-                  state.lesson.video,
-                  state.lesson.name,
-                  state.lesson.id,
-                  // state.lesson.isEncrypted,
-                  false,
-                );
-              }
-            });
-          } else if (state is LessonError) {
-            print("BlocStorageError: ${state.message}");
-          }
-        },
-        child: BlocListener<SayarehCubit, SayarehState>(
-          listener: (context, state) {
-            print("SayarehCubit state changed: $state");
-            if (state.sayarehDataStatus is SayarehDataCompleted) {
-              print("SayarehStorageCompleted");
-              final storageData =
-                  state.sayarehDataStatus as SayarehDataCompleted;
-              if (storageData.data.data.isNotEmpty) {
-                print("Data is not empty, calling download");
-                print("Key: ${storageData.data.data[0].key}");
-                print("Name: ${storageData.data.data[0].name}");
-              }
+    return BlocListener<LessonBloc, LessonState>(
+      listener: (context, state) {
+        print("LessonBloc state changed: $state");
+        if (state is LessonSuccess) {
+          // Check for existing files first
+          _checkExistingFiles(state.lesson.video).then((_) {
+            // Only start download if we don't have a local file
+            if (localVideoPath == null) {
+              _downloadAndStoreVideo(
+                state.lesson.video, // video ID for download
+                state.lesson.id, // name for file
+                state.lesson.video, // video ID for decryption key
+                true,
+              );
             }
-          },
-          child: Scaffold(
-            backgroundColor: MyColors.secondaryTint4,
-            appBar: AppBar(
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(30),
-                ),
+          });
+        } else if (state is LessonError) {
+          print("LessonError: ${state.message}");
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: Colors.red,
+                duration: const Duration(seconds: 2),
               ),
-              title: BlocBuilder<LessonBloc, LessonState>(
-                builder: (context, state) {
-                  if (state is LessonSuccess) {
-                    return Text(state.lesson.name);
-                  }
-                  return Text(
-                    widget.title,
-                    style: MyTextStyle.textMatn16,
-                  );
-                },
-              ),
-            ),
-            body: BlocBuilder<SayarehCubit, SayarehState>(
-              builder: (context, state) {
-                print("BlocBuilder building with state: $state");
-                // Show loading only when explicitly loading storage data
-                if (state.sayarehDataStatus is SayarehDataLoading) {
-                  return Stack(
-                    children: [
-                      _buildContent(null),
-                      const Center(child: CircularProgressIndicator()),
-                    ],
-                  );
-                }
-
-                // Show error state if storage API fails
-                if (state.sayarehDataStatus is SayarehDataError) {
-                  final error = state.sayarehDataStatus as SayarehDataError;
-                  return Stack(
-                    children: [
-                      _buildContent(null),
-                      Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(error.errorMessage),
-                            const SizedBox(height: 16),
-                            ElevatedButton(
-                              onPressed: () {
-                                // context
-                                //     .read<SayarehStorageCubit>()
-                                //     .downloadSayareh(widget.key, widget.name);
-                              },
-                              child: const Text('Try Again'),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  );
-                }
-
-                // For all other states (including initial and completed), show the content
-                return _buildContent(widget.lessonId);
-              },
+            );
+          }
+        }
+      },
+      child: Scaffold(
+        backgroundColor: MyColors.secondaryTint4,
+        appBar: AppBar(
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(30),
             ),
           ),
+          title: BlocBuilder<LessonBloc, LessonState>(
+            builder: (context, state) {
+              if (state is LessonSuccess) {
+                return Text(state.lesson.name);
+              }
+              return Text(
+                widget.title,
+                style: MyTextStyle.textMatn16,
+              );
+            },
+          ),
         ),
+        body: _buildContent(widget.lessonId),
       ),
     );
   }

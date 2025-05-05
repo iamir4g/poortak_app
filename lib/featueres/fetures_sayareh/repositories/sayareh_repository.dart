@@ -35,7 +35,7 @@ class SayarehRepository {
     try {
       Response response = await sayarehApiProvider.callGetCourseById(id);
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final data = Lesson.fromJson(response.data);
+        final data = Lesson.fromJson(response.data['data']);
         return DataSuccess(data);
       } else {
         return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
