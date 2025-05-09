@@ -5,6 +5,7 @@ import 'package:poortak/common/widgets/step_progress.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/vocabulary_bloc/vocabulary_bloc.dart';
+import 'package:poortak/featueres/fetures_sayareh/screens/practice_vocabulary_screen.dart';
 import 'package:poortak/locator.dart';
 import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/common/services/tts_service.dart';
@@ -176,6 +177,30 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                       ],
                     ),
                   ),
+                  if (currentIndex == totalWords - 1)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 16.0),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pushNamed(
+                            context,
+                            PracticeVocabularyScreen.routeName,
+                            arguments: {'courseId': widget.id},
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: MyColors.primary,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 32,
+                            vertical: 16,
+                          ),
+                        ),
+                        child: const Text(
+                          'تمرین ها',
+                          style: MyTextStyle.textMatnBtn,
+                        ),
+                      ),
+                    ),
                 ],
               );
             }

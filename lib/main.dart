@@ -8,9 +8,11 @@ import 'package:poortak/featueres/feature_profile/data/data_sorce/profile_api_pr
 import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/profile_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/lesson_bloc.dart';
+import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/practice_vocabulary_bloc/practice_vocabulary_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/vocabulary_bloc/vocabulary_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/converstion_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/lesson_screen.dart';
+import 'package:poortak/featueres/fetures_sayareh/screens/practice_vocabulary_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/vocabulary_screen.dart';
 import 'package:poortak/featueres/feature_intro/presentation/bloc/splash_bloc/splash_cubit.dart';
 import 'package:poortak/featueres/feature_intro/presentation/screens/intro_main_wrapper.dart';
@@ -96,6 +98,15 @@ class MyApp extends StatelessWidget {
             create: (context) => locator<
                 VocabularyBloc>(), // VocabularyBloc(sayarehRepository: locator()),
             child: VocabularyScreen(id: args['id']),
+          );
+        },
+        PracticeVocabularyScreen.routeName: (context) {
+          final args = ModalRoute.of(context)?.settings.arguments
+              as Map<String, dynamic>;
+          return BlocProvider(
+            create: (context) => locator<
+                PracticeVocabularyBloc>(), // PracticeVocabularyBloc(sayarehRepository: locator()),
+            child: PracticeVocabularyScreen(courseId: args['courseId']),
           );
         },
         ConversationScreen.routeName: (context) {

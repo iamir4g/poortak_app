@@ -15,6 +15,19 @@ class MyTextStyle {
     fontWeight: FontWeight.bold,
     color: MyColors.textMatn1,
   );
+  static const TextStyle text14Wrong = TextStyle(
+    fontFamily: "IranSans",
+    fontSize: 14,
+    fontWeight: FontWeight.normal,
+    decoration: TextDecoration.lineThrough,
+    color: MyColors.error,
+  );
+  static const TextStyle text24Correct = TextStyle(
+    fontFamily: "IranSans",
+    fontSize: 24,
+    fontWeight: FontWeight.bold,
+    color: MyColors.success,
+  );
   static const TextStyle textMatn16 = TextStyle(
     fontFamily: "IranSans",
     fontSize: 16,

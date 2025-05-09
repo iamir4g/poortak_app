@@ -45,6 +45,8 @@ class MyColors {
   static const Color warning = Color(0xFFFFC107); // Amber
   static const Color info = Color(0xFF2196F3); // Light Blue
 
+  static const Color infoBg = Color.fromRGBO(251, 246, 251, 1);
+
   // Common UI Colors
   static const Color divider = Color(0xFFE0E0E0); // Light Grey
   static const Color cardBackground = Color(0xFFFAFAFA); // Very Light Grey

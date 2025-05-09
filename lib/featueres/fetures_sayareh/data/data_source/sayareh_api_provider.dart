@@ -37,6 +37,19 @@ class SayarehApiProvider {
     return response;
   }
 
+  dynamic callPostPracticeVocabulary(
+      String id, List<String>? previousVocabularyIds) async {
+    final response = await dio.post(
+      "${Constants.baseUrl}iknow/courses/$id/vocabulary/practice",
+      data: {
+        "previousVocabularyIds": previousVocabularyIds,
+      },
+    );
+
+    log("Sayareh Practice Vocabulary Response: ${response.data}");
+    return response;
+  }
+
   dynamic callSayarehStorageApi() async {
     final response = await dio.get(
       "${Constants.baseUrl}storage",

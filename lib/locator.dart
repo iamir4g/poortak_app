@@ -8,6 +8,7 @@ import 'package:poortak/featueres/fetures_sayareh/data/data_source/sayareh_api_p
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/bloc_storage_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/converstion_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/lesson_bloc.dart';
+import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/practice_vocabulary_bloc/practice_vocabulary_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/vocabulary_bloc/vocabulary_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/repositories/sayareh_repository.dart';
 import 'package:poortak/featueres/feature_profile/data/data_sorce/profile_api_provider.dart';
@@ -61,6 +62,8 @@ Future<void> initLocator() async {
       ConverstionBloc(sayarehRepository: locator()));
   locator.registerSingleton<VocabularyBloc>(
       VocabularyBloc(sayarehRepository: locator()));
+  locator.registerSingleton<PracticeVocabularyBloc>(
+      PracticeVocabularyBloc(sayarehRepository: locator()));
   // Register PermissionBloc
   locator.registerSingleton<PermissionBloc>(PermissionBloc());
 }

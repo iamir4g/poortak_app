@@ -13,6 +13,7 @@ import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/bloc_storage_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/lesson_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/converstion_screen.dart';
+import 'package:poortak/featueres/fetures_sayareh/screens/practice_vocabulary_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/vocabulary_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/widgets/custom_video_player.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/sayareh_cubit.dart';
@@ -554,33 +555,39 @@ class _LessonScreenState extends State<LessonScreen> {
           ),
 
           const SizedBox(height: 12),
-          Container(
-            width: 350,
-            height: 104,
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(40)),
-                color: MyColors.background),
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 22, horizontal: 28),
-              child: Row(
-                children: [
-                  Image.asset(
-                    "assets/images/quiz_icon.png",
-                    width: 48.0,
-                    height: 48.0,
-                  ),
-                  SizedBox(
-                    width: 18,
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("Quiz", style: CustomTextStyle.titleLesonText),
-                      Text("آزمون", style: CustomTextStyle.subTitleLeasonText)
-                    ],
-                  )
-                ],
+          InkWell(
+            onTap: () {
+              Navigator.pushNamed(context, PracticeVocabularyScreen.routeName,
+                  arguments: {"courseId": conversationId});
+            },
+            child: Container(
+              width: 350,
+              height: 104,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(40)),
+                  color: MyColors.background),
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 22, horizontal: 28),
+                child: Row(
+                  children: [
+                    Image.asset(
+                      "assets/images/quiz_icon.png",
+                      width: 48.0,
+                      height: 48.0,
+                    ),
+                    SizedBox(
+                      width: 18,
+                    ),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("Quiz", style: CustomTextStyle.titleLesonText),
+                        Text("آزمون", style: CustomTextStyle.subTitleLeasonText)
+                      ],
+                    )
+                  ],
+                ),
               ),
             ),
           ),
