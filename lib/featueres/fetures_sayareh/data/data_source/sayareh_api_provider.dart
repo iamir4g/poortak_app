@@ -51,6 +51,15 @@ class SayarehApiProvider {
     return response;
   }
 
+  dynamic callGetQuizzes(String id) async {
+    final response = await dio.get(
+      "${Constants.baseUrl}iknow/courses/$id/quiz",
+    );
+
+    log("Sayareh Quizzes Response: ${response.data}");
+    return response;
+  }
+
   dynamic callSayarehStorageApi() async {
     final response = await dio.get(
       "${Constants.baseUrl}storage",

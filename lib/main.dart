@@ -13,6 +13,7 @@ import 'package:poortak/featueres/fetures_sayareh/presentation/vocabulary_bloc/v
 import 'package:poortak/featueres/fetures_sayareh/screens/converstion_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/lesson_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/practice_vocabulary_screen.dart';
+import 'package:poortak/featueres/fetures_sayareh/screens/quiez_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/quiezs_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/vocabulary_screen.dart';
 import 'package:poortak/featueres/feature_intro/presentation/bloc/splash_bloc/splash_cubit.dart';
@@ -21,11 +22,13 @@ import 'package:poortak/featueres/feature_intro/presentation/screens/splash_scre
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/sayareh_cubit.dart';
+import 'package:poortak/featueres/fetures_sayareh/repositories/sayareh_repository.dart';
 import 'package:poortak/locator.dart';
 import 'package:poortak/test_screen.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/bloc_storage_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/converstion_bloc.dart';
+import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quizes_cubit/cubit/quizes_cubit.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -105,8 +108,8 @@ class MyApp extends StatelessWidget {
           final args = ModalRoute.of(context)?.settings.arguments
               as Map<String, dynamic>;
           return BlocProvider(
-            create: (context) => locator<
-                PracticeVocabularyBloc>(), // PracticeVocabularyBloc(sayarehRepository: locator()),
+            create: (context) =>
+                PracticeVocabularyBloc(sayarehRepository: locator()),
             child: PracticeVocabularyScreen(courseId: args['courseId']),
           );
         },
@@ -115,7 +118,22 @@ class MyApp extends StatelessWidget {
               as Map<String, dynamic>;
           return ConversationScreen(conversationId: args['conversationId']);
         },
-        QuizzesScreen.routeName: (context) => QuizzesScreen(),
+        QuizzesScreen.routeName: (context) {
+          final args = ModalRoute.of(context)?.settings.arguments
+              as Map<String, dynamic>;
+          return BlocProvider(
+            create: (context) => QuizesCubit(),
+            child: QuizzesScreen(courseId: args['courseId']),
+          );
+        },
+        QuizScreen.routeName: (context) {
+          final args = ModalRoute.of(context)?.settings.arguments
+              as Map<String, dynamic>;
+          return QuizScreen(
+              quizId: args['quizId'],
+              courseId: args['courseId'],
+              title: args['title']);
+        },
       },
       debugShowCheckedModeBanner: false,
       title: 'Poortak',

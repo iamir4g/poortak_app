@@ -62,8 +62,6 @@ Future<void> initLocator() async {
       ConverstionBloc(sayarehRepository: locator()));
   locator.registerSingleton<VocabularyBloc>(
       VocabularyBloc(sayarehRepository: locator()));
-  locator.registerSingleton<PracticeVocabularyBloc>(
-      PracticeVocabularyBloc(sayarehRepository: locator()));
   // Register PermissionBloc
   locator.registerSingleton<PermissionBloc>(PermissionBloc());
 }

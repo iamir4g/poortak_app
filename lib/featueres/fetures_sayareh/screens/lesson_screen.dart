@@ -23,6 +23,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'dart:typed_data';
 import 'package:poortak/common/utils/decryption.dart';
+import 'package:poortak/common/utils/prefs_operator.dart';
 
 class LessonScreen extends StatefulWidget {
   static const routeName = "/lesson_screen";
@@ -558,9 +559,18 @@ class _LessonScreenState extends State<LessonScreen> {
           const SizedBox(height: 12),
           InkWell(
             onTap: () {
-              Navigator.pushNamed(context, QuizzesScreen.routeName);
-              // Navigator.pushNamed(context, PracticeVocabularyScreen.routeName,
-              //     arguments: {"courseId": conversationId});
+              final prefsOperator = locator<PrefsOperator>();
+              if (!prefsOperator.isLoggedIn()) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('لطفا ابتدا وارد حساب کاربری خود شوید'),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+                return;
+              }
+              Navigator.pushNamed(context, QuizzesScreen.routeName,
+                  arguments: {"courseId": conversationId});
             },
             child: Container(
               width: 350,

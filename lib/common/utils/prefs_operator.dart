@@ -41,4 +41,8 @@ class PrefsOperator {
     sharedPreferences.clear();
     sharedPreferences.setBool("showIntro", false);
   }
+
+  bool isLoggedIn() {
+    return sharedPreferences.getString('user_token') != null;
+  }
 }

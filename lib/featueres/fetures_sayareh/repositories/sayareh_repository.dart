@@ -6,6 +6,7 @@ import 'package:poortak/common/resources/data_state.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/data_source/sayareh_api_provider.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/conversation_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/practice_vocabulary_model.dart';
+import 'package:poortak/featueres/fetures_sayareh/data/models/quizes_list_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_home_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_storage_test_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/vocabulary_model.dart';
@@ -85,6 +86,20 @@ class SayarehRepository {
           return DataSuccess(null);
         }
         final data = PracticeVocabularyModel.fromJson(response.data);
+        return DataSuccess(data);
+      } else {
+        return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
+      }
+    } on AppException catch (e) {
+      return await CheckExceptions.getError(e);
+    }
+  }
+
+  Future<DataState<QuizesList>> fetchQuizzes(String id) async {
+    try {
+      Response response = await sayarehApiProvider.callGetQuizzes(id);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = QuizesList.fromJson(response.data);
         return DataSuccess(data);
       } else {
         return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
