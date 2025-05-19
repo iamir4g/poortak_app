@@ -13,6 +13,7 @@ import 'package:poortak/featueres/fetures_sayareh/presentation/vocabulary_bloc/v
 import 'package:poortak/featueres/fetures_sayareh/screens/converstion_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/lesson_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/practice_vocabulary_screen.dart';
+import 'package:poortak/featueres/fetures_sayareh/screens/quiezs_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/vocabulary_screen.dart';
 import 'package:poortak/featueres/feature_intro/presentation/bloc/splash_bloc/splash_cubit.dart';
 import 'package:poortak/featueres/feature_intro/presentation/screens/intro_main_wrapper.dart';
@@ -114,6 +115,7 @@ class MyApp extends StatelessWidget {
               as Map<String, dynamic>;
           return ConversationScreen(conversationId: args['conversationId']);
         },
+        QuizzesScreen.routeName: (context) => QuizzesScreen(),
       },
       debugShowCheckedModeBanner: false,
       title: 'Poortak',

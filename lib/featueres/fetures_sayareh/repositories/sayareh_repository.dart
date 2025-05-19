@@ -81,6 +81,9 @@ class SayarehRepository {
       Response response = await sayarehApiProvider.callPostPracticeVocabulary(
           id, previousVocabularyIds);
       if (response.statusCode == 200 || response.statusCode == 201) {
+        if (response.data['data'] == null) {
+          return DataSuccess(null);
+        }
         final data = PracticeVocabularyModel.fromJson(response.data);
         return DataSuccess(data);
       } else {

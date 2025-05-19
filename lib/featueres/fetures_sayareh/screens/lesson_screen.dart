@@ -14,6 +14,7 @@ import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/bloc_storage
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/lesson_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/converstion_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/practice_vocabulary_screen.dart';
+import 'package:poortak/featueres/fetures_sayareh/screens/quiezs_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/vocabulary_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/widgets/custom_video_player.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/sayareh_cubit.dart';
@@ -557,8 +558,9 @@ class _LessonScreenState extends State<LessonScreen> {
           const SizedBox(height: 12),
           InkWell(
             onTap: () {
-              Navigator.pushNamed(context, PracticeVocabularyScreen.routeName,
-                  arguments: {"courseId": conversationId});
+              Navigator.pushNamed(context, QuizzesScreen.routeName);
+              // Navigator.pushNamed(context, PracticeVocabularyScreen.routeName,
+              //     arguments: {"courseId": conversationId});
             },
             child: Container(
               width: 350,

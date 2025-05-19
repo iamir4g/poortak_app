@@ -39,6 +39,7 @@ class SayarehApiProvider {
 
   dynamic callPostPracticeVocabulary(
       String id, List<String>? previousVocabularyIds) async {
+    log("previousVocabularyIds: $previousVocabularyIds");
     final response = await dio.post(
       "${Constants.baseUrl}iknow/courses/$id/vocabulary/practice",
       data: {

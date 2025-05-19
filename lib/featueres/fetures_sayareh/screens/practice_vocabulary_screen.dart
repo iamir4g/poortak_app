@@ -79,7 +79,10 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
           );
     } else {
       context.read<PracticeVocabularyBloc>().add(
-            PracticeVocabularyFetchEvent(courseId: widget.courseId),
+            PracticeVocabularyFetchEvent(
+              courseId: widget.courseId,
+              previousVocabularyIds: [],
+            ),
           );
     }
   }
@@ -139,6 +142,26 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
         body: BlocBuilder<PracticeVocabularyBloc, PracticeVocabularyState>(
           builder: (context, state) {
             if (state is PracticeVocabularyLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (state is PracticeVocabularyCompleted) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('تمرین واژگان به پایان رسید'),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+                Navigator.pushReplacementNamed(
+                  context,
+                  LessonScreen.routeName,
+                  arguments: {
+                    'index': 0,
+                    'title': 'درس',
+                    'lessonId': widget.courseId,
+                  },
+                );
+              });
               return const Center(child: CircularProgressIndicator());
             }
             if (state is PracticeVocabularySuccess) {

@@ -19,8 +19,15 @@ class PracticeVocabularyBloc
         event.courseId,
         event.previousVocabularyIds,
       );
-      if (response is DataSuccess && response.data != null) {
-        emit(PracticeVocabularySuccess(practiceVocabulary: response.data!));
+      if (response is DataSuccess) {
+        if (response.data != null) {
+          emit(PracticeVocabularySuccess(
+            practiceVocabulary: response.data!,
+            correctWords: event.previousVocabularyIds ?? [],
+          ));
+        } else {
+          emit(PracticeVocabularyCompleted());
+        }
       } else {
         emit(PracticeVocabularyError(
             message: response.error ?? "خطا در دریافت اطلاعات"));

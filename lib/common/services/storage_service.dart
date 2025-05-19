@@ -15,7 +15,7 @@ class StorageService {
       "${Constants.baseUrl}storage/download/$key",
     );
 
-    log("Download URL Response: ${response.data}");
+    // log("Download URL Response: ${response.data}");
     return GetDownloadUrl.fromJson(response.data);
   }
   // 'https://api.poortak.ir/api/v1/storage/key/{fileId}'
