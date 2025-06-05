@@ -29,6 +29,10 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/bloc_storage_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/converstion_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quizes_cubit/cubit/quizes_cubit.dart';
+import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_start_bloc/quiz_start_bloc.dart';
+import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_answer_bloc/quiz_answer_bloc.dart';
+import 'package:poortak/featueres/fetures_sayareh/screens/first_quiz_screen.dart';
+import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_result_bloc/quiz_result_bloc.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -126,13 +130,50 @@ class MyApp extends StatelessWidget {
             child: QuizzesScreen(courseId: args['courseId']),
           );
         },
+        FirstQuizScreen.routeName: (context) {
+          final args = ModalRoute.of(context)?.settings.arguments
+              as Map<String, dynamic>;
+          return MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (context) => QuizStartBloc(locator()),
+              ),
+              BlocProvider(
+                create: (context) => QuizAnswerBloc(locator()),
+              ),
+              BlocProvider(
+                create: (context) => QuizResultBloc(locator()),
+              ),
+            ],
+            child: FirstQuizScreen(
+              quizId: args['quizId'],
+              courseId: args['courseId'],
+              title: args['title'],
+            ),
+          );
+        },
         QuizScreen.routeName: (context) {
           final args = ModalRoute.of(context)?.settings.arguments
               as Map<String, dynamic>;
-          return QuizScreen(
+          return MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (context) => QuizStartBloc(locator()),
+              ),
+              BlocProvider(
+                create: (context) => QuizAnswerBloc(locator()),
+              ),
+              BlocProvider(
+                create: (context) => QuizResultBloc(locator()),
+              ),
+            ],
+            child: QuizScreen(
               quizId: args['quizId'],
               courseId: args['courseId'],
-              title: args['title']);
+              title: args['title'],
+              initialQuestion: args['initialQuestion'],
+            ),
+          );
         },
       },
       debugShowCheckedModeBanner: false,

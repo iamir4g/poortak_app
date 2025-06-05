@@ -3,6 +3,8 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poortak/common/widgets/primaryButton.dart';
+import 'package:poortak/common/widgets/main_wrapper.dart';
+import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_profile/presentation/bloc/profile_bloc.dart';
@@ -124,14 +126,26 @@ class _LoginScreenState extends State<LoginScreen> {
                           mobileNumber = _mobileController.text;
                         });
                       } else if (state is ProfileSuccessLogin) {
+                        // Save user data and login state
+                        locator<PrefsOperator>().saveUserData(
+                          state.data.data.result.accessToken,
+                          state.data.data.result.refreshToken,
+                          mobileNumber ?? '',
+                          mobileNumber ?? '',
+                        );
+
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('ورود با موفقیت انجام شد'),
                             duration: Duration(seconds: 2),
                           ),
                         );
-                        Navigator.pushReplacementNamed(
-                            context, '/profile_screen');
+                        // Navigate to MainWrapper instead of profile screen
+                        Navigator.pushNamedAndRemoveUntil(
+                          context,
+                          MainWrapper.routeName,
+                          (route) => false,
+                        );
                       }
                     },
                     builder: (context, state) {

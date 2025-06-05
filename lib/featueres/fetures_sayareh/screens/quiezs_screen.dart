@@ -5,6 +5,7 @@ import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quizes_cubit/cubit/quizes_cubit.dart';
+import 'package:poortak/featueres/fetures_sayareh/screens/first_quiz_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/quiez_screen.dart';
 import 'package:poortak/locator.dart';
 
@@ -24,23 +25,23 @@ class _QuizzesScreenState extends State<QuizzesScreen> {
   void initState() {
     super.initState();
     _quizesCubit = QuizesCubit();
-    // _checkAuthAndFetchQuizzes();
+    _checkAuthAndFetchQuizzes();
   }
 
-  // void _checkAuthAndFetchQuizzes() {
-  //   final prefsOperator = locator<PrefsOperator>();
-  //   if (!prefsOperator.isLoggedIn()) {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       const SnackBar(
-  //         content: Text('لطفا ابتدا وارد حساب کاربری خود شوید'),
-  //         duration: Duration(seconds: 2),
-  //       ),
-  //     );
-  //     Navigator.pop(context);
-  //     return;
-  //   }
-  //   _quizesCubit.fetchQuizzes(widget.courseId);
-  // }
+  void _checkAuthAndFetchQuizzes() {
+    final prefsOperator = locator<PrefsOperator>();
+    if (!prefsOperator.isLoggedIn()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('لطفا ابتدا وارد حساب کاربری خود شوید'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      Navigator.pop(context);
+      return;
+    }
+    _quizesCubit.fetchQuizzes(widget.courseId);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,12 +76,15 @@ class _QuizzesScreenState extends State<QuizzesScreen> {
                       final quiz = state.quizzes.data[index];
                       return InkWell(
                         onTap: () {
-                          Navigator.pushNamed(context, QuizScreen.routeName,
-                              arguments: {
-                                "quizId": quiz.id,
-                                "courseId": widget.courseId,
-                                "title": quiz.title,
-                              });
+                          Navigator.pushNamed(
+                            context,
+                            FirstQuizScreen.routeName,
+                            arguments: {
+                              "quizId": quiz.id,
+                              "courseId": widget.courseId,
+                              "title": quiz.title,
+                            },
+                          );
                         },
                         child: QuizItem(
                           title: quiz.title,

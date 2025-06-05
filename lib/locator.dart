@@ -16,6 +16,9 @@ import 'package:poortak/featueres/feature_profile/repositories/profile_repositor
 import 'package:poortak/featueres/feature_shopping_cart/repositories/shopping_cart_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:poortak/common/bloc/permission/permission_bloc.dart';
+import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_start_bloc/quiz_start_bloc.dart';
+import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_answer_bloc/quiz_answer_bloc.dart';
+import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_result_bloc/quiz_result_bloc.dart';
 
 GetIt locator = GetIt.instance;
 
@@ -64,4 +67,9 @@ Future<void> initLocator() async {
       VocabularyBloc(sayarehRepository: locator()));
   // Register PermissionBloc
   locator.registerSingleton<PermissionBloc>(PermissionBloc());
+
+  // Register Quiz Blocs
+  locator.registerFactory<QuizStartBloc>(() => QuizStartBloc(locator()));
+  locator.registerFactory<QuizAnswerBloc>(() => QuizAnswerBloc(locator()));
+  locator.registerFactory<QuizResultBloc>(() => QuizResultBloc(locator()));
 }

@@ -45,4 +45,8 @@ class PrefsOperator {
   bool isLoggedIn() {
     return sharedPreferences.getString('user_token') != null;
   }
+
+  Future<String?> getAccessToken() async {
+    return sharedPreferences.getString('user_token');
+  }
 }

@@ -1,15 +1,41 @@
 import 'dart:developer';
 import 'package:dio/dio.dart';
+import 'package:poortak/common/error_handling/app_exception.dart';
 import 'package:poortak/common/error_handling/check_exception.dart';
+import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/config/constants.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_home_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_storage_test_model.dart';
+import 'package:poortak/locator.dart';
 
 class SayarehApiProvider {
-  Dio dio;
-  SayarehApiProvider({required this.dio});
+  final Dio dio;
+  final PrefsOperator _prefsOperator;
 
-  // Future<SayarehHomeModel>
+  SayarehApiProvider({required this.dio})
+      : _prefsOperator = locator<PrefsOperator>();
+
+  Future<Response> _makeAuthenticatedRequest(
+      Future<Response> Function() request) async {
+    final token = await _prefsOperator.getUserToken();
+    if (token == null) {
+      throw UnauthorisedException(message: 'Please login to continue');
+    }
+
+    dio.options.headers['Authorization'] = 'Bearer $token';
+    try {
+      return await request();
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 401 || e.response?.statusCode == 404) {
+        // Clear token and throw unauthorized exception
+        await _prefsOperator.logout();
+        throw UnauthorisedException(
+            message: 'Session expired. Please login again.');
+      }
+      rethrow;
+    }
+  }
+
   dynamic callGetAllCourses() async {
     final response = await dio.get(
       "${Constants.baseUrl}iknow/courses",
@@ -52,12 +78,32 @@ class SayarehApiProvider {
   }
 
   dynamic callGetQuizzes(String id) async {
-    final response = await dio.get(
-      "${Constants.baseUrl}iknow/courses/$id/quiz",
-    );
+    return await _makeAuthenticatedRequest(() => dio.get(
+          "${Constants.baseUrl}iknow/courses/$id/quiz",
+        ));
+  }
 
-    log("Sayareh Quizzes Response: ${response.data}");
-    return response;
+  dynamic callGetStartQuizById(String courseId, String quizId) async {
+    return await _makeAuthenticatedRequest(() => dio.get(
+          "${Constants.baseUrl}iknow/courses/$courseId/quiz/$quizId/start",
+        ));
+  }
+
+  dynamic callPostAnswerQuestion(String courseId, String quizId,
+      String questionId, String answerId) async {
+    return await _makeAuthenticatedRequest(() => dio.post(
+          "${Constants.baseUrl}iknow/courses/$courseId/quiz/$quizId/answer",
+          data: {
+            "questionId": questionId,
+            "answerId": answerId,
+          },
+        ));
+  }
+
+  dynamic callGetResultQuestion(String courseId, String quizId) async {
+    return await _makeAuthenticatedRequest(() => dio.get(
+          "${Constants.baseUrl}iknow/courses/$courseId/quiz/$quizId/result",
+        ));
   }
 
   dynamic callSayarehStorageApi() async {

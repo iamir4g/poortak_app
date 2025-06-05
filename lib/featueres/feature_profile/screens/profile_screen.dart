@@ -26,6 +26,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     setState(() {
       isLoggedIn = loggedIn;
     });
+    print("token: ${await prefsOperator.getAccessToken()}");
   }
 
   @override
@@ -34,35 +35,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return const LoginScreen();
     }
 
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Color(0xFFE8F0FC),
-            Color(0xFFFCEBF1),
-            Color(0xFFEFE8FC),
-          ],
-          stops: [0.1, 0.54, 1.0],
-        ),
-      ),
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              const Text("Profile Screen"),
-              ElevatedButton(
-                onPressed: () async {
-                  await prefsOperator.logout();
-                  setState(() {
-                    isLoggedIn = false;
-                  });
-                },
-                child: const Text("Logout"),
-              ),
+    return Scaffold(
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFFE8F0FC),
+              Color(0xFFFCEBF1),
+              Color(0xFFEFE8FC),
             ],
+            stops: [0.1, 0.54, 1.0],
+          ),
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                const Text("Profile Screen"),
+                ElevatedButton(
+                  onPressed: () async {
+                    await prefsOperator.logout();
+                    if (mounted) {
+                      setState(() {
+                        isLoggedIn = false;
+                      });
+                    }
+                  },
+                  child: const Text("Logout"),
+                ),
+              ],
+            ),
           ),
         ),
       ),
