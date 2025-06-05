@@ -19,4 +19,10 @@ class CustomTextStyle {
     fontSize: 16,
     fontWeight: FontWeight.w500,
   );
+
+  static const TextStyle textHeader16Bold = TextStyle(
+    fontWeight: FontWeight.w700,
+    fontSize: 16,
+    color: Color(0xFF494E6A),
+  );
 }

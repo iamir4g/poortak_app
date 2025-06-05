@@ -87,6 +87,8 @@ class QuizAnswerBloc extends Bloc<QuizAnswerEvent, QuizAnswerState> {
           isCorrect: result.data!.data.correct,
           explanation: result.data!.data.question.explanation?.toString(),
           nextQuestion: nextQuestion,
+          correctAnswerId: result.data!.data.correctAnswer.id,
+          selectedAnswerId: event.answerId,
         ));
       } else if (result is DataFailed) {
         log("Result is DataFailed: ${result.error}");
