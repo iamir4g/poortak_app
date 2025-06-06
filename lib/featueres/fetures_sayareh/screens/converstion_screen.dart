@@ -5,7 +5,7 @@ import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/locator.dart';
 import 'package:poortak/common/services/tts_service.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/conversation_model.dart';
-import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/converstion_bloc.dart';
+import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/converstion_bloc/converstion_bloc.dart';
 // import 'package:poortak/featueres/fetures_sayareh/data/models/conversation_model.dart';
 // import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/converstion_bloc.dart';
 // import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/converstion_event.dart';
