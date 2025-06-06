@@ -7,7 +7,7 @@ import 'package:poortak/featueres/fetures_sayareh/screens/quizzes_screen.dart';
 class QuizResultModal extends StatelessWidget {
   final int totalQuestions;
   final int correctAnswers;
-  final int score;
+  final double score;
   final String courseId;
 
   const QuizResultModal({

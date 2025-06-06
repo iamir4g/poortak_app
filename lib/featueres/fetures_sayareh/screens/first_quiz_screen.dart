@@ -266,10 +266,10 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                                       id: answer.id,
                                       isSelected: isSelected,
                                       isCorrect: isCorrectAnswer,
-                                      showFeedback:
-                                          answerState is QuizAnswerLoaded,
                                       isWrongSelected: isWrongSelected,
                                       selectedAnswerId: selectedAnswerId ?? "",
+                                      showFeedback:
+                                          answerState is QuizAnswerLoaded,
                                     ),
                                   );
                                 },
@@ -277,6 +277,7 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                               const Spacer(),
                               // Explanation just above the button
                               if (answerState is QuizAnswerLoaded &&
+                                  !answerState.isCorrect &&
                                   answerState.explanation != null)
                                 Padding(
                                   padding: const EdgeInsets.only(bottom: 16.0),
@@ -307,7 +308,39 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                                       textAlign: TextAlign.center,
                                     ),
                                   ),
-                                ),
+                                )
+                              else if (answerState is QuizAnswerLoaded &&
+                                  answerState.isCorrect)
+                                (Padding(
+                                    padding:
+                                        const EdgeInsets.only(bottom: 16.0),
+                                    child: Column(
+                                      children: [
+                                        Container(
+                                          width: 54,
+                                          height: 54,
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFFEDFAEB),
+                                            borderRadius:
+                                                BorderRadius.circular(50),
+                                          ),
+                                          child: const Icon(Icons.check_circle,
+                                              color: Color(0xFF6FC845),
+                                              size: 40),
+                                        ),
+                                        const SizedBox(height: 12),
+                                        Text(
+                                          'آفرین درست گفتی!🥳',
+                                          style: TextStyle(
+                                            fontFamily: 'IRANSans',
+                                            fontWeight: FontWeight.w300,
+                                            fontSize: 12,
+                                            color: Color(0xFF3D495C),
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ],
+                                    ))),
                               // Button logic
                               if (selectedAnswerId != null &&
                                   answerState is! QuizAnswerLoaded)

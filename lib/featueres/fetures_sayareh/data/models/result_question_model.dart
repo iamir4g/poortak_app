@@ -37,7 +37,7 @@ class Data {
   int totalQuestions;
   int answeredQuestions;
   int correctAnswers;
-  int score;
+  double score;
   List<AnswerElement> answers;
 
   Data({

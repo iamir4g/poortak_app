@@ -51,10 +51,10 @@ class _QuizAnswerItemState extends State<QuizAnswerItem> {
   Widget build(BuildContext context) {
     Color borderColor = Colors.transparent;
     Color bgColor = const Color(0xFFF6F9FE);
-    log("widget.id: ${widget.id}");
-    log("widget.showFeedback: ${widget.showFeedback}");
-    log("widget.isCorrect: ${widget.isCorrect}");
-    log("widget.isSelected: ${widget.isSelected}");
+    // log("widget.id: ${widget.id}");
+    // log("widget.showFeedback: ${widget.showFeedback}");
+    // log("widget.isCorrect: ${widget.isCorrect}");
+    // log("widget.isSelected: ${widget.isSelected}");
     if (widget.showFeedback) {
       if (widget.isCorrect) {
         borderColor = const Color(0xFF6FC845); // green

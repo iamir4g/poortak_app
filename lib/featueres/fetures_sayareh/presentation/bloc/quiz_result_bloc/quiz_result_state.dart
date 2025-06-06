@@ -14,7 +14,7 @@ class QuizResultLoading extends QuizResultState {}
 class QuizResultLoaded extends QuizResultState {
   final int totalQuestions;
   final int correctAnswers;
-  final int score;
+  final double score;
 
   const QuizResultLoaded({
     required this.totalQuestions,

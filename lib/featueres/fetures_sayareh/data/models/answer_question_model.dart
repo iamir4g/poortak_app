@@ -37,27 +37,29 @@ class Data {
   Question question;
   CorrectAnswer correctAnswer;
   bool correct;
-  Question nextQuestion;
+  Question? nextQuestion;
 
   Data({
     required this.question,
     required this.correctAnswer,
     required this.correct,
-    required this.nextQuestion,
+    this.nextQuestion,
   });
 
   factory Data.fromJson(Map<String, dynamic> json) => Data(
         question: Question.fromJson(json["question"]),
         correctAnswer: CorrectAnswer.fromJson(json["correctAnswer"]),
         correct: json["correct"],
-        nextQuestion: Question.fromJson(json["nextQuestion"]),
+        nextQuestion: json["nextQuestion"] != null
+            ? Question.fromJson(json["nextQuestion"])
+            : null,
       );
 
   Map<String, dynamic> toJson() => {
         "question": question.toJson(),
         "correctAnswer": correctAnswer.toJson(),
         "correct": correct,
-        "nextQuestion": nextQuestion.toJson(),
+        "nextQuestion": nextQuestion?.toJson(),
       };
 }
 
