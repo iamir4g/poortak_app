@@ -7,8 +7,8 @@ import 'package:poortak/featueres/fetures_sayareh/data/data_source/sayareh_api_p
 import 'package:poortak/featueres/fetures_sayareh/data/models/answer_question_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/conversation_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/practice_vocabulary_model.dart';
-import 'package:poortak/featueres/fetures_sayareh/data/models/quiez_question_model.dart';
-import 'package:poortak/featueres/fetures_sayareh/data/models/quizes_list_model.dart';
+import 'package:poortak/featueres/fetures_sayareh/data/models/quiz_question_model.dart';
+import 'package:poortak/featueres/fetures_sayareh/data/models/quizzes_list_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/result_question_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_home_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_storage_test_model.dart';

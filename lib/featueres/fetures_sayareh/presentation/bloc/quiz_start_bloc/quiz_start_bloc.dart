@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poortak/common/resources/data_state.dart';
-import 'package:poortak/featueres/fetures_sayareh/data/models/quiez_question_model.dart';
+import 'package:poortak/featueres/fetures_sayareh/data/models/quiz_question_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/repositories/sayareh_repository.dart';
 
 part 'quiz_start_event.dart';

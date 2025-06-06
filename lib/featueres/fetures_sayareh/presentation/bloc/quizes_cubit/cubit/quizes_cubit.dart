@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:poortak/common/resources/data_state.dart';
-import 'package:poortak/featueres/fetures_sayareh/data/models/quizes_list_model.dart';
+import 'package:poortak/featueres/fetures_sayareh/data/models/quizzes_list_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/repositories/sayareh_repository.dart';
 import 'package:poortak/locator.dart';
 

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:lottie/lottie.dart';
-import 'package:poortak/featueres/fetures_sayareh/screens/quiezs_screen.dart';
+import 'package:poortak/featueres/fetures_sayareh/screens/quizzes_screen.dart';
 
 class QuizResultModal extends StatelessWidget {
   final int totalQuestions;

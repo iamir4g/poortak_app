@@ -7,9 +7,9 @@ import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_start_b
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_answer_bloc/quiz_answer_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_result_bloc/quiz_result_bloc.dart';
 import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
-import 'package:poortak/featueres/fetures_sayareh/data/models/quiez_question_model.dart';
+import 'package:poortak/featueres/fetures_sayareh/data/models/quiz_question_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/first_quiz_screen.dart';
-import 'package:poortak/featueres/fetures_sayareh/screens/quiz_result_modal.dart';
+import 'package:poortak/featueres/fetures_sayareh/widgets/quiz_result_modal.dart';
 import 'package:poortak/featueres/fetures_sayareh/repositories/sayareh_repository.dart';
 import 'package:poortak/common/resources/data_state.dart';
 import 'package:poortak/featueres/fetures_sayareh/widgets/item_question.dart';

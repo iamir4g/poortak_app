@@ -8,7 +8,7 @@ import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_start_bloc/quiz_start_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_answer_bloc/quiz_answer_bloc.dart';
 import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
-import 'package:poortak/featueres/fetures_sayareh/screens/quiez_screen.dart';
+import 'package:poortak/featueres/fetures_sayareh/screens/quiz_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/widgets/item_question.dart';
 import 'package:poortak/locator.dart';
 
