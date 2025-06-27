@@ -9,6 +9,7 @@ import 'package:poortak/common/widgets/bottom_nav.dart';
 import 'package:poortak/common/widgets/custom_drawer.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
+import 'package:poortak/featueres/feature_litner/screens/litner_main_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/profile_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/bloc_storage_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/repositories/sayareh_repository.dart';
@@ -31,9 +32,10 @@ class MainWrapper extends StatelessWidget {
           color: Colors.blue,
         ),
         const ShoppingCartScreen(),
-        Container(
-          color: Colors.yellow,
-        ),
+        // Container(
+        //   color: Colors.yellow,
+        // ),
+        LitnerMainScreen(),
         const ProfileScreen(),
         // Container(
         //   color: Colors.purple,
@@ -87,29 +89,11 @@ class MainWrapper extends StatelessWidget {
 
             return Scaffold(
               appBar: AppBar(
-                // bottom: PreferredSize(
-                //   preferredSize: const Size.fromHeight(150.0),
-                //   child: Container(
-                //     height: 57,
-                //     // width: 100,
-                //     color: Colors.white,
-                //     alignment: Alignment.center,
-                //     child: const Text('Some content'),
-                //   ),
-                // ),
                 flexibleSpace: Container(
                   decoration: const BoxDecoration(
                     borderRadius: BorderRadius.vertical(
                       bottom: Radius.circular(30.0),
                     ),
-                    // gradient: LinearGradient(
-                    //   begin: Alignment.topLeft,
-                    //   end: Alignment.bottomRight,
-                    //   colors: [
-                    //     Color(0xFF72326a),
-                    //     Color(0xFF321c53),
-                    //   ],
-                    // ),
                   ),
                 ),
                 shape: const RoundedRectangleBorder(
@@ -117,10 +101,6 @@ class MainWrapper extends StatelessWidget {
                     bottom: Radius.circular(30.0),
                   ),
                 ),
-                // title: Text("Poortak"),
-                // actions: [
-                //   IconButton(onPressed: () {}, icon: Icon(Icons.search)),
-                // ],
               ),
               drawer: const CustomDrawer(),
               bottomNavigationBar: BottomNav(controller: controller),

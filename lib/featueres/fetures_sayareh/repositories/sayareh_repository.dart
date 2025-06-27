@@ -145,18 +145,6 @@ class SayarehRepository {
       log("Raw response data: ${response.data}");
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        // if (response.data == null) {
-        //   log("Response data is null, returning DataSuccess(null)");
-        //   return DataSuccess(null);
-        // }
-
-        // Check if nextQuestion is null in the raw response
-        // if (response.data['data'] != null &&
-        //     response.data['data']['nextQuestion'] == null) {
-        //   log("nextQuestion is null in raw response, returning DataSuccess(null)");
-        //   return DataSuccess(null);
-        // }
-
         log("Attempting to parse response data...");
         final data = AnswerQuestion.fromJson(response.data);
         log("Successfully parsed response data");

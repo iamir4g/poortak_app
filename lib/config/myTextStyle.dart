@@ -89,6 +89,12 @@ class MyTextStyle {
       fontWeight: FontWeight.w500,
       color: MyColors.primaryShade1);
 
+  static const TextStyle textCenter16 = TextStyle(
+    fontFamily: "IranSans",
+    fontSize: 16,
+    fontWeight: FontWeight.w500,
+    color: MyColors.textMatn1,
+  );
   // static const TextStyle bottomNavDisabledTextStyle = TextStyle(
   //   fontFamily: "IranSans",
   //   fontSize: 14,

@@ -4,6 +4,9 @@ import 'package:poortak/common/bloc/storage/storage_bloc.dart';
 import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/common/services/tts_service.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
+import 'package:poortak/featueres/feature_litner/data/data_source/litner_api_provider.dart';
+import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_bloc.dart';
+import 'package:poortak/featueres/feature_litner/repositories/litner_repository.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/data_source/sayareh_api_provider.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/bloc_storage_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/converstion_bloc/converstion_bloc.dart';
@@ -52,11 +55,14 @@ Future<void> initLocator() async {
       SayarehApiProvider(dio: locator()));
   locator.registerSingleton<ProfileApiProvider>(
       ProfileApiProvider(dio: locator()));
+  locator
+      .registerSingleton<LitnerApiProvider>(LitnerApiProvider(dio: locator()));
 
   //repository
   locator.registerSingleton<SayarehRepository>(SayarehRepository(locator()));
   locator.registerSingleton<ShoppingCartRepository>(ShoppingCartRepository());
   locator.registerSingleton<ProfileRepository>(ProfileRepository(locator()));
+  locator.registerSingleton<LitnerRepository>(LitnerRepository(locator()));
   locator.registerSingleton<BlocStorageBloc>(
       BlocStorageBloc(sayarehRepository: locator()));
   locator
@@ -65,6 +71,8 @@ Future<void> initLocator() async {
       ConverstionBloc(sayarehRepository: locator()));
   locator.registerSingleton<VocabularyBloc>(
       VocabularyBloc(sayarehRepository: locator()));
+  locator
+      .registerSingleton<LitnerBloc>(LitnerBloc(litnerRepository: locator()));
   // Register PermissionBloc
   locator.registerSingleton<PermissionBloc>(PermissionBloc());
 

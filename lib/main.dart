@@ -4,6 +4,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:poortak/common/blocs/bottom_nav_cubit/bottom_nav_cubit.dart';
 import 'package:poortak/common/widgets/main_wrapper.dart';
 import 'package:poortak/config/my_theme.dart';
+import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_bloc.dart';
 import 'package:poortak/featueres/feature_profile/data/data_sorce/profile_api_provider.dart';
 import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/profile_screen.dart';
@@ -50,6 +51,7 @@ void main() async {
         return bloc;
       },
     ),
+    BlocProvider(create: (_) => locator<LitnerBloc>()),
   ], child: const MyApp()));
 }
 
@@ -100,13 +102,7 @@ class MyApp extends StatelessWidget {
         VocabularyScreen.routeName: (context) {
           final args = ModalRoute.of(context)?.settings.arguments
               as Map<String, dynamic>;
-          // return VocabularyScreen(id: args['id']);
-
-          return BlocProvider(
-            create: (context) => locator<
-                VocabularyBloc>(), // VocabularyBloc(sayarehRepository: locator()),
-            child: VocabularyScreen(id: args['id']),
-          );
+          return VocabularyScreen(id: args['id']);
         },
         PracticeVocabularyScreen.routeName: (context) {
           final args = ModalRoute.of(context)?.settings.arguments
