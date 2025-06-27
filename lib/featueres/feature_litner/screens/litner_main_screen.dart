@@ -78,18 +78,6 @@ class _LitnerMainScreenState extends State<LitnerMainScreen> {
                       children: [
                         LitnerCard(
                           gradient: const LinearGradient(
-                            colors: [Color(0xFFECFDE2), Color(0xFFE1FCF2)],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          icon: 'assets/images/litner/mortarboard.png',
-                          number: '۰',
-                          label: 'کلمه',
-                          subLabel: 'آموخته شده',
-                        ),
-                        const SizedBox(height: 16),
-                        LitnerCard(
-                          gradient: const LinearGradient(
                             colors: [Color(0xFFEED0F6), Color(0xFFF2E5FF)],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
@@ -98,6 +86,18 @@ class _LitnerMainScreenState extends State<LitnerMainScreen> {
                           number: '۴',
                           label: 'کلمه',
                           subLabel: 'در حال یادگیری',
+                        ),
+                        const SizedBox(height: 16),
+                        LitnerCard(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFFECFDE2), Color(0xFFE1FCF2)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          icon: 'assets/images/litner/mortarboard.png',
+                          number: '۰',
+                          label: 'کلمه',
+                          subLabel: 'آموخته شده',
                         ),
                         const SizedBox(height: 16),
                         LitnerTodayCard(),
