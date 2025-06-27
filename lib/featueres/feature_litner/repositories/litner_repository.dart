@@ -34,6 +34,8 @@ class LitnerRepository {
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = CreateWord.fromJson(response.data);
         return DataSuccess(data);
+      } else if (response.statusCode == 409) {
+        return DataFailed("این لغت قبلا اضافه شده");
       } else {
         return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
       }

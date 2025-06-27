@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconify_design/iconify_design.dart';
@@ -50,6 +52,8 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
       return;
     }
 
+    log(word);
+    log(translation);
     context.read<LitnerBloc>().add(CreateWordEvent(
           word: word,
           translation: translation,
@@ -78,30 +82,25 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(
-          create: (context) => VocabularyBloc(sayarehRepository: locator())
-            ..add(VocabularyFetchEvent(id: widget.id)),
-        ),
-        BlocProvider(
-          create: (context) => locator<LitnerBloc>(),
-        ),
-      ],
+    return BlocProvider(
+      create: (context) => VocabularyBloc(sayarehRepository: locator())
+        ..add(VocabularyFetchEvent(id: widget.id)),
       child: BlocListener<LitnerBloc, LitnerState>(
         listener: (context, state) {
           if (state is CreateWordSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('کلمه با موفقیت به لایتنر اضافه شد'),
+                content: Text('لغت به لایتنر اضافه شد'),
                 backgroundColor: Colors.green,
               ),
             );
           } else if (state is LitnerError) {
+            // Check if it's the "word already exists" error
+            final isWordExistsError = state.message == "این لغت قبلا اضافه شده";
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.message),
-                backgroundColor: Colors.red,
+                backgroundColor: isWordExistsError ? Colors.orange : Colors.red,
               ),
             );
           }

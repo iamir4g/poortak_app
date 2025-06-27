@@ -40,7 +40,7 @@ class Datum {
   String translation;
   int boxLevel;
   DateTime nextReview;
-  dynamic lastReviewed;
+  DateTime? lastReviewed;
   DateTime createdAt;
   DateTime updatedAt;
 
@@ -51,7 +51,7 @@ class Datum {
     required this.translation,
     required this.boxLevel,
     required this.nextReview,
-    required this.lastReviewed,
+    this.lastReviewed,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -63,7 +63,9 @@ class Datum {
         translation: json["translation"],
         boxLevel: json["boxLevel"],
         nextReview: DateTime.parse(json["nextReview"]),
-        lastReviewed: json["lastReviewed"],
+        lastReviewed: json["lastReviewed"] != null
+            ? DateTime.parse(json["lastReviewed"])
+            : null,
         createdAt: DateTime.parse(json["createdAt"]),
         updatedAt: DateTime.parse(json["updatedAt"]),
       );
@@ -75,7 +77,7 @@ class Datum {
         "translation": translation,
         "boxLevel": boxLevel,
         "nextReview": nextReview.toIso8601String(),
-        "lastReviewed": lastReviewed,
+        "lastReviewed": lastReviewed?.toIso8601String() ?? null,
         "createdAt": createdAt.toIso8601String(),
         "updatedAt": updatedAt.toIso8601String(),
       };

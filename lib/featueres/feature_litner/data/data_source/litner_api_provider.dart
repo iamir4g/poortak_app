@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:dio/dio.dart';
+import 'package:poortak/common/error_handling/app_exception.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/config/constants.dart';
 import 'package:poortak/locator.dart';
@@ -12,24 +13,51 @@ class LitnerApiProvider {
   LitnerApiProvider({required this.dio})
       : _prefsOperator = locator<PrefsOperator>();
 
+  Future<Response> _makeAuthenticatedRequest(
+      Future<Response> Function() request) async {
+    final token = await _prefsOperator.getUserToken();
+    if (token == null) {
+      throw UnauthorisedException(message: 'Please login to continue');
+    }
+
+    dio.options.headers['Authorization'] = 'Bearer $token';
+    try {
+      return await request();
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 401 || e.response?.statusCode == 404) {
+        // Clear token and throw unauthorized exception
+        await _prefsOperator.logout();
+        throw UnauthorisedException(
+            message: 'Session expired. Please login again.');
+      } else if (e.response?.statusCode == 409) {
+        // Return the response for 409 (word already exists) instead of throwing
+        return e.response!;
+      }
+      rethrow;
+    }
+  }
+
   dynamic callGetLitnerReviewWords() async {
-    final response = await dio.get("${Constants.baseUrl}leitner/review");
+    final response = await _makeAuthenticatedRequest(
+        () => dio.get("${Constants.baseUrl}leitner/review"));
     log(response.data.toString());
     return response;
   }
 
   dynamic callPostLitnerCreateWord(String word, String translation) async {
-    final response = await dio.post("${Constants.baseUrl}leitner/create",
-        data: {"word": word, "translation": translation});
+    final response = await _makeAuthenticatedRequest(() => dio.post(
+          "${Constants.baseUrl}leitner",
+          data: {"word": word, "translation": translation},
+        ));
     log(response.data.toString());
     return response;
   }
 
   dynamic callPatchLitnerSubmitReviewWord(String wordId, bool success) async {
-    final response = await dio.patch(
-      "${Constants.baseUrl}leitner/review/$wordId",
-      data: {"wordId": wordId, "success": success},
-    );
+    final response = await _makeAuthenticatedRequest(() => dio.patch(
+          "${Constants.baseUrl}leitner/review/$wordId",
+          data: {"wordId": wordId, "success": success},
+        ));
     log(response.data.toString());
     return response;
   }
