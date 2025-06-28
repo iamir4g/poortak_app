@@ -5,6 +5,7 @@ import 'package:poortak/common/blocs/bottom_nav_cubit/bottom_nav_cubit.dart';
 import 'package:poortak/common/widgets/main_wrapper.dart';
 import 'package:poortak/config/my_theme.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_bloc.dart';
+import 'package:poortak/featueres/feature_litner/screens/litner_words_inprogress_screen.dart';
 import 'package:poortak/featueres/feature_profile/data/data_sorce/profile_api_provider.dart';
 import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/profile_screen.dart';
@@ -171,6 +172,8 @@ class MyApp extends StatelessWidget {
             ),
           );
         },
+        LitnerWordsInprogressScreen.routeName: (context) =>
+            LitnerWordsInprogressScreen(),
       },
       debugShowCheckedModeBanner: false,
       title: 'Poortak',

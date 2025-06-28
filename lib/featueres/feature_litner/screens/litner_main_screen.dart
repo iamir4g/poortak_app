@@ -4,6 +4,7 @@ import 'package:poortak/common/widgets/primaryButton.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:poortak/config/myTextStyle.dart';
+import 'package:poortak/featueres/feature_litner/screens/litner_words_inprogress_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
 import 'package:poortak/locator.dart';
 import '../widgets/litner_card.dart';
@@ -86,6 +87,10 @@ class _LitnerMainScreenState extends State<LitnerMainScreen> {
                           number: '۴',
                           label: 'کلمه',
                           subLabel: 'در حال یادگیری',
+                          onTap: () {
+                            Navigator.pushNamed(
+                                context, LitnerWordsInprogressScreen.routeName);
+                          },
                         ),
                         const SizedBox(height: 16),
                         LitnerCard(
@@ -98,9 +103,18 @@ class _LitnerMainScreenState extends State<LitnerMainScreen> {
                           number: '۰',
                           label: 'کلمه',
                           subLabel: 'آموخته شده',
+                          onTap: () {
+                            // Navigator.pushNamed(
+                            //     context, LitnerWordsInprogressScreen.routeName);
+                          },
                         ),
                         const SizedBox(height: 16),
-                        LitnerTodayCard(),
+                        LitnerTodayCard(
+                          onTap: () {
+                            // Navigator.pushNamed(
+                            //     context, LitnerWordsInprogressScreen.routeName);
+                          },
+                        ),
                       ],
                     ),
                   ),
