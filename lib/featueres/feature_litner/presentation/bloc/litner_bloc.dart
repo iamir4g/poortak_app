@@ -13,6 +13,7 @@ class LitnerBloc extends Bloc<LitnerEvent, LitnerState> {
     on<ReviewWordsEvent>(_onReviewWords);
     on<SubmitReviewWordEvent>(_onSubmitReviewWord);
     on<FetchListWordsEvent>(_onFetchListWords);
+    on<FetchOverviewLitnerEvent>(_onFetchOverviewLitner);
   }
 
   Future<void> _onCreateWord(
@@ -72,6 +73,17 @@ class LitnerBloc extends Bloc<LitnerEvent, LitnerState> {
       emit(ListWordsSuccess(result.data!));
     } else if (result is DataFailed) {
       emit(LitnerError(result.error ?? "خطا در دریافت لیست کلمات"));
+    }
+  }
+
+  Future<void> _onFetchOverviewLitner(
+      FetchOverviewLitnerEvent event, Emitter<LitnerState> emit) async {
+    emit(LitnerLoading());
+    final result = await litnerRepository.fetchLitnerOverview();
+    if (result is DataSuccess) {
+      emit(OverviewLitnerSuccess(result.data!));
+    } else if (result is DataFailed) {
+      emit(LitnerError(result.error ?? "خطا در دریافت اطلاعات لایتنر"));
     }
   }
 }

@@ -71,4 +71,14 @@ class LitnerApiProvider {
     log(response.data.toString());
     return response;
   }
+
+  dynamic callGetOverviewLitner() async {
+    //curl https://poortak-backend.liara.run/api/v1/leitner/overview
+
+    final response = await _makeAuthenticatedRequest(() => dio.get(
+          "${Constants.baseUrl}leitner/overview",
+        ));
+    log(response.data.toString());
+    return response;
+  }
 }

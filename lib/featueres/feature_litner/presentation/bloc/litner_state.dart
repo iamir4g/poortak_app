@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:poortak/featueres/feature_litner/data/models/create_word_model.dart';
+import 'package:poortak/featueres/feature_litner/data/models/overview_linter_model.dart';
 import 'package:poortak/featueres/feature_litner/data/models/review_words_model.dart';
 import 'package:poortak/featueres/feature_litner/data/models/submit_review_word.dart';
 import 'package:poortak/featueres/feature_litner/data/models/list_words_model.dart';
@@ -49,6 +50,15 @@ class ListWordsSuccess extends LitnerState {
 
   @override
   List<Object> get props => [listWords];
+}
+
+class OverviewLitnerSuccess extends LitnerState {
+  final OverviewLinter overviewLitner;
+
+  const OverviewLitnerSuccess(this.overviewLitner);
+
+  @override
+  List<Object> get props => [overviewLitner];
 }
 
 class LitnerError extends LitnerState {

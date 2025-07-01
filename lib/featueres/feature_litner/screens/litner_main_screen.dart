@@ -4,10 +4,14 @@ import 'package:poortak/common/widgets/primaryButton.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:poortak/config/myTextStyle.dart';
+import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_bloc.dart';
+import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_event.dart';
+import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_state.dart';
 import 'package:poortak/featueres/feature_litner/screens/litner_words_inprogress_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
 import 'package:poortak/locator.dart';
 import '../widgets/litner_card.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class LitnerMainScreen extends StatefulWidget {
   static const routeName = '/litner_main';
@@ -26,6 +30,7 @@ class _LitnerMainScreenState extends State<LitnerMainScreen> {
   void initState() {
     super.initState();
     _checkLoginStatus();
+    context.read<LitnerBloc>().add(FetchOverviewLitnerEvent());
   }
 
   Future<void> _checkLoginStatus() async {
@@ -75,47 +80,58 @@ class _LitnerMainScreenState extends State<LitnerMainScreen> {
                   // Cards
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child: Column(
-                      children: [
-                        LitnerCard(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFFEED0F6), Color(0xFFF2E5FF)],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          icon: 'assets/images/litner/work-in-progress.png',
-                          number: '۴',
-                          label: 'کلمه',
-                          subLabel: 'در حال یادگیری',
-                          onTap: () {
-                            Navigator.pushNamed(
-                                context, LitnerWordsInprogressScreen.routeName);
-                          },
-                        ),
-                        const SizedBox(height: 16),
-                        LitnerCard(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFFECFDE2), Color(0xFFE1FCF2)],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          icon: 'assets/images/litner/mortarboard.png',
-                          number: '۰',
-                          label: 'کلمه',
-                          subLabel: 'آموخته شده',
-                          onTap: () {
-                            // Navigator.pushNamed(
-                            //     context, LitnerWordsInprogressScreen.routeName);
-                          },
-                        ),
-                        const SizedBox(height: 16),
-                        LitnerTodayCard(
-                          onTap: () {
-                            // Navigator.pushNamed(
-                            //     context, LitnerWordsInprogressScreen.routeName);
-                          },
-                        ),
-                      ],
+                    child: BlocBuilder<LitnerBloc, LitnerState>(
+                      builder: (context, state) {
+                        int inProgress = 0;
+                        int completed = 0;
+                        int today = 0;
+
+                        if (state is OverviewLitnerSuccess) {
+                          inProgress =
+                              state.overviewLitner.data.inProgressWordsCount;
+                          completed =
+                              state.overviewLitner.data.completedWordsCount;
+                          today = state.overviewLitner.data.todayWordsCount;
+                        }
+
+                        return Column(
+                          children: [
+                            LitnerCard(
+                              gradient: const LinearGradient(
+                                colors: [Color(0xFFEED0F6), Color(0xFFF2E5FF)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              icon: 'assets/images/litner/work-in-progress.png',
+                              number: inProgress.toString(),
+                              label: 'کلمه',
+                              subLabel: 'در حال یادگیری',
+                              onTap: () {
+                                Navigator.pushNamed(context,
+                                    LitnerWordsInprogressScreen.routeName);
+                              },
+                            ),
+                            const SizedBox(height: 16),
+                            LitnerCard(
+                              gradient: const LinearGradient(
+                                colors: [Color(0xFFECFDE2), Color(0xFFE1FCF2)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              icon: 'assets/images/litner/mortarboard.png',
+                              number: completed.toString(),
+                              label: 'کلمه',
+                              subLabel: 'آموخته شده',
+                              onTap: () {},
+                            ),
+                            const SizedBox(height: 16),
+                            LitnerTodayCard(
+                              number: today.toString(),
+                              onTap: () {},
+                            ),
+                          ],
+                        );
+                      },
                     ),
                   ),
                   const Spacer(),
