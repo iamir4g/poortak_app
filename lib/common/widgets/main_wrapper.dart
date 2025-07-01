@@ -9,6 +9,7 @@ import 'package:poortak/common/widgets/bottom_nav.dart';
 import 'package:poortak/common/widgets/custom_drawer.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
+import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_bloc.dart';
 import 'package:poortak/featueres/feature_litner/screens/litner_main_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/profile_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/bloc_storage_bloc.dart';
@@ -58,6 +59,9 @@ class MainWrapper extends StatelessWidget {
         ),
         BlocProvider(
           create: (context) => locator<PermissionBloc>(),
+        ),
+        BlocProvider(
+          create: (context) => locator<LitnerBloc>(),
         ),
       ],
       child: BlocListener<PermissionBloc, PermissionState>(

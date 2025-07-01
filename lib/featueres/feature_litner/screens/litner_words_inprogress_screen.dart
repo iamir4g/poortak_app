@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
+import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_bloc.dart';
 import '../widgets/add_word_bottom_sheet.dart';
 
 class LitnerWordsInprogressScreen extends StatefulWidget {
@@ -19,7 +21,11 @@ class _LitnerWordsInprogressScreenState
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => const AddWordBottomSheet(),
+      // builder: (context) => const AddWordBottomSheet(),
+      builder: (context) => BlocProvider.value(
+        value: context.read<LitnerBloc>(),
+        child: AddWordBottomSheet(),
+      ),
     );
   }
 

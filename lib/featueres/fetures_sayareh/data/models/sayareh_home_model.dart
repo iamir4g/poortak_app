@@ -46,7 +46,7 @@ class Lesson {
   int order;
   DateTime createdAt;
   DateTime updatedAt;
-  DateTime publishedAt;
+  DateTime? publishedAt;
 
   Lesson({
     required this.id,
@@ -73,7 +73,9 @@ class Lesson {
         order: json["order"],
         createdAt: DateTime.parse(json["createdAt"]),
         updatedAt: DateTime.parse(json["updatedAt"]),
-        publishedAt: DateTime.parse(json["publishedAt"]),
+        publishedAt: json["publishedAt"] != null
+            ? DateTime.parse(json["publishedAt"])
+            : null,
       );
 
   Map<String, dynamic> toJson() => {
@@ -87,7 +89,7 @@ class Lesson {
         "order": order,
         "createdAt": createdAt.toIso8601String(),
         "updatedAt": updatedAt.toIso8601String(),
-        "publishedAt": publishedAt.toIso8601String(),
+        "publishedAt": publishedAt?.toIso8601String(),
       };
 }
 
