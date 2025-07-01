@@ -61,4 +61,14 @@ class LitnerApiProvider {
     log(response.data.toString());
     return response;
   }
+
+  dynamic callGetListWords(int size, int page, String order) async {
+    //curl 'https://poortak-backend.liara.run/api/v1/leitner?size=10&page=1&order=asc'
+
+    final response = await _makeAuthenticatedRequest(() => dio.get(
+          "${Constants.baseUrl}leitner?size=$size&page=$page&order=$order",
+        ));
+    log(response.data.toString());
+    return response;
+  }
 }

@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:poortak/featueres/feature_litner/data/models/create_word_model.dart';
 import 'package:poortak/featueres/feature_litner/data/models/review_words_model.dart';
 import 'package:poortak/featueres/feature_litner/data/models/submit_review_word.dart';
+import 'package:poortak/featueres/feature_litner/data/models/list_words_model.dart';
 
 abstract class LitnerState extends Equatable {
   const LitnerState();
@@ -39,6 +40,15 @@ class SubmitReviewWordSuccess extends LitnerState {
 
   @override
   List<Object> get props => [submitReviewWord];
+}
+
+class ListWordsSuccess extends LitnerState {
+  final ListWords listWords;
+
+  const ListWordsSuccess(this.listWords);
+
+  @override
+  List<Object> get props => [listWords];
 }
 
 class LitnerError extends LitnerState {

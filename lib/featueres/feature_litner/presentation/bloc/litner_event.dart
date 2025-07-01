@@ -36,3 +36,18 @@ class SubmitReviewWordEvent extends LitnerEvent {
   @override
   List<Object> get props => [wordId, success];
 }
+
+class FetchListWordsEvent extends LitnerEvent {
+  final int size;
+  final int page;
+  final String order;
+
+  const FetchListWordsEvent({
+    required this.size,
+    required this.page,
+    required this.order,
+  });
+
+  @override
+  List<Object> get props => [size, page, order];
+}

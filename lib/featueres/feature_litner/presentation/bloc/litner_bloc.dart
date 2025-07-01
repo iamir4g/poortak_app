@@ -3,6 +3,7 @@ import 'package:poortak/common/resources/data_state.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_event.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_state.dart';
 import 'package:poortak/featueres/feature_litner/repositories/litner_repository.dart';
+import 'package:poortak/featueres/feature_litner/data/models/list_words_model.dart';
 
 class LitnerBloc extends Bloc<LitnerEvent, LitnerState> {
   final LitnerRepository litnerRepository;
@@ -11,6 +12,7 @@ class LitnerBloc extends Bloc<LitnerEvent, LitnerState> {
     on<CreateWordEvent>(_onCreateWord);
     on<ReviewWordsEvent>(_onReviewWords);
     on<SubmitReviewWordEvent>(_onSubmitReviewWord);
+    on<FetchListWordsEvent>(_onFetchListWords);
   }
 
   Future<void> _onCreateWord(
@@ -55,6 +57,21 @@ class LitnerBloc extends Bloc<LitnerEvent, LitnerState> {
       emit(SubmitReviewWordSuccess(result.data!));
     } else if (result is DataFailed) {
       emit(LitnerError(result.error ?? "خطا در ثبت بررسی"));
+    }
+  }
+
+  Future<void> _onFetchListWords(
+      FetchListWordsEvent event, Emitter<LitnerState> emit) async {
+    emit(LitnerLoading());
+    final result = await litnerRepository.fetchLitnerListWords(
+      event.size,
+      event.page,
+      event.order,
+    );
+    if (result is DataSuccess) {
+      emit(ListWordsSuccess(result.data!));
+    } else if (result is DataFailed) {
+      emit(LitnerError(result.error ?? "خطا در دریافت لیست کلمات"));
     }
   }
 }
