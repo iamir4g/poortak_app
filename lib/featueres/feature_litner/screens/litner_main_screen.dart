@@ -7,6 +7,7 @@ import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_bloc.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_event.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_state.dart';
+import 'package:poortak/featueres/feature_litner/screens/litner_word_box_screen.dart';
 import 'package:poortak/featueres/feature_litner/screens/litner_words_inprogress_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
 import 'package:poortak/locator.dart';
@@ -127,7 +128,10 @@ class _LitnerMainScreenState extends State<LitnerMainScreen> {
                             const SizedBox(height: 16),
                             LitnerTodayCard(
                               number: today.toString(),
-                              onTap: () {},
+                              onTap: () {
+                                Navigator.pushNamed(
+                                    context, LitnerWordBoxScreen.routeName);
+                              },
                             ),
                           ],
                         );
