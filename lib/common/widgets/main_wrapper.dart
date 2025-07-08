@@ -60,9 +60,9 @@ class MainWrapper extends StatelessWidget {
         BlocProvider(
           create: (context) => locator<PermissionBloc>(),
         ),
-        BlocProvider(
-          create: (context) => locator<LitnerBloc>(),
-        ),
+        // BlocProvider(
+        //   create: (context) => locator<LitnerBloc>(),
+        // ),
       ],
       child: BlocListener<PermissionBloc, PermissionState>(
         listener: (context, state) {

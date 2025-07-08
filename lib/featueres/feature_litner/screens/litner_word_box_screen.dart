@@ -80,15 +80,11 @@ class _LitnerWordBoxScreenState extends State<LitnerWordBoxScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Row(
+          const Spacer(),
+          Center(
+              child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              IconifyIcon(
-                icon: "cuida:volume-2-outline",
-                size: 28,
-                color: const Color(0xFF3A465A),
-              ),
-              const SizedBox(width: 12),
               Text(
                 englishWord,
                 style: const TextStyle(
@@ -97,22 +93,14 @@ class _LitnerWordBoxScreenState extends State<LitnerWordBoxScreen> {
                   color: Color(0xFF3A465A),
                 ),
               ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Container(
-            width: 120,
-            height: 1,
-            decoration: const BoxDecoration(
-              border: Border(
-                bottom: BorderSide(
-                  color: Color(0xFFBFD6F6),
-                  width: 1,
-                  style: BorderStyle.solid,
-                ),
+              const SizedBox(width: 12),
+              IconifyIcon(
+                icon: "cuida:volume-2-outline",
+                size: 28,
+                color: const Color(0xFF3A465A),
               ),
-            ),
-          ),
+            ],
+          )),
           const Spacer(),
           GestureDetector(
             onTap: () => _flipController.flipcard(),
@@ -139,40 +127,28 @@ class _LitnerWordBoxScreenState extends State<LitnerWordBoxScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              IconifyIcon(
-                icon: "cuida:volume-2-outline",
-                size: 28,
-                color: Colors.white,
-              ),
-              const SizedBox(width: 12),
-              Text(
-                englishWord,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 28,
+          const Spacer(),
+          Center(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  englishWord,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 28,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                IconifyIcon(
+                  icon: "cuida:volume-2-outline",
+                  size: 28,
                   color: Colors.white,
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Container(
-            width: 120,
-            height: 1,
-            decoration: const BoxDecoration(
-              border: Border(
-                bottom: BorderSide(
-                  color: Colors.white,
-                  width: 1,
-                  style: BorderStyle.solid,
-                ),
-              ),
+              ],
             ),
           ),
-          const SizedBox(height: 16),
           Text(
             persianWord,
             style: const TextStyle(
