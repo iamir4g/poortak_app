@@ -61,6 +61,8 @@ class OverviewLitnerSuccess extends LitnerState {
   List<Object> get props => [overviewLitner];
 }
 
+class OverviewLitnerLoading extends LitnerState {}
+
 class LitnerError extends LitnerState {
   final String message;
 

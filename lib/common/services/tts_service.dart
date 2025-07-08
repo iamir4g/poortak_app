@@ -7,8 +7,11 @@ class TTSService {
   Completer<void>? _speechCompleter;
 
   Future<void> initialize() async {
-    if (_isInitialized) return;
-
+    if (_isInitialized) {
+      print('TTS already initialized');
+      return;
+    }
+    print('Initializing TTS...');
     await _flutterTts.setLanguage('en-US');
     await _flutterTts.setSpeechRate(0.5);
     await _flutterTts.setVolume(1.0);
@@ -24,6 +27,7 @@ class TTSService {
     });
 
     _isInitialized = true;
+    print('TTS initialized');
   }
 
   Future<void> setPitch(double pitch) async {

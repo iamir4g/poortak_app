@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:poortak/common/blocs/bottom_nav_cubit/bottom_nav_cubit.dart';
+import 'package:poortak/common/services/tts_service.dart';
 import 'package:poortak/common/widgets/main_wrapper.dart';
 import 'package:poortak/config/my_theme.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_bloc.dart';
@@ -42,6 +43,8 @@ void main() async {
   // runApp(const MyApp());
 
   await initLocator();
+
+  await locator<TTSService>().initialize();
   runApp(MultiBlocProvider(providers: [
     BlocProvider(create: (_) => SplashCubit()),
     BlocProvider(create: (_) => BottomNavCubit()),

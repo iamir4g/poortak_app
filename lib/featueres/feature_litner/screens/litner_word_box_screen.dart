@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:poortak/common/widgets/step_progress.dart';
 import 'package:iconify_design/iconify_design.dart';
 import 'package:flutter_flip_card/flutter_flip_card.dart';
+import 'package:poortak/locator.dart';
+import 'package:poortak/common/services/tts_service.dart';
 
 class LitnerWordBoxScreen extends StatefulWidget {
   static const routeName = '/litner_word_box';
@@ -18,6 +20,7 @@ class _LitnerWordBoxScreenState extends State<LitnerWordBoxScreen> {
   final String englishWord = 'Lunch';
   final String persianWord = 'ناهار';
   final FlipCardController _flipController = FlipCardController();
+  final TTSService ttsService = locator<TTSService>();
 
   @override
   Widget build(BuildContext context) {
@@ -94,10 +97,13 @@ class _LitnerWordBoxScreenState extends State<LitnerWordBoxScreen> {
                 ),
               ),
               const SizedBox(width: 12),
-              IconifyIcon(
-                icon: "cuida:volume-2-outline",
-                size: 28,
-                color: const Color(0xFF3A465A),
+              GestureDetector(
+                onTap: () => ttsService.speak(englishWord),
+                child: IconifyIcon(
+                  icon: "cuida:volume-2-outline",
+                  size: 28,
+                  color: const Color(0xFF3A465A),
+                ),
               ),
             ],
           )),
@@ -141,10 +147,13 @@ class _LitnerWordBoxScreenState extends State<LitnerWordBoxScreen> {
                   ),
                 ),
                 const SizedBox(width: 12),
-                IconifyIcon(
-                  icon: "cuida:volume-2-outline",
-                  size: 28,
-                  color: Colors.white,
+                GestureDetector(
+                  onTap: () => ttsService.speak(englishWord),
+                  child: IconifyIcon(
+                    icon: "cuida:volume-2-outline",
+                    size: 28,
+                    color: Colors.white,
+                  ),
                 ),
               ],
             ),

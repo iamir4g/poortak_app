@@ -104,7 +104,9 @@ class _LitnerMainScreenState extends State<LitnerMainScreen> {
                                 end: Alignment.bottomRight,
                               ),
                               icon: 'assets/images/litner/work-in-progress.png',
-                              number: inProgress.toString(),
+                              number: state is OverviewLitnerLoading
+                                  ? '...'
+                                  : inProgress.toString(),
                               label: 'کلمه',
                               subLabel: 'در حال یادگیری',
                               onTap: () {
