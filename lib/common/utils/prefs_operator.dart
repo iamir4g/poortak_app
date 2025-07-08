@@ -30,7 +30,7 @@ class PrefsOperator {
   }
 
   Future<bool> getIntroState() async {
-    return sharedPreferences.getBool("showIntro") ?? true;
+    return sharedPreferences.getBool("showIntro") ?? false;
   }
 
   Future<bool> getLoggedIn() async {
