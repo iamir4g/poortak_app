@@ -63,11 +63,12 @@ class LitnerApiProvider {
     return response;
   }
 
-  dynamic callGetListWords(int size, int page, String order) async {
-    //curl 'https://poortak-backend.liara.run/api/v1/leitner?size=10&page=1&order=asc'
+  dynamic callGetListWords(int size, int page, String order, String boxLevels,
+      String? word, String? query) async {
+    //curl 'https://poortak-backend.liara.run/api/v1/leitner?size=10&page=1&order=asc&boxLevels=1%2C2%2C3'
 
     final response = await _makeAuthenticatedRequest(() => dio.get(
-          "${Constants.baseUrl}leitner?size=$size&page=$page&order=$order",
+          "${Constants.baseUrl}leitner?size=$size&page=$page&order=$order&boxLevels=$boxLevels",
         ));
     log(response.data.toString());
     return response;

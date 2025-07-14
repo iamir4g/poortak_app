@@ -41,11 +41,16 @@ class FetchListWordsEvent extends LitnerEvent {
   final int size;
   final int page;
   final String order;
-
+  final String boxLevels;
+  final String word;
+  final String query;
   const FetchListWordsEvent({
     required this.size,
     required this.page,
     required this.order,
+    required this.boxLevels,
+    required this.word,
+    required this.query,
   });
 
   @override

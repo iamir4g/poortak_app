@@ -67,13 +67,16 @@ class LitnerRepository {
     }
   }
 
-  Future<DataState<ListWords>> fetchLitnerListWords(
-      int size, int page, String order) async {
+  Future<DataState<ListWords>> fetchLitnerListWords(int size, int page,
+      String order, String boxLevels, String? word, String? query) async {
     try {
       Response response = await litnerApiProvider.callGetListWords(
         size,
         page,
         order,
+        boxLevels,
+        word,
+        query,
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = ListWords.fromJson(response.data);

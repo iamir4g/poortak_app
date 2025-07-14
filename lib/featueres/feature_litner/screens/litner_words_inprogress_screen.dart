@@ -26,6 +26,7 @@ class _LitnerWordsInprogressScreenState
   int _page = 1;
   final int _size = 10;
   final String _order = 'asc';
+  final String _boxLevels = '1,2,3,4';
   List<Datum> _words = [];
   bool _isLoadingMore = false;
   bool _hasMore = true;
@@ -38,9 +39,13 @@ class _LitnerWordsInprogressScreenState
   }
 
   void _fetchWords() {
-    context
-        .read<LitnerBloc>()
-        .add(FetchListWordsEvent(size: _size, page: _page, order: _order));
+    context.read<LitnerBloc>().add(FetchListWordsEvent(
+        size: _size,
+        page: _page,
+        order: _order,
+        boxLevels: _boxLevels,
+        word: "",
+        query: ""));
   }
 
   void _onScroll() {

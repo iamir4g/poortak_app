@@ -68,6 +68,9 @@ class LitnerBloc extends Bloc<LitnerEvent, LitnerState> {
       event.size,
       event.page,
       event.order,
+      event.boxLevels ?? "",
+      event.word ?? "",
+      event.query,
     );
     if (result is DataSuccess) {
       emit(ListWordsSuccess(result.data!));
