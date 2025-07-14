@@ -7,6 +7,7 @@ import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_bloc.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_event.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_state.dart';
+import 'package:poortak/featueres/feature_litner/screens/litner_word_completed_screen.dart';
 import 'package:poortak/featueres/feature_litner/screens/litner_word_box_screen.dart';
 import 'package:poortak/featueres/feature_litner/screens/litner_words_inprogress_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
@@ -145,7 +146,10 @@ class _LitnerMainScreenState extends State<LitnerMainScreen> with RouteAware {
                               number: completed.toString(),
                               label: 'کلمه',
                               subLabel: 'آموخته شده',
-                              onTap: () {},
+                              onTap: () {
+                                Navigator.pushNamed(context,
+                                    LitnerWordCompletedScreen.routeName);
+                              },
                             ),
                             const SizedBox(height: 16),
                             LitnerTodayCard(

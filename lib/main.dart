@@ -6,6 +6,7 @@ import 'package:poortak/common/services/tts_service.dart';
 import 'package:poortak/common/widgets/main_wrapper.dart';
 import 'package:poortak/config/my_theme.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_bloc.dart';
+import 'package:poortak/featueres/feature_litner/screens/litner_word_completed_screen.dart';
 import 'package:poortak/featueres/feature_litner/screens/litner_word_box_screen.dart';
 import 'package:poortak/featueres/feature_litner/screens/litner_words_inprogress_screen.dart';
 import 'package:poortak/featueres/feature_profile/data/data_sorce/profile_api_provider.dart';
@@ -179,6 +180,8 @@ void main() async {
           LitnerWordsInprogressScreen.routeName: (context) =>
               LitnerWordsInprogressScreen(),
           LitnerWordBoxScreen.routeName: (context) => LitnerWordBoxScreen(),
+          LitnerWordCompletedScreen.routeName: (context) =>
+              LitnerWordCompletedScreen(),
         },
         debugShowCheckedModeBanner: false,
         title: 'Poortak',
