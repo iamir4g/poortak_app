@@ -13,6 +13,8 @@ import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
 import 'package:poortak/locator.dart';
 import '../widgets/litner_card.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter/widgets.dart'; // For RouteAware
+import 'package:poortak/main.dart'; // For routeObserver
 
 class LitnerMainScreen extends StatefulWidget {
   static const routeName = '/litner_main';
@@ -23,7 +25,7 @@ class LitnerMainScreen extends StatefulWidget {
   State<LitnerMainScreen> createState() => _LitnerMainScreenState();
 }
 
-class _LitnerMainScreenState extends State<LitnerMainScreen> {
+class _LitnerMainScreenState extends State<LitnerMainScreen> with RouteAware {
   final PrefsOperator prefsOperator = locator<PrefsOperator>();
   bool isLoggedIn = false;
 
@@ -31,6 +33,24 @@ class _LitnerMainScreenState extends State<LitnerMainScreen> {
   void initState() {
     super.initState();
     _checkLoginStatus();
+    context.read<LitnerBloc>().add(FetchOverviewLitnerEvent());
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    routeObserver.subscribe(this, ModalRoute.of(context)!);
+  }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    // Called when coming back to this screen
     context.read<LitnerBloc>().add(FetchOverviewLitnerEvent());
   }
 

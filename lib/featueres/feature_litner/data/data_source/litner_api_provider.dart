@@ -22,6 +22,7 @@ class LitnerApiProvider {
 
     dio.options.headers['Authorization'] = 'Bearer $token';
     try {
+      log("request: ${request.toString()}");
       return await request();
     } on DioException catch (e) {
       if (e.response?.statusCode == 401 || e.response?.statusCode == 404) {
@@ -55,7 +56,7 @@ class LitnerApiProvider {
 
   dynamic callPatchLitnerSubmitReviewWord(String wordId, bool success) async {
     final response = await _makeAuthenticatedRequest(() => dio.patch(
-          "${Constants.baseUrl}leitner/review/$wordId",
+          "${Constants.baseUrl}leitner/$wordId",
           data: {"wordId": wordId, "success": success},
         ));
     log(response.data.toString());

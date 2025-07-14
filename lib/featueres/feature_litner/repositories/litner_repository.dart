@@ -51,10 +51,13 @@ class LitnerRepository {
   Future<DataState<SubmitReviewWord>> fetchLitnerSubmitReviewWord(
       String wordId, bool success) async {
     try {
+      log("wordId: $wordId, success: $success");
       Response response = await litnerApiProvider
           .callPatchLitnerSubmitReviewWord(wordId, success);
+      log(response.data.toString());
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = SubmitReviewWord.fromJson(response.data);
+        log(data.toString());
         return DataSuccess(data);
       } else {
         return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");

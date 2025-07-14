@@ -113,7 +113,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 child: ClipOval(
                   child: Image.asset(
-                    'assets/images/profile_avatar.png', // Replace with actual asset
+                    'assets/images/profile/finalProfile.png', // Replace with actual asset
                     fit: BoxFit.cover,
                   ),
                 ),

@@ -10,5 +10,6 @@
   "total_price": "Total Price : ",
   "pay_now": "Pay Now",
   "you_are_not_logged_in_litner": "You are not logged in, to use the litner section you must log in to your account",
-  "login": "Login"
+  "login": "Login",
+  "litner_review": "Litner Review"
 }
