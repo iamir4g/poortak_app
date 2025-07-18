@@ -54,7 +54,7 @@ class FetchListWordsEvent extends LitnerEvent {
   });
 
   @override
-  List<Object> get props => [size, page, order];
+  List<Object> get props => [size, page, order, boxLevels, word, query];
 }
 
 class FetchOverviewLitnerEvent extends LitnerEvent {

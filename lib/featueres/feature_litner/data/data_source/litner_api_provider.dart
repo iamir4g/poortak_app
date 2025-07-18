@@ -67,9 +67,20 @@ class LitnerApiProvider {
       String? word, String? query) async {
     //curl 'https://poortak-backend.liara.run/api/v1/leitner?size=10&page=1&order=asc&boxLevels=1%2C2%2C3'
 
-    final response = await _makeAuthenticatedRequest(() => dio.get(
-          "${Constants.baseUrl}leitner?size=$size&page=$page&order=$order&boxLevels=$boxLevels",
-        ));
+    String url =
+        "${Constants.baseUrl}leitner?size=$size&page=$page&order=$order&boxLevels=$boxLevels";
+
+    // Add word parameter if it has a value
+    if (word != null && word.isNotEmpty) {
+      url += "&word=$word";
+    }
+
+    // Add query parameter if it has a value
+    if (query != null && query.isNotEmpty) {
+      url += "&query=$query";
+    }
+
+    final response = await _makeAuthenticatedRequest(() => dio.get(url));
     log(response.data.toString());
     return response;
   }
