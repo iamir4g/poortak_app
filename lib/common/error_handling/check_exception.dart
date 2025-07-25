@@ -21,26 +21,29 @@ class CheckExceptions {
     }
   }
 
-  static dynamic getError(AppException appException) async {
+  static DataState<T> getError<T>(AppException appException) {
     switch (appException.runtimeType) {
       /// return error came from server
       case BadRequestException:
-        return DataFailed(appException.message);
+        return DataFailed<T>(appException.message);
 
       case NotFoundException:
-        return DataFailed(appException.message);
+        return DataFailed<T>(appException.message);
 
       /// get refresh token and call api again
       case UnauthorisedException:
-        return DataFailed(appException.message);
+        return DataFailed<T>(appException.message);
 
       /// server error
       case ServerException:
-        return DataFailed(appException.message);
+        return DataFailed<T>(appException.message);
 
       /// dio or timeout and etc error
       case FetchDataException:
-        return DataFailed(appException.message);
+        return DataFailed<T>(appException.message);
+
+      default:
+        return DataFailed<T>(appException.message);
     }
   }
 }

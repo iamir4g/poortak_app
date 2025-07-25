@@ -31,7 +31,7 @@ class SayarehRepository {
         return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
       }
     } on AppException catch (e) {
-      return await CheckExceptions.getError(e);
+      return CheckExceptions.getError<SayarehHomeModel>(e);
     }
     //return SayarehState(sayarehDataStatus: SayarehDataSuccess(response));
   }
@@ -46,7 +46,7 @@ class SayarehRepository {
         return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
       }
     } on AppException catch (e) {
-      return await CheckExceptions.getError(e);
+      return CheckExceptions.getError<Lesson>(e);
     }
   }
 
@@ -61,7 +61,7 @@ class SayarehRepository {
         return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
       }
     } on AppException catch (e) {
-      return await CheckExceptions.getError(e);
+      return CheckExceptions.getError<ConversationModel>(e);
     }
   }
 
@@ -75,7 +75,7 @@ class SayarehRepository {
         return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
       }
     } on AppException catch (e) {
-      return await CheckExceptions.getError(e);
+      return CheckExceptions.getError<VocabularyModel>(e);
     }
   }
 
@@ -94,7 +94,7 @@ class SayarehRepository {
         return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
       }
     } on AppException catch (e) {
-      return await CheckExceptions.getError(e);
+      return CheckExceptions.getError<PracticeVocabularyModel>(e);
     }
   }
 
@@ -108,7 +108,7 @@ class SayarehRepository {
         return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
       }
     } on AppException catch (e) {
-      return await CheckExceptions.getError(e);
+      return CheckExceptions.getError<QuizesList>(e);
     }
   }
 
@@ -156,7 +156,7 @@ class SayarehRepository {
       }
     } on AppException catch (e) {
       log("AppException caught: $e");
-      return await CheckExceptions.getError(e);
+      return CheckExceptions.getError<AnswerQuestion>(e);
     } catch (e) {
       log("Unexpected error: $e");
       return DataFailed(e.toString());
@@ -183,7 +183,7 @@ class SayarehRepository {
         return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
       }
     } on AppException catch (e) {
-      return await CheckExceptions.getError(e);
+      return CheckExceptions.getError<ResultQuestion>(e);
     }
   }
 
@@ -200,7 +200,7 @@ class SayarehRepository {
         return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
       }
     } on AppException catch (e) {
-      return await CheckExceptions.getError(e);
+      return CheckExceptions.getError<SayarehStorageTest>(e);
     }
   }
 }

@@ -26,7 +26,7 @@ class LitnerRepository {
         return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
       }
     } on AppException catch (e) {
-      return await CheckExceptions.getError(e);
+      return CheckExceptions.getError<ReviewWords>(e);
     }
   }
 
@@ -44,7 +44,7 @@ class LitnerRepository {
         return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
       }
     } on AppException catch (e) {
-      return await CheckExceptions.getError(e);
+      return CheckExceptions.getError<CreateWord>(e);
     }
   }
 
@@ -63,7 +63,7 @@ class LitnerRepository {
         return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
       }
     } on AppException catch (e) {
-      return await CheckExceptions.getError(e);
+      return CheckExceptions.getError<SubmitReviewWord>(e);
     }
   }
 
@@ -85,7 +85,7 @@ class LitnerRepository {
         return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
       }
     } on AppException catch (e) {
-      return await CheckExceptions.getError(e);
+      return CheckExceptions.getError<ListWords>(e);
     }
   }
 
@@ -100,7 +100,7 @@ class LitnerRepository {
         return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
       }
     } on AppException catch (e) {
-      return await CheckExceptions.getError(e);
+      return CheckExceptions.getError<OverviewLinter>(e);
     }
   }
 }
