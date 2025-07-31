@@ -21,3 +21,22 @@ class UpdateQuantityEvent extends ShoppingCartEvent {
 }
 
 class ClearCartEvent extends ShoppingCartEvent {}
+
+// Local Cart Events
+class AddToLocalCartEvent extends ShoppingCartEvent {
+  final String type;
+  final String itemId;
+  AddToLocalCartEvent(this.type, this.itemId);
+}
+
+class GetLocalCartEvent extends ShoppingCartEvent {}
+
+class RemoveFromLocalCartEvent extends ShoppingCartEvent {
+  final String type;
+  final String itemId;
+  RemoveFromLocalCartEvent(this.type, this.itemId);
+}
+
+class ClearLocalCartEvent extends ShoppingCartEvent {}
+
+class SyncLocalCartToBackendEvent extends ShoppingCartEvent {}

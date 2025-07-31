@@ -62,14 +62,14 @@ class Cart {
   String userId;
   DateTime createdAt;
   DateTime updatedAt;
-  List<dynamic> items;
+  List<CartItem>? items;
 
   Cart({
     required this.id,
     required this.userId,
     required this.createdAt,
     required this.updatedAt,
-    required this.items,
+    this.items,
   });
 
   factory Cart.fromJson(Map<String, dynamic> json) => Cart(
@@ -77,7 +77,10 @@ class Cart {
         userId: json["userId"],
         createdAt: DateTime.parse(json["createdAt"]),
         updatedAt: DateTime.parse(json["updatedAt"]),
-        items: List<dynamic>.from(json["items"].map((x) => x)),
+        items: json["items"] != null
+            ? List<CartItem>.from(
+                json["items"].map((x) => CartItem.fromJson(x)))
+            : null,
       );
 
   Map<String, dynamic> toJson() => {
@@ -85,7 +88,85 @@ class Cart {
         "userId": userId,
         "createdAt": createdAt.toIso8601String(),
         "updatedAt": updatedAt.toIso8601String(),
-        "items": List<dynamic>.from(items.map((x) => x)),
+        "items": items != null
+            ? List<dynamic>.from(items!.map((x) => x.toJson()))
+            : [],
+      };
+}
+
+class CartItem {
+  String id;
+  String cartId;
+  String itemId;
+  String type;
+  int quantity;
+  String price;
+  DateTime createdAt;
+  DateTime updatedAt;
+  CartItemSource source;
+
+  CartItem({
+    required this.id,
+    required this.cartId,
+    required this.itemId,
+    required this.type,
+    required this.quantity,
+    required this.price,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.source,
+  });
+
+  factory CartItem.fromJson(Map<String, dynamic> json) => CartItem(
+        id: json["id"],
+        cartId: json["cartId"],
+        itemId: json["itemId"],
+        type: json["type"],
+        quantity: json["quantity"],
+        price: json["price"],
+        createdAt: DateTime.parse(json["createdAt"]),
+        updatedAt: DateTime.parse(json["updatedAt"]),
+        source: CartItemSource.fromJson(json["source"]),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "cartId": cartId,
+        "itemId": itemId,
+        "type": type,
+        "quantity": quantity,
+        "price": price,
+        "createdAt": createdAt.toIso8601String(),
+        "updatedAt": updatedAt.toIso8601String(),
+        "source": source.toJson(),
+      };
+}
+
+class CartItemSource {
+  String id;
+  String price;
+  String discountType;
+  String discountAmount;
+
+  CartItemSource({
+    required this.id,
+    required this.price,
+    required this.discountType,
+    required this.discountAmount,
+  });
+
+  factory CartItemSource.fromJson(Map<String, dynamic> json) => CartItemSource(
+        id: json["id"],
+        price: json["price"],
+        discountType: json["discountType"],
+        discountAmount: json["discountAmount"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "price": price,
+        "discountType": discountType,
+        "discountAmount": discountAmount,
       };
 }
 

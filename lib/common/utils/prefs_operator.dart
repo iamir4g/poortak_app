@@ -1,5 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 import '../../locator.dart';
+import 'dart:developer';
 
 class PrefsOperator {
   late SharedPreferences sharedPreferences;
@@ -8,20 +10,30 @@ class PrefsOperator {
   }
 
   saveUserData(accessToken, refreshToken, userName, mobile) async {
+    log("💾 Saving user data to SharedPreferences...");
+    log("   Access token: ${accessToken.substring(0, 20)}...");
+    log("   Refresh token: ${refreshToken.substring(0, 20)}...");
+    log("   User name: $userName");
+    log("   Mobile: $mobile");
+
     sharedPreferences.setString("user_token", accessToken);
     sharedPreferences.setString("refresh_token", refreshToken);
     sharedPreferences.setString("user_name", userName);
     sharedPreferences.setString("user_mobile", mobile);
     sharedPreferences.setBool("loggedIn", true);
+
+    log("✅ User data saved successfully");
   }
 
   Future<String?> getUserToken() async {
     final String? userToken = sharedPreferences.getString('user_token');
+    log("🔑 Retrieved user token: ${userToken != null ? '${userToken.substring(0, 20)}...' : 'null'}");
     return userToken;
   }
 
   Future<String?> getRefreshToken() async {
     final String? refreshToken = sharedPreferences.getString('refresh_token');
+    log("🔄 Retrieved refresh token: ${refreshToken != null ? '${refreshToken.substring(0, 20)}...' : 'null'}");
     return refreshToken;
   }
 
@@ -38,15 +50,74 @@ class PrefsOperator {
   }
 
   Future<void> logout() async {
+    log("🚪 Logging out - clearing SharedPreferences");
     sharedPreferences.clear();
     sharedPreferences.setBool("showIntro", false);
+    log("✅ Logout completed");
   }
 
   bool isLoggedIn() {
-    return sharedPreferences.getString('user_token') != null;
+    final token = sharedPreferences.getString('user_token');
+    log("🔍 Checking if user is logged in: ${token != null ? 'Yes' : 'No'}");
+    return token != null;
   }
 
   Future<String?> getAccessToken() async {
-    return sharedPreferences.getString('user_token');
+    final token = sharedPreferences.getString('user_token');
+    log("🔑 Retrieved access token: ${token != null ? '${token.substring(0, 20)}...' : 'null'}");
+    return token;
+  }
+
+  // Local Cart Storage Methods
+  Future<void> saveLocalCartItem(String type, String itemId) async {
+    log("🛒 Saving local cart item: Type=$type, ID=$itemId");
+    final cartItems = await getLocalCartItems();
+    final newItem = {
+      'type': type,
+      'itemId': itemId,
+      'addedAt': DateTime.now().toIso8601String(),
+    };
+
+    // Check if item already exists
+    final exists = cartItems
+        .any((item) => item['type'] == type && item['itemId'] == itemId);
+
+    if (!exists) {
+      cartItems.add(newItem);
+      await sharedPreferences.setString(
+          'local_cart_items', jsonEncode(cartItems));
+      log("✅ Local cart item saved successfully");
+    } else {
+      log("ℹ️ Item already exists in local cart - skipping");
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getLocalCartItems() async {
+    log("📋 Getting local cart items...");
+    final cartJson = sharedPreferences.getString('local_cart_items');
+    if (cartJson != null) {
+      final List<dynamic> cartList = jsonDecode(cartJson);
+      final items = cartList.cast<Map<String, dynamic>>();
+      log("📊 Found ${items.length} local cart items");
+      return items;
+    }
+    log("📭 No local cart items found");
+    return [];
+  }
+
+  Future<void> removeLocalCartItem(String type, String itemId) async {
+    log("🗑️ Removing local cart item: Type=$type, ID=$itemId");
+    final cartItems = await getLocalCartItems();
+    cartItems.removeWhere(
+        (item) => item['type'] == type && item['itemId'] == itemId);
+    await sharedPreferences.setString(
+        'local_cart_items', jsonEncode(cartItems));
+    log("✅ Local cart item removed successfully");
+  }
+
+  Future<void> clearLocalCart() async {
+    log("🧹 Clearing local cart...");
+    await sharedPreferences.remove('local_cart_items');
+    log("✅ Local cart cleared successfully");
   }
 }

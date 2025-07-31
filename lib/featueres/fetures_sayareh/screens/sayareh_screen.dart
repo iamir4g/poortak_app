@@ -13,6 +13,7 @@ import 'package:poortak/featueres/fetures_sayareh/screens/lesson_screen.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/models/shopping_cart_model.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
+import 'package:poortak/featueres/feature_shopping_cart/data/models/cart_enum.dart';
 import 'package:poortak/featueres/fetures_sayareh/widgets/item_multi_card.dart';
 import 'package:poortak/locator.dart';
 import 'package:poortak/common/services/storage_service.dart';
@@ -518,9 +519,13 @@ class _SayarehScreenState extends State<SayarehScreen> {
                                   height: 65,
                                   lable: l10n.add_to_cart,
                                   onPressed: () {
+                                    // Add single course to cart using item ID and IKnowCourse type
                                     context
                                         .read<ShoppingCartBloc>()
-                                        .add(AddToCartEvent(cartItem));
+                                        .add(AddToLocalCartEvent(
+                                          CartType.IKnowCourse.name,
+                                          item.id, // Use the item's ID for single purchase
+                                        ));
                                     Navigator.pop(context);
                                   })
                             ],
@@ -655,9 +660,13 @@ class _SayarehScreenState extends State<SayarehScreen> {
                                 height: 65,
                                 lable: l10n.add_to_cart,
                                 onPressed: () {
+                                  // Add bundle to cart using specific item ID and IKnow type
                                   context
                                       .read<ShoppingCartBloc>()
-                                      .add(AddToCartEvent(cartItem));
+                                      .add(AddToLocalCartEvent(
+                                        CartType.IKnow.name,
+                                        "4a61cc6b-8e3c-46e5-ad3c-5f52d0aff181", // Specific bundle ID
+                                      ));
                                   Navigator.pop(context);
                                 }),
                             SizedBox(

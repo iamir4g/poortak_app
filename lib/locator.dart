@@ -17,6 +17,8 @@ import 'package:poortak/featueres/fetures_sayareh/repositories/sayareh_repositor
 import 'package:poortak/featueres/feature_profile/data/data_sorce/profile_api_provider.dart';
 import 'package:poortak/featueres/feature_profile/repositories/profile_repository.dart';
 import 'package:poortak/featueres/feature_shopping_cart/repositories/shopping_cart_repository.dart';
+import 'package:poortak/featueres/feature_shopping_cart/data/data_source/shopping_cart_api_provider.dart';
+import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:poortak/common/bloc/permission/permission_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_start_bloc/quiz_start_bloc.dart';
@@ -57,10 +59,13 @@ Future<void> initLocator() async {
       ProfileApiProvider(dio: locator()));
   locator
       .registerSingleton<LitnerApiProvider>(LitnerApiProvider(dio: locator()));
+  locator.registerSingleton<ShoppingCartApiProvider>(
+      ShoppingCartApiProvider(dio: locator()));
 
   //repository
   locator.registerSingleton<SayarehRepository>(SayarehRepository(locator()));
-  locator.registerSingleton<ShoppingCartRepository>(ShoppingCartRepository());
+  locator.registerSingleton<ShoppingCartRepository>(
+      ShoppingCartRepository(apiProvider: locator()));
   locator.registerSingleton<ProfileRepository>(ProfileRepository(locator()));
   locator.registerSingleton<LitnerRepository>(LitnerRepository(locator()));
   locator.registerSingleton<BlocStorageBloc>(
@@ -73,6 +78,11 @@ Future<void> initLocator() async {
       VocabularyBloc(sayarehRepository: locator()));
   locator
       .registerSingleton<LitnerBloc>(LitnerBloc(litnerRepository: locator()));
+
+  // Register ShoppingCartBloc
+  locator.registerSingleton<ShoppingCartBloc>(
+      ShoppingCartBloc(repository: locator()));
+
   // Register PermissionBloc
   locator.registerSingleton<PermissionBloc>(PermissionBloc());
 
