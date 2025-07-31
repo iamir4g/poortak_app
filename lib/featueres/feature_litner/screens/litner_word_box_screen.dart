@@ -1,7 +1,8 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:poortak/l10n/app_localizations.dart';
+// import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:poortak/common/services/tts_service.dart';
 import 'package:poortak/common/widgets/step_progress.dart';
 import 'package:iconify_design/iconify_design.dart';

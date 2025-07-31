@@ -30,7 +30,8 @@ import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/sayareh_cubi
 import 'package:poortak/featueres/fetures_sayareh/repositories/sayareh_repository.dart';
 import 'package:poortak/locator.dart';
 import 'package:poortak/test_screen.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:poortak/l10n/app_localizations.dart';
+// import 'package:poortak/l10n/app_localizations.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/bloc_storage_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/converstion_bloc/converstion_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quizes_cubit/cubit/quizes_cubit.dart';

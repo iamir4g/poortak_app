@@ -10,8 +10,9 @@ import 'package:poortak/featueres/feature_shopping_cart/data/models/shopping_car
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_state.dart';
+import 'package:poortak/l10n/app_localizations.dart';
 import 'package:poortak/locator.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+// import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:zarinpal/zarinpal.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
@@ -605,7 +606,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                       amount: totalAmount *
                           10, // Convert to Rials (1 Toman = 10 Rials)
                       description: "پرداخت سفارش از پورتک",
-                      callbackUrl: "poortak://payment",
+                      callbackUrl: "return://payment",
                       onPaymentComplete: (isSuccess, refId) async {
                         print('Payment completion status: $isSuccess');
                         print('Payment reference ID: $refId');

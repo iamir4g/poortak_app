@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:poortak/l10n/app_localizations.dart';
+// import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:iconify_design/iconify_design.dart';
 import 'package:persian_tools/persian_tools.dart';
 import 'package:poortak/common/widgets/dot_loading_widget.dart';
@@ -17,6 +18,8 @@ import 'package:poortak/featueres/feature_shopping_cart/data/models/cart_enum.da
 import 'package:poortak/featueres/fetures_sayareh/widgets/item_multi_card.dart';
 import 'package:poortak/locator.dart';
 import 'package:poortak/common/services/storage_service.dart';
+import 'package:poortak/common/utils/prefs_operator.dart';
+import 'dart:developer';
 
 class SayarehScreen extends StatefulWidget {
   static const routeName = "/sayareh_screen";
@@ -28,6 +31,7 @@ class SayarehScreen extends StatefulWidget {
 
 class _SayarehScreenState extends State<SayarehScreen> {
   final StorageService _storageService = locator<StorageService>();
+  final PrefsOperator _prefsOperator = locator<PrefsOperator>();
   Map<String, String> _imageUrls = {};
 
   Future<String> _getImageUrl(String thumbnailId) async {
@@ -42,6 +46,36 @@ class _SayarehScreenState extends State<SayarehScreen> {
     } catch (e) {
       print('Error getting image URL: $e');
       return ''; // Return empty string or a placeholder image URL
+    }
+  }
+
+  // Helper method to add item to cart based on login status
+  void _addItemToCart(
+      BuildContext context, String type, String itemId, String itemName) {
+    final isLoggedIn = _prefsOperator.isLoggedIn();
+
+    log("🛒 Adding item to cart: $itemName");
+    log("   Type: $type");
+    log("   ID: $itemId");
+    log("   User logged in: $isLoggedIn");
+
+    if (isLoggedIn) {
+      // User is logged in - add to server cart
+      log("📤 Adding item to server cart via API");
+      context.read<ShoppingCartBloc>().add(AddToCartEvent(
+            ShoppingCartItem(
+              title: itemName,
+              description:
+                  type == 'IKnowCourse' ? 'دوره تک درس' : 'مجموعه کامل',
+              image: '',
+              isLock: false,
+              price: type == 'IKnowCourse' ? 75000 : 750000,
+            ),
+          ));
+    } else {
+      // User is not logged in - add to local cart
+      log("📱 Adding item to local cart");
+      context.read<ShoppingCartBloc>().add(AddToLocalCartEvent(type, itemId));
     }
   }
 
@@ -520,12 +554,11 @@ class _SayarehScreenState extends State<SayarehScreen> {
                                   lable: l10n.add_to_cart,
                                   onPressed: () {
                                     // Add single course to cart using item ID and IKnowCourse type
-                                    context
-                                        .read<ShoppingCartBloc>()
-                                        .add(AddToLocalCartEvent(
-                                          CartType.IKnowCourse.name,
-                                          item.id, // Use the item's ID for single purchase
-                                        ));
+                                    _addItemToCart(
+                                        context,
+                                        CartType.IKnowCourse.name,
+                                        item.id,
+                                        item.name);
                                     Navigator.pop(context);
                                   })
                             ],
@@ -661,12 +694,11 @@ class _SayarehScreenState extends State<SayarehScreen> {
                                 lable: l10n.add_to_cart,
                                 onPressed: () {
                                   // Add bundle to cart using specific item ID and IKnow type
-                                  context
-                                      .read<ShoppingCartBloc>()
-                                      .add(AddToLocalCartEvent(
-                                        CartType.IKnow.name,
-                                        "4a61cc6b-8e3c-46e5-ad3c-5f52d0aff181", // Specific bundle ID
-                                      ));
+                                  _addItemToCart(
+                                      context,
+                                      CartType.IKnow.name,
+                                      "4a61cc6b-8e3c-46e5-ad3c-5f52d0aff181",
+                                      "مجموعه کامل سیاره آی نو");
                                   Navigator.pop(context);
                                 }),
                             SizedBox(
