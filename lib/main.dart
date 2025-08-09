@@ -5,6 +5,7 @@ import 'package:poortak/common/blocs/bottom_nav_cubit/bottom_nav_cubit.dart';
 import 'package:poortak/common/services/tts_service.dart';
 import 'package:poortak/common/widgets/main_wrapper.dart';
 import 'package:poortak/config/my_theme.dart';
+import 'package:poortak/featueres/feature_kavoosh/screens/kavoosh_main_screen.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_bloc.dart';
 import 'package:poortak/featueres/feature_litner/screens/litner_word_completed_screen.dart';
 import 'package:poortak/featueres/feature_litner/screens/litner_word_box_screen.dart';
@@ -183,6 +184,7 @@ void main() async {
           LitnerWordBoxScreen.routeName: (context) => LitnerWordBoxScreen(),
           LitnerWordCompletedScreen.routeName: (context) =>
               LitnerWordCompletedScreen(),
+          KavooshMainScreen.routeName: (context) => KavooshMainScreen(),
         },
         debugShowCheckedModeBanner: false,
         title: 'Poortak',

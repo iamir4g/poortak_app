@@ -77,32 +77,32 @@ class CustomDrawer extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             // Add Payment Button
-            ElevatedButton(
-              onPressed: () => _handlePayment(context),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: MyColors.primary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                padding: const EdgeInsets.symmetric(vertical: 12),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  IconifyIcon(
-                    icon: "mdi:credit-card-outline",
-                    color: Colors.white,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    "پرداخت",
-                    style: MyTextStyle.textMatn14Bold.copyWith(
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            // ElevatedButton(
+            //   onPressed: () => _handlePayment(context),
+            //   style: ElevatedButton.styleFrom(
+            //     backgroundColor: MyColors.primary,
+            //     shape: RoundedRectangleBorder(
+            //       borderRadius: BorderRadius.circular(10),
+            //     ),
+            //     padding: const EdgeInsets.symmetric(vertical: 12),
+            //   ),
+            //   child: Row(
+            //     mainAxisAlignment: MainAxisAlignment.center,
+            //     children: [
+            //       IconifyIcon(
+            //         icon: "mdi:credit-card-outline",
+            //         color: Colors.white,
+            //       ),
+            //       const SizedBox(width: 8),
+            //       Text(
+            //         "پرداخت",
+            //         style: MyTextStyle.textMatn14Bold.copyWith(
+            //           color: Colors.white,
+            //         ),
+            //       ),
+            //     ],
+            //   ),
+            // ),
             const SizedBox(height: 20),
             ListTile(
               leading: Container(

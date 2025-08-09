@@ -62,7 +62,7 @@ class BottomNav extends StatelessWidget {
                           state: state,
                           index: 0,
                           icon: "mage:video-player",
-                          label: 'کاوش',
+                          label: 'سیاره آینو',
                           controller: controller,
                         ),
                         _buildNavItem(
@@ -70,7 +70,7 @@ class BottomNav extends StatelessWidget {
                           state: state,
                           index: 1,
                           icon: "mage:search", //mdi:text-box-search-outline
-                          label: 'دسته بندی',
+                          label: 'کاوش',
                           controller: controller,
                           // useCustomIcon: false,
                         ),

@@ -9,6 +9,7 @@ import 'package:poortak/common/widgets/bottom_nav.dart';
 import 'package:poortak/common/widgets/custom_drawer.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
+import 'package:poortak/featueres/feature_kavoosh/screens/kavoosh_main_screen.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_bloc.dart';
 import 'package:poortak/featueres/feature_litner/screens/litner_main_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/profile_screen.dart';
@@ -29,9 +30,7 @@ class MainWrapper extends StatelessWidget {
   // Define screens as getters to ensure they're created when needed
   List<Widget> get topLevelScreens => [
         const SayarehScreen(),
-        Container(
-          color: Colors.blue,
-        ),
+        const KavooshMainScreen(),
         const ShoppingCartScreen(),
         // Container(
         //   color: Colors.yellow,

@@ -98,6 +98,7 @@ flutter:
   assets:
     - assets/images/
     - assets/images/litner/
+    - assets/images/kavoosh/
     - assets/videos/
     - assets/sayarehHome.json
     - assets/lottie/
