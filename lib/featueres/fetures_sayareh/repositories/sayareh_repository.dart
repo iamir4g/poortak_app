@@ -37,17 +37,17 @@ class SayarehRepository {
     //return SayarehState(sayarehDataStatus: SayarehDataSuccess(response));
   }
 
-  Future<DataState<BookList>> fetchBookList() async {
+  Future<DataState<GetBookListModel>> fetchBookList() async {
     try {
       Response response = await sayarehApiProvider.callGetBookList();
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final data = BookList.fromJson(response.data);
+        final data = GetBookListModel.fromJson(response.data);
         return DataSuccess(data);
       } else {
         return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
       }
     } on AppException catch (e) {
-      return CheckExceptions.getError<BookList>(e);
+      return CheckExceptions.getError<GetBookListModel>(e);
     }
   }
 

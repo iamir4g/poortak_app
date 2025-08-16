@@ -42,16 +42,16 @@ class GetBookListModel {
 class BookList {
   String id;
   String title;
-  String description;
+  String? description;
   int order;
   String thumbnail;
   String price;
-  String author;
-  String publisher;
+  String? author;
+  String? publisher;
   int pageCount;
   String publishDate;
   String file;
-  String trialFile;
+  String? trialFile;
   DateTime createdAt;
   DateTime updatedAt;
   DateTime? publishedAt;
@@ -59,36 +59,40 @@ class BookList {
   BookList({
     required this.id,
     required this.title,
-    required this.description,
+    this.description,
     required this.order,
     required this.thumbnail,
     required this.price,
-    required this.author,
-    required this.publisher,
+    this.author,
+    this.publisher,
     required this.pageCount,
     required this.publishDate,
     required this.file,
-    required this.trialFile,
+    this.trialFile,
     required this.createdAt,
     required this.updatedAt,
-    required this.publishedAt,
+    this.publishedAt,
   });
 
   factory BookList.fromJson(Map<String, dynamic> json) => BookList(
-        id: json["id"],
-        title: json["title"],
+        id: json["id"] ?? "",
+        title: json["title"] ?? "",
         description: json["description"],
-        order: json["order"],
-        thumbnail: json["thumbnail"],
-        price: json["price"],
+        order: json["order"] ?? 0,
+        thumbnail: json["thumbnail"] ?? "",
+        price: json["price"] ?? "0",
         author: json["author"],
         publisher: json["publisher"],
-        pageCount: json["pageCount"],
-        publishDate: json["publishDate"],
-        file: json["file"],
+        pageCount: json["pageCount"] ?? 0,
+        publishDate: json["publishDate"] ?? "",
+        file: json["file"] ?? "",
         trialFile: json["trialFile"],
-        createdAt: DateTime.parse(json["createdAt"]),
-        updatedAt: DateTime.parse(json["updatedAt"]),
+        createdAt: json["createdAt"] != null
+            ? DateTime.parse(json["createdAt"])
+            : DateTime.now(),
+        updatedAt: json["updatedAt"] != null
+            ? DateTime.parse(json["updatedAt"])
+            : DateTime.now(),
         publishedAt: json["publishedAt"] == null
             ? null
             : DateTime.parse(json["publishedAt"]),

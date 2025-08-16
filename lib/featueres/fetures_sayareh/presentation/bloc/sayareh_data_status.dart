@@ -8,8 +8,8 @@ class SayarehDataInitial extends SayarehDataStatus {}
 class SayarehDataLoading extends SayarehDataStatus {}
 
 class SayarehDataCompleted extends SayarehDataStatus {
-  final dynamic data;
-  final dynamic bookListData;
+  final SayarehHomeModel data;
+  final GetBookListModel bookListData;
   SayarehDataCompleted(this.data, this.bookListData);
 }
 
