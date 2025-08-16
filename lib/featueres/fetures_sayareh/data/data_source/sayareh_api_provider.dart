@@ -45,6 +45,14 @@ class SayarehApiProvider {
     return response;
   }
 
+  dynamic callGetBookList() async {
+    final response = await dio.get(
+      "${Constants.baseUrl}iknow/books",
+    );
+    log("Sayareh Book List Response: ${response.data}");
+    return response;
+  }
+
   dynamic callGetCourseById(String id) async {
     final response = await dio.get(
       "${Constants.baseUrl}iknow/courses/$id",

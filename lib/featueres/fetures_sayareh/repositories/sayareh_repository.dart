@@ -5,6 +5,7 @@ import 'package:poortak/common/error_handling/check_exception.dart';
 import 'package:poortak/common/resources/data_state.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/data_source/sayareh_api_provider.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/answer_question_model.dart';
+import 'package:poortak/featueres/fetures_sayareh/data/models/book_list_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/conversation_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/practice_vocabulary_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/quiz_question_model.dart';
@@ -34,6 +35,20 @@ class SayarehRepository {
       return CheckExceptions.getError<SayarehHomeModel>(e);
     }
     //return SayarehState(sayarehDataStatus: SayarehDataSuccess(response));
+  }
+
+  Future<DataState<BookList>> fetchBookList() async {
+    try {
+      Response response = await sayarehApiProvider.callGetBookList();
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = BookList.fromJson(response.data);
+        return DataSuccess(data);
+      } else {
+        return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
+      }
+    } on AppException catch (e) {
+      return CheckExceptions.getError<BookList>(e);
+    }
   }
 
   Future<DataState<Lesson>> fetchCourseById(String id) async {

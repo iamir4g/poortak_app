@@ -9,7 +9,8 @@ class SayarehDataLoading extends SayarehDataStatus {}
 
 class SayarehDataCompleted extends SayarehDataStatus {
   final dynamic data;
-  SayarehDataCompleted(this.data);
+  final dynamic bookListData;
+  SayarehDataCompleted(this.data, this.bookListData);
 }
 
 class SayarehDataError extends SayarehDataStatus {

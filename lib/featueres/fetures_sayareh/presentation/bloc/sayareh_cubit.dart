@@ -16,11 +16,13 @@ class SayarehCubit extends Cubit<SayarehState> {
     emit(state.copyWith(sayarehDataStatus: SayarehDataLoading()));
 
     DataState dataState = await sayarehRepository.fetchAllCourses();
+    DataState bookListState = await sayarehRepository.fetchBookList();
 
-    if (dataState is DataSuccess) {
+    if (dataState is DataSuccess || bookListState is DataSuccess) {
       // emit completed
       emit(state.copyWith(
-          sayarehDataStatus: SayarehDataCompleted(dataState.data)));
+          sayarehDataStatus:
+              SayarehDataCompleted(dataState.data, bookListState.data)));
     } else if (dataState is DataFailed) {
       // emit error
       emit(state.copyWith(
