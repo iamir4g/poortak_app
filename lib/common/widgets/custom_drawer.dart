@@ -3,6 +3,7 @@ import 'package:iconify_design/iconify_design.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/common/services/payment_service.dart';
+import 'package:poortak/featueres/featureMenu/screens/settings_screen.dart';
 
 class CustomDrawer extends StatelessWidget {
   const CustomDrawer({super.key});
@@ -145,6 +146,9 @@ class CustomDrawer extends StatelessWidget {
               ),
             ),
             ListTile(
+              onTap: () {
+                Navigator.pushNamed(context, SettingsScreen.routeName);
+              },
               leading: Container(
                 width: 32,
                 height: 32,

@@ -32,25 +32,14 @@ class MainWrapper extends StatelessWidget {
         const SayarehScreen(),
         const KavooshMainScreen(),
         const ShoppingCartScreen(),
-        // Container(
-        //   color: Colors.yellow,
-        // ),
         LitnerMainScreen(),
         const ProfileScreen(),
-        // Container(
-        //   color: Colors.purple,
-        // ),
       ];
 
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        // BlocProvider(
-        //   create: (context) => StorageBloc(
-        //     storageService: locator<StorageService>(),
-        //   ),
-        // ),
         BlocProvider(
           create: (context) => BlocStorageBloc(
             sayarehRepository: locator<SayarehRepository>(),
