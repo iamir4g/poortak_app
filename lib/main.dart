@@ -5,6 +5,7 @@ import 'package:poortak/common/blocs/bottom_nav_cubit/bottom_nav_cubit.dart';
 import 'package:poortak/common/services/tts_service.dart';
 import 'package:poortak/common/widgets/main_wrapper.dart';
 import 'package:poortak/config/my_theme.dart';
+import 'package:poortak/featueres/featureMenu/screens/faq_screen.dart';
 import 'package:poortak/featueres/featureMenu/screens/settings_screen.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/kavoosh_main_screen.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_bloc.dart';
@@ -84,6 +85,7 @@ void main() async {
         supportedLocales: const [Locale("en", ""), Locale("fa", "")],
         routes: {
           SettingsScreen.routeName: (context) => SettingsScreen(),
+          FAQScreen.routeName: (context) => FAQScreen(),
           IntroMainWrapper.routeName: (context) => IntroMainWrapper(),
           TestScreen.routeName: (context) => TestScreen(),
           MainWrapper.routeName: (context) => MainWrapper(),
