@@ -143,14 +143,6 @@ class _FAQScreenState extends State<FAQScreen> {
       ),
       child: Row(
         children: [
-          IconButton(
-            onPressed: () => Navigator.of(context).pop(),
-            icon: const Icon(
-              Icons.arrow_back_ios,
-              color: MyColors.textMatn1,
-              size: 20,
-            ),
-          ),
           const Expanded(
             child: Center(
               child: Text(
@@ -160,7 +152,14 @@ class _FAQScreenState extends State<FAQScreen> {
               ),
             ),
           ),
-          const SizedBox(width: 48), // Balance the back button
+          IconButton(
+            onPressed: () => Navigator.of(context).pop(),
+            icon: const Icon(
+              Icons.arrow_forward,
+              color: MyColors.textMatn1,
+              size: 24,
+            ),
+          ),
         ],
       ),
     );
@@ -168,41 +167,45 @@ class _FAQScreenState extends State<FAQScreen> {
 
   Widget _buildCategoryFilters() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 16),
-      child: Row(
-        children: FAQCategory.values.map((category) {
-          final isActive = _selectedCategory == category;
-          return Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: GestureDetector(
-              onTap: () => _selectCategory(category),
-              child: Container(
-                height: 33,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  color: isActive ? MyColors.primary : MyColors.background,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color:
-                        isActive ? MyColors.primary : const Color(0xFFD9D9D9),
-                    width: 1,
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 25),
+        child: Row(
+          children: FAQCategory.values.map((category) {
+            final isActive = _selectedCategory == category;
+            return Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: GestureDetector(
+                onTap: () => _selectCategory(category),
+                child: Container(
+                  height: 33,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: isActive ? MyColors.primary : MyColors.background,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color:
+                          isActive ? MyColors.primary : const Color(0xFFD9D9D9),
+                      width: 1,
+                    ),
                   ),
-                ),
-                child: Center(
-                  child: Text(
-                    category.displayName,
-                    style: TextStyle(
-                      fontFamily: "IranSans",
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: isActive ? MyColors.background : MyColors.text3,
+                  child: Center(
+                    child: Text(
+                      category.displayName,
+                      style: TextStyle(
+                        fontFamily: "IranSans",
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: isActive ? MyColors.background : MyColors.text3,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          );
-        }).toList(),
+            );
+          }).toList(),
+        ),
       ),
     );
   }
@@ -239,18 +242,7 @@ class _FAQScreenState extends State<FAQScreen> {
               child: Row(
                 children: [
                   // Arrow Icon
-                  SizedBox(
-                    width: 12.5,
-                    height: 12.5,
-                    child: Transform.rotate(
-                      angle: faqItem.isExpanded ? 5.5 : 0.785, // 315° or 45°
-                      child: Icon(
-                        Icons.keyboard_arrow_down,
-                        color: MyColors.textMatn1,
-                        size: 12.5,
-                      ),
-                    ),
-                  ),
+
                   const SizedBox(width: 12),
                   // Question Text
                   Expanded(
@@ -267,6 +259,18 @@ class _FAQScreenState extends State<FAQScreen> {
                             : MyColors.textMatn1,
                       ),
                       textAlign: TextAlign.right,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: Transform.rotate(
+                      angle: faqItem.isExpanded ? 6.2 : 1.5, // 315° or 45°
+                      child: Icon(
+                        Icons.keyboard_arrow_down,
+                        color: MyColors.textMatn1,
+                        size: 20,
+                      ),
                     ),
                   ),
                 ],

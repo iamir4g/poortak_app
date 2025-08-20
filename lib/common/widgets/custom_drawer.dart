@@ -3,7 +3,9 @@ import 'package:iconify_design/iconify_design.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/common/services/payment_service.dart';
+import 'package:poortak/featueres/featureMenu/screens/aboutUs_screen.dart';
 import 'package:poortak/featueres/featureMenu/screens/faq_screen.dart';
+import 'package:poortak/featueres/featureMenu/screens/contactUs_screen.dart';
 import 'package:poortak/featueres/featureMenu/screens/settings_screen.dart';
 
 class CustomDrawer extends StatelessWidget {
@@ -214,6 +216,9 @@ class CustomDrawer extends StatelessWidget {
               ),
             ),
             ListTile(
+              onTap: () {
+                Navigator.pushNamed(context, ContactUsScreen.routeName);
+              },
               leading: Container(
                 width: 32,
                 height: 32,
@@ -234,6 +239,9 @@ class CustomDrawer extends StatelessWidget {
               ),
             ),
             ListTile(
+              onTap: () {
+                Navigator.pushNamed(context, AboutUsScreen.routeName);
+              },
               leading: Container(
                 width: 32,
                 height: 32,

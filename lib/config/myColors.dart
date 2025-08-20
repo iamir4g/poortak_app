@@ -30,7 +30,6 @@ class MyColors {
   // Background Colors
   static const Color background = Color(0xFFFFFFFF); // White
   static const Color darkBackground = Color(0xFF121212); // Dark background
-
   // Text Colors
   static const Color textPrimary = Color(0xFF000000); // Black
   static const Color textSecondary = Color(0xFF757575); // Grey
