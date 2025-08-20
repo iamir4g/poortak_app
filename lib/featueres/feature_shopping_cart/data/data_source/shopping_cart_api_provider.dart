@@ -58,7 +58,7 @@ class ShoppingCartApiProvider {
   Future<Response> getCart() async {
     log("🛒 Getting cart from API...");
     final response = await _makeAuthenticatedRequest(
-        () => dio.get("${Constants.baseUrl2}cart"));
+        () => dio.get("${Constants.baseUrl}cart"));
     log("📦 Shopping Cart Response: ${response.data}");
     return response;
   }
@@ -67,10 +67,10 @@ class ShoppingCartApiProvider {
     log("➕ Adding item to cart via API...");
     log("   Type: ${type.name}");
     log("   ItemId: $itemId");
-    log("   URL: ${Constants.baseUrl2}cart");
+    log("   URL: ${Constants.baseUrl}cart");
 
     final response = await _makeAuthenticatedRequest(() => dio.post(
-        "${Constants.baseUrl2}cart",
+        "${Constants.baseUrl}cart",
         data: {"type": type.name, "itemId": itemId}));
 
     log("✅ Add to Cart Response: ${response.data}");
@@ -80,7 +80,7 @@ class ShoppingCartApiProvider {
   Future<Response> clearCart() async {
     log("🗑️ Clearing cart via API...");
     final response = await _makeAuthenticatedRequest(
-        () => dio.delete("${Constants.baseUrl2}cart"));
+        () => dio.delete("${Constants.baseUrl}cart"));
     log("✅ Clear Cart Response: ${response.data}");
     return response;
   }
@@ -89,7 +89,7 @@ class ShoppingCartApiProvider {
     log("➖ Removing item from cart via API...");
     log("   ItemId: $itemId");
     final response = await _makeAuthenticatedRequest(
-        () => dio.delete("${Constants.baseUrl2}cart/$itemId"));
+        () => dio.delete("${Constants.baseUrl}cart/$itemId"));
     log("✅ Remove from Cart Response: ${response.data}");
     return response;
   }
@@ -97,7 +97,7 @@ class ShoppingCartApiProvider {
   Future<Response> checkoutCart() async {
     log("💳 Checking out cart via API...");
     final response = await _makeAuthenticatedRequest(
-        () => dio.post("${Constants.baseUrl2}cart/checkout"));
+        () => dio.post("${Constants.baseUrl}cart/checkout"));
     log("✅ Checkout Cart Response: ${response.data}");
     return response;
   }

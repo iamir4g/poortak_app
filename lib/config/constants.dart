@@ -1,7 +1,7 @@
 class Constants {
   // static const baseUrl = "https://api.poortak.ir/api/v1/";
   static const baseUrl = "https://poortak-backend.liara.run/api/v1/";
-  static const baseUrl2 = "https://poortak-backend.liara.run/api/";
+  // static const baseUrl2 = "https://poortak-backend.liara.run/api/";
   // static const baseUrl = "http://192.168.1.3:3000/api/v1/";
 // static const tapsellAppID = "gporbsshqsbpkbkmnmrranjjijddhmenocqtcagegeqgesliijajposlophsptcmfgqsif";
 // static const bannerAd = "6301c89827a9cb5ebea007b0";
