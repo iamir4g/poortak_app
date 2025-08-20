@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:iconify_design/iconify_design.dart';
+
 import 'package:persian_tools/persian_tools.dart';
 import 'package:poortak/common/widgets/dot_loading_widget.dart';
 import 'package:poortak/common/widgets/primaryButton.dart';
-import 'package:poortak/common/services/payment_service.dart';
+
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/models/shopping_cart_model.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_state.dart';
+import 'package:poortak/featueres/feature_shopping_cart/data/data_source/shopping_cart_api_provider.dart';
+import 'package:poortak/featueres/feature_shopping_cart/widgets/empty_cart_widget.dart';
 import 'package:poortak/l10n/app_localizations.dart';
 import 'package:poortak/locator.dart';
 // import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:zarinpal/zarinpal.dart';
+
 import 'package:url_launcher/url_launcher.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'dart:developer';
@@ -41,6 +43,8 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
         builder: (context) {
           return BlocBuilder<ShoppingCartBloc, ShoppingCartState>(
             builder: (context, state) {
+              log("🔄 Builder called with state: ${state.runtimeType}");
+
               if (state is ShoppingCartLoading) {
                 return Container(
                   decoration: const BoxDecoration(
@@ -61,32 +65,28 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
 
               // Handle server cart (for logged-in users)
               if (state is ShoppingCartLoaded) {
-                log("📦 Processing ShoppingCartLoaded state");
-                final ShoppingCart cart = state.cart;
-                log("   Cart has ${cart.items.length} items");
+                log("📦 Builder: ShoppingCartLoaded state - Cart has ${state.cart.items.length} items");
 
-                if (cart.items.isEmpty) {
-                  log("📭 Server cart is empty - showing empty UI");
-                  return _buildEmptyCartUI();
+                if (state.cart.items.isEmpty) {
+                  log("📭 Builder: Server cart is empty - showing empty UI");
+                  return buildEmptyCartUI();
                 }
 
-                log("✅ Server cart has items - showing cart UI");
-                return _buildCartItemsUI(cart, l10n);
+                log("✅ Builder: Server cart has items - showing cart UI");
+                return _buildCartItemsUI(state.cart, l10n);
               }
 
               // Handle local cart (for non-logged-in users)
               if (state is LocalCartLoaded) {
-                log("📱 Processing LocalCartLoaded state");
-                final List<Map<String, dynamic>> localCartItems = state.items;
-                log("   Local cart has ${localCartItems.length} items");
+                log("📱 Builder: LocalCartLoaded state - Cart has ${state.items.length} items");
 
-                if (localCartItems.isEmpty) {
-                  log("📭 Local cart is empty - showing empty UI");
-                  return _buildEmptyCartUI();
+                if (state.items.isEmpty) {
+                  log("📭 Builder: Local cart is empty - showing empty UI");
+                  return buildEmptyCartUI();
                 }
 
-                log("✅ Local cart has items - showing local cart UI");
-                return _buildLocalCartItemsUI(localCartItems, l10n);
+                log("✅ Builder: Local cart has items - showing local cart UI");
+                return _buildLocalCartItemsUI(state.items, l10n);
               }
 
               // Handle local cart item added/removed states
@@ -172,93 +172,6 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
   }
 
   // Build empty cart UI
-  Widget _buildEmptyCartUI() {
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Color(0xFFE8F0FC),
-            Color(0xFFFCEBF1),
-            Color(0xFFEFE8FC),
-          ],
-          stops: [0.1, 0.54, 1.0],
-        ),
-      ),
-      child: Column(
-        children: [
-          const SizedBox(height: 40),
-          // Top section: star icon and score
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset(
-                'assets/images/star_icon.png',
-                width: 24,
-                height: 24,
-              ),
-              const SizedBox(width: 8),
-              const Text(
-                'مجموع امتیاز های شما : ',
-                style: TextStyle(
-                  fontFamily: 'IRANSans',
-                  fontWeight: FontWeight.w500,
-                  fontSize: 16,
-                  color: Color(0xFF29303D),
-                ),
-              ),
-              const SizedBox(width: 4),
-              const Text(
-                '۲۰۰ سکه',
-                style: TextStyle(
-                  fontFamily: 'IRANSans',
-                  fontWeight: FontWeight.w500,
-                  fontSize: 16,
-                  color: Color(0xFF29303D),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 40),
-          // Body: white container with border, illustration, and text
-          Center(
-            child: Container(
-              width: 360,
-              padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(22),
-                border: Border.all(color: Color(0xFFC2C9D6), width: 1),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Image.asset(
-                    'assets/images/empty_cart_illustration.png',
-                    width: 140,
-                    height: 120,
-                    fit: BoxFit.contain,
-                  ),
-                  const SizedBox(height: 32),
-                  const Text(
-                    'سبد خرید شما خالی است!',
-                    style: TextStyle(
-                      fontFamily: 'IRANSans',
-                      fontWeight: FontWeight.w500,
-                      fontSize: 16,
-                      color: Color(0xFF3D495C),
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   // Build server cart items UI
   Widget _buildCartItemsUI(ShoppingCart cart, AppLocalizations? l10n) {
@@ -381,43 +294,50 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                   width: 208,
                   height: 60,
                   lable: l10n?.pay_now ?? "Pay Now",
-                  onPressed: () {
-                    final totalAmount =
-                        cart.items.fold(0, (sum, item) => sum + item.price);
-                    PaymentService paymentService = PaymentService();
+                  onPressed: () async {
+                    try {
+                      // Show loading message
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('در حال پردازش...'),
+                          backgroundColor: Colors.blue,
+                          duration: const Duration(seconds: 2),
+                        ),
+                      );
 
-                    paymentService.startPayment(
-                      amount: totalAmount *
-                          10, // Convert to Rials (1 Toman = 10 Rials)
-                      description: "پرداخت سفارش از پورتک",
-                      callbackUrl: "poortak://payment",
-                      onPaymentComplete: (isSuccess, refId) async {
-                        print('Payment completion status: $isSuccess');
-                        print('Payment reference ID: $refId');
+                      // Call checkout API directly
+                      final apiProvider = locator<ShoppingCartApiProvider>();
+                      final response = await apiProvider.checkoutCart();
 
-                        if (isSuccess) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                  'پرداخت با موفقیت انجام شد. کد پیگیری: $refId'),
-                              backgroundColor: Colors.green,
-                            ),
-                          );
-                          // Clear cart after successful payment
-                          context
-                              .read<ShoppingCartBloc>()
-                              .add(ClearCartEvent());
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                  'پرداخت با خطا مواجه شد. لطفا دوباره تلاش کنید.'),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
-                        }
-                      },
-                    );
+                      log("✅ Checkout response: ${response.data}");
+
+                      // Parse response and get URL
+                      final url = response.data['data']['url'] as String;
+                      log("🔗 Payment URL: $url");
+
+                      // Show success message
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('در حال انتقال به درگاه پرداخت...'),
+                          backgroundColor: Colors.green,
+                          duration: const Duration(seconds: 2),
+                        ),
+                      );
+
+                      // Launch payment URL
+                      launchUrl(
+                        Uri.parse(url),
+                        mode: LaunchMode.externalApplication,
+                      );
+                    } catch (e) {
+                      log("❌ Checkout failed: $e");
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('خطا در پردازش پرداخت: $e'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
                   },
                 ),
               ],
@@ -598,42 +518,50 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                   width: 208,
                   height: 60,
                   lable: l10n?.pay_now ?? "Pay Now",
-                  onPressed: () {
-                    final totalAmount = _calculateTotalPrice(localCartItems);
-                    PaymentService paymentService = PaymentService();
+                  onPressed: () async {
+                    try {
+                      // Show loading message
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('در حال پردازش...'),
+                          backgroundColor: Colors.blue,
+                          duration: const Duration(seconds: 2),
+                        ),
+                      );
 
-                    paymentService.startPayment(
-                      amount: totalAmount *
-                          10, // Convert to Rials (1 Toman = 10 Rials)
-                      description: "پرداخت سفارش از پورتک",
-                      callbackUrl: "return://payment",
-                      onPaymentComplete: (isSuccess, refId) async {
-                        print('Payment completion status: $isSuccess');
-                        print('Payment reference ID: $refId');
+                      // Call checkout API directly
+                      final apiProvider = locator<ShoppingCartApiProvider>();
+                      final response = await apiProvider.checkoutCart();
 
-                        if (isSuccess) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                  'پرداخت با موفقیت انجام شد. کد پیگیری: $refId'),
-                              backgroundColor: Colors.green,
-                            ),
-                          );
-                          // Clear local cart after successful payment
-                          context
-                              .read<ShoppingCartBloc>()
-                              .add(ClearLocalCartEvent());
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                  'پرداخت با خطا مواجه شد. لطفا دوباره تلاش کنید.'),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
-                        }
-                      },
-                    );
+                      log("✅ Checkout response: ${response.data}");
+
+                      // Parse response and get URL
+                      final url = response.data['data']['url'] as String;
+                      log("🔗 Payment URL: $url");
+
+                      // Show success message
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('در حال انتقال به درگاه پرداخت...'),
+                          backgroundColor: Colors.green,
+                          duration: const Duration(seconds: 2),
+                        ),
+                      );
+
+                      // Launch payment URL
+                      launchUrl(
+                        Uri.parse(url),
+                        mode: LaunchMode.externalApplication,
+                      );
+                    } catch (e) {
+                      log("❌ Checkout failed: $e");
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('خطا در پردازش پرداخت: $e'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
                   },
                 ),
               ],
@@ -658,12 +586,5 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
       }
     }
     return total;
-  }
-
-  Future<void> _launchUrl(String url) async {
-    final Uri uri = Uri.parse(url);
-    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
-      throw Exception('Could not launch $url');
-    }
   }
 }

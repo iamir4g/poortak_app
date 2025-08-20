@@ -7,6 +7,7 @@ import 'package:poortak/featueres/feature_shopping_cart/data/data_source/shoppin
 import 'package:poortak/common/error_handling/app_exception.dart';
 import 'dart:developer';
 import 'dart:async';
+import 'package:poortak/featueres/feature_shopping_cart/data/models/checkout_cart_model.dart';
 
 class ShoppingCartRepository {
   ShoppingCart _cart = ShoppingCart();
@@ -113,6 +114,28 @@ class ShoppingCartRepository {
 
   Future<void> clearLocalCart() async {
     await _prefsOperator.clearLocalCart();
+  }
+
+  Future<String> checkoutCart() async {
+    log("💳 Checking out cart...");
+    try {
+      final response = await _apiProvider.checkoutCart();
+      log("📦 Checkout response received");
+
+      // Parse the checkout response
+      final checkoutModel = CheckoutCartModel.fromJson(response.data);
+      log("📊 Checkout successful: ${checkoutModel.ok}");
+
+      if (checkoutModel.ok && checkoutModel.data != null) {
+        log("🔗 Payment URL: ${checkoutModel.data!.url}");
+        return checkoutModel.data!.url;
+      } else {
+        throw Exception('Checkout failed: Invalid response from server');
+      }
+    } catch (e) {
+      log("❌ Error during checkout: $e");
+      rethrow;
+    }
   }
 
   // Sync Local Cart to Backend with retry mechanism
