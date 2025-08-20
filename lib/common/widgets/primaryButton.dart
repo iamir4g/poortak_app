@@ -23,15 +23,20 @@ class PrimaryButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: MyColors.brandSecondary,
+          backgroundColor: MyColors.primary,
           foregroundColor: MyColors.textLight,
+          elevation: 0,
+          shadowColor: Colors.transparent,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(16),
           ),
         ),
         child: Text(
           lable,
-          style: MyTextStyle.textMatnBtn,
+          style: MyTextStyle.textMatnBtn.copyWith(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
     );
