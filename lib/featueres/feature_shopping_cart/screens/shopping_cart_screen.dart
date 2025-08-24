@@ -11,7 +11,6 @@ import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shoppi
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_state.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/data_source/shopping_cart_api_provider.dart';
-import 'package:poortak/featueres/feature_shopping_cart/widgets/empty_cart_widget.dart';
 import 'package:poortak/l10n/app_localizations.dart';
 import 'package:poortak/locator.dart';
 // import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -66,6 +65,8 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
               // Handle server cart (for logged-in users)
               if (state is ShoppingCartLoaded) {
                 log("📦 Builder: ShoppingCartLoaded state - Cart has ${state.cart.items.length} items");
+                log("💰 Cart totals - SubTotal: ${state.cart.subTotal}, GrandTotal: ${state.cart.grandTotal}");
+                log("🆔 Cart ID: ${state.cart.id}");
 
                 if (state.cart.items.isEmpty) {
                   log("📭 Builder: Server cart is empty - showing empty UI");
@@ -172,6 +173,52 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
   }
 
   // Build empty cart UI
+  Widget buildEmptyCartUI() {
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Color(0xFFE8F0FC),
+            Color(0xFFFCEBF1),
+            Color(0xFFEFE8FC),
+          ],
+          stops: [0.1, 0.54, 1.0],
+        ),
+      ),
+      child: const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.shopping_cart_outlined,
+              size: 100,
+              color: Colors.grey,
+            ),
+            SizedBox(height: 16),
+            Text(
+              'سبد خرید شما خالی است',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey,
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'محصولات مورد نظر خود را به سبد خرید اضافه کنید',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   // Build server cart items UI
   Widget _buildCartItemsUI(ShoppingCart cart, AppLocalizations? l10n) {
@@ -190,6 +237,50 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
       ),
       child: Column(
         children: [
+          // Cart metadata header
+          if (cart.id != null)
+            Container(
+              margin: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: MyColors.background,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'سبد خرید',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  if (cart.subTotal != null && cart.grandTotal != null)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'قیمت کل: ${cart.subTotal!.addComma} تومان',
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 14,
+                          ),
+                        ),
+                        if (cart.subTotal != cart.grandTotal)
+                          Text(
+                            'تخفیف: ${(cart.subTotal! - cart.grandTotal!).addComma} تومان',
+                            style: TextStyle(
+                              color: Colors.green[600],
+                              fontSize: 14,
+                            ),
+                          ),
+                      ],
+                    ),
+                ],
+              ),
+            ),
           Expanded(
             child: ListView.builder(
               itemCount: cart.items.length,
@@ -241,13 +332,46 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                             ),
                           ),
                           const SizedBox(width: 8),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(item.title),
-                              Text(item.description),
-                            ],
+                          Expanded(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  item.title,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  item.description,
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                if (item.quantity != null && item.quantity! > 1)
+                                  Text(
+                                    'تعداد: ${item.quantity}',
+                                    style: TextStyle(
+                                      color: Colors.grey[500],
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                if (item.source != null &&
+                                    item.source!['discountAmount'] != null)
+                                  Text(
+                                    'تخفیف: ${item.source!['discountAmount']}%',
+                                    style: TextStyle(
+                                      color: Colors.green[600],
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
@@ -256,8 +380,14 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                         left: 0,
                         child: Row(
                           children: [
-                            Text(item.price.toString().addComma),
-                            Text("تومان"),
+                            Text(
+                              item.price.toString().addComma,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                            const Text("تومان"),
                           ],
                         ),
                       ),
@@ -282,12 +412,23 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '${l10n?.total_price} ${cart.items.fold(0, (sum, item) => sum + item.price).addComma}',
+                      '${l10n?.total_price} ${cart.grandTotal?.addComma ?? cart.items.fold(0, (sum, item) => sum + item.price).addComma}',
                       style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
+                    if (cart.subTotal != null &&
+                        cart.grandTotal != null &&
+                        cart.subTotal != cart.grandTotal)
+                      Text(
+                        'قیمت اصلی: ${cart.subTotal!.addComma} تومان',
+                        style: TextStyle(
+                          color: Colors.grey[600],
+                          fontSize: 14,
+                          decoration: TextDecoration.lineThrough,
+                        ),
+                      ),
                   ],
                 ),
                 PrimaryButton(

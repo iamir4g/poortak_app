@@ -31,7 +31,15 @@ class ShoppingCartRepository {
       if (getCartModel.data.cart.items == null ||
           getCartModel.data.cart.items!.isEmpty) {
         log("📭 Server cart is empty - creating empty ShoppingCart");
-        _cart = ShoppingCart(items: []);
+        _cart = ShoppingCart(
+          id: getCartModel.data.cart.id,
+          userId: getCartModel.data.cart.userId,
+          createdAt: getCartModel.data.cart.createdAt,
+          updatedAt: getCartModel.data.cart.updatedAt,
+          items: [],
+          subTotal: getCartModel.data.subTotal,
+          grandTotal: getCartModel.data.grandTotal,
+        );
         return _cart;
       }
 
@@ -62,15 +70,34 @@ class ShoppingCartRepository {
           image: '', // Server doesn't provide image URL, using empty for now
           isLock: false, // Assuming items in cart are unlocked
           price: int.parse(cartItem.price),
+          itemId: cartItem.itemId,
+          type: cartItem.type,
+          quantity: cartItem.quantity,
+          source: {
+            'id': cartItem.source.id,
+            'price': cartItem.source.price,
+            'discountType': cartItem.source.discountType,
+            'discountAmount': cartItem.source.discountAmount,
+          },
         );
 
         shoppingCartItems.add(shoppingCartItem);
         log("✅ Converted item: ${shoppingCartItem.title} - ${shoppingCartItem.price} تومان");
       }
 
-      // Create new ShoppingCart with server items
-      _cart = ShoppingCart(items: shoppingCartItems);
+      // Create new ShoppingCart with server items and all metadata
+      _cart = ShoppingCart(
+        id: getCartModel.data.cart.id,
+        userId: getCartModel.data.cart.userId,
+        createdAt: getCartModel.data.cart.createdAt,
+        updatedAt: getCartModel.data.cart.updatedAt,
+        items: shoppingCartItems,
+        subTotal: getCartModel.data.subTotal,
+        grandTotal: getCartModel.data.grandTotal,
+      );
+
       log("🎉 Successfully converted server cart to ShoppingCart format with ${shoppingCartItems.length} items");
+      log("💰 Cart totals - SubTotal: ${_cart.subTotal}, GrandTotal: ${_cart.grandTotal}");
 
       return _cart;
     } catch (e) {

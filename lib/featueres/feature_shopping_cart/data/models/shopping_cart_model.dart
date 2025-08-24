@@ -3,8 +3,11 @@ class ShoppingCartItem {
   final String description;
   final String image;
   final bool isLock;
-  // int quantity;
   final int price;
+  final String? itemId;
+  final String? type;
+  final int? quantity;
+  final Map<String, dynamic>? source;
 
   ShoppingCartItem({
     required this.title,
@@ -12,16 +15,33 @@ class ShoppingCartItem {
     required this.image,
     required this.isLock,
     required this.price,
-    // this.quantity = 1,
+    this.itemId,
+    this.type,
+    this.quantity,
+    this.source,
   });
 
   // double get totalPrice => quantity * 100; // Assuming each item costs 100
 }
 
 class ShoppingCart {
-  List<ShoppingCartItem> items;
+  final String? id;
+  final String? userId;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+  List<ShoppingCartItem> items; // Remove final to allow modification
+  final int? subTotal;
+  final int? grandTotal;
 
-  ShoppingCart({this.items = const []});
+  ShoppingCart({
+    this.id,
+    this.userId,
+    this.createdAt,
+    this.updatedAt,
+    this.items = const [],
+    this.subTotal,
+    this.grandTotal,
+  });
 
   // double get totalAmount => items.fold(0, (sum, item) => sum + item.totalPrice);
 
