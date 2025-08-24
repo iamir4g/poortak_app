@@ -271,6 +271,8 @@ class _SayarehScreenState extends State<SayarehScreen> {
                                       .bookListData.data![index].description,
                                   thumbnail: sayarehDataCompleted
                                       .bookListData.data![index].thumbnail,
+                                  fileKey: sayarehDataCompleted
+                                      .bookListData.data![index].file,
                                   // price: sayarehDataCompleted.bookListData.data![index].price,
                                 );
                               },
