@@ -110,6 +110,7 @@ void main() async {
                 index: args['index'],
                 title: args['title'],
                 lessonId: args['lessonId'],
+                purchased: args['purchased'],
               ),
             );
           },
@@ -246,6 +247,7 @@ class MyApp extends StatelessWidget {
               index: args['index'],
               title: args['title'],
               lessonId: args['lessonId'],
+              purchased: args['purchased'],
             ),
           );
         },

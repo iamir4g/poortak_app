@@ -8,30 +8,33 @@ import 'package:poortak/featueres/fetures_sayareh/widgets/dialog_cart.dart';
 class ItemLeason extends StatelessWidget {
   final Lesson item;
   final int index;
+  final bool purchased;
   final Function() onTap;
   const ItemLeason(
       {super.key,
       required this.item,
       required this.onTap,
+      required this.purchased,
       required this.index});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        if (item.price != "0") {
-          showDialog(
-              context: context,
-              builder: (context) {
-                return DialogCart(item: item); //buildDialog(context, item);
-              });
-        } else {
-          Navigator.pushNamed(context, LessonScreen.routeName, arguments: {
-            'index': index,
-            'title': item.name,
-            'lessonId': item.id,
-          });
-        }
+        // if (item.price != "0") {
+        //   showDialog(
+        //       context: context,
+        //       builder: (context) {
+        //         return DialogCart(item: item); //buildDialog(context, item);
+        //       });
+        // } else {
+        Navigator.pushNamed(context, LessonScreen.routeName, arguments: {
+          'index': index,
+          'title': item.name,
+          'lessonId': item.id,
+          'purchased': purchased,
+        });
+        // }
       },
       child: Container(
         width: 360,
@@ -52,7 +55,6 @@ class ItemLeason extends StatelessWidget {
                   minRadius: 30,
                   child: FutureBuilder<String>(
                     future: GetImageUrlService().getImageUrl(item.thumbnail),
-                    // _getImageUrl(item.thumbnail),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const CircularProgressIndicator();
@@ -85,7 +87,7 @@ class ItemLeason extends StatelessWidget {
             ),
             Row(
               children: [
-                item.price != "0"
+                !purchased
                     ? Image(image: AssetImage("assets/images/lock_image.png"))
                     : SizedBox(),
                 SizedBox(

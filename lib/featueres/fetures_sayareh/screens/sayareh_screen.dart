@@ -127,99 +127,10 @@ class _SayarehScreenState extends State<SayarehScreen> {
                       itemBuilder: (context, index) {
                         final item = sayarehDataCompleted.data.data[index];
                         return ItemLeason(
-                            item: item, onTap: () {}, index: index);
-                        // GestureDetector(
-                        //     onTap: () {
-                        //       if (item.price != "0") {
-                        //         showDialog(
-                        //             context: context,
-                        //             builder: (context) {
-                        //               return buildDialog(context, item);
-                        //             });
-                        //       } else {
-                        //         Navigator.pushNamed(
-                        //             context, LessonScreen.routeName,
-                        //             arguments: {
-                        //               'index': index,
-                        //               'title': item.name,
-                        //               'lessonId': item.id,
-                        //             });
-                        //       }
-                        //     },
-                        //     child: Container(
-                        //         width: 360,
-                        //         height: 80,
-                        //         margin: const EdgeInsets.symmetric(
-                        //             horizontal: 16, vertical: 8),
-                        //         padding: const EdgeInsets.all(16),
-                        //         decoration: BoxDecoration(
-                        //           color: MyColors.background,
-                        //           borderRadius: BorderRadius.circular(40),
-                        //         ),
-                        //         child: Row(
-                        //           mainAxisAlignment:
-                        //               MainAxisAlignment.spaceBetween,
-                        //           children: [
-                        //             Container(
-                        //               child: Row(children: [
-                        //                 CircleAvatar(
-                        //                   maxRadius: 30,
-                        //                   minRadius: 30,
-                        //                   child: FutureBuilder<String>(
-                        //                     future: GetImageUrlService()
-                        //                         .getImageUrl(item.thumbnail),
-                        //                     // _getImageUrl(item.thumbnail),
-                        //                     builder: (context, snapshot) {
-                        //                       if (snapshot.connectionState ==
-                        //                           ConnectionState.waiting) {
-                        //                         return const CircularProgressIndicator();
-                        //                       }
-                        //                       if (snapshot.hasError ||
-                        //                           !snapshot.hasData ||
-                        //                           snapshot.data!.isEmpty) {
-                        //                         return const Icon(Icons.error);
-                        //                       }
-                        //                       return Image.network(
-                        //                         snapshot.data!,
-                        //                         fit: BoxFit.cover,
-                        //                         errorBuilder: (context, error,
-                        //                             stackTrace) {
-                        //                           return const Icon(
-                        //                               Icons.error);
-                        //                         },
-                        //                       );
-                        //                     },
-                        //                   ),
-                        //                 ),
-                        //                 const SizedBox(width: 8),
-                        //                 Column(
-                        //                   mainAxisAlignment:
-                        //                       MainAxisAlignment.start,
-                        //                   crossAxisAlignment:
-                        //                       CrossAxisAlignment.start,
-                        //                   children: [
-                        //                     Text(item.name),
-                        //                     Text(item.description),
-                        //                   ],
-                        //                 )
-                        //               ]),
-                        //             ),
-                        //             Row(
-                        //               children: [
-                        //                 item.price != "0"
-                        //                     ? Image(
-                        //                         image: AssetImage(
-                        //                             "assets/images/lock_image.png"))
-                        //                     : SizedBox(),
-                        //                 SizedBox(
-                        //                   width: 8,
-                        //                 ),
-                        //                 Icon(Icons.arrow_forward_ios,
-                        //                     color: Colors.black),
-                        //               ],
-                        //             ),
-                        //           ],
-                        //         )));
+                            item: item,
+                            onTap: () {},
+                            index: index,
+                            purchased: item.purchased);
                       },
                     ),
 
@@ -272,7 +183,7 @@ class _SayarehScreenState extends State<SayarehScreen> {
                                   thumbnail: sayarehDataCompleted
                                       .bookListData.data![index].thumbnail,
                                   fileKey: sayarehDataCompleted
-                                      .bookListData.data![index].file,
+                                      .bookListData.data![index].id,
                                   // price: sayarehDataCompleted.bookListData.data![index].price,
                                 );
                               },
@@ -291,27 +202,6 @@ class _SayarehScreenState extends State<SayarehScreen> {
                               ),
                             ),
                           // Example Box 1
-
-                          // const SizedBox(height: 12),
-                          // Example Box 2
-                          // Container(
-                          //   width: 360,
-                          //   height: 100,
-                          //   padding: const EdgeInsets.all(16),
-                          //   decoration: BoxDecoration(
-                          //     color: Colors.white,
-                          //     borderRadius: BorderRadius.circular(20),
-                          //   ),
-                          //   child: const Row(
-                          //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          //     children: [
-                          //       Text('Box 2',
-                          //           style: TextStyle(color: Colors.white)),
-                          //       Icon(Icons.arrow_forward_ios,
-                          //           color: Colors.white),
-                          //     ],
-                          //   ),
-                          // ),
                         ],
                       ),
                     ),

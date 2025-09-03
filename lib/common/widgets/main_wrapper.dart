@@ -2,15 +2,11 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:iconify_design/iconify_design.dart';
-import 'package:poortak/common/bloc/storage/storage_bloc.dart';
-import 'package:poortak/common/services/storage_service.dart';
+import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/common/widgets/bottom_nav.dart';
 import 'package:poortak/common/widgets/custom_drawer.dart';
-import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/kavoosh_main_screen.dart';
-import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_bloc.dart';
 import 'package:poortak/featueres/feature_litner/screens/litner_main_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/profile_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/bloc_storage_bloc.dart';
@@ -20,12 +16,20 @@ import 'package:poortak/featueres/feature_shopping_cart/screens/shopping_cart_sc
 import 'package:poortak/locator.dart';
 import 'package:poortak/common/bloc/permission/permission_bloc.dart';
 
-class MainWrapper extends StatelessWidget {
+class MainWrapper extends StatefulWidget {
   static const routeName = "/main_wrapper";
-  MainWrapper({super.key});
+  const MainWrapper({super.key});
 
+  @override
+  State<MainWrapper> createState() => _MainWrapperState();
+}
+
+class _MainWrapperState extends State<MainWrapper> {
   // Using late init to ensure PageController is created only once
   final PageController controller = PageController();
+  final PrefsOperator prefsOperator = locator<PrefsOperator>();
+
+  int currentPageIndex = 0;
 
   // Define screens as getters to ensure they're created when needed
   List<Widget> get topLevelScreens => [
@@ -35,6 +39,38 @@ class MainWrapper extends StatelessWidget {
         LitnerMainScreen(),
         const ProfileScreen(),
       ];
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  String getTitle(int index) {
+    switch (index) {
+      case 0:
+        return 'کتاب های سیاره آی نو';
+      case 1:
+        return 'کاووش';
+      case 2:
+        return 'سبد خرید';
+      case 3:
+        return 'لایتنر';
+      case 4:
+        return 'پروفایل';
+    }
+
+    return '';
+  }
+
+  void _logout() async {
+    await prefsOperator.logout();
+    // if (mounted) {
+    //   setState(() {
+    //     isLoggedIn = false;
+    //   });
+    // }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,16 +117,44 @@ class MainWrapper extends StatelessWidget {
 
             return Scaffold(
               appBar: AppBar(
+                backgroundColor: Colors.white,
+                elevation: 0,
+                actions: [
+                  currentPageIndex == 4
+                      ? PopupMenuButton<String>(
+                          icon: const Icon(Icons.more_vert,
+                              color: Color(0xFF3D495C)),
+                          onSelected: (value) {
+                            if (value == 'logout') _logout();
+                          },
+                          itemBuilder: (context) => [
+                            const PopupMenuItem(
+                              value: 'logout',
+                              child: Text('خروج از ناحیه کاربری'),
+                            ),
+                          ],
+                        )
+                      : const SizedBox.shrink(),
+                ],
                 flexibleSpace: Container(
                   decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.vertical(
-                      bottom: Radius.circular(30.0),
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(33.5),
                     ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color.fromRGBO(0, 0, 0, 0.05),
+                        offset: Offset(0, 1),
+                        blurRadius: 1,
+                        spreadRadius: 0,
+                      ),
+                    ],
                   ),
                 ),
                 shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.vertical(
-                    bottom: Radius.circular(30.0),
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(33.5),
                   ),
                 ),
               ),
@@ -98,7 +162,15 @@ class MainWrapper extends StatelessWidget {
               bottomNavigationBar: BottomNav(controller: controller),
               body: state is PermissionLoading
                   ? const Center(child: CircularProgressIndicator())
-                  : PageView(controller: controller, children: topLevelScreens),
+                  : PageView(
+                      controller: controller,
+                      onPageChanged: (index) {
+                        setState(() {
+                          currentPageIndex = index;
+                        });
+                      },
+                      children: topLevelScreens,
+                    ),
             );
           },
         ),

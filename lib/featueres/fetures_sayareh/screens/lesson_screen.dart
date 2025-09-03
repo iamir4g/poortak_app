@@ -30,6 +30,7 @@ class LessonScreen extends StatefulWidget {
   final int index;
   final String lessonId;
   final String title;
+  final bool purchased;
   // final String name;
 
   const LessonScreen({
@@ -37,6 +38,7 @@ class LessonScreen extends StatefulWidget {
     required this.index,
     required this.title,
     required this.lessonId,
+    required this.purchased,
     // required this.name,
   });
 
@@ -346,15 +348,24 @@ class _LessonScreenState extends State<LessonScreen> {
         print("LessonBloc state changed: $state");
         if (state is LessonSuccess) {
           // Check for existing files first
-          _checkExistingFiles(state.lesson.video).then((_) {
+          _checkExistingFiles(state.lesson.id).then((_) {
             // Only start download if we don't have a local file
             if (localVideoPath == null) {
-              _downloadAndStoreVideo(
-                state.lesson.video, // video ID for download
-                state.lesson.id, // name for file
-                state.lesson.video, // video ID for decryption key
-                true,
-              );
+              if (widget.purchased) {
+                _downloadAndStoreVideo(
+                  state.lesson.trailerVideo, // video ID for download
+                  state.lesson.trailerVideo, // name for file
+                  state.lesson.trailerVideo, // video ID for decryption key
+                  true,
+                );
+              } else {
+                _downloadAndStoreVideo(
+                  state.lesson.id, // video ID for download
+                  state.lesson.id, // name for file
+                  state.lesson.id, // video ID for decryption key
+                  false,
+                );
+              }
             }
           });
         } else if (state is LessonError) {

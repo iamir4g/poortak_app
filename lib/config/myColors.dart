@@ -58,4 +58,5 @@ class MyColors {
 
   static const Color background1 = Color(0xffF2F5FA);
   static const Color background2 = Color(0xFFF3F5F7);
+  static const Color background3 = Color(0xFFF6F9FE);
 }

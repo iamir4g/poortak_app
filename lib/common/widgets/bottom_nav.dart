@@ -29,85 +29,97 @@ class BottomNav extends StatelessWidget {
     // var primaryColor = Theme.of(context).primaryColor;
     // TextTheme textTheme = Theme.of(context).textTheme;
 
-    return BottomAppBar(
-      shape: const CircularNotchedRectangle(),
-      notchMargin: 5,
-      color: Colors.white,
-      elevation: 0,
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF92A2BE).withOpacity(0.12),
+            offset: const Offset(0, -7),
+            blurRadius: 13,
+            spreadRadius: 0,
+          ),
+        ],
+      ),
       child: Container(
-          height: 50,
-          padding: EdgeInsets.only(bottom: 8),
-          child: MultiBlocProvider(
-              providers: [
-                BlocProvider(
-                  create: (context) => BottomNavCubit(),
-                ),
-                BlocProvider(
-                  create: (context) {
-                    final bloc = ShoppingCartBloc(repository: locator());
-                    bloc.add(GetCartEvent());
-                    return bloc;
-                  },
-                )
-              ],
-              child: Builder(builder: (context) {
-                return BlocBuilder<BottomNavCubit, int>(
-                    builder: (context, state) {
-                  return Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        _buildNavItem(
-                          context: context,
-                          state: state,
-                          index: 0,
-                          icon: "mage:video-player",
-                          label: 'سیاره آینو',
-                          controller: controller,
-                        ),
-                        _buildNavItem(
-                          context: context,
-                          state: state,
-                          index: 1,
-                          icon: "mage:search", //mdi:text-box-search-outline
-                          label: 'کاوش',
-                          controller: controller,
-                          // useCustomIcon: false,
-                        ),
-                        _buildNavItem(
-                          context: context,
-                          state: state,
-                          index: 2,
-                          label: 'سبد خرید',
-                          icon:
-                              "hugeicons:shopping-cart-02", //"mage:shopping-cart",
-                          controller: controller,
-                          // useCustomIcon: false,
-                          // materialIcon: Icons.shopping_cart_outlined,
-                        ),
-                        _buildNavItem(
-                          context: context,
-                          state: state,
-                          index: 3,
-                          label: 'لایتنر',
-                          icon: "hugeicons:book-open-02", //"mage:book",
-                          controller: controller,
-                          // useCustomIcon: false,
-                          // materialIcon: Icons.folder_outlined,
-                        ),
-                        _buildNavItem(
-                          context: context,
-                          state: state,
-                          index: 4,
-                          label: 'پروفایل',
-                          controller: controller,
-                          icon: "mynaui:user-square", //"mage:user",
-                          // useCustomIcon: false,
-                          // materialIcon: Icons.account_box_outlined,
-                        ),
-                      ]);
-                });
-              }))),
+        height: 70,
+        padding: const EdgeInsets.only(bottom: 8),
+        child: MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (context) => BottomNavCubit(),
+              ),
+              BlocProvider(
+                create: (context) {
+                  final bloc = ShoppingCartBloc(repository: locator());
+                  bloc.add(GetCartEvent());
+                  return bloc;
+                },
+              )
+            ],
+            child: Builder(builder: (context) {
+              return BlocBuilder<BottomNavCubit, int>(
+                  builder: (context, state) {
+                return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      _buildNavItem(
+                        context: context,
+                        state: state,
+                        index: 0,
+                        icon: "mage:video-player",
+                        label: 'سیاره آینو',
+                        controller: controller,
+                      ),
+                      _buildNavItem(
+                        context: context,
+                        state: state,
+                        index: 1,
+                        icon: "mage:search", //mdi:text-box-search-outline
+                        label: 'کاوش',
+                        controller: controller,
+                        // useCustomIcon: false,
+                      ),
+                      _buildNavItem(
+                        context: context,
+                        state: state,
+                        index: 2,
+                        label: 'سبد خرید',
+                        icon:
+                            "hugeicons:shopping-cart-02", //"mage:shopping-cart",
+                        controller: controller,
+                        // useCustomIcon: false,
+                        // materialIcon: Icons.shopping_cart_outlined,
+                      ),
+                      _buildNavItem(
+                        context: context,
+                        state: state,
+                        index: 3,
+                        label: 'لایتنر',
+                        icon: "hugeicons:book-open-02", //"mage:book",
+                        controller: controller,
+                        // useCustomIcon: false,
+                        // materialIcon: Icons.folder_outlined,
+                      ),
+                      _buildNavItem(
+                        context: context,
+                        state: state,
+                        index: 4,
+                        label: 'پروفایل',
+                        controller: controller,
+                        icon: "mynaui:user-square", //"mage:user",
+                        // useCustomIcon: false,
+                        // materialIcon: Icons.account_box_outlined,
+                      ),
+                    ]);
+              });
+            })),
+      ),
     );
   }
 
@@ -219,7 +231,12 @@ class BottomNav extends StatelessWidget {
                   padding: const EdgeInsets.only(top: 4.0),
                   child: Text(
                     label,
-                    style: MyTextStyle.bottomNavEnabledTextStyle,
+                    style: const TextStyle(
+                      fontFamily: 'IRANSans',
+                      fontWeight: FontWeight.bold,
+                      fontSize: 9,
+                      color: Color(0xFFF8A748),
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.visible,
                   ),

@@ -41,12 +41,13 @@ class Lesson {
   String description;
   String thumbnail;
   String price;
-  String video;
+  String? video;
   String trailerVideo;
   int order;
   DateTime createdAt;
   DateTime updatedAt;
   DateTime? publishedAt;
+  bool purchased;
 
   Lesson({
     required this.id,
@@ -54,7 +55,8 @@ class Lesson {
     required this.description,
     required this.thumbnail,
     required this.price,
-    required this.video,
+    this.video,
+    required this.purchased,
     required this.trailerVideo,
     required this.order,
     required this.createdAt,
@@ -69,6 +71,7 @@ class Lesson {
         thumbnail: json["thumbnail"],
         price: json["price"],
         video: json["video"],
+        purchased: json["purchased"],
         trailerVideo: json["trailerVideo"],
         order: json["order"],
         createdAt: DateTime.parse(json["createdAt"]),
@@ -85,6 +88,7 @@ class Lesson {
         "thumbnail": thumbnail,
         "price": price,
         "video": video,
+        "purchased": purchased,
         "trailerVideo": trailerVideo,
         "order": order,
         "createdAt": createdAt.toIso8601String(),
