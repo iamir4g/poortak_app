@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/common/widgets/bottom_nav.dart';
 import 'package:poortak/common/widgets/custom_drawer.dart';
+import 'package:poortak/common/widgets/logout_confirmation_modal.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/kavoosh_main_screen.dart';
 import 'package:poortak/featueres/feature_litner/screens/litner_main_screen.dart';
@@ -72,6 +73,16 @@ class _MainWrapperState extends State<MainWrapper> {
     // }
   }
 
+  void _showLogoutConfirmation() {
+    LogoutConfirmationModal.show(
+      context: context,
+      onLogout: _logout,
+      onStay: () {
+        // Do nothing, just close the modal
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -125,7 +136,7 @@ class _MainWrapperState extends State<MainWrapper> {
                           icon: const Icon(Icons.more_vert,
                               color: Color(0xFF3D495C)),
                           onSelected: (value) {
-                            if (value == 'logout') _logout();
+                            if (value == 'logout') _showLogoutConfirmation();
                           },
                           itemBuilder: (context) => [
                             const PopupMenuItem(
