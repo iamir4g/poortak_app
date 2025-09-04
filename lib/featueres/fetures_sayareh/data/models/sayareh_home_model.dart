@@ -23,7 +23,7 @@ class SayarehHomeModel {
 
   factory SayarehHomeModel.fromJson(Map<String, dynamic> json) =>
       SayarehHomeModel(
-        ok: json["ok"],
+        ok: json["ok"] ?? false,
         meta: Meta.fromJson(json["meta"]),
         data: List<Lesson>.from(json["data"].map((x) => Lesson.fromJson(x))),
       );
@@ -65,15 +65,15 @@ class Lesson {
   });
 
   factory Lesson.fromJson(Map<String, dynamic> json) => Lesson(
-        id: json["id"],
-        name: json["name"],
-        description: json["description"],
-        thumbnail: json["thumbnail"],
-        price: json["price"],
+        id: json["id"] ?? "",
+        name: json["name"] ?? "",
+        description: json["description"] ?? "",
+        thumbnail: json["thumbnail"] ?? "",
+        price: json["price"] ?? "",
         video: json["video"],
-        purchased: json["purchased"],
-        trailerVideo: json["trailerVideo"],
-        order: json["order"],
+        purchased: json["purchased"] ?? false,
+        trailerVideo: json["trailerVideo"] ?? "",
+        order: json["order"] ?? 0,
         createdAt: DateTime.parse(json["createdAt"]),
         updatedAt: DateTime.parse(json["updatedAt"]),
         publishedAt: json["publishedAt"] != null

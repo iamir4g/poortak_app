@@ -1,6 +1,4 @@
 // import 'package:appinio_video_player/appinio_video_player.dart';
-import 'dart:math';
-import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:path_provider/path_provider.dart';
@@ -10,18 +8,14 @@ import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/common/utils/custom_textStyle.dart';
 import 'package:poortak/config/myTextStyle.dart';
-import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/bloc_storage_bloc.dart';
+import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_home_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/lesson_bloc/lesson_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/converstion_screen.dart';
-import 'package:poortak/featueres/fetures_sayareh/screens/practice_vocabulary_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/quizzes_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/vocabulary_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/widgets/custom_video_player.dart';
-import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/sayareh_cubit.dart';
+import 'package:poortak/featueres/fetures_sayareh/widgets/dialog_cart.dart';
 import 'package:poortak/locator.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:encrypt/encrypt.dart' as encrypt;
-import 'dart:typed_data';
 import 'package:poortak/common/utils/decryption.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 
@@ -52,6 +46,7 @@ class _LessonScreenState extends State<LessonScreen> {
   bool isDownloading = false;
   double downloadProgress = 0.0;
   final StorageService _storageService = locator<StorageService>();
+  Lesson? _currentLesson;
 
   Future<void> _checkExistingFiles(String name) async {
     try {
@@ -74,68 +69,71 @@ class _LessonScreenState extends State<LessonScreen> {
         }
       }
 
-      // Check in encrypted directory
-      if (await encryptedDir.exists()) {
-        final files = await encryptedDir.list().toList();
-        for (var encryptedFile in files) {
-          if (encryptedFile.path.contains(name)) {
-            print("Found existing encrypted file: ${encryptedFile.path}");
-            // Try to decrypt it
-            try {
-              final decryptionKeyResponse = await _storageService
-                  .callGetDecryptedFile(widget.index.toString());
-              final decryptedFile = File(
-                  '${videoDir.path}/${encryptedFile.path.split('/').last}');
-              final decryptedPath = await decryptFile(
-                encryptedFile.path,
-                decryptedFile.path,
-                decryptionKeyResponse.data.key,
-              );
-              if (await File(decryptedPath).exists()) {
-                setState(() {
-                  localVideoPath = decryptedPath;
-                });
-                return;
+      // For purchased content, check encrypted directory and try to decrypt
+      if (widget.purchased) {
+        // Check in encrypted directory
+        if (await encryptedDir.exists()) {
+          final files = await encryptedDir.list().toList();
+          for (var encryptedFile in files) {
+            if (encryptedFile.path.contains(name)) {
+              print("Found existing encrypted file: ${encryptedFile.path}");
+              // Try to decrypt it
+              try {
+                final decryptionKeyResponse = await _storageService
+                    .callGetDecryptedFile(widget.index.toString());
+                final decryptedFile = File(
+                    '${videoDir.path}/${encryptedFile.path.split('/').last}');
+                final decryptedPath = await decryptFile(
+                  encryptedFile.path,
+                  decryptedFile.path,
+                  decryptionKeyResponse.data.key,
+                );
+                if (await File(decryptedPath).exists()) {
+                  setState(() {
+                    localVideoPath = decryptedPath;
+                  });
+                  return;
+                }
+              } catch (e) {
+                print("Error decrypting existing file: $e");
               }
-            } catch (e) {
-              print("Error decrypting existing file: $e");
             }
           }
         }
-      }
 
-      // Check in Downloads directory
-      final downloadsDir = Directory('/storage/emulated/0/Download');
-      if (await downloadsDir.exists()) {
-        final files = await downloadsDir.list().toList();
-        for (var downloadedFile in files) {
-          if (downloadedFile.path.contains(name) &&
-              !downloadedFile.path.contains('-')) {
-            print("Found existing file in Downloads: ${downloadedFile.path}");
-            // Copy to encrypted directory
-            final encryptedFile = File(
-                '${encryptedDir.path}/${downloadedFile.path.split('/').last}');
-            await File(downloadedFile.path).copy(encryptedFile.path);
+        // Check in Downloads directory for purchased content
+        final downloadsDir = Directory('/storage/emulated/0/Download');
+        if (await downloadsDir.exists()) {
+          final files = await downloadsDir.list().toList();
+          for (var downloadedFile in files) {
+            if (downloadedFile.path.contains(name) &&
+                !downloadedFile.path.contains('-')) {
+              print("Found existing file in Downloads: ${downloadedFile.path}");
+              // Copy to encrypted directory
+              final encryptedFile = File(
+                  '${encryptedDir.path}/${downloadedFile.path.split('/').last}');
+              await File(downloadedFile.path).copy(encryptedFile.path);
 
-            // Try to decrypt it
-            try {
-              final decryptionKeyResponse = await _storageService
-                  .callGetDecryptedFile(widget.index.toString());
-              final decryptedFile = File(
-                  '${videoDir.path}/${downloadedFile.path.split('/').last}');
-              final decryptedPath = await decryptFile(
-                encryptedFile.path,
-                decryptedFile.path,
-                decryptionKeyResponse.data.key,
-              );
-              if (await File(decryptedPath).exists()) {
-                setState(() {
-                  localVideoPath = decryptedPath;
-                });
-                return;
+              // Try to decrypt it
+              try {
+                final decryptionKeyResponse = await _storageService
+                    .callGetDecryptedFile(widget.index.toString());
+                final decryptedFile = File(
+                    '${videoDir.path}/${downloadedFile.path.split('/').last}');
+                final decryptedPath = await decryptFile(
+                  encryptedFile.path,
+                  decryptedFile.path,
+                  decryptionKeyResponse.data.key,
+                );
+                if (await File(decryptedPath).exists()) {
+                  setState(() {
+                    localVideoPath = decryptedPath;
+                  });
+                  return;
+                }
+              } catch (e) {
+                print("Error processing file from Downloads: $e");
               }
-            } catch (e) {
-              print("Error processing file from Downloads: $e");
             }
           }
         }
@@ -203,18 +201,28 @@ class _LessonScreenState extends State<LessonScreen> {
       }
 
       print("Getting download URL from StorageService");
-      final downloadUrl = await _storageService.callGetDownloadUrl(key);
-      print("Download URL received: ${downloadUrl.data}");
+
+      String downloadUrlString;
+      if (isEncrypted) {
+        // For purchased content, use regular download URL
+        final downloadUrl = await _storageService.callGetDownloadUrl(key);
+        downloadUrlString = downloadUrl.data;
+      } else {
+        // For trailer videos, use public download URL
+        downloadUrlString = await _storageService.callGetDownloadPublicUrl(key);
+      }
+
+      print("Download URL received: $downloadUrlString");
 
       // Set the video URL for immediate playback while downloading
       setState(() {
-        videoUrl = downloadUrl.data;
+        videoUrl = downloadUrlString;
       });
 
       print("Starting file download");
       // Download using flutter_file_downloader
       await FileDownloader.downloadFile(
-        url: downloadUrl.data,
+        url: downloadUrlString,
         name: name,
         onProgress: (fileName, progress) {
           print("Download progress: $progress%");
@@ -273,13 +281,24 @@ class _LessonScreenState extends State<LessonScreen> {
                 throw Exception("Failed to process file");
               }
             } else {
-              // If not encrypted, just copy to video directory
+              // If not encrypted (trailer video), just copy to video directory
               await encryptedFile.copy(decryptedFile.path);
               setState(() {
                 localVideoPath = decryptedFile.path;
                 videoUrl = null;
                 isDownloading = false;
               });
+
+              // Show success snackbar for trailer video
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('تریلر دانلود شد'),
+                    backgroundColor: Colors.green,
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              }
             }
           } catch (e) {
             print("Error processing file: $e");
@@ -334,6 +353,20 @@ class _LessonScreenState extends State<LessonScreen> {
     }
   }
 
+  void _showPurchaseDialog() {
+    if (_currentLesson == null) {
+      print('No lesson data available for purchase dialog');
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return DialogCart(item: _currentLesson!);
+      },
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -347,8 +380,13 @@ class _LessonScreenState extends State<LessonScreen> {
       listener: (context, state) {
         print("LessonBloc state changed: $state");
         if (state is LessonSuccess) {
+          // Store the lesson data for use in dialogs
+          setState(() {
+            _currentLesson = state.lesson;
+          });
+
           // Check for existing files first
-          _checkExistingFiles(state.lesson.id).then((_) {
+          _checkExistingFiles(state.lesson.trailerVideo).then((_) {
             // Only start download if we don't have a local file
             if (localVideoPath == null) {
               if (widget.purchased) {
@@ -360,9 +398,10 @@ class _LessonScreenState extends State<LessonScreen> {
                 );
               } else {
                 _downloadAndStoreVideo(
-                  state.lesson.id, // video ID for download
-                  state.lesson.id, // name for file
-                  state.lesson.id, // video ID for decryption key
+                  state.lesson
+                      .trailerVideo, // trailer video ID for public download
+                  state.lesson.trailerVideo, // name for file
+                  state.lesson.trailerVideo, // video ID (not used for public)
                   false,
                 );
               }
@@ -404,12 +443,12 @@ class _LessonScreenState extends State<LessonScreen> {
             },
           ),
         ),
-        body: _buildContent(widget.lessonId),
+        body: _buildContent(context, widget.lessonId),
       ),
     );
   }
 
-  Widget _buildContent(String? conversationId) {
+  Widget _buildContent(BuildContext context, String? conversationId) {
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -454,34 +493,47 @@ class _LessonScreenState extends State<LessonScreen> {
                     borderRadius: 37,
                     autoPlay: true,
                     showControls: true,
+                    onVideoEnded: () {
+                      print('Video ended');
+                      // If user hasn't purchased and this was a trailer video, show purchase dialog
+                      if (!widget.purchased) {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return DialogCart(item: _currentLesson!);
+                          },
+                        );
+                        // _showPurchaseDialog();
+                      }
+                    },
                   ),
-                if (isDownloading)
-                  Positioned.fill(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.5),
-                        borderRadius: BorderRadius.circular(37),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const CircularProgressIndicator(
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.white),
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            '${(downloadProgress * 100).toStringAsFixed(0)}%',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                // if (isDownloading)
+                //   Positioned.fill(
+                //     child: Container(
+                //       decoration: BoxDecoration(
+                //         color: Colors.black.withOpacity(0.5),
+                //         borderRadius: BorderRadius.circular(37),
+                //       ),
+                //       child: Column(
+                //         mainAxisAlignment: MainAxisAlignment.center,
+                //         children: [
+                //           const CircularProgressIndicator(
+                //             valueColor:
+                //                 AlwaysStoppedAnimation<Color>(Colors.white),
+                //           ),
+                //           const SizedBox(height: 16),
+                //           Text(
+                //             '${(downloadProgress * 100).toStringAsFixed(0)}%',
+                //             style: const TextStyle(
+                //               color: Colors.white,
+                //               fontSize: 16,
+                //               fontWeight: FontWeight.bold,
+                //             ),
+                //           ),
+                //         ],
+                //       ),
+                //     ),
+                //   ),
               ],
             ),
           ),

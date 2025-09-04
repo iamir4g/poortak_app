@@ -22,11 +22,11 @@ class ItemLeason extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         // if (item.price != "0") {
-        //   showDialog(
-        //       context: context,
-        //       builder: (context) {
-        //         return DialogCart(item: item); //buildDialog(context, item);
-        //       });
+        // showDialog(
+        //     context: context,
+        //     builder: (context) {
+        //       return DialogCart(item: item); //buildDialog(context, item);
+        //     });
         // } else {
         Navigator.pushNamed(context, LessonScreen.routeName, arguments: {
           'index': index,

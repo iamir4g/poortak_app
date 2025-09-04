@@ -12,6 +12,7 @@ class CustomVideoPlayer extends StatefulWidget {
   final double borderRadius;
   final bool autoPlay;
   final bool showControls;
+  final VoidCallback? onVideoEnded;
 
   const CustomVideoPlayer({
     Key? key,
@@ -22,6 +23,7 @@ class CustomVideoPlayer extends StatefulWidget {
     this.borderRadius = 37,
     this.autoPlay = true,
     this.showControls = true,
+    this.onVideoEnded,
   }) : super(key: key);
 
   @override
@@ -43,6 +45,7 @@ class _CustomVideoPlayerState extends State<CustomVideoPlayer> {
 
   @override
   void dispose() {
+    _videoPlayerController.removeListener(_videoPlayerListener);
     _videoPlayerController.dispose();
     _hideTimer?.cancel();
     super.dispose();
@@ -76,6 +79,10 @@ class _CustomVideoPlayerState extends State<CustomVideoPlayer> {
           : VideoPlayerController.file(File(widget.videoPath));
 
       await _videoPlayerController.initialize();
+
+      // Add listener for video completion
+      _videoPlayerController.addListener(_videoPlayerListener);
+
       if (mounted) {
         setState(() {
           _isVideoInitialized = true;
@@ -93,6 +100,20 @@ class _CustomVideoPlayerState extends State<CustomVideoPlayer> {
         setState(() {
           _isVideoInitialized = false;
         });
+      }
+    }
+  }
+
+  void _videoPlayerListener() {
+    if (_videoPlayerController.value.position >=
+        _videoPlayerController.value.duration) {
+      // Video has ended
+      if (mounted) {
+        setState(() {
+          _isPlaying = false;
+        });
+        // Call the callback if provided
+        widget.onVideoEnded?.call();
       }
     }
   }
