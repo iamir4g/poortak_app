@@ -11,9 +11,12 @@ class GetImageUrlService {
     }
 
     try {
-      final response = await _storageService.callGetDownloadUrl(thumbnailId);
-      _imageUrls[thumbnailId] = response.data;
-      return response.data;
+      print("Getting image URL from StorageService");
+      final imageUrl =
+          await _storageService.callGetDownloadPublicUrl(thumbnailId);
+      _imageUrls[thumbnailId] = imageUrl;
+      print("Image URL received: $imageUrl");
+      return imageUrl;
     } catch (e) {
       print('Error getting image URL: $e');
       return ''; // Return empty string or a placeholder image URL
