@@ -2,6 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:poortak/common/resources/data_state.dart';
 import 'package:poortak/featueres/feature_profile/data/data_sorce/profile_api_provider.dart';
 import 'package:poortak/featueres/feature_profile/data/models/login_with_otp_model.dart';
+import 'package:poortak/featueres/feature_profile/data/models/payment_history_modle.dart';
+import 'package:poortak/featueres/feature_profile/data/models/payment_history_params.dart';
 import 'package:poortak/featueres/feature_profile/data/models/request_otp_model.dart';
 import 'dart:developer';
 
@@ -49,6 +51,29 @@ class ProfileRepository {
       }
     } catch (e) {
       log("Login Error: $e");
+      return DataFailed(e.toString());
+    }
+  }
+
+  Future<DataState<PaymentHistoryList>> callPaymentHistory(
+      {PaymentHistoryParams? params}) async {
+    try {
+      final response =
+          await profileApiProvider.callPaymentHistory(params: params);
+      log("Payment History Response: ${response.data}");
+      if ((response.statusCode == 200 || response.statusCode == 201) &&
+          response.data['ok'] == true) {
+        final PaymentHistoryList paymentHistoryList =
+            PaymentHistoryList.fromJson(response.data);
+        log("Payment History Success - Parsed Model: ${paymentHistoryList.data}");
+        return DataSuccess(paymentHistoryList);
+      } else {
+        log("Payment History Error - Status: ${response.statusCode}, Data: ${response.data}");
+        return DataFailed(
+            response.data['message'] ?? "خطا در دریافت تاریخچه خرید");
+      }
+    } catch (e) {
+      log("Payment History Error: $e");
       return DataFailed(e.toString());
     }
   }

@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:poortak/config/constants.dart';
+import 'package:poortak/featueres/feature_profile/data/models/payment_history_params.dart';
 import 'dart:developer';
 
 class ProfileApiProvider {
@@ -23,17 +24,27 @@ class ProfileApiProvider {
     return response;
   }
 
-  dynamic callGetDownloadLink(String key) async {
+  dynamic callPaymentHistory({PaymentHistoryParams? params}) async {
+    //payments
+    final queryParams = params?.toQueryParams() ?? {};
     final response = await dio.get(
-      "${Constants.baseUrl}storage/download/$key",
+      "${Constants.baseUrl}payments",
+      queryParameters: queryParams,
     );
     return response;
   }
 
-  dynamic callGetDecryptKey(String fileId) async {
-    final response = await dio.get(
-      "${Constants.baseUrl}storage/key/$fileId",
-    );
-    return response;
-  }
+  // dynamic callGetDownloadLink(String key) async {
+  //   final response = await dio.get(
+  //     "${Constants.baseUrl}storage/download/$key",
+  //   );
+  //   return response;
+  // }
+
+  // dynamic callGetDecryptKey(String fileId) async {
+  //   final response = await dio.get(
+  //     "${Constants.baseUrl}storage/key/$fileId",
+  //   );
+  //   return response;
+  // }
 }

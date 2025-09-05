@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
+import 'package:poortak/featueres/feature_profile/screens/payment_history_screen.dart';
 import 'package:poortak/locator.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -28,15 +29,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       isLoggedIn = loggedIn;
     });
     print("token: \\${await prefsOperator.getAccessToken()}");
-  }
-
-  void _logout() async {
-    await prefsOperator.logout();
-    if (mounted) {
-      setState(() {
-        isLoggedIn = false;
-      });
-    }
   }
 
   @override
@@ -197,7 +189,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               _ProfileActionCard(
                                 icon: Icons.history,
                                 label: 'تاریخچه خرید',
-                                onTap: () {},
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const PaymentHistoryScreen(),
+                                    ),
+                                  );
+                                },
                               ),
                             ],
                           ),
