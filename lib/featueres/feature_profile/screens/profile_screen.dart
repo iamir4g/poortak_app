@@ -45,13 +45,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             // Left and right brand secondary strips
             Row(
               children: [
-                // Left strip
-                // Container(
-                //   width: 10,
-                //   height: double.infinity,
-                //   color: MyColors.brandSecondary,
-                // ),
-                // Center area with curved white background
                 Expanded(
                   child: Stack(
                     children: [

@@ -131,7 +131,7 @@ class _MainWrapperState extends State<MainWrapper> {
                 backgroundColor: Colors.white,
                 elevation: 0,
                 actions: [
-                  currentPageIndex == 4
+                  (currentPageIndex == 4 && (prefsOperator.isLoggedIn == true))
                       ? PopupMenuButton<String>(
                           icon: const Icon(Icons.more_vert,
                               color: Color(0xFF3D495C)),

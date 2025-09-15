@@ -12,7 +12,9 @@ import 'package:poortak/locator.dart';
 import 'package:poortak/test_screen.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
+  final bool hasDeepLink;
+
+  const SplashScreen({super.key, this.hasDeepLink = false});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -102,6 +104,12 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> gotoHome() async {
+    // Don't auto-navigate if there's a deep link being handled
+    if (widget.hasDeepLink) {
+      debugPrint("SplashScreen: Skipping auto-navigation due to deep link");
+      return;
+    }
+
     // return Future.delayed(const Duration(seconds: 3),() {
     //   CustomSnackBar.showSnack(context, "وارد شدید", Colors.green);
     //   Navigator.pushNamed(context, IntroMainWrapper.routeName);
@@ -110,6 +118,13 @@ class _SplashScreenState extends State<SplashScreen> {
     var shouldShowIntro = await prefsOperator.getIntroState();
 
     return Future.delayed(const Duration(seconds: 3), () {
+      // Check again if deep link was handled during the delay
+      if (widget.hasDeepLink) {
+        debugPrint(
+            "SplashScreen: Skipping auto-navigation due to deep link (delayed check)");
+        return;
+      }
+
       if (shouldShowIntro) {
         Navigator.pushNamedAndRemoveUntil(
           context,

@@ -17,7 +17,8 @@ class CustomDrawer extends StatelessWidget {
     paymentService.startPayment(
       amount: 10000, // 1000 Toman = 10000 Rials
       description: "پرداخت در اپلیکیشن پورتک",
-      callbackUrl: "poortak://payment", // You'll need to set up deep linking
+      callbackUrl:
+          "return://poortak://payment", // You'll need to set up deep linking
       onPaymentComplete: (isSuccess, refId) {
         if (isSuccess) {
           ScaffoldMessenger.of(context).showSnackBar(

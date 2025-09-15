@@ -9,17 +9,17 @@ import 'package:poortak/featueres/featureMenu/screens/aboutUs_screen.dart';
 import 'package:poortak/featueres/featureMenu/screens/contactUs_screen.dart';
 import 'package:poortak/featueres/featureMenu/screens/faq_screen.dart';
 import 'package:poortak/featueres/featureMenu/screens/settings_screen.dart';
+import 'package:poortak/featueres/feature_intro/presentation/screens/deepLinkHandler.dart';
+import 'package:poortak/featueres/feature_payment/presentation/screens/payment_result_screen.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/kavoosh_main_screen.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_bloc.dart';
 import 'package:poortak/featueres/feature_litner/screens/litner_word_completed_screen.dart';
 import 'package:poortak/featueres/feature_litner/screens/litner_word_box_screen.dart';
 import 'package:poortak/featueres/feature_litner/screens/litner_words_inprogress_screen.dart';
-import 'package:poortak/featueres/feature_profile/data/data_sorce/profile_api_provider.dart';
 import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/profile_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/lesson_bloc/lesson_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/practice_vocabulary_bloc/practice_vocabulary_bloc.dart';
-import 'package:poortak/featueres/fetures_sayareh/presentation/vocabulary_bloc/vocabulary_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/converstion_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/lesson_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/practice_vocabulary_screen.dart';
@@ -28,24 +28,19 @@ import 'package:poortak/featueres/fetures_sayareh/screens/quizzes_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/vocabulary_screen.dart';
 import 'package:poortak/featueres/feature_intro/presentation/bloc/splash_bloc/splash_cubit.dart';
 import 'package:poortak/featueres/feature_intro/presentation/screens/intro_main_wrapper.dart';
-import 'package:poortak/featueres/feature_intro/presentation/screens/splash_screen.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/sayareh_cubit.dart';
-import 'package:poortak/featueres/fetures_sayareh/repositories/sayareh_repository.dart';
 import 'package:poortak/locator.dart';
 import 'package:poortak/test_screen.dart';
 import 'package:poortak/l10n/app_localizations.dart';
 // import 'package:poortak/l10n/app_localizations.dart';
-import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/bloc_storage_bloc.dart';
-import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/converstion_bloc/converstion_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quizes_cubit/cubit/quizes_cubit.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_start_bloc/quiz_start_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_answer_bloc/quiz_answer_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/first_quiz_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_result_bloc/quiz_result_bloc.dart';
 import 'package:flutter/widgets.dart'; // For RouteAware
-import 'package:poortak/main.dart'; // For routeObserver
 
 final RouteObserver<ModalRoute<void>> routeObserver =
     RouteObserver<ModalRoute<void>>();
@@ -194,6 +189,14 @@ void main() async {
           LitnerWordCompletedScreen.routeName: (context) =>
               LitnerWordCompletedScreen(),
           KavooshMainScreen.routeName: (context) => KavooshMainScreen(),
+          PaymentResultScreen.routeName: (context) {
+            final args = ModalRoute.of(context)?.settings.arguments
+                as Map<String, dynamic>;
+            return PaymentResultScreen(
+              status: args['status'],
+              ref: args['ref'],
+            );
+          },
         },
         debugShowCheckedModeBanner: false,
         title: 'Poortak',
@@ -204,7 +207,7 @@ void main() async {
         //     icon: Icon(Icons.search),
         //   ),
         // ],
-        home: SplashScreen(),
+        home: DeepLinkHandler(),
       )));
 }
 
@@ -328,7 +331,16 @@ class MyApp extends StatelessWidget {
         LitnerWordsInprogressScreen.routeName: (context) =>
             LitnerWordsInprogressScreen(),
         LitnerWordBoxScreen.routeName: (context) => LitnerWordBoxScreen(),
+        PaymentResultScreen.routeName: (context) {
+          final args = ModalRoute.of(context)?.settings.arguments
+              as Map<String, dynamic>;
+          return PaymentResultScreen(
+            status: args['status'],
+            ref: args['ref'],
+          );
+        },
       },
+
       debugShowCheckedModeBanner: false,
       title: 'Poortak',
 
@@ -338,7 +350,7 @@ class MyApp extends StatelessWidget {
       //     icon: Icon(Icons.search),
       //   ),
       // ],
-      home: SplashScreen(),
+      home: DeepLinkHandler(), //SplashScreen()
     );
   }
 }
