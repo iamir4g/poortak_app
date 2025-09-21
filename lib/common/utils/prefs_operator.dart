@@ -74,6 +74,60 @@ class PrefsOperator {
     return userName;
   }
 
+  // User Profile Data Methods
+  Future<void> saveUserProfileData(
+      String? firstName, String? lastName, String? avatar) async {
+    log("💾 Saving user profile data to SharedPreferences...");
+    log("   First name: ${firstName ?? 'null'}");
+    log("   Last name: ${lastName ?? 'null'}");
+    log("   Avatar: ${avatar ?? 'null'}");
+
+    if (firstName != null) {
+      sharedPreferences.setString("user_first_name", firstName);
+    }
+    if (lastName != null) {
+      sharedPreferences.setString("user_last_name", lastName);
+    }
+    if (avatar != null) {
+      sharedPreferences.setString("user_avatar", avatar);
+    }
+
+    log("✅ User profile data saved successfully");
+  }
+
+  Future<String?> getUserFirstName() async {
+    final firstName = sharedPreferences.getString('user_first_name');
+    log("👤 Retrieved user first name: ${firstName ?? 'null'}");
+    return firstName;
+  }
+
+  Future<String?> getUserLastName() async {
+    final lastName = sharedPreferences.getString('user_last_name');
+    log("👤 Retrieved user last name: ${lastName ?? 'null'}");
+    return lastName;
+  }
+
+  Future<String?> getUserAvatar() async {
+    final avatar = sharedPreferences.getString('user_avatar');
+    log("🖼️ Retrieved user avatar: ${avatar ?? 'null'}");
+    return avatar;
+  }
+
+  Future<String> getFullUserName() async {
+    final firstName = await getUserFirstName();
+    final lastName = await getUserLastName();
+
+    if (firstName != null && lastName != null) {
+      return "$firstName $lastName";
+    } else if (firstName != null) {
+      return firstName;
+    } else if (lastName != null) {
+      return lastName;
+    } else {
+      return "کاربر";
+    }
+  }
+
   // Local Cart Storage Methods
   Future<void> saveLocalCartItem(String type, String itemId) async {
     log("🛒 Saving local cart item: Type=$type, ID=$itemId");

@@ -2,8 +2,6 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poortak/common/resources/data_state.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
-import 'package:poortak/featueres/feature_profile/data/models/login_with_otp_model.dart';
-import 'package:poortak/featueres/feature_profile/data/models/request_otp_model.dart';
 import 'package:poortak/featueres/feature_profile/repositories/profile_repository.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
@@ -20,6 +18,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   ProfileBloc({required this.repository}) : super(ProfileInitial()) {
     on<RequestOtpEvent>(_onRequestOtp);
     on<LoginWithOtpEvent>(_onLoginWithOtp);
+    on<GetMeProfileEvent>(_onGetMeProfile);
+    on<UpdateProfileEvent>(_onUpdateProfile);
   }
 
   void _onRequestOtp(RequestOtpEvent event, Emitter<ProfileState> emit) async {
@@ -65,6 +65,10 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
             event.mobile,
           );
           log("💾 User data saved successfully to local storage");
+
+          // Get user profile data after successful login
+          log("👤 Getting user profile data...");
+          await _getAndSaveUserProfile();
 
           // Sync local cart data to server after successful login with delay
           log("🛒 Starting cart sync process...");
@@ -133,6 +137,92 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       log("💥 Error during cart sync: $e");
       log("⚠️ Cart sync failed, but login will continue");
       // Don't throw error here as login should still succeed even if cart sync fails
+    }
+  }
+
+  // Get user profile data and save to preferences
+  Future<void> _getAndSaveUserProfile() async {
+    try {
+      log("🔍 Fetching user profile data...");
+      final response = await repository.callGetMeProfile();
+
+      if (response is DataSuccess && response.data != null) {
+        final userData = response.data!.data;
+        log("✅ User profile data retrieved successfully");
+        log("   First name: ${userData.firstName ?? 'null'}");
+        log("   Last name: ${userData.lastName ?? 'null'}");
+        log("   Avatar: ${userData.avatar ?? 'null'}");
+
+        // Save profile data to preferences
+        await prefsOperator.saveUserProfileData(
+          userData.firstName,
+          userData.lastName,
+          userData.avatar,
+        );
+
+        log("💾 User profile data saved to preferences successfully");
+      } else {
+        log("⚠️ Failed to get user profile data, but login will continue");
+        log("   Response: ${response}");
+      }
+    } catch (e) {
+      log("💥 Error getting user profile data: $e");
+      log("⚠️ Profile data fetch failed, but login will continue");
+      // Don't throw error here as login should still succeed even if profile fetch fails
+    }
+  }
+
+  void _onGetMeProfile(
+      GetMeProfileEvent event, Emitter<ProfileState> emit) async {
+    emit(ProfileLoading());
+    try {
+      log("🔄 Getting user profile...");
+      final response = await repository.callGetMeProfile();
+      log("📡 Get Me Profile Response: ${response}");
+
+      if (response is DataSuccess) {
+        if (response.data != null) {
+          log("✅ Profile retrieved successfully!");
+          emit(ProfileSuccessGetMe(response.data!));
+        } else {
+          log("❌ Get profile failed: Invalid response data");
+          emit(ProfileErrorGetMe("Invalid response data"));
+        }
+      } else if (response is DataFailed) {
+        log("❌ Get profile failed: ${response.error ?? "خطا در دریافت پروفایل"}");
+        emit(ProfileErrorGetMe(response.error ?? "خطا در دریافت پروفایل"));
+      }
+    } catch (e) {
+      log("💥 Get profile error: $e");
+      emit(ProfileErrorGetMe(e.toString()));
+    }
+  }
+
+  void _onUpdateProfile(
+      UpdateProfileEvent event, Emitter<ProfileState> emit) async {
+    emit(ProfileLoading());
+    try {
+      log("🔄 Updating user profile...");
+      log("📝 Update data: firstName=${event.updateProfileParams.firstName}, lastName=${event.updateProfileParams.lastName}");
+      final response =
+          await repository.callPutUserProfile(event.updateProfileParams);
+      log("📡 Update Profile Response: ${response}");
+
+      if (response is DataSuccess) {
+        if (response.data != null) {
+          log("✅ Profile updated successfully!");
+          emit(ProfileSuccessUpdate(response.data!));
+        } else {
+          log("❌ Update profile failed: Invalid response data");
+          emit(ProfileErrorUpdate("Invalid response data"));
+        }
+      } else if (response is DataFailed) {
+        log("❌ Update profile failed: ${response.error ?? "خطا در بروزرسانی پروفایل"}");
+        emit(ProfileErrorUpdate(response.error ?? "خطا در بروزرسانی پروفایل"));
+      }
+    } catch (e) {
+      log("💥 Update profile error: $e");
+      emit(ProfileErrorUpdate(e.toString()));
     }
   }
 }

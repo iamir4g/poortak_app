@@ -16,6 +16,10 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   final PrefsOperator prefsOperator = locator<PrefsOperator>();
   bool isLoggedIn = false;
+  String? userFirstName;
+  String? userLastName;
+  String? userAvatar;
+  String? userMobile;
 
   @override
   void initState() {
@@ -25,10 +29,38 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _checkLoginStatus() async {
     final loggedIn = await prefsOperator.getLoggedIn();
-    setState(() {
-      isLoggedIn = loggedIn;
-    });
+    if (loggedIn) {
+      // Load user profile data
+      final firstName = await prefsOperator.getUserFirstName();
+      final lastName = await prefsOperator.getUserLastName();
+      final avatar = await prefsOperator.getUserAvatar();
+      final mobile = await prefsOperator.getUserName();
+
+      setState(() {
+        isLoggedIn = loggedIn;
+        userFirstName = firstName;
+        userLastName = lastName;
+        userAvatar = avatar;
+        userMobile = mobile;
+      });
+    } else {
+      setState(() {
+        isLoggedIn = loggedIn;
+      });
+    }
     print("token: \\${await prefsOperator.getAccessToken()}");
+  }
+
+  String _getDisplayName() {
+    if (userFirstName != null && userLastName != null) {
+      return "$userFirstName $userLastName";
+    } else if (userFirstName != null) {
+      return userFirstName!;
+    } else if (userLastName != null) {
+      return userLastName!;
+    } else {
+      return "کاربر";
+    }
   }
 
   @override
@@ -78,18 +110,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ],
                               ),
                               child: ClipOval(
-                                child: Image.asset(
-                                  'assets/images/profile/finalProfile.png', // Replace with actual asset
-                                  fit: BoxFit.cover,
-                                ),
+                                child:
+                                    userAvatar != null && userAvatar!.isNotEmpty
+                                        ? Image.network(
+                                            userAvatar!,
+                                            fit: BoxFit.cover,
+                                            errorBuilder:
+                                                (context, error, stackTrace) {
+                                              return Image.asset(
+                                                'assets/images/profile/finalProfile.png',
+                                                fit: BoxFit.cover,
+                                              );
+                                            },
+                                          )
+                                        : Image.asset(
+                                            'assets/images/profile/finalProfile.png',
+                                            fit: BoxFit.cover,
+                                          ),
                               ),
                             ),
                           ),
                           const SizedBox(height: 16),
                           // Name
-                          const Text(
-                            'بهاره بیرامی',
-                            style: TextStyle(
+                          Text(
+                            _getDisplayName(),
+                            style: const TextStyle(
                               fontFamily: 'IRANSans',
                               fontWeight: FontWeight.w700,
                               fontSize: 16,
@@ -98,9 +143,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                           const SizedBox(height: 8),
                           // Mobile
-                          const Text(
-                            ' موبایل: ۰۹۱۹۹۵۵۲۲۲۰',
-                            style: TextStyle(
+                          Text(
+                            ' موبایل: ${userMobile ?? 'نامشخص'}',
+                            style: const TextStyle(
                               fontFamily: 'IRANSans',
                               fontWeight: FontWeight.w700,
                               fontSize: 12,

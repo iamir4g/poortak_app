@@ -4,9 +4,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poortak/featueres/feature_profile/data/models/payment_history_params.dart';
-import 'package:poortak/featueres/feature_profile/presentation/bloc/payment_history_bloc.dart';
-import 'package:poortak/featueres/feature_profile/presentation/bloc/payment_history_event.dart';
-import 'package:poortak/featueres/feature_profile/presentation/bloc/payment_history_state.dart';
+import 'package:poortak/featueres/feature_profile/presentation/bloc/payment_history_bloc/payment_history_bloc.dart';
+import 'package:poortak/featueres/feature_profile/presentation/bloc/payment_history_bloc/payment_history_event.dart';
+import 'package:poortak/featueres/feature_profile/presentation/bloc/payment_history_bloc/payment_history_state.dart';
 
 class PaymentHistoryUsageExample extends StatelessWidget {
   const PaymentHistoryUsageExample({super.key});
