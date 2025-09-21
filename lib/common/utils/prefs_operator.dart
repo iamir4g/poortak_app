@@ -68,6 +68,12 @@ class PrefsOperator {
     return token;
   }
 
+  Future<String?> getUserName() async {
+    final userName = sharedPreferences.getString('user_name');
+    log("👤 Retrieved user name: ${userName ?? 'null'}");
+    return userName;
+  }
+
   // Local Cart Storage Methods
   Future<void> saveLocalCartItem(String type, String itemId) async {
     log("🛒 Saving local cart item: Type=$type, ID=$itemId");

@@ -1,8 +1,8 @@
-import 'package:app_links/app_links.dart';
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:app_links/app_links.dart';
 import 'package:poortak/featueres/feature_intro/presentation/screens/splash_screen.dart';
 import 'package:poortak/featueres/feature_payment/presentation/screens/payment_result_screen.dart';
-import 'package:poortak/common/services/deep_link_manager.dart';
 
 class DeepLinkHandler extends StatefulWidget {
   const DeepLinkHandler({super.key});
@@ -13,153 +13,101 @@ class DeepLinkHandler extends StatefulWidget {
 
 class _DeepLinkHandlerState extends State<DeepLinkHandler> {
   late final AppLinks _appLinks;
-  final DeepLinkManager _deepLinkManager = DeepLinkManager();
+  StreamSubscription<Uri>? _linkSubscription;
+  bool _hasReceivedDeepLink = false;
 
   @override
   void initState() {
     super.initState();
+    debugPrint("🚀 DeepLinkHandler: initState called - Widget is loading!");
     _initDeepLinks();
-    _deepLinkManager.addListener(_onDeepLinkUpdate);
+  }
+
+  Future<void> _initDeepLinks() async {
+    debugPrint("🔧 DeepLinkHandler: _initDeepLinks started");
+    _appLinks = AppLinks();
+    debugPrint("🔧 DeepLinkHandler: AppLinks created");
+
+    // برای وقتی که اپ از قبل بازه
+    _linkSubscription = _appLinks.uriLinkStream.listen(
+      (Uri uri) {
+        debugPrint("🔗 DeepLinkHandler: Stream received URI: $uri");
+        _handleIncomingLink(uri);
+      },
+      onError: (error) {
+        debugPrint("❌ DeepLinkHandler: Stream error: $error");
+      },
+    );
+
+    // برای وقتی که اپ تازه از لینک لانچ شده
+    try {
+      final Uri? initialLink = await _appLinks.getInitialLink();
+      debugPrint("🔗 DeepLinkHandler: Initial link: $initialLink");
+      if (initialLink != null) {
+        _handleIncomingLink(initialLink);
+      }
+    } catch (e) {
+      debugPrint("❌ DeepLinkHandler: Error getting initial link: $e");
+    }
+  }
+
+  void _handleIncomingLink(Uri uri) {
+    debugPrint("📌 DeepLinkHandler: Deep Link received: $uri");
+    debugPrint("📌 DeepLinkHandler: URI scheme: ${uri.scheme}");
+    debugPrint("📌 DeepLinkHandler: URI host: ${uri.host}");
+    debugPrint(
+        "📌 DeepLinkHandler: URI query parameters: ${uri.queryParameters}");
+
+    if (uri.scheme == "return" &&
+        uri.host == "poortak" &&
+        uri.queryParameters["ok"] == "1") {
+      debugPrint(
+          "📌 DeepLinkHandler: Valid deep link detected, navigating to PaymentResultScreen");
+      _hasReceivedDeepLink = true;
+
+      // Navigate directly to payment result
+      Navigator.pushNamed(
+        context,
+        PaymentResultScreen.routeName,
+        arguments: {
+          "status": uri.queryParameters["ok"],
+          "ref": uri.queryParameters["ref"],
+        },
+      );
+    } else {
+      debugPrint(
+          "📌 DeepLinkHandler: Deep link does not match expected format");
+    }
   }
 
   @override
   void dispose() {
-    _deepLinkManager.removeListener(_onDeepLinkUpdate);
+    _linkSubscription?.cancel();
     super.dispose();
-  }
-
-  void _onDeepLinkUpdate() {
-    if (mounted) {
-      setState(() {});
-    }
-  }
-
-  Future<void> _initDeepLinks() async {
-    _appLinks = AppLinks();
-    debugPrint("DeepLinkHandler: Initializing deep links...");
-
-    // هندل لینک اولیه (وقتی اپ با لینک باز میشه)
-    final initialLink = await _appLinks.getInitialLink();
-    debugPrint("DeepLinkHandler: Initial link: $initialLink");
-    if (initialLink != null) {
-      _handleUri(initialLink);
-    }
-
-    // هندل لینک‌های بعدی (وقتی اپ بازه و لینک جدید میاد)
-    _appLinks.uriLinkStream.listen((uri) {
-      debugPrint("DeepLinkHandler: Received new link: $uri");
-      _handleUri(uri);
-    });
-  }
-
-  void _handleUri(Uri uri) {
-    debugPrint("DeepLinkHandler: Handling URI: $uri");
-    debugPrint("DeepLinkHandler: URI scheme: ${uri.scheme}");
-    debugPrint("DeepLinkHandler: URI host: ${uri.host}");
-    debugPrint("DeepLinkHandler: URI path: ${uri.path}");
-    debugPrint("DeepLinkHandler: URI query: ${uri.query}");
-
-    // اینجا مقادیر رو بخون
-    final status = uri.queryParameters['status'];
-    final ref = uri.queryParameters['ref'];
-    debugPrint("DeepLink => status: $status, ref: $ref");
-
-    // Check if this is a payment deep link
-    debugPrint("DeepLinkHandler: Checking conditions...");
-    debugPrint("DeepLinkHandler: scheme='${uri.scheme}' (expected: 'return')");
-    debugPrint("DeepLinkHandler: host='${uri.host}' (expected: 'poortak')");
-    debugPrint("DeepLinkHandler: status='$status' (expected: not null)");
-    debugPrint(
-        "DeepLinkHandler: hasHandled='${_deepLinkManager.hasDeepLink}' (expected: false)");
-
-    if (uri.scheme == 'return' &&
-        uri.host == 'poortak' &&
-        status != null &&
-        !_deepLinkManager.hasDeepLink) {
-      debugPrint(
-          "DeepLinkHandler: ✅ Payment deep link detected - Status: $status, Ref: $ref");
-      debugPrint("DeepLinkHandler: Storing pending navigation data...");
-
-      // Use the global manager to store the data
-      _deepLinkManager.setDeepLinkData(status, ref);
-    } else {
-      debugPrint("DeepLinkHandler: ❌ Conditions not met for payment deep link");
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        children: [
-          // Show navigation button if there's pending deep link data
-          // if (_deepLinkManager.hasDeepLink)
-          //   Container(
-          //     padding: const EdgeInsets.all(20),
-          //     child: Column(
-          //       children: [
-          //         ElevatedButton(
-          //           onPressed: () {
-          //             debugPrint(
-          //                 "DeepLinkHandler: Navigating to PaymentResultScreen with pending data...");
-          //             _deepLinkManager.navigateToPaymentResult(context);
-          //           },
-          //           style: ElevatedButton.styleFrom(
-          //             backgroundColor: Colors.green,
-          //             foregroundColor: Colors.white,
-          //           ),
-          //           child: Text(
-          //               "Go to Payment Result (${_deepLinkManager.pendingStatus})"),
-          //         ),
-          //         const SizedBox(height: 10),
-          //         Text("Deep Link Handled: ${_deepLinkManager.hasDeepLink}"),
-          //       ],
-          //     ),
-          //   ),
-          // Test buttons
-          // Container(
-          //   padding: const EdgeInsets.all(20),
-          //   child: Column(
-          //     children: [
-          //       ElevatedButton(
-          //         onPressed: () {
-          //           debugPrint(
-          //               "TEST: Manually navigating to PaymentResultScreen...");
-          //           Navigator.of(context).pushAndRemoveUntil(
-          //             MaterialPageRoute(
-          //               builder: (context) => PaymentResultScreen(
-          //                 status: "OK",
-          //                 ref: "test123",
-          //               ),
-          //             ),
-          //             (route) => false,
-          //           );
-          //         },
-          //         child: const Text("TEST: Go to Payment Result"),
-          //       ),
-          //       const SizedBox(height: 10),
-          //       ElevatedButton(
-          //         onPressed: () {
-          //           debugPrint("RESET: Resetting deep link handler...");
-          //           _deepLinkManager.clearDeepLinkData();
-          //         },
-          //         style: ElevatedButton.styleFrom(
-          //           backgroundColor: Colors.orange,
-          //           foregroundColor: Colors.white,
-          //         ),
-          //         child: const Text("RESET Deep Link Handler"),
-          //       ),
-          //     ],
-          //   ),
-          // ),
-          // Original splash screen
-          Expanded(
-            child: SplashScreen(
-              hasDeepLink: _deepLinkManager.hasDeepLink,
-            ),
+    debugPrint(
+        "🎨 DeepLinkHandler: build() called - hasDeepLink: $_hasReceivedDeepLink");
+
+    // If we have a deep link, show a simple loading screen
+    if (_hasReceivedDeepLink) {
+      return Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 20),
+              Text('در حال پردازش...', style: TextStyle(fontSize: 18)),
+            ],
           ),
-        ],
-      ),
-    );
+        ),
+      );
+    }
+
+    // Otherwise show splash screen
+    return SplashScreen();
   }
 }

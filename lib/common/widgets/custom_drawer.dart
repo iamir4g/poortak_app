@@ -1,42 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:iconify_design/iconify_design.dart';
+import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
-import 'package:poortak/common/services/payment_service.dart';
 import 'package:poortak/featueres/featureMenu/screens/aboutUs_screen.dart';
 import 'package:poortak/featueres/featureMenu/screens/faq_screen.dart';
 import 'package:poortak/featueres/featureMenu/screens/contactUs_screen.dart';
 import 'package:poortak/featueres/featureMenu/screens/settings_screen.dart';
+import 'package:poortak/featueres/feature_payment/presentation/screens/payment_result_screen.dart';
+import 'package:poortak/featueres/feature_profile/screens/profile_screen.dart';
+import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
+import 'package:poortak/locator.dart';
 
-class CustomDrawer extends StatelessWidget {
+class CustomDrawer extends StatefulWidget {
   const CustomDrawer({super.key});
 
-  void _handlePayment(BuildContext context) {
-    final paymentService = PaymentService();
+  @override
+  State<CustomDrawer> createState() => _CustomDrawerState();
+}
 
-    paymentService.startPayment(
-      amount: 10000, // 1000 Toman = 10000 Rials
-      description: "پرداخت در اپلیکیشن پورتک",
-      callbackUrl:
-          "return://poortak://payment", // You'll need to set up deep linking
-      onPaymentComplete: (isSuccess, refId) {
-        if (isSuccess) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('پرداخت با موفقیت انجام شد. کد پیگیری: $refId'),
-              backgroundColor: Colors.green,
-            ),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('پرداخت با خطا مواجه شد. لطفا دوباره تلاش کنید.'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      },
-    );
+class _CustomDrawerState extends State<CustomDrawer> {
+  final PrefsOperator prefsOperator = locator<PrefsOperator>();
+  bool isLoggedIn = false;
+  String? userName;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkLoginStatus();
+  }
+
+  Future<void> _checkLoginStatus() async {
+    final loggedIn = await prefsOperator.getLoggedIn();
+    final name = await prefsOperator.getUserName();
+    setState(() {
+      isLoggedIn = loggedIn;
+      userName = name;
+    });
   }
 
   @override
@@ -47,67 +47,49 @@ class CustomDrawer extends StatelessWidget {
         padding: const EdgeInsets.only(top: 50, left: 16, right: 16),
         child: ListView(
           children: [
-            SizedBox(
-              height: 80,
-              width: 240,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: MyColors.background1,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(100),
-                        color: Colors.red,
-                        image: const DecorationImage(
-                          image: AssetImage(
-                            "assets/images/profile.png",
+            GestureDetector(
+              onTap: () {
+                if (isLoggedIn) {
+                  Navigator.pushNamed(context, ProfileScreen.routeName);
+                } else {
+                  Navigator.pushNamed(context, LoginScreen.routeName);
+                }
+              },
+              child: SizedBox(
+                height: 80,
+                width: 240,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: MyColors.background1,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(100),
+                          color: Colors.red,
+                          image: const DecorationImage(
+                            image: AssetImage(
+                              "assets/images/profile/finalProfile.png",
+                            ),
                           ),
                         ),
+                        width: 50,
+                        height: 50,
                       ),
-                      width: 50,
-                      height: 50,
-                    ),
-                    const SizedBox(width: 10),
-                    Text(
-                      "امیر فراهانی",
-                      style: MyTextStyle.textMatn14Bold,
-                    )
-                  ],
+                      const SizedBox(width: 10),
+                      Text(
+                        isLoggedIn ? (userName ?? "کاربر") : "وارد شوید",
+                        style: MyTextStyle.textMatn14Bold,
+                      )
+                    ],
+                  ),
                 ),
               ),
             ),
             const SizedBox(height: 20),
-            // Add Payment Button
-            // ElevatedButton(
-            //   onPressed: () => _handlePayment(context),
-            //   style: ElevatedButton.styleFrom(
-            //     backgroundColor: MyColors.primary,
-            //     shape: RoundedRectangleBorder(
-            //       borderRadius: BorderRadius.circular(10),
-            //     ),
-            //     padding: const EdgeInsets.symmetric(vertical: 12),
-            //   ),
-            //   child: Row(
-            //     mainAxisAlignment: MainAxisAlignment.center,
-            //     children: [
-            //       IconifyIcon(
-            //         icon: "mdi:credit-card-outline",
-            //         color: Colors.white,
-            //       ),
-            //       const SizedBox(width: 8),
-            //       Text(
-            //         "پرداخت",
-            //         style: MyTextStyle.textMatn14Bold.copyWith(
-            //           color: Colors.white,
-            //         ),
-            //       ),
-            //     ],
-            //   ),
-            // ),
             const SizedBox(height: 20),
             ListTile(
               leading: Container(
@@ -196,6 +178,16 @@ class CustomDrawer extends StatelessWidget {
               ),
             ),
             ListTile(
+              onTap: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("به زودی")),
+                );
+                // Navigator.pushNamed(context, PaymentResultScreen.routeName,
+                //     arguments: {
+                //       'status': 0,
+                //       'ref': '1234567890',
+                //     });
+              },
               leading: Container(
                 width: 32,
                 height: 32,
@@ -263,6 +255,16 @@ class CustomDrawer extends StatelessWidget {
               ),
             ),
             ListTile(
+              onTap: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("به زودی.")),
+                );
+                // Navigator.pushNamed(context, PaymentResultScreen.routeName,
+                //     arguments: {
+                //       'status': 1,
+                //       'ref': '1234567890',
+                //     });
+              },
               leading: Container(
                 width: 32,
                 height: 32,

@@ -1,119 +1,88 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fa" dir="rtl">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Deep Link Test</title>
+    <title>تست Deep Link</title>
     <style>
       body {
         font-family: Arial, sans-serif;
-        max-width: 600px;
-        margin: 50px auto;
-        padding: 20px;
+        text-align: center;
+        padding: 50px;
         background-color: #f5f5f5;
       }
       .container {
+        max-width: 600px;
+        margin: 0 auto;
         background: white;
         padding: 30px;
         border-radius: 10px;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
       }
-      h1 {
-        color: #333;
-        text-align: center;
-      }
-      .test-link {
-        display: block;
-        background: #007bff;
+      button {
+        background-color: #4caf50;
         color: white;
-        padding: 15px 20px;
-        text-decoration: none;
+        padding: 15px 30px;
+        font-size: 18px;
+        border: none;
         border-radius: 5px;
-        margin: 10px 0;
-        text-align: center;
-        font-weight: bold;
+        cursor: pointer;
+        margin: 10px;
       }
-      .test-link:hover {
-        background: #0056b3;
+      button:hover {
+        background-color: #45a049;
+      }
+      .success {
+        background-color: #4caf50;
+      }
+      .error {
+        background-color: #f44336;
       }
       .info {
-        background: #e7f3ff;
-        padding: 15px;
-        border-radius: 5px;
-        margin: 20px 0;
-        border-left: 4px solid #007bff;
-      }
-      .code {
-        background: #f8f9fa;
-        padding: 10px;
-        border-radius: 3px;
-        font-family: monospace;
-        margin: 10px 0;
+        background-color: #2196f3;
       }
     </style>
   </head>
   <body>
     <div class="container">
-      <h1>🔗 Deep Link Test Page</h1>
+      <h1>تست Deep Link برای اپلیکیشن Poortak</h1>
+      <p>برای تست deep link، یکی از دکمه‌های زیر را کلیک کنید:</p>
 
-      <div class="info">
-        <strong>Instructions:</strong>
-        <ol>
-          <li>Make sure your Poortak app is installed on your device</li>
-          <li>Click the test links below</li>
-          <li>Your app should open and show the deep link logs</li>
-        </ol>
-      </div>
+      <button class="success" onclick="testSuccessLink()">
+        تست پرداخت موفق (ok=1)
+      </button>
 
-      <h3>Test Deep Links:</h3>
+      <button class="error" onclick="testErrorLink()">
+        تست پرداخت ناموفق (ok=0)
+      </button>
 
-      <a href="return://poortak?status=OK&ref=123" class="test-link">
-        ✅ Test 1: Payment Success (OK)
-      </a>
+      <button class="info" onclick="testWithRef()">
+        تست با کد پیگیری (ref=123)
+      </button>
 
-      <a href="return://poortak?status=success&ref=456" class="test-link">
-        ✅ Test 2: Payment Success (SUCCESS)
-      </a>
-
-      <a href="return://poortak?status=NOK&ref=789" class="test-link">
-        ❌ Test 3: Payment Failed (ERROR)
-      </a>
-
-      <a href="return://poortak?status=failed&ref=999" class="test-link">
-        ❌ Test 4: Payment Failed (FAILED)
-      </a>
-
-      <div class="info">
-        <strong>Alternative Testing Methods:</strong>
-        <div class="code">
-          # Using ADB (recommended for development)<br />
-          adb shell am start -a android.intent.action.VIEW -d
-          "return://poortak?status=ok&ref=123"
-        </div>
-      </div>
-
-      <div class="info">
-        <strong>Expected Behavior:</strong>
-        <div class="code">
-          1. Deep link logs will appear in console<br />
-          2. App will navigate to PaymentResultScreen<br />
-          3. Success: Green checkmark with payment details<br />
-          4. Failure: Red X with error message and retry option
-        </div>
+      <div style="margin-top: 30px">
+        <h3>لینک‌های تست:</h3>
+        <p><strong>موفق:</strong> <code>return://poortak?ok=1</code></p>
+        <p><strong>ناموفق:</strong> <code>return://poortak?ok=0</code></p>
+        <p>
+          <strong>با کد پیگیری:</strong>
+          <code>return://poortak?ok=1&ref=123</code>
+        </p>
       </div>
     </div>
 
     <script>
-      // Add click tracking for debugging
-      document.querySelectorAll(".test-link").forEach((link) => {
-        link.addEventListener("click", function (e) {
-          console.log("Clicked deep link:", this.href);
-          // Optional: Add a small delay to see if the app opens
-          setTimeout(() => {
-            console.log("Deep link should have opened the app");
-          }, 1000);
-        });
-      });
+      function testSuccessLink() {
+        window.location.href = "return://poortak?ok=1&ref=123";
+      }
+
+      function testErrorLink() {
+        window.location.href = "return://poortak?ok=0&ref=123";
+      }
+
+      function testWithRef() {
+        window.location.href = "return://poortak?ok=1&ref=123";
+      }
     </script>
   </body>
 </html>

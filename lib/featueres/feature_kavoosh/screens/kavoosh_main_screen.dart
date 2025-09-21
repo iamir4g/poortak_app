@@ -49,6 +49,7 @@ class _KavooshMainScreenState extends State<KavooshMainScreen> {
                       onTap: () {
                         // Handle video tap
                       },
+                      showComingSoonBadge: true,
                     ),
 
                     const SizedBox(height: 13),
@@ -64,6 +65,7 @@ class _KavooshMainScreenState extends State<KavooshMainScreen> {
                       onTap: () {
                         // Handle audio books tap
                       },
+                      showComingSoonBadge: true,
                     ),
 
                     const SizedBox(height: 13),
@@ -80,6 +82,7 @@ class _KavooshMainScreenState extends State<KavooshMainScreen> {
                       onTap: () {
                         // Handle e-books tap
                       },
+                      showComingSoonBadge: true,
                     ),
 
                     const SizedBox(height: 13),
@@ -95,6 +98,7 @@ class _KavooshMainScreenState extends State<KavooshMainScreen> {
                       onTap: () {
                         // Handle self-assessment tap
                       },
+                      showComingSoonBadge: true,
                     ),
                   ],
                 ),
@@ -111,85 +115,120 @@ class _KavooshMainScreenState extends State<KavooshMainScreen> {
     required String subtitle,
     required List<Color> gradientColors,
     required VoidCallback onTap,
+    bool showComingSoonBadge = false,
   }) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        height: 150,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: gradientColors,
-          ),
-          borderRadius: BorderRadius.circular(30),
-          border: Border.all(
-            color: Colors.white,
-            width: 5,
-          ),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x1F92A2BE),
-              blurRadius: 13,
-              offset: Offset(0, -7),
-            ),
-          ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Row(
-            children: [
-              // Icon placeholder
-              Container(
-                width: 100,
-                height: 70,
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.3),
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Center(
-                  child: Image.asset(
-                    _getIconPathForTitle(title),
-                    width: 40,
-                    height: 40,
-                    fit: BoxFit.contain,
-                  ),
-                ),
+      child: Stack(
+        children: [
+          Container(
+            height: 150,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: gradientColors,
               ),
-              const SizedBox(width: 20),
-              // Text content
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontFamily: 'IRANSans',
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF29303D),
-                      ),
-                      textAlign: TextAlign.right,
+              borderRadius: BorderRadius.circular(30),
+              border: Border.all(
+                color: Colors.white,
+                width: 5,
+              ),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x1F92A2BE),
+                  blurRadius: 13,
+                  offset: Offset(0, -7),
+                ),
+              ],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          title,
+                          style: const TextStyle(
+                            fontFamily: 'IRANSans',
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF29303D),
+                          ),
+                          textAlign: TextAlign.right,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          subtitle,
+                          style: const TextStyle(
+                            fontFamily: 'IRANSans',
+                            fontSize: 10,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF52617A),
+                          ),
+                          textAlign: TextAlign.right,
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      subtitle,
-                      style: const TextStyle(
-                        fontFamily: 'IRANSans',
-                        fontSize: 10,
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xFF52617A),
+                  ),
+                  const SizedBox(width: 20),
+                  // Icon placeholder
+                  Container(
+                    width: 100,
+                    height: 70,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.3),
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: Center(
+                      child: Image.asset(
+                        _getIconPathForTitle(title),
+                        width: 114,
+                        height: 70,
+                        fit: BoxFit.contain,
                       ),
-                      textAlign: TextAlign.right,
+                    ),
+                  ),
+
+                  // Text content
+                ],
+              ),
+            ),
+          ),
+          // Coming Soon Badge
+          if (showComingSoonBadge)
+            Positioned(
+              top: 10,
+              right: 10,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFF6B6B),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x1F000000),
+                      blurRadius: 4,
+                      offset: Offset(0, 2),
                     ),
                   ],
                 ),
+                child: const Text(
+                  'به زودی',
+                  style: TextStyle(
+                    fontFamily: 'IRANSans',
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
               ),
-            ],
-          ),
-        ),
+            ),
+        ],
       ),
     );
   }

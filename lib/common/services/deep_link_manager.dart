@@ -64,7 +64,7 @@ class DeepLinkManager {
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
           builder: (context) => PaymentResultScreen(
-            status: _pendingStatus!,
+            ok: int.parse(_pendingStatus!),
             ref: _pendingRef,
           ),
         ),

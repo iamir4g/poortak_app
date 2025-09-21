@@ -1,30 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:poortak/common/widgets/main_wrapper.dart';
 
 class PaymentResultScreen extends StatelessWidget {
   static const String routeName = '/payment-result';
 
-  final String status;
+  final int ok;
   final String? ref;
 
   const PaymentResultScreen({
     super.key,
-    required this.status,
+    required this.ok,
     this.ref,
   });
 
   @override
   Widget build(BuildContext context) {
-    debugPrint(
-        "PaymentResultScreen: Building with status='$status', ref='$ref'");
-    final isSuccess =
-        status.toLowerCase() == 'ok' || status.toLowerCase() == 'success';
+    debugPrint("PaymentResultScreen: Building with status='$ok', ref='$ref'");
+    final isSuccess = ok == 1 ? true : false;
+
     debugPrint("PaymentResultScreen: isSuccess=$isSuccess");
 
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
         title: Text(
-          isSuccess ? 'Payment Successful' : 'Payment Failed',
+          "رسید نهایی",
           style: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
@@ -67,7 +67,9 @@ class PaymentResultScreen extends StatelessWidget {
 
             // Status Text
             Text(
-              isSuccess ? 'Payment Successful!' : 'Payment Failed',
+              isSuccess
+                  ? 'پرداخت با موفقیت انجام شد'
+                  : 'پرداخت با خطا مواجه شد',
               style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
@@ -77,17 +79,6 @@ class PaymentResultScreen extends StatelessWidget {
             ),
 
             const SizedBox(height: 10),
-
-            Text(
-              isSuccess
-                  ? 'Your payment has been processed successfully'
-                  : 'There was an issue processing your payment',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey[600],
-              ),
-              textAlign: TextAlign.center,
-            ),
 
             const SizedBox(height: 40),
 
@@ -110,21 +101,22 @@ class PaymentResultScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Payment Details',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey[800],
+                  Center(
+                    child: Text(
+                      'جزئیات پرداخت',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey[800],
+                      ),
                     ),
                   ),
                   const SizedBox(height: 20),
-                  _buildDetailRow('Transaction ID', _getTransactionId()),
-                  _buildDetailRow('Amount', _getAmount()),
-                  _buildDetailRow('Payment Method', _getPaymentMethod()),
-                  _buildDetailRow('Date & Time', _getDateTime()),
-                  if (ref != null) _buildDetailRow('Reference', ref!),
-                  _buildDetailRow('Status', isSuccess ? 'Completed' : 'Failed'),
+                  _buildDetailRow('کد پیگیری', _getTransactionId()),
+                  _buildDetailRow('مبلغ', _getAmount()),
+                  _buildDetailRow('روش پرداخت', _getPaymentMethod()),
+                  _buildDetailRow('تاریخ و زمان', _getDateTime()),
+                  if (ref != null) _buildDetailRow('کد پیگیری', ref!),
                 ],
               ),
             ),
@@ -140,7 +132,7 @@ class PaymentResultScreen extends StatelessWidget {
                   onPressed: () {
                     // Navigate to main app or specific screen
                     Navigator.of(context).pushNamedAndRemoveUntil(
-                      '/main',
+                      MainWrapper.routeName,
                       (route) => false,
                     );
                   },
@@ -151,7 +143,7 @@ class PaymentResultScreen extends StatelessWidget {
                     ),
                   ),
                   child: const Text(
-                    'Continue to App',
+                    'بازگشت به صفحه اصلی',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 16,
@@ -161,30 +153,6 @@ class PaymentResultScreen extends StatelessWidget {
                 ),
               ),
             ] else ...[
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  onPressed: () {
-                    // Retry payment or go back
-                    Navigator.of(context).pop();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: const Text(
-                    'Try Again',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
               const SizedBox(height: 15),
               SizedBox(
                 width: double.infinity,
@@ -192,7 +160,7 @@ class PaymentResultScreen extends StatelessWidget {
                 child: OutlinedButton(
                   onPressed: () {
                     Navigator.of(context).pushNamedAndRemoveUntil(
-                      '/main',
+                      MainWrapper.routeName,
                       (route) => false,
                     );
                   },
@@ -203,7 +171,7 @@ class PaymentResultScreen extends StatelessWidget {
                     ),
                   ),
                   child: Text(
-                    'Back to App',
+                    'بازگشت به صفحه اصلی',
                     style: TextStyle(
                       color: Colors.grey[700],
                       fontSize: 16,
@@ -231,8 +199,8 @@ class PaymentResultScreen extends StatelessWidget {
                   Expanded(
                     child: Text(
                       isSuccess
-                          ? 'You will receive a confirmation email shortly'
-                          : 'Please contact support if you continue to experience issues',
+                          ? 'شما به زودی یک ایمیل تایید خواهید گرفت'
+                          : 'لطفا با پشتیبانی تماس بگیرید اگر مشکلات خود را ادامه دهید',
                       style: TextStyle(
                         color: Colors.blue[700],
                         fontSize: 14,
