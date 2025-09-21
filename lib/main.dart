@@ -18,6 +18,8 @@ import 'package:poortak/featueres/feature_litner/screens/litner_word_box_screen.
 import 'package:poortak/featueres/feature_litner/screens/litner_words_inprogress_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/profile_screen.dart';
+import 'package:poortak/featueres/feature_profile/screens/edit_profile_screen.dart';
+import 'package:poortak/featueres/feature_profile/presentation/bloc/profile_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/lesson_bloc/lesson_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/practice_vocabulary_bloc/practice_vocabulary_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/converstion_screen.dart';
@@ -111,6 +113,10 @@ void main() async {
           },
           LoginScreen.routeName: (context) => LoginScreen(),
           ProfileScreen.routeName: (context) => ProfileScreen(),
+          EditProfileScreen.routeName: (context) => BlocProvider(
+                create: (context) => locator<ProfileBloc>(),
+                child: EditProfileScreen(),
+              ),
           VocabularyScreen.routeName: (context) {
             final args = ModalRoute.of(context)?.settings.arguments
                 as Map<String, dynamic>;

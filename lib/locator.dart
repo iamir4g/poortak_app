@@ -16,6 +16,7 @@ import 'package:poortak/featueres/fetures_sayareh/presentation/vocabulary_bloc/v
 import 'package:poortak/featueres/fetures_sayareh/repositories/sayareh_repository.dart';
 import 'package:poortak/featueres/feature_profile/data/data_sorce/profile_api_provider.dart';
 import 'package:poortak/featueres/feature_profile/repositories/profile_repository.dart';
+import 'package:poortak/featueres/feature_profile/presentation/bloc/profile_bloc.dart';
 import 'package:poortak/featueres/feature_shopping_cart/repositories/shopping_cart_repository.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/data_source/shopping_cart_api_provider.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
@@ -67,6 +68,7 @@ Future<void> initLocator() async {
   locator.registerSingleton<ShoppingCartRepository>(
       ShoppingCartRepository(apiProvider: locator()));
   locator.registerSingleton<ProfileRepository>(ProfileRepository(locator()));
+  locator.registerSingleton<ProfileBloc>(ProfileBloc(repository: locator()));
   locator.registerSingleton<LitnerRepository>(LitnerRepository(locator()));
   locator.registerSingleton<BlocStorageBloc>(
       BlocStorageBloc(sayarehRepository: locator()));

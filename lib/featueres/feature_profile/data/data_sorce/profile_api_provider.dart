@@ -38,20 +38,47 @@ class ProfileApiProvider {
   ///api/v1/user/profile
 
   dynamic callPutUserProfile(UpdateProfileParams updateProfileModel) async {
-    final response = await dio.put(
+    // Only include fields that have values
+    Map<String, dynamic> data = {};
+
+    if (updateProfileModel.firstName.isNotEmpty) {
+      data["firstName"] = updateProfileModel.firstName;
+    }
+    if (updateProfileModel.lastName.isNotEmpty) {
+      data["lastName"] = updateProfileModel.lastName;
+    }
+    if (updateProfileModel.ageGroup.isNotEmpty) {
+      data["ageGroup"] = updateProfileModel.ageGroup;
+    }
+    if (updateProfileModel.avatar.isNotEmpty) {
+      data["avatar"] = updateProfileModel.avatar;
+    }
+    if (updateProfileModel.nationalCode.isNotEmpty) {
+      data["nationalCode"] = updateProfileModel.nationalCode;
+    }
+    if (updateProfileModel.province.isNotEmpty) {
+      data["province"] = updateProfileModel.province;
+    }
+    if (updateProfileModel.city.isNotEmpty) {
+      data["city"] = updateProfileModel.city;
+    }
+    if (updateProfileModel.address.isNotEmpty) {
+      data["address"] = updateProfileModel.address;
+    }
+    if (updateProfileModel.postalCode.isNotEmpty) {
+      data["postalCode"] = updateProfileModel.postalCode;
+    }
+    if (updateProfileModel.birthdate.isNotEmpty) {
+      data["birthdate"] = updateProfileModel.birthdate;
+    }
+
+    log("📤 Sending update data: $data");
+    log("📊 Data keys: ${data.keys.toList()}");
+    log("📊 Data values: ${data.values.toList()}");
+
+    final response = await dio.patch(
       "${Constants.baseUrl}user/profile",
-      data: {
-        "firstName": updateProfileModel.firstName,
-        "lastName": updateProfileModel.lastName,
-        "ageGroup": updateProfileModel.ageGroup,
-        "avatar": updateProfileModel.avatar,
-        "nationalCode": updateProfileModel.nationalCode,
-        "province": updateProfileModel.province,
-        "city": updateProfileModel.city,
-        "address": updateProfileModel.address,
-        "postalCode": updateProfileModel.postalCode,
-        "birthdate": updateProfileModel.birthdate,
-      },
+      data: data,
     );
     return response;
   }

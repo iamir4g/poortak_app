@@ -211,6 +211,21 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       if (response is DataSuccess) {
         if (response.data != null) {
           log("✅ Profile updated successfully!");
+
+          // Save updated profile data to preferences
+          final updatedData = response.data!.data;
+          log("💾 Saving updated profile data to preferences...");
+          log("   First name: ${updatedData.firstName}");
+          log("   Last name: ${updatedData.lastName}");
+          log("   Avatar: ${updatedData.avatar}");
+
+          await prefsOperator.saveUserProfileData(
+            updatedData.firstName,
+            updatedData.lastName,
+            updatedData.avatar,
+          );
+
+          log("✅ Updated profile data saved to preferences successfully!");
           emit(ProfileSuccessUpdate(response.data!));
         } else {
           log("❌ Update profile failed: Invalid response data");

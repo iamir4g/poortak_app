@@ -3,6 +3,7 @@ import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/payment_history_screen.dart';
+import 'package:poortak/featueres/feature_profile/screens/edit_profile_screen.dart';
 import 'package:poortak/locator.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -160,7 +161,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 width: 180,
                                 height: 42,
                                 child: OutlinedButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    Navigator.pushNamed(
+                                      context,
+                                      EditProfileScreen.routeName,
+                                    ).then((_) {
+                                      // Refresh profile data when returning from edit screen
+                                      _checkLoginStatus();
+                                    });
+                                  },
                                   style: OutlinedButton.styleFrom(
                                     side: const BorderSide(
                                         color: Color(0xFFE0E4EB), width: 2),
