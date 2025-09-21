@@ -5,6 +5,9 @@ import 'package:poortak/featueres/feature_profile/data/models/login_with_otp_mod
 import 'package:poortak/featueres/feature_profile/data/models/payment_history_modle.dart';
 import 'package:poortak/featueres/feature_profile/data/models/payment_history_params.dart';
 import 'package:poortak/featueres/feature_profile/data/models/request_otp_model.dart';
+import 'package:poortak/featueres/feature_profile/data/models/me_profile_model.dart';
+import 'package:poortak/featueres/feature_profile/data/models/update_profile_model.dart';
+import 'package:poortak/featueres/feature_profile/data/models/update_profile_params.dart';
 import 'dart:developer';
 
 // import 'package:poortak/featueres/feature_profile/data/models/login_otp_model.dart';
@@ -74,6 +77,49 @@ class ProfileRepository {
       }
     } catch (e) {
       log("Payment History Error: $e");
+      return DataFailed(e.toString());
+    }
+  }
+
+  Future<DataState<UpdateProfileModel>> callPutUserProfile(
+      UpdateProfileParams updateProfileModel) async {
+    try {
+      final response =
+          await profileApiProvider.callPutUserProfile(updateProfileModel);
+      log("Update Profile Response: ${response.data}");
+      if ((response.statusCode == 200 || response.statusCode == 201) &&
+          response.data['ok'] == true) {
+        final UpdateProfileModel updateProfileModel =
+            UpdateProfileModel.fromJson(response.data);
+        log("Update Profile Success - Parsed Model: ${updateProfileModel}");
+        return DataSuccess(updateProfileModel);
+      } else {
+        log("Update Profile Error - Status: ${response.statusCode}, Data: ${response.data}");
+        return DataFailed(
+            response.data['message'] ?? "خطا در بروزرسانی پروفایل");
+      }
+    } catch (e) {
+      log("Update Profile Error: $e");
+      return DataFailed(e.toString());
+    }
+  }
+
+  Future<DataState<MeProfileModel>> callGetMeProfile() async {
+    try {
+      final response = await profileApiProvider.callGetMeProfile();
+      log("Get Me Profile Response: ${response.data}");
+      if ((response.statusCode == 200 || response.statusCode == 201) &&
+          response.data['ok'] == true) {
+        final MeProfileModel meProfileModel =
+            MeProfileModel.fromJson(response.data);
+        log("Get Me Profile Success - Parsed Model: ${meProfileModel}");
+        return DataSuccess(meProfileModel);
+      } else {
+        log("Get Me Profile Error - Status: ${response.statusCode}, Data: ${response.data}");
+        return DataFailed(response.data['message'] ?? "خطا در دریافت پروفایل");
+      }
+    } catch (e) {
+      log("Get Me Profile Error: $e");
       return DataFailed(e.toString());
     }
   }
