@@ -23,7 +23,8 @@ class _CustomDrawerState extends State<CustomDrawer> {
   final PrefsOperator prefsOperator = locator<PrefsOperator>();
   bool isLoggedIn = false;
   String? userName;
-
+  String? userFirstName;
+  String? userLastName;
   @override
   void initState() {
     super.initState();
@@ -33,9 +34,13 @@ class _CustomDrawerState extends State<CustomDrawer> {
   Future<void> _checkLoginStatus() async {
     final loggedIn = await prefsOperator.getLoggedIn();
     final name = await prefsOperator.getUserName();
+    final firstName = await prefsOperator.getUserFirstName();
+    final lastName = await prefsOperator.getUserLastName();
     setState(() {
       isLoggedIn = loggedIn;
       userName = name;
+      userFirstName = firstName;
+      userLastName = lastName;
     });
   }
 
@@ -81,7 +86,11 @@ class _CustomDrawerState extends State<CustomDrawer> {
                       ),
                       const SizedBox(width: 10),
                       Text(
-                        isLoggedIn ? (userName ?? "کاربر") : "وارد شوید",
+                        isLoggedIn
+                            ? (userFirstName != null && userLastName != null
+                                ? "$userFirstName $userLastName"
+                                : userFirstName ?? userLastName ?? "کاربر")
+                            : "وارد شوید",
                         style: MyTextStyle.textMatn14Bold,
                       )
                     ],
