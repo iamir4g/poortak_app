@@ -6,7 +6,7 @@ import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/common/widgets/bottom_nav.dart';
 import 'package:poortak/common/widgets/custom_drawer.dart';
 import 'package:poortak/common/widgets/logout_confirmation_modal.dart';
-import 'package:poortak/config/myTextStyle.dart';
+import 'package:poortak/config/myColors.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/kavoosh_main_screen.dart';
 import 'package:poortak/featueres/feature_litner/screens/litner_main_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/profile_screen.dart';
@@ -16,6 +16,7 @@ import 'package:poortak/featueres/fetures_sayareh/screens/sayareh_screen.dart';
 import 'package:poortak/featueres/feature_shopping_cart/screens/shopping_cart_screen.dart';
 import 'package:poortak/locator.dart';
 import 'package:poortak/common/bloc/permission/permission_bloc.dart';
+import 'package:poortak/common/bloc/theme_cubit/theme_cubit.dart';
 
 class MainWrapper extends StatefulWidget {
   static const routeName = "/main_wrapper";
@@ -126,62 +127,89 @@ class _MainWrapperState extends State<MainWrapper> {
               context.read<PermissionBloc>().add(CheckStoragePermissionEvent());
             }
 
-            return Scaffold(
-              appBar: AppBar(
-                backgroundColor: Colors.white,
-                elevation: 0,
-                actions: [
-                  (currentPageIndex == 4 && (prefsOperator.isLoggedIn == true))
-                      ? PopupMenuButton<String>(
-                          icon: const Icon(Icons.more_vert,
-                              color: Color(0xFF3D495C)),
-                          onSelected: (value) {
-                            if (value == 'logout') _showLogoutConfirmation();
-                          },
-                          itemBuilder: (context) => [
-                            const PopupMenuItem(
-                              value: 'logout',
-                              child: Text('خروج از ناحیه کاربری'),
-                            ),
-                          ],
-                        )
-                      : const SizedBox.shrink(),
-                ],
-                flexibleSpace: Container(
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(33.5),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Color.fromRGBO(0, 0, 0, 0.05),
-                        offset: Offset(0, 1),
-                        blurRadius: 1,
-                        spreadRadius: 0,
-                      ),
+            return BlocBuilder<ThemeCubit, ThemeState>(
+              builder: (context, themeState) {
+                return Scaffold(
+                  backgroundColor: themeState.isDark
+                      ? MyColors.darkBackground
+                      : Colors.white,
+                  appBar: AppBar(
+                    backgroundColor: themeState.isDark
+                        ? MyColors.darkBackground
+                        : Colors.white,
+                    foregroundColor: themeState.isDark
+                        ? MyColors.darkTextPrimary
+                        : MyColors.textMatn1,
+                    elevation: 0,
+                    actions: [
+                      (currentPageIndex == 4 &&
+                              (prefsOperator.isLoggedIn == true))
+                          ? PopupMenuButton<String>(
+                              icon: Icon(Icons.more_vert,
+                                  color: themeState.isDark
+                                      ? MyColors.darkTextPrimary
+                                      : const Color(0xFF3D495C)),
+                              onSelected: (value) {
+                                if (value == 'logout')
+                                  _showLogoutConfirmation();
+                              },
+                              itemBuilder: (context) => [
+                                PopupMenuItem(
+                                  value: 'logout',
+                                  child: Text(
+                                    'خروج از ناحیه کاربری',
+                                    style: TextStyle(
+                                      color: themeState.isDark
+                                          ? MyColors.darkTextPrimary
+                                          : MyColors.textMatn1,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            )
+                          : const SizedBox.shrink(),
                     ],
-                  ),
-                ),
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(33.5),
-                  ),
-                ),
-              ),
-              drawer: const CustomDrawer(),
-              bottomNavigationBar: BottomNav(controller: controller),
-              body: state is PermissionLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : PageView(
-                      controller: controller,
-                      onPageChanged: (index) {
-                        setState(() {
-                          currentPageIndex = index;
-                        });
-                      },
-                      children: topLevelScreens,
+                    flexibleSpace: Container(
+                      decoration: BoxDecoration(
+                        color: themeState.isDark
+                            ? MyColors.darkBackground
+                            : Colors.white,
+                        borderRadius: const BorderRadius.only(
+                          bottomLeft: Radius.circular(33.5),
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: themeState.isDark
+                                ? Colors.black.withOpacity(0.3)
+                                : const Color.fromRGBO(0, 0, 0, 0.05),
+                            offset: const Offset(0, 1),
+                            blurRadius: 1,
+                            spreadRadius: 0,
+                          ),
+                        ],
+                      ),
                     ),
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(33.5),
+                      ),
+                    ),
+                  ),
+                  drawer: const CustomDrawer(),
+                  bottomNavigationBar: BottomNav(controller: controller),
+                  body: state is PermissionLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : PageView(
+                          controller: controller,
+                          onPageChanged: (index) {
+                            setState(() {
+                              currentPageIndex = index;
+                            });
+                          },
+                          children: topLevelScreens,
+                        ),
+                );
+              },
             );
           },
         ),
