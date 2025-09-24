@@ -25,6 +25,7 @@ import 'package:poortak/common/bloc/permission/permission_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_start_bloc/quiz_start_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_answer_bloc/quiz_answer_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_result_bloc/quiz_result_bloc.dart';
+import 'package:poortak/common/bloc/theme_cubit/theme_cubit.dart';
 
 GetIt locator = GetIt.instance;
 
@@ -92,4 +93,7 @@ Future<void> initLocator() async {
   locator.registerFactory<QuizStartBloc>(() => QuizStartBloc(locator()));
   locator.registerFactory<QuizAnswerBloc>(() => QuizAnswerBloc(locator()));
   locator.registerFactory<QuizResultBloc>(() => QuizResultBloc(locator()));
+
+  // Register ThemeCubit
+  locator.registerSingleton<ThemeCubit>(ThemeCubit());
 }

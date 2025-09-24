@@ -43,6 +43,7 @@ import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_answer_
 import 'package:poortak/featueres/fetures_sayareh/screens/first_quiz_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_result_bloc/quiz_result_bloc.dart';
 import 'package:flutter/widgets.dart'; // For RouteAware
+import 'package:poortak/common/bloc/theme_cubit/theme_cubit.dart';
 
 final RouteObserver<ModalRoute<void>> routeObserver =
     RouteObserver<ModalRoute<void>>();
@@ -58,6 +59,7 @@ void main() async {
       providers: [
         BlocProvider(create: (_) => SplashCubit()),
         BlocProvider(create: (_) => BottomNavCubit()),
+        BlocProvider(create: (_) => locator<ThemeCubit>()),
         BlocProvider(
           create: (_) {
             final bloc = ShoppingCartBloc(repository: locator());
@@ -68,154 +70,160 @@ void main() async {
         ),
         BlocProvider(create: (_) => locator<LitnerBloc>()),
       ],
-      child: MaterialApp(
-        navigatorObservers: [routeObserver],
-        themeMode: ThemeMode.light,
-        theme: MyThemes.lightTheme,
-        darkTheme: MyThemes.darkTheme,
-        initialRoute: "/",
-        localizationsDelegates: const [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        locale: const Locale("fa", ""),
-        supportedLocales: const [Locale("en", ""), Locale("fa", "")],
-        routes: {
-          AboutUsScreen.routeName: (context) => AboutUsScreen(),
-          ContactUsScreen.routeName: (context) => ContactUsScreen(),
-          SettingsScreen.routeName: (context) => SettingsScreen(),
-          FAQScreen.routeName: (context) => FAQScreen(),
-          IntroMainWrapper.routeName: (context) => IntroMainWrapper(),
-          TestScreen.routeName: (context) => TestScreen(),
-          MainWrapper.routeName: (context) => MainWrapper(),
-          LessonScreen.routeName: (context) {
-            final args = ModalRoute.of(context)?.settings.arguments
-                as Map<String, dynamic>;
-            return MultiBlocProvider(
-              providers: [
-                BlocProvider(
+      child: BlocBuilder<ThemeCubit, ThemeState>(
+        builder: (context, themeState) {
+          return MaterialApp(
+            navigatorObservers: [routeObserver],
+            themeMode: themeState.themeMode,
+            theme: MyThemes.lightTheme,
+            darkTheme: MyThemes.darkTheme,
+            initialRoute: "/",
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            locale: const Locale("fa", ""),
+            supportedLocales: const [Locale("en", ""), Locale("fa", "")],
+            routes: {
+              AboutUsScreen.routeName: (context) => AboutUsScreen(),
+              ContactUsScreen.routeName: (context) => ContactUsScreen(),
+              SettingsScreen.routeName: (context) => SettingsScreen(),
+              FAQScreen.routeName: (context) => FAQScreen(),
+              IntroMainWrapper.routeName: (context) => IntroMainWrapper(),
+              TestScreen.routeName: (context) => TestScreen(),
+              MainWrapper.routeName: (context) => MainWrapper(),
+              LessonScreen.routeName: (context) {
+                final args = ModalRoute.of(context)?.settings.arguments
+                    as Map<String, dynamic>;
+                return MultiBlocProvider(
+                  providers: [
+                    BlocProvider(
+                      create: (context) =>
+                          SayarehCubit(sayarehRepository: locator()),
+                    ),
+                    BlocProvider(
+                      create: (context) =>
+                          LessonBloc(sayarehRepository: locator()),
+                    ),
+                  ],
+                  child: LessonScreen(
+                    index: args['index'],
+                    title: args['title'],
+                    lessonId: args['lessonId'],
+                    purchased: args['purchased'],
+                  ),
+                );
+              },
+              LoginScreen.routeName: (context) => LoginScreen(),
+              ProfileScreen.routeName: (context) => ProfileScreen(),
+              EditProfileScreen.routeName: (context) => BlocProvider(
+                    create: (context) => locator<ProfileBloc>(),
+                    child: EditProfileScreen(),
+                  ),
+              VocabularyScreen.routeName: (context) {
+                final args = ModalRoute.of(context)?.settings.arguments
+                    as Map<String, dynamic>;
+                return VocabularyScreen(id: args['id']);
+              },
+              PracticeVocabularyScreen.routeName: (context) {
+                final args = ModalRoute.of(context)?.settings.arguments
+                    as Map<String, dynamic>;
+                return BlocProvider(
                   create: (context) =>
-                      SayarehCubit(sayarehRepository: locator()),
-                ),
-                BlocProvider(
-                  create: (context) => LessonBloc(sayarehRepository: locator()),
-                ),
-              ],
-              child: LessonScreen(
-                index: args['index'],
-                title: args['title'],
-                lessonId: args['lessonId'],
-                purchased: args['purchased'],
-              ),
-            );
-          },
-          LoginScreen.routeName: (context) => LoginScreen(),
-          ProfileScreen.routeName: (context) => ProfileScreen(),
-          EditProfileScreen.routeName: (context) => BlocProvider(
-                create: (context) => locator<ProfileBloc>(),
-                child: EditProfileScreen(),
-              ),
-          VocabularyScreen.routeName: (context) {
-            final args = ModalRoute.of(context)?.settings.arguments
-                as Map<String, dynamic>;
-            return VocabularyScreen(id: args['id']);
-          },
-          PracticeVocabularyScreen.routeName: (context) {
-            final args = ModalRoute.of(context)?.settings.arguments
-                as Map<String, dynamic>;
-            return BlocProvider(
-              create: (context) =>
-                  PracticeVocabularyBloc(sayarehRepository: locator()),
-              child: PracticeVocabularyScreen(courseId: args['courseId']),
-            );
-          },
-          ConversationScreen.routeName: (context) {
-            final args = ModalRoute.of(context)?.settings.arguments
-                as Map<String, dynamic>;
-            return ConversationScreen(conversationId: args['conversationId']);
-          },
-          QuizzesScreen.routeName: (context) {
-            final args = ModalRoute.of(context)?.settings.arguments
-                as Map<String, dynamic>;
-            return BlocProvider(
-              create: (context) => QuizesCubit(),
-              child: QuizzesScreen(courseId: args['courseId']),
-            );
-          },
-          FirstQuizScreen.routeName: (context) {
-            final args = ModalRoute.of(context)?.settings.arguments
-                as Map<String, dynamic>;
-            return MultiBlocProvider(
-              providers: [
-                BlocProvider(
-                  create: (context) => QuizStartBloc(locator()),
-                ),
-                BlocProvider(
-                  create: (context) => QuizAnswerBloc(locator()),
-                ),
-                BlocProvider(
-                  create: (context) => QuizResultBloc(locator()),
-                ),
-              ],
-              child: FirstQuizScreen(
-                quizId: args['quizId'],
-                courseId: args['courseId'],
-                title: args['title'],
-              ),
-            );
-          },
-          QuizScreen.routeName: (context) {
-            final args = ModalRoute.of(context)?.settings.arguments
-                as Map<String, dynamic>;
-            return MultiBlocProvider(
-              providers: [
-                BlocProvider(
-                  create: (context) => QuizStartBloc(locator()),
-                ),
-                BlocProvider(
-                  create: (context) => QuizAnswerBloc(locator()),
-                ),
-                BlocProvider(
-                  create: (context) => QuizResultBloc(locator()),
-                ),
-              ],
-              child: QuizScreen(
-                quizId: args['quizId'],
-                courseId: args['courseId'],
-                title: args['title'],
-                initialQuestion: args['initialQuestion'],
-              ),
-            );
-          },
-          LitnerWordsInprogressScreen.routeName: (context) =>
-              LitnerWordsInprogressScreen(),
-          LitnerWordBoxScreen.routeName: (context) => LitnerWordBoxScreen(),
-          LitnerWordCompletedScreen.routeName: (context) =>
-              LitnerWordCompletedScreen(),
-          KavooshMainScreen.routeName: (context) => KavooshMainScreen(),
-          PaymentResultScreen.routeName: (context) {
-            final args = ModalRoute.of(context)?.settings.arguments
-                as Map<String, dynamic>;
-            return PaymentResultScreen(
-              ok: args['status'] is int
-                  ? args['status']
-                  : int.parse(args['status'].toString()),
-              ref: args['ref'],
-            );
-          },
-        },
-        debugShowCheckedModeBanner: false,
-        title: 'Poortak',
+                      PracticeVocabularyBloc(sayarehRepository: locator()),
+                  child: PracticeVocabularyScreen(courseId: args['courseId']),
+                );
+              },
+              ConversationScreen.routeName: (context) {
+                final args = ModalRoute.of(context)?.settings.arguments
+                    as Map<String, dynamic>;
+                return ConversationScreen(
+                    conversationId: args['conversationId']);
+              },
+              QuizzesScreen.routeName: (context) {
+                final args = ModalRoute.of(context)?.settings.arguments
+                    as Map<String, dynamic>;
+                return BlocProvider(
+                  create: (context) => QuizesCubit(),
+                  child: QuizzesScreen(courseId: args['courseId']),
+                );
+              },
+              FirstQuizScreen.routeName: (context) {
+                final args = ModalRoute.of(context)?.settings.arguments
+                    as Map<String, dynamic>;
+                return MultiBlocProvider(
+                  providers: [
+                    BlocProvider(
+                      create: (context) => QuizStartBloc(locator()),
+                    ),
+                    BlocProvider(
+                      create: (context) => QuizAnswerBloc(locator()),
+                    ),
+                    BlocProvider(
+                      create: (context) => QuizResultBloc(locator()),
+                    ),
+                  ],
+                  child: FirstQuizScreen(
+                    quizId: args['quizId'],
+                    courseId: args['courseId'],
+                    title: args['title'],
+                  ),
+                );
+              },
+              QuizScreen.routeName: (context) {
+                final args = ModalRoute.of(context)?.settings.arguments
+                    as Map<String, dynamic>;
+                return MultiBlocProvider(
+                  providers: [
+                    BlocProvider(
+                      create: (context) => QuizStartBloc(locator()),
+                    ),
+                    BlocProvider(
+                      create: (context) => QuizAnswerBloc(locator()),
+                    ),
+                    BlocProvider(
+                      create: (context) => QuizResultBloc(locator()),
+                    ),
+                  ],
+                  child: QuizScreen(
+                    quizId: args['quizId'],
+                    courseId: args['courseId'],
+                    title: args['title'],
+                    initialQuestion: args['initialQuestion'],
+                  ),
+                );
+              },
+              LitnerWordsInprogressScreen.routeName: (context) =>
+                  LitnerWordsInprogressScreen(),
+              LitnerWordBoxScreen.routeName: (context) => LitnerWordBoxScreen(),
+              LitnerWordCompletedScreen.routeName: (context) =>
+                  LitnerWordCompletedScreen(),
+              KavooshMainScreen.routeName: (context) => KavooshMainScreen(),
+              PaymentResultScreen.routeName: (context) {
+                final args = ModalRoute.of(context)?.settings.arguments
+                    as Map<String, dynamic>;
+                return PaymentResultScreen(
+                  ok: args['status'] is int
+                      ? args['status']
+                      : int.parse(args['status'].toString()),
+                  ref: args['ref'],
+                );
+              },
+            },
+            debugShowCheckedModeBanner: false,
+            title: 'Poortak',
 
-        // actions: <Widget>[
-        //   IconButton(
-        //     onPressed: () {},
-        //     icon: Icon(Icons.search),
-        //   ),
-        // ],
-        home: SplashScreen(),
+            // actions: <Widget>[
+            //   IconButton(
+            //     onPressed: () {},
+            //     icon: Icon(Icons.search),
+            //   ),
+            // ],
+            home: SplashScreen(),
+          );
+        },
       )));
 }
 

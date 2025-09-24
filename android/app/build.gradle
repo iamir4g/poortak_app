@@ -8,8 +8,8 @@ plugins {
 android {
     namespace = "com.example.poortak"
     compileSdk = flutter.compileSdkVersion
-    // ndkVersion = flutter.ndkVersion
-    ndkVersion = "26.2.11394342"
+    ndkVersion = flutter.ndkVersion
+    // ndkVersion = "26.2.11394342"
 
 // 26.2.11394342
 

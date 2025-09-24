@@ -29,7 +29,7 @@ class MyColors {
 
   // Background Colors
   static const Color background = Color(0xFFFFFFFF); // White
-  static const Color darkBackground = Color(0xFF121212); // Dark background
+  static const Color lightDarkBackground = Color(0xFF121212); // Dark background
   // Text Colors
   static const Color textPrimary = Color(0xFF000000); // Black
   static const Color textSecondary = Color(0xFF757575); // Grey
@@ -59,4 +59,29 @@ class MyColors {
   static const Color background1 = Color(0xffF2F5FA);
   static const Color background2 = Color(0xFFF3F5F7);
   static const Color background3 = Color(0xFFF6F9FE);
+
+  // Dark Mode Colors
+  static const Color darkBackground =
+      Color(0xFF212332); // Primary dark background
+  static const Color darkBackgroundSecondary =
+      Color(0xFF2C2E3F); // Secondary dark background
+  static const Color darkCardBackground =
+      Color(0xFF3B3D54); // Card/component background
+  static const Color darkBorder = Color(0xFF696E96); // Border/divider color
+
+  // Dark Mode Text Colors
+  static const Color darkTextPrimary =
+      Color(0xFFF2F5FA); // Primary text in dark mode
+  static const Color darkTextSecondary =
+      Color(0xFFA3AFC2); // Secondary text in dark mode
+  static const Color darkTextAccent =
+      Color(0xFFF8A748); // Accent text (orange/yellow)
+
+  // Dark Mode Status Colors
+  static const Color darkError = Color(0xFFFF6969); // Error red
+  static const Color darkErrorLight = Color(0xFFFF5454); // Light error red
+
+  // Dark Mode Specific Colors
+  static const Color darkMatn1 = Color(0xFF363A53); // Dark text color
+  static const Color darkText1 = Color(0xFF29303D); // Dark text variant
 }
