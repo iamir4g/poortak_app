@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:poortak/common/services/getImageUrl_service.dart';
-import 'package:poortak/config/myColors.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_home_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/lesson_screen.dart';
-import 'package:poortak/featueres/fetures_sayareh/widgets/dialog_cart.dart';
 
 class ItemLeason extends StatelessWidget {
   final Lesson item;
@@ -42,7 +40,7 @@ class ItemLeason extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: MyColors.background,
+          color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(40),
         ),
         child: Row(
@@ -79,8 +77,14 @@ class ItemLeason extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(item.name),
-                    Text(item.description),
+                    Text(
+                      item.name,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    Text(
+                      item.description,
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
                   ],
                 )
               ]),
@@ -93,7 +97,10 @@ class ItemLeason extends StatelessWidget {
                 SizedBox(
                   width: 8,
                 ),
-                Icon(Icons.arrow_forward_ios, color: Colors.black),
+                Icon(
+                  Icons.arrow_forward_ios, 
+                  color: Theme.of(context).textTheme.titleMedium?.color,
+                ),
               ],
             ),
           ],

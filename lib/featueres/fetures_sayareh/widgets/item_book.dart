@@ -36,11 +36,13 @@ class ItemBook extends StatelessWidget {
           height: 100,
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).cardColor,
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: Colors.grey.withOpacity(0.1),
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.black.withOpacity(0.3)
+                    : Colors.grey.withOpacity(0.1),
                 spreadRadius: 1,
                 blurRadius: 3,
                 offset: const Offset(0, 1),
@@ -57,8 +59,8 @@ class ItemBook extends StatelessWidget {
                   children: [
                     Text(
                       title ?? 'بدون عنوان',
-                      style: const TextStyle(
-                        color: Colors.black87,
+                      style: TextStyle(
+                        color: Theme.of(context).textTheme.titleMedium?.color,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),
@@ -69,8 +71,8 @@ class ItemBook extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         description!,
-                        style: const TextStyle(
-                          color: Colors.grey,
+                        style: TextStyle(
+                          color: Theme.of(context).textTheme.bodySmall?.color,
                           fontSize: 12,
                         ),
                         maxLines: 2,
@@ -105,7 +107,10 @@ class ItemBook extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              const Icon(Icons.arrow_forward_ios, color: Colors.grey),
+              Icon(
+                Icons.arrow_forward_ios, 
+                color: Theme.of(context).textTheme.bodySmall?.color,
+              ),
             ],
           ),
         ),
@@ -121,12 +126,17 @@ class ItemBook extends StatelessWidget {
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        return const AlertDialog(
+        return AlertDialog(
           content: Row(
             children: [
               CircularProgressIndicator(),
               SizedBox(width: 16),
-              Text('در حال باز کردن کتاب...'),
+              Text(
+                'در حال باز کردن کتاب...',
+                style: TextStyle(
+                  color: Theme.of(context).textTheme.titleMedium?.color,
+                ),
+              ),
             ],
           ),
         );

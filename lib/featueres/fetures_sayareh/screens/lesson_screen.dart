@@ -6,7 +6,6 @@ import 'dart:io';
 import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/config/myColors.dart';
-import 'package:poortak/common/utils/custom_textStyle.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_home_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/lesson_bloc/lesson_bloc.dart';
@@ -421,7 +420,7 @@ class _LessonScreenState extends State<LessonScreen> {
         }
       },
       child: Scaffold(
-        backgroundColor: MyColors.secondaryTint4,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: AppBar(
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
@@ -469,14 +468,14 @@ class _LessonScreenState extends State<LessonScreen> {
                         children: [
                           Icon(
                             Icons.error_outline,
-                            color: Colors.white,
+                            color: Theme.of(context).textTheme.titleMedium?.color,
                             size: 48,
                           ),
                           SizedBox(height: 16),
                           Text(
                             'خطا در بارگذاری ویدیو',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: Theme.of(context).textTheme.titleMedium?.color,
                               fontSize: 16,
                             ),
                           ),
@@ -529,7 +528,7 @@ class _LessonScreenState extends State<LessonScreen> {
               height: 104,
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.all(Radius.circular(40)),
-                  color: MyColors.background),
+                  color: Theme.of(context).cardColor),
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 22, horizontal: 28),
                 child: Row(
@@ -547,9 +546,9 @@ class _LessonScreenState extends State<LessonScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text("conversation",
-                            style: CustomTextStyle.titleLesonText),
+                            style: Theme.of(context).textTheme.titleMedium),
                         Text("مکالمه",
-                            style: CustomTextStyle.subTitleLeasonText)
+                            style: Theme.of(context).textTheme.bodySmall)
                       ],
                     )
                   ],
@@ -574,7 +573,7 @@ class _LessonScreenState extends State<LessonScreen> {
               height: 104,
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.all(Radius.circular(40)),
-                  color: MyColors.background),
+                  color: Theme.of(context).cardColor),
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 22, horizontal: 28),
                 child: Row(
@@ -592,9 +591,9 @@ class _LessonScreenState extends State<LessonScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text("vocabulary",
-                            style: CustomTextStyle.titleLesonText),
+                            style: Theme.of(context).textTheme.titleMedium),
                         Text("واژگان",
-                            style: CustomTextStyle.subTitleLeasonText)
+                            style: Theme.of(context).textTheme.bodySmall)
                       ],
                     )
                   ],
@@ -629,7 +628,7 @@ class _LessonScreenState extends State<LessonScreen> {
               height: 104,
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.all(Radius.circular(40)),
-                  color: MyColors.background),
+                  color: Theme.of(context).cardColor),
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 22, horizontal: 28),
                 child: Row(
@@ -646,8 +645,8 @@ class _LessonScreenState extends State<LessonScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Quiz", style: CustomTextStyle.titleLesonText),
-                        Text("آزمون", style: CustomTextStyle.subTitleLeasonText)
+                        Text("Quiz", style: Theme.of(context).textTheme.titleMedium),
+                        Text("آزمون", style: Theme.of(context).textTheme.bodySmall)
                       ],
                     )
                   ],

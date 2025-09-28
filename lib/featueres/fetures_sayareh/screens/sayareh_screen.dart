@@ -19,6 +19,7 @@ import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shoppi
 import 'package:poortak/featueres/feature_shopping_cart/data/models/cart_enum.dart';
 import 'package:poortak/featueres/fetures_sayareh/widgets/item_book.dart';
 import 'package:poortak/featueres/fetures_sayareh/widgets/item_multi_card.dart';
+import 'package:poortak/featueres/fetures_sayareh/widgets/contest_card.dart';
 import 'package:poortak/locator.dart';
 // import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
@@ -69,17 +70,28 @@ class _SayarehScreenState extends State<SayarehScreen> {
           /// loading
           if (state.sayarehDataStatus is SayarehDataLoading) {
             return Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Color(0xFFE8F0FC),
-                    Color(0xFFFCEBF1),
-                    Color(0xFFEFE8FC),
-                  ],
-                  stops: [0.1, 0.54, 1.0],
-                ),
+              decoration: BoxDecoration(
+                gradient: Theme.of(context).brightness == Brightness.dark
+                    ? const LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Color(0xFF1A1D2E),
+                          Color(0xFF2C2E3F),
+                          Color(0xFF3B3D54),
+                        ],
+                        stops: [0.1, 0.54, 1.0],
+                      )
+                    : const LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Color(0xFFE8F0FC),
+                          Color(0xFFFCEBF1),
+                          Color(0xFFEFE8FC),
+                        ],
+                        stops: [0.1, 0.54, 1.0],
+                      ),
               ),
               child: const Center(child: DotLoadingWidget(size: 100)),
             );
@@ -90,17 +102,28 @@ class _SayarehScreenState extends State<SayarehScreen> {
             final SayarehDataCompleted sayarehDataCompleted =
                 state.sayarehDataStatus as SayarehDataCompleted;
             return Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Color(0xFFE8F0FC),
-                    Color(0xFFFCEBF1),
-                    Color(0xFFEFE8FC),
-                  ],
-                  stops: [0.1, 0.54, 1.0],
-                ),
+              decoration: BoxDecoration(
+                gradient: Theme.of(context).brightness == Brightness.dark
+                    ? const LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Color(0xFF1A1D2E),
+                          Color(0xFF2C2E3F),
+                          Color(0xFF3B3D54),
+                        ],
+                        stops: [0.1, 0.54, 1.0],
+                      )
+                    : const LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Color(0xFFE8F0FC),
+                          Color(0xFFFCEBF1),
+                          Color(0xFFEFE8FC),
+                        ],
+                        stops: [0.1, 0.54, 1.0],
+                      ),
               ),
               child: SingleChildScrollView(
                 child: Column(
@@ -110,7 +133,9 @@ class _SayarehScreenState extends State<SayarehScreen> {
                     ),
                     Text(
                       l10n?.sayareh ?? "",
-                      style: MyTextStyle.textMatn14Bold,
+                      style: MyTextStyle.textMatn14Bold?.copyWith(
+                        color: Theme.of(context).textTheme.titleMedium?.color,
+                      ),
                     ),
                     SizedBox(
                       height: 12,
@@ -140,15 +165,25 @@ class _SayarehScreenState extends State<SayarehScreen> {
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Color(0xFFFFF7F1), //#FFF7F1
-                            Color(0xFFFFE2CE), //#FFE2CE
-                          ],
-                          stops: [0.0, 1.0],
-                        ),
+                        gradient: Theme.of(context).brightness == Brightness.dark
+                            ? LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Color(0xFF2C2E3F), // Dark card background
+                                  Color(0xFF3B3D54), // Darker card background
+                                ],
+                                stops: [0.0, 1.0],
+                              )
+                            : LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Color(0xFFFFF7F1), //#FFF7F1
+                                  Color(0xFFFFE2CE), //#FFE2CE
+                                ],
+                                stops: [0.0, 1.0],
+                              ),
                       ),
                       // margin: const EdgeInsets.symmetric(horizontal: 16),
                       child: Column(
@@ -158,7 +193,9 @@ class _SayarehScreenState extends State<SayarehScreen> {
                           ),
                           Text(
                             "کتاب های سیاره آی نو",
-                            style: MyTextStyle.textMatn14Bold,
+                            style: MyTextStyle.textMatn14Bold?.copyWith(
+                              color: Theme.of(context).textTheme.titleMedium?.color,
+                            ),
                           ),
                           SizedBox(
                             height: 12,
@@ -191,12 +228,12 @@ class _SayarehScreenState extends State<SayarehScreen> {
                           else
                             Container(
                               padding: const EdgeInsets.all(20),
-                              child: const Center(
+                              child: Center(
                                 child: Text(
                                   "هیچ کتابی یافت نشد",
                                   style: TextStyle(
                                     fontSize: 16,
-                                    color: Colors.grey,
+                                    color: Theme.of(context).textTheme.bodySmall?.color,
                                   ),
                                 ),
                               ),
@@ -204,6 +241,20 @@ class _SayarehScreenState extends State<SayarehScreen> {
                           // Example Box 1
                         ],
                       ),
+                    ),
+                    
+                    // Contest Card Section
+                    const SizedBox(height: 20),
+                    ContestCard(
+                      onTap: () {
+                        // TODO: Navigate to contest screen
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('مسابقه پورتک - به زودی'),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -217,17 +268,28 @@ class _SayarehScreenState extends State<SayarehScreen> {
                 state.sayarehDataStatus as SayarehDataError;
 
             return Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Color(0xFFE8F0FC),
-                    Color(0xFFFCEBF1),
-                    Color(0xFFEFE8FC),
-                  ],
-                  stops: [0.1, 0.54, 1.0],
-                ),
+              decoration: BoxDecoration(
+                gradient: Theme.of(context).brightness == Brightness.dark
+                    ? const LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Color(0xFF1A1D2E),
+                          Color(0xFF2C2E3F),
+                          Color(0xFF3B3D54),
+                        ],
+                        stops: [0.1, 0.54, 1.0],
+                      )
+                    : const LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Color(0xFFE8F0FC),
+                          Color(0xFFFCEBF1),
+                          Color(0xFFEFE8FC),
+                        ],
+                        stops: [0.1, 0.54, 1.0],
+                      ),
               ),
               child: Center(
                 child: Column(
@@ -235,7 +297,9 @@ class _SayarehScreenState extends State<SayarehScreen> {
                   children: [
                     Text(
                       sayarehDataError.errorMessage,
-                      style: const TextStyle(color: Colors.white),
+                      style: TextStyle(
+                        color: Theme.of(context).textTheme.titleMedium?.color,
+                      ),
                     ),
                     const SizedBox(
                       height: 10,
