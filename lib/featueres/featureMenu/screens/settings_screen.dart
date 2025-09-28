@@ -285,6 +285,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Widget _buildTestTextBox() {
+    // محاسبه اندازه فونت بر اساس مقدار اسلایدر
+    // حداقل 12 و حداکثر 24 پیکسل
+    double fontSize = 12 + (_textSize * 12);
+    
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -292,11 +296,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
         color: Colors.grey[100],
         borderRadius: BorderRadius.circular(12),
       ),
-      child: const Text(
+      child: Text(
         "این یک متن آزمایشی است",
         textAlign: TextAlign.center,
         style: TextStyle(
-          fontSize: 14,
+          fontSize: fontSize,
           color: Colors.black87,
         ),
       ),
