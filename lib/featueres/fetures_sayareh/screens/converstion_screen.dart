@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
+import 'package:poortak/common/utils/font_size_helper.dart';
 import 'package:poortak/locator.dart';
 import 'package:poortak/common/services/tts_service.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/conversation_model.dart';
@@ -187,7 +188,9 @@ class _ConversationScreenState extends State<ConversationScreen> {
             children: [
               Text(
                 message.text,
-                style: TextStyle(
+                style: FontSizeHelper.getContentTextStyle(
+                  context,
+                  baseFontSize: 16.0,
                   color: isFirstPerson ? Colors.white : Colors.black,
                 ),
               ),
@@ -195,9 +198,10 @@ class _ConversationScreenState extends State<ConversationScreen> {
                 const SizedBox(height: 4),
                 Text(
                   message.translation,
-                  style: TextStyle(
+                  style: FontSizeHelper.getContentTextStyle(
+                    context,
+                    baseFontSize: 12.0,
                     color: isFirstPerson ? Colors.white70 : Colors.black54,
-                    fontSize: 12,
                   ),
                 ),
               ],

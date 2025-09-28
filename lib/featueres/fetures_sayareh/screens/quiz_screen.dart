@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poortak/common/error_handling/app_exception.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
+import 'package:poortak/common/utils/font_size_helper.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_start_bloc/quiz_start_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_answer_bloc/quiz_answer_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_result_bloc/quiz_result_bloc.dart';
@@ -195,7 +196,11 @@ class _QuizScreenState extends State<QuizScreen> {
                             Text(
                               questionData.title,
                               textAlign: TextAlign.center,
-                              style: MyTextStyle.textHeader16Bold,
+                              style: FontSizeHelper.getContentTextStyle(
+                                context,
+                                baseFontSize: 16.0,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                             const SizedBox(height: 32),
                             const SizedBox(height: 32),

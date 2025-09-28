@@ -507,33 +507,7 @@ class _LessonScreenState extends State<LessonScreen> {
                       }
                     },
                   ),
-                // if (isDownloading)
-                //   Positioned.fill(
-                //     child: Container(
-                //       decoration: BoxDecoration(
-                //         color: Colors.black.withOpacity(0.5),
-                //         borderRadius: BorderRadius.circular(37),
-                //       ),
-                //       child: Column(
-                //         mainAxisAlignment: MainAxisAlignment.center,
-                //         children: [
-                //           const CircularProgressIndicator(
-                //             valueColor:
-                //                 AlwaysStoppedAnimation<Color>(Colors.white),
-                //           ),
-                //           const SizedBox(height: 16),
-                //           Text(
-                //             '${(downloadProgress * 100).toStringAsFixed(0)}%',
-                //             style: const TextStyle(
-                //               color: Colors.white,
-                //               fontSize: 16,
-                //               fontWeight: FontWeight.bold,
-                //             ),
-                //           ),
-                //         ],
-                //       ),
-                //     ),
-                //   ),
+               
               ],
             ),
           ),
@@ -542,6 +516,11 @@ class _LessonScreenState extends State<LessonScreen> {
           //card lesons
           InkWell(
             onTap: () {
+              if (!widget.purchased
+              ) {
+                _showPurchaseDialog();
+                return;
+              }
               Navigator.pushNamed(context, ConversationScreen.routeName,
                   arguments: {"conversationId": conversationId});
             },
@@ -582,6 +561,11 @@ class _LessonScreenState extends State<LessonScreen> {
           const SizedBox(height: 12),
           InkWell(
             onTap: () {
+               if (!widget.purchased
+              ) {
+                _showPurchaseDialog();
+                return;
+              }
               Navigator.pushNamed(context, VocabularyScreen.routeName,
                   arguments: {"id": conversationId});
             },
@@ -622,6 +606,11 @@ class _LessonScreenState extends State<LessonScreen> {
           const SizedBox(height: 12),
           InkWell(
             onTap: () {
+               if (!widget.purchased
+              ) {
+                _showPurchaseDialog();
+                return;
+              }
               final prefsOperator = locator<PrefsOperator>();
               if (!prefsOperator.isLoggedIn()) {
                 ScaffoldMessenger.of(context).showSnackBar(
