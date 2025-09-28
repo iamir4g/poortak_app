@@ -44,6 +44,7 @@ import 'package:poortak/featueres/fetures_sayareh/screens/first_quiz_screen.dart
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_result_bloc/quiz_result_bloc.dart';
 import 'package:flutter/widgets.dart'; // For RouteAware
 import 'package:poortak/common/bloc/theme_cubit/theme_cubit.dart';
+import 'package:poortak/common/bloc/settings_cubit/settings_cubit.dart';
 
 final RouteObserver<ModalRoute<void>> routeObserver =
     RouteObserver<ModalRoute<void>>();
@@ -60,6 +61,7 @@ void main() async {
         BlocProvider(create: (_) => SplashCubit()),
         BlocProvider(create: (_) => BottomNavCubit()),
         BlocProvider(create: (_) => locator<ThemeCubit>()),
+        BlocProvider(create: (_) => locator<SettingsCubit>()),
         BlocProvider(
           create: (_) {
             final bloc = ShoppingCartBloc(repository: locator());

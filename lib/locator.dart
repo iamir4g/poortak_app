@@ -26,6 +26,7 @@ import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_start_b
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_answer_bloc/quiz_answer_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_result_bloc/quiz_result_bloc.dart';
 import 'package:poortak/common/bloc/theme_cubit/theme_cubit.dart';
+import 'package:poortak/common/bloc/settings_cubit/settings_cubit.dart';
 
 GetIt locator = GetIt.instance;
 
@@ -96,4 +97,7 @@ Future<void> initLocator() async {
 
   // Register ThemeCubit
   locator.registerSingleton<ThemeCubit>(ThemeCubit());
+
+  // Register SettingsCubit
+  locator.registerSingleton<SettingsCubit>(SettingsCubit());
 }

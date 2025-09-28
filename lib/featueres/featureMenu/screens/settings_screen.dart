@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:poortak/common/bloc/settings_cubit/settings_cubit.dart';
 
 class SettingsScreen extends StatefulWidget {
   static const String routeName = "/settings";
@@ -10,143 +12,128 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  bool _fullScreenMode = false;
-  bool _achievementNotifications = true;
-  bool _generalNotifications = true;
-  bool _autoPlayPronunciation = true;
-  bool _autoPlayExerciseSounds = true;
-  bool _playSoundEffects = true;
-  double _textSize = 0.67; // 2/3 of the way to the right
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Header
-            _buildHeader(),
+    return BlocBuilder<SettingsCubit, SettingsState>(
+      builder: (context, state) {
+        return Scaffold(
+          backgroundColor: Colors.white,
+          body: SafeArea(
+            child: Column(
+              children: [
+                // Header
+                _buildHeader(),
 
-            // Settings Sections
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  children: [
-                    const SizedBox(height: 20),
-
-                    // Display Settings
-                    _buildSettingsSection(
-                      title: "تنظیمات نمایش",
-                      icon: Icons.monitor,
+                // Settings Sections
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
                       children: [
-                        _buildToggleOption(
-                          title: "نمایش اپلیکیشن به صورت تمام صفحه",
-                          value: _fullScreenMode,
-                          onChanged: (value) {
-                            setState(() {
-                              _fullScreenMode = value;
-                            });
-                          },
+                        const SizedBox(height: 20),
+
+                        // Display Settings
+                        _buildSettingsSection(
+                          title: "تنظیمات نمایش",
+                          icon: Icons.monitor,
+                          children: [
+                            _buildToggleOption(
+                              title: "نمایش اپلیکیشن به صورت تمام صفحه",
+                              value: state.fullScreenMode,
+                              onChanged: (value) {
+                                context.read<SettingsCubit>().updateFullScreenMode(value);
+                              },
+                            ),
+                          ],
                         ),
+
+                        const SizedBox(height: 24),
+
+                        // App Notifications
+                        _buildSettingsSection(
+                          title: "اعلانات برنامه",
+                          icon: Icons.notifications,
+                          children: [
+                            _buildToggleOption(
+                              title: "دریافت اعلان هنگام دستاورد جدید",
+                              value: state.achievementNotifications,
+                              onChanged: (value) {
+                                context.read<SettingsCubit>().updateAchievementNotifications(value);
+                              },
+                              activeColor: Colors.orange,
+                            ),
+                            _buildToggleOption(
+                              title: "دریافت اعلان های عمومی",
+                              value: state.generalNotifications,
+                              onChanged: (value) {
+                                context.read<SettingsCubit>().updateGeneralNotifications(value);
+                              },
+                              activeColor: Colors.orange,
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 24),
+
+                        // Sound Settings
+                        _buildSettingsSection(
+                          title: "تنظیمات صوتی",
+                          icon: Icons.volume_up,
+                          children: [
+                            _buildToggleOption(
+                              title: "پخش خودکار تلفظ در صفحه واژگان جدید",
+                              value: state.autoPlayPronunciation,
+                              onChanged: (value) {
+                                context.read<SettingsCubit>().updateAutoPlayPronunciation(value);
+                              },
+                              activeColor: Colors.orange,
+                            ),
+                            _buildToggleOption(
+                              title: "پخش خودکار صوت تمرین ها",
+                              value: state.autoPlayExerciseSounds,
+                              onChanged: (value) {
+                                context.read<SettingsCubit>().updateAutoPlayExerciseSounds(value);
+                              },
+                              activeColor: Colors.orange,
+                            ),
+                            _buildToggleOption(
+                              title: "پخش افکت های صوتی",
+                              value: state.playSoundEffects,
+                              onChanged: (value) {
+                                context.read<SettingsCubit>().updatePlaySoundEffects(value);
+                              },
+                              activeColor: Colors.orange,
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 24),
+
+                        // Content Text Size
+                        _buildSettingsSection(
+                          title: "اندازه متون محتوای درسی",
+                          icon: Icons.text_fields,
+                          children: [
+                            _buildTextSizeSlider(state.textSize),
+                          ],
+                        ),
+
+                        const SizedBox(height: 40),
+
+                        // Test Text Box
+                        _buildTestTextBox(state.textSize),
+
+                        const SizedBox(height: 20),
                       ],
                     ),
-
-                    const SizedBox(height: 24),
-
-                    // App Notifications
-                    _buildSettingsSection(
-                      title: "اعلانات برنامه",
-                      icon: Icons.notifications,
-                      children: [
-                        _buildToggleOption(
-                          title: "دریافت اعلان هنگام دستاورد جدید",
-                          value: _achievementNotifications,
-                          onChanged: (value) {
-                            setState(() {
-                              _achievementNotifications = value;
-                            });
-                          },
-                          activeColor: Colors.orange,
-                        ),
-                        _buildToggleOption(
-                          title: "دریافت اعلان های عمومی",
-                          value: _generalNotifications,
-                          onChanged: (value) {
-                            setState(() {
-                              _generalNotifications = value;
-                            });
-                          },
-                          activeColor: Colors.orange,
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    // Sound Settings
-                    _buildSettingsSection(
-                      title: "تنظیمات صوتی",
-                      icon: Icons.volume_up,
-                      children: [
-                        _buildToggleOption(
-                          title: "پخش خودکار تلفظ در صفحه واژگان جدید",
-                          value: _autoPlayPronunciation,
-                          onChanged: (value) {
-                            setState(() {
-                              _autoPlayPronunciation = value;
-                            });
-                          },
-                          activeColor: Colors.orange,
-                        ),
-                        _buildToggleOption(
-                          title: "پخش خودکار صوت تمرین ها",
-                          value: _autoPlayExerciseSounds,
-                          onChanged: (value) {
-                            setState(() {
-                              _autoPlayExerciseSounds = value;
-                            });
-                          },
-                          activeColor: Colors.orange,
-                        ),
-                        _buildToggleOption(
-                          title: "پخش افکت های صوتی",
-                          value: _playSoundEffects,
-                          onChanged: (value) {
-                            setState(() {
-                              _playSoundEffects = value;
-                            });
-                          },
-                          activeColor: Colors.orange,
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    // Content Text Size
-                    _buildSettingsSection(
-                      title: "اندازه متون محتوای درسی",
-                      icon: Icons.text_fields,
-                      children: [
-                        _buildTextSizeSlider(),
-                      ],
-                    ),
-
-                    const SizedBox(height: 40),
-
-                    // Test Text Box
-                    _buildTestTextBox(),
-
-                    const SizedBox(height: 20),
-                  ],
+                  ),
                 ),
-              ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -239,7 +226,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildTextSizeSlider() {
+  Widget _buildTextSizeSlider(double textSize) {
     return Column(
       children: [
         SliderTheme(
@@ -251,13 +238,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
             thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
           ),
           child: Slider(
-            value: _textSize,
+            value: textSize,
             min: 0.0,
             max: 1.0,
             onChanged: (value) {
-              setState(() {
-                _textSize = value;
-              });
+              context.read<SettingsCubit>().updateTextSize(value);
             },
           ),
         ),
@@ -284,10 +269,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildTestTextBox() {
+  Widget _buildTestTextBox(double textSize) {
     // محاسبه اندازه فونت بر اساس مقدار اسلایدر
     // حداقل 12 و حداکثر 24 پیکسل
-    double fontSize = 12 + (_textSize * 12);
+    double fontSize = 12 + (textSize * 12);
     
     return Container(
       width: double.infinity,
