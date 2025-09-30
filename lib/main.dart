@@ -10,6 +10,7 @@ import 'package:poortak/featueres/featureMenu/screens/contactUs_screen.dart';
 import 'package:poortak/featueres/featureMenu/screens/faq_screen.dart';
 import 'package:poortak/featueres/featureMenu/screens/settings_screen.dart';
 import 'package:poortak/featueres/feature_intro/presentation/screens/splash_screen.dart';
+import 'package:poortak/featueres/feature_match/screens/main_match_screen.dart';
 import 'package:poortak/featueres/feature_payment/presentation/screens/payment_result_screen.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/kavoosh_main_screen.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_bloc.dart';
@@ -213,16 +214,10 @@ void main() async {
                   ref: args['ref'],
                 );
               },
+              MainMatchScreen.routeName: (context) => MainMatchScreen(),
             },
             debugShowCheckedModeBanner: false,
             title: 'Poortak',
-
-            // actions: <Widget>[
-            //   IconButton(
-            //     onPressed: () {},
-            //     icon: Icon(Icons.search),
-            //   ),
-            // ],
             home: SplashScreen(),
           );
         },

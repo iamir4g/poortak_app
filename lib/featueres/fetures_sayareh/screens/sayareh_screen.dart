@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poortak/common/services/getImageUrl_service.dart';
+import 'package:poortak/common/widgets/reusable_modal.dart';
 import 'package:poortak/featueres/fetures_sayareh/widgets/item_leason.dart';
 import 'package:poortak/l10n/app_localizations.dart';
 // import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -13,6 +14,7 @@ import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_home_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/sayareh_cubit.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/lesson_screen.dart';
+import 'package:poortak/featueres/feature_match/screens/main_match_screen.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/models/shopping_cart_model.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
@@ -165,7 +167,8 @@ class _SayarehScreenState extends State<SayarehScreen> {
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       decoration: BoxDecoration(
-                        gradient: Theme.of(context).brightness == Brightness.dark
+                        gradient: Theme.of(context).brightness ==
+                                Brightness.dark
                             ? LinearGradient(
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter,
@@ -194,7 +197,10 @@ class _SayarehScreenState extends State<SayarehScreen> {
                           Text(
                             "کتاب های سیاره آی نو",
                             style: MyTextStyle.textMatn14Bold?.copyWith(
-                              color: Theme.of(context).textTheme.titleMedium?.color,
+                              color: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium
+                                  ?.color,
                             ),
                           ),
                           SizedBox(
@@ -233,7 +239,10 @@ class _SayarehScreenState extends State<SayarehScreen> {
                                   "هیچ کتابی یافت نشد",
                                   style: TextStyle(
                                     fontSize: 16,
-                                    color: Theme.of(context).textTheme.bodySmall?.color,
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall
+                                        ?.color,
                                   ),
                                 ),
                               ),
@@ -242,18 +251,22 @@ class _SayarehScreenState extends State<SayarehScreen> {
                         ],
                       ),
                     ),
-                    
+
                     // Contest Card Section
                     const SizedBox(height: 20),
                     ContestCard(
                       onTap: () {
-                        // TODO: Navigate to contest screen
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('مسابقه پورتک - به زودی'),
-                            duration: Duration(seconds: 2),
-                          ),
-                        );
+                        if (locator<PrefsOperator>().isLoggedIn()) {
+                          Navigator.pushNamed(
+                              context, MainMatchScreen.routeName);
+                        } else {
+                          ReusableModal.show(
+                            context: context,
+                            title: '',
+                            message: 'لطفا ابتدا وارد حساب کاربری خود شوید',
+                            type: ModalType.info,
+                          );
+                        }
                       },
                     ),
                   ],
