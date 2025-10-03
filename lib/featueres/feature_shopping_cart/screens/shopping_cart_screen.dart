@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lottie/lottie.dart';
 
 import 'package:persian_tools/persian_tools.dart';
 import 'package:poortak/common/widgets/dot_loading_widget.dart';
@@ -176,46 +177,176 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
   Widget buildEmptyCartUI() {
     return Container(
       decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Color(0xFFE8F0FC),
-            Color(0xFFFCEBF1),
-            Color(0xFFEFE8FC),
-          ],
-          stops: [0.1, 0.54, 1.0],
-        ),
+        color: Color(0xFFF6F9FE), // Background color from Figma
       ),
-      child: const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.shopping_cart_outlined,
-              size: 100,
-              color: Colors.grey,
-            ),
-            SizedBox(height: 16),
-            Text(
-              'سبد خرید شما خالی است',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey,
+      child: Column(
+        children: [
+          // Header section with points
+          Container(
+            height: 144,
+            padding: EdgeInsets.symmetric(horizontal: 32),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(15),
+                bottomRight: Radius.circular(15),
               ),
             ),
-            SizedBox(height: 8),
-            Text(
-              'محصولات مورد نظر خود را به سبد خرید اضافه کنید',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey,
-              ),
-              textAlign: TextAlign.center,
+            child: Column(
+              children: [
+                const SizedBox(height: 12),
+                // Points section with star animation
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    // Star animation
+                    SizedBox(
+                      width: 50,
+                      height: 50,
+                      child: Lottie.asset(
+                        'assets/images/cart/star.json',
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+
+                    const Text(
+                      'مجموع امتیاز های شما : ',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xFF29303D),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      width: 79,
+                      height: 33,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFE8CC),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Center(
+                        child: Text(
+                          '۲۰۰ سکه',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF29303D),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                // Progress bar section
+                // Progress fill
+                Row(
+                  children: [
+                    Container(
+                      width: 71,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: const Color(0xFFFFA73F)),
+                        borderRadius: BorderRadius.circular(22),
+                      ),
+                      child: const Center(
+                        child: Text(
+                          'راهنما ؟',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFFFFA73F),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      width: 247,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: const Color(0xFFC2C9D6)),
+                        borderRadius: BorderRadius.circular(22),
+                      ),
+                      child: Row(
+                        children: [
+                          // Remaining space
+                          Expanded(
+                            child: Container(
+                              height: 48,
+                              child: const Center(
+                                child: Text(
+                                  'محاسبه امتیاز بر روی سبد خرید',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFFC2C9D6),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+          // Main content - empty cart
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                const SizedBox(height: 24),
+                // White card container
+                Container(
+                  width: 360,
+                  height: 282,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(22),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.1),
+                        blurRadius: 10,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Shopping cart image
+                      Container(
+                        width: 138.716,
+                        height: 117.656,
+                        child: Image.asset(
+                          'assets/images/cart/shopping_cart.png',
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      // Empty cart text
+                      const Text(
+                        'سبد خرید شما خالی است!',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xFF3D495C),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
