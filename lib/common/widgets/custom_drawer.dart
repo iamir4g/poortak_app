@@ -47,6 +47,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
             ),
             child: Center(
               child: IconifyIcon(
+                size: 16,
                 icon: icon,
                 color: themeState.isDark
                     ? MyColors.darkTextSecondary
@@ -217,6 +218,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                     ),
                     child: Center(
                       child: IconifyIcon(
+                        size: 16,
                         icon: themeState.isDark
                             ? "famicons:sun"
                             : "famicons:moon",
@@ -305,6 +307,15 @@ class _CustomDrawerState extends State<CustomDrawer> {
                     //     });
                   },
                 ),
+                _buildListTile(
+                  icon: "fluent:heart-28-regular",
+                  title: "ثبت نظر درباره برنامه",
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("به زودی.")),
+                    );
+                  },
+                )
               ],
             ),
           ),

@@ -1,3 +1,6 @@
+import 'package:poortak/common/error_handling/app_exception.dart';
+import 'package:poortak/common/error_handling/check_exception.dart';
+import 'package:poortak/common/resources/data_state.dart';
 import 'package:poortak/featueres/feature_match/data/data_source/match_api_provider.dart';
 import 'package:poortak/featueres/feature_match/data/models/submit_answer_model.dart';
 import 'package:poortak/featueres/feature_match/data/models/match_model.dart';
@@ -7,25 +10,47 @@ class MatchRepository {
 
   MatchRepository(this._apiProvider);
 
-  // Future methods for match-related operations will be added here
-  // For example:
-  // Future<MatchModel> getMatchDetails() async { ... }
-  // Future<List<WinnerModel>> getWinners() async { ... }
-  // Future<List<PrizeModel>> getPrizes() async { ... }
-
-  Future<Match> getMatch() async {
-    final response = await _apiProvider.callGetMatch();
-    return Match.fromJson(response.data);
+  Future<DataState<Match>> getMatch() async {
+    try {
+      final response = await _apiProvider.callGetMatch();
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = Match.fromJson(response.data);
+        return DataSuccess(data);
+      } else {
+        return DataFailed(
+            response.data['message'] ?? "خطا در دریافت اطلاعات مسابقه");
+      }
+    } on AppException catch (e) {
+      return CheckExceptions.getError<Match>(e);
+    }
   }
 
-  Future<ResponseSubmitAnswer> postSubmitAnswer(
+  Future<DataState<ResponseSubmitAnswer>> postSubmitAnswer(
       String matchId, String answer) async {
-    final response = await _apiProvider.submitAnswer(matchId, answer);
-    return ResponseSubmitAnswer.fromJson(response.data);
+    try {
+      final response = await _apiProvider.submitAnswer(matchId, answer);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = ResponseSubmitAnswer.fromJson(response.data);
+        return DataSuccess(data);
+      } else {
+        return DataFailed(response.data['message'] ?? "خطا در ارسال پاسخ");
+      }
+    } on AppException catch (e) {
+      return CheckExceptions.getError<ResponseSubmitAnswer>(e);
+    }
   }
 
-  // Future<List<WinnerModel>> getWinners() async {
-  //   final response = await _apiProvider.callGetWinners();
-  //   return response.data.map((e) => WinnerModel.fromJson(e)).toList();
+  // Future<DataState<List<WinnerModel>>> getWinners() async {
+  //   try {
+  //     final response = await _apiProvider.callGetWinners();
+  //     if (response.statusCode == 200 || response.statusCode == 201) {
+  //       final data = response.data.map((e) => WinnerModel.fromJson(e)).toList();
+  //       return DataSuccess(data);
+  //     } else {
+  //       return DataFailed(response.data['message'] ?? "خطا در دریافت لیست برندگان");
+  //     }
+  //   } on AppException catch (e) {
+  //     return CheckExceptions.getError<List<WinnerModel>>(e);
+  //   }
   // }
 }

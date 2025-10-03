@@ -1,18 +1,14 @@
 import 'dart:developer';
 
 import 'package:dio/dio.dart';
-import 'package:poortak/common/utils/prefs_operator.dart';
+import 'package:poortak/common/services/auth_service.dart';
 import 'package:poortak/config/constants.dart';
 import 'package:poortak/locator.dart';
 
 class MatchApiProvider {
-  final Dio _dio;
-  final PrefsOperator _prefsOperator;
+  final AuthService _authService;
 
-  // SayarehApiProvider({required this.dio})
-  //     : _prefsOperator = locator<PrefsOperator>();
-
-  MatchApiProvider(this._dio) : _prefsOperator = locator<PrefsOperator>();
+  MatchApiProvider(Dio dio) : _authService = locator<AuthService>();
 
   // API methods for match-related operations will be added here
   // For example:
@@ -21,7 +17,7 @@ class MatchApiProvider {
   // Future<Response> getPrizes() async { ... }
 
   dynamic callGetMatch() async {
-    final response = await _dio.get(
+    final response = await _authService.get(
       "${Constants.baseUrl}matches",
     );
 
@@ -30,7 +26,7 @@ class MatchApiProvider {
   }
 
   dynamic callGetLeaderboard(String matchId) async {
-    final response = await _dio.get(
+    final response = await _authService.get(
       "${Constants.baseUrl}matches/leaderboards",
     );
 
@@ -39,7 +35,7 @@ class MatchApiProvider {
   }
 
   dynamic submitAnswer(String matchId, String answer) async {
-    final response = await _dio.post(
+    final response = await _authService.post(
       "${Constants.baseUrl}matches/$matchId",
       data: {
         "answer": answer,

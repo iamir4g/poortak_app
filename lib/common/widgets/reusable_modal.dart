@@ -14,6 +14,11 @@ class ReusableModal extends StatelessWidget {
   final ModalType type;
   final VoidCallback? onButtonPressed;
 
+  // Optional second button
+  final String? secondButtonText;
+  final VoidCallback? onSecondButtonPressed;
+  final bool showSecondButton;
+
   const ReusableModal({
     Key? key,
     required this.title,
@@ -21,6 +26,9 @@ class ReusableModal extends StatelessWidget {
     this.buttonText = 'متوجه شدم',
     required this.type,
     this.onButtonPressed,
+    this.secondButtonText,
+    this.onSecondButtonPressed,
+    this.showSecondButton = false,
   }) : super(key: key);
 
   @override
@@ -75,30 +83,93 @@ class ReusableModal extends StatelessWidget {
               ),
             ),
 
-            // Button
-            Container(
-              width: 172,
-              height: 64,
-              child: ElevatedButton(
-                onPressed: onButtonPressed ?? () => Navigator.of(context).pop(),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: MyColors.primary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
+            // Buttons
+            if (showSecondButton && secondButtonText != null)
+              // Two buttons layout
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  // First button (primary)
+                  Container(
+                    width: 140,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed:
+                          onButtonPressed ?? () => Navigator.of(context).pop(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: MyColors.primary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: Text(
+                        buttonText,
+                        style: const TextStyle(
+                          fontFamily: 'IRANSans',
+                          fontWeight: FontWeight.w500,
+                          fontSize: 16,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
                   ),
-                  elevation: 0,
-                ),
-                child: Text(
-                  buttonText,
-                  style: const TextStyle(
-                    fontFamily: 'IRANSans',
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                    color: Colors.white,
+
+                  // Second button (secondary)
+                  Container(
+                    width: 140,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: onSecondButtonPressed ??
+                          () => Navigator.of(context).pop(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.transparent,
+                        side:
+                            const BorderSide(color: MyColors.primary, width: 1),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: Text(
+                        secondButtonText!,
+                        style: const TextStyle(
+                          fontFamily: 'IRANSans',
+                          fontWeight: FontWeight.w500,
+                          fontSize: 16,
+                          color: MyColors.primary,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            else
+              // Single button layout
+              Container(
+                width: 172,
+                height: 64,
+                child: ElevatedButton(
+                  onPressed:
+                      onButtonPressed ?? () => Navigator.of(context).pop(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: MyColors.primary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: Text(
+                    buttonText,
+                    style: const TextStyle(
+                      fontFamily: 'IRANSans',
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
-            ),
           ],
         ),
       ),
@@ -160,6 +231,9 @@ class ReusableModal extends StatelessWidget {
     required ModalType type,
     VoidCallback? onButtonPressed,
     bool barrierDismissible = true,
+    String? secondButtonText,
+    VoidCallback? onSecondButtonPressed,
+    bool showSecondButton = false,
   }) {
     showDialog(
       context: context,
@@ -171,6 +245,9 @@ class ReusableModal extends StatelessWidget {
           buttonText: buttonText,
           type: type,
           onButtonPressed: onButtonPressed ?? () => Navigator.of(context).pop(),
+          secondButtonText: secondButtonText,
+          onSecondButtonPressed: onSecondButtonPressed,
+          showSecondButton: showSecondButton,
         );
       },
     );
@@ -184,6 +261,9 @@ class ReusableModal extends StatelessWidget {
     String buttonText = 'متوجه شدم',
     VoidCallback? onButtonPressed,
     bool barrierDismissible = true,
+    String? secondButtonText,
+    VoidCallback? onSecondButtonPressed,
+    bool showSecondButton = false,
   }) {
     show(
       context: context,
@@ -193,6 +273,9 @@ class ReusableModal extends StatelessWidget {
       type: ModalType.error,
       onButtonPressed: onButtonPressed,
       barrierDismissible: barrierDismissible,
+      secondButtonText: secondButtonText,
+      onSecondButtonPressed: onSecondButtonPressed,
+      showSecondButton: showSecondButton,
     );
   }
 
@@ -203,6 +286,9 @@ class ReusableModal extends StatelessWidget {
     String buttonText = 'متوجه شدم',
     VoidCallback? onButtonPressed,
     bool barrierDismissible = true,
+    String? secondButtonText,
+    VoidCallback? onSecondButtonPressed,
+    bool showSecondButton = false,
   }) {
     show(
       context: context,
@@ -212,6 +298,9 @@ class ReusableModal extends StatelessWidget {
       type: ModalType.info,
       onButtonPressed: onButtonPressed,
       barrierDismissible: barrierDismissible,
+      secondButtonText: secondButtonText,
+      onSecondButtonPressed: onSecondButtonPressed,
+      showSecondButton: showSecondButton,
     );
   }
 
@@ -222,6 +311,9 @@ class ReusableModal extends StatelessWidget {
     String buttonText = 'متوجه شدم',
     VoidCallback? onButtonPressed,
     bool barrierDismissible = true,
+    String? secondButtonText,
+    VoidCallback? onSecondButtonPressed,
+    bool showSecondButton = false,
   }) {
     show(
       context: context,
@@ -231,6 +323,9 @@ class ReusableModal extends StatelessWidget {
       type: ModalType.success,
       onButtonPressed: onButtonPressed,
       barrierDismissible: barrierDismissible,
+      secondButtonText: secondButtonText,
+      onSecondButtonPressed: onSecondButtonPressed,
+      showSecondButton: showSecondButton,
     );
   }
 }

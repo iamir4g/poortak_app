@@ -11,6 +11,7 @@ import 'package:poortak/featueres/featureMenu/screens/faq_screen.dart';
 import 'package:poortak/featueres/featureMenu/screens/settings_screen.dart';
 import 'package:poortak/featueres/feature_intro/presentation/screens/splash_screen.dart';
 import 'package:poortak/featueres/feature_match/screens/main_match_screen.dart';
+import 'package:poortak/featueres/feature_match/screens/match_screen.dart';
 import 'package:poortak/featueres/feature_payment/presentation/screens/payment_result_screen.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/kavoosh_main_screen.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_bloc.dart';
@@ -46,6 +47,7 @@ import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_result_
 import 'package:flutter/widgets.dart'; // For RouteAware
 import 'package:poortak/common/bloc/theme_cubit/theme_cubit.dart';
 import 'package:poortak/common/bloc/settings_cubit/settings_cubit.dart';
+import 'package:poortak/featueres/feature_match/presentation/bloc/match_bloc/match_bloc.dart';
 
 final RouteObserver<ModalRoute<void>> routeObserver =
     RouteObserver<ModalRoute<void>>();
@@ -215,6 +217,10 @@ void main() async {
                 );
               },
               MainMatchScreen.routeName: (context) => MainMatchScreen(),
+              MatchScreen.routeName: (context) => BlocProvider(
+                    create: (context) => locator<MatchBloc>(),
+                    child: const MatchScreen(),
+                  ),
             },
             debugShowCheckedModeBanner: false,
             title: 'Poortak',

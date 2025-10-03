@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:poortak/config/myColors.dart';
+import 'package:poortak/featueres/feature_match/screens/match_screen.dart';
 
 class MainMatchScreen extends StatelessWidget {
   static const routeName = '/main_match_screen';
@@ -91,20 +92,21 @@ class MainMatchScreen extends StatelessWidget {
                         title: 'شرکت در مسابقه',
                         onTap: () {
                           // Navigate to join match screen
-                          _showComingSoonDialog(context);
+                          // _showComingSoonDialog(context);
+                          Navigator.pushNamed(context, MatchScreen.routeName);
                         },
                       ),
 
                       const SizedBox(height: 20),
 
-                      _buildMatchCard(
-                        iconLottiePath: 'assets/images/match/mylists.json',
-                        title: 'اسامی برندگان مسابقه',
-                        onTap: () {
-                          // Navigate to winners list screen
-                          _showComingSoonDialog(context);
-                        },
-                      ),
+                      // _buildMatchCard(
+                      //   iconLottiePath: 'assets/images/match/mylists.json',
+                      //   title: 'اسامی برندگان مسابقه',
+                      //   onTap: () {
+                      //     // Navigate to winners list screen
+                      //     _showComingSoonDialog(context);
+                      //   },
+                      // ),
 
                       const SizedBox(height: 20),
 

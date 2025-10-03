@@ -32,23 +32,69 @@ class Match {
       };
 }
 
+class Answer {
+  String id;
+  String matchId;
+  String userId;
+  String answer;
+  bool isCorrect;
+  DateTime submittedAt;
+  DateTime createdAt;
+  DateTime updatedAt;
+
+  Answer({
+    required this.id,
+    required this.matchId,
+    required this.userId,
+    required this.answer,
+    required this.isCorrect,
+    required this.submittedAt,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  factory Answer.fromJson(Map<String, dynamic> json) => Answer(
+        id: json["id"],
+        matchId: json["matchId"],
+        userId: json["userId"],
+        answer: json["answer"],
+        isCorrect: json["isCorrect"],
+        submittedAt: DateTime.parse(json["submittedAt"]),
+        createdAt: DateTime.parse(json["createdAt"]),
+        updatedAt: DateTime.parse(json["updatedAt"]),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "matchId": matchId,
+        "userId": userId,
+        "answer": answer,
+        "isCorrect": isCorrect,
+        "submittedAt": submittedAt.toIso8601String(),
+        "createdAt": createdAt.toIso8601String(),
+        "updatedAt": updatedAt.toIso8601String(),
+      };
+}
+
 class Data {
   MatchClass match;
-  dynamic answer;
+  Answer? answer;
 
   Data({
     required this.match,
-    required this.answer,
+    this.answer,
   });
 
   factory Data.fromJson(Map<String, dynamic> json) => Data(
         match: MatchClass.fromJson(json["match"]),
-        answer: json["answer"],
+        answer: json["answer"] != null && json["answer"].isNotEmpty
+            ? Answer.fromJson(json["answer"])
+            : null,
       );
 
   Map<String, dynamic> toJson() => {
         "match": match.toJson(),
-        "answer": answer,
+        "answer": answer?.toJson(),
       };
 }
 
