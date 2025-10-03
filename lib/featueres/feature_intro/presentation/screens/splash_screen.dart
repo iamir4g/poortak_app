@@ -2,8 +2,6 @@ import 'dart:async';
 
 import 'package:app_links/app_links.dart';
 import 'package:flutter/services.dart';
-import 'package:delayed_widget/delayed_widget.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -24,12 +22,16 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends State<SplashScreen>
+    with TickerProviderStateMixin {
   late final AppLinks _appLinks;
   StreamSubscription<Uri?>? _linkSub;
   bool _hasHandledDeepLink = false;
   static const MethodChannel _channel =
       MethodChannel('poortak.deeplink.flutter.dev/channel');
+
+  late AnimationController _backgroundAnimationController;
+  late Animation<double> _backgroundAnimation;
 
   // Uri? _latestLink;
 
@@ -37,6 +39,27 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     debugPrint("🚀 SplashScreen: initState called");
+
+    // Initialize background animation
+    _backgroundAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 4500), // 4.5 seconds
+      vsync: this,
+    );
+    _backgroundAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _backgroundAnimationController,
+      curve: Curves.easeInOut,
+    ));
+
+    // Start background animation after a short delay
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (mounted) {
+        _backgroundAnimationController.forward();
+      }
+    });
+
     BlocProvider.of<SplashCubit>(context).checkConnectionEvent();
 
     // Initialize deep links after the first frame is built
@@ -52,6 +75,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void dispose() {
     _linkSub?.cancel(); // ✅ مهم
     _channel.setMethodCallHandler(null);
+    _backgroundAnimationController.dispose();
     super.dispose();
   }
 
@@ -59,73 +83,142 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     var width = MediaQuery.of(context).size.width;
     return Scaffold(
-      body: Container(
-        width: width,
-        color: Colors.white,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Expanded(
-                child: DelayedWidget(
-                    delayDuration: const Duration(milliseconds: 200),
-                    animationDuration: const Duration(milliseconds: 1000),
-                    animation: DelayedAnimations.SLIDE_FROM_BOTTOM,
-                    child: Image.asset(
-                      'assets/images/poortakLogo.png',
-                      width: width * 0.8,
-                    ))),
-            BlocConsumer<SplashCubit, SplashState>(builder: (context, state) {
-              /// if user is online
-              if (state.connectionStatus is ConnectionInitial ||
-                  state.connectionStatus is ConnectionOn) {
-                return Directionality(
-                  textDirection: TextDirection.ltr,
-                  child: LoadingAnimationWidget.progressiveDots(
-                    color: Colors.red,
-                    size: 50,
-                  ),
-                );
-              }
-
-              /// if user is offline
-              if (state.connectionStatus is ConnectionOff) {
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      'به اینترنت متصل نیستید!',
-                      style: TextStyle(
-                          color: Colors.red,
-                          fontWeight: FontWeight.w500,
-                          fontFamily: "vazir"),
+      body: AnimatedBuilder(
+        animation: _backgroundAnimation,
+        builder: (context, child) {
+          return Container(
+            width: width,
+            child: Stack(
+              children: [
+                // Second background image (splash2.png) - slides down from top
+                Positioned(
+                  top: -MediaQuery.of(context).size.height +
+                      (_backgroundAnimation.value *
+                          MediaQuery.of(context).size.height),
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      image: DecorationImage(
+                        image: AssetImage('assets/images/splash/splash2.png'),
+                        fit: BoxFit.cover,
+                      ),
                     ),
-                    IconButton(
-                        splashColor: Colors.red,
-                        onPressed: () {
-                          /// check that we are online or not
-                          BlocProvider.of<SplashCubit>(context)
-                              .checkConnectionEvent();
-                        },
-                        icon: const Icon(
-                          Icons.autorenew,
-                          color: Colors.red,
-                        ))
-                  ],
-                );
-              }
+                  ),
+                ),
+                // First background image (splash1.png) - moves down
+                Positioned(
+                  top: _backgroundAnimation.value *
+                      MediaQuery.of(context).size.height,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      image: DecorationImage(
+                        image: AssetImage('assets/images/splash/splash1.png'),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                ),
+                // Content overlay
+                SafeArea(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Logo section without animation
+                      Expanded(
+                        flex: 3,
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              // Logo
+                              Image.asset(
+                                'assets/images/poortakLogo.png',
+                                width: width * 0.7,
+                                height:
+                                    width * 0.7 * 0.5, // Maintain aspect ratio
+                              ),
+                              const SizedBox(height: 30),
+                              // Persian text
+                              const Text(
+                                'ایده ای جدید از انتشارات تاجیک',
+                                style: TextStyle(
+                                  fontFamily: 'IranSans',
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  height: 1.4,
+                                ),
+                                textAlign: TextAlign.center,
+                                textDirection: TextDirection.rtl,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      // Loading section
+                      Expanded(
+                        flex: 1,
+                        child: BlocConsumer<SplashCubit, SplashState>(
+                            builder: (context, state) {
+                          /// if user is online
+                          if (state.connectionStatus is ConnectionInitial ||
+                              state.connectionStatus is ConnectionOn) {
+                            return Directionality(
+                              textDirection: TextDirection.ltr,
+                              child: LoadingAnimationWidget.progressiveDots(
+                                color: Colors.white,
+                                size: 50,
+                              ),
+                            );
+                          }
 
-              /// default value
-              return Container();
-            }, listener: (context, state) {
-              if (state.connectionStatus is ConnectionOn) {
-                gotoHome();
-              }
-            }),
-            const SizedBox(
-              height: 30,
+                          /// if user is offline
+                          if (state.connectionStatus is ConnectionOff) {
+                            return Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Text(
+                                  'به اینترنت متصل نیستید!',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w500,
+                                      fontFamily: "vazir"),
+                                ),
+                                IconButton(
+                                    splashColor: Colors.white,
+                                    onPressed: () {
+                                      /// check that we are online or not
+                                      BlocProvider.of<SplashCubit>(context)
+                                          .checkConnectionEvent();
+                                    },
+                                    icon: const Icon(
+                                      Icons.autorenew,
+                                      color: Colors.white,
+                                    ))
+                              ],
+                            );
+                          }
+
+                          /// default value
+                          return Container();
+                        }, listener: (context, state) {
+                          if (state.connectionStatus is ConnectionOn) {
+                            gotoHome();
+                          }
+                        }),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
@@ -205,7 +298,7 @@ class _SplashScreenState extends State<SplashScreen> {
         _hasHandledDeepLink = true;
 
         // Add delay to ensure navigation works properly
-        Future.delayed(const Duration(milliseconds: 100), () {
+        Future.delayed(const Duration(milliseconds: 500), () {
           Navigator.pushNamed(
             context,
             PaymentResultScreen.routeName,
