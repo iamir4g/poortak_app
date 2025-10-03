@@ -97,56 +97,107 @@ class _CustomDrawerState extends State<CustomDrawer> {
             padding: const EdgeInsets.only(top: 50, left: 16, right: 16),
             child: ListView(
               children: [
-                GestureDetector(
-                  onTap: () {
-                    if (isLoggedIn) {
-                      Navigator.pushNamed(context, ProfileScreen.routeName);
-                    } else {
-                      Navigator.pushNamed(context, LoginScreen.routeName);
-                    }
-                  },
-                  child: SizedBox(
-                    height: 80,
-                    width: 240,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: themeState.isDark
-                            ? MyColors.darkCardBackground
-                            : MyColors.background1,
-                        borderRadius: BorderRadius.circular(10),
+                // const SizedBox(height: 20),
+                // const SizedBox(height: 20),
+                SizedBox(
+                  height: 100, // افزایش ارتفاع برای جا دادن دایره نارنجی
+                  width: 240,
+                  child: Stack(
+                    clipBehavior: Clip.none, // اجازه نمایش خارج از محدوده
+                    children: [
+                      Positioned(
+                        top: 20, // فاصله از بالا برای جا دادن دایره
+                        child: GestureDetector(
+                          onTap: () {
+                            if (isLoggedIn) {
+                              Navigator.pushNamed(
+                                  context, ProfileScreen.routeName);
+                            } else {
+                              Navigator.pushNamed(
+                                  context, LoginScreen.routeName);
+                            }
+                          },
+                          child: SizedBox(
+                            height: 80,
+                            width: 240,
+                            child: Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: themeState.isDark
+                                    ? MyColors.darkCardBackground
+                                    : MyColors.background1,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(100),
+                                      color: Colors.red,
+                                      image: const DecorationImage(
+                                        image: AssetImage(
+                                          "assets/images/profile/finalProfile.png",
+                                        ),
+                                      ),
+                                    ),
+                                    width: 50,
+                                    height: 50,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    isLoggedIn
+                                        ? (userFirstName != null &&
+                                                userLastName != null
+                                            ? "$userFirstName $userLastName"
+                                            : userFirstName ??
+                                                userLastName ??
+                                                "کاربر")
+                                        : "وارد شوید",
+                                    style: MyTextStyle.textMatn14Bold.copyWith(
+                                      color: themeState.isDark
+                                          ? MyColors.darkTextPrimary
+                                          : MyColors.textMatn1,
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(100),
-                              color: Colors.red,
-                              image: const DecorationImage(
-                                image: AssetImage(
-                                  "assets/images/profile/finalProfile.png",
+                      // Edit button positioned above the container
+                      if (!isLoggedIn)
+                        Positioned(
+                          top: 10,
+                          left: 20,
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamed(
+                                  context, ProfileScreen.routeName);
+                            },
+                            child: Container(
+                              width: 30,
+                              height: 30,
+                              decoration: BoxDecoration(
+                                color: MyColors.secondary,
+                                borderRadius: BorderRadius.circular(100),
+                                border: Border.all(
+                                  color: Colors.white,
+                                  width: 2,
+                                ),
+                              ),
+                              child: Center(
+                                child: IconifyIcon(
+                                  icon: "tdesign:edit",
+                                  color: Colors.white,
+                                  size: 12,
                                 ),
                               ),
                             ),
-                            width: 50,
-                            height: 50,
                           ),
-                          const SizedBox(width: 10),
-                          Text(
-                            isLoggedIn
-                                ? (userFirstName != null && userLastName != null
-                                    ? "$userFirstName $userLastName"
-                                    : userFirstName ?? userLastName ?? "کاربر")
-                                : "وارد شوید",
-                            style: MyTextStyle.textMatn14Bold.copyWith(
-                              color: themeState.isDark
-                                  ? MyColors.darkTextPrimary
-                                  : MyColors.textMatn1,
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
+                        ),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 20),
