@@ -30,10 +30,10 @@ class CustomVideoPlayer extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<CustomVideoPlayer> createState() => _CustomVideoPlayerState();
+  State<CustomVideoPlayer> createState() => CustomVideoPlayerState();
 }
 
-class _CustomVideoPlayerState extends State<CustomVideoPlayer> {
+class CustomVideoPlayerState extends State<CustomVideoPlayer> {
   late VideoPlayerController _videoPlayerController;
   bool _isVideoInitialized = false;
   bool _isPlaying = false;
@@ -52,6 +52,16 @@ class _CustomVideoPlayerState extends State<CustomVideoPlayer> {
     _videoPlayerController.dispose();
     _hideTimer?.cancel();
     super.dispose();
+  }
+
+  // Public method to stop video from external calls
+  void stopVideo() {
+    if (_isVideoInitialized) {
+      _videoPlayerController.pause();
+      setState(() {
+        _isPlaying = false;
+      });
+    }
   }
 
   String _formatDuration(Duration duration) {
@@ -249,13 +259,9 @@ class _CustomVideoPlayerState extends State<CustomVideoPlayer> {
         borderRadius: BorderRadius.all(Radius.circular(widget.borderRadius)),
         child: GestureDetector(
           onTap: () {
-            if (widget.showControls) {
-              setState(() {
-                _showControls = !_showControls;
-              });
-              if (_showControls) {
-                _startHideTimer();
-              }
+            // Toggle play/pause when tapping on video
+            if (_isVideoInitialized) {
+              _togglePlayPause();
             }
           },
           child: Stack(
@@ -269,8 +275,39 @@ class _CustomVideoPlayerState extends State<CustomVideoPlayer> {
                         child: CircularProgressIndicator(),
                       ),
               ),
+
               if (_isVideoInitialized && widget.showControls)
                 _buildVideoControls(),
+
+              // Large play button overlay - only show when video is paused/stopped
+              if (_isVideoInitialized && !_isPlaying)
+                Positioned.fill(
+                  child: Container(
+                    color: Colors.transparent,
+                    child: Center(
+                      child: Container(
+                        width: 80,
+                        height: 80,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.3),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.play_arrow,
+                          color: Colors.black,
+                          size: 50,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
             ],
           ),
         ),
@@ -307,7 +344,7 @@ class _FullscreenVideoPlayerState extends State<FullscreenVideoPlayer> {
     super.initState();
     // Hide system UI for fullscreen experience
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-    
+
     // Set landscape orientation
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeLeft,
@@ -316,7 +353,7 @@ class _FullscreenVideoPlayerState extends State<FullscreenVideoPlayer> {
 
     _isPlaying = widget.videoPlayerController.value.isPlaying;
     _startHideTimer();
-    
+
     // Add listener to update playing state
     widget.videoPlayerController.addListener(_videoListener);
   }
@@ -333,16 +370,16 @@ class _FullscreenVideoPlayerState extends State<FullscreenVideoPlayer> {
   void dispose() {
     // Remove listener
     widget.videoPlayerController.removeListener(_videoListener);
-    
+
     // Restore system UI
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-    
+
     // Restore portrait orientation
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
-    
+
     _hideTimer?.cancel();
     super.dispose();
   }
@@ -430,13 +467,15 @@ class _FullscreenVideoPlayerState extends State<FullscreenVideoPlayer> {
                 ],
               ),
             ),
-            
+
             // Center play/pause button
             Expanded(
               child: Center(
                 child: IconButton(
                   icon: Icon(
-                    _isPlaying ? Icons.pause_circle_filled : Icons.play_circle_filled,
+                    _isPlaying
+                        ? Icons.pause_circle_filled
+                        : Icons.play_circle_filled,
                     color: Colors.white,
                     size: 80,
                   ),
@@ -444,7 +483,7 @@ class _FullscreenVideoPlayerState extends State<FullscreenVideoPlayer> {
                 ),
               ),
             ),
-            
+
             // Bottom controls
             Padding(
               padding: const EdgeInsets.all(16.0),
@@ -458,33 +497,41 @@ class _FullscreenVideoPlayerState extends State<FullscreenVideoPlayer> {
                       thumbColor: Colors.white,
                       overlayColor: Colors.white.withOpacity(0.3),
                       trackHeight: 4,
-                      thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
-                      overlayShape: const RoundSliderOverlayShape(overlayRadius: 16),
+                      thumbShape:
+                          const RoundSliderThumbShape(enabledThumbRadius: 8),
+                      overlayShape:
+                          const RoundSliderOverlayShape(overlayRadius: 16),
                     ),
                     child: Slider(
-                      value: widget.videoPlayerController.value.position.inMilliseconds.toDouble(),
+                      value: widget
+                          .videoPlayerController.value.position.inMilliseconds
+                          .toDouble(),
                       min: 0,
-                      max: widget.videoPlayerController.value.duration.inMilliseconds.toDouble(),
+                      max: widget
+                          .videoPlayerController.value.duration.inMilliseconds
+                          .toDouble(),
                       onChanged: (value) {
                         final position = Duration(milliseconds: value.toInt());
                         widget.videoPlayerController.seekTo(position);
                       },
                     ),
                   ),
-                  
+
                   // Time display
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        _formatDuration(widget.videoPlayerController.value.position),
+                        _formatDuration(
+                            widget.videoPlayerController.value.position),
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 16,
                         ),
                       ),
                       Text(
-                        _formatDuration(widget.videoPlayerController.value.duration),
+                        _formatDuration(
+                            widget.videoPlayerController.value.duration),
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 16,
@@ -523,7 +570,7 @@ class _FullscreenVideoPlayerState extends State<FullscreenVideoPlayer> {
                 child: VideoPlayer(widget.videoPlayerController),
               ),
             ),
-            
+
             // Controls overlay
             _buildFullscreenControls(),
           ],

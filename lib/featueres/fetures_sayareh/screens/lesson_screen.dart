@@ -46,6 +46,8 @@ class _LessonScreenState extends State<LessonScreen> {
   double downloadProgress = 0.0;
   final StorageService _storageService = locator<StorageService>();
   Lesson? _currentLesson;
+  final GlobalKey<CustomVideoPlayerState> _videoPlayerKey =
+      GlobalKey<CustomVideoPlayerState>();
 
   Future<void> _checkExistingFiles(String name) async {
     try {
@@ -374,6 +376,13 @@ class _LessonScreenState extends State<LessonScreen> {
   }
 
   @override
+  void dispose() {
+    // Stop video when leaving the screen
+    _videoPlayerKey.currentState?.stopVideo();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return BlocListener<LessonBloc, LessonState>(
       listener: (context, state) {
@@ -420,26 +429,63 @@ class _LessonScreenState extends State<LessonScreen> {
         }
       },
       child: Scaffold(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        appBar: AppBar(
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(30),
+        backgroundColor: const Color(0xFFF6F9FE),
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(57),
+          child: SafeArea(
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(16, 0, 32, 0),
+              height: 57,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(33.5),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    offset: const Offset(0, 1),
+                    blurRadius: 1,
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Title
+                  BlocBuilder<LessonBloc, LessonState>(
+                    builder: (context, state) {
+                      return Text(
+                        state is LessonSuccess
+                            ? state.lesson.name
+                            : widget.title,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontFamily: 'IranSans',
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF3D495C),
+                        ),
+                      );
+                    },
+                  ),
+
+                  // Back button
+                  Container(
+                    width: 40,
+                    height: 40,
+                    child: IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: const Icon(
+                        Icons.arrow_forward,
+                        color: Color(0xFF3D495C),
+                        size: 28,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          title: BlocBuilder<LessonBloc, LessonState>(
-            builder: (context, state) {
-              if (state is LessonSuccess) {
-                return Text(
-                  state.lesson.name,
-                  style: MyTextStyle.textHeader16Bold,
-                );
-              }
-              return Text(
-                widget.title,
-                style: MyTextStyle.textHeader16Bold,
-              );
-            },
           ),
         ),
         body: _buildContent(context, widget.lessonId),
@@ -451,62 +497,92 @@ class _LessonScreenState extends State<LessonScreen> {
     return SingleChildScrollView(
       child: Column(
         children: [
+          SizedBox(height: 28),
           Center(
             child: Stack(
               children: [
-                if (localVideoPath == null && videoUrl == null)
-                  Container(
+                // White container background
+                Container(
+                  width: 360,
+                  height: 248,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(40),
+                  ),
+                ),
+
+                // Video player
+                Positioned(
+                  top: 5,
+                  left: 5,
+                  child: Container(
                     width: 350,
                     height: 240,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(37),
-                      color: MyColors.brandSecondary,
                     ),
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.error_outline,
-                            color: Theme.of(context).textTheme.titleMedium?.color,
-                            size: 48,
-                          ),
-                          SizedBox(height: 16),
-                          Text(
-                            'خطا در بارگذاری ویدیو',
-                            style: TextStyle(
-                              color: Theme.of(context).textTheme.titleMedium?.color,
-                              fontSize: 16,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(37),
+                      child: localVideoPath == null && videoUrl == null
+                          ? Container(
+                              decoration: BoxDecoration(
+                                color: MyColors.brandSecondary,
+                                borderRadius: BorderRadius.circular(37),
+                              ),
+                              child: Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.error_outline,
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium
+                                          ?.color,
+                                      size: 48,
+                                    ),
+                                    SizedBox(height: 16),
+                                    Text(
+                                      'خطا در بارگذاری ویدیو',
+                                      style: TextStyle(
+                                        color: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium
+                                            ?.color,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            )
+                          : CustomVideoPlayer(
+                              key: _videoPlayerKey,
+                              videoPath: localVideoPath ?? videoUrl!,
+                              isNetworkVideo:
+                                  localVideoPath == null && videoUrl != null,
+                              width: 350,
+                              height: 240,
+                              borderRadius: 37,
+                              autoPlay: true,
+                              showControls: true,
+                              onVideoEnded: () {
+                                print('Video ended');
+                                // If user hasn't purchased and this was a trailer video, show purchase dialog
+                                if (!widget.purchased) {
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return DialogCart(item: _currentLesson!);
+                                    },
+                                  );
+                                  // _showPurchaseDialog();
+                                }
+                              },
                             ),
-                          ),
-                        ],
-                      ),
                     ),
-                  )
-                else
-                  CustomVideoPlayer(
-                    videoPath: localVideoPath ?? videoUrl!,
-                    isNetworkVideo: localVideoPath == null && videoUrl != null,
-                    width: 350,
-                    height: 240,
-                    borderRadius: 37,
-                    autoPlay: true,
-                    showControls: true,
-                    onVideoEnded: () {
-                      print('Video ended');
-                      // If user hasn't purchased and this was a trailer video, show purchase dialog
-                      if (!widget.purchased) {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return DialogCart(item: _currentLesson!);
-                          },
-                        );
-                        // _showPurchaseDialog();
-                      }
-                    },
                   ),
-               
+                ),
               ],
             ),
           ),
@@ -515,8 +591,7 @@ class _LessonScreenState extends State<LessonScreen> {
           //card lesons
           InkWell(
             onTap: () {
-              if (!widget.purchased
-              ) {
+              if (!widget.purchased) {
                 _showPurchaseDialog();
                 return;
               }
@@ -524,13 +599,22 @@ class _LessonScreenState extends State<LessonScreen> {
                   arguments: {"conversationId": conversationId});
             },
             child: Container(
-              width: 350,
+              width: 359,
               height: 104,
               decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(40)),
-                  color: Theme.of(context).cardColor),
+                borderRadius: BorderRadius.circular(40),
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.04),
+                    offset: const Offset(0, 0),
+                    blurRadius: 4,
+                  ),
+                ],
+              ),
               child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 22, horizontal: 28),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 22, horizontal: 28),
                 child: Row(
                   children: [
                     Image.asset(
@@ -538,17 +622,29 @@ class _LessonScreenState extends State<LessonScreen> {
                       width: 48.0,
                       height: 48.0,
                     ),
-                    SizedBox(
-                      width: 18,
-                    ),
+                    const SizedBox(width: 18),
                     Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("conversation",
-                            style: Theme.of(context).textTheme.titleMedium),
-                        Text("مکالمه",
-                            style: Theme.of(context).textTheme.bodySmall)
+                        Text(
+                          "conversation",
+                          style: const TextStyle(
+                            fontFamily: 'IranSans',
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFFA3AFC2),
+                          ),
+                        ),
+                        Text(
+                          "مکالمه",
+                          style: const TextStyle(
+                            fontFamily: 'IranSans',
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF29303D),
+                          ),
+                        )
                       ],
                     )
                   ],
@@ -560,8 +656,7 @@ class _LessonScreenState extends State<LessonScreen> {
           const SizedBox(height: 12),
           InkWell(
             onTap: () {
-               if (!widget.purchased
-              ) {
+              if (!widget.purchased) {
                 _showPurchaseDialog();
                 return;
               }
@@ -569,31 +664,79 @@ class _LessonScreenState extends State<LessonScreen> {
                   arguments: {"id": conversationId});
             },
             child: Container(
-              width: 350,
+              width: 359,
               height: 104,
               decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(40)),
-                  color: Theme.of(context).cardColor),
+                borderRadius: BorderRadius.circular(40),
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.04),
+                    offset: const Offset(0, 0),
+                    blurRadius: 4,
+                  ),
+                ],
+              ),
               child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 22, horizontal: 28),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 22, horizontal: 28),
                 child: Row(
                   children: [
-                    Image.asset(
-                      "assets/images/words_icon.png",
-                      width: 48.0,
-                      height: 48.0,
+                    Stack(
+                      children: [
+                        Image.asset(
+                          "assets/images/words_icon.png",
+                          width: 48.0,
+                          height: 48.0,
+                        ),
+                        Positioned(
+                          top: 5,
+                          left: 14,
+                          child: Container(
+                            width: 40,
+                            height: 15,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Center(
+                              child: Text(
+                                "Word",
+                                style: TextStyle(
+                                  fontFamily: 'IranSans',
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w900,
+                                  color: Color(0xFF95D6A4),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                    SizedBox(
-                      width: 18,
-                    ),
+                    const SizedBox(width: 18),
                     Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("vocabulary",
-                            style: Theme.of(context).textTheme.titleMedium),
-                        Text("واژگان",
-                            style: Theme.of(context).textTheme.bodySmall)
+                        Text(
+                          "vocabulary",
+                          style: const TextStyle(
+                            fontFamily: 'IranSans',
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFFA3AFC2),
+                          ),
+                        ),
+                        Text(
+                          "واژگان",
+                          style: const TextStyle(
+                            fontFamily: 'IranSans',
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF29303D),
+                          ),
+                        )
                       ],
                     )
                   ],
@@ -605,8 +748,7 @@ class _LessonScreenState extends State<LessonScreen> {
           const SizedBox(height: 12),
           InkWell(
             onTap: () {
-               if (!widget.purchased
-              ) {
+              if (!widget.purchased) {
                 _showPurchaseDialog();
                 return;
               }
@@ -624,13 +766,22 @@ class _LessonScreenState extends State<LessonScreen> {
                   arguments: {"courseId": conversationId});
             },
             child: Container(
-              width: 350,
+              width: 359,
               height: 104,
               decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(40)),
-                  color: Theme.of(context).cardColor),
+                borderRadius: BorderRadius.circular(40),
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.04),
+                    offset: const Offset(0, 0),
+                    blurRadius: 4,
+                  ),
+                ],
+              ),
               child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 22, horizontal: 28),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 22, horizontal: 28),
                 child: Row(
                   children: [
                     Image.asset(
@@ -638,18 +789,67 @@ class _LessonScreenState extends State<LessonScreen> {
                       width: 48.0,
                       height: 48.0,
                     ),
-                    SizedBox(
-                      width: 18,
-                    ),
+                    const SizedBox(width: 18),
                     Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Quiz", style: Theme.of(context).textTheme.titleMedium),
-                        Text("آزمون", style: Theme.of(context).textTheme.bodySmall)
+                        Text(
+                          "Quiz",
+                          style: const TextStyle(
+                            fontFamily: 'IranSans',
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFFA3AFC2),
+                          ),
+                        ),
+                        Text(
+                          "آزمون",
+                          style: const TextStyle(
+                            fontFamily: 'IranSans',
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF29303D),
+                          ),
+                        )
                       ],
                     )
                   ],
+                ),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 50),
+
+          // Floating Action Button - Left positioned
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 20),
+              child: Container(
+                width: 63,
+                height: 63,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(50),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.04),
+                      offset: const Offset(0, 0),
+                      blurRadius: 4,
+                    ),
+                  ],
+                ),
+                child: IconButton(
+                  onPressed: () {
+                    // Add your action here
+                  },
+                  icon: Image.asset(
+                    "assets/images/iknow/dictionary_icon.png",
+                    width: 36,
+                    height: 36,
+                  ),
                 ),
               ),
             ),
