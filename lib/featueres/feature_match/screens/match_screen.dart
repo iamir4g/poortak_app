@@ -91,7 +91,7 @@ class _MatchScreenState extends State<MatchScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: Column(
                           children: [
-                            const SizedBox(height: 20),
+                            const SizedBox(height: 75),
 
                             // Question section
                             _buildQuestionSection(state),
@@ -121,6 +121,7 @@ class _MatchScreenState extends State<MatchScreen> {
 
   Widget _buildHeader() {
     return Container(
+      padding: const EdgeInsets.fromLTRB(16, 0, 32, 0),
       height: 57,
       // margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
@@ -137,223 +138,258 @@ class _MatchScreenState extends State<MatchScreen> {
         ],
       ),
       child: Row(
+        // padding: const EdgeInsets.symmetric(horizontal: 16),
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
+          // Title
+
+          Text(
+            'شرکت در مسابقه',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontFamily: 'IranSans',
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: MyColors.textMatn2,
+            ),
+          ),
+
           // Back button
           Container(
             width: 40,
             height: 40,
-            margin: const EdgeInsets.only(left: 16),
+            // margin: const EdgeInsets.only(left: 16),
             child: IconButton(
               onPressed: () => Navigator.pop(context),
               icon: const Icon(
-                Icons.arrow_back_ios,
+                Icons.arrow_forward,
                 color: MyColors.textMatn1,
-                size: 20,
+                size: 28,
               ),
             ),
           ),
-
-          // Title
-          const Expanded(
-            child: Text(
-              'شرکت در مسابقه',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontFamily: 'IranSans',
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: MyColors.textMatn2,
-              ),
-            ),
-          ),
-
           // Spacer for balance
-          const SizedBox(width: 40),
         ],
       ),
     );
   }
 
   Widget _buildQuestionSection(MatchState state) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(22),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            offset: const Offset(0, 2),
-            blurRadius: 8,
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        // Main content area
+        Container(
+          width: double.infinity,
+          margin: const EdgeInsets.only(top: 20),
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(22),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                offset: const Offset(0, 2),
+                blurRadius: 8,
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // "سوال این ماه" label
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: const Color(0xFFF2F2FE),
-              borderRadius: BorderRadius.circular(15),
-            ),
-            child: const Text(
-              'سوال این ماه',
-              style: TextStyle(
-                fontFamily: 'IranSans',
-                fontSize: 14,
-                fontWeight: FontWeight.w300,
-                color: MyColors.textMatn1,
-              ),
-            ),
-          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 20),
 
-          const SizedBox(height: 20),
-
-          // Question text
-          if (state is MatchLoading)
-            const Center(
-              child: CircularProgressIndicator(),
-            )
-          else if (state is MatchSuccess)
-            Text(
-              state.match.data.match.question,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontFamily: 'IranSans',
-                fontSize: 14,
-                fontWeight: FontWeight.w300,
-                color: MyColors.textMatn1,
-              ),
-            )
-          else if (state is MatchError)
-            Text(
-              'خطا در بارگذاری سوال',
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontFamily: 'IranSans',
-                fontSize: 14,
-                fontWeight: FontWeight.w300,
-                color: MyColors.error,
-              ),
-            )
-          else
-            const Text(
-              'در حال بارگذاری...',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontFamily: 'IranSans',
-                fontSize: 14,
-                fontWeight: FontWeight.w300,
-                color: MyColors.textMatn1,
-              ),
-            ),
-
-          const SizedBox(height: 20),
-
-          // Answer input field
-          Container(
-            height: 50,
-            decoration: BoxDecoration(
-              color: _isAnswerSubmitted()
-                  ? const Color(0xFFE0E0E0)
-                  : const Color(0xFFF8F8F8),
-              borderRadius: BorderRadius.circular(30),
-            ),
-            child: TextField(
-              controller: _answerController,
-              enabled: !_isAnswerSubmitted(),
-              textAlign: TextAlign.right,
-              style: TextStyle(
-                fontFamily: 'IranSans',
-                fontSize: 16,
-                fontWeight: FontWeight.w300,
-                color: _isAnswerSubmitted()
-                    ? MyColors.text4.withOpacity(0.5)
-                    : MyColors.text4,
-              ),
-              decoration: InputDecoration(
-                hintText: _isAnswerSubmitted()
-                    ? 'شما قبلاً پاسخ داده‌اید'
-                    : 'جواب سوال:',
-                hintStyle: TextStyle(
-                  fontFamily: 'IranSans',
-                  fontSize: 16,
-                  fontWeight: FontWeight.w300,
-                  color: _isAnswerSubmitted()
-                      ? MyColors.text4.withOpacity(0.5)
-                      : MyColors.text4,
+              // Question text
+              if (state is MatchLoading)
+                const Center(
+                  child: CircularProgressIndicator(),
+                )
+              else if (state is MatchSuccess)
+                Center(
+                    child: Text(
+                  state.match.data.match.question,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontFamily: 'IranSans',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w300,
+                    color: MyColors.textMatn1,
+                  ),
+                ))
+              else if (state is MatchError)
+                Text(
+                  'خطا در بارگذاری سوال',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontFamily: 'IranSans',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w300,
+                    color: MyColors.error,
+                  ),
+                )
+              else
+                const Text(
+                  'در حال بارگذاری...',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontFamily: 'IranSans',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w300,
+                    color: MyColors.textMatn1,
+                  ),
                 ),
-                border: InputBorder.none,
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+
+              const SizedBox(height: 20),
+
+              // Answer input field
+              Container(
+                height: 50,
+                decoration: BoxDecoration(
+                  color: _isAnswerSubmitted()
+                      ? const Color(0xFFE0E0E0)
+                      : const Color(0xFFF8F8F8),
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: TextField(
+                  controller: _answerController,
+                  enabled: !_isAnswerSubmitted(),
+                  textAlign: TextAlign.right,
+                  style: TextStyle(
+                    fontFamily: 'IranSans',
+                    fontSize: 16,
+                    fontWeight: FontWeight.w300,
+                    color: _isAnswerSubmitted()
+                        ? MyColors.text4.withOpacity(0.5)
+                        : MyColors.text4,
+                  ),
+                  decoration: InputDecoration(
+                    hintText: _isAnswerSubmitted()
+                        ? 'شما قبلاً پاسخ داده‌اید'
+                        : 'جواب سوال:',
+                    hintStyle: TextStyle(
+                      fontFamily: 'IranSans',
+                      fontSize: 16,
+                      fontWeight: FontWeight.w300,
+                      color: _isAnswerSubmitted()
+                          ? MyColors.text4.withOpacity(0.5)
+                          : MyColors.text4,
+                    ),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 15),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // Submit button
+              Center(
+                child: Container(
+                  width: 164,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: _isAnswerSubmitted()
+                        ? const Color(0xFFBDBDBD)
+                        : MyColors.textMatn2,
+                    borderRadius: BorderRadius.circular(56.5),
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(56.5),
+                      onTap: _isAnswerSubmitted()
+                          ? null
+                          : () {
+                              // Handle submit answer
+                              _submitAnswer();
+                            },
+                      child: BlocBuilder<MatchBloc, MatchState>(
+                        builder: (context, state) {
+                          if (state is MatchSubmittingAnswer) {
+                            return const Center(
+                              child: SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white),
+                                ),
+                              ),
+                            );
+                          }
+                          return Center(
+                            child: Text(
+                              _isAnswerSubmitted()
+                                  ? 'پاسخ ارسال شده'
+                                  : 'ارسال پاسخ',
+                              style: TextStyle(
+                                fontFamily: 'IranSans',
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: _isAnswerSubmitted()
+                                    ? Colors.white.withOpacity(0.7)
+                                    : Colors.white,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // Avatar positioned on the left side above the main container
+        Positioned(
+          top: -40,
+          left: 0,
+          child: Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(30),
+              image: const DecorationImage(
+                image: AssetImage('assets/images/match/match_avatar.png'),
+                fit: BoxFit.cover,
               ),
             ),
           ),
+        ),
 
-          const SizedBox(height: 20),
-
-          // Submit button
-          Center(
+        // "سوال این ماه" label centered above the main container
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          child: Center(
             child: Container(
-              width: 164,
-              height: 50,
+              width: 112,
+              height: 33,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                color: _isAnswerSubmitted()
-                    ? const Color(0xFFBDBDBD)
-                    : MyColors.textMatn2,
-                borderRadius: BorderRadius.circular(56.5),
+                color: const Color(0xFFF2F2FE),
+                borderRadius: BorderRadius.circular(15),
               ),
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(56.5),
-                  onTap: _isAnswerSubmitted()
-                      ? null
-                      : () {
-                          // Handle submit answer
-                          _submitAnswer();
-                        },
-                  child: BlocBuilder<MatchBloc, MatchState>(
-                    builder: (context, state) {
-                      if (state is MatchSubmittingAnswer) {
-                        return const Center(
-                          child: SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor:
-                                  AlwaysStoppedAnimation<Color>(Colors.white),
-                            ),
-                          ),
-                        );
-                      }
-                      return Center(
-                        child: Text(
-                          _isAnswerSubmitted()
-                              ? 'پاسخ ارسال شده'
-                              : 'ارسال پاسخ',
-                          style: TextStyle(
-                            fontFamily: 'IranSans',
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: _isAnswerSubmitted()
-                                ? Colors.white.withOpacity(0.7)
-                                : Colors.white,
-                          ),
-                        ),
-                      );
-                    },
+              child: const Center(
+                child: Text(
+                  'سوال این ماه',
+                  style: TextStyle(
+                    fontFamily: 'IranSans',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w300,
+                    color: MyColors.textMatn1,
                   ),
                 ),
               ),
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -436,7 +472,7 @@ class _MatchScreenState extends State<MatchScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          '$daysRemaining',
+                          '$hoursRemaining',
                           style: const TextStyle(
                             fontFamily: 'IranSans',
                             fontSize: 24,
@@ -479,7 +515,7 @@ class _MatchScreenState extends State<MatchScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          '$hoursRemaining',
+                          '$daysRemaining',
                           style: const TextStyle(
                             fontFamily: 'IranSans',
                             fontSize: 24,
@@ -500,7 +536,7 @@ class _MatchScreenState extends State<MatchScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text(
-                    'روز',
+                    'ساعت',
                     style: TextStyle(
                       fontFamily: 'IranSans',
                       fontSize: 10,
@@ -510,7 +546,7 @@ class _MatchScreenState extends State<MatchScreen> {
                   ),
                   const SizedBox(width: 54),
                   const Text(
-                    'ساعت',
+                    'روز',
                     style: TextStyle(
                       fontFamily: 'IranSans',
                       fontSize: 10,
