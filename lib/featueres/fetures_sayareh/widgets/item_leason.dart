@@ -79,11 +79,11 @@ class ItemLeason extends StatelessWidget {
                   children: [
                     Text(
                       item.name,
-                      style: Theme.of(context).textTheme.titleMedium,
+                      style: Theme.of(context).textTheme.titleSmall,
                     ),
                     Text(
                       item.description,
-                      style: Theme.of(context).textTheme.bodySmall,
+                      style: Theme.of(context).textTheme.labelMedium,
                     ),
                   ],
                 )
@@ -98,7 +98,7 @@ class ItemLeason extends StatelessWidget {
                   width: 8,
                 ),
                 Icon(
-                  Icons.arrow_forward_ios, 
+                  Icons.arrow_forward_ios,
                   color: Theme.of(context).textTheme.titleMedium?.color,
                 ),
               ],

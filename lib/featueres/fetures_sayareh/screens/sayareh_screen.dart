@@ -135,7 +135,7 @@ class _SayarehScreenState extends State<SayarehScreen> {
                     ),
                     Text(
                       l10n?.sayareh ?? "",
-                      style: MyTextStyle.textMatn14Bold?.copyWith(
+                      style: MyTextStyle.textMatn17W700?.copyWith(
                         color: Theme.of(context).textTheme.titleMedium?.color,
                       ),
                     ),

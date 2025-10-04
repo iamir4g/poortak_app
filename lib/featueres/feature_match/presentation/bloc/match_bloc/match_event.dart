@@ -24,3 +24,4 @@ class SubmitAnswerEvent extends MatchEvent {
   List<Object> get props => [matchId, answer];
 }
 
+
