@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/config/myColors.dart';
+import 'package:poortak/featueres/feature_profile/screens/main_points_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/payment_history_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/edit_profile_screen.dart';
@@ -224,7 +225,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               _ProfileActionCard(
                                 icon: Icons.star,
                                 label: 'امتیازات',
-                                onTap: () {},
+                                onTap: () {
+                                  Navigator.pushNamed(
+                                    context,
+                                    MainPointsScreen.routeName,
+                                  );
+                                },
                               ),
                               const SizedBox(height: 16),
                               _ProfileActionCard(

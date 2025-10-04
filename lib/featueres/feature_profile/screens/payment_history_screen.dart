@@ -40,60 +40,81 @@ class _PaymentHistoryScreenState extends State<PaymentHistoryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: MyColors.background3,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: MyColors.textMatn1),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Text(
-          'تاریخچه خرید',
-          style: TextStyle(
-            fontFamily: 'IRANSans',
-            fontWeight: FontWeight.w700,
-            fontSize: 16,
-            color: MyColors.textMatn1,
-          ),
-        ),
-        centerTitle: true,
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(33.5),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Color.fromRGBO(0, 0, 0, 0.05),
-                offset: Offset(0, 1),
-                blurRadius: 1,
-                spreadRadius: 0,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Header
+            Container(
+              height: 57,
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(33.5),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Color(0x0D000000),
+                    offset: Offset(0, 1),
+                    blurRadius: 1,
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(33.5),
-          ),
-        ),
-      ),
-      body: BlocProvider.value(
-        value: _paymentHistoryBloc,
-        child: BlocBuilder<PaymentHistoryBloc, PaymentHistoryState>(
-          builder: (context, state) {
-            if (state is PaymentHistoryLoading) {
-              return _buildLoadingState();
-            } else if (state is PaymentHistoryError) {
-              return _buildErrorState(state.message);
-            } else if (state is PaymentHistoryEmpty) {
-              return _buildEmptyState(state.message);
-            } else if (state is PaymentHistorySuccess) {
-              return _buildSuccessState(state);
-            }
-            return _buildEmptyState();
-          },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Title
+                  Text(
+                    'تاریخچه خرید',
+                    style: TextStyle(
+                      fontFamily: 'IRANSans',
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: MyColors.textMatn1,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+
+                  // Back Button
+                  Container(
+                    width: 50,
+                    height: 50,
+                    margin: const EdgeInsets.only(left: 16),
+                    child: IconButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      icon: const Icon(
+                        Icons.arrow_forward,
+                        color: MyColors.textMatn1,
+                        size: 20,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Content
+            Expanded(
+              child: BlocProvider.value(
+                value: _paymentHistoryBloc,
+                child: BlocBuilder<PaymentHistoryBloc, PaymentHistoryState>(
+                  builder: (context, state) {
+                    if (state is PaymentHistoryLoading) {
+                      return _buildLoadingState();
+                    } else if (state is PaymentHistoryError) {
+                      return _buildErrorState(state.message);
+                    } else if (state is PaymentHistoryEmpty) {
+                      return _buildEmptyState(state.message);
+                    } else if (state is PaymentHistorySuccess) {
+                      return _buildSuccessState(state);
+                    }
+                    return _buildEmptyState();
+                  },
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

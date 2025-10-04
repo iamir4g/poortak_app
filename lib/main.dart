@@ -19,6 +19,7 @@ import 'package:poortak/featueres/feature_litner/screens/litner_word_completed_s
 import 'package:poortak/featueres/feature_litner/screens/litner_word_box_screen.dart';
 import 'package:poortak/featueres/feature_litner/screens/litner_words_inprogress_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
+import 'package:poortak/featueres/feature_profile/screens/main_points_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/profile_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/edit_profile_screen.dart';
 import 'package:poortak/featueres/feature_profile/presentation/bloc/profile_bloc.dart';
@@ -221,6 +222,7 @@ void main() async {
                     create: (context) => locator<MatchBloc>(),
                     child: const MatchScreen(),
                   ),
+              MainPointsScreen.routeName: (context) => MainPointsScreen(),
             },
             debugShowCheckedModeBanner: false,
             title: 'Poortak',
