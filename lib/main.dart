@@ -18,6 +18,7 @@ import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_bloc.d
 import 'package:poortak/featueres/feature_litner/screens/litner_word_completed_screen.dart';
 import 'package:poortak/featueres/feature_litner/screens/litner_word_box_screen.dart';
 import 'package:poortak/featueres/feature_litner/screens/litner_words_inprogress_screen.dart';
+import 'package:poortak/featueres/feature_profile/screens/favorit_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/main_points_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/history_prize_screen.dart';
@@ -230,6 +231,7 @@ void main() async {
               PrizeScreen.routeName: (context) => PrizeScreen(),
               HowToGetPointsScreen.routeName: (context) =>
                   HowToGetPointsScreen(),
+              FavoritScreen.routeName: (context) => FavoritScreen(),
             },
             debugShowCheckedModeBanner: false,
             title: 'Poortak',
