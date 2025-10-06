@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -30,13 +31,54 @@ class _LoginScreenState extends State<LoginScreen> {
   final FocusNode _mobileFocusNode = FocusNode();
   final FocusNode _otpFocusNode = FocusNode();
 
+  // Timer variables
+  Timer? _timer;
+  int _remainingSeconds = 120; // 2 minutes = 120 seconds
+  bool _canResend = false;
+
   @override
   void dispose() {
+    _timer?.cancel();
     _mobileController.dispose();
     _otpController.dispose();
     _mobileFocusNode.dispose();
     _otpFocusNode.dispose();
     super.dispose();
+  }
+
+  void _startTimer() {
+    _timer?.cancel();
+    _remainingSeconds = 120;
+    _canResend = false;
+    log("🕐 Timer started: $_remainingSeconds seconds remaining");
+
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_remainingSeconds > 0) {
+        setState(() {
+          _remainingSeconds--;
+        });
+        log("🕐 Timer tick: $_remainingSeconds seconds remaining");
+      } else {
+        setState(() {
+          _canResend = true;
+        });
+        log("🕐 Timer finished: Resend button now available");
+        _timer?.cancel();
+      }
+    });
+  }
+
+  void _resetTimer() {
+    _timer?.cancel();
+    _remainingSeconds = 120;
+    _canResend = false;
+    _startTimer();
+  }
+
+  String _formatTime(int seconds) {
+    int minutes = seconds ~/ 60;
+    int remainingSeconds = seconds % 60;
+    return '${minutes.toString().padLeft(2, '0')}:${remainingSeconds.toString().padLeft(2, '0')}';
   }
 
   @override
@@ -98,9 +140,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 16),
 
                       // Subtitle for OTP
-                      if (showOtpForm)
+                      if (showOtpForm) ...[
                         Text(
-                          "کد ارسال شده به شماره ${mobileNumber ?? ''} را وارد کنید",
+                          "کد ارسال شده به شماره 09${mobileNumber ?? ''} را وارد کنید",
                           style: MyTextStyle.textMatn13.copyWith(
                             color: MyColors.text3,
                             height: 1.4,
@@ -108,6 +150,40 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           textAlign: TextAlign.center,
                         ),
+                        const SizedBox(height: 8),
+                        // Timer display or resend button
+                        if (!_canResend)
+                          Text(
+                            "ارسال مجدد کد در ${_formatTime(_remainingSeconds)}",
+                            style: MyTextStyle.textMatn13.copyWith(
+                              color: MyColors.primary,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                            ),
+                            textAlign: TextAlign.center,
+                          )
+                        else
+                          TextButton(
+                            onPressed: () {
+                              if (mobileNumber != null) {
+                                context.read<ProfileBloc>().add(
+                                      RequestOtpEvent(
+                                          mobile: "09$mobileNumber"),
+                                    );
+                                // Reset timer after resending
+                                _resetTimer();
+                              }
+                            },
+                            child: Text(
+                              "ارسال مجدد کد",
+                              style: MyTextStyle.textMatn13.copyWith(
+                                color: MyColors.primary,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                      ],
 
                       if (!showOtpForm)
                         Text(
@@ -120,7 +196,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           textAlign: TextAlign.center,
                         ),
 
-                      const SizedBox(height: 200),
+                      const SizedBox(height: 100),
 
                       // Terms and conditions link
                       if (!showOtpForm) _buildTermsLink(),
@@ -130,13 +206,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       // Action button
                       _buildActionButton(),
 
-                      const SizedBox(height: 32),
+                      const SizedBox(height: 16),
 
-                      // Footer buttons
-                      if (showOtpForm) _buildResendOtpButton(),
+                      // Footer buttons removed - resend button is now in OTP section
 
                       // Bottom spacing
-                      const SizedBox(height: 50),
+                      const SizedBox(height: 120),
+                      // const Expanded(child: SizedBox()),
                     ],
                   ),
                 ),
@@ -178,6 +254,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   FilteringTextInputFormatter.digitsOnly,
                   LengthLimitingTextInputFormatter(9),
                 ],
+                onChanged: (value) {
+                  // Close keyboard when mobile number is complete (9 digits)
+                  if (value.length == 9) {
+                    FocusScope.of(context).unfocus();
+                  }
+                },
                 style: MyTextStyle.textMatn16.copyWith(
                   fontSize: 16,
                   color: MyColors.textMatn1,
@@ -279,8 +361,14 @@ class _LoginScreenState extends State<LoginScreen> {
               textAlign: TextAlign.center,
               inputFormatters: [
                 FilteringTextInputFormatter.digitsOnly,
-                LengthLimitingTextInputFormatter(6),
+                LengthLimitingTextInputFormatter(4),
               ],
+              onChanged: (value) {
+                // Close keyboard when OTP is complete (4 digits)
+                if (value.length == 4) {
+                  FocusScope.of(context).unfocus();
+                }
+              },
               style: MyTextStyle.textMatn16.copyWith(
                 fontSize: 18,
                 color: MyColors.textMatn1,
@@ -288,7 +376,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 fontFamily: 'monospace',
               ),
               decoration: InputDecoration(
-                hintText: "000000",
+                hintText: "0000",
                 hintStyle: MyTextStyle.textMatn13.copyWith(
                   color: MyColors.text4,
                   letterSpacing: 2,
@@ -352,13 +440,19 @@ class _LoginScreenState extends State<LoginScreen> {
             showOtpForm = true;
             mobileNumber = _mobileController.text;
           });
+          // Start the timer when OTP is successfully requested
+          log("🕐 Starting OTP timer...");
+          _startTimer();
         } else if (state is ProfileSuccessLogin) {
           // Save user data and login state
           locator<PrefsOperator>().saveUserData(
             state.data.data.result.accessToken,
             state.data.data.result.refreshToken,
-            mobileNumber ?? '',
-            mobileNumber ?? '',
+            "09${mobileNumber ?? ''}",
+            "09${mobileNumber ?? ''}",
+            // userId: state.data.data.result.user.id,
+            // referrerCode: state.data.data.result.user.referrerCode,
+            // rate: state.data.data.result.user.rate,
           );
 
           ScaffoldMessenger.of(context).showSnackBar(
@@ -476,25 +570,6 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildResendOtpButton() {
-    return TextButton(
-      onPressed: () {
-        if (mobileNumber != null) {
-          context.read<ProfileBloc>().add(
-                RequestOtpEvent(mobile: mobileNumber!),
-              );
-        }
-      },
-      child: Text(
-        "ارسال مجدد کد",
-        style: MyTextStyle.textMatn13.copyWith(
-          color: MyColors.primary,
-          fontWeight: FontWeight.w500,
         ),
       ),
     );

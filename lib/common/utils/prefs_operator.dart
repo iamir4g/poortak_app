@@ -76,11 +76,31 @@ class PrefsOperator {
 
   // User Profile Data Methods
   Future<void> saveUserProfileData(
-      String? firstName, String? lastName, String? avatar) async {
+      String? firstName, String? lastName, String? avatar,
+      {String? email,
+      String? ageGroup,
+      String? nationalCode,
+      String? province,
+      String? city,
+      String? address,
+      String? postalCode,
+      String? birthdate,
+      int? rate,
+      String? referrerCode}) async {
     log("💾 Saving user profile data to SharedPreferences...");
     log("   First name: ${firstName ?? 'null'}");
     log("   Last name: ${lastName ?? 'null'}");
     log("   Avatar: ${avatar ?? 'null'}");
+    log("   Email: ${email ?? 'null'}");
+    log("   Age Group: ${ageGroup ?? 'null'}");
+    log("   National Code: ${nationalCode ?? 'null'}");
+    log("   Province: ${province ?? 'null'}");
+    log("   City: ${city ?? 'null'}");
+    log("   Address: ${address ?? 'null'}");
+    log("   Postal Code: ${postalCode ?? 'null'}");
+    log("   Birthdate: ${birthdate ?? 'null'}");
+    log("   Rate: ${rate ?? 'null'}");
+    log("   Referrer Code: ${referrerCode ?? 'null'}");
 
     if (firstName != null) {
       sharedPreferences.setString("user_first_name", firstName);
@@ -90,6 +110,39 @@ class PrefsOperator {
     }
     if (avatar != null) {
       sharedPreferences.setString("user_avatar", avatar);
+    }
+    if (email != null) {
+      sharedPreferences.setString("user_email", email);
+    }
+    if (ageGroup != null) {
+      sharedPreferences.setString("user_age_group", ageGroup);
+    }
+    if (nationalCode != null) {
+      sharedPreferences.setString("user_national_code", nationalCode);
+    }
+    if (province != null) {
+      sharedPreferences.setString("user_province", province);
+    }
+    if (city != null) {
+      sharedPreferences.setString("user_city", city);
+    }
+    if (address != null) {
+      sharedPreferences.setString("user_address", address);
+    }
+    if (postalCode != null) {
+      sharedPreferences.setString("user_postal_code", postalCode);
+    }
+    if (birthdate != null) {
+      sharedPreferences.setString("user_birthdate", birthdate);
+    }
+    if (rate != null) {
+      sharedPreferences.setInt("user_rate", rate);
+    }
+    if (referrerCode != null) {
+      sharedPreferences.setString("user_referrer_code", referrerCode);
+      log("💾 Referrer code saved to SharedPreferences: $referrerCode");
+    } else {
+      log("⚠️ Referrer code is null - not saving to SharedPreferences");
     }
 
     log("✅ User profile data saved successfully");
@@ -111,6 +164,71 @@ class PrefsOperator {
     final avatar = sharedPreferences.getString('user_avatar');
     log("🖼️ Retrieved user avatar: ${avatar ?? 'null'}");
     return avatar;
+  }
+
+  Future<String?> getUserEmail() async {
+    final email = sharedPreferences.getString('user_email');
+    log("📧 Retrieved user email: ${email ?? 'null'}");
+    return email;
+  }
+
+  Future<String?> getUserAgeGroup() async {
+    final ageGroup = sharedPreferences.getString('user_age_group');
+    log("👶 Retrieved user age group: ${ageGroup ?? 'null'}");
+    return ageGroup;
+  }
+
+  Future<String?> getUserNationalCode() async {
+    final nationalCode = sharedPreferences.getString('user_national_code');
+    log("🆔 Retrieved user national code: ${nationalCode ?? 'null'}");
+    return nationalCode;
+  }
+
+  Future<String?> getUserProvince() async {
+    final province = sharedPreferences.getString('user_province');
+    log("🏛️ Retrieved user province: ${province ?? 'null'}");
+    return province;
+  }
+
+  Future<String?> getUserCity() async {
+    final city = sharedPreferences.getString('user_city');
+    log("🏙️ Retrieved user city: ${city ?? 'null'}");
+    return city;
+  }
+
+  Future<String?> getUserAddress() async {
+    final address = sharedPreferences.getString('user_address');
+    log("🏠 Retrieved user address: ${address ?? 'null'}");
+    return address;
+  }
+
+  Future<String?> getUserPostalCode() async {
+    final postalCode = sharedPreferences.getString('user_postal_code');
+    log("📮 Retrieved user postal code: ${postalCode ?? 'null'}");
+    return postalCode;
+  }
+
+  Future<String?> getUserBirthdate() async {
+    final birthdate = sharedPreferences.getString('user_birthdate');
+    log("🎂 Retrieved user birthdate: ${birthdate ?? 'null'}");
+    return birthdate;
+  }
+
+  Future<int?> getUserRate() async {
+    final rate = sharedPreferences.getInt('user_rate');
+    log("⭐ Retrieved user rate: ${rate ?? 'null'}");
+    return rate;
+  }
+
+  Future<String?> getUserReferrerCode() async {
+    final referrerCode = sharedPreferences.getString('user_referrer_code');
+    log("🎯 Retrieved user referrer code: ${referrerCode ?? 'null'}");
+
+    // Debug: Print all keys in SharedPreferences
+    final allKeys = sharedPreferences.getKeys();
+    log("🔍 All SharedPreferences keys: $allKeys");
+
+    return referrerCode;
   }
 
   Future<String> getFullUserName() async {

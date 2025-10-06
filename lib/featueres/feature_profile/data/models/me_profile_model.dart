@@ -32,7 +32,7 @@ class MeProfileModel {
 class Data {
   String id;
   String? avatar;
-  String email;
+  String? email;
   String? firstName;
   String? lastName;
   String phone;
@@ -46,6 +46,7 @@ class Data {
   String? postalCode;
   String? birthdate;
   int rate;
+  String? referrerCode;
   DateTime createdAt;
   DateTime updatedAt;
   DateTime? disabledAt;
@@ -54,7 +55,7 @@ class Data {
   Data({
     required this.id,
     this.avatar,
-    required this.email,
+    this.email,
     this.firstName,
     this.lastName,
     required this.phone,
@@ -68,6 +69,7 @@ class Data {
     this.postalCode,
     this.birthdate,
     required this.rate,
+    this.referrerCode,
     required this.createdAt,
     required this.updatedAt,
     this.disabledAt,
@@ -91,9 +93,12 @@ class Data {
         postalCode: json["postalCode"],
         birthdate: json["birthdate"],
         rate: json["rate"],
+        referrerCode: json["referrerCode"],
         createdAt: DateTime.parse(json["createdAt"]),
         updatedAt: DateTime.parse(json["updatedAt"]),
-        disabledAt: json["disabledAt"],
+        disabledAt: json["disabledAt"] != null
+            ? DateTime.parse(json["disabledAt"])
+            : null,
         roles: List<Role>.from(json["roles"].map((x) => Role.fromJson(x))),
       );
 
@@ -114,9 +119,10 @@ class Data {
         "postalCode": postalCode,
         "birthdate": birthdate,
         "rate": rate,
+        "referrerCode": referrerCode,
         "createdAt": createdAt.toIso8601String(),
         "updatedAt": updatedAt.toIso8601String(),
-        "disabledAt": disabledAt,
+        "disabledAt": disabledAt?.toIso8601String(),
         "roles": List<dynamic>.from(roles.map((x) => x.toJson())),
       };
 }

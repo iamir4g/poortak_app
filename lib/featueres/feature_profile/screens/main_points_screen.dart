@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lottie/lottie.dart';
+import 'package:poortak/config/myTextStyle.dart';
 
 class MainPointsScreen extends StatefulWidget {
   static const routeName = "/main_points_screen";
@@ -127,22 +128,24 @@ class _MainPointsScreenState extends State<MainPointsScreen> {
                   Text(
                     "امتیاز کسب شده:",
                     textAlign: TextAlign.right,
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 16,
-                      fontFamily: 'IRANSans',
-                      fontWeight: FontWeight.w500,
-                    ),
+                    style: MyTextStyle.textMatn16Bold,
+                    // TextStyle(
+                    //   color: Colors.black,
+                    //   fontSize: 16,
+                    //   fontFamily: 'IRANSans',
+                    //   fontWeight: FontWeight.w500,
+                    // ),
                   ),
                   Text(
                     "امتیاز کسب شده از ابتدای آموزش",
                     textAlign: TextAlign.right,
-                    style: TextStyle(
-                      color: const Color(0xFF3D485B),
-                      fontSize: 10,
-                      fontFamily: 'IRANSans',
-                      fontWeight: FontWeight.w300,
-                    ),
+                    style: MyTextStyle.textMatn12W300,
+                    // TextStyle(
+                    //   color: const Color(0xFF3D485B),
+                    //   fontSize: 10,
+                    //   fontFamily: 'IRANSans',
+                    //   fontWeight: FontWeight.w300,
+                    // ),
                   ),
                 ],
               ),
@@ -212,12 +215,13 @@ class _MainPointsScreenState extends State<MainPointsScreen> {
                 child: Text(
                   "روش های کسب امتیاز",
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: const Color(0xFF28303D),
-                    fontSize: 15,
-                    fontFamily: 'IRANSans',
-                    fontWeight: FontWeight.w500,
-                  ),
+                  style: MyTextStyle.textMatn15,
+                  // TextStyle(
+                  //   color: const Color(0xFF28303D),
+                  //   fontSize: 15,
+                  //   fontFamily: 'IRANSans',
+                  //   fontWeight: FontWeight.w500,
+                  // ),
                 ),
               ),
             ),
@@ -228,151 +232,165 @@ class _MainPointsScreenState extends State<MainPointsScreen> {
   }
 
   Widget _buildPointsHistoryCard() {
-    return Container(
-      width: 350,
-      height: 119,
-      margin: const EdgeInsets.symmetric(horizontal: 23, vertical: 20),
-      decoration: BoxDecoration(
-        color: const Color(0xFFE9EFFF),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x0A000000),
-            blurRadius: 4,
-            offset: Offset(0, 0),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // SizedBox(width: 20),
-
-          // Text content
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.only(right: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "تاریخچه امتیاز",
-                    textAlign: TextAlign.right,
-                    style: TextStyle(
-                      color: const Color(0xFF28303D),
-                      fontSize: 13,
-                      fontFamily: 'IRANSans',
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    "تاریخچه ی امتیازهای کسب شده خود را ببینید.",
-                    textAlign: TextAlign.right,
-                    style: TextStyle(
-                      color: const Color(0xFF3D485B),
-                      fontSize: 10,
-                      fontFamily: 'IRANSans',
-                      fontWeight: FontWeight.w300,
-                    ),
-                  ),
-                ],
-              ),
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(context, '/history_prize_screen');
+      },
+      child: Container(
+        width: 350,
+        height: 119,
+        margin: const EdgeInsets.symmetric(horizontal: 23, vertical: 20),
+        decoration: BoxDecoration(
+          color: const Color(0xFFE9EFFF),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x0A000000),
+              blurRadius: 4,
+              offset: Offset(0, 0),
             ),
-          ),
-          // Calendar animation placeholder
-          Container(
-            width: 100,
-            height: 100,
-            child: Lottie.asset(
-              'assets/images/points/calendar.json',
-              width: 79,
-              height: 78,
-              fit: BoxFit.cover,
-            ),
-          ),
-
-          // const
-          // const SizedBox(width: 23),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDiscountsCard() {
-    return Container(
-      width: 350,
-      height: 119,
-      margin: const EdgeInsets.symmetric(horizontal: 23, vertical: 20),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFFF9EB),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x0A000000),
-            blurRadius: 4,
-            offset: Offset(0, 0),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20),
+          ],
+        ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // const SizedBox(width: 20),
+            // SizedBox(width: 20),
 
             // Text content
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "تخفیف ها و جایزه",
-                    textAlign: TextAlign.right,
-                    style: TextStyle(
-                      color: const Color(0xFF28303D),
-                      fontSize: 13,
-                      fontFamily: 'IRANSans',
-                      fontWeight: FontWeight.w500,
+              child: Padding(
+                padding: EdgeInsets.only(right: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "تاریخچه امتیاز",
+                      textAlign: TextAlign.right,
+                      style: MyTextStyle.textMatn13,
+                      // TextStyle(
+                      //   color: const Color(0xFF28303D),
+                      //   fontSize: 13,
+                      //   fontFamily: 'IRANSans',
+                      //   fontWeight: FontWeight.w500,
+                      // ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    "جایزه سکه های جمع شده خود را مشاهده کنید.",
-                    textAlign: TextAlign.right,
-                    style: TextStyle(
-                      color: const Color(0xFF3D485B),
-                      fontSize: 10,
-                      fontFamily: 'IRANSans',
-                      fontWeight: FontWeight.w300,
+                    const SizedBox(height: 8),
+                    Text(
+                      "تاریخچه ی امتیازهای کسب شده خود را ببینید.",
+                      textAlign: TextAlign.right,
+                      style: MyTextStyle.textMatn10W300,
+                      // TextStyle(
+                      //   color: const Color(0xFF3D485B),
+                      //   fontSize: 10,
+                      //   fontFamily: 'IRANSans',
+                      //   fontWeight: FontWeight.w300,
+                      // ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-
-            // Prize animation placeholder with background circle
+            // Calendar animation placeholder
             Container(
-              width: 70,
-              height: 70,
-              // margin: const EdgeInsets.only(left: 23),
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white,
-              ),
+              width: 100,
+              height: 100,
               child: Lottie.asset(
-                'assets/images/points/prize.json',
-                width: 78,
+                'assets/images/points/calendar.json',
+                width: 79,
                 height: 78,
                 fit: BoxFit.cover,
               ),
             ),
 
+            // const
             // const SizedBox(width: 23),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDiscountsCard() {
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(context, '/prize_screen');
+      },
+      child: Container(
+        width: 350,
+        height: 119,
+        margin: const EdgeInsets.symmetric(horizontal: 23, vertical: 20),
+        decoration: BoxDecoration(
+          color: const Color(0xFFFFF9EB),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x0A000000),
+              blurRadius: 4,
+              offset: Offset(0, 0),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // const SizedBox(width: 20),
+
+              // Text content
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "تخفیف ها و جایزه",
+                      textAlign: TextAlign.right,
+                      style: MyTextStyle.textMatn13,
+                      // TextStyle(
+                      //   color: const Color(0xFF28303D),
+                      //   fontSize: 13,
+                      //   fontFamily: 'IRANSans',
+                      //   fontWeight: FontWeight.w500,
+                      // ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      "جایزه سکه های جمع شده خود را مشاهده کنید.",
+                      textAlign: TextAlign.right,
+                      style: MyTextStyle.textMatn10W300,
+                      // TextStyle(
+                      //   color: const Color(0xFF3D485B),
+                      //   fontSize: 10,
+                      //   fontFamily: 'IRANSans',
+                      //   fontWeight: FontWeight.w300,
+                      // ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Prize animation placeholder with background circle
+              Container(
+                width: 70,
+                height: 70,
+                // margin: const EdgeInsets.only(left: 23),
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
+                ),
+                child: Lottie.asset(
+                  'assets/images/points/prize.json',
+                  width: 78,
+                  height: 78,
+                  fit: BoxFit.cover,
+                ),
+              ),
+
+              // const SizedBox(width: 23),
+            ],
+          ),
         ),
       ),
     );

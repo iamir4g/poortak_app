@@ -152,12 +152,23 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         log("   First name: ${userData.firstName ?? 'null'}");
         log("   Last name: ${userData.lastName ?? 'null'}");
         log("   Avatar: ${userData.avatar ?? 'null'}");
+        log("   Referrer Code: ${userData.referrerCode ?? 'null'}");
 
         // Save profile data to preferences
         await prefsOperator.saveUserProfileData(
           userData.firstName,
           userData.lastName,
           userData.avatar,
+          email: userData.email,
+          ageGroup: userData.ageGroup,
+          nationalCode: userData.nationalCode,
+          province: userData.province,
+          city: userData.city,
+          address: userData.address,
+          postalCode: userData.postalCode,
+          birthdate: userData.birthdate?.toString(),
+          rate: userData.rate,
+          referrerCode: userData.referrerCode,
         );
 
         log("💾 User profile data saved to preferences successfully");
@@ -223,6 +234,16 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
             updatedData.firstName,
             updatedData.lastName,
             updatedData.avatar,
+            email: updatedData.email,
+            ageGroup: updatedData.ageGroup,
+            nationalCode: updatedData.nationalCode,
+            province: updatedData.province,
+            city: updatedData.city,
+            address: updatedData.address,
+            postalCode: updatedData.postalCode,
+            birthdate: updatedData.birthdate?.toIso8601String(),
+            rate: updatedData.rate,
+            // referrerCode is not available in UpdateProfileModel
           );
 
           log("✅ Updated profile data saved to preferences successfully!");

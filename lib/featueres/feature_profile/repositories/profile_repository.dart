@@ -52,6 +52,35 @@ class ProfileRepository {
         log("Login Error - Status: ${response.statusCode}, Data: ${response.data}");
         return DataFailed(response.data['message'] ?? "خطا در ورود");
       }
+    } on DioException catch (dioError) {
+      log("Login DioException: $dioError");
+
+      // Handle DioException with response data
+      if (dioError.response != null) {
+        final responseData = dioError.response!.data;
+        log("DioException Response Data: $responseData");
+
+        // Extract error message from response
+        String errorMessage = "خطا در ورود";
+        if (responseData is Map<String, dynamic>) {
+          if (responseData.containsKey('message')) {
+            errorMessage = responseData['message'];
+          } else if (responseData.containsKey('error')) {
+            errorMessage = responseData['error'];
+          }
+        }
+
+        // Check for specific invalid OTP error
+        if (dioError.response!.statusCode == 400 &&
+            errorMessage.toLowerCase().contains('invalid otp')) {
+          errorMessage = "کد تایید اشتباه است. لطفاً کد صحیح را وارد کنید.";
+        }
+
+        return DataFailed(errorMessage);
+      } else {
+        // Handle DioException without response data
+        return DataFailed("خطا در اتصال به سرور");
+      }
     } catch (e) {
       log("Login Error: $e");
       return DataFailed(e.toString());

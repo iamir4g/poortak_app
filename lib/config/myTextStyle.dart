@@ -34,6 +34,12 @@ class MyTextStyle {
     fontWeight: FontWeight.w300,
     color: MyColors.textMatn1,
   );
+  static const TextStyle textMatn16Bold = TextStyle(
+    fontFamily: "IranSans",
+    fontSize: 16,
+    fontWeight: FontWeight.bold,
+    color: MyColors.textMatn1,
+  );
   static const TextStyle textMatn14Bold = TextStyle(
     fontFamily: "IranSans",
     fontSize: 14,
@@ -61,13 +67,19 @@ class MyTextStyle {
   static const TextStyle textMatn12W300 = TextStyle(
     fontFamily: "IranSans",
     fontSize: 12,
-    fontWeight: FontWeight.w300,
+    fontWeight: FontWeight.normal,
+    color: MyColors.textMatn1,
+  );
+  static const TextStyle textMatn10W300 = TextStyle(
+    fontFamily: "IranSans",
+    fontSize: 10,
+    fontWeight: FontWeight.normal,
     color: MyColors.textMatn1,
   );
   static const TextStyle textMatn15 = TextStyle(
     fontFamily: "IranSans",
     fontSize: 15,
-    fontWeight: FontWeight.w300,
+    fontWeight: FontWeight.bold,
     color: MyColors.textMatn1,
   );
 

@@ -10,10 +10,13 @@ import 'package:poortak/config/myColors.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/kavoosh_main_screen.dart';
 import 'package:poortak/featueres/feature_litner/screens/litner_main_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/profile_screen.dart';
+import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/bloc_storage_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/repositories/sayareh_repository.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/sayareh_screen.dart';
 import 'package:poortak/featueres/feature_shopping_cart/screens/shopping_cart_screen.dart';
+import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
+import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
 import 'package:poortak/locator.dart';
 import 'package:poortak/common/bloc/permission/permission_bloc.dart';
 import 'package:poortak/common/bloc/theme_cubit/theme_cubit.dart';
@@ -66,12 +69,22 @@ class _MainWrapperState extends State<MainWrapper> {
   }
 
   void _logout() async {
+    // Clear user data from preferences
     await prefsOperator.logout();
-    // if (mounted) {
-    //   setState(() {
-    //     isLoggedIn = false;
-    //   });
-    // }
+
+    // Clear shopping cart (both local and remote)
+    try {
+      context.read<ShoppingCartBloc>().add(ClearLocalCartEvent());
+    } catch (e) {
+      log("⚠️ Failed to clear shopping cart: $e");
+    }
+
+    // Navigate to login screen and clear all previous routes
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      LoginScreen.routeName,
+      (route) => false,
+    );
   }
 
   void _showLogoutConfirmation() {
@@ -142,8 +155,7 @@ class _MainWrapperState extends State<MainWrapper> {
                         : MyColors.textMatn1,
                     elevation: 0,
                     actions: [
-                      (currentPageIndex == 4 &&
-                              (prefsOperator.isLoggedIn == true))
+                      (currentPageIndex == 4 && prefsOperator.isLoggedIn())
                           ? PopupMenuButton<String>(
                               icon: Icon(Icons.more_vert,
                                   color: themeState.isDark
