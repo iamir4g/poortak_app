@@ -1,45 +1,41 @@
 // To parse this JSON data, do
 //
-//     final GetBookListModel = GetBookListModelFromJson(jsonString);
+//     final SingleBookModel = SingleBookModelFromJson(jsonString);
 
 import 'dart:convert';
 
-GetBookListModel GetBookListModelFromJson(String str) =>
-    GetBookListModel.fromJson(json.decode(str));
+SingleBookModel SingleBookModelFromJson(String str) =>
+    SingleBookModel.fromJson(json.decode(str));
 
-String GetBookListModelToJson(GetBookListModel data) =>
+String SingleBookModelToJson(SingleBookModel data) =>
     json.encode(data.toJson());
 
-class GetBookListModel {
+class SingleBookModel {
   bool ok;
   Meta meta;
-  List<BookList>? data;
+  SingleBookData data;
 
-  GetBookListModel({
+  SingleBookModel({
     required this.ok,
     required this.meta,
-    this.data,
+    required this.data,
   });
 
-  factory GetBookListModel.fromJson(Map<String, dynamic> json) =>
-      GetBookListModel(
+  factory SingleBookModel.fromJson(Map<String, dynamic> json) =>
+      SingleBookModel(
         ok: json["ok"],
         meta: Meta.fromJson(json["meta"]),
-        data: json["data"] != null
-            ? List<BookList>.from(json["data"].map((x) => BookList.fromJson(x)))
-            : null,
+        data: SingleBookData.fromJson(json["data"]),
       );
 
   Map<String, dynamic> toJson() => {
         "ok": ok,
         "meta": meta.toJson(),
-        "data": data != null
-            ? List<dynamic>.from(data!.map((x) => x.toJson()))
-            : null,
+        "data": data.toJson(),
       };
 }
 
-class BookList {
+class SingleBookData {
   String id;
   String title;
   String? description;
@@ -57,7 +53,7 @@ class BookList {
   DateTime? publishedAt;
   bool purchased;
 
-  BookList({
+  SingleBookData({
     required this.id,
     required this.title,
     this.description,
@@ -76,7 +72,7 @@ class BookList {
     required this.purchased,
   });
 
-  factory BookList.fromJson(Map<String, dynamic> json) => BookList(
+  factory SingleBookData.fromJson(Map<String, dynamic> json) => SingleBookData(
         id: json["id"] ?? "",
         title: json["title"] ?? "",
         description: json["description"],

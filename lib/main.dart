@@ -53,6 +53,8 @@ import 'package:flutter/widgets.dart'; // For RouteAware
 import 'package:poortak/common/bloc/theme_cubit/theme_cubit.dart';
 import 'package:poortak/common/bloc/settings_cubit/settings_cubit.dart';
 import 'package:poortak/featueres/feature_match/presentation/bloc/match_bloc/match_bloc.dart';
+import 'package:poortak/featueres/fetures_sayareh/screens/pdf_reader_screen.dart';
+import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/single_book_cubit.dart';
 
 final RouteObserver<ModalRoute<void>> routeObserver =
     RouteObserver<ModalRoute<void>>();
@@ -232,6 +234,23 @@ void main() async {
               HowToGetPointsScreen.routeName: (context) =>
                   HowToGetPointsScreen(),
               FavoritScreen.routeName: (context) => FavoritScreen(),
+              PdfReaderScreen.routeName: (context) {
+                final args = ModalRoute.of(context)?.settings.arguments
+                    as Map<String, dynamic>;
+                return MultiBlocProvider(
+                  providers: [
+                    BlocProvider(
+                      create: (context) =>
+                          SingleBookCubit(sayarehRepository: locator()),
+                    ),
+                    BlocProvider(
+                      create: (context) =>
+                          ShoppingCartBloc(repository: locator()),
+                    ),
+                  ],
+                  child: PdfReaderScreen(),
+                );
+              },
             },
             debugShowCheckedModeBanner: false,
             title: 'Poortak',

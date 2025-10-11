@@ -28,6 +28,14 @@ class SayarehApiProvider {
     return response;
   }
 
+  dynamic callGetBookById(String bookId) async {
+    final response = await dio.get(
+      "${Constants.baseUrl}iknow/books/$bookId",
+    );
+    log("Sayareh Single Book Response: ${response.data}");
+    return response;
+  }
+
   dynamic callGetCourseById(String id) async {
     final response = await dio.get(
       "${Constants.baseUrl}iknow/courses/$id",

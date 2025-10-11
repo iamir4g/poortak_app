@@ -10,14 +10,20 @@ class ItemBook extends StatelessWidget {
   final String? description;
   final String? thumbnail;
   final String? fileKey;
-  // final String? price;
+  final String? trialFile;
+  final bool purchased;
+  final String? price;
+  final String? bookId;
   const ItemBook({
     super.key,
     this.title,
     this.description,
     this.thumbnail,
     this.fileKey,
-    // this.price
+    this.trialFile,
+    this.purchased = false,
+    this.price,
+    this.bookId,
   });
 
   @override
@@ -27,8 +33,8 @@ class ItemBook extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(20),
         onTap: () {
-          if (fileKey != null && fileKey!.isNotEmpty) {
-            _openPdfReader(context);
+          if (bookId != null && bookId!.isNotEmpty) {
+            _navigateToPdfReader(context);
           }
         },
         child: Container(
@@ -108,7 +114,7 @@ class ItemBook extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Icon(
-                Icons.arrow_forward_ios, 
+                Icons.arrow_forward_ios,
                 color: Theme.of(context).textTheme.bodySmall?.color,
               ),
             ],
@@ -118,48 +124,16 @@ class ItemBook extends StatelessWidget {
     );
   }
 
-  void _openPdfReader(BuildContext context) {
-    if (fileKey == null || fileKey!.isEmpty) return;
+  void _navigateToPdfReader(BuildContext context) {
+    if (bookId == null || bookId!.isEmpty) return;
 
-    // Show loading dialog
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          content: Row(
-            children: [
-              CircularProgressIndicator(),
-              SizedBox(width: 16),
-              Text(
-                'در حال باز کردن کتاب...',
-                style: TextStyle(
-                  color: Theme.of(context).textTheme.titleMedium?.color,
-                ),
-              ),
-            ],
-          ),
-        );
+    // Navigate to PDF reader with book ID
+    Navigator.pushNamed(
+      context,
+      '/pdf_reader_screen',
+      arguments: {
+        'bookId': bookId!,
       },
     );
-
-    final storageService = locator<StorageService>();
-
-    // Navigate to PDF reader
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => PdfReaderScreen(
-          fileKey: fileKey!,
-          fileName: '${title ?? 'book'}.pdf',
-          fileId: 'book_${fileKey}',
-          storageService: storageService,
-          bookTitle: title ?? 'کتاب',
-        ),
-      ),
-    ).then((_) {
-      // Close loading dialog when returning from PDF reader
-      Navigator.of(context).pop();
-    });
   }
 }

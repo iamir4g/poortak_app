@@ -6,6 +6,7 @@ import 'package:poortak/common/resources/data_state.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/data_source/sayareh_api_provider.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/answer_question_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/book_list_model.dart';
+import 'package:poortak/featueres/fetures_sayareh/data/models/single_book_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/conversation_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/practice_vocabulary_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/quiz_question_model.dart';
@@ -48,6 +49,20 @@ class SayarehRepository {
       }
     } on AppException catch (e) {
       return CheckExceptions.getError<GetBookListModel>(e);
+    }
+  }
+
+  Future<DataState<SingleBookModel>> fetchBookById(String bookId) async {
+    try {
+      Response response = await sayarehApiProvider.callGetBookById(bookId);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = SingleBookModel.fromJson(response.data);
+        return DataSuccess(data);
+      } else {
+        return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
+      }
+    } on AppException catch (e) {
+      return CheckExceptions.getError<SingleBookModel>(e);
     }
   }
 
