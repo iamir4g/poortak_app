@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:iconify_design/iconify_design.dart';
 import 'package:persian_tools/persian_tools.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/common/widgets/primaryButton.dart';
@@ -98,7 +99,7 @@ class _DialogCartState extends State<DialogCart> {
                           Tab(
                             text: "خرید تکی",
                           ),
-                          Tab(text: "خرید مجموعه"),
+                          Tab(text: "خرید مجموعه %"),
                         ])),
                 SizedBox(
                   height: 16,
@@ -252,6 +253,35 @@ class _DialogCartState extends State<DialogCart> {
                                   ),
                                 ),
                                 Positioned(
+                                    bottom: 35,
+                                    right: 8,
+                                    child: Container(
+                                      width: 30,
+                                      height: 30,
+                                      // decoration: BoxDecoration(
+                                      //   color: Colors.white,
+                                      //   borderRadius: BorderRadius.circular(15),
+                                      // ),
+                                      child: IconifyIcon(
+                                          color: Colors.white,
+                                          icon: "arcticons:pdf-viewer"),
+                                    )),
+                                Positioned(
+                                  bottom: 5,
+                                  right: 8,
+                                  child: Container(
+                                    width: 30,
+                                    height: 30,
+                                    // decoration: BoxDecoration(
+                                    //   color: Colors.white,
+                                    //   borderRadius: BorderRadius.circular(15),
+                                    // ),
+                                    child: IconifyIcon(
+                                        color: Colors.white,
+                                        icon: "carbon:play-outline"),
+                                  ),
+                                ),
+                                Positioned(
                                   bottom: 5,
                                   left: 8,
                                   child: Container(
@@ -262,7 +292,7 @@ class _DialogCartState extends State<DialogCart> {
                                             Radius.circular(20)),
                                         color: Colors.white),
                                     child: Padding(
-                                      padding: EdgeInsets.fromLTRB(4, 0, 4, 0),
+                                      padding: EdgeInsets.fromLTRB(4, 0, 2, 0),
                                       child: Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceAround,
@@ -357,6 +387,142 @@ class _DialogCartState extends State<DialogCart> {
                             SizedBox(
                               height: 16,
                             ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
+                                    children: [
+                                      Text(
+                                        "جمع دروس و کتاب ها",
+                                        style: MyTextStyle.textMatn12W300,
+                                      ),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            "${widget.item.price.toString().addComma} ",
+                                            style: MyTextStyle.textMatn14Bold,
+                                          ),
+                                          Text(
+                                            l10n!.toman,
+                                            style: MyTextStyle.textMatn10W300,
+                                          )
+                                        ],
+                                      )
+                                    ],
+                                  ),
+                                  SizedBox(
+                                    height: 16,
+                                  ),
+                                  Container(
+                                    width: 286,
+                                    height: 42,
+                                    decoration: ShapeDecoration(
+                                      color: const Color(0xFFFEF3E6),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                      children: [
+                                        Text(
+                                          "تخفیف",
+                                          style: MyTextStyle.textMatn12W300,
+                                        ),
+                                        Row(
+                                          // mainAxisAlignment:
+                                          //     MainAxisAlignment.spaceAround,
+                                          children: [
+                                            Container(
+                                              width: 33,
+                                              height: 17.84,
+                                              alignment: Alignment.center,
+                                              decoration: ShapeDecoration(
+                                                color: const Color(0xFFFF5353),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          11.50),
+                                                ),
+                                              ),
+                                              child: Text(
+                                                "10%",
+                                                style:
+                                                    MyTextStyle.textMatn10W300,
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              width: 4,
+                                            ),
+                                            Text(
+                                              "150000",
+                                              style: MyTextStyle.textMatn12W300,
+                                            ),
+                                            SizedBox(
+                                              width: 4,
+                                            ),
+                                            Text(
+                                              l10n!.toman,
+                                              style: MyTextStyle.textMatn10W300,
+                                            ),
+                                          ],
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 16,
+                                  ),
+                                  Container(
+                                    width: 286,
+                                    height: 54,
+                                    decoration: ShapeDecoration(
+                                      color: const Color(0xFFF5F6F9),
+                                      shape: RoundedRectangleBorder(
+                                        side: BorderSide(
+                                          width: 2,
+                                          color: const Color(0xFFFFA63E),
+                                        ),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                      children: [
+                                        Text(
+                                          "مبلغ قابل پرداخت",
+                                          style: MyTextStyle.textMatn12W300,
+                                        ),
+                                        Row(
+                                          children: [
+                                            Text(
+                                              "60000",
+                                              style: MyTextStyle.textMatn14Bold,
+                                            ),
+                                            SizedBox(
+                                              width: 4,
+                                            ),
+                                            Text(
+                                              l10n!.toman,
+                                              style: MyTextStyle.textMatn10W300,
+                                            )
+                                          ],
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 16,
+                                  ),
+                                ],
+                              ),
+                            ),
                             PrimaryButton(
                                 width: 286,
                                 height: 65,
@@ -379,6 +545,33 @@ class _DialogCartState extends State<DialogCart> {
                     ],
                   ),
                 ),
+                Container(
+                  width: 360,
+                  height: 112,
+                  decoration: ShapeDecoration(
+                    color: const Color(0xFFEFF1F4),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(25),
+                        bottomRight: Radius.circular(25),
+                      ),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Image.asset("assets/images/cart/subtract.png"),
+                      Container(
+                        // margin: EdgeInsets.only(right: 10),
+                        width: 230,
+                        child: Text(
+                          "جهت کسب اطلاعات بیشتر به وبسایت پورتک به نشانی www.poortak.ir مراجه کنید.",
+                          style: MyTextStyle.textMatn11,
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
+                  ),
+                )
               ],
             ),
           ),

@@ -120,6 +120,7 @@ class MyTextStyle {
     fontWeight: FontWeight.w300,
     color: MyColors.textMatn1,
   );
+
   // static const TextStyle bottomNavDisabledTextStyle = TextStyle(
   //   fontFamily: "IranSans",
   //   fontSize: 14,
