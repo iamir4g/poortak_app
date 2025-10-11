@@ -56,15 +56,16 @@ class _ConversationScreenState extends State<ConversationScreen> {
           currentPlayingIndex = i;
         });
 
-        // Set voice based on the message's voice field
-        if (message.voice == 'male') {
-          await ttsService.setPitch(0.3);
-        } else if (message.voice == 'female') {
-          await ttsService.setPitch(1.0);
-        }
-
         // Wait for the current message to finish playing
-        await ttsService.speak(message.text);
+        if (message.voice == 'male') {
+          await ttsService.setMaleVoice();
+          await ttsService.speak(message.text);
+        } else if (message.voice == 'female') {
+          await ttsService.setFemaleVoice();
+          await ttsService.speak(message.text);
+        } else {
+          await ttsService.speak(message.text, voice: message.voice);
+        }
         await Future.delayed(const Duration(
             milliseconds: 500)); // Add a small delay between messages
       }
@@ -77,13 +78,18 @@ class _ConversationScreenState extends State<ConversationScreen> {
   }
 
   Future<void> speakText(String text, String voice) async {
-    // Set voice based on the message's voice field
     if (voice == 'male') {
-      await ttsService.setPitch(0.3);
+      // استفاده مستقیم از صدای مردانه انتخابی
+      await ttsService.setMaleVoice();
+      await ttsService.speak(text);
     } else if (voice == 'female') {
-      await ttsService.setPitch(1.0);
+      // استفاده از صدای زنانه
+      await ttsService.setFemaleVoice();
+      await ttsService.speak(text);
+    } else {
+      // استفاده از متد عادی
+      await ttsService.speak(text, voice: voice);
     }
-    await ttsService.speak(text);
   }
 
   @override
@@ -173,39 +179,55 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
       return Align(
         alignment: isFirstPerson ? Alignment.centerRight : Alignment.centerLeft,
-        child: Container(
-          margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-          decoration: BoxDecoration(
-            color: isFirstPerson ? MyColors.primary : Colors.grey[300],
-            borderRadius: BorderRadius.circular(20),
-            border: isCurrentPlaying
-                ? Border.all(color: Colors.green, width: 2)
-                : null,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                message.text,
-                style: FontSizeHelper.getContentTextStyle(
-                  context,
-                  baseFontSize: 16.0,
-                  color: isFirstPerson ? Colors.white : Colors.black,
+        child: GestureDetector(
+          onTap: () {
+            speakText(message.text, message.voice);
+          },
+          child: Container(
+            margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+            decoration: BoxDecoration(
+              color: isFirstPerson ? MyColors.primary : Colors.grey[300],
+              borderRadius: BorderRadius.circular(20),
+              border: isCurrentPlaying
+                  ? Border.all(color: Colors.green, width: 2)
+                  : null,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      message.text,
+                      style: FontSizeHelper.getContentTextStyle(
+                        context,
+                        baseFontSize: 16.0,
+                        color: isFirstPerson ? Colors.white : Colors.black,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Icon(
+                      Icons.volume_up,
+                      size: 16,
+                      color: isFirstPerson ? Colors.white70 : Colors.black54,
+                    ),
+                  ],
                 ),
-              ),
-              if (showTranslations) ...[
-                const SizedBox(height: 4),
-                Text(
-                  message.translation,
-                  style: FontSizeHelper.getContentTextStyle(
-                    context,
-                    baseFontSize: 12.0,
-                    color: isFirstPerson ? Colors.white70 : Colors.black54,
+                if (showTranslations) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    message.translation,
+                    style: FontSizeHelper.getContentTextStyle(
+                      context,
+                      baseFontSize: 12.0,
+                      color: isFirstPerson ? Colors.white70 : Colors.black54,
+                    ),
                   ),
-                ),
+                ],
               ],
-            ],
+            ),
           ),
         ),
       );
