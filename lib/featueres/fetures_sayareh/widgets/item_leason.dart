@@ -91,9 +91,10 @@ class ItemLeason extends StatelessWidget {
             ),
             Row(
               children: [
-                !purchased
-                    ? Image(image: AssetImage("assets/images/lock_image.png"))
-                    : SizedBox(),
+                purchased
+                    ? SizedBox()
+                    : Image(image: AssetImage("assets/images/lock_image.png")),
+                // : SizedBox(),
                 SizedBox(
                   width: 8,
                 ),

@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:pdfx/pdfx.dart';
 import '../utils/pdfDownloader.dart';
@@ -12,6 +11,7 @@ class CustomPdfReader extends StatefulWidget {
   final bool isEncrypted;
   final bool showDownloadButton;
   final bool autoDownload;
+  final bool usePublicUrl;
   final StorageService storageService;
 
   const CustomPdfReader({
@@ -24,6 +24,7 @@ class CustomPdfReader extends StatefulWidget {
     this.isEncrypted = false,
     this.showDownloadButton = true,
     this.autoDownload = false,
+    this.usePublicUrl = false,
   }) : super(key: key);
 
   @override
@@ -51,16 +52,19 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
 
   Future<void> _initializePdf() async {
     try {
-      // First check if we have a local file
-      final localPath = await PdfDownloader.getLocalPdfPath(widget.fileName);
+      // First check if we have a local file for this specific fileKey
+      final localPath =
+          await PdfDownloader.getLocalPdfPathByFileId(widget.fileId);
 
       if (localPath != null) {
+        print("Found existing local file: $localPath");
         _loadLocalPdf(localPath);
         return;
       }
 
       // If no local file and we have a fileKey, check if we should auto-download
       if (widget.fileKey != null && widget.autoDownload) {
+        // Start downloading immediately
         _downloadPdf();
       } else if (widget.fileKey != null) {
         // Load from URL directly (will be fetched from StorageService)
@@ -92,14 +96,12 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
     // Get total pages count
     try {
       final document = await _pdfController!.document;
-      if (document != null) {
-        setState(() {
-          _totalPages = document.pagesCount;
-        });
-        print("Total pages: $_totalPages");
+      setState(() {
+        _totalPages = document.pagesCount;
+      });
+      print("Total pages: $_totalPages");
 
-        // Note: PdfController doesn't have addListener, page changes will be handled by navigation methods
-      }
+      // Note: PdfController doesn't have addListener, page changes will be handled by navigation methods
     } catch (e) {
       print("Error getting page count: $e");
     }
@@ -111,9 +113,13 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
     });
 
     try {
-      // Get download URL from StorageService
-      final downloadUrl =
-          await widget.storageService.callGetDownloadUrl(widget.fileKey!);
+      if (widget.usePublicUrl) {
+        // Use public URL for trial files
+        await widget.storageService.callGetDownloadPublicUrl(widget.fileKey!);
+      } else {
+        // Use authenticated download URL for purchased files
+        await widget.storageService.callGetDownloadUrl(widget.fileKey!);
+      }
 
       // For now, we'll use a placeholder and let the user download the PDF
       // The actual PDF viewing will happen after download
@@ -218,6 +224,7 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
         fileName: widget.fileName,
         fileId: widget.fileId,
         isEncrypted: widget.isEncrypted,
+        usePublicUrl: widget.usePublicUrl,
         onProgress: (progress) {
           setState(() {
             _downloadProgress = progress;
@@ -230,8 +237,8 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
           });
           _loadLocalPdf(path);
 
-          // Show success message
-          if (mounted) {
+          // Show success message only if not auto-downloading
+          if (mounted && !widget.autoDownload) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text('کتاب با موفقیت دانلود شد'),
@@ -299,7 +306,7 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
                 color: Colors.red,
               ),
             ),
-            if (widget.fileKey != null) ...[
+            if (widget.fileKey != null && !widget.autoDownload) ...[
               const SizedBox(height: 16),
               ElevatedButton.icon(
                 onPressed: _downloadPdf,
@@ -328,8 +335,16 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
             ),
             const SizedBox(height: 16),
             Text(
-              'در حال دانلود کتاب... ${(_downloadProgress * 100).toInt()}%',
+              'در حال بارگذاری کتاب... ${(_downloadProgress * 100).toInt()}%',
               style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'لطفاً صبر کنید',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[600],
+              ),
             ),
           ],
         ),
@@ -497,10 +512,11 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
           ),
         ),
 
-        // Bottom controls
+        // Bottom controls - only show if not auto-downloading
         if (widget.showDownloadButton &&
             widget.fileKey != null &&
-            _currentPdfPath == null)
+            _currentPdfPath == null &&
+            !widget.autoDownload)
           Container(
             padding: const EdgeInsets.all(16),
             child: Row(

@@ -255,6 +255,9 @@ class _SayarehScreenState extends State<SayarehScreen> {
                               ),
                             ),
                           // Example Box 1
+                          SizedBox(
+                            height: 12,
+                          ),
                         ],
                       ),
                     ),

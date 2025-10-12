@@ -46,12 +46,12 @@ class SingleBookData {
   String? publisher;
   int pageCount;
   String publishDate;
-  String file;
+  String? file;
   String? trialFile;
   DateTime createdAt;
   DateTime updatedAt;
   DateTime? publishedAt;
-  bool purchased;
+  bool? purchased;
 
   SingleBookData({
     required this.id,
@@ -64,12 +64,12 @@ class SingleBookData {
     this.publisher,
     required this.pageCount,
     required this.publishDate,
-    required this.file,
+    this.file,
     this.trialFile,
     required this.createdAt,
     required this.updatedAt,
     this.publishedAt,
-    required this.purchased,
+    this.purchased,
   });
 
   factory SingleBookData.fromJson(Map<String, dynamic> json) => SingleBookData(
@@ -83,7 +83,7 @@ class SingleBookData {
         publisher: json["publisher"],
         pageCount: json["pageCount"] ?? 0,
         publishDate: json["publishDate"] ?? "",
-        file: json["file"] ?? "",
+        file: json["file"],
         trialFile: json["trialFile"],
         createdAt: json["createdAt"] != null
             ? DateTime.parse(json["createdAt"])
@@ -94,7 +94,7 @@ class SingleBookData {
         publishedAt: json["publishedAt"] == null
             ? null
             : DateTime.parse(json["publishedAt"]),
-        purchased: json["purchased"] ?? false,
+        purchased: json["purchased"],
       );
 
   Map<String, dynamic> toJson() => {

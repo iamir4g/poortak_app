@@ -1,9 +1,7 @@
 import 'dart:io';
 import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:pdfx/pdfx.dart';
 import '../services/storage_service.dart';
-import 'dart:convert';
 
 class PdfDownloader {
   // Helper method to sanitize filename for safe file operations
@@ -154,6 +152,7 @@ class PdfDownloader {
     required String fileName,
     required String fileId,
     bool isEncrypted = false,
+    bool usePublicUrl = false,
     Function(double)? onProgress,
     Function(String)? onDownloadCompleted,
     Function(String)? onDownloadError,
@@ -172,10 +171,12 @@ class PdfDownloader {
         await encryptedDir.create(recursive: true);
       }
 
-      // Sanitize filename for safe file operations
-      final sanitizedFileName = _sanitizeFileName(fileName);
+      // Sanitize filename for safe file operations and include fileId
+      final baseFileName = _sanitizeFileName(fileName);
+      final sanitizedFileName = '${fileId}_$baseFileName';
       print("Original filename: $fileName");
       print("Sanitized filename: $sanitizedFileName");
+      print("FileId: $fileId");
 
       // Test the sanitization
       testSanitization(fileName);
@@ -195,12 +196,22 @@ class PdfDownloader {
 
       // Get download URL from StorageService
       print("Getting download URL from StorageService");
-      final downloadUrl = await storageService.callGetDownloadUrl(key);
-      print("Download URL received: ${downloadUrl.data}");
+      print("usePublicUrl: $usePublicUrl, key: $key");
+      String downloadUrl;
+      if (usePublicUrl) {
+        downloadUrl = await storageService.callGetDownloadPublicUrl(key);
+        print("Public download URL received: $downloadUrl");
+      } else {
+        final response = await storageService.callGetDownloadUrl(key);
+        downloadUrl = response.data;
+        print("Authenticated download URL received: $downloadUrl");
+        print(
+            "Response ok: ${response.ok}, data length: ${downloadUrl.length}");
+      }
 
       // Download using flutter_file_downloader
       await FileDownloader.downloadFile(
-        url: downloadUrl.data,
+        url: downloadUrl,
         name: sanitizedFileName,
         onProgress: (fileName, progress) {
           print("PDF download progress: $progress%");
@@ -306,6 +317,37 @@ class PdfDownloader {
     }
   }
 
+  static Future<String?> getLocalPdfPathByFileId(String fileId) async {
+    try {
+      final directory = await getApplicationDocumentsDirectory();
+      final pdfDir = Directory('${directory.path}/pdfs');
+
+      if (!await pdfDir.exists()) {
+        return null;
+      }
+
+      // List all files in the PDF directory
+      final files = await pdfDir.list().toList();
+
+      // Look for files that contain the fileId in their name
+      for (var file in files) {
+        if (file is File && file.path.toLowerCase().endsWith('.pdf')) {
+          final fileName = file.path.split('/').last;
+          // Check if the file name contains our fileId
+          if (fileName.contains(fileId)) {
+            print("Found PDF file with fileId $fileId: $fileName");
+            return file.path;
+          }
+        }
+      }
+
+      return null;
+    } catch (e) {
+      print('Error getting local PDF path by fileId: $e');
+      return null;
+    }
+  }
+
   static Future<void> deletePdf(String fileName) async {
     try {
       final directory = await getApplicationDocumentsDirectory();
@@ -319,6 +361,34 @@ class PdfDownloader {
       }
     } catch (e) {
       print('Error deleting PDF: $e');
+    }
+  }
+
+  static Future<void> deletePdfByFileId(String fileId) async {
+    try {
+      final directory = await getApplicationDocumentsDirectory();
+      final pdfDir = Directory('${directory.path}/pdfs');
+
+      if (!await pdfDir.exists()) {
+        return;
+      }
+
+      // List all files in the PDF directory
+      final files = await pdfDir.list().toList();
+
+      // Look for files that contain the fileId in their name and delete them
+      for (var file in files) {
+        if (file is File && file.path.toLowerCase().endsWith('.pdf')) {
+          final fileName = file.path.split('/').last;
+          // Check if the file name contains our fileId
+          if (fileName.contains(fileId)) {
+            await file.delete();
+            print('PDF deleted by fileId $fileId: $fileName');
+          }
+        }
+      }
+    } catch (e) {
+      print('Error deleting PDF by fileId: $e');
     }
   }
 }

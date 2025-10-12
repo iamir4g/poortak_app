@@ -6,7 +6,6 @@ import 'dart:io';
 import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/config/myColors.dart';
-import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_home_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/lesson_bloc/lesson_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/converstion_screen.dart';
@@ -107,12 +106,14 @@ class _LessonScreenState extends State<LessonScreen> {
         if (await downloadsDir.exists()) {
           final files = await downloadsDir.list().toList();
           for (var downloadedFile in files) {
-            if (downloadedFile.path.contains(name) &&
-                !downloadedFile.path.contains('-')) {
+            // Check if file name starts with the expected name (ignoring suffix like -1, -2, etc.)
+            final fileName = downloadedFile.path.split('/').last;
+            final baseFileName =
+                fileName.split('-').first; // Get the part before any dash
+            if (baseFileName == name) {
               print("Found existing file in Downloads: ${downloadedFile.path}");
-              // Copy to encrypted directory
-              final encryptedFile = File(
-                  '${encryptedDir.path}/${downloadedFile.path.split('/').last}');
+              // Copy to encrypted directory with the original name
+              final encryptedFile = File('${encryptedDir.path}/$name');
               await File(downloadedFile.path).copy(encryptedFile.path);
 
               // Try to decrypt it
@@ -149,7 +150,8 @@ class _LessonScreenState extends State<LessonScreen> {
   }
 
   Future<void> _downloadAndStoreVideo(
-      String key, String name, String fileId, bool isEncrypted) async {
+      String key, String name, String fileId, bool isEncrypted,
+      {bool usePublicUrl = false}) async {
     print(
         "Starting download process for key: $key, name: $name, isEncrypted: $isEncrypted");
     if (isDownloading) {
@@ -202,15 +204,18 @@ class _LessonScreenState extends State<LessonScreen> {
       }
 
       print("Getting download URL from StorageService");
+      print("usePublicUrl: $usePublicUrl, key: $key");
 
       String downloadUrlString;
-      if (isEncrypted) {
+      if (usePublicUrl) {
+        // For trailer videos, use public download URL
+        downloadUrlString = await _storageService.callGetDownloadPublicUrl(key);
+        print("Public download URL received: $downloadUrlString");
+      } else {
         // For purchased content, use regular download URL
         final downloadUrl = await _storageService.callGetDownloadUrl(key);
         downloadUrlString = downloadUrl.data;
-      } else {
-        // For trailer videos, use public download URL
-        downloadUrlString = await _storageService.callGetDownloadPublicUrl(key);
+        print("Authenticated download URL received: $downloadUrlString");
       }
 
       print("Download URL received: $downloadUrlString");
@@ -241,7 +246,16 @@ class _LessonScreenState extends State<LessonScreen> {
 
             // Copy the file from Downloads to encrypted directory
             final downloadedFile = File(path);
-            await downloadedFile.copy(encryptedFile.path);
+            print("Downloaded file path: $path");
+            print("Target encrypted file path: ${encryptedFile.path}");
+
+            // Check if downloaded file exists
+            if (await downloadedFile.exists()) {
+              await downloadedFile.copy(encryptedFile.path);
+              print("File copied successfully to encrypted directory");
+            } else {
+              throw Exception("Downloaded file does not exist at: $path");
+            }
 
             // If file is encrypted, get decryption key and decrypt
             if (isEncrypted) {
@@ -354,6 +368,38 @@ class _LessonScreenState extends State<LessonScreen> {
     }
   }
 
+  Future<void> _deleteOldVideoFiles(String videoId) async {
+    try {
+      final directory = await getApplicationDocumentsDirectory();
+      final videoDir = Directory('${directory.path}/videos');
+      final encryptedDir = Directory('${directory.path}/encrypted');
+
+      // Delete files from videos directory
+      if (await videoDir.exists()) {
+        final files = await videoDir.list().toList();
+        for (var file in files) {
+          if (file is File && file.path.contains(videoId)) {
+            await file.delete();
+            print('Deleted old video file: ${file.path}');
+          }
+        }
+      }
+
+      // Delete files from encrypted directory
+      if (await encryptedDir.exists()) {
+        final files = await encryptedDir.list().toList();
+        for (var file in files) {
+          if (file is File && file.path.contains(videoId)) {
+            await file.delete();
+            print('Deleted old encrypted video file: ${file.path}');
+          }
+        }
+      }
+    } catch (e) {
+      print('Error deleting old video files: $e');
+    }
+  }
+
   void _showPurchaseDialog() {
     if (_currentLesson == null) {
       print('No lesson data available for purchase dialog');
@@ -393,28 +439,95 @@ class _LessonScreenState extends State<LessonScreen> {
             _currentLesson = state.lesson;
           });
 
+          // First determine which video to use based on login and purchase status
+          String? videoToCheck;
+
+          // Check if user is logged in
+          final prefsOperator = locator<PrefsOperator>();
+          final isLoggedIn = prefsOperator.isLoggedIn();
+
+          if (isLoggedIn &&
+              state.lesson.purchased == true &&
+              state.lesson.video != null &&
+              state.lesson.video!.isNotEmpty) {
+            // User has purchased, check for the full video first
+            videoToCheck = state.lesson.video;
+            print("Checking for purchased video: $videoToCheck");
+          } else {
+            // Check for trailer video
+            videoToCheck = state.lesson.trailerVideo;
+            print("Checking for trailer video: $videoToCheck");
+          }
+
           // Check for existing files first
-          _checkExistingFiles(state.lesson.trailerVideo).then((_) {
-            // Only start download if we don't have a local file
-            if (localVideoPath == null) {
-              if (widget.purchased) {
-                _downloadAndStoreVideo(
-                  state.lesson.trailerVideo, // video ID for download
-                  state.lesson.trailerVideo, // name for file
-                  state.lesson.trailerVideo, // video ID for decryption key
-                  true,
-                );
-              } else {
-                _downloadAndStoreVideo(
-                  state.lesson
-                      .trailerVideo, // trailer video ID for public download
-                  state.lesson.trailerVideo, // name for file
-                  state.lesson.trailerVideo, // video ID (not used for public)
-                  false,
-                );
+          if (videoToCheck != null && videoToCheck.isNotEmpty) {
+            _checkExistingFiles(videoToCheck).then((_) async {
+              // Only start download if we don't have a local file
+              if (localVideoPath == null) {
+                // Determine which video to download based on login and purchase status
+                String? videoToDownload;
+                bool usePublicUrl = false;
+
+                // Check if user is logged in
+                final prefsOperator = locator<PrefsOperator>();
+                final isLoggedIn = prefsOperator.isLoggedIn();
+
+                print(
+                    "Video download logic - isLoggedIn: $isLoggedIn, purchased: ${state.lesson.purchased}, video: ${state.lesson.video}, trailerVideo: ${state.lesson.trailerVideo}");
+
+                if (isLoggedIn) {
+                  // User is logged in
+                  if (state.lesson.purchased == true &&
+                      state.lesson.video != null &&
+                      state.lesson.video!.isNotEmpty) {
+                    // User has purchased the lesson, use the full video
+                    videoToDownload = state.lesson.video;
+                    usePublicUrl = false;
+                    print(
+                        "Using purchased video: $videoToDownload with authenticated URL");
+                  } else if (state.lesson.trailerVideo.isNotEmpty) {
+                    // User hasn't purchased or video is not available, use trailer video with public URL
+                    videoToDownload = state.lesson.trailerVideo;
+                    usePublicUrl = true;
+                    print(
+                        "Using trailer video: $videoToDownload with public URL");
+                  }
+                } else {
+                  // User is not logged in, always use trailer video with public URL
+                  if (state.lesson.trailerVideo.isNotEmpty) {
+                    videoToDownload = state.lesson.trailerVideo;
+                    usePublicUrl = true;
+                    print(
+                        "Using trailer video: $videoToDownload with public URL");
+                  }
+                }
+
+                if (videoToDownload != null && videoToDownload.isNotEmpty) {
+                  // Delete old video files before downloading new one
+                  await _deleteOldVideoFiles(videoToDownload);
+
+                  // If user purchased and we're downloading the full video, also delete trailer files
+                  if (isLoggedIn &&
+                      state.lesson.purchased == true &&
+                      state.lesson.video != null &&
+                      state.lesson.video!.isNotEmpty &&
+                      videoToDownload == state.lesson.video) {
+                    await _deleteOldVideoFiles(state.lesson.trailerVideo);
+                    print(
+                        "Deleted old trailer files since user purchased the full video");
+                  }
+
+                  _downloadAndStoreVideo(
+                    videoToDownload, // video ID for download
+                    videoToDownload, // name for file
+                    videoToDownload, // video ID for decryption key
+                    !usePublicUrl, // isEncrypted: true for authenticated URL, false for public URL
+                    usePublicUrl: usePublicUrl, // usePublicUrl parameter
+                  );
+                }
               }
-            }
-          });
+            });
+          }
         } else if (state is LessonError) {
           print("LessonError: ${state.message}");
           if (mounted) {
