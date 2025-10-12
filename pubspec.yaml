@@ -100,8 +100,6 @@ flutter:
     - assets/images/
     - assets/images/litner/
     - assets/images/kavoosh/
-    - assets/videos/
-    - assets/sayarehHome.json
     - assets/lottie/
     - assets/images/contactUs/
     - assets/images/profile/
@@ -113,7 +111,6 @@ flutter:
     - assets/images/iknow/
     - assets/images/points/
     - assets/images/favorit/
-    - assets/pdf/
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 
