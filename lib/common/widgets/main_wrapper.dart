@@ -1,11 +1,13 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/common/widgets/bottom_nav.dart';
 import 'package:poortak/common/widgets/custom_drawer.dart';
 import 'package:poortak/common/widgets/logout_confirmation_modal.dart';
+import 'package:poortak/common/widgets/exit_confirmation_modal.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/kavoosh_main_screen.dart';
 import 'package:poortak/featueres/feature_litner/screens/litner_main_screen.dart';
@@ -97,6 +99,35 @@ class _MainWrapperState extends State<MainWrapper> {
     );
   }
 
+  void _showExitConfirmation() {
+    ExitConfirmationModal.show(
+      context: context,
+      onExit: () {
+        // Exit the app
+        SystemNavigator.pop();
+      },
+      onStay: () {
+        // Do nothing, just close the modal
+      },
+    );
+  }
+
+  Future<bool> _onWillPop() async {
+    // If not on Sayareh screen (index 0), navigate to Sayareh
+    if (currentPageIndex != 0) {
+      controller.animateToPage(
+        0,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+      return false; // Prevent default back behavior
+    }
+
+    // If on Sayareh screen, show exit confirmation
+    _showExitConfirmation();
+    return false; // Prevent default back behavior
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -142,84 +173,92 @@ class _MainWrapperState extends State<MainWrapper> {
 
             return BlocBuilder<ThemeCubit, ThemeState>(
               builder: (context, themeState) {
-                return Scaffold(
-                  backgroundColor: themeState.isDark
-                      ? MyColors.darkBackground
-                      : Colors.white,
-                  appBar: AppBar(
+                return PopScope(
+                  canPop: false,
+                  onPopInvoked: (didPop) async {
+                    if (!didPop) {
+                      await _onWillPop();
+                    }
+                  },
+                  child: Scaffold(
                     backgroundColor: themeState.isDark
                         ? MyColors.darkBackground
                         : Colors.white,
-                    foregroundColor: themeState.isDark
-                        ? MyColors.darkTextPrimary
-                        : MyColors.textMatn1,
-                    elevation: 0,
-                    actions: [
-                      (currentPageIndex == 4 && prefsOperator.isLoggedIn())
-                          ? PopupMenuButton<String>(
-                              icon: Icon(Icons.more_vert,
-                                  color: themeState.isDark
-                                      ? MyColors.darkTextPrimary
-                                      : const Color(0xFF3D495C)),
-                              onSelected: (value) {
-                                if (value == 'logout')
-                                  _showLogoutConfirmation();
-                              },
-                              itemBuilder: (context) => [
-                                PopupMenuItem(
-                                  value: 'logout',
-                                  child: Text(
-                                    'خروج از ناحیه کاربری',
-                                    style: TextStyle(
-                                      color: themeState.isDark
-                                          ? MyColors.darkTextPrimary
-                                          : MyColors.textMatn1,
+                    appBar: AppBar(
+                      backgroundColor: themeState.isDark
+                          ? MyColors.darkBackground
+                          : Colors.white,
+                      foregroundColor: themeState.isDark
+                          ? MyColors.darkTextPrimary
+                          : MyColors.textMatn1,
+                      elevation: 0,
+                      actions: [
+                        (currentPageIndex == 4 && prefsOperator.isLoggedIn())
+                            ? PopupMenuButton<String>(
+                                icon: Icon(Icons.more_vert,
+                                    color: themeState.isDark
+                                        ? MyColors.darkTextPrimary
+                                        : const Color(0xFF3D495C)),
+                                onSelected: (value) {
+                                  if (value == 'logout')
+                                    _showLogoutConfirmation();
+                                },
+                                itemBuilder: (context) => [
+                                  PopupMenuItem(
+                                    value: 'logout',
+                                    child: Text(
+                                      'خروج از ناحیه کاربری',
+                                      style: TextStyle(
+                                        color: themeState.isDark
+                                            ? MyColors.darkTextPrimary
+                                            : MyColors.textMatn1,
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            )
-                          : const SizedBox.shrink(),
-                    ],
-                    flexibleSpace: Container(
-                      decoration: BoxDecoration(
-                        color: themeState.isDark
-                            ? MyColors.darkBackground
-                            : Colors.white,
-                        borderRadius: const BorderRadius.only(
+                                ],
+                              )
+                            : const SizedBox.shrink(),
+                      ],
+                      flexibleSpace: Container(
+                        decoration: BoxDecoration(
+                          color: themeState.isDark
+                              ? MyColors.darkBackground
+                              : Colors.white,
+                          borderRadius: const BorderRadius.only(
+                            bottomLeft: Radius.circular(33.5),
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: themeState.isDark
+                                  ? Colors.black.withOpacity(0.3)
+                                  : const Color.fromRGBO(0, 0, 0, 0.05),
+                              offset: const Offset(0, 1),
+                              blurRadius: 1,
+                              spreadRadius: 0,
+                            ),
+                          ],
+                        ),
+                      ),
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.only(
                           bottomLeft: Radius.circular(33.5),
                         ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: themeState.isDark
-                                ? Colors.black.withOpacity(0.3)
-                                : const Color.fromRGBO(0, 0, 0, 0.05),
-                            offset: const Offset(0, 1),
-                            blurRadius: 1,
-                            spreadRadius: 0,
+                      ),
+                    ),
+                    drawer: const CustomDrawer(),
+                    bottomNavigationBar: BottomNav(controller: controller),
+                    body: state is PermissionLoading
+                        ? const Center(child: CircularProgressIndicator())
+                        : PageView(
+                            controller: controller,
+                            onPageChanged: (index) {
+                              setState(() {
+                                currentPageIndex = index;
+                              });
+                            },
+                            children: topLevelScreens,
                           ),
-                        ],
-                      ),
-                    ),
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(33.5),
-                      ),
-                    ),
                   ),
-                  drawer: const CustomDrawer(),
-                  bottomNavigationBar: BottomNav(controller: controller),
-                  body: state is PermissionLoading
-                      ? const Center(child: CircularProgressIndicator())
-                      : PageView(
-                          controller: controller,
-                          onPageChanged: (index) {
-                            setState(() {
-                              currentPageIndex = index;
-                            });
-                          },
-                          children: topLevelScreens,
-                        ),
                 );
               },
             );
