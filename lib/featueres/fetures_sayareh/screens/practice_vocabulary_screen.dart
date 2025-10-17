@@ -198,9 +198,9 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
                           SizedBox(
                             height: 24,
                           ),
-                          FutureBuilder(
-                            future: storageService
-                                .callGetDownloadUrl(correctWord.thumbnail),
+                          FutureBuilder<String>(
+                            future: storageService.callGetDownloadPublicUrl(
+                                correctWord.thumbnail),
                             builder: (context, snapshot) {
                               if (snapshot.connectionState ==
                                   ConnectionState.waiting) {
@@ -213,7 +213,7 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
                                 return ClipRRect(
                                   borderRadius: BorderRadius.circular(24),
                                   child: Image.network(
-                                    snapshot.data!.data,
+                                    snapshot.data!,
                                     height: 264,
                                     width: 264,
                                     fit: BoxFit.cover,

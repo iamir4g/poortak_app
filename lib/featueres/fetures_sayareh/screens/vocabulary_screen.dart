@@ -15,7 +15,7 @@ import 'package:poortak/featueres/fetures_sayareh/screens/practice_vocabulary_sc
 import 'package:poortak/locator.dart';
 import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/common/services/tts_service.dart';
-import 'package:poortak/common/models/download_url_response.dart';
+import 'package:poortak/common/widgets/reusable_modal.dart';
 
 class VocabularyScreen extends StatefulWidget {
   static const routeName = "/vocabulary_screen";
@@ -62,6 +62,26 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
 
   void _readWord(String word) async {
     await ttsService.speak(word);
+  }
+
+  void _showExitModal() {
+    ReusableModal.show(
+      context: context,
+      title: 'ترک تمرین ها',
+      message:
+          'با ترک تمرین های این بخش، پاسخ های فعلی شما حذف می شود و باید دفعه ی بعد دوباره به آنها پاسخ دهید',
+      type: ModalType.info,
+      buttonText: 'ماندن',
+      secondButtonText: 'ترک تمرین ها',
+      showSecondButton: true,
+      onButtonPressed: () {
+        Navigator.of(context).pop(); // Close modal
+      },
+      onSecondButtonPressed: () {
+        Navigator.of(context).pop(); // Close modal
+        Navigator.of(context).pop(); // Exit vocabulary screen
+      },
+    );
   }
 
   void _nextWord(int totalWords) {
@@ -117,6 +137,10 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
               'واژگان',
               style: MyTextStyle.textHeader16Bold,
             ),
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: _showExitModal,
+            ),
           ),
           body: BlocBuilder<VocabularyBloc, VocabularyState>(
             builder: (context, state) {
@@ -148,9 +172,9 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                             SizedBox(
                               height: 85,
                             ),
-                            FutureBuilder<GetDownloadUrl>(
-                              future: storageService
-                                  .callGetDownloadUrl(currentWord.thumbnail),
+                            FutureBuilder<String>(
+                              future: storageService.callGetDownloadPublicUrl(
+                                  currentWord.thumbnail),
                               builder: (context, snapshot) {
                                 if (snapshot.connectionState ==
                                     ConnectionState.waiting) {
@@ -161,7 +185,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                                 }
                                 if (snapshot.hasData) {
                                   return Image.network(
-                                    snapshot.data!.data,
+                                    snapshot.data!,
                                     height: 264,
                                     width: 264,
                                     fit: BoxFit.cover,
