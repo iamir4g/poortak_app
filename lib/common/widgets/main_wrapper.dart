@@ -12,7 +12,6 @@ import 'package:poortak/config/myColors.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/kavoosh_main_screen.dart';
 import 'package:poortak/featueres/feature_litner/screens/litner_main_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/profile_screen.dart';
-import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/bloc_storage_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/repositories/sayareh_repository.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/sayareh_screen.dart';
@@ -81,12 +80,17 @@ class _MainWrapperState extends State<MainWrapper> {
       log("⚠️ Failed to clear shopping cart: $e");
     }
 
-    // Navigate to login screen and clear all previous routes
-    Navigator.pushNamedAndRemoveUntil(
-      context,
-      LoginScreen.routeName,
-      (route) => false,
+    // Navigate to Sayareh screen (index 0) instead of login screen
+    controller.animateToPage(
+      0,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
     );
+
+    // Update the current page index
+    setState(() {
+      currentPageIndex = 0;
+    });
   }
 
   void _showLogoutConfirmation() {

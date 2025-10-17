@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:poortak/featueres/feature_profile/data/models/payment_history_modle.dart';
+import 'package:poortak/featueres/feature_profile/data/models/payment_history_model.dart';
 
 class PaymentHistoryCard extends StatelessWidget {
   final Datum payment;
@@ -72,7 +72,9 @@ class PaymentHistoryCard extends StatelessWidget {
                 // Details section
                 _buildDetailRow(
                   label: 'تاریخ خرید',
-                  value: _formatDate(payment.createdAt),
+                  value: payment.createdAt != null
+                      ? _formatDate(payment.createdAt!)
+                      : 'نامشخص',
                 ),
                 const SizedBox(height: 8),
                 _buildDetailRow(
@@ -82,12 +84,16 @@ class PaymentHistoryCard extends StatelessWidget {
                 const SizedBox(height: 8),
                 _buildDetailRow(
                   label: 'مبلغ پرداخت شده',
-                  value: _formatAmount(payment.grandTotal),
+                  value: payment.grandTotal != null
+                      ? _formatAmount(payment.grandTotal!)
+                      : 'نامشخص',
                 ),
                 const SizedBox(height: 8),
                 _buildDetailRow(
                   label: 'مبلغ کل خرید',
-                  value: _formatAmount(payment.grandTotal),
+                  value: payment.grandTotal != null
+                      ? _formatAmount(payment.grandTotal!)
+                      : 'نامشخص',
                 ),
               ],
             ),
@@ -148,55 +154,71 @@ class PaymentHistoryCard extends StatelessWidget {
 
   String _getProductTitle() {
     // Extract product name from description or items
-    if (payment.items.isNotEmpty) {
-      final item = payment.items.first;
-      return item.description.toString().replaceAll('Description.', '');
+    if (payment.items != null && payment.items!.isNotEmpty) {
+      final item = payment.items!.first;
+      if (item.description != null) {
+        return item.description.toString();
+      }
     }
-    return payment.description.isNotEmpty ? payment.description : 'خرید محصول';
+    return payment.description != null && payment.description!.isNotEmpty
+        ? payment.description!
+        : 'خرید محصول';
   }
 
   String _getStatusText() {
+    if (payment.status == null) return 'نامشخص';
+
     switch (payment.status) {
-      case Status.PENDING:
+      case 'Pending':
         return 'در انتظار';
-      case Status.SUCCEEDED:
+      case 'Succeeded':
         return 'موفق';
-      case Status.FAILED:
+      case 'Failed':
         return 'ناموفق';
-      case Status.EXPIRED:
+      case 'Expired':
         return 'منقضی شده';
-      case Status.REFUNDED:
+      case 'Refunded':
         return 'برگشت خورده';
+      default:
+        return 'نامشخص';
     }
   }
 
   Color _getStatusColor() {
+    if (payment.status == null) return const Color(0xFF9E9E9E);
+
     switch (payment.status) {
-      case Status.PENDING:
+      case 'Pending':
         return const Color(0xFFFFA726); // Orange
-      case Status.SUCCEEDED:
+      case 'Succeeded':
         return const Color(0xFF4CAF50); // Green
-      case Status.FAILED:
+      case 'Failed':
         return const Color(0xFFF44336); // Red
-      case Status.EXPIRED:
+      case 'Expired':
         return const Color(0xFF9E9E9E); // Gray
-      case Status.REFUNDED:
+      case 'Refunded':
         return const Color(0xFF2196F3); // Blue
+      default:
+        return const Color(0xFF9E9E9E); // Gray
     }
   }
 
   IconData _getStatusIcon() {
+    if (payment.status == null) return Icons.help_outline;
+
     switch (payment.status) {
-      case Status.PENDING:
+      case 'Pending':
         return Icons.schedule;
-      case Status.SUCCEEDED:
+      case 'Succeeded':
         return Icons.check;
-      case Status.FAILED:
+      case 'Failed':
         return Icons.close;
-      case Status.EXPIRED:
+      case 'Expired':
         return Icons.access_time;
-      case Status.REFUNDED:
+      case 'Refunded':
         return Icons.undo;
+      default:
+        return Icons.help_outline;
     }
   }
 

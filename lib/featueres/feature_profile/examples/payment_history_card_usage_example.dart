@@ -2,9 +2,8 @@
 // This file demonstrates how to use the payment history card widget
 
 import 'package:flutter/material.dart';
-import 'package:poortak/featueres/feature_profile/data/models/payment_history_modle.dart';
+import 'package:poortak/featueres/feature_profile/data/models/payment_history_model.dart';
 import 'package:poortak/featueres/feature_profile/widgets/payment_history_card.dart';
-import 'package:poortak/common/models/cart_enum.dart';
 
 class PaymentHistoryCardUsageExample extends StatelessWidget {
   const PaymentHistoryCardUsageExample({super.key});
@@ -42,7 +41,7 @@ class PaymentHistoryCardUsageExample extends StatelessWidget {
 
           // Pending payment
           PaymentHistoryCard(
-            payment: _createSamplePayment(status: Status.PENDING),
+            payment: _createSamplePayment(status: 'Pending'),
             onTap: () => _showSnackBar(context, 'Pending payment tapped'),
           ),
 
@@ -50,7 +49,7 @@ class PaymentHistoryCardUsageExample extends StatelessWidget {
 
           // Succeeded payment
           PaymentHistoryCard(
-            payment: _createSamplePayment(status: Status.SUCCEEDED),
+            payment: _createSamplePayment(status: 'Succeeded'),
             onTap: () => _showSnackBar(context, 'Succeeded payment tapped'),
           ),
 
@@ -58,7 +57,7 @@ class PaymentHistoryCardUsageExample extends StatelessWidget {
 
           // Failed payment
           PaymentHistoryCard(
-            payment: _createSamplePayment(status: Status.FAILED),
+            payment: _createSamplePayment(status: 'Failed'),
             onTap: () => _showSnackBar(context, 'Failed payment tapped'),
           ),
 
@@ -66,7 +65,7 @@ class PaymentHistoryCardUsageExample extends StatelessWidget {
 
           // Expired payment
           PaymentHistoryCard(
-            payment: _createSamplePayment(status: Status.EXPIRED),
+            payment: _createSamplePayment(status: 'Expired'),
             onTap: () => _showSnackBar(context, 'Expired payment tapped'),
           ),
 
@@ -74,7 +73,7 @@ class PaymentHistoryCardUsageExample extends StatelessWidget {
 
           // Refunded payment
           PaymentHistoryCard(
-            payment: _createSamplePayment(status: Status.REFUNDED),
+            payment: _createSamplePayment(status: 'Refunded'),
             onTap: () => _showSnackBar(context, 'Refunded payment tapped'),
           ),
         ],
@@ -89,17 +88,17 @@ class PaymentHistoryCardUsageExample extends StatelessWidget {
   }
 
   // Helper method to create sample payment data
-  static Datum _createSamplePayment({Status status = Status.SUCCEEDED}) {
+  static Datum _createSamplePayment({String status = 'Succeeded'}) {
     return Datum(
       id: 'sample-payment-id',
       userId: 'sample-user-id',
-      source: Source.IPG,
+      source: 'Card',
       status: status,
       trackingCode: 'TRK123456789',
-      buyerEmail: BuyerEmail.BEYRAMIBAHAREH_GMAIL_COM,
+      buyerEmail: null,
       buyerMobile: '09123456789',
       discountCode: null,
-      discountAmount: '0',
+      discountAmount: null,
       discountType: null,
       subTotal: '118200',
       grandTotal: '118200',
@@ -116,12 +115,12 @@ class PaymentHistoryCardUsageExample extends StatelessWidget {
         Item(
           id: 'item-1',
           paymentId: 'sample-payment-id',
-          itemType: CartType.IKnow,
+          itemType: 'IKnow',
           itemId: 'lesson-1',
-          description: Description.PURCHASING_I_KNOW_COLLECTION,
+          description: 'خرید مجموعه سیاره آی\u200cنو.',
           discountCode: null,
-          discountAmount: '0',
-          discountType: DiscountType.PERCENT,
+          discountAmount: null,
+          discountType: null,
           quantity: 1,
           price: '118200',
           createdAt: DateTime.now().subtract(const Duration(days: 1)),
@@ -184,37 +183,42 @@ class PaymentHistoryCardExamples {
     );
   }
 
-  static Color _getStatusBorderColor(Status status) {
+  static Color _getStatusBorderColor(String? status) {
     switch (status) {
-      case Status.PENDING:
+      case 'Pending':
         return Colors.orange;
-      case Status.SUCCEEDED:
+      case 'Succeeded':
         return Colors.green;
-      case Status.FAILED:
+      case 'Failed':
         return Colors.red;
-      case Status.EXPIRED:
+      case 'Expired':
         return Colors.grey;
-      case Status.REFUNDED:
+      case 'Refunded':
         return Colors.blue;
+      default:
+        return Colors.grey;
     }
   }
 
-  static void _handleStatusBasedTap(Status status) {
+  static void _handleStatusBasedTap(String? status) {
     switch (status) {
-      case Status.PENDING:
+      case 'Pending':
         print('Pending payment - show waiting message');
         break;
-      case Status.SUCCEEDED:
+      case 'Succeeded':
         print('Succeeded payment - show success details');
         break;
-      case Status.FAILED:
+      case 'Failed':
         print('Failed payment - show retry option');
         break;
-      case Status.EXPIRED:
+      case 'Expired':
         print('Expired payment - show renewal option');
         break;
-      case Status.REFUNDED:
+      case 'Refunded':
         print('Refunded payment - show refund details');
+        break;
+      default:
+        print('Unknown status - show default message');
         break;
     }
   }

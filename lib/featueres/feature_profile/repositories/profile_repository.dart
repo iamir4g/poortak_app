@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:poortak/common/resources/data_state.dart';
 import 'package:poortak/featueres/feature_profile/data/data_sorce/profile_api_provider.dart';
 import 'package:poortak/featueres/feature_profile/data/models/login_with_otp_model.dart';
-import 'package:poortak/featueres/feature_profile/data/models/payment_history_modle.dart';
+import 'package:poortak/featueres/feature_profile/data/models/payment_history_model.dart';
 import 'package:poortak/featueres/feature_profile/data/models/payment_history_params.dart';
 import 'package:poortak/featueres/feature_profile/data/models/request_otp_model.dart';
 import 'package:poortak/featueres/feature_profile/data/models/me_profile_model.dart';

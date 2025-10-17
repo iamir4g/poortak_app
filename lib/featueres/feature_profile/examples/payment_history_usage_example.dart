@@ -99,10 +99,10 @@ class _PaymentHistoryExampleWidgetState
                     .add(RefreshPaymentHistoryEvent());
               },
               child: ListView.builder(
-                itemCount: state.paymentHistoryList.data.length +
+                itemCount: (state.paymentHistoryList.data?.length ?? 0) +
                     (state.hasReachedMax ? 0 : 1),
                 itemBuilder: (context, index) {
-                  if (index == state.paymentHistoryList.data.length) {
+                  if (index == (state.paymentHistoryList.data?.length ?? 0)) {
                     // Load more button
                     return Padding(
                       padding: const EdgeInsets.all(16.0),
@@ -117,12 +117,15 @@ class _PaymentHistoryExampleWidgetState
                     );
                   }
 
-                  final payment = state.paymentHistoryList.data[index];
-                  return ListTile(
-                    title: Text(payment.trackingCode),
-                    subtitle: Text('Status: ${payment.status.name}'),
-                    trailing: Text(payment.grandTotal),
-                  );
+                  final payment = state.paymentHistoryList.data?[index];
+                  if (payment != null) {
+                    return ListTile(
+                      title: Text(payment.trackingCode ?? 'نامشخص'),
+                      subtitle: Text('Status: ${payment.status ?? 'نامشخص'}'),
+                      trailing: Text(payment.grandTotal ?? 'نامشخص'),
+                    );
+                  }
+                  return const SizedBox.shrink();
                 },
               ),
             );

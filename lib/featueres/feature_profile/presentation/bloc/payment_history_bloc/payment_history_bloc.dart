@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poortak/common/resources/data_state.dart';
-import 'package:poortak/featueres/feature_profile/data/models/payment_history_modle.dart';
+import 'package:poortak/featueres/feature_profile/data/models/payment_history_model.dart';
 import 'package:poortak/featueres/feature_profile/data/models/payment_history_params.dart';
 import 'package:poortak/featueres/feature_profile/repositories/profile_repository.dart';
 import 'dart:developer';
@@ -37,11 +37,11 @@ class PaymentHistoryBloc
         if (response.data != null) {
           final paymentHistoryList = response.data!;
 
-          if (paymentHistoryList.data.isEmpty) {
+          if (paymentHistoryList.data?.isEmpty ?? true) {
             log("📭 No payment history found");
             emit(PaymentHistoryEmpty());
           } else {
-            log("✅ Payment history loaded successfully: ${paymentHistoryList.data.length} items");
+            log("✅ Payment history loaded successfully: ${paymentHistoryList.data?.length ?? 0} items");
             emit(PaymentHistorySuccess(
               paymentHistoryList: paymentHistoryList,
               hasReachedMax: _hasReachedMax(paymentHistoryList),
@@ -84,11 +84,11 @@ class PaymentHistoryBloc
         if (response.data != null) {
           final paymentHistoryList = response.data!;
 
-          if (paymentHistoryList.data.isEmpty) {
+          if (paymentHistoryList.data?.isEmpty ?? true) {
             log("📭 No payment history found after refresh");
             emit(PaymentHistoryEmpty());
           } else {
-            log("✅ Payment history refreshed successfully: ${paymentHistoryList.data.length} items");
+            log("✅ Payment history refreshed successfully: ${paymentHistoryList.data?.length ?? 0} items");
             emit(PaymentHistorySuccess(
               paymentHistoryList: paymentHistoryList,
               hasReachedMax: _hasReachedMax(paymentHistoryList),
@@ -136,8 +136,8 @@ class PaymentHistoryBloc
 
           // Combine existing data with new data
           final combinedData =
-              List<Datum>.from(currentState.paymentHistoryList.data)
-                ..addAll(newPaymentHistoryList.data);
+              List<Datum>.from(currentState.paymentHistoryList.data ?? [])
+                ..addAll(newPaymentHistoryList.data ?? []);
 
           final combinedPaymentHistoryList = PaymentHistoryList(
             ok: newPaymentHistoryList.ok,
@@ -145,7 +145,7 @@ class PaymentHistoryBloc
             data: combinedData,
           );
 
-          log("✅ More payment history loaded: ${newPaymentHistoryList.data.length} new items");
+          log("✅ More payment history loaded: ${newPaymentHistoryList.data?.length ?? 0} new items");
           emit(PaymentHistorySuccess(
             paymentHistoryList: combinedPaymentHistoryList,
             hasReachedMax: _hasReachedMax(newPaymentHistoryList),
@@ -182,12 +182,12 @@ class PaymentHistoryBloc
         if (response.data != null) {
           final paymentHistoryList = response.data!;
 
-          if (paymentHistoryList.data.isEmpty) {
+          if (paymentHistoryList.data?.isEmpty ?? true) {
             log("📭 No payment history found with current filters");
             emit(PaymentHistoryEmpty(
                 message: "هیچ تراکنشی با فیلترهای انتخابی یافت نشد"));
           } else {
-            log("✅ Payment history filtered successfully: ${paymentHistoryList.data.length} items");
+            log("✅ Payment history filtered successfully: ${paymentHistoryList.data?.length ?? 0} items");
             emit(PaymentHistorySuccess(
               paymentHistoryList: paymentHistoryList,
               hasReachedMax: _hasReachedMax(paymentHistoryList),
@@ -212,6 +212,7 @@ class PaymentHistoryBloc
   bool _hasReachedMax(PaymentHistoryList paymentHistoryList) {
     // Check if we've reached the maximum number of items
     // This could be based on the meta count or a fixed limit
-    return paymentHistoryList.data.length >= paymentHistoryList.meta.count;
+    return (paymentHistoryList.data?.length ?? 0) >=
+        (paymentHistoryList.meta?.count ?? 0);
   }
 }

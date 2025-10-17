@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poortak/config/myColors.dart';
-import 'package:poortak/featueres/feature_profile/data/models/payment_history_modle.dart';
 import 'package:poortak/featueres/feature_profile/presentation/bloc/payment_history_bloc/payment_history_bloc.dart';
 import 'package:poortak/featueres/feature_profile/presentation/bloc/payment_history_bloc/payment_history_event.dart';
 import 'package:poortak/featueres/feature_profile/presentation/bloc/payment_history_bloc/payment_history_state.dart';
@@ -206,10 +205,10 @@ class _PaymentHistoryScreenState extends State<PaymentHistoryScreen> {
       },
       child: ListView.builder(
         padding: const EdgeInsets.symmetric(vertical: 8),
-        itemCount: state.paymentHistoryList.data.length +
+        itemCount: (state.paymentHistoryList.data?.length ?? 0) +
             (state.hasReachedMax ? 0 : 1),
         itemBuilder: (context, index) {
-          if (index == state.paymentHistoryList.data.length) {
+          if (index == (state.paymentHistoryList.data?.length ?? 0)) {
             // Load more button
             return Padding(
               padding: const EdgeInsets.all(16.0),
@@ -222,14 +221,17 @@ class _PaymentHistoryScreenState extends State<PaymentHistoryScreen> {
             );
           }
 
-          final payment = state.paymentHistoryList.data[index];
-          return PaymentHistoryCard(
-            payment: payment,
-            onTap: () {
-              // Handle payment card tap
-              _onPaymentCardTap(payment);
-            },
-          );
+          final payment = state.paymentHistoryList.data?[index];
+          if (payment != null) {
+            return PaymentHistoryCard(
+              payment: payment,
+              onTap: () {
+                // Handle payment card tap
+                _onPaymentCardTap(payment);
+              },
+            );
+          }
+          return const SizedBox.shrink();
         },
       ),
     );
@@ -256,27 +258,31 @@ class _PaymentHistoryScreenState extends State<PaymentHistoryScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            Text('کد پیگیری: ${payment.trackingCode}'),
+            Text('کد پیگیری: ${payment.trackingCode ?? 'نامشخص'}'),
             Text('وضعیت: ${_getStatusText(payment.status)}'),
-            Text('مبلغ: ${_formatAmount(payment.grandTotal)}'),
-            Text('تاریخ: ${_formatDate(payment.createdAt)}'),
+            Text(
+                'مبلغ: ${payment.grandTotal != null ? _formatAmount(payment.grandTotal!) : 'نامشخص'}'),
+            Text(
+                'تاریخ: ${payment.createdAt != null ? _formatDate(payment.createdAt!) : 'نامشخص'}'),
           ],
         ),
       ),
     );
   }
 
-  String _getStatusText(status) {
+  String _getStatusText(String? status) {
+    if (status == null) return 'نامشخص';
+
     switch (status) {
-      case Status.PENDING:
+      case 'Pending':
         return 'در انتظار';
-      case Status.SUCCEEDED:
+      case 'Succeeded':
         return 'موفق';
-      case Status.FAILED:
+      case 'Failed':
         return 'ناموفق';
-      case Status.EXPIRED:
+      case 'Expired':
         return 'منقضی شده';
-      case Status.REFUNDED:
+      case 'Refunded':
         return 'برگشت خورده';
       default:
         return 'نامشخص';

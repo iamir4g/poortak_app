@@ -1,4 +1,4 @@
-import 'package:poortak/featueres/feature_profile/data/models/payment_history_modle.dart';
+import 'package:poortak/featueres/feature_profile/data/models/payment_history_model.dart';
 
 abstract class PaymentHistoryState {}
 
