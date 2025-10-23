@@ -172,6 +172,67 @@ class _LessonScreenState extends State<LessonScreen> {
       return;
     }
 
+    // Check if file already exists in local directories
+    final directory = await getApplicationDocumentsDirectory();
+    final videoDir = Directory('${directory.path}/videos');
+    final encryptedDir = Directory('${directory.path}/encrypted');
+
+    // Check in videos directory
+    if (await videoDir.exists()) {
+      final files = await videoDir.list().toList();
+      for (var file in files) {
+        if (file is File && file.path.contains(name)) {
+          print("✅ Found existing video file: ${file.path}");
+          if (!_isDisposed && mounted) {
+            setState(() {
+              localVideoPath = file.path;
+            });
+          }
+          return;
+        }
+      }
+    }
+
+    // Check in encrypted directory for purchased content
+    if (widget.purchased && await encryptedDir.exists()) {
+      final files = await encryptedDir.list().toList();
+      for (var file in files) {
+        if (file is File && file.path.contains(name)) {
+          print("✅ Found existing encrypted file: ${file.path}");
+          // Try to decrypt it
+          try {
+            final decryptionKeyResponse = await _storageService
+                .callGetDecryptedFile(widget.index.toString());
+            final decryptedFile = File('${videoDir.path}/$name');
+            final decryptedPath = await decryptFile(
+              file.path,
+              decryptedFile.path,
+              decryptionKeyResponse.data.key,
+            );
+            if (await File(decryptedPath).exists()) {
+              print("✅ Successfully decrypted existing file: $decryptedPath");
+              if (!_isDisposed && mounted) {
+                setState(() {
+                  localVideoPath = decryptedPath;
+                });
+              }
+              return;
+            }
+          } catch (e) {
+            print("❌ Error decrypting existing file: $e");
+            // If decryption fails, use the encrypted file as is
+            print("✅ Using encrypted file without decryption: ${file.path}");
+            if (!_isDisposed && mounted) {
+              setState(() {
+                localVideoPath = file.path;
+              });
+            }
+            return;
+          }
+        }
+      }
+    }
+
     if (!_isDisposed && mounted) {
       setState(() {
         isDownloading = true;
@@ -403,38 +464,6 @@ class _LessonScreenState extends State<LessonScreen> {
     }
   }
 
-  Future<void> _deleteOldVideoFiles(String videoId) async {
-    try {
-      final directory = await getApplicationDocumentsDirectory();
-      final videoDir = Directory('${directory.path}/videos');
-      final encryptedDir = Directory('${directory.path}/encrypted');
-
-      // Delete files from videos directory
-      if (await videoDir.exists()) {
-        final files = await videoDir.list().toList();
-        for (var file in files) {
-          if (file is File && file.path.contains(videoId)) {
-            await file.delete();
-            print('Deleted old video file: ${file.path}');
-          }
-        }
-      }
-
-      // Delete files from encrypted directory
-      if (await encryptedDir.exists()) {
-        final files = await encryptedDir.list().toList();
-        for (var file in files) {
-          if (file is File && file.path.contains(videoId)) {
-            await file.delete();
-            print('Deleted old encrypted video file: ${file.path}');
-          }
-        }
-      }
-    } catch (e) {
-      print('Error deleting old video files: $e');
-    }
-  }
-
   void _showPurchaseDialog() {
     if (_currentLesson == null) {
       print('No lesson data available for purchase dialog');
@@ -541,20 +570,6 @@ class _LessonScreenState extends State<LessonScreen> {
                 }
 
                 if (videoToDownload != null && videoToDownload.isNotEmpty) {
-                  // Delete old video files before downloading new one
-                  await _deleteOldVideoFiles(videoToDownload);
-
-                  // If user purchased and we're downloading the full video, also delete trailer files
-                  if (isLoggedIn &&
-                      state.lesson.purchased == true &&
-                      state.lesson.video != null &&
-                      state.lesson.video!.isNotEmpty &&
-                      videoToDownload == state.lesson.video) {
-                    await _deleteOldVideoFiles(state.lesson.trailerVideo);
-                    print(
-                        "Deleted old trailer files since user purchased the full video");
-                  }
-
                   _downloadAndStoreVideo(
                     videoToDownload, // video ID for download
                     videoToDownload, // name for file

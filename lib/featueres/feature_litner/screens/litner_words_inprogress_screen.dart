@@ -164,6 +164,15 @@ class _LitnerWordsInprogressScreenState
               }
               _hasMore = state.listWords.data.length == _size;
             });
+          } else if (state is CreateWordSuccess) {
+            // Refresh the list when a new word is successfully created
+            setState(() {
+              _page = 1;
+              _words.clear();
+              _hasMore = true;
+              _isInitialLoading = false;
+            });
+            _fetchWords();
           } else if (state is LitnerError) {
             setState(() {
               _isInitialLoading = false;
