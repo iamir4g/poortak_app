@@ -8,6 +8,7 @@ import 'package:poortak/featueres/fetures_sayareh/screens/reviewed_vocabularies_
 class PracticeVocabularyResultModal extends StatelessWidget {
   final int totalQuestions;
   final int correctAnswers;
+  final int wrongAnswers;
   final List<ReviewedVocabulary> reviewedVocabularies;
   final String courseId;
 
@@ -15,6 +16,7 @@ class PracticeVocabularyResultModal extends StatelessWidget {
     super.key,
     required this.totalQuestions,
     required this.correctAnswers,
+    required this.wrongAnswers,
     required this.reviewedVocabularies,
     required this.courseId,
   });
@@ -24,9 +26,8 @@ class PracticeVocabularyResultModal extends StatelessWidget {
     // Calculate percentages
     final double correctPercent =
         totalQuestions > 0 ? (correctAnswers / totalQuestions) * 100 : 0;
-    final double wrongPercent = totalQuestions > 0
-        ? ((totalQuestions - correctAnswers) / totalQuestions) * 100
-        : 0;
+    final double wrongPercent =
+        totalQuestions > 0 ? (wrongAnswers / totalQuestions) * 100 : 0;
 
     return Dialog(
       shape: RoundedRectangleBorder(
@@ -160,4 +161,3 @@ class PracticeVocabularyResultModal extends StatelessWidget {
     );
   }
 }
-

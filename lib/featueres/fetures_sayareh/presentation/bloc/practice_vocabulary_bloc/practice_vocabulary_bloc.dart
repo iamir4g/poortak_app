@@ -11,22 +11,15 @@ class PracticeVocabularyBloc
     extends Bloc<PracticeVocabularyEvent, PracticeVocabularyState> {
   final SayarehRepository sayarehRepository;
 
+  // Store accumulated data across questions
+  List<ReviewedVocabulary> _accumulatedReviewed = [];
+  int _accumulatedCorrectCount = 0;
+  int _accumulatedWrongCount = 0;
+
   PracticeVocabularyBloc({required this.sayarehRepository})
       : super(PracticeVocabularyInitial()) {
     on<PracticeVocabularyFetchEvent>((event, emit) async {
       emit(PracticeVocabularyLoading());
-
-      // Get previous state data if exists
-      List<ReviewedVocabulary> previousReviewed = [];
-      int previousCorrectCount = 0;
-      int previousWrongCount = 0;
-
-      if (state is PracticeVocabularySuccess) {
-        final currentState = state as PracticeVocabularySuccess;
-        previousReviewed = currentState.reviewedVocabularies;
-        previousCorrectCount = currentState.correctAnswersCount;
-        previousWrongCount = currentState.wrongAnswersCount;
-      }
 
       final response = await sayarehRepository.fetchPracticeVocabulary(
         event.courseId,
@@ -37,17 +30,24 @@ class PracticeVocabularyBloc
           emit(PracticeVocabularySuccess(
             practiceVocabulary: response.data!,
             correctWords: event.previousVocabularyIds,
-            reviewedVocabularies: previousReviewed,
-            correctAnswersCount: previousCorrectCount,
-            wrongAnswersCount: previousWrongCount,
+            reviewedVocabularies: _accumulatedReviewed,
+            correctAnswersCount: _accumulatedCorrectCount,
+            wrongAnswersCount: _accumulatedWrongCount,
           ));
         } else {
           // API returned null, practice completed
-          final totalQuestions = previousCorrectCount + previousWrongCount;
+          final totalQuestions =
+              _accumulatedCorrectCount + _accumulatedWrongCount;
+          print('DEBUG: Practice completed');
+          print('DEBUG: Total questions: $totalQuestions');
+          print('DEBUG: Correct answers: $_accumulatedCorrectCount');
+          print('DEBUG: Wrong answers: $_accumulatedWrongCount');
+          print(
+              'DEBUG: Reviewed vocabularies count: ${_accumulatedReviewed.length}');
           emit(PracticeVocabularyCompleted(
-            reviewedVocabularies: previousReviewed,
-            correctAnswersCount: previousCorrectCount,
-            wrongAnswersCount: previousWrongCount,
+            reviewedVocabularies: _accumulatedReviewed,
+            correctAnswersCount: _accumulatedCorrectCount,
+            wrongAnswersCount: _accumulatedWrongCount,
             totalQuestions: totalQuestions,
           ));
         }
@@ -67,9 +67,9 @@ class PracticeVocabularyBloc
         emit(PracticeVocabularySuccess(
           practiceVocabulary: currentState.practiceVocabulary,
           correctWords: updatedCorrectWords,
-          reviewedVocabularies: currentState.reviewedVocabularies,
-          correctAnswersCount: currentState.correctAnswersCount,
-          wrongAnswersCount: currentState.wrongAnswersCount,
+          reviewedVocabularies: _accumulatedReviewed,
+          correctAnswersCount: _accumulatedCorrectCount,
+          wrongAnswersCount: _accumulatedWrongCount,
         ));
       }
     });
@@ -83,25 +83,31 @@ class PracticeVocabularyBloc
           isCorrect: event.isCorrect,
         );
 
-        final updatedReviewed = [
-          ...currentState.reviewedVocabularies,
+        // Update accumulated data
+        _accumulatedReviewed = [
+          ..._accumulatedReviewed,
           newReviewedVocabulary,
         ];
 
-        final updatedCorrectCount = event.isCorrect
-            ? currentState.correctAnswersCount + 1
-            : currentState.correctAnswersCount;
+        if (event.isCorrect) {
+          _accumulatedCorrectCount++;
+        } else {
+          _accumulatedWrongCount++;
+        }
 
-        final updatedWrongCount = !event.isCorrect
-            ? currentState.wrongAnswersCount + 1
-            : currentState.wrongAnswersCount;
+        print('DEBUG: Answer saved - isCorrect: ${event.isCorrect}');
+        print('DEBUG: Word: ${event.word.word}');
+        print('DEBUG: Accumulated correct count: $_accumulatedCorrectCount');
+        print('DEBUG: Accumulated wrong count: $_accumulatedWrongCount');
+        print(
+            'DEBUG: Accumulated reviewed count: ${_accumulatedReviewed.length}');
 
         emit(PracticeVocabularySuccess(
           practiceVocabulary: currentState.practiceVocabulary,
           correctWords: currentState.correctWords,
-          reviewedVocabularies: updatedReviewed,
-          correctAnswersCount: updatedCorrectCount,
-          wrongAnswersCount: updatedWrongCount,
+          reviewedVocabularies: _accumulatedReviewed,
+          correctAnswersCount: _accumulatedCorrectCount,
+          wrongAnswersCount: _accumulatedWrongCount,
         ));
       }
     });

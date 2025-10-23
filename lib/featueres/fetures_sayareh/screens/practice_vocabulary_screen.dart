@@ -155,6 +155,7 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
                   builder: (context) => PracticeVocabularyResultModal(
                     totalQuestions: state.totalQuestions,
                     correctAnswers: state.correctAnswersCount,
+                    wrongAnswers: state.wrongAnswersCount,
                     reviewedVocabularies: state.reviewedVocabularies,
                     courseId: widget.courseId,
                   ),
