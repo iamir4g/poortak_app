@@ -26,3 +26,15 @@ final class PracticeVocabularySaveCorrectEvent extends PracticeVocabularyEvent {
   @override
   List<Object> get props => [wordId];
 }
+
+final class PracticeVocabularySaveAnswerEvent extends PracticeVocabularyEvent {
+  final Word word;
+  final bool isCorrect;
+  const PracticeVocabularySaveAnswerEvent({
+    required this.word,
+    required this.isCorrect,
+  });
+
+  @override
+  List<Object> get props => [word, isCorrect];
+}

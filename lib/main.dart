@@ -32,6 +32,7 @@ import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/practice_voc
 import 'package:poortak/featueres/fetures_sayareh/screens/converstion_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/lesson_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/practice_vocabulary_screen.dart';
+import 'package:poortak/featueres/fetures_sayareh/screens/reviewed_vocabularies_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/quiz_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/quizzes_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/vocabulary_screen.dart';
@@ -39,7 +40,7 @@ import 'package:poortak/featueres/feature_intro/presentation/bloc/splash_bloc/sp
 import 'package:poortak/featueres/feature_intro/presentation/screens/intro_main_wrapper.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
-import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/sayareh_cubit.dart';
+import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/sayareh_bloc/sayareh_cubit.dart';
 import 'package:poortak/locator.dart';
 import 'package:poortak/test_screen.dart';
 import 'package:poortak/l10n/app_localizations.dart';
@@ -54,7 +55,7 @@ import 'package:poortak/common/bloc/theme_cubit/theme_cubit.dart';
 import 'package:poortak/common/bloc/settings_cubit/settings_cubit.dart';
 import 'package:poortak/featueres/feature_match/presentation/bloc/match_bloc/match_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/pdf_reader_screen.dart';
-import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/single_book_cubit.dart';
+import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/single_book_bloc/single_book_cubit.dart';
 
 final RouteObserver<ModalRoute<void>> routeObserver =
     RouteObserver<ModalRoute<void>>();
@@ -146,6 +147,14 @@ void main() async {
                   create: (context) =>
                       PracticeVocabularyBloc(sayarehRepository: locator()),
                   child: PracticeVocabularyScreen(courseId: args['courseId']),
+                );
+              },
+              ReviewedVocabulariesScreen.routeName: (context) {
+                final args = ModalRoute.of(context)?.settings.arguments
+                    as Map<String, dynamic>;
+                return ReviewedVocabulariesScreen(
+                  reviewedVocabularies: args['reviewedVocabularies'],
+                  courseId: args['courseId'],
                 );
               },
               ConversationScreen.routeName: (context) {

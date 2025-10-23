@@ -47,6 +47,7 @@ class _LessonScreenState extends State<LessonScreen> {
   Lesson? _currentLesson;
   final GlobalKey<CustomVideoPlayerState> _videoPlayerKey =
       GlobalKey<CustomVideoPlayerState>();
+  bool _isDisposed = false;
 
   Future<void> _checkExistingFiles(String name) async {
     try {
@@ -61,9 +62,11 @@ class _LessonScreenState extends State<LessonScreen> {
           if (file.path.contains(name)) {
             print(
                 "Found existing video file in videos directory: ${file.path}");
-            setState(() {
-              localVideoPath = file.path;
-            });
+            if (!_isDisposed && mounted) {
+              setState(() {
+                localVideoPath = file.path;
+              });
+            }
             return;
           }
         }
@@ -89,9 +92,11 @@ class _LessonScreenState extends State<LessonScreen> {
                   decryptionKeyResponse.data.key,
                 );
                 if (await File(decryptedPath).exists()) {
-                  setState(() {
-                    localVideoPath = decryptedPath;
-                  });
+                  if (!_isDisposed && mounted) {
+                    setState(() {
+                      localVideoPath = decryptedPath;
+                    });
+                  }
                   return;
                 }
               } catch (e) {
@@ -128,9 +133,11 @@ class _LessonScreenState extends State<LessonScreen> {
                   decryptionKeyResponse.data.key,
                 );
                 if (await File(decryptedPath).exists()) {
-                  setState(() {
-                    localVideoPath = decryptedPath;
-                  });
+                  if (!_isDisposed && mounted) {
+                    setState(() {
+                      localVideoPath = decryptedPath;
+                    });
+                  }
                   return;
                 }
               } catch (e) {
@@ -165,10 +172,12 @@ class _LessonScreenState extends State<LessonScreen> {
       return;
     }
 
-    setState(() {
-      isDownloading = true;
-      downloadProgress = 0.0;
-    });
+    if (!_isDisposed && mounted) {
+      setState(() {
+        isDownloading = true;
+        downloadProgress = 0.0;
+      });
+    }
 
     try {
       // Get the application documents directory
@@ -196,10 +205,12 @@ class _LessonScreenState extends State<LessonScreen> {
       // Check if decrypted file already exists
       if (await decryptedFile.exists()) {
         print("Decrypted file already exists, using local path");
-        setState(() {
-          localVideoPath = decryptedFile.path;
-          isDownloading = false;
-        });
+        if (!_isDisposed && mounted) {
+          setState(() {
+            localVideoPath = decryptedFile.path;
+            isDownloading = false;
+          });
+        }
         return;
       }
 
@@ -207,23 +218,44 @@ class _LessonScreenState extends State<LessonScreen> {
       print("usePublicUrl: $usePublicUrl, key: $key");
 
       String downloadUrlString;
-      if (usePublicUrl) {
-        // For trailer videos, use public download URL
-        downloadUrlString = await _storageService.callGetDownloadPublicUrl(key);
-        print("Public download URL received: $downloadUrlString");
-      } else {
-        // For purchased content, use regular download URL
-        final downloadUrl = await _storageService.callGetDownloadUrl(key);
-        downloadUrlString = downloadUrl.data;
-        print("Authenticated download URL received: $downloadUrlString");
+      try {
+        if (usePublicUrl) {
+          // For trailer videos, use public download URL
+          downloadUrlString =
+              await _storageService.callGetDownloadPublicUrl(key);
+          print("Public download URL received: $downloadUrlString");
+        } else {
+          // For purchased content, use regular download URL
+          final downloadUrl = await _storageService.callGetDownloadUrl(key);
+          downloadUrlString = downloadUrl.data;
+          print("Authenticated download URL received: $downloadUrlString");
+        }
+      } catch (e) {
+        print('Error getting download URL: $e');
+        if (!_isDisposed && mounted) {
+          setState(() {
+            isDownloading = false;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content:
+                  Text('خطا در دریافت لینک دانلود. لطفا دوباره تلاش کنید.'),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        }
+        return;
       }
 
       print("Download URL received: $downloadUrlString");
 
       // Set the video URL for immediate playback while downloading
-      setState(() {
-        videoUrl = downloadUrlString;
-      });
+      if (!_isDisposed && mounted) {
+        setState(() {
+          videoUrl = downloadUrlString;
+        });
+      }
 
       print("Starting file download");
       // Download using flutter_file_downloader
@@ -232,9 +264,11 @@ class _LessonScreenState extends State<LessonScreen> {
         name: name,
         onProgress: (fileName, progress) {
           print("Download progress: $progress%");
-          setState(() {
-            downloadProgress = progress / 100;
-          });
+          if (!_isDisposed && mounted) {
+            setState(() {
+              downloadProgress = progress / 100;
+            });
+          }
         },
         onDownloadCompleted: (path) async {
           print("Download completed, file saved to: $path");
@@ -275,14 +309,15 @@ class _LessonScreenState extends State<LessonScreen> {
 
               if (await File(decryptedPath).exists()) {
                 print("File successfully processed");
-                setState(() {
-                  localVideoPath = decryptedPath;
-                  videoUrl = null; // Clear the URL since we now have local file
-                  isDownloading = false;
-                });
+                if (!_isDisposed && mounted) {
+                  setState(() {
+                    localVideoPath = decryptedPath;
+                    videoUrl =
+                        null; // Clear the URL since we now have local file
+                    isDownloading = false;
+                  });
 
-                // Show success snackbar
-                if (mounted) {
+                  // Show success snackbar
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('فایل دانلود شد'),
@@ -298,14 +333,14 @@ class _LessonScreenState extends State<LessonScreen> {
             } else {
               // If not encrypted (trailer video), just copy to video directory
               await encryptedFile.copy(decryptedFile.path);
-              setState(() {
-                localVideoPath = decryptedFile.path;
-                videoUrl = null;
-                isDownloading = false;
-              });
+              if (!_isDisposed && mounted) {
+                setState(() {
+                  localVideoPath = decryptedFile.path;
+                  videoUrl = null;
+                  isDownloading = false;
+                });
 
-              // Show success snackbar for trailer video
-              if (mounted) {
+                // Show success snackbar for trailer video
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('تریلر دانلود شد'),
@@ -317,10 +352,10 @@ class _LessonScreenState extends State<LessonScreen> {
             }
           } catch (e) {
             print("Error processing file: $e");
-            setState(() {
-              isDownloading = false;
-            });
-            if (mounted) {
+            if (!_isDisposed && mounted) {
+              setState(() {
+                isDownloading = false;
+              });
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text('خطا در پردازش فایل: $e'),
@@ -333,12 +368,12 @@ class _LessonScreenState extends State<LessonScreen> {
         },
         onDownloadError: (error) {
           print("Download error: $error");
-          setState(() {
-            isDownloading = false;
-          });
+          if (!_isDisposed && mounted) {
+            setState(() {
+              isDownloading = false;
+            });
 
-          // Show error snackbar
-          if (mounted) {
+            // Show error snackbar
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('خطا در دانلود فایل: $error'),
@@ -351,12 +386,12 @@ class _LessonScreenState extends State<LessonScreen> {
       );
     } catch (e) {
       print('Error in download process: $e');
-      setState(() {
-        isDownloading = false;
-      });
+      if (!_isDisposed && mounted) {
+        setState(() {
+          isDownloading = false;
+        });
 
-      // Show error snackbar
-      if (mounted) {
+        // Show error snackbar
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('خطا در دانلود فایل: $e'),
@@ -423,6 +458,7 @@ class _LessonScreenState extends State<LessonScreen> {
 
   @override
   void dispose() {
+    _isDisposed = true;
     // Stop video when leaving the screen
     _videoPlayerKey.currentState?.stopVideo();
     super.dispose();
@@ -435,9 +471,11 @@ class _LessonScreenState extends State<LessonScreen> {
         print("LessonBloc state changed: $state");
         if (state is LessonSuccess) {
           // Store the lesson data for use in dialogs
-          setState(() {
-            _currentLesson = state.lesson;
-          });
+          if (!_isDisposed && mounted) {
+            setState(() {
+              _currentLesson = state.lesson;
+            });
+          }
 
           // First determine which video to use based on login and purchase status
           String? videoToCheck;
@@ -767,8 +805,10 @@ class _LessonScreenState extends State<LessonScreen> {
           ),
 
           const SizedBox(height: 12),
+          //card vocabulary
           InkWell(
             onTap: () {
+              print("VocabularyScreen.routeName: ${widget.purchased}");
               if (!widget.purchased) {
                 _showPurchaseDialog();
                 return;
@@ -859,6 +899,7 @@ class _LessonScreenState extends State<LessonScreen> {
           ),
 
           const SizedBox(height: 12),
+          //card quiz
           InkWell(
             onTap: () {
               if (!widget.purchased) {

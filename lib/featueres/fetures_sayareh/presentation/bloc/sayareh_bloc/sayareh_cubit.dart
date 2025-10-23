@@ -20,6 +20,9 @@ class SayarehCubit extends Cubit<SayarehState> {
     DataState dataState = await sayarehRepository.fetchAllCourses();
     DataState bookListState = await sayarehRepository.fetchBookList();
 
+    // Check if cubit is still open before emitting
+    if (isClosed) return;
+
     if (dataState is DataSuccess && bookListState is DataSuccess) {
       // emit completed when both succeed
       emit(state.copyWith(

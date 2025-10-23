@@ -33,6 +33,10 @@ class LitnerReviewCubit extends Cubit<LitnerReviewState> {
   Future<void> fetchWords() async {
     emit(LitnerReviewLoading());
     final result = await repository.fetchLitnerReviewWords();
+
+    // Check if cubit is still open before emitting
+    if (isClosed) return;
+
     if (result is DataSuccess<ReviewWords>) {
       _words = result.data!.data; // 'data' is the list of Datum
       _currentIndex = 0;

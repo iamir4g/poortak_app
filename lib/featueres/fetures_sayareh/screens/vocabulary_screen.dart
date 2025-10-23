@@ -10,7 +10,7 @@ import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_bloc.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_event.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_state.dart';
-import 'package:poortak/featueres/fetures_sayareh/presentation/vocabulary_bloc/vocabulary_bloc.dart';
+import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/vocabulary_bloc/vocabulary_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/practice_vocabulary_screen.dart';
 import 'package:poortak/locator.dart';
 import 'package:poortak/common/services/storage_service.dart';

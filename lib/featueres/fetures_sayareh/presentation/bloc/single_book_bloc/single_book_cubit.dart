@@ -17,6 +17,9 @@ class SingleBookCubit extends Cubit<SingleBookState> {
 
     DataState dataState = await sayarehRepository.fetchBookById(bookId);
 
+    // Check if cubit is still open before emitting
+    if (isClosed) return;
+
     if (dataState is DataSuccess) {
       emit(state.copyWith(
           singleBookDataStatus: SingleBookDataCompleted(dataState.data)));

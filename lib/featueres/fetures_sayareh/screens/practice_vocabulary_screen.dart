@@ -6,6 +6,7 @@ import 'package:poortak/common/services/tts_service.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/practice_vocabulary_bloc/practice_vocabulary_bloc.dart';
+import 'package:poortak/featueres/fetures_sayareh/widgets/practice_vocabulary_result_modal.dart';
 import 'package:poortak/locator.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/lesson_screen.dart';
 
@@ -36,27 +37,29 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
   }
 
   void _checkAnswer(String word) {
+    final currentState = context.read<PracticeVocabularyBloc>().state
+        as PracticeVocabularySuccess;
+    final correctWord = currentState.practiceVocabulary.data.correctWord;
+
     setState(() {
       selectedWord = word;
       showAnswer = true;
-      isCorrect = word ==
-          (context.read<PracticeVocabularyBloc>().state
-                  as PracticeVocabularySuccess)
-              .practiceVocabulary
-              .data
-              .correctWord
-              .word;
+      isCorrect = word == correctWord.word;
     });
 
+    // Save the answer (correct or wrong)
+    context.read<PracticeVocabularyBloc>().add(
+          PracticeVocabularySaveAnswerEvent(
+            word: correctWord,
+            isCorrect: isCorrect,
+          ),
+        );
+
+    // If correct, also save the word ID for fetching next question
     if (isCorrect) {
       context.read<PracticeVocabularyBloc>().add(
             PracticeVocabularySaveCorrectEvent(
-              wordId: (context.read<PracticeVocabularyBloc>().state
-                      as PracticeVocabularySuccess)
-                  .practiceVocabulary
-                  .data
-                  .correctWord
-                  .id,
+              wordId: correctWord.id,
             ),
           );
     }
@@ -146,20 +149,15 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
             }
             if (state is PracticeVocabularyCompleted) {
               WidgetsBinding.instance.addPostFrameCallback((_) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('تمرین واژگان به پایان رسید'),
-                    duration: Duration(seconds: 2),
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (context) => PracticeVocabularyResultModal(
+                    totalQuestions: state.totalQuestions,
+                    correctAnswers: state.correctAnswersCount,
+                    reviewedVocabularies: state.reviewedVocabularies,
+                    courseId: widget.courseId,
                   ),
-                );
-                Navigator.pushReplacementNamed(
-                  context,
-                  LessonScreen.routeName,
-                  arguments: {
-                    'index': 0,
-                    'title': 'درس',
-                    'lessonId': widget.courseId,
-                  },
                 );
               });
               return const Center(child: CircularProgressIndicator());

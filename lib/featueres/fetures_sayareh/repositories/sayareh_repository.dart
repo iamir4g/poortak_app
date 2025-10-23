@@ -15,7 +15,7 @@ import 'package:poortak/featueres/fetures_sayareh/data/models/result_question_mo
 import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_home_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_storage_test_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/vocabulary_model.dart';
-import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/sayareh_cubit.dart';
+import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/sayareh_bloc/sayareh_cubit.dart';
 
 class SayarehRepository {
   SayarehApiProvider sayarehApiProvider;

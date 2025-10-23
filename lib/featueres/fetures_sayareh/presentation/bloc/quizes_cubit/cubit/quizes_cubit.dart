@@ -18,13 +18,19 @@ class QuizesCubit extends Cubit<QuizesState> {
     emit(QuizesLoading());
     try {
       final result = await _sayarehRepository.fetchQuizzes(courseId);
+
+      // Check if cubit is still open before emitting
+      if (isClosed) return;
+
       if (result is DataSuccess && result.data != null) {
         emit(QuizesLoaded(result.data!));
       } else if (result is DataFailed) {
         emit(QuizesError(result.error ?? 'An error occurred'));
       }
     } catch (e) {
-      emit(QuizesError(e.toString()));
+      if (!isClosed) {
+        emit(QuizesError(e.toString()));
+      }
     }
   }
 }

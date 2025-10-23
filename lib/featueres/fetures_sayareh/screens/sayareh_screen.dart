@@ -12,7 +12,7 @@ import 'package:poortak/common/widgets/primaryButton.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_home_model.dart';
-import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/sayareh_cubit.dart';
+import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/sayareh_bloc/sayareh_cubit.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/lesson_screen.dart';
 import 'package:poortak/featueres/feature_match/screens/main_match_screen.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/models/shopping_cart_model.dart';
