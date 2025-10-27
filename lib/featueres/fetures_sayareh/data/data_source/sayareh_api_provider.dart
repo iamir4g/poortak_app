@@ -106,13 +106,22 @@ class SayarehApiProvider {
     return response; //SayarehStorageTest.fromJson(response.data);
   }
 
-  dynamic callGetDownloadUrl(String key) async {
+  dynamic callDownloadCourseVideo(String courseId) async {
     final response = await dio.get(
-      "${Constants.baseUrl}storage/download/$key",
+      "${Constants.baseUrl}iknow/courses/$courseId/download",
     );
 
-    log("Sayareh Storage Download URL: ${response.data}");
-    return response; //SayarehStorageTest.fromJson(response.data);
+    log("Course Video Download URL: ${response.data}");
+    return response;
+  }
+
+  dynamic callDownloadBookFile(String bookId) async {
+    final response = await dio.get(
+      "${Constants.baseUrl}iknow/books/$bookId/download",
+    );
+
+    log("Book File Download URL: ${response.data}");
+    return response;
   }
 
   dynamic callGetConversation(String id) async {

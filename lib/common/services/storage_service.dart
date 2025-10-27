@@ -10,6 +10,29 @@ class StorageService {
 
   StorageService({required this.dio});
 
+  // For course video downloads - uses new API
+  Future<String> callDownloadCourseVideo(String courseId) async {
+    final response = await dio.get(
+      "${Constants.baseUrl}iknow/courses/$courseId/download",
+    );
+
+    log("Course Video Download URL Response: ${response.data}");
+    return response.data.toString();
+  }
+
+  // For book file downloads - uses new API
+  Future<String> callDownloadBookFile(String bookId) async {
+    final response = await dio.get(
+      "${Constants.baseUrl}iknow/books/$bookId/download",
+    );
+
+    log("Book File Download URL Response: ${response.data}");
+    return response.data.toString();
+  }
+
+  // DEPRECATED: This method is kept for backwards compatibility but should not be used
+  // Use callDownloadCourseVideo or callDownloadBookFile instead
+  @Deprecated('Use callDownloadCourseVideo or callDownloadBookFile instead')
   Future<GetDownloadUrl> callGetDownloadUrl(String key) async {
     final response = await dio.get(
       "${Constants.baseUrl}storage/download/$key",

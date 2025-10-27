@@ -196,17 +196,20 @@ class PdfDownloader {
 
       // Get download URL from StorageService
       print("Getting download URL from StorageService");
-      print("usePublicUrl: $usePublicUrl, key: $key");
+      print("usePublicUrl: $usePublicUrl, key: $key, fileId: $fileId");
       String downloadUrl;
       if (usePublicUrl) {
+        // For trailer book files, use public download URL (DO NOT TOUCH - this is correct)
         downloadUrl = await storageService.callGetDownloadPublicUrl(key);
         print("Public download URL received: $downloadUrl");
       } else {
-        final response = await storageService.callGetDownloadUrl(key);
-        downloadUrl = response.data;
-        print("Authenticated download URL received: $downloadUrl");
-        print(
-            "Response ok: ${response.ok}, data length: ${downloadUrl.length}");
+        // For purchased book files, use new API endpoint
+        // Extract bookId from fileId (format: 'book_{bookId}')
+        final bookId =
+            fileId.startsWith('book_') ? fileId.substring(5) : fileId;
+        print("Extracted bookId: $bookId from fileId: $fileId");
+        downloadUrl = await storageService.callDownloadBookFile(bookId);
+        print("Authenticated book download URL received: $downloadUrl");
       }
 
       // Download using flutter_file_downloader

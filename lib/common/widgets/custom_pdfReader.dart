@@ -114,11 +114,14 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
 
     try {
       if (widget.usePublicUrl) {
-        // Use public URL for trial files
+        // Use public URL for trial files (DO NOT TOUCH - this is correct)
         await widget.storageService.callGetDownloadPublicUrl(widget.fileKey!);
       } else {
-        // Use authenticated download URL for purchased files
-        await widget.storageService.callGetDownloadUrl(widget.fileKey!);
+        // Use new API endpoint for purchased book files
+        final bookId = widget.fileId.startsWith('book_')
+            ? widget.fileId.substring(5)
+            : widget.fileId;
+        await widget.storageService.callDownloadBookFile(bookId);
       }
 
       // For now, we'll use a placeholder and let the user download the PDF

@@ -281,15 +281,15 @@ class _LessonScreenState extends State<LessonScreen> {
       String downloadUrlString;
       try {
         if (usePublicUrl) {
-          // For trailer videos, use public download URL
+          // For trailer videos, use public download URL (DO NOT TOUCH - this is correct)
           downloadUrlString =
               await _storageService.callGetDownloadPublicUrl(key);
           print("Public download URL received: $downloadUrlString");
         } else {
-          // For purchased content, use regular download URL
-          final downloadUrl = await _storageService.callGetDownloadUrl(key);
-          downloadUrlString = downloadUrl.data;
-          print("Authenticated download URL received: $downloadUrlString");
+          // For purchased course videos, use new API endpoint
+          downloadUrlString =
+              await _storageService.callDownloadCourseVideo(key);
+          print("Course video download URL received: $downloadUrlString");
         }
       } catch (e) {
         print('Error getting download URL: $e');
