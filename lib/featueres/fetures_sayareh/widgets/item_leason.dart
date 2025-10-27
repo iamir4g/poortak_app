@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poortak/common/services/getImageUrl_service.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_home_model.dart';
+import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/iknow_access_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/lesson_screen.dart';
 
 class ItemLeason extends StatelessWidget {
@@ -17,6 +19,15 @@ class ItemLeason extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Get IknowAccessBloc from context
+    final accessBloc = context.watch<IknowAccessBloc>();
+
+    // Check if user has access to this course
+    final hasAccess = accessBloc.hasCourseAccess(item.id);
+
+    // Use hasAccess instead of purchased
+    final isLocked = !hasAccess;
+
     return GestureDetector(
       onTap: () {
         // if (item.price != "0") {
@@ -30,7 +41,7 @@ class ItemLeason extends StatelessWidget {
           'index': index,
           'title': item.name,
           'lessonId': item.id,
-          'purchased': purchased,
+          'purchased': hasAccess, // Use hasAccess instead of purchased
         });
         // }
       },
@@ -91,9 +102,9 @@ class ItemLeason extends StatelessWidget {
             ),
             Row(
               children: [
-                purchased
-                    ? SizedBox()
-                    : Image(image: AssetImage("assets/images/lock_image.png")),
+                isLocked
+                    ? Image(image: AssetImage("assets/images/lock_image.png"))
+                    : SizedBox(),
                 // : SizedBox(),
                 SizedBox(
                   width: 8,

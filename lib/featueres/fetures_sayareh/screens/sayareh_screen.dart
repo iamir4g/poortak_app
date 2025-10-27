@@ -12,6 +12,7 @@ import 'package:poortak/common/widgets/primaryButton.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_home_model.dart';
+import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/iknow_access_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/sayareh_bloc/sayareh_cubit.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/lesson_screen.dart';
 import 'package:poortak/featueres/feature_match/screens/main_match_screen.dart';
@@ -38,6 +39,16 @@ class SayarehScreen extends StatefulWidget {
 class _SayarehScreenState extends State<SayarehScreen> {
   final PrefsOperator _prefsOperator = locator<PrefsOperator>();
 
+  @override
+  void initState() {
+    super.initState();
+    // Fetch access data every time this screen is opened
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final accessBloc = locator<IknowAccessBloc>();
+      accessBloc.add(FetchIknowAccessEvent(forceRefresh: true));
+    });
+  }
+
   // Helper method to add item to cart based on login status
 
   @override
@@ -59,6 +70,9 @@ class _SayarehScreenState extends State<SayarehScreen> {
             bloc.add(GetCartEvent());
             return bloc;
           },
+        ),
+        BlocProvider.value(
+          value: locator<IknowAccessBloc>(),
         ),
       ],
       child: BlocBuilder<SayarehCubit, SayarehState>(

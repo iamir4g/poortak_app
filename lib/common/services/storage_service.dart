@@ -12,12 +12,36 @@ class StorageService {
 
   // For course video downloads - uses new API
   Future<String> callDownloadCourseVideo(String courseId) async {
-    final response = await dio.get(
-      "${Constants.baseUrl}iknow/courses/$courseId/download",
-    );
+    try {
+      final response = await dio.get(
+        "${Constants.baseUrl}iknow/courses/$courseId/download",
+      );
 
-    log("Course Video Download URL Response: ${response.data}");
-    return response.data.toString();
+      log("Course Video Download URL Response: ${response.data}");
+
+      // Response structure: {ok: true, meta: {}, data: "url"}
+      if (response.data is Map) {
+        final data = response.data as Map<String, dynamic>;
+
+        // Check if the response has a data field which contains the URL
+        if (data.containsKey('data') && data['data'] is String) {
+          final url = data['data'] as String;
+          log("Extracted URL: $url");
+          return url;
+        }
+
+        // Check if the response has a url field (fallback)
+        if (data.containsKey('url')) {
+          return data['url'] as String;
+        }
+      }
+
+      // Otherwise return the data as string
+      return response.data.toString();
+    } catch (e) {
+      log("Error calling callDownloadCourseVideo: $e");
+      rethrow;
+    }
   }
 
   // For book file downloads - uses new API
@@ -27,6 +51,25 @@ class StorageService {
     );
 
     log("Book File Download URL Response: ${response.data}");
+
+    // Response structure: {ok: true, meta: {}, data: "url"}
+    if (response.data is Map) {
+      final data = response.data as Map<String, dynamic>;
+
+      // Check if the response has a data field which contains the URL
+      if (data.containsKey('data') && data['data'] is String) {
+        final url = data['data'] as String;
+        log("Extracted URL: $url");
+        return url;
+      }
+
+      // Check if the response has a url field (fallback)
+      if (data.containsKey('url')) {
+        return data['url'] as String;
+      }
+    }
+
+    // Otherwise return the data as string
     return response.data.toString();
   }
 

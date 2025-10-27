@@ -132,4 +132,13 @@ class SayarehApiProvider {
     log("Sayareh Conversation Response: ${response.data}");
     return response;
   }
+
+  dynamic callGetIknowAccess() async {
+    final response = await dio.get(
+      "${Constants.baseUrl}iknow/access",
+    );
+
+    log("Iknow Access Response: ${response.data}");
+    return response;
+  }
 }

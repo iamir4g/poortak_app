@@ -1,11 +1,5 @@
 #!/bin/bash
-export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
-export PATH="$JAVA_HOME/bin:$PATH"
-exec /Users/amir/development/flutter/bin/flutter "$@"
-
-
-
-
-
-
-
+export PATH="/Users/macbookpro/development/flutter/bin:$PATH"
+export JAVA_HOME="/Library/Java/JavaVirtualMachines/zulu-17.jdk/Contents/Home"
+export ANDROID_HOME="/Users/macbookpro/Library/Android/sdk"
+exec /Users/macbookpro/development/flutter/bin/flutter "$@"

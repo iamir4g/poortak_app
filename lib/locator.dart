@@ -10,6 +10,7 @@ import 'package:poortak/featueres/feature_litner/repositories/litner_repository.
 import 'package:poortak/featueres/fetures_sayareh/data/data_source/sayareh_api_provider.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/bloc_storage_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/converstion_bloc/converstion_bloc.dart';
+import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/iknow_access_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/lesson_bloc/lesson_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/vocabulary_bloc/vocabulary_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/repositories/sayareh_repository.dart';
@@ -35,21 +36,30 @@ GetIt locator = GetIt.instance;
 Future<void> initLocator() async {
   final dio = Dio();
 
-  // Add interceptor to set x-lang header
+  SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+  locator.registerSingleton<SharedPreferences>(sharedPreferences);
+  locator.registerSingleton<PrefsOperator>(PrefsOperator());
+
+  final prefsOperator = locator<PrefsOperator>();
+
+  // Add interceptor to set x-lang header and authorization token
   dio.interceptors.add(InterceptorsWrapper(
-    onRequest: (options, handler) {
+    onRequest: (options, handler) async {
       // Set x-lang header for all requests
       options.headers['x-lang'] =
           'fa'; // You can change 'en' to your desired language code
+
+      // Add authorization token if available
+      final token = await prefsOperator.getUserToken();
+      if (token != null && token.isNotEmpty) {
+        options.headers['Authorization'] = 'Bearer $token';
+      }
+
       return handler.next(options);
     },
   ));
 
   locator.registerSingleton<Dio>(dio);
-
-  SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-  locator.registerSingleton<SharedPreferences>(sharedPreferences);
-  locator.registerSingleton<PrefsOperator>(PrefsOperator());
 
   // Register StorageService
   locator.registerSingleton<StorageService>(StorageService(dio: locator()));
@@ -81,6 +91,8 @@ Future<void> initLocator() async {
   locator.registerSingleton<MatchRepository>(MatchRepository(locator()));
   locator.registerSingleton<BlocStorageBloc>(
       BlocStorageBloc(sayarehRepository: locator()));
+  locator.registerSingleton<IknowAccessBloc>(
+      IknowAccessBloc(sayarehRepository: locator()));
   locator
       .registerSingleton<LessonBloc>(LessonBloc(sayarehRepository: locator()));
   locator.registerSingleton<ConverstionBloc>(

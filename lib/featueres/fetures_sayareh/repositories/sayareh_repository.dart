@@ -12,10 +12,10 @@ import 'package:poortak/featueres/fetures_sayareh/data/models/practice_vocabular
 import 'package:poortak/featueres/fetures_sayareh/data/models/quiz_question_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/quizzes_list_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/result_question_model.dart';
+import 'package:poortak/featueres/fetures_sayareh/data/models/iknow_access_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_home_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_storage_test_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/vocabulary_model.dart';
-import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/sayareh_bloc/sayareh_cubit.dart';
 
 class SayarehRepository {
   SayarehApiProvider sayarehApiProvider;
@@ -231,6 +231,20 @@ class SayarehRepository {
       }
     } on AppException catch (e) {
       return CheckExceptions.getError<SayarehStorageTest>(e);
+    }
+  }
+
+  Future<DataState<IknowAccess>> fetchIknowAccess() async {
+    try {
+      Response response = await sayarehApiProvider.callGetIknowAccess();
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = IknowAccess.fromJson(response.data);
+        return DataSuccess(data);
+      } else {
+        return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
+      }
+    } on AppException catch (e) {
+      return CheckExceptions.getError<IknowAccess>(e);
     }
   }
 }

@@ -7,6 +7,7 @@ import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_home_model.dart';
+import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/iknow_access_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/lesson_bloc/lesson_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/converstion_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/quizzes_screen.dart';
@@ -49,58 +50,89 @@ class _LessonScreenState extends State<LessonScreen> {
       GlobalKey<CustomVideoPlayerState>();
   bool _isDisposed = false;
 
+  // Helper method to check if user has access
+  bool get hasAccess {
+    final accessBloc = locator<IknowAccessBloc>();
+    return accessBloc.hasCourseAccess(widget.lessonId);
+  }
+
+  // Helper method to extract base filename without flutter_file_downloader suffixes
+  String _getBaseFileName(String filePath) {
+    final fileName = filePath.split('/').last;
+    // flutter_file_downloader adds suffixes like -1, -2, -3
+    // A UUID has 4 dashes (e.g., 26ab6de7-147c-4297-a7d8-85939dc7d7f1)
+    // If there's a 5th dash followed by a number, that's the flutter_file_downloader suffix
+    final dashIndex = fileName.lastIndexOf('-');
+    if (dashIndex != -1) {
+      final suffix = fileName.substring(dashIndex + 1);
+      // If the part after the last dash is a number, it's a suffix
+      if (int.tryParse(suffix) != null) {
+        return fileName.substring(0, dashIndex);
+      }
+    }
+    return fileName;
+  }
+
   Future<void> _checkExistingFiles(String name) async {
     try {
       final directory = await getApplicationDocumentsDirectory();
       final videoDir = Directory('${directory.path}/videos');
       final encryptedDir = Directory('${directory.path}/encrypted');
 
-      // Check in videos directory first
+      // Check in videos directory first (decrypted files)
       if (await videoDir.exists()) {
         final files = await videoDir.list().toList();
         for (var file in files) {
-          if (file.path.contains(name)) {
-            print(
-                "Found existing video file in videos directory: ${file.path}");
-            if (!_isDisposed && mounted) {
-              setState(() {
-                localVideoPath = file.path;
-              });
+          if (file is File) {
+            final fileName = _getBaseFileName(file.path);
+            if (fileName == name) {
+              print("✅ Found existing decrypted video file: ${file.path}");
+              if (!_isDisposed && mounted) {
+                setState(() {
+                  localVideoPath = file.path;
+                });
+              }
+              return;
             }
-            return;
           }
         }
       }
 
       // For purchased content, check encrypted directory and try to decrypt
-      if (widget.purchased) {
+      if (hasAccess) {
         // Check in encrypted directory
         if (await encryptedDir.exists()) {
           final files = await encryptedDir.list().toList();
           for (var encryptedFile in files) {
-            if (encryptedFile.path.contains(name)) {
-              print("Found existing encrypted file: ${encryptedFile.path}");
-              // Try to decrypt it
-              try {
-                final decryptionKeyResponse = await _storageService
-                    .callGetDecryptedFile(widget.index.toString());
-                final decryptedFile = File(
-                    '${videoDir.path}/${encryptedFile.path.split('/').last}');
-                final decryptedPath = await decryptFile(
-                  encryptedFile.path,
-                  decryptedFile.path,
-                  decryptionKeyResponse.data.key,
-                );
-                if (await File(decryptedPath).exists()) {
-                  if (!_isDisposed && mounted) {
-                    setState(() {
-                      localVideoPath = decryptedPath;
-                    });
+            if (encryptedFile is File) {
+              final fileName = _getBaseFileName(encryptedFile.path);
+              if (fileName == name) {
+                print("✅ Found existing encrypted file: ${encryptedFile.path}");
+                // Try to decrypt it
+                try {
+                  // Use the video file ID for getting decryption key, not the index
+                  final decryptionKeyResponse =
+                      await _storageService.callGetDecryptedFile(fileName);
+                  final decryptedFileName =
+                      '${fileName}.mp4'; // or keep original extension
+                  final decryptedFile =
+                      File('${videoDir.path}/$decryptedFileName');
+                  final decryptedPath = await decryptFile(
+                    encryptedFile.path,
+                    decryptedFile.path,
+                    decryptionKeyResponse.data.key,
+                  );
+                  if (await File(decryptedPath).exists()) {
+                    if (!_isDisposed && mounted) {
+                      setState(() {
+                        localVideoPath = decryptedPath;
+                      });
+                    }
+                    return;
                   }
-                  return;
+                } catch (e) {
+                  print("❌ Error decrypting existing file: $e");
                 }
-              } catch (e) {
-                print("Error decrypting existing file: $e");
               }
             }
           }
@@ -111,47 +143,47 @@ class _LessonScreenState extends State<LessonScreen> {
         if (await downloadsDir.exists()) {
           final files = await downloadsDir.list().toList();
           for (var downloadedFile in files) {
-            // Check if file name starts with the expected name (ignoring suffix like -1, -2, etc.)
-            final fileName = downloadedFile.path.split('/').last;
-            final baseFileName =
-                fileName.split('-').first; // Get the part before any dash
-            if (baseFileName == name) {
-              print("Found existing file in Downloads: ${downloadedFile.path}");
-              // Copy to encrypted directory with the original name
-              final encryptedFile = File('${encryptedDir.path}/$name');
-              await File(downloadedFile.path).copy(encryptedFile.path);
+            if (downloadedFile is File) {
+              final fileName = _getBaseFileName(downloadedFile.path);
+              if (fileName == name) {
+                print(
+                    "✅ Found existing file in Downloads: ${downloadedFile.path}");
+                // Copy to encrypted directory with the original name
+                final encryptedFile = File('${encryptedDir.path}/$name');
+                await File(downloadedFile.path).copy(encryptedFile.path);
 
-              // Try to decrypt it
-              try {
-                final decryptionKeyResponse = await _storageService
-                    .callGetDecryptedFile(widget.index.toString());
-                final decryptedFile = File(
-                    '${videoDir.path}/${downloadedFile.path.split('/').last}');
-                final decryptedPath = await decryptFile(
-                  encryptedFile.path,
-                  decryptedFile.path,
-                  decryptionKeyResponse.data.key,
-                );
-                if (await File(decryptedPath).exists()) {
-                  if (!_isDisposed && mounted) {
-                    setState(() {
-                      localVideoPath = decryptedPath;
-                    });
+                // Try to decrypt it
+                try {
+                  // Use the video file ID for getting decryption key, not the index
+                  final decryptionKeyResponse =
+                      await _storageService.callGetDecryptedFile(name);
+                  final decryptedFile = File('${videoDir.path}/$name.mp4');
+                  final decryptedPath = await decryptFile(
+                    encryptedFile.path,
+                    decryptedFile.path,
+                    decryptionKeyResponse.data.key,
+                  );
+                  if (await File(decryptedPath).exists()) {
+                    if (!_isDisposed && mounted) {
+                      setState(() {
+                        localVideoPath = decryptedPath;
+                      });
+                    }
+                    return;
                   }
-                  return;
+                } catch (e) {
+                  print("❌ Error processing file from Downloads: $e");
                 }
-              } catch (e) {
-                print("Error processing file from Downloads: $e");
               }
             }
           }
         }
       }
 
-      // If we reach here, file doesn't exist anywhere - return false to indicate download needed
+      print("ℹ️ No existing file found for: $name");
       return;
     } catch (e) {
-      print("Error checking existing files: $e");
+      print("❌ Error checking existing files: $e");
       return;
     }
   }
@@ -177,57 +209,65 @@ class _LessonScreenState extends State<LessonScreen> {
     final videoDir = Directory('${directory.path}/videos');
     final encryptedDir = Directory('${directory.path}/encrypted');
 
-    // Check in videos directory
+    // Check in videos directory (decrypted files)
     if (await videoDir.exists()) {
       final files = await videoDir.list().toList();
       for (var file in files) {
-        if (file is File && file.path.contains(name)) {
-          print("✅ Found existing video file: ${file.path}");
-          if (!_isDisposed && mounted) {
-            setState(() {
-              localVideoPath = file.path;
-            });
-          }
-          return;
-        }
-      }
-    }
-
-    // Check in encrypted directory for purchased content
-    if (widget.purchased && await encryptedDir.exists()) {
-      final files = await encryptedDir.list().toList();
-      for (var file in files) {
-        if (file is File && file.path.contains(name)) {
-          print("✅ Found existing encrypted file: ${file.path}");
-          // Try to decrypt it
-          try {
-            final decryptionKeyResponse = await _storageService
-                .callGetDecryptedFile(widget.index.toString());
-            final decryptedFile = File('${videoDir.path}/$name');
-            final decryptedPath = await decryptFile(
-              file.path,
-              decryptedFile.path,
-              decryptionKeyResponse.data.key,
-            );
-            if (await File(decryptedPath).exists()) {
-              print("✅ Successfully decrypted existing file: $decryptedPath");
-              if (!_isDisposed && mounted) {
-                setState(() {
-                  localVideoPath = decryptedPath;
-                });
-              }
-              return;
-            }
-          } catch (e) {
-            print("❌ Error decrypting existing file: $e");
-            // If decryption fails, use the encrypted file as is
-            print("✅ Using encrypted file without decryption: ${file.path}");
+        if (file is File) {
+          final fileName = _getBaseFileName(file.path);
+          if (fileName == name) {
+            print("✅ Found existing decrypted video file: ${file.path}");
             if (!_isDisposed && mounted) {
               setState(() {
                 localVideoPath = file.path;
               });
             }
             return;
+          }
+        }
+      }
+    }
+
+    // Check in encrypted directory for purchased content
+    if (hasAccess && await encryptedDir.exists()) {
+      final files = await encryptedDir.list().toList();
+      for (var file in files) {
+        if (file is File) {
+          final fileName = _getBaseFileName(file.path);
+          if (fileName == name) {
+            print("✅ Found existing encrypted file: ${file.path}");
+            // Try to decrypt it
+            try {
+              // Use the video file ID for getting decryption key, not the index
+              final decryptionKeyResponse =
+                  await _storageService.callGetDecryptedFile(fileName);
+              final decryptedFileName = '${fileName}.mp4';
+              final decryptedFile = File('${videoDir.path}/$decryptedFileName');
+              final decryptedPath = await decryptFile(
+                file.path,
+                decryptedFile.path,
+                decryptionKeyResponse.data.key,
+              );
+              if (await File(decryptedPath).exists()) {
+                print("✅ Successfully decrypted existing file: $decryptedPath");
+                if (!_isDisposed && mounted) {
+                  setState(() {
+                    localVideoPath = decryptedPath;
+                  });
+                }
+                return;
+              }
+            } catch (e) {
+              print("❌ Error decrypting existing file: $e");
+              // If decryption fails, use the encrypted file as is
+              print("✅ Using encrypted file without decryption: ${file.path}");
+              if (!_isDisposed && mounted) {
+                setState(() {
+                  localVideoPath = file.path;
+                });
+              }
+              return;
+            }
           }
         }
       }
@@ -286,9 +326,9 @@ class _LessonScreenState extends State<LessonScreen> {
               await _storageService.callGetDownloadPublicUrl(key);
           print("Public download URL received: $downloadUrlString");
         } else {
-          // For purchased course videos, use new API endpoint
+          // For purchased course videos, use new API endpoint with lessonId
           downloadUrlString =
-              await _storageService.callDownloadCourseVideo(key);
+              await _storageService.callDownloadCourseVideo(widget.lessonId);
           print("Course video download URL received: $downloadUrlString");
         }
       } catch (e) {
@@ -334,14 +374,19 @@ class _LessonScreenState extends State<LessonScreen> {
         onDownloadCompleted: (path) async {
           print("Download completed, file saved to: $path");
           try {
+            // Get the downloaded file name without suffixes
+            final downloadedFileName = _getBaseFileName(path);
+
             // Delete the target file if it exists
             if (await encryptedFile.exists()) {
+              print("Deleting existing encrypted file...");
               await encryptedFile.delete();
             }
 
             // Copy the file from Downloads to encrypted directory
             final downloadedFile = File(path);
             print("Downloaded file path: $path");
+            print("Downloaded file base name: $downloadedFileName");
             print("Target encrypted file path: ${encryptedFile.path}");
 
             // Check if downloaded file exists
@@ -355,6 +400,7 @@ class _LessonScreenState extends State<LessonScreen> {
             // If file is encrypted, get decryption key and decrypt
             if (isEncrypted) {
               print("File is encrypted, getting decryption key");
+              // For course videos, use video ID (the actual file key) for getting decryption key
               final decryptionKeyResponse =
                   await _storageService.callGetDecryptedFile(fileId);
               print(
@@ -362,14 +408,16 @@ class _LessonScreenState extends State<LessonScreen> {
 
               // Decrypt the file using the utility function
               print("Starting decryption process");
+              // Use a clean path for decrypted file (without flutter_file_downloader suffixes)
+              final cleanDecryptedFile = File('${videoDir.path}/$name.mp4');
               final decryptedPath = await decryptFile(
                 encryptedFile.path,
-                decryptedFile.path,
+                cleanDecryptedFile.path,
                 decryptionKeyResponse.data.key,
               );
 
               if (await File(decryptedPath).exists()) {
-                print("File successfully processed");
+                print("✅ File successfully decrypted and processed");
                 if (!_isDisposed && mounted) {
                   setState(() {
                     localVideoPath = decryptedPath;
@@ -388,15 +436,16 @@ class _LessonScreenState extends State<LessonScreen> {
                   );
                 }
               } else {
-                print("Failed to process file");
+                print("❌ Failed to process file");
                 throw Exception("Failed to process file");
               }
             } else {
               // If not encrypted (trailer video), just copy to video directory
-              await encryptedFile.copy(decryptedFile.path);
+              final cleanDecryptedFile = File('${videoDir.path}/$name.mp4');
+              await encryptedFile.copy(cleanDecryptedFile.path);
               if (!_isDisposed && mounted) {
                 setState(() {
-                  localVideoPath = decryptedFile.path;
+                  localVideoPath = cleanDecryptedFile.path;
                   videoUrl = null;
                   isDownloading = false;
                 });
@@ -490,6 +539,12 @@ class _LessonScreenState extends State<LessonScreen> {
     _isDisposed = true;
     // Stop video when leaving the screen
     _videoPlayerKey.currentState?.stopVideo();
+    // Stop download if it's in progress
+    if (isDownloading) {
+      // Reset downloading state
+      isDownloading = false;
+      downloadProgress = 0.0;
+    }
     super.dispose();
   }
 
@@ -514,7 +569,7 @@ class _LessonScreenState extends State<LessonScreen> {
           final isLoggedIn = prefsOperator.isLoggedIn();
 
           if (isLoggedIn &&
-              state.lesson.purchased == true &&
+              hasAccess &&
               state.lesson.video != null &&
               state.lesson.video!.isNotEmpty) {
             // User has purchased, check for the full video first
@@ -540,11 +595,11 @@ class _LessonScreenState extends State<LessonScreen> {
                 final isLoggedIn = prefsOperator.isLoggedIn();
 
                 print(
-                    "Video download logic - isLoggedIn: $isLoggedIn, purchased: ${state.lesson.purchased}, video: ${state.lesson.video}, trailerVideo: ${state.lesson.trailerVideo}");
+                    "Video download logic - isLoggedIn: $isLoggedIn, hasAccess: $hasAccess, video: ${state.lesson.video}, trailerVideo: ${state.lesson.trailerVideo}");
 
                 if (isLoggedIn) {
                   // User is logged in
-                  if (state.lesson.purchased == true &&
+                  if (hasAccess &&
                       state.lesson.video != null &&
                       state.lesson.video!.isNotEmpty) {
                     // User has purchased the lesson, use the full video
@@ -665,30 +720,21 @@ class _LessonScreenState extends State<LessonScreen> {
         children: [
           SizedBox(height: 28),
           Center(
-            child: Stack(
+            child: Column(
               children: [
-                // White container background
+                // White container background with video
                 Container(
                   width: 360,
-                  height: 248,
+                  padding: const EdgeInsets.all(5),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(40),
                   ),
-                ),
-
-                // Video player
-                Positioned(
-                  top: 5,
-                  left: 5,
-                  child: Container(
-                    width: 350,
-                    height: 240,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(37),
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(37),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(37),
+                    child: Container(
+                      width: 350,
+                      height: 240,
                       child: localVideoPath == null && videoUrl == null
                           ? Container(
                               decoration: BoxDecoration(
@@ -735,7 +781,7 @@ class _LessonScreenState extends State<LessonScreen> {
                               onVideoEnded: () {
                                 print('Video ended');
                                 // If user hasn't purchased and this was a trailer video, show purchase dialog
-                                if (!widget.purchased) {
+                                if (!hasAccess) {
                                   showDialog(
                                     context: context,
                                     builder: (BuildContext context) {
@@ -749,6 +795,49 @@ class _LessonScreenState extends State<LessonScreen> {
                     ),
                   ),
                 ),
+
+                // Download progress bar (below video)
+                if (isDownloading)
+                  Container(
+                    margin: const EdgeInsets.only(top: 12),
+                    width: 350,
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'در حال دانلود...',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              '${(downloadProgress * 100).toInt()}%',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(4),
+                          child: LinearProgressIndicator(
+                            value: downloadProgress,
+                            minHeight: 6,
+                            backgroundColor: Colors.grey[300],
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.blue,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
               ],
             ),
           ),
@@ -757,7 +846,7 @@ class _LessonScreenState extends State<LessonScreen> {
           //card lesons
           InkWell(
             onTap: () {
-              if (!widget.purchased) {
+              if (!hasAccess) {
                 _showPurchaseDialog();
                 return;
               }
@@ -823,8 +912,8 @@ class _LessonScreenState extends State<LessonScreen> {
           //card vocabulary
           InkWell(
             onTap: () {
-              print("VocabularyScreen.routeName: ${widget.purchased}");
-              if (!widget.purchased) {
+              print("VocabularyScreen.routeName: $hasAccess");
+              if (!hasAccess) {
                 _showPurchaseDialog();
                 return;
               }
@@ -917,7 +1006,7 @@ class _LessonScreenState extends State<LessonScreen> {
           //card quiz
           InkWell(
             onTap: () {
-              if (!widget.purchased) {
+              if (!hasAccess) {
                 _showPurchaseDialog();
                 return;
               }
