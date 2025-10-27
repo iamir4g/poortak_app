@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
+import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/featueres/feature_profile/screens/favorit_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/main_points_screen.dart';
@@ -18,11 +19,13 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   final PrefsOperator prefsOperator = locator<PrefsOperator>();
+  final StorageService storageService = locator<StorageService>();
   bool isLoggedIn = false;
   String? userFirstName;
   String? userLastName;
   String? userAvatar;
   String? userMobile;
+  String? userAvatarUrl;
 
   @override
   void initState() {
@@ -39,11 +42,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final avatar = await prefsOperator.getUserAvatar();
       final mobile = await prefsOperator.getUserName();
 
+      // Convert avatar ID to URL if exists
+      String? avatarUrl;
+      if (avatar != null && avatar.isNotEmpty) {
+        avatarUrl = await storageService.callGetDownloadPublicUrl(avatar);
+      }
+
       setState(() {
         isLoggedIn = loggedIn;
         userFirstName = firstName;
         userLastName = lastName;
         userAvatar = avatar;
+        userAvatarUrl = avatarUrl;
         userMobile = mobile;
       });
     } else {
@@ -113,23 +123,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ],
                               ),
                               child: ClipOval(
-                                child:
-                                    userAvatar != null && userAvatar!.isNotEmpty
-                                        ? Image.network(
-                                            userAvatar!,
-                                            fit: BoxFit.cover,
-                                            errorBuilder:
-                                                (context, error, stackTrace) {
-                                              return Image.asset(
-                                                'assets/images/profile/finalProfile.png',
-                                                fit: BoxFit.cover,
-                                              );
-                                            },
-                                          )
-                                        : Image.asset(
+                                child: userAvatarUrl != null
+                                    ? Image.network(
+                                        userAvatarUrl!,
+                                        fit: BoxFit.cover,
+                                        errorBuilder:
+                                            (context, error, stackTrace) {
+                                          return Image.asset(
                                             'assets/images/profile/finalProfile.png',
                                             fit: BoxFit.cover,
-                                          ),
+                                          );
+                                        },
+                                      )
+                                    : Image.asset(
+                                        'assets/images/profile/finalProfile.png',
+                                        fit: BoxFit.cover,
+                                      ),
                               ),
                             ),
                           ),

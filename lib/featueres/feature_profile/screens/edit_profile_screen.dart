@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
+import 'package:poortak/common/services/storage_service.dart';
+import 'package:poortak/featueres/feature_profile/data/models/avatar_model.dart';
+import 'package:poortak/featueres/feature_profile/data/data_sorce/profile_api_provider.dart';
 import 'package:poortak/featueres/feature_profile/data/models/update_profile_params.dart';
 import 'package:poortak/featueres/feature_profile/presentation/bloc/profile_bloc.dart';
 import 'package:poortak/featueres/feature_profile/presentation/bloc/profile_event.dart';
@@ -20,10 +23,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
   final PrefsOperator prefsOperator = locator<PrefsOperator>();
+  final ProfileApiProvider profileApiProvider = locator<ProfileApiProvider>();
+  final StorageService storageService = locator<StorageService>();
 
   String? selectedAvatar;
   String? selectedAgeGroup;
   bool isLoading = false;
+  bool isLoadingAvatars = true;
+  List<AvatarWithUrl> avatars = [];
 
   // Age group options
   final List<String> ageGroups = [
@@ -34,24 +41,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     'سالمند',
   ];
 
-  // Avatar options - using default profile image for now
-  // You can replace these with actual avatar URLs or add more avatar assets
-  final List<String> avatarOptions = [
-    'assets/images/profile/finalProfile.png',
-    'assets/images/profile/finalProfile.png',
-    'assets/images/profile/finalProfile.png',
-    'assets/images/profile/finalProfile.png',
-    'assets/images/profile/finalProfile.png',
-    'assets/images/profile/finalProfile.png',
-    'assets/images/profile/finalProfile.png',
-    'assets/images/profile/finalProfile.png',
-    'assets/images/profile/finalProfile.png',
-  ];
-
   @override
   void initState() {
     super.initState();
     _loadUserData();
+    _loadAvatars();
   }
 
   Future<void> _loadUserData() async {
@@ -64,6 +58,48 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       _lastNameController.text = lastName ?? '';
       selectedAvatar = avatar;
     });
+  }
+
+  Future<void> _loadAvatars() async {
+    try {
+      setState(() {
+        isLoadingAvatars = true;
+      });
+
+      final response = await profileApiProvider.callGetAvatars();
+
+      if (response.data['ok'] == true && response.data['data'] != null) {
+        final List<AvatarModel> avatarsList = (response.data['data'] as List)
+            .map((json) => AvatarModel.fromJson(json))
+            .toList();
+
+        // Get download URLs for each avatar using StorageService
+        final List<AvatarWithUrl> avatarsWithUrls = [];
+        for (var avatar in avatarsList) {
+          final url =
+              await storageService.callGetDownloadPublicUrl(avatar.fileKey);
+          avatarsWithUrls.add(AvatarWithUrl(
+            id: avatar.id,
+            fileKey: avatar.fileKey,
+            url: url,
+          ));
+        }
+
+        setState(() {
+          avatars = avatarsWithUrls;
+          isLoadingAvatars = false;
+        });
+      } else {
+        setState(() {
+          isLoadingAvatars = false;
+        });
+      }
+    } catch (e) {
+      print('Error loading avatars: $e');
+      setState(() {
+        isLoadingAvatars = false;
+      });
+    }
   }
 
   @override
@@ -96,18 +132,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         avatar: selectedAvatar ?? '',
       );
 
-      context
-          .read<ProfileBloc>()
-          .add(UpdateProfileEvent(updateProfileParams: updateParams));
+      final profileBloc = locator<ProfileBloc>();
+      profileBloc.add(UpdateProfileEvent(updateProfileParams: updateParams));
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final profileBloc = locator<ProfileBloc>();
+
     return Scaffold(
       backgroundColor: const Color(0xFFF4F6FB),
       body: SafeArea(
         child: BlocListener<ProfileBloc, ProfileState>(
+          bloc: profileBloc,
           listener: (context, state) {
             if (state is ProfileSuccessUpdate) {
               setState(() {
@@ -289,21 +327,33 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   Widget _buildAvatarGrid() {
-    // Different colors for avatar options
-    final List<Color> avatarColors = [
-      const Color(0xFFE3F2FD), // Light blue
-      const Color(0xFFF3E5F5), // Light purple
-      const Color(0xFFE8F5E8), // Light green
-      const Color(0xFFFFF3E0), // Light orange
-      const Color(0xFFFCE4EC), // Light pink
-      const Color(0xFFE0F2F1), // Light teal
-      const Color(0xFFFFF8E1), // Light yellow
-      const Color(0xFFF1F8E9), // Light lime
-      const Color(0xFFE8EAF6), // Light indigo
-    ];
+    if (isLoadingAvatars) {
+      return const SizedBox(
+        height: 270,
+        child: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    if (avatars.isEmpty) {
+      return const SizedBox(
+        height: 270,
+        child: Center(
+          child: Text(
+            'آواتار موجود نیست',
+            style: TextStyle(
+              fontFamily: 'IRANSans',
+              fontSize: 14,
+              color: Color(0xFF29303D),
+            ),
+          ),
+        ),
+      );
+    }
 
     return Container(
-      height: 270, // 3 rows * 90px each
+      height: 270,
       child: GridView.builder(
         physics: const NeverScrollableScrollPhysics(),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -312,13 +362,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           crossAxisSpacing: 0,
           mainAxisSpacing: 0,
         ),
-        itemCount: 9,
+        itemCount: avatars.length,
         itemBuilder: (context, index) {
-          final isSelected = selectedAvatar == avatarOptions[index];
+          final avatar = avatars[index];
+          final isSelected = selectedAvatar == avatar.id;
+
           return GestureDetector(
             onTap: () {
               setState(() {
-                selectedAvatar = avatarOptions[index];
+                selectedAvatar = avatar.id;
               });
             },
             child: Container(
@@ -332,13 +384,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ),
               ),
               child: ClipOval(
-                child: Container(
-                  color: avatarColors[index],
-                  child: const Icon(
-                    Icons.person,
-                    size: 40,
-                    color: Color(0xFFA3AFC2),
-                  ),
+                child: Image.network(
+                  avatar.url,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      color: const Color(0xFFE3F2FD),
+                      child: const Icon(
+                        Icons.person,
+                        size: 40,
+                        color: Color(0xFFA3AFC2),
+                      ),
+                    );
+                  },
                 ),
               ),
             ),
@@ -452,4 +510,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       ),
     );
   }
+}
+
+// Helper class to store avatar with its URL
+class AvatarWithUrl {
+  final String id;
+  final String fileKey;
+  final String url;
+
+  AvatarWithUrl({
+    required this.id,
+    required this.fileKey,
+    required this.url,
+  });
 }

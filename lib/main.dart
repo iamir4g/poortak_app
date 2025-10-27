@@ -131,10 +131,7 @@ void main() async {
               },
               LoginScreen.routeName: (context) => LoginScreen(),
               ProfileScreen.routeName: (context) => ProfileScreen(),
-              EditProfileScreen.routeName: (context) => BlocProvider(
-                    create: (context) => locator<ProfileBloc>(),
-                    child: EditProfileScreen(),
-                  ),
+              EditProfileScreen.routeName: (context) => EditProfileScreen(),
               VocabularyScreen.routeName: (context) {
                 final args = ModalRoute.of(context)?.settings.arguments
                     as Map<String, dynamic>;

@@ -38,7 +38,7 @@ class UpdateProfileModel {
 class Data {
   String id;
   String? avatar;
-  String email;
+  String? email;
   String firstName;
   String? lastName;
   String phone;
@@ -59,7 +59,7 @@ class Data {
   Data({
     required this.id,
     this.avatar,
-    required this.email,
+    this.email,
     required this.firstName,
     this.lastName,
     required this.phone,

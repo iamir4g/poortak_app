@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconify_design/iconify_design.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
+import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/featureMenu/screens/aboutUs_screen.dart';
@@ -22,10 +23,13 @@ class CustomDrawer extends StatefulWidget {
 
 class _CustomDrawerState extends State<CustomDrawer> {
   final PrefsOperator prefsOperator = locator<PrefsOperator>();
+  final StorageService storageService = locator<StorageService>();
   bool isLoggedIn = false;
   String? userName;
   String? userFirstName;
   String? userLastName;
+  String? userAvatar;
+  String? userAvatarUrl;
 
   Widget _buildListTile({
     required String icon,
@@ -79,11 +83,21 @@ class _CustomDrawerState extends State<CustomDrawer> {
     final name = await prefsOperator.getUserName();
     final firstName = await prefsOperator.getUserFirstName();
     final lastName = await prefsOperator.getUserLastName();
+    final avatar = await prefsOperator.getUserAvatar();
+
+    // Convert avatar ID to URL if exists
+    String? avatarUrl;
+    if (avatar != null && avatar.isNotEmpty) {
+      avatarUrl = await storageService.callGetDownloadPublicUrl(avatar);
+    }
+
     setState(() {
       isLoggedIn = loggedIn;
       userName = name;
       userFirstName = firstName;
       userLastName = lastName;
+      userAvatar = avatar;
+      userAvatarUrl = avatarUrl;
     });
   }
 
@@ -132,18 +146,46 @@ class _CustomDrawerState extends State<CustomDrawer> {
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(100),
-                                      color: Colors.red,
-                                      image: const DecorationImage(
-                                        image: AssetImage(
-                                          "assets/images/profile/finalProfile.png",
-                                        ),
-                                      ),
-                                    ),
-                                    width: 50,
-                                    height: 50,
+                                  ClipOval(
+                                    child: userAvatarUrl != null
+                                        ? Image.network(
+                                            userAvatarUrl!,
+                                            width: 50,
+                                            height: 50,
+                                            fit: BoxFit.cover,
+                                            errorBuilder:
+                                                (context, error, stackTrace) {
+                                              return Container(
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          100),
+                                                  color: Colors.red,
+                                                  image: const DecorationImage(
+                                                    image: AssetImage(
+                                                      "assets/images/profile/finalProfile.png",
+                                                    ),
+                                                  ),
+                                                ),
+                                                width: 50,
+                                                height: 50,
+                                              );
+                                            },
+                                          )
+                                        : Container(
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(100),
+                                              color: Colors.red,
+                                              image: const DecorationImage(
+                                                image: AssetImage(
+                                                  "assets/images/profile/finalProfile.png",
+                                                ),
+                                              ),
+                                            ),
+                                            width: 50,
+                                            height: 50,
+                                          ),
                                   ),
                                   const SizedBox(width: 10),
                                   Text(

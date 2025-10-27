@@ -90,6 +90,13 @@ class ProfileApiProvider {
     return response;
   }
 
+  dynamic callGetAvatars() async {
+    final response = await dio.get(
+      "${Constants.baseUrl}constants/avatars",
+    );
+    return response;
+  }
+
   // dynamic callGetDownloadLink(String key) async {
   //   final response = await dio.get(
   //     "${Constants.baseUrl}storage/download/$key",
