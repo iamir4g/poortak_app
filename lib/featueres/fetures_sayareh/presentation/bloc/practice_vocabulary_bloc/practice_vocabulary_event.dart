@@ -38,3 +38,7 @@ final class PracticeVocabularySaveAnswerEvent extends PracticeVocabularyEvent {
   @override
   List<Object> get props => [word, isCorrect];
 }
+
+final class PracticeVocabularyResetEvent extends PracticeVocabularyEvent {
+  const PracticeVocabularyResetEvent();
+}

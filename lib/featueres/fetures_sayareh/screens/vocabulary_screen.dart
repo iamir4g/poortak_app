@@ -184,11 +184,19 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                                   return const Icon(Icons.error);
                                 }
                                 if (snapshot.hasData) {
-                                  return Image.network(
-                                    snapshot.data!,
-                                    height: 264,
-                                    width: 264,
-                                    fit: BoxFit.cover,
+                                  return Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(16),
+                                      child: Image.network(
+                                        snapshot.data!,
+                                        height: 264,
+                                        width: 264,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
                                   );
                                 }
                                 return const SizedBox.shrink();

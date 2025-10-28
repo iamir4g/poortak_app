@@ -46,6 +46,7 @@ class _LessonScreenState extends State<LessonScreen> {
   double downloadProgress = 0.0;
   bool isDecrypting = false;
   double decryptionProgress = 0.0;
+  bool isCheckingFiles = false; // Check existing files and decrypt if needed
   final StorageService _storageService = locator<StorageService>();
   Lesson? _currentLesson;
   final GlobalKey<CustomVideoPlayerState> _videoPlayerKey =
@@ -92,6 +93,7 @@ class _LessonScreenState extends State<LessonScreen> {
               if (!_isDisposed && mounted) {
                 setState(() {
                   localVideoPath = file.path;
+                  isCheckingFiles = false;
                 });
               }
               return;
@@ -140,21 +142,29 @@ class _LessonScreenState extends State<LessonScreen> {
                     },
                   );
 
+                  if (await File(decryptedPath).exists()) {
+                    if (!_isDisposed && mounted) {
+                      setState(() {
+                        localVideoPath = decryptedPath;
+                        isDecrypting = false;
+                        isCheckingFiles = false;
+                      });
+                    }
+                    return;
+                  }
+                  // File doesn't exist after decryption
                   if (!_isDisposed && mounted) {
                     setState(() {
                       isDecrypting = false;
                     });
                   }
-                  if (await File(decryptedPath).exists()) {
-                    if (!_isDisposed && mounted) {
-                      setState(() {
-                        localVideoPath = decryptedPath;
-                      });
-                    }
-                    return;
-                  }
                 } catch (e) {
                   print("❌ Error decrypting existing file: $e");
+                  if (!_isDisposed && mounted) {
+                    setState(() {
+                      isDecrypting = false;
+                    });
+                  }
                 }
               }
             }
@@ -202,21 +212,29 @@ class _LessonScreenState extends State<LessonScreen> {
                     },
                   );
 
+                  if (await File(decryptedPath).exists()) {
+                    if (!_isDisposed && mounted) {
+                      setState(() {
+                        localVideoPath = decryptedPath;
+                        isDecrypting = false;
+                        isCheckingFiles = false;
+                      });
+                    }
+                    return;
+                  }
+                  // File doesn't exist after decryption
                   if (!_isDisposed && mounted) {
                     setState(() {
                       isDecrypting = false;
                     });
                   }
-                  if (await File(decryptedPath).exists()) {
-                    if (!_isDisposed && mounted) {
-                      setState(() {
-                        localVideoPath = decryptedPath;
-                      });
-                    }
-                    return;
-                  }
                 } catch (e) {
                   print("❌ Error processing file from Downloads: $e");
+                  if (!_isDisposed && mounted) {
+                    setState(() {
+                      isDecrypting = false;
+                    });
+                  }
                 }
               }
             }
@@ -225,9 +243,19 @@ class _LessonScreenState extends State<LessonScreen> {
       }
 
       print("ℹ️ No existing file found for: $name");
+      if (!_isDisposed && mounted) {
+        setState(() {
+          isCheckingFiles = false;
+        });
+      }
       return;
     } catch (e) {
       print("❌ Error checking existing files: $e");
+      if (!_isDisposed && mounted) {
+        setState(() {
+          isCheckingFiles = false;
+        });
+      }
       return;
     }
   }
@@ -264,6 +292,7 @@ class _LessonScreenState extends State<LessonScreen> {
             if (!_isDisposed && mounted) {
               setState(() {
                 localVideoPath = file.path;
+                isCheckingFiles = false;
               });
             }
             return;
@@ -318,6 +347,7 @@ class _LessonScreenState extends State<LessonScreen> {
                 if (!_isDisposed && mounted) {
                   setState(() {
                     localVideoPath = decryptedPath;
+                    isCheckingFiles = false;
                   });
                 }
                 return;
@@ -329,6 +359,7 @@ class _LessonScreenState extends State<LessonScreen> {
               if (!_isDisposed && mounted) {
                 setState(() {
                   localVideoPath = file.path;
+                  isCheckingFiles = false;
                 });
               }
               return;
@@ -375,6 +406,7 @@ class _LessonScreenState extends State<LessonScreen> {
           setState(() {
             localVideoPath = decryptedFile.path;
             isDownloading = false;
+            isCheckingFiles = false;
           });
         }
         return;
@@ -618,6 +650,8 @@ class _LessonScreenState extends State<LessonScreen> {
   @override
   void initState() {
     super.initState();
+    // Set checking state initially to show loading
+    isCheckingFiles = true;
     // Call the storage API when the screen initializes
     context.read<LessonBloc>().add(GetLessonEvenet(id: widget.lessonId));
   }
@@ -637,6 +671,10 @@ class _LessonScreenState extends State<LessonScreen> {
     if (isDecrypting) {
       isDecrypting = false;
       decryptionProgress = 0.0;
+    }
+    // Reset checking files state
+    if (isCheckingFiles) {
+      isCheckingFiles = false;
     }
     super.dispose();
   }
@@ -676,6 +714,12 @@ class _LessonScreenState extends State<LessonScreen> {
 
           // Check for existing files first
           if (videoToCheck != null && videoToCheck.isNotEmpty) {
+            // Set checking state before starting
+            if (!_isDisposed && mounted) {
+              setState(() {
+                isCheckingFiles = true;
+              });
+            }
             _checkExistingFiles(videoToCheck).then((_) async {
               // Only start download if we don't have a local file
               if (localVideoPath == null) {
@@ -828,7 +872,7 @@ class _LessonScreenState extends State<LessonScreen> {
                     child: Container(
                       width: 350,
                       height: 240,
-                      child: localVideoPath == null && videoUrl == null
+                      child: isCheckingFiles || isDownloading || isDecrypting
                           ? Container(
                               decoration: BoxDecoration(
                                 color: MyColors.brandSecondary,
@@ -838,53 +882,91 @@ class _LessonScreenState extends State<LessonScreen> {
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Icon(
-                                      Icons.error_outline,
+                                    CircularProgressIndicator(
                                       color: Theme.of(context)
                                           .textTheme
                                           .titleMedium
                                           ?.color,
-                                      size: 48,
                                     ),
                                     SizedBox(height: 16),
                                     Text(
-                                      'خطا در بارگذاری ویدیو',
+                                      isDecrypting
+                                          ? 'در حال رمزگشایی ویدیو...'
+                                          : isDownloading
+                                              ? 'در حال دانلود ویدیو...'
+                                              : 'در حال پردازش ویدیو...',
                                       style: TextStyle(
                                         color: Theme.of(context)
                                             .textTheme
                                             .titleMedium
                                             ?.color,
                                         fontSize: 16,
+                                        fontFamily: 'IranSans',
                                       ),
                                     ),
                                   ],
                                 ),
                               ),
                             )
-                          : CustomVideoPlayer(
-                              key: _videoPlayerKey,
-                              videoPath: localVideoPath ?? videoUrl!,
-                              isNetworkVideo:
-                                  localVideoPath == null && videoUrl != null,
-                              width: 350,
-                              height: 240,
-                              borderRadius: 37,
-                              autoPlay: true,
-                              showControls: true,
-                              onVideoEnded: () {
-                                print('Video ended');
-                                // If user hasn't purchased and this was a trailer video, show purchase dialog
-                                if (!hasAccess) {
-                                  showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return DialogCart(item: _currentLesson!);
-                                    },
-                                  );
-                                  // _showPurchaseDialog();
-                                }
-                              },
-                            ),
+                          : localVideoPath == null && videoUrl == null
+                              ? Container(
+                                  decoration: BoxDecoration(
+                                    color: MyColors.brandSecondary,
+                                    borderRadius: BorderRadius.circular(37),
+                                  ),
+                                  child: Center(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.error_outline,
+                                          color: Theme.of(context)
+                                              .textTheme
+                                              .titleMedium
+                                              ?.color,
+                                          size: 48,
+                                        ),
+                                        SizedBox(height: 16),
+                                        Text(
+                                          'خطا در بارگذاری ویدیو',
+                                          style: TextStyle(
+                                            color: Theme.of(context)
+                                                .textTheme
+                                                .titleMedium
+                                                ?.color,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                )
+                              : CustomVideoPlayer(
+                                  key: _videoPlayerKey,
+                                  videoPath: localVideoPath ?? videoUrl!,
+                                  isNetworkVideo: localVideoPath == null &&
+                                      videoUrl != null,
+                                  width: 350,
+                                  height: 240,
+                                  borderRadius: 37,
+                                  autoPlay: true,
+                                  showControls: true,
+                                  onVideoEnded: () {
+                                    print('Video ended');
+                                    // If user hasn't purchased and this was a trailer video, show purchase dialog
+                                    if (!hasAccess) {
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return DialogCart(
+                                              item: _currentLesson!);
+                                        },
+                                      );
+                                      // _showPurchaseDialog();
+                                    }
+                                  },
+                                ),
                     ),
                   ),
                 ),

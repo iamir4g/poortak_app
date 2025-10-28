@@ -125,7 +125,7 @@ void main() async {
                     index: args['index'],
                     title: args['title'],
                     lessonId: args['lessonId'],
-                    purchased: args['purchased'],
+                    purchased: args['purchased'] ?? false,
                   ),
                 );
               },

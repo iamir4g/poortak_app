@@ -111,5 +111,15 @@ class PracticeVocabularyBloc
         ));
       }
     });
+
+    on<PracticeVocabularyResetEvent>((event, emit) async {
+      // Reset all accumulated data
+      _accumulatedReviewed = [];
+      _accumulatedCorrectCount = 0;
+      _accumulatedWrongCount = 0;
+
+      // Reset to initial state
+      emit(PracticeVocabularyInitial());
+    });
   }
 }
