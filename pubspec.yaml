@@ -36,40 +36,40 @@ dependencies:
   cupertino_icons: ^1.0.8
   delayed_widget: ^1.1.2
   flutter_bloc: ^9.1.0
-  bloc: ^9.0.0
+  bloc: ^9.1.0
   equatable: ^2.0.5
-  connectivity_plus: ^6.1.2
+  connectivity_plus: ^6.1.5
   loading_animation_widget: ^1.3.0
   shimmer: ^3.0.0
-  get_it: ^8.0.3
-  dio: ^5.7.0
-  shared_preferences: ^2.4.0
+  get_it: ^8.2.0
+  dio: ^5.9.0
+  shared_preferences: ^2.5.3
   smooth_page_indicator: ^1.2.0+3
-  font_awesome_flutter: ^10.8.0
+  font_awesome_flutter: ^10.12.0
   badges: ^3.1.2
-  flutter_svg: ^2.0.17
+  flutter_svg: ^2.2.1
   # android_sms_retriever: ^1.3.3  # Commented out - not used
-  persian_number_utility: ^1.1.4
+  persian_number_utility: ^1.1.6
   iconify_design: ^1.0.1
   cached_network_image: ^3.4.1
-  video_player: ^2.9.5
+  video_player: ^2.10.0
   persian_tools: ^1.0.3
   encrypt: ^5.0.3
   # pointycastle: ^3.9.1
   path_provider: ^2.1.5
   flutter_file_downloader: ^2.1.0
-  permission_handler: ^12.0.0+1
+  permission_handler: ^12.0.1
   zarinpal: ^2.0.0
-  url_launcher: ^6.3.1
-  flutter_tts: ^4.2.2
-  translator: ^1.0.3+1
-  lottie: ^3.3.1
+  url_launcher: ^6.3.2
+  flutter_tts: ^4.2.3
+  translator: ^1.0.4+1
+  lottie: ^3.3.2
   # appinio_video_player: ^1.3.0  # Commented out - not used
   flutter_flip_card: ^0.0.6
   app_links: ^6.4.1
   pdfx: ^2.9.2
   shamsi_date: ^1.1.1
-  pointycastle: ^3.4.0
+  pointycastle: ^3.9.1
   # برای رمزنگاری و رمزگشایی
   # cryptography: ^2.7.0
   # برای خواندن فایل .env
