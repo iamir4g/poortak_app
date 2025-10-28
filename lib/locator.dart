@@ -10,7 +10,7 @@ import 'package:poortak/featueres/feature_litner/repositories/litner_repository.
 import 'package:poortak/featueres/fetures_sayareh/data/data_source/sayareh_api_provider.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/bloc_storage_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/converstion_bloc/converstion_bloc.dart';
-import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/iknow_access_bloc.dart';
+import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/iknow_access_bloc/iknow_access_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/lesson_bloc/lesson_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/vocabulary_bloc/vocabulary_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/repositories/sayareh_repository.dart';

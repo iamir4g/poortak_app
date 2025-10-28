@@ -1,27 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:poortak/common/services/getImageUrl_service.dart';
 import 'package:poortak/common/widgets/reusable_modal.dart';
+import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/iknow_access_bloc/iknow_access_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/widgets/item_leason.dart';
 import 'package:poortak/l10n/app_localizations.dart';
-// import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:iconify_design/iconify_design.dart';
-import 'package:persian_tools/persian_tools.dart';
 import 'package:poortak/common/widgets/dot_loading_widget.dart';
-import 'package:poortak/common/widgets/primaryButton.dart';
-import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
-import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_home_model.dart';
-import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/iknow_access_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/sayareh_bloc/sayareh_cubit.dart';
-import 'package:poortak/featueres/fetures_sayareh/screens/lesson_screen.dart';
 import 'package:poortak/featueres/feature_match/screens/main_match_screen.dart';
-import 'package:poortak/featueres/feature_shopping_cart/data/models/shopping_cart_model.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
-import 'package:poortak/featueres/feature_shopping_cart/data/models/cart_enum.dart';
+
 import 'package:poortak/featueres/fetures_sayareh/widgets/item_book.dart';
-import 'package:poortak/featueres/fetures_sayareh/widgets/item_multi_card.dart';
+
 import 'package:poortak/featueres/fetures_sayareh/widgets/contest_card.dart';
 import 'package:poortak/locator.dart';
 // import 'package:poortak/common/services/storage_service.dart';
