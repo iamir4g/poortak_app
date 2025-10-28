@@ -69,6 +69,7 @@ dependencies:
   app_links: ^6.4.1
   pdfx: ^2.9.2
   shamsi_date: ^1.1.1
+  pointycastle: ^3.4.0
   # برای رمزنگاری و رمزگشایی
   # cryptography: ^2.7.0
   # برای خواندن فایل .env

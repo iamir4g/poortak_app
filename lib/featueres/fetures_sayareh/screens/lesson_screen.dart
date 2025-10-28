@@ -7,7 +7,7 @@ import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_home_model.dart';
-import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/iknow_access_bloc.dart';
+import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/iknow_access_bloc/iknow_access_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/lesson_bloc/lesson_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/converstion_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/quizzes_screen.dart';
@@ -44,6 +44,8 @@ class _LessonScreenState extends State<LessonScreen> {
   String? localVideoPath;
   bool isDownloading = false;
   double downloadProgress = 0.0;
+  bool isDecrypting = false;
+  double decryptionProgress = 0.0;
   final StorageService _storageService = locator<StorageService>();
   Lesson? _currentLesson;
   final GlobalKey<CustomVideoPlayerState> _videoPlayerKey =
@@ -117,11 +119,32 @@ class _LessonScreenState extends State<LessonScreen> {
                       '${fileName}.mp4'; // or keep original extension
                   final decryptedFile =
                       File('${videoDir.path}/$decryptedFileName');
+
+                  if (!_isDisposed && mounted) {
+                    setState(() {
+                      isDecrypting = true;
+                      decryptionProgress = 0.0;
+                    });
+                  }
+
                   final decryptedPath = await decryptFile(
                     encryptedFile.path,
                     decryptedFile.path,
                     decryptionKeyResponse.data.key,
+                    onProgress: (progress) {
+                      if (!_isDisposed && mounted) {
+                        setState(() {
+                          decryptionProgress = progress;
+                        });
+                      }
+                    },
                   );
+
+                  if (!_isDisposed && mounted) {
+                    setState(() {
+                      isDecrypting = false;
+                    });
+                  }
                   if (await File(decryptedPath).exists()) {
                     if (!_isDisposed && mounted) {
                       setState(() {
@@ -158,11 +181,32 @@ class _LessonScreenState extends State<LessonScreen> {
                   final decryptionKeyResponse =
                       await _storageService.callGetDecryptedFile(name);
                   final decryptedFile = File('${videoDir.path}/$name.mp4');
+
+                  if (!_isDisposed && mounted) {
+                    setState(() {
+                      isDecrypting = true;
+                      decryptionProgress = 0.0;
+                    });
+                  }
+
                   final decryptedPath = await decryptFile(
                     encryptedFile.path,
                     decryptedFile.path,
                     decryptionKeyResponse.data.key,
+                    onProgress: (progress) {
+                      if (!_isDisposed && mounted) {
+                        setState(() {
+                          decryptionProgress = progress;
+                        });
+                      }
+                    },
                   );
+
+                  if (!_isDisposed && mounted) {
+                    setState(() {
+                      isDecrypting = false;
+                    });
+                  }
                   if (await File(decryptedPath).exists()) {
                     if (!_isDisposed && mounted) {
                       setState(() {
@@ -243,11 +287,32 @@ class _LessonScreenState extends State<LessonScreen> {
                   await _storageService.callGetDecryptedFile(fileName);
               final decryptedFileName = '${fileName}.mp4';
               final decryptedFile = File('${videoDir.path}/$decryptedFileName');
+
+              if (!_isDisposed && mounted) {
+                setState(() {
+                  isDecrypting = true;
+                  decryptionProgress = 0.0;
+                });
+              }
+
               final decryptedPath = await decryptFile(
                 file.path,
                 decryptedFile.path,
                 decryptionKeyResponse.data.key,
+                onProgress: (progress) {
+                  if (!_isDisposed && mounted) {
+                    setState(() {
+                      decryptionProgress = progress;
+                    });
+                  }
+                },
               );
+
+              if (!_isDisposed && mounted) {
+                setState(() {
+                  isDecrypting = false;
+                });
+              }
               if (await File(decryptedPath).exists()) {
                 print("✅ Successfully decrypted existing file: $decryptedPath");
                 if (!_isDisposed && mounted) {
@@ -410,11 +475,35 @@ class _LessonScreenState extends State<LessonScreen> {
               print("Starting decryption process");
               // Use a clean path for decrypted file (without flutter_file_downloader suffixes)
               final cleanDecryptedFile = File('${videoDir.path}/$name.mp4');
+
+              // Set decryption state
+              if (!_isDisposed && mounted) {
+                setState(() {
+                  isDecrypting = true;
+                  decryptionProgress = 0.0;
+                  isDownloading = false; // Download finished, now decrypting
+                });
+              }
+
               final decryptedPath = await decryptFile(
                 encryptedFile.path,
                 cleanDecryptedFile.path,
                 decryptionKeyResponse.data.key,
+                onProgress: (progress) {
+                  if (!_isDisposed && mounted) {
+                    setState(() {
+                      decryptionProgress = progress;
+                    });
+                  }
+                },
               );
+
+              // Reset decryption state
+              if (!_isDisposed && mounted) {
+                setState(() {
+                  isDecrypting = false;
+                });
+              }
 
               if (await File(decryptedPath).exists()) {
                 print("✅ File successfully decrypted and processed");
@@ -423,18 +512,17 @@ class _LessonScreenState extends State<LessonScreen> {
                     localVideoPath = decryptedPath;
                     videoUrl =
                         null; // Clear the URL since we now have local file
-                    isDownloading = false;
                   });
-
-                  // Show success snackbar
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('فایل دانلود شد'),
-                      backgroundColor: Colors.green,
-                      duration: Duration(seconds: 2),
-                    ),
-                  );
                 }
+
+                // Show success snackbar
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('فایل دانلود شد'),
+                    backgroundColor: Colors.green,
+                    duration: Duration(seconds: 2),
+                  ),
+                );
               } else {
                 print("❌ Failed to process file");
                 throw Exception("Failed to process file");
@@ -544,6 +632,11 @@ class _LessonScreenState extends State<LessonScreen> {
       // Reset downloading state
       isDownloading = false;
       downloadProgress = 0.0;
+    }
+    // Reset decryption state
+    if (isDecrypting) {
+      isDecrypting = false;
+      decryptionProgress = 0.0;
     }
     super.dispose();
   }
@@ -832,6 +925,49 @@ class _LessonScreenState extends State<LessonScreen> {
                             backgroundColor: Colors.grey[300],
                             valueColor: AlwaysStoppedAnimation<Color>(
                               Colors.blue,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                // Decryption progress bar (below video or download)
+                if (isDecrypting)
+                  Container(
+                    margin: const EdgeInsets.only(top: 12),
+                    width: 350,
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'در حال رمزگشایی...',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              '${(decryptionProgress * 100).toInt()}%',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(4),
+                          child: LinearProgressIndicator(
+                            value: decryptionProgress,
+                            minHeight: 6,
+                            backgroundColor: Colors.grey[300],
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.green,
                             ),
                           ),
                         ),
