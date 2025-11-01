@@ -1,17 +1,20 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:convert';
+import 'dart:async';
 import 'package:pointycastle/export.dart' as pc;
 
 /// تنظیمات
 const int _aesBlockSize = 16;
 const int _readChunkSize =
     256 * 1024; // 256 KB per read (must be multiple of 16)
+const int _progressUpdateInterval = 50; // Update progress every N chunks
 
 /// Decrypt a file encrypted with Node's crypto.createCipheriv('aes-256-cbc', key, ivZero)
 /// - encryptionKey: base64 string of 32 bytes (server stores encryptionKey.toString('base64'))
 /// - iv assumed to be 16 zero bytes (as backend told us)
 /// - Always decrypt from scratch (no caching)
+/// - Optimized for real devices with async I/O and UI thread yielding
 Future<String> decryptFile(
   String filePath,
   String outputPath,
@@ -52,12 +55,13 @@ Future<String> decryptFile(
     pc.ParametersWithIV(pc.KeyParameter(keyBytes), ivBytes),
   );
 
-  // Open files
-  final raf = inputFile.openSync(mode: FileMode.read);
+  // Open files with async operations
+  final raf = await inputFile.open();
   final outSink = outputFile.openWrite();
 
   int processed = 0;
   final int lastBlockStart = fileSize - _aesBlockSize;
+  int chunkCount = 0;
 
   try {
     // Read and decrypt everything up to (but not including) the final block
@@ -75,8 +79,13 @@ Future<String> decryptFile(
       }
       if (toRead <= 0) break;
 
-      final chunk = raf.readSync(toRead);
+      // Async read instead of sync
+      final chunk = await raf.read(toRead);
+      if (chunk.isEmpty) break;
+
       final chunkLen = chunk.length;
+
+      // Create output buffer for decrypted data
       final outBuf = Uint8List(chunkLen);
 
       // process block-by-block
@@ -89,12 +98,19 @@ Future<String> decryptFile(
 
       position += chunkLen;
       processed += chunkLen;
-      onProgress?.call((processed / fileSize).clamp(0.0, 0.95));
+      chunkCount++;
+
+      // Update progress less frequently and yield to UI thread
+      if (chunkCount % _progressUpdateInterval == 0) {
+        onProgress?.call((processed / fileSize).clamp(0.0, 0.95));
+        // Yield to event loop to keep UI responsive
+        await Future<void>.delayed(Duration.zero);
+      }
     }
 
     // Now process final block(s): read the last 16 bytes (single AES block)
-    raf.setPositionSync(lastBlockStart);
-    final finalCipherBlock = raf.readSync(_aesBlockSize);
+    await raf.setPosition(lastBlockStart);
+    final finalCipherBlock = await raf.read(_aesBlockSize);
     if (finalCipherBlock.length != _aesBlockSize) {
       throw Exception('Failed to read final cipher block.');
     }
@@ -124,7 +140,7 @@ Future<String> decryptFile(
 
     await outSink.flush();
     await outSink.close();
-    raf.closeSync();
+    await raf.close();
 
     print('✅ File decrypted successfully: ${outputFile.path}');
     return outputFile.path;
@@ -134,7 +150,7 @@ Future<String> decryptFile(
       await outSink.close();
     } catch (_) {}
     try {
-      raf.closeSync();
+      await raf.close();
     } catch (_) {}
     // remove partial output
     if (await outputFile.exists()) {
