@@ -2,16 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
-import 'package:poortak/common/utils/font_size_helper.dart';
 import 'package:poortak/locator.dart';
 import 'package:poortak/common/services/tts_service.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/conversation_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/converstion_bloc/converstion_bloc.dart';
+import 'package:poortak/featueres/fetures_sayareh/widgets/conversation_message_bubble.dart';
 // import 'package:poortak/featueres/fetures_sayareh/data/models/conversation_model.dart';
 // import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/converstion_bloc.dart';
 // import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/converstion_event.dart';
 // import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/converstion_state.dart';
 
+/// صفحه نمایش مکالمه بین دو شخص
+/// این صفحه لیستی از پیام‌های مکالمه را نمایش می‌دهد و امکان پخش صوتی و نمایش ترجمه را فراهم می‌کند
 class ConversationScreen extends StatefulWidget {
   static const routeName = "/conversation_screen";
   final String conversationId;
@@ -26,13 +28,25 @@ class ConversationScreen extends StatefulWidget {
 }
 
 class _ConversationScreenState extends State<ConversationScreen> {
+  // سرویس TTS برای پخش صوتی متن‌ها
   final TTSService ttsService = locator<TTSService>();
+
+  // مشخص می‌کند که آیا در حال پخش تمام مکالمه است
   bool isPlaying = false;
+
+  // ایندکس پیام فعلی که در حال پخش است
   int currentPlayingIndex = 0;
+
+  // لیست پیام‌های مرتب شده بر اساس order
   List<Datum>? sortedMessages;
+
+  // مشخص می‌کند که آیا ترجمه‌ها باید نمایش داده شوند
   bool showTranslations = false;
 
+  /// پخش تمام پیام‌های مکالمه به ترتیب
+  /// در صورت فعال بودن پخش، با فراخوانی این متد پخش متوقف می‌شود
   Future<void> playAllConversations(List<Datum> messages) async {
+    // اگر در حال پخش است، پخش را متوقف کن
     if (isPlaying) {
       await ttsService.stop();
       setState(() {
@@ -42,12 +56,14 @@ class _ConversationScreenState extends State<ConversationScreen> {
       return;
     }
 
+    // شروع پخش
     setState(() {
       isPlaying = true;
       currentPlayingIndex = 0;
     });
 
     try {
+      // پخش هر پیام به ترتیب
       for (var i = 0; i < messages.length; i++) {
         if (!isPlaying) break;
 
@@ -56,7 +72,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
           currentPlayingIndex = i;
         });
 
-        // Wait for the current message to finish playing
+        // پخش پیام با صدای مناسب
         if (message.voice == 'male') {
           await ttsService.setMaleVoice();
           await ttsService.speak(message.text);
@@ -66,10 +82,11 @@ class _ConversationScreenState extends State<ConversationScreen> {
         } else {
           await ttsService.speak(message.text, voice: message.voice);
         }
-        await Future.delayed(const Duration(
-            milliseconds: 500)); // Add a small delay between messages
+        // اضافه کردن تاخیر کوتاه بین پیام‌ها
+        await Future.delayed(const Duration(milliseconds: 500));
       }
     } finally {
+      // پاک کردن وضعیت پخش
       setState(() {
         isPlaying = false;
         currentPlayingIndex = 0;
@@ -77,6 +94,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
     }
   }
 
+  /// پخش یک متن با صدای مشخص شده
+  /// این متد زمانی که کاربر روی یک پیام کلیک می‌کند فراخوانی می‌شود
   Future<void> speakText(String text, String voice) async {
     if (voice == 'male') {
       // استفاده مستقیم از صدای مردانه انتخابی
@@ -95,11 +114,13 @@ class _ConversationScreenState extends State<ConversationScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
+      // ایجاد و راه‌اندازی Bloc برای مدیریت وضعیت مکالمه
       create: (context) => ConverstionBloc(
         sayarehRepository: locator(),
       )..add(GetConversationEvent(id: widget.conversationId)),
       child: Scaffold(
         backgroundColor: MyColors.secondaryTint4,
+        // نوار بالای صفحه با عنوان "مکالمه"
         appBar: AppBar(
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
@@ -111,6 +132,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
             style: MyTextStyle.textHeader16Bold,
           ),
         ),
+        // نوار پایین صفحه شامل دکمه‌های پخش و نمایش ترجمه
         bottomNavigationBar: Container(
           height: 60,
           decoration: BoxDecoration(
@@ -119,6 +141,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              // دکمه پخش/توقف تمام مکالمه
               IconButton(
                 onPressed: () {
                   if (sortedMessages != null) {
@@ -131,6 +154,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                   color: isPlaying ? Colors.red : Colors.green,
                 ),
               ),
+              // دکمه نمایش/مخفی کردن ترجمه
               IconButton(
                 onPressed: () {
                   setState(() {
@@ -145,17 +169,22 @@ class _ConversationScreenState extends State<ConversationScreen> {
             ],
           ),
         ),
+        // بدنه صفحه که بر اساس وضعیت Bloc محتوا را نمایش می‌دهد
         body: BlocBuilder<ConverstionBloc, ConverstionState>(
           builder: (context, state) {
+            // نمایش Loading در هنگام بارگذاری داده‌ها
             if (state is ConverstionLoading) {
               return const Center(child: CircularProgressIndicator());
             }
 
+            // نمایش پیام خطا در صورت بروز مشکل
             if (state is ConverstionError) {
               return Center(child: Text(state.message));
             }
 
+            // نمایش لیست مکالمه در صورت موفقیت‌آمیز بودن درخواست
             if (state is ConverstionSuccess) {
+              // مرتب‌سازی پیام‌ها بر اساس order
               sortedMessages = state.data.data
                 ..sort((a, b) => a.order.compareTo(b.order));
               return _buildConversationList(context, state.data);
@@ -168,87 +197,10 @@ class _ConversationScreenState extends State<ConversationScreen> {
     );
   }
 
+  /// ساخت لیست مکالمه با استفاده از ListView.builder
+  /// این متد پیام‌های مرتب شده را به صورت اسکرول‌پذیر نمایش می‌دهد
   Widget _buildConversationList(BuildContext context, ConversationModel data) {
     final ScrollController scrollController = ScrollController();
-
-    Widget buildMessageBubble(Datum message) {
-      final isFirstPerson = message.voice == 'male';
-      final isCurrentPlaying = sortedMessages != null &&
-          currentPlayingIndex < sortedMessages!.length &&
-          sortedMessages![currentPlayingIndex].id == message.id;
-      final screenWidth = MediaQuery.of(context).size.width;
-
-      return Align(
-        alignment: isFirstPerson ? Alignment.centerRight : Alignment.centerLeft,
-        child: GestureDetector(
-          onTap: () {
-            speakText(message.text, message.voice);
-          },
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxWidth: screenWidth * 0.75,
-            ),
-            child: Container(
-              margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-              decoration: BoxDecoration(
-                color: isFirstPerson ? MyColors.primary : Colors.grey[300],
-                borderRadius: BorderRadius.circular(20),
-                border: isCurrentPlaying
-                    ? Border.all(color: Colors.green, width: 2)
-                    : null,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    textDirection: TextDirection.ltr,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          message.text,
-                          style: FontSizeHelper.getContentTextStyle(
-                            context,
-                            baseFontSize: 16.0,
-                            color: isFirstPerson ? Colors.white : Colors.black,
-                          ),
-                          softWrap: true,
-                          textDirection: TextDirection.ltr,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 2),
-                        child: Icon(
-                          Icons.volume_up,
-                          size: 16,
-                          color:
-                              isFirstPerson ? Colors.white70 : Colors.black54,
-                        ),
-                      ),
-                    ],
-                  ),
-                  if (showTranslations) ...[
-                    const SizedBox(height: 4),
-                    Text(
-                      message.translation,
-                      style: FontSizeHelper.getContentTextStyle(
-                        context,
-                        baseFontSize: 12.0,
-                        color: isFirstPerson ? Colors.white70 : Colors.black54,
-                      ),
-                      softWrap: true,
-                      textDirection: TextDirection.ltr,
-                    ),
-                  ],
-                ],
-              ),
-            ),
-          ),
-        ),
-      );
-    }
 
     return ListView.builder(
       controller: scrollController,
@@ -256,7 +208,22 @@ class _ConversationScreenState extends State<ConversationScreen> {
       itemCount: sortedMessages?.length ?? 0,
       itemBuilder: (context, index) {
         final message = sortedMessages![index];
-        return buildMessageBubble(message);
+
+        // بررسی اینکه آیا این پیام در حال پخش است
+        final isCurrentPlaying = sortedMessages != null &&
+            currentPlayingIndex < sortedMessages!.length &&
+            sortedMessages![currentPlayingIndex].id == message.id;
+
+        // استفاده از widget جداگانه برای نمایش هر حباب پیام
+        return ConversationMessageBubble(
+          message: message,
+          isCurrentPlaying: isCurrentPlaying,
+          showTranslations: showTranslations,
+          onTap: () {
+            // پخش صوتی پیام هنگام لمس
+            speakText(message.text, message.voice);
+          },
+        );
       },
     );
   }
