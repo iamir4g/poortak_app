@@ -62,7 +62,7 @@ class VideoContainerWidget extends StatelessWidget {
       width: 350,
       height: 240,
       borderRadius: 37,
-      autoPlay: true,
+      autoPlay: false,
       showControls: true,
       onVideoEnded: () {
         print('Video ended');

@@ -267,14 +267,21 @@ class CustomVideoPlayerState extends State<CustomVideoPlayer> {
           child: Stack(
             alignment: Alignment.center,
             children: [
-              AspectRatio(
-                aspectRatio: _videoPlayerController.value.aspectRatio,
-                child: _isVideoInitialized
-                    ? VideoPlayer(_videoPlayerController)
-                    : const Center(
-                        child: CircularProgressIndicator(),
-                      ),
-              ),
+              if (_isVideoInitialized)
+                Positioned.fill(
+                  child: FittedBox(
+                    fit: BoxFit.cover,
+                    child: SizedBox(
+                      width: _videoPlayerController.value.size.width,
+                      height: _videoPlayerController.value.size.height,
+                      child: VideoPlayer(_videoPlayerController),
+                    ),
+                  ),
+                )
+              else
+                const Center(
+                  child: CircularProgressIndicator(),
+                ),
 
               if (_isVideoInitialized && widget.showControls)
                 _buildVideoControls(),

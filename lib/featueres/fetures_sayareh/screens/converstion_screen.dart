@@ -176,6 +176,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
       final isCurrentPlaying = sortedMessages != null &&
           currentPlayingIndex < sortedMessages!.length &&
           sortedMessages![currentPlayingIndex].id == message.id;
+      final screenWidth = MediaQuery.of(context).size.width;
 
       return Align(
         alignment: isFirstPerson ? Alignment.centerRight : Alignment.centerLeft,
@@ -183,50 +184,66 @@ class _ConversationScreenState extends State<ConversationScreen> {
           onTap: () {
             speakText(message.text, message.voice);
           },
-          child: Container(
-            margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-            decoration: BoxDecoration(
-              color: isFirstPerson ? MyColors.primary : Colors.grey[300],
-              borderRadius: BorderRadius.circular(20),
-              border: isCurrentPlaying
-                  ? Border.all(color: Colors.green, width: 2)
-                  : null,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: screenWidth * 0.75,
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
+            child: Container(
+              margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+              decoration: BoxDecoration(
+                color: isFirstPerson ? MyColors.primary : Colors.grey[300],
+                borderRadius: BorderRadius.circular(20),
+                border: isCurrentPlaying
+                    ? Border.all(color: Colors.green, width: 2)
+                    : null,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    textDirection: TextDirection.ltr,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          message.text,
+                          style: FontSizeHelper.getContentTextStyle(
+                            context,
+                            baseFontSize: 16.0,
+                            color: isFirstPerson ? Colors.white : Colors.black,
+                          ),
+                          softWrap: true,
+                          textDirection: TextDirection.ltr,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 2),
+                        child: Icon(
+                          Icons.volume_up,
+                          size: 16,
+                          color:
+                              isFirstPerson ? Colors.white70 : Colors.black54,
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (showTranslations) ...[
+                    const SizedBox(height: 4),
                     Text(
-                      message.text,
+                      message.translation,
                       style: FontSizeHelper.getContentTextStyle(
                         context,
-                        baseFontSize: 16.0,
-                        color: isFirstPerson ? Colors.white : Colors.black,
+                        baseFontSize: 12.0,
+                        color: isFirstPerson ? Colors.white70 : Colors.black54,
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Icon(
-                      Icons.volume_up,
-                      size: 16,
-                      color: isFirstPerson ? Colors.white70 : Colors.black54,
+                      softWrap: true,
+                      textDirection: TextDirection.ltr,
                     ),
                   ],
-                ),
-                if (showTranslations) ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    message.translation,
-                    style: FontSizeHelper.getContentTextStyle(
-                      context,
-                      baseFontSize: 12.0,
-                      color: isFirstPerson ? Colors.white70 : Colors.black54,
-                    ),
-                  ),
                 ],
-              ],
+              ),
             ),
           ),
         ),
