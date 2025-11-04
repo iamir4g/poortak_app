@@ -33,7 +33,7 @@ class VideoProgressBarWidget extends StatelessWidget {
                 ),
               ),
               Text(
-                '${(progress * 100).toInt()}%',
+                '${((progress.clamp(0.0, 1.0) * 100).toInt())}%',
                 style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
@@ -45,7 +45,7 @@ class VideoProgressBarWidget extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(4),
             child: LinearProgressIndicator(
-              value: progress,
+              value: progress.clamp(0.0, 1.0),
               minHeight: 6,
               backgroundColor: Colors.grey[300],
               valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
@@ -88,7 +88,7 @@ class DecryptionProgressBarWidget extends StatelessWidget {
                 ),
               ),
               Text(
-                '${(progress * 100).toInt()}%',
+                '${((progress.clamp(0.0, 1.0) * 100).toInt())}%',
                 style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
@@ -100,7 +100,7 @@ class DecryptionProgressBarWidget extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(4),
             child: LinearProgressIndicator(
-              value: progress,
+              value: progress.clamp(0.0, 1.0),
               minHeight: 6,
               backgroundColor: Colors.grey[300],
               valueColor: const AlwaysStoppedAnimation<Color>(Colors.green),

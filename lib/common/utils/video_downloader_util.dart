@@ -222,8 +222,10 @@ class VideoDownloaderUtil {
         url: downloadUrlString,
         name: name,
         onProgress: (fileName, progress) {
-          print("Download progress: $progress%");
-          onDownloadProgress?.call(progress / 100);
+          // Clamp progress to valid range (0-100) to prevent invalid values
+          final clampedProgress = progress.clamp(0.0, 100.0);
+          print("Download progress: $clampedProgress%");
+          onDownloadProgress?.call(clampedProgress / 100);
         },
         onDownloadCompleted: (path) async {
           print("Download completed, file saved to: $path");

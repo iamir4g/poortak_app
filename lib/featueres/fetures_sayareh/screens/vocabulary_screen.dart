@@ -29,6 +29,7 @@ class VocabularyScreen extends StatefulWidget {
 class _VocabularyScreenState extends State<VocabularyScreen> {
   int currentIndex = 0;
   int totalWords = 0;
+  String? lastPlayedWord;
   final TTSService ttsService = locator<TTSService>();
   final StorageService storageService = locator<StorageService>();
   final PrefsOperator prefsOperator = locator<PrefsOperator>();
@@ -84,18 +85,20 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
     );
   }
 
-  void _nextWord(int totalWords) {
+  void _nextWord(int totalWords, String word) {
     setState(() {
       if (currentIndex < totalWords - 1) {
         currentIndex++;
+        lastPlayedWord = null; // Reset to trigger auto-play in build
       }
     });
   }
 
-  void _previousWord(int totalWords) {
+  void _previousWord(int totalWords, String word) {
     setState(() {
       if (currentIndex > 0) {
         currentIndex--;
+        lastPlayedWord = null; // Reset to trigger auto-play in build
       }
     });
   }
@@ -154,71 +157,109 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
 
                 final currentWord = state.vocabulary.data[currentIndex];
                 totalWords = state.vocabulary.data.length;
+
+                // Auto-play word when it changes
+                if (lastPlayedWord != currentWord.word) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    _readWord(currentWord.word);
+                    if (mounted) {
+                      setState(() {
+                        lastPlayedWord = currentWord.word;
+                      });
+                    }
+                  });
+                }
+
                 return Column(
                   children: [
                     Expanded(
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            SizedBox(
-                              height: 20,
-                            ),
-                            //step progress bar
-                            StepProgress(
-                                currentIndex: currentIndex,
-                                totalSteps: totalWords),
+                      child: GestureDetector(
+                        onHorizontalDragEnd: (details) {
+                          final velocity = details.primaryVelocity;
+                          if (velocity == null) return;
 
-                            SizedBox(
-                              height: 85,
-                            ),
-                            FutureBuilder<String>(
-                              future: storageService.callGetDownloadPublicUrl(
-                                  currentWord.thumbnail),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return const CircularProgressIndicator();
-                                }
-                                if (snapshot.hasError) {
-                                  return const Icon(Icons.error);
-                                }
-                                if (snapshot.hasData) {
-                                  return Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(16),
-                                    ),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(16),
-                                      child: Image.network(
-                                        snapshot.data!,
-                                        height: 264,
-                                        width: 264,
-                                        fit: BoxFit.cover,
+                          final currentWordObj =
+                              state.vocabulary.data[currentIndex];
+                          // Swipe right (to previous) - positive velocity
+                          if (velocity > 0) {
+                            if (currentIndex > 0) {
+                              final previousWord =
+                                  state.vocabulary.data[currentIndex - 1].word;
+                              _previousWord(totalWords, previousWord);
+                            }
+                          }
+                          // Swipe left (to next) - negative velocity
+                          else if (velocity < 0) {
+                            if (currentIndex < totalWords - 1) {
+                              final nextWord =
+                                  state.vocabulary.data[currentIndex + 1].word;
+                              _nextWord(totalWords, nextWord);
+                            }
+                          }
+                        },
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              SizedBox(
+                                height: 20,
+                              ),
+                              //step progress bar
+                              StepProgress(
+                                  currentIndex: currentIndex,
+                                  totalSteps: totalWords),
+
+                              SizedBox(
+                                height: 85,
+                              ),
+                              FutureBuilder<String>(
+                                future: storageService.callGetDownloadPublicUrl(
+                                    currentWord.thumbnail),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return const CircularProgressIndicator();
+                                  }
+                                  if (snapshot.hasError) {
+                                    return const Icon(Icons.error);
+                                  }
+                                  if (snapshot.hasData) {
+                                    return Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(16),
                                       ),
-                                    ),
-                                  );
-                                }
-                                return const SizedBox.shrink();
-                              },
-                            ),
-                            const SizedBox(height: 20),
-                            Text(
-                              currentWord.word,
-                              style: const TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(16),
+                                        child: Image.network(
+                                          snapshot.data!,
+                                          height: 264,
+                                          width: 264,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                  return const SizedBox.shrink();
+                                },
                               ),
-                            ),
-                            const SizedBox(height: 10),
-                            Text(
-                              currentWord.translation,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                color: Colors.grey,
+                              const SizedBox(height: 20),
+                              Text(
+                                currentWord.word,
+                                style: const TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                          ],
+                              const SizedBox(height: 10),
+                              Text(
+                                currentWord.translation,
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -228,8 +269,15 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           IconButton(
-                            onPressed: () =>
-                                _nextWord(state.vocabulary.data.length),
+                            onPressed: () {
+                              if (currentIndex <
+                                  state.vocabulary.data.length - 1) {
+                                final nextWord = state
+                                    .vocabulary.data[currentIndex + 1].word;
+                                _nextWord(
+                                    state.vocabulary.data.length, nextWord);
+                              }
+                            },
                             icon: const Icon(Icons.arrow_back),
                             iconSize: 32,
                           ),
@@ -263,8 +311,14 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                             ),
                           ),
                           IconButton(
-                            onPressed: () =>
-                                _previousWord(state.vocabulary.data.length),
+                            onPressed: () {
+                              if (currentIndex > 0) {
+                                final previousWord = state
+                                    .vocabulary.data[currentIndex - 1].word;
+                                _previousWord(
+                                    state.vocabulary.data.length, previousWord);
+                              }
+                            },
                             icon: const Icon(Icons.arrow_forward),
                             iconSize: 32,
                           ),

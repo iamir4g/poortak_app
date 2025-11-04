@@ -113,7 +113,10 @@ class _LessonScreenState extends State<LessonScreen> {
 
     // Start download
     if (!_isDisposed && mounted) {
-      setState(() => isDownloading = true);
+      setState(() {
+        isDownloading = true;
+        downloadProgress = 0.0; // Reset progress to 0 when starting download
+      });
     }
 
     await VideoDownloaderUtil.downloadAndStoreVideo(
