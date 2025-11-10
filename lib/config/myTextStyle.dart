@@ -52,6 +52,12 @@ class MyTextStyle {
     fontWeight: FontWeight.w700,
     color: MyColors.textMatn1,
   );
+  static const TextStyle textMatn12W700 = TextStyle(
+    fontFamily: "IranSans",
+    fontSize: 12,
+    fontWeight: FontWeight.bold,
+    color: MyColors.textMatn1,
+  );
   static const TextStyle textMatn12Bold = TextStyle(
     fontFamily: "IranSans",
     fontSize: 12,

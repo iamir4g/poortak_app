@@ -34,6 +34,7 @@ class _MainWrapperState extends State<MainWrapper> {
   // Using late init to ensure PageController is created only once
   final PageController controller = PageController();
   final PrefsOperator prefsOperator = locator<PrefsOperator>();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   int currentPageIndex = 0;
 
@@ -45,6 +46,21 @@ class _MainWrapperState extends State<MainWrapper> {
         LitnerMainScreen(),
         const ProfileScreen(),
       ];
+
+  @override
+  void initState() {
+    super.initState();
+    // تنظیم status bar برای MainWrapper
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      SystemChrome.setSystemUIOverlayStyle(
+        const SystemUiOverlayStyle(
+          statusBarColor: MyColors.primary,
+          statusBarIconBrightness: Brightness.dark,
+          statusBarBrightness: Brightness.light,
+        ),
+      );
+    });
+  }
 
   @override
   void dispose() {
@@ -134,6 +150,9 @@ class _MainWrapperState extends State<MainWrapper> {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: MyColors.primary,
+    ));
     return MultiBlocProvider(
       providers: [
         BlocProvider(
@@ -185,13 +204,58 @@ class _MainWrapperState extends State<MainWrapper> {
                     }
                   },
                   child: Scaffold(
+                    key: _scaffoldKey,
                     backgroundColor: themeState.isDark
                         ? MyColors.darkBackground
                         : Colors.white,
+                    extendBodyBehindAppBar: false,
+                    drawerScrimColor: Colors.black54,
+                    // onDrawerChanged: (isOpened) async {
+                    //   // تنظیم status bar وقتی drawer باز یا بسته می‌شود
+                    //   final backgroundColor = themeState.isDark
+                    //       ? MyColors.darkBackground
+                    //       : Colors.white;
+                    //   final statusBarIconBrightness = themeState.isDark
+                    //       ? Brightness.light
+                    //       : Brightness.dark;
+
+                    //   if (isOpened) {
+                    //     // وقتی drawer باز است، status bar را کاملاً شفاف می‌کنیم
+                    //     await SystemChrome.setEnabledSystemUIMode(
+                    //       SystemUiMode.edgeToEdge,
+                    //     );
+                    //     SystemChrome.setSystemUIOverlayStyle(
+                    //       SystemUiOverlayStyle(
+                    //         statusBarColor: MyColors.primary,
+                    //         statusBarIconBrightness: statusBarIconBrightness,
+                    //         statusBarBrightness: themeState.isDark
+                    //             ? Brightness.dark
+                    //             : Brightness.light,
+                    //         systemNavigationBarColor: MyColors.primary,
+                    //         systemNavigationBarIconBrightness:
+                    //             statusBarIconBrightness,
+                    //       ),
+                    //     );
+                    //   } else {
+                    //     // وقتی drawer بسته است، status bar را به MyColors.statusBarColor برمی‌گردانیم
+                    //     SystemChrome.setSystemUIOverlayStyle(
+                    //       SystemUiOverlayStyle(
+                    //         statusBarColor: MyColors.primary,
+                    //         statusBarIconBrightness: statusBarIconBrightness,
+                    //         statusBarBrightness: themeState.isDark
+                    //             ? Brightness.dark
+                    //             : Brightness.light,
+                    //         systemNavigationBarColor: backgroundColor,
+                    //         systemNavigationBarIconBrightness:
+                    //             statusBarIconBrightness,
+                    //       ),
+                    //     );
+                    //   }
+                    // },
                     appBar: AppBar(
                       backgroundColor: themeState.isDark
                           ? MyColors.darkBackground
-                          : Colors.white,
+                          : MyColors.background,
                       foregroundColor: themeState.isDark
                           ? MyColors.darkTextPrimary
                           : MyColors.textMatn1,
@@ -251,17 +315,19 @@ class _MainWrapperState extends State<MainWrapper> {
                     ),
                     drawer: const CustomDrawer(),
                     bottomNavigationBar: BottomNav(controller: controller),
-                    body: state is PermissionLoading
-                        ? const Center(child: CircularProgressIndicator())
-                        : PageView(
-                            controller: controller,
-                            onPageChanged: (index) {
-                              setState(() {
-                                currentPageIndex = index;
-                              });
-                            },
-                            children: topLevelScreens,
-                          ),
+                    body: SafeArea(
+                      child: state is PermissionLoading
+                          ? const Center(child: CircularProgressIndicator())
+                          : PageView(
+                              controller: controller,
+                              onPageChanged: (index) {
+                                setState(() {
+                                  currentPageIndex = index;
+                                });
+                              },
+                              children: topLevelScreens,
+                            ),
+                    ),
                   ),
                 );
               },

@@ -18,7 +18,7 @@ class _PrizeScreenState extends State<PrizeScreen> {
     // Set status bar to light content
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
+        statusBarColor: MyColors.primary,
         statusBarIconBrightness: Brightness.dark,
         statusBarBrightness: Brightness.light,
       ),

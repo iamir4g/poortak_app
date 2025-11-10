@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:poortak/config/myColors.dart';
 
 class KavooshMainScreen extends StatefulWidget {
   static const String routeName = '/kavoosh-main';
@@ -16,7 +17,7 @@ class _KavooshMainScreenState extends State<KavooshMainScreen> {
     // Set status bar to light content
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
+        statusBarColor: MyColors.primary,
         statusBarIconBrightness: Brightness.dark,
         statusBarBrightness: Brightness.light,
       ),

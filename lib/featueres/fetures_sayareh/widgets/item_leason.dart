@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:iconify_design/iconify_design.dart';
 import 'package:poortak/common/services/getImageUrl_service.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_home_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/iknow_access_bloc/iknow_access_bloc.dart';
@@ -30,13 +31,6 @@ class ItemLeason extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
-        // if (item.price != "0") {
-        // showDialog(
-        //     context: context,
-        //     builder: (context) {
-        //       return DialogCart(item: item); //buildDialog(context, item);
-        //     });
-        // } else {
         Navigator.pushNamed(context, LessonScreen.routeName, arguments: {
           'index': index,
           'title': item.name,
@@ -47,7 +41,7 @@ class ItemLeason extends StatelessWidget {
       },
       child: Container(
         width: 360,
-        height: 80,
+        height: 88,
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
@@ -60,8 +54,7 @@ class ItemLeason extends StatelessWidget {
             Container(
               child: Row(children: [
                 CircleAvatar(
-                  maxRadius: 30,
-                  minRadius: 30,
+                  radius: 33.5,
                   child: FutureBuilder<String>(
                     future: GetImageUrlService().getImageUrl(item.thumbnail),
                     builder: (context, snapshot) {
@@ -92,6 +85,7 @@ class ItemLeason extends StatelessWidget {
                       item.name,
                       style: Theme.of(context).textTheme.titleSmall,
                     ),
+                    SizedBox(height: 6),
                     Text(
                       item.description,
                       style: Theme.of(context).textTheme.labelMedium,
@@ -109,10 +103,15 @@ class ItemLeason extends StatelessWidget {
                 SizedBox(
                   width: 8,
                 ),
-                Icon(
-                  Icons.arrow_forward_ios,
+                IconifyIcon(
+                  size: 32,
+                  icon: "iconamoon:arrow-left-2-bold",
                   color: Theme.of(context).textTheme.titleMedium?.color,
                 ),
+                // Icon(
+                //   Icons.arrow_forward_ios,
+                //   color: Theme.of(context).textTheme.titleMedium?.color,
+                // ),
               ],
             ),
           ],

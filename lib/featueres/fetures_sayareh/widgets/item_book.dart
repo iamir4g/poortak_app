@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:poortak/common/services/getImageUrl_service.dart';
-import 'package:poortak/common/services/storage_service.dart';
-import 'package:poortak/locator.dart';
-import '../screens/pdf_reader_screen.dart';
 
 class ItemBook extends StatelessWidget {
   final String? title;
@@ -88,35 +85,46 @@ class ItemBook extends StatelessWidget {
                   ],
                 ),
               ),
-              CircleAvatar(
-                maxRadius: 30,
-                minRadius: 30,
-                child: FutureBuilder<String>(
-                  future: GetImageUrlService().getImageUrl(thumbnail ?? ""),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const CircularProgressIndicator();
-                    }
-                    if (snapshot.hasError ||
-                        !snapshot.hasData ||
-                        snapshot.data!.isEmpty) {
-                      return const Icon(Icons.error);
-                    }
-                    return Image.network(
-                      snapshot.data!,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return const Icon(Icons.error);
-                      },
-                    );
-                  },
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  width: 81,
+                  height: 81,
+                  child: FutureBuilder<String>(
+                    future: GetImageUrlService().getImageUrl(thumbnail ?? ""),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+                      if (snapshot.hasError ||
+                          !snapshot.hasData ||
+                          snapshot.data!.isEmpty) {
+                        return const Center(
+                          child: Icon(Icons.error),
+                        );
+                      }
+                      return Image.network(
+                        snapshot.data!,
+                        width: 81,
+                        height: 81,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Center(
+                            child: Icon(Icons.error),
+                          );
+                        },
+                      );
+                    },
+                  ),
                 ),
               ),
-              const SizedBox(width: 8),
-              Icon(
-                Icons.arrow_forward_ios,
-                color: Theme.of(context).textTheme.bodySmall?.color,
-              ),
+              // const SizedBox(width: 8),
+              // Icon(
+              //   Icons.arrow_forward_ios,
+              //   color: Theme.of(context).textTheme.bodySmall?.color,
+              // ),
             ],
           ),
         ),

@@ -3,7 +3,7 @@ import 'package:poortak/config/myColors.dart';
 
 class ContestCard extends StatelessWidget {
   final VoidCallback? onTap;
-  
+
   const ContestCard({
     super.key,
     this.onTap,
@@ -14,8 +14,7 @@ class ContestCard extends StatelessWidget {
     return Container(
       width: 360,
       height: 105,
-      
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      // margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
@@ -23,49 +22,53 @@ class ContestCard extends StatelessWidget {
           onTap: onTap,
           child: Container(
             decoration: ShapeDecoration(
-gradient: LinearGradient(
-begin: Alignment(0.00, 0.50),
-end: Alignment(1.00, 0.50),
-colors: [const Color(0xFFF1EFFF), const Color(0xFFF2F6FD)],
-),
-shape: RoundedRectangleBorder(
-borderRadius: BorderRadius.circular(20),
-),
-),              
-            child: Row(
-              children: [
-                 // Text content - positioned exactly like Figma
-                Expanded(
-                  child:
-                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child:  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
- Text(
-                    'مسابقه پورتک',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).textTheme.titleMedium?.color,
-                    ),
-                  ),
-                  Text(
-                    'در مسابقه ماهانه پورتک شرکت کنید و جایزه ببرید.',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Theme.of(context).textTheme.bodySmall?.color,
-                    ),
-                  ),    
-                    ],
-                  ))
-                  
-                  
-                ),
-                SizedBox(width: 16),
-                // Gift box icon container - positioned exactly like Figma
-                Container(
+              gradient: LinearGradient(
+                begin: Alignment(0.00, 0.50),
+                end: Alignment(1.00, 0.50),
+                colors: [const Color(0xFFF1EFFF), const Color(0xFFF2F6FD)],
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+            ),
+            child: Padding(
+              padding: EdgeInsetsGeometry.symmetric(horizontal: 8),
+              child: Row(
+                children: [
+                  // Text content - positioned exactly like Figma
+                  Expanded(
+                      child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'مسابقه پورتک',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium
+                                      ?.color,
+                                ),
+                              ),
+                              Text(
+                                'در مسابقه ماهانه پورتک شرکت کنید و جایزه ببرید.',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.color,
+                                ),
+                              ),
+                            ],
+                          ))),
+                  SizedBox(width: 16),
+                  // Gift box icon container - positioned exactly like Figma
+                  Container(
                     width: 77.5,
                     height: 79,
                     decoration: BoxDecoration(
@@ -91,23 +94,14 @@ borderRadius: BorderRadius.circular(20),
                         width: 48,
                         height: 49,
                         decoration: BoxDecoration(
-                          // color: Theme.of(context).brightness == Brightness.dark
-                          //     ? const Color(0xFFF8A748) // Dark mode gift color
-                          //     : const Color(0xFFFF8A00), // Light mode gift color
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Image.asset("assets/images/main/gift-box.png"),
-                        // Icon(
-                        //   Icons.card_giftcard,
-                        //   size: 24,
-                        //   color: Colors.white,
-                        // ),
                       ),
                     ),
                   ),
-                
-               
-              ],
+                ],
+              ),
             ),
           ),
         ),

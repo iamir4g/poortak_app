@@ -44,7 +44,6 @@ import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/sayareh_bloc
 import 'package:poortak/locator.dart';
 import 'package:poortak/test_screen.dart';
 import 'package:poortak/l10n/app_localizations.dart';
-// import 'package:poortak/l10n/app_localizations.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quizes_cubit/cubit/quizes_cubit.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_start_bloc/quiz_start_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_answer_bloc/quiz_answer_bloc.dart';

@@ -14,6 +14,7 @@ class MyColors {
   static const Color primaryShade4 = Color.fromRGBO(163, 88, 0, 1);
   static const Color primaryShade5 = Color.fromRGBO(112, 61, 0, 1);
   static const Color primaryShade6 = Color.fromRGBO(61, 33, 0, 1);
+  static const Color statusBarColor = Color.fromRGBO(255, 255, 255, 0.1);
 
   static const Color secondary = Color.fromRGBO(66, 129, 236, 1.0); // Blue
   static const Color secondaryTint1 = Color.fromRGBO(117, 161, 235, 1);

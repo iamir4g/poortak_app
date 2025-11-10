@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconify_design/iconify_design.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
@@ -105,259 +106,321 @@ class _CustomDrawerState extends State<CustomDrawer> {
   Widget build(BuildContext context) {
     return BlocBuilder<ThemeCubit, ThemeState>(
       builder: (context, themeState) {
+        final backgroundColor =
+            themeState.isDark ? MyColors.darkBackground : Colors.white;
+        final statusBarHeight = MediaQuery.of(context).padding.top;
+
         return Drawer(
-          backgroundColor:
-              themeState.isDark ? MyColors.darkBackground : Colors.white,
-          child: Padding(
-            padding: const EdgeInsets.only(top: 50, left: 16, right: 16),
-            child: ListView(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: Container(
+            decoration: BoxDecoration(
+              color: backgroundColor,
+            ),
+            child: Stack(
               children: [
-                // const SizedBox(height: 20),
-                // const SizedBox(height: 20),
-                SizedBox(
-                  height: 100, // افزایش ارتفاع برای جا دادن دایره نارنجی
-                  width: 240,
-                  child: Stack(
-                    clipBehavior: Clip.none, // اجازه نمایش خارج از محدوده
+                // پس‌زمینه کامل که تا بالای صفحه می‌رود
+                Positioned.fill(
+                  child: Container(
+                    color: backgroundColor,
+                  ),
+                ),
+                // محتوای دراور
+                Padding(
+                  padding: EdgeInsets.only(
+                    top: statusBarHeight,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                  ),
+                  child: Column(
                     children: [
-                      Positioned(
-                        top: 20, // فاصله از بالا برای جا دادن دایره
-                        child: GestureDetector(
-                          onTap: () {
-                            if (isLoggedIn) {
-                              Navigator.pushNamed(
-                                  context, ProfileScreen.routeName);
-                            } else {
-                              Navigator.pushNamed(
-                                  context, LoginScreen.routeName);
-                            }
-                          },
-                          child: SizedBox(
-                            height: 80,
-                            width: 240,
-                            child: Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: themeState.isDark
-                                    ? MyColors.darkCardBackground
-                                    : MyColors.background1,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  ClipOval(
-                                    child: userAvatarUrl != null
-                                        ? Image.network(
-                                            userAvatarUrl!,
-                                            width: 50,
-                                            height: 50,
-                                            fit: BoxFit.cover,
-                                            errorBuilder:
-                                                (context, error, stackTrace) {
-                                              return Container(
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          100),
-                                                  color: Colors.red,
-                                                  image: const DecorationImage(
-                                                    image: AssetImage(
-                                                      "assets/images/profile/finalProfile.png",
-                                                    ),
-                                                  ),
-                                                ),
-                                                width: 50,
-                                                height: 50,
-                                              );
-                                            },
-                                          )
-                                        : Container(
+                      // Drawer content
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 16,
+                          ),
+                          child: ListView(
+                            children: [
+                              SizedBox(
+                                height:
+                                    100, // افزایش ارتفاع برای جا دادن دایره نارنجی
+                                width: 240,
+                                child: Stack(
+                                  clipBehavior:
+                                      Clip.none, // اجازه نمایش خارج از محدوده
+                                  children: [
+                                    Positioned(
+                                      top:
+                                          20, // فاصله از بالا برای جا دادن دایره
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          if (isLoggedIn) {
+                                            Navigator.pushNamed(context,
+                                                ProfileScreen.routeName);
+                                          } else {
+                                            Navigator.pushNamed(
+                                                context, LoginScreen.routeName);
+                                          }
+                                        },
+                                        child: SizedBox(
+                                          height: 80,
+                                          width: 240,
+                                          child: Container(
+                                            padding: const EdgeInsets.all(12),
                                             decoration: BoxDecoration(
+                                              color: themeState.isDark
+                                                  ? MyColors.darkCardBackground
+                                                  : MyColors.background1,
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: [
+                                                ClipOval(
+                                                  child: userAvatarUrl != null
+                                                      ? Image.network(
+                                                          userAvatarUrl!,
+                                                          width: 50,
+                                                          height: 50,
+                                                          fit: BoxFit.cover,
+                                                          errorBuilder:
+                                                              (context, error,
+                                                                  stackTrace) {
+                                                            return Container(
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            100),
+                                                                color:
+                                                                    Colors.red,
+                                                                image:
+                                                                    const DecorationImage(
+                                                                  image:
+                                                                      AssetImage(
+                                                                    "assets/images/profile/finalProfile.png",
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                              width: 50,
+                                                              height: 50,
+                                                            );
+                                                          },
+                                                        )
+                                                      : Container(
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        100),
+                                                            color: Colors.red,
+                                                            image:
+                                                                const DecorationImage(
+                                                              image: AssetImage(
+                                                                "assets/images/profile/finalProfile.png",
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          width: 50,
+                                                          height: 50,
+                                                        ),
+                                                ),
+                                                const SizedBox(width: 10),
+                                                Text(
+                                                  isLoggedIn
+                                                      ? (userFirstName !=
+                                                                  null &&
+                                                              userLastName !=
+                                                                  null
+                                                          ? "$userFirstName $userLastName"
+                                                          : userFirstName ??
+                                                              userLastName ??
+                                                              "کاربر")
+                                                      : "وارد شوید",
+                                                  style: MyTextStyle
+                                                      .textMatn14Bold
+                                                      .copyWith(
+                                                    color: themeState.isDark
+                                                        ? MyColors
+                                                            .darkTextPrimary
+                                                        : MyColors.textMatn1,
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    // Edit button positioned above the container
+                                    if (isLoggedIn)
+                                      Positioned(
+                                        top: 10,
+                                        left: 20,
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            Navigator.pushNamed(context,
+                                                ProfileScreen.routeName);
+                                          },
+                                          child: Container(
+                                            width: 30,
+                                            height: 30,
+                                            decoration: BoxDecoration(
+                                              color: MyColors.secondary,
                                               borderRadius:
                                                   BorderRadius.circular(100),
-                                              color: Colors.red,
-                                              image: const DecorationImage(
-                                                image: AssetImage(
-                                                  "assets/images/profile/finalProfile.png",
-                                                ),
+                                              border: Border.all(
+                                                color: Colors.white,
+                                                width: 2,
                                               ),
                                             ),
-                                            width: 50,
-                                            height: 50,
+                                            child: Center(
+                                              child: IconifyIcon(
+                                                icon: "tdesign:edit",
+                                                color: Colors.white,
+                                                size: 12,
+                                              ),
+                                            ),
                                           ),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Text(
-                                    isLoggedIn
-                                        ? (userFirstName != null &&
-                                                userLastName != null
-                                            ? "$userFirstName $userLastName"
-                                            : userFirstName ??
-                                                userLastName ??
-                                                "کاربر")
-                                        : "وارد شوید",
-                                    style: MyTextStyle.textMatn14Bold.copyWith(
-                                      color: themeState.isDark
-                                          ? MyColors.darkTextPrimary
-                                          : MyColors.textMatn1,
-                                    ),
-                                  )
-                                ],
+                                        ),
+                                      ),
+                                  ],
+                                ),
                               ),
-                            ),
+                              const SizedBox(height: 20),
+                              const SizedBox(height: 20),
+                              ListTile(
+                                onTap: () {
+                                  context.read<ThemeCubit>().toggleTheme();
+                                },
+                                leading: Container(
+                                  width: 32,
+                                  height: 32,
+                                  decoration: BoxDecoration(
+                                    color: themeState.isDark
+                                        ? MyColors.darkCardBackground
+                                        : MyColors.background1,
+                                    borderRadius: BorderRadius.circular(100),
+                                  ),
+                                  child: Center(
+                                    child: IconifyIcon(
+                                      size: 16,
+                                      icon: themeState.isDark
+                                          ? "famicons:sun"
+                                          : "famicons:moon",
+                                      color: themeState.isDark
+                                          ? MyColors.darkTextAccent
+                                          : MyColors.text3,
+                                    ),
+                                  ),
+                                ),
+                                title: Text(
+                                  themeState.isDark ? "حالت روز" : "حالت شب",
+                                  style: MyTextStyle.textMatn14Bold.copyWith(
+                                    color: themeState.isDark
+                                        ? MyColors.darkTextPrimary
+                                        : MyColors.textMatn1,
+                                  ),
+                                ),
+                                trailing: Switch(
+                                  value: themeState.isDark,
+                                  onChanged: (value) {
+                                    context.read<ThemeCubit>().toggleTheme();
+                                  },
+                                  inactiveThumbColor: Colors.white,
+                                  activeColor: MyColors.primary,
+                                  trackOutlineColor: WidgetStateProperty.all(
+                                      Colors.transparent),
+                                ),
+                              ),
+                              _buildListTile(
+                                icon: "ic:baseline-more-time",
+                                title: "یادآور مطالعه",
+                              ),
+                              _buildListTile(
+                                icon: "famicons:settings-outline",
+                                title: "تنظیمات",
+                                onTap: () {
+                                  Navigator.pushNamed(
+                                      context, SettingsScreen.routeName);
+                                },
+                              ),
+                              _buildListTile(
+                                icon: "ph:chat-dots-light",
+                                title: "سوالات رایج",
+                                onTap: () {
+                                  Navigator.pushNamed(
+                                      context, FAQScreen.routeName);
+                                },
+                              ),
+                              _buildListTile(
+                                icon: "lsicon:circle-more-outline",
+                                title: "پشتیبانی",
+                                onTap: () {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text("به زودی")),
+                                  );
+                                  // Navigator.pushNamed(context, PaymentResultScreen.routeName,
+                                  //     arguments: {
+                                  //       'status': 0,
+                                  //       'ref': '1234567890',
+                                  //     });
+                                },
+                              ),
+                              _buildListTile(
+                                icon: "ion:call-outline",
+                                title: "تماس با ما",
+                                onTap: () {
+                                  Navigator.pushNamed(
+                                      context, ContactUsScreen.routeName);
+                                },
+                              ),
+                              _buildListTile(
+                                icon:
+                                    "material-symbols-light:info-outline-rounded",
+                                title: "درباره ی ما",
+                                onTap: () {
+                                  Navigator.pushNamed(
+                                      context, AboutUsScreen.routeName);
+                                },
+                              ),
+                              _buildListTile(
+                                icon: "mynaui:share",
+                                title: "اشتراک گذاری به دوستان",
+                                onTap: () {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text("به زودی.")),
+                                  );
+                                  // Navigator.pushNamed(context, PaymentResultScreen.routeName,
+                                  //     arguments: {
+                                  //       'status': 1,
+                                  //       'ref': '1234567890',
+                                  //     });
+                                },
+                              ),
+                              _buildListTile(
+                                icon: "fluent:heart-28-regular",
+                                title: "ثبت نظر درباره برنامه",
+                                onTap: () {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text("به زودی.")),
+                                  );
+                                },
+                              )
+                            ],
                           ),
                         ),
                       ),
-                      // Edit button positioned above the container
-                      if (!isLoggedIn)
-                        Positioned(
-                          top: 10,
-                          left: 20,
-                          child: GestureDetector(
-                            onTap: () {
-                              Navigator.pushNamed(
-                                  context, ProfileScreen.routeName);
-                            },
-                            child: Container(
-                              width: 30,
-                              height: 30,
-                              decoration: BoxDecoration(
-                                color: MyColors.secondary,
-                                borderRadius: BorderRadius.circular(100),
-                                border: Border.all(
-                                  color: Colors.white,
-                                  width: 2,
-                                ),
-                              ),
-                              child: Center(
-                                child: IconifyIcon(
-                                  icon: "tdesign:edit",
-                                  color: Colors.white,
-                                  size: 12,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 20),
-                const SizedBox(height: 20),
-                ListTile(
-                  onTap: () {
-                    context.read<ThemeCubit>().toggleTheme();
-                  },
-                  leading: Container(
-                    width: 32,
-                    height: 32,
-                    decoration: BoxDecoration(
-                      color: themeState.isDark
-                          ? MyColors.darkCardBackground
-                          : MyColors.background1,
-                      borderRadius: BorderRadius.circular(100),
-                    ),
-                    child: Center(
-                      child: IconifyIcon(
-                        size: 16,
-                        icon: themeState.isDark
-                            ? "famicons:sun"
-                            : "famicons:moon",
-                        color: themeState.isDark
-                            ? MyColors.darkTextAccent
-                            : MyColors.text3,
-                      ),
-                    ),
-                  ),
-                  title: Text(
-                    themeState.isDark ? "حالت روز" : "حالت شب",
-                    style: MyTextStyle.textMatn14Bold.copyWith(
-                      color: themeState.isDark
-                          ? MyColors.darkTextPrimary
-                          : MyColors.textMatn1,
-                    ),
-                  ),
-                  trailing: Switch(
-                    value: themeState.isDark,
-                    onChanged: (value) {
-                      context.read<ThemeCubit>().toggleTheme();
-                    },
-                    activeColor: MyColors.primary,
-                    activeTrackColor: MyColors.primaryTint1,
-                    inactiveThumbColor: MyColors.textSecondary,
-                    inactiveTrackColor: MyColors.background1,
-                  ),
-                ),
-                _buildListTile(
-                  icon: "ic:baseline-more-time",
-                  title: "یادآور مطالعه",
-                ),
-                _buildListTile(
-                  icon: "famicons:settings-outline",
-                  title: "تنظیمات",
-                  onTap: () {
-                    Navigator.pushNamed(context, SettingsScreen.routeName);
-                  },
-                ),
-                _buildListTile(
-                  icon: "ph:chat-dots-light",
-                  title: "سوالات رایج",
-                  onTap: () {
-                    Navigator.pushNamed(context, FAQScreen.routeName);
-                  },
-                ),
-                _buildListTile(
-                  icon: "lsicon:circle-more-outline",
-                  title: "پشتیبانی",
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text("به زودی")),
-                    );
-                    // Navigator.pushNamed(context, PaymentResultScreen.routeName,
-                    //     arguments: {
-                    //       'status': 0,
-                    //       'ref': '1234567890',
-                    //     });
-                  },
-                ),
-                _buildListTile(
-                  icon: "ion:call-outline",
-                  title: "تماس با ما",
-                  onTap: () {
-                    Navigator.pushNamed(context, ContactUsScreen.routeName);
-                  },
-                ),
-                _buildListTile(
-                  icon: "material-symbols-light:info-outline-rounded",
-                  title: "درباره ی ما",
-                  onTap: () {
-                    Navigator.pushNamed(context, AboutUsScreen.routeName);
-                  },
-                ),
-                _buildListTile(
-                  icon: "mynaui:share",
-                  title: "اشتراک گذاری به دوستان",
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text("به زودی.")),
-                    );
-                    // Navigator.pushNamed(context, PaymentResultScreen.routeName,
-                    //     arguments: {
-                    //       'status': 1,
-                    //       'ref': '1234567890',
-                    //     });
-                  },
-                ),
-                _buildListTile(
-                  icon: "fluent:heart-28-regular",
-                  title: "ثبت نظر درباره برنامه",
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text("به زودی.")),
-                    );
-                  },
-                )
               ],
             ),
           ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lottie/lottie.dart';
+import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 
 class MainPointsScreen extends StatefulWidget {
@@ -18,8 +19,8 @@ class _MainPointsScreenState extends State<MainPointsScreen> {
     super.initState();
     // Set status bar to light content
     SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
+      SystemUiOverlayStyle(
+        statusBarColor: MyColors.primary,
         statusBarIconBrightness: Brightness.dark,
         statusBarBrightness: Brightness.light,
       ),

@@ -21,8 +21,8 @@ class _HistoryPrizeScreenState extends State<HistoryPrizeScreen> {
     super.initState();
     // Set status bar to light content
     SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
+      SystemUiOverlayStyle(
+        statusBarColor: MyColors.primary,
         statusBarIconBrightness: Brightness.dark,
         statusBarBrightness: Brightness.light,
       ),

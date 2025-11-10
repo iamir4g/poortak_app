@@ -19,8 +19,8 @@ class _HowToGetPointsScreenState extends State<HowToGetPointsScreen> {
     super.initState();
     // Set status bar to light content
     SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
+      SystemUiOverlayStyle(
+        statusBarColor: MyColors.primary,
         statusBarIconBrightness: Brightness.dark,
         statusBarBrightness: Brightness.light,
       ),

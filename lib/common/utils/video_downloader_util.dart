@@ -23,6 +23,14 @@ class VideoDownloaderUtil {
     return fileName;
   }
 
+  /// Helper method to normalize filename for comparison (removes .mp4 extension if present)
+  static String normalizeFileName(String fileName) {
+    if (fileName.endsWith('.mp4')) {
+      return fileName.substring(0, fileName.length - 4);
+    }
+    return fileName;
+  }
+
   /// Check for existing video files in local directories
   static Future<String?> checkExistingFiles({
     required String name,
@@ -39,67 +47,104 @@ class VideoDownloaderUtil {
       // Check in videos directory first (decrypted files)
       if (await videoDir.exists()) {
         final files = await videoDir.list().toList();
+        print("🔍 Checking ${files.length} files in videos directory for: $name");
         for (var file in files) {
           if (file is File) {
             final fileName = getBaseFileName(file.path);
-            if (fileName == name) {
+            final normalizedFileName = normalizeFileName(fileName);
+            print("  - File: $fileName, Normalized: $normalizedFileName, Looking for: $name");
+            // Compare normalized filename (without .mp4) with the name parameter
+            if (normalizedFileName == name) {
               print("✅ Found existing decrypted video file: ${file.path}");
               return file.path;
             }
           }
         }
+      } else {
+        print("⚠️ Videos directory does not exist: ${videoDir.path}");
       }
 
-      // For purchased content, check encrypted directory and try to decrypt
-      if (hasAccess) {
-        // Check in encrypted directory
-        if (await encryptedDir.exists()) {
-          final files = await encryptedDir.list().toList();
-          for (var encryptedFile in files) {
-            if (encryptedFile is File) {
-              final fileName = getBaseFileName(encryptedFile.path);
-              if (fileName == name) {
-                print("✅ Found existing encrypted file: ${encryptedFile.path}");
-                // Try to decrypt it
-                try {
-                  final decryptionKeyResponse =
-                      await storageService.callGetDecryptedFile(fileName);
-                  final decryptedFileName = '${fileName}.mp4';
-                  final decryptedFile =
-                      File('${videoDir.path}/$decryptedFileName');
+      // Check encrypted directory for both purchased and trailer videos
+      // (trailer videos are also stored in encrypted directory temporarily)
+      if (await encryptedDir.exists()) {
+        final files = await encryptedDir.list().toList();
+        print("🔍 Checking ${files.length} files in encrypted directory for: $name");
+        for (var encryptedFile in files) {
+          if (encryptedFile is File) {
+            final fileName = getBaseFileName(encryptedFile.path);
+            final normalizedFileName = normalizeFileName(fileName);
+            print("  - Encrypted file: $fileName, Normalized: $normalizedFileName, Looking for: $name");
+            
+            // For purchased content, try to decrypt
+            if (hasAccess && normalizedFileName == name) {
+              print("✅ Found existing encrypted file: ${encryptedFile.path}");
+              // Try to decrypt it
+              try {
+                final decryptionKeyResponse =
+                    await storageService.callGetDecryptedFile(fileName);
+                final decryptedFileName = '${fileName}.mp4';
+                final decryptedFile =
+                    File('${videoDir.path}/$decryptedFileName');
 
-                  onDecrypting?.call(true);
-                  if (onDecryptionProgress != null) {
-                    final decryptedPath = await decryptFile(
-                      encryptedFile.path,
-                      decryptedFile.path,
-                      decryptionKeyResponse.data.key,
-                      onProgress: onDecryptionProgress,
-                    );
+                onDecrypting?.call(true);
+                if (onDecryptionProgress != null) {
+                  final decryptedPath = await decryptFile(
+                    encryptedFile.path,
+                    decryptedFile.path,
+                    decryptionKeyResponse.data.key,
+                    onProgress: onDecryptionProgress,
+                  );
 
-                    if (await File(decryptedPath).exists()) {
-                      onDecrypting?.call(false);
-                      return decryptedPath;
-                    }
+                  if (await File(decryptedPath).exists()) {
+                    onDecrypting?.call(false);
+                    return decryptedPath;
                   }
-                  onDecrypting?.call(false);
-                } catch (e) {
-                  print("❌ Error decrypting existing file: $e");
-                  onDecrypting?.call(false);
                 }
+                onDecrypting?.call(false);
+              } catch (e) {
+                print("❌ Error decrypting existing file: $e");
+                onDecrypting?.call(false);
+              }
+            } 
+            // For trailer videos (not encrypted), check if decrypted version exists
+            // or copy directly if it's a trailer video
+            else if (!hasAccess && normalizedFileName == name) {
+              print("✅ Found existing file in encrypted directory (trailer): ${encryptedFile.path}");
+              // Check if decrypted version already exists in videos directory
+              final possibleDecryptedFile = File('${videoDir.path}/$name.mp4');
+              if (await possibleDecryptedFile.exists()) {
+                print("✅ Decrypted version already exists, using it");
+                return possibleDecryptedFile.path;
+              }
+              // If not, copy to videos directory (trailer videos are not encrypted)
+              try {
+                final decryptedFile = File('${videoDir.path}/$name.mp4');
+                await encryptedFile.copy(decryptedFile.path);
+                if (await decryptedFile.exists()) {
+                  print("✅ Copied trailer video to videos directory");
+                  return decryptedFile.path;
+                }
+              } catch (e) {
+                print("❌ Error copying trailer video: $e");
               }
             }
           }
         }
+      }
 
+      // For purchased content, also check Downloads directory
+      if (hasAccess) {
         // Check in Downloads directory for purchased content
         final downloadsDir = Directory('/storage/emulated/0/Download');
         if (await downloadsDir.exists()) {
           final files = await downloadsDir.list().toList();
+          print("🔍 Checking ${files.length} files in Downloads directory for: $name");
           for (var downloadedFile in files) {
             if (downloadedFile is File) {
               final fileName = getBaseFileName(downloadedFile.path);
-              if (fileName == name) {
+              final normalizedFileName = normalizeFileName(fileName);
+              print("  - Downloads file: $fileName, Normalized: $normalizedFileName, Looking for: $name");
+              if (normalizedFileName == name) {
                 print(
                     "✅ Found existing file in Downloads: ${downloadedFile.path}");
                 // Copy to encrypted directory with the original name
