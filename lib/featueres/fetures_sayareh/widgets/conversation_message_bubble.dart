@@ -77,16 +77,16 @@ class ConversationMessageBubble extends StatelessWidget {
                         textDirection: TextDirection.ltr,
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    // آیکون صوتی برای نشان دادن قابلیت پخش
-                    Padding(
-                      padding: const EdgeInsets.only(top: 2),
-                      child: Icon(
-                        Icons.volume_up,
-                        size: 16,
-                        color: isFirstPerson ? Colors.white70 : Colors.black54,
-                      ),
-                    ),
+                    // const SizedBox(width: 8),
+                    // // آیکون صوتی برای نشان دادن قابلیت پخش
+                    // Padding(
+                    //   padding: const EdgeInsets.only(top: 2),
+                    //   child: Icon(
+                    //     Icons.volume_up,
+                    //     size: 16,
+                    //     color: isFirstPerson ? Colors.white70 : Colors.black54,
+                    //   ),
+                    // ),
                   ],
                 ),
                 // نمایش ترجمه در صورت فعال بودن

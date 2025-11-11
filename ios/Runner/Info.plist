@@ -50,5 +50,9 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>دسترسی برای ذخیره برخی از ویدو ها و فایل ها است</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>دسترسی برای ذخیره برخی از ویدو ها و فایل ها است</string>
 </dict>
 </plist>

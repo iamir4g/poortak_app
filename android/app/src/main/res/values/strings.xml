@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">poortak</string>
+    <!-- Permission rationale for storage access -->
+    <string name="storage_permission_rationale">دسترسی برای ذخیره برخی از ویدو ها و فایل ها است</string>
+</resources>
+

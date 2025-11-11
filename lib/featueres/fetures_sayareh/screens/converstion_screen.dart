@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:iconify_design/iconify_design.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/locator.dart';
@@ -141,6 +142,27 @@ class _ConversationScreenState extends State<ConversationScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              // دکمه نمایش/مخفی کردن ترجمه
+              IconButton(
+                onPressed: () {
+                  setState(() {
+                    showTranslations = !showTranslations;
+                  });
+                },
+                icon: Icon(
+                  Icons.translate,
+                  color: showTranslations ? Colors.blue : Colors.grey,
+                ),
+              ),
+              IconButton(
+                  onPressed: () {
+                    // Navigator.pop(context);
+                  },
+                  icon: IconifyIcon(
+                    icon: "ri:skip-left-fill",
+                    size: 30,
+                    color: Colors.black,
+                  )),
               // دکمه پخش/توقف تمام مکالمه
               IconButton(
                 onPressed: () {
@@ -154,18 +176,15 @@ class _ConversationScreenState extends State<ConversationScreen> {
                   color: isPlaying ? Colors.red : Colors.green,
                 ),
               ),
-              // دکمه نمایش/مخفی کردن ترجمه
               IconButton(
-                onPressed: () {
-                  setState(() {
-                    showTranslations = !showTranslations;
-                  });
-                },
-                icon: Icon(
-                  Icons.translate,
-                  color: showTranslations ? Colors.blue : Colors.grey,
-                ),
-              ),
+                  onPressed: () {
+                    // Navigator.pop(context);
+                  },
+                  icon: IconifyIcon(
+                    icon: "ri:skip-right-fill",
+                    size: 30,
+                    color: Colors.black,
+                  )),
             ],
           ),
         ),

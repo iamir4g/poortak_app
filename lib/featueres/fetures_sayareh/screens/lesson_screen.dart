@@ -324,7 +324,7 @@ class _LessonScreenState extends State<LessonScreen> {
           _buildVocabularyCard(),
           const SizedBox(height: 12),
           _buildQuizCard(),
-          const SizedBox(height: 50),
+          const SizedBox(height: 110),
           _buildDictionaryButton(),
         ],
       ),
