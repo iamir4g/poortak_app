@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:flutter_file_downloader/flutter_file_downloader.dart';
+import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
 import '../services/storage_service.dart';
 
@@ -103,41 +103,6 @@ class PdfDownloader {
     return _sanitizeFileName(fileName);
   }
 
-  // Helper method to find the actual downloaded file
-  static Future<String?> _findDownloadedFile(
-      String expectedPath, String sanitizedFileName) async {
-    try {
-      // First check if the expected path exists
-      final expectedFile = File(expectedPath);
-      if (await expectedFile.exists()) {
-        return expectedPath;
-      }
-
-      // If not, search in the Downloads directory
-      final downloadsDir = Directory('/storage/emulated/0/Download');
-      if (await downloadsDir.exists()) {
-        final files = downloadsDir.listSync();
-
-        // Look for files that might match our expected name
-        for (var file in files) {
-          if (file is File) {
-            final fileName = file.path.split('/').last;
-            // Check if it's a PDF file
-            if (fileName.toLowerCase().endsWith('.pdf')) {
-              print("Found PDF file: $fileName");
-              return file.path;
-            }
-          }
-        }
-      }
-
-      return null;
-    } catch (e) {
-      print('Error finding downloaded file: $e');
-      return null;
-    }
-  }
-
   // Debug method to test filename sanitization
   static void testSanitization(String fileName) {
     print("=== Filename Sanitization Test ===");
@@ -212,75 +177,64 @@ class PdfDownloader {
         print("Authenticated book download URL received: $downloadUrl");
       }
 
-      // Download using flutter_file_downloader
-      await FileDownloader.downloadFile(
-        url: downloadUrl,
-        name: sanitizedFileName,
-        onProgress: (fileName, progress) {
-          print("PDF download progress: $progress%");
-          onProgress?.call(progress / 100);
-        },
-        onDownloadCompleted: (path) async {
-          print("PDF download completed, file saved to: $path");
-          print("Expected sanitized filename: $sanitizedFileName");
-          print("Download path: $path");
+      print("Starting PDF download directly to internal storage");
 
-          try {
-            // Ensure directories exist
-            if (!await encryptedDir.exists()) {
-              await encryptedDir.create(recursive: true);
+      // Delete the target file if it exists
+      if (await encryptedFile.exists()) {
+        print("Deleting existing encrypted file...");
+        await encryptedFile.delete();
+      }
+
+      // Download directly to internal storage using Dio
+      try {
+        // Create a new Dio instance without interceptors for file downloads
+        // Signed S3 URLs should not have additional headers (x-lang, Authorization)
+        // as they would invalidate the signature
+        final dio = Dio();
+
+        // Download with progress tracking
+        await dio.download(
+          downloadUrl,
+          encryptedFile.path,
+          onReceiveProgress: (received, total) {
+            if (total > 0) {
+              final progress = (received / total).clamp(0.0, 1.0);
+              print(
+                  "PDF download progress: ${(progress * 100).toStringAsFixed(1)}%");
+              onProgress?.call(progress);
             }
-            if (!await pdfDir.exists()) {
-              await pdfDir.create(recursive: true);
-            }
+          },
+        );
 
-            // Delete the target file if it exists
-            if (await encryptedFile.exists()) {
-              await encryptedFile.delete();
-            }
+        print("PDF download completed, file saved to: ${encryptedFile.path}");
 
-            // Try to find the actual downloaded file
-            String? actualFilePath =
-                await _findDownloadedFile(path, sanitizedFileName);
-            if (actualFilePath == null) {
-              throw Exception("Could not find downloaded PDF file");
-            }
+        // Verify file was downloaded
+        if (!await encryptedFile.exists()) {
+          throw Exception(
+              "Downloaded PDF file does not exist at: ${encryptedFile.path}");
+        }
 
-            // Copy the file from Downloads to encrypted directory
-            final downloadedFile = File(actualFilePath);
-            print("Copying file from: $actualFilePath");
-            print("Copying file to: ${encryptedFile.path}");
+        // If file is encrypted, get decryption key and decrypt
+        if (isEncrypted) {
+          print("PDF is encrypted, getting decryption key");
+          // TODO: Implement decryption logic for PDFs
+          // For now, just copy to pdf directory
+          await encryptedFile.copy(decryptedFile.path);
+        } else {
+          // If not encrypted, just copy to pdf directory
+          print("File is not encrypted, copying to PDF directory");
+          await encryptedFile.copy(decryptedFile.path);
+        }
 
-            await downloadedFile.copy(encryptedFile.path);
-            print("File copied to encrypted directory successfully");
+        print("File processing completed successfully");
+        print("Final PDF path: ${decryptedFile.path}");
 
-            // If file is encrypted, get decryption key and decrypt
-            if (isEncrypted) {
-              print("PDF is encrypted, getting decryption key");
-              // TODO: Implement decryption logic for PDFs
-              // For now, just copy to pdf directory
-              await encryptedFile.copy(decryptedFile.path);
-            } else {
-              // If not encrypted, just copy to pdf directory
-              print("File is not encrypted, copying to PDF directory");
-              await encryptedFile.copy(decryptedFile.path);
-            }
-
-            print("File processing completed successfully");
-            print("Final PDF path: ${decryptedFile.path}");
-
-            // Call the completion callback with the local file path
-            onDownloadCompleted?.call(decryptedFile.path);
-          } catch (e) {
-            print("Error processing PDF file: $e");
-            onDownloadError?.call("Error processing PDF file: $e");
-          }
-        },
-        onDownloadError: (error) {
-          print("PDF download error: $error");
-          onDownloadError?.call(error);
-        },
-      );
+        // Call the completion callback with the local file path
+        onDownloadCompleted?.call(decryptedFile.path);
+      } catch (e) {
+        print("Error downloading PDF file: $e");
+        onDownloadError?.call('خطا در دانلود فایل: $e');
+      }
 
       return null; // Will be set in onDownloadCompleted callback
     } catch (e) {

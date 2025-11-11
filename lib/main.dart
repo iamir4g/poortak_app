@@ -55,15 +55,54 @@ import 'package:poortak/common/bloc/settings_cubit/settings_cubit.dart';
 import 'package:poortak/featueres/feature_match/presentation/bloc/match_bloc/match_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/pdf_reader_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/single_book_bloc/single_book_cubit.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'dart:io' show Platform;
 
 final RouteObserver<ModalRoute<void>> routeObserver =
     RouteObserver<ModalRoute<void>>();
+
+/// Request storage permission with user-friendly explanation
+Future<void> _requestStoragePermission() async {
+  try {
+    if (Platform.isAndroid) {
+      // Check if permission is already granted
+      if (await Permission.storage.isGranted ||
+          await Permission.manageExternalStorage.isGranted) {
+        return;
+      }
+
+      // Request storage permission
+      // The rationale message will be shown automatically by the system
+      // based on the permission description in AndroidManifest.xml
+      final status = await Permission.storage.request();
+
+      // If storage permission is denied, try manageExternalStorage for Android 11+
+      if (!status.isGranted) {
+        await Permission.manageExternalStorage.request();
+      }
+    } else if (Platform.isIOS) {
+      // For iOS, check if permission is already granted
+      final status = await Permission.storage.status;
+      if (!status.isGranted) {
+        // Request permission
+        // The explanation will be shown from Info.plist
+        await Permission.storage.request();
+      }
+    }
+  } catch (e) {
+    print('Error requesting storage permission: $e');
+    // Continue app execution even if permission request fails
+  }
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // runApp(const MyApp());
 
   await initLocator();
+
+  // Request storage permission at app startup
+  await _requestStoragePermission();
 
   await locator<TTSService>().initialize();
   runApp(MultiBlocProvider(

@@ -462,14 +462,14 @@ class _FullscreenVideoPlayerState extends State<FullscreenVideoPlayer> {
                     ),
                     onPressed: _exitFullscreen,
                   ),
-                  const Text(
-                    'تمام صفحه',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
+                  // const Text(
+                  //   'تمام صفحه',
+                  //   style: TextStyle(
+                  //     color: Colors.white,
+                  //     fontSize: 18,
+                  //     fontWeight: FontWeight.w500,
+                  //   ),
+                  // ),
                   const SizedBox(width: 48), // Balance the back button
                 ],
               ),

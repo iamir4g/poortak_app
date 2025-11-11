@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
-import 'package:flutter_file_downloader/flutter_file_downloader.dart';
+import 'package:dio/dio.dart';
 import '../services/storage_service.dart';
 import 'decryption.dart';
 
@@ -47,12 +47,14 @@ class VideoDownloaderUtil {
       // Check in videos directory first (decrypted files)
       if (await videoDir.exists()) {
         final files = await videoDir.list().toList();
-        print("🔍 Checking ${files.length} files in videos directory for: $name");
+        print(
+            "🔍 Checking ${files.length} files in videos directory for: $name");
         for (var file in files) {
           if (file is File) {
             final fileName = getBaseFileName(file.path);
             final normalizedFileName = normalizeFileName(fileName);
-            print("  - File: $fileName, Normalized: $normalizedFileName, Looking for: $name");
+            print(
+                "  - File: $fileName, Normalized: $normalizedFileName, Looking for: $name");
             // Compare normalized filename (without .mp4) with the name parameter
             if (normalizedFileName == name) {
               print("✅ Found existing decrypted video file: ${file.path}");
@@ -68,13 +70,15 @@ class VideoDownloaderUtil {
       // (trailer videos are also stored in encrypted directory temporarily)
       if (await encryptedDir.exists()) {
         final files = await encryptedDir.list().toList();
-        print("🔍 Checking ${files.length} files in encrypted directory for: $name");
+        print(
+            "🔍 Checking ${files.length} files in encrypted directory for: $name");
         for (var encryptedFile in files) {
           if (encryptedFile is File) {
             final fileName = getBaseFileName(encryptedFile.path);
             final normalizedFileName = normalizeFileName(fileName);
-            print("  - Encrypted file: $fileName, Normalized: $normalizedFileName, Looking for: $name");
-            
+            print(
+                "  - Encrypted file: $fileName, Normalized: $normalizedFileName, Looking for: $name");
+
             // For purchased content, try to decrypt
             if (hasAccess && normalizedFileName == name) {
               print("✅ Found existing encrypted file: ${encryptedFile.path}");
@@ -105,11 +109,12 @@ class VideoDownloaderUtil {
                 print("❌ Error decrypting existing file: $e");
                 onDecrypting?.call(false);
               }
-            } 
+            }
             // For trailer videos (not encrypted), check if decrypted version exists
             // or copy directly if it's a trailer video
             else if (!hasAccess && normalizedFileName == name) {
-              print("✅ Found existing file in encrypted directory (trailer): ${encryptedFile.path}");
+              print(
+                  "✅ Found existing file in encrypted directory (trailer): ${encryptedFile.path}");
               // Check if decrypted version already exists in videos directory
               final possibleDecryptedFile = File('${videoDir.path}/$name.mp4');
               if (await possibleDecryptedFile.exists()) {
@@ -126,56 +131,6 @@ class VideoDownloaderUtil {
                 }
               } catch (e) {
                 print("❌ Error copying trailer video: $e");
-              }
-            }
-          }
-        }
-      }
-
-      // For purchased content, also check Downloads directory
-      if (hasAccess) {
-        // Check in Downloads directory for purchased content
-        final downloadsDir = Directory('/storage/emulated/0/Download');
-        if (await downloadsDir.exists()) {
-          final files = await downloadsDir.list().toList();
-          print("🔍 Checking ${files.length} files in Downloads directory for: $name");
-          for (var downloadedFile in files) {
-            if (downloadedFile is File) {
-              final fileName = getBaseFileName(downloadedFile.path);
-              final normalizedFileName = normalizeFileName(fileName);
-              print("  - Downloads file: $fileName, Normalized: $normalizedFileName, Looking for: $name");
-              if (normalizedFileName == name) {
-                print(
-                    "✅ Found existing file in Downloads: ${downloadedFile.path}");
-                // Copy to encrypted directory with the original name
-                final encryptedFile = File('${encryptedDir.path}/$name');
-                await File(downloadedFile.path).copy(encryptedFile.path);
-
-                // Try to decrypt it
-                try {
-                  final decryptionKeyResponse =
-                      await storageService.callGetDecryptedFile(name);
-                  final decryptedFile = File('${videoDir.path}/$name.mp4');
-
-                  onDecrypting?.call(true);
-                  if (onDecryptionProgress != null) {
-                    final decryptedPath = await decryptFile(
-                      encryptedFile.path,
-                      decryptedFile.path,
-                      decryptionKeyResponse.data.key,
-                      onProgress: onDecryptionProgress,
-                    );
-
-                    if (await File(decryptedPath).exists()) {
-                      onDecrypting?.call(false);
-                      return decryptedPath;
-                    }
-                  }
-                  onDecrypting?.call(false);
-                } catch (e) {
-                  print("❌ Error processing file from Downloads: $e");
-                  onDecrypting?.call(false);
-                }
               }
             }
           }
@@ -261,92 +216,85 @@ class VideoDownloaderUtil {
 
       print("Download URL received: $downloadUrlString");
 
-      print("Starting file download");
-      // Download using flutter_file_downloader
-      await FileDownloader.downloadFile(
-        url: downloadUrlString,
-        name: name,
-        onProgress: (fileName, progress) {
-          // Clamp progress to valid range (0-100) to prevent invalid values
-          final clampedProgress = progress.clamp(0.0, 100.0);
-          print("Download progress: $clampedProgress%");
-          onDownloadProgress?.call(clampedProgress / 100);
-        },
-        onDownloadCompleted: (path) async {
-          print("Download completed, file saved to: $path");
-          try {
-            // Get the downloaded file name without suffixes
-            final downloadedFileName = getBaseFileName(path);
+      print("Starting file download directly to internal storage");
 
-            // Delete the target file if it exists
-            if (await encryptedFile.exists()) {
-              print("Deleting existing encrypted file...");
-              await encryptedFile.delete();
-            }
+      // Delete the target file if it exists
+      if (await encryptedFile.exists()) {
+        print("Deleting existing encrypted file...");
+        await encryptedFile.delete();
+      }
 
-            // Copy the file from Downloads to encrypted directory
-            final downloadedFile = File(path);
-            print("Downloaded file path: $path");
-            print("Downloaded file base name: $downloadedFileName");
-            print("Target encrypted file path: ${encryptedFile.path}");
+      // Download directly to internal storage using Dio
+      try {
+        // Create a new Dio instance without interceptors for file downloads
+        // Signed S3 URLs should not have additional headers (x-lang, Authorization)
+        // as they would invalidate the signature
+        final dio = Dio();
 
-            // Check if downloaded file exists
-            if (await downloadedFile.exists()) {
-              await downloadedFile.copy(encryptedFile.path);
-              print("File copied successfully to encrypted directory");
-            } else {
-              throw Exception("Downloaded file does not exist at: $path");
-            }
-
-            // If file is encrypted, get decryption key and decrypt
-            if (isEncrypted) {
-              print("File is encrypted, getting decryption key");
-              final decryptionKeyResponse =
-                  await storageService.callGetDecryptedFile(fileId);
+        // Download with progress tracking
+        await dio.download(
+          downloadUrlString,
+          encryptedFile.path,
+          onReceiveProgress: (received, total) {
+            if (total > 0) {
+              final progress = (received / total).clamp(0.0, 1.0);
               print(
-                  "Decryption key received: ${decryptionKeyResponse.data.key}");
-
-              // Decrypt the file using the utility function
-              print("Starting decryption process");
-              final cleanDecryptedFile = File('${videoDir.path}/$name.mp4');
-
-              // Set decryption state
-              onDownloading?.call(false);
-              onDecrypting?.call(true);
-
-              final decryptedPath = await decryptFile(
-                encryptedFile.path,
-                cleanDecryptedFile.path,
-                decryptionKeyResponse.data.key,
-                onProgress: onDecryptionProgress,
-              );
-
-              // Reset decryption state
-              onDecrypting?.call(false);
-
-              if (await File(decryptedPath).exists()) {
-                print("✅ File successfully decrypted and processed");
-                onSuccess?.call(decryptedPath);
-              } else {
-                print("❌ Failed to process file");
-                onError?.call("Failed to process file");
-              }
-            } else {
-              // If not encrypted (trailer video), just copy to video directory
-              final cleanDecryptedFile = File('${videoDir.path}/$name.mp4');
-              await encryptedFile.copy(cleanDecryptedFile.path);
-              onSuccess?.call(cleanDecryptedFile.path);
+                  "Download progress: ${(progress * 100).toStringAsFixed(1)}%");
+              onDownloadProgress?.call(progress);
             }
-          } catch (e) {
-            print("Error processing file: $e");
-            onError?.call('خطا در پردازش فایل: $e');
+          },
+        );
+
+        print("Download completed, file saved to: ${encryptedFile.path}");
+
+        // Verify file was downloaded
+        if (!await encryptedFile.exists()) {
+          throw Exception(
+              "Downloaded file does not exist at: ${encryptedFile.path}");
+        }
+
+        // If file is encrypted, get decryption key and decrypt
+        if (isEncrypted) {
+          print("File is encrypted, getting decryption key");
+          final decryptionKeyResponse =
+              await storageService.callGetDecryptedFile(fileId);
+          print("Decryption key received: ${decryptionKeyResponse.data.key}");
+
+          // Decrypt the file using the utility function
+          print("Starting decryption process");
+          final cleanDecryptedFile = File('${videoDir.path}/$name.mp4');
+
+          // Set decryption state
+          onDownloading?.call(false);
+          onDecrypting?.call(true);
+
+          final decryptedPath = await decryptFile(
+            encryptedFile.path,
+            cleanDecryptedFile.path,
+            decryptionKeyResponse.data.key,
+            onProgress: onDecryptionProgress,
+          );
+
+          // Reset decryption state
+          onDecrypting?.call(false);
+
+          if (await File(decryptedPath).exists()) {
+            print("✅ File successfully decrypted and processed");
+            onSuccess?.call(decryptedPath);
+          } else {
+            print("❌ Failed to process file");
+            onError?.call("Failed to process file");
           }
-        },
-        onDownloadError: (error) {
-          print("Download error: $error");
-          onError?.call('خطا در دانلود فایل: $error');
-        },
-      );
+        } else {
+          // If not encrypted (trailer video), just copy to video directory
+          final cleanDecryptedFile = File('${videoDir.path}/$name.mp4');
+          await encryptedFile.copy(cleanDecryptedFile.path);
+          onSuccess?.call(cleanDecryptedFile.path);
+        }
+      } catch (e) {
+        print("Error downloading file: $e");
+        onError?.call('خطا در دانلود فایل: $e');
+      }
     } catch (e) {
       print('Error in download process: $e');
       onError?.call('خطا در دانلود فایل: $e');
