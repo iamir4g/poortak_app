@@ -19,6 +19,9 @@ class ReusableModal extends StatelessWidget {
   final VoidCallback? onSecondButtonPressed;
   final bool showSecondButton;
 
+  // Optional close button (X)
+  final bool showCloseButton;
+
   const ReusableModal({
     Key? key,
     required this.title,
@@ -29,70 +32,131 @@ class ReusableModal extends StatelessWidget {
     this.secondButtonText,
     this.onSecondButtonPressed,
     this.showSecondButton = false,
+    this.showCloseButton = false,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Dialog(
       backgroundColor: Colors.transparent,
       child: Container(
         width: 350,
         height: 311,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDarkMode ? const Color(0xFF2C2E3F) : Colors.white,
           borderRadius: BorderRadius.circular(20),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+        child: Stack(
           children: [
-            // Icon based on type
-            _buildIcon(),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Icon based on type
+                _buildIcon(),
 
-            const SizedBox(height: 20),
+                const SizedBox(height: 20),
 
-            // Title
-            Container(
-              width: 250,
-              margin: const EdgeInsets.only(bottom: 10),
-              child: Text(
-                title,
-                style: const TextStyle(
-                  fontFamily: 'IRANSans',
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                  color: MyColors.textMatn1,
+                // Title
+                Container(
+                  width: 250,
+                  margin: const EdgeInsets.only(bottom: 10),
+                  child: Text(
+                    title,
+                    style: const TextStyle(
+                      fontFamily: 'IRANSans',
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: MyColors.textMatn1,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
-                textAlign: TextAlign.center,
-              ),
-            ),
 
-            // Message
-            Container(
-              width: 250,
-              margin: const EdgeInsets.only(bottom: 30),
-              child: Text(
-                message,
-                style: const TextStyle(
-                  fontFamily: 'IRANSans',
-                  fontWeight: FontWeight.w500,
-                  fontSize: 14,
-                  color: Color(0xFF3D495C),
-                  height: 1.4,
+                // Message
+                Container(
+                  width: 250,
+                  margin: const EdgeInsets.only(bottom: 30),
+                  child: Text(
+                    message,
+                    style: const TextStyle(
+                      fontFamily: 'IRANSans',
+                      fontWeight: FontWeight.w500,
+                      fontSize: 14,
+                      color: Color(0xFF3D495C),
+                      height: 1.4,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
-                textAlign: TextAlign.center,
-              ),
-            ),
 
-            // Buttons
-            if (showSecondButton && secondButtonText != null)
-              // Two buttons layout
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  // First button (primary)
+                // Buttons
+                if (showSecondButton && secondButtonText != null)
+                  // Two buttons layout
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      // First button (primary)
+                      Container(
+                        width: 140,
+                        height: 50,
+                        child: ElevatedButton(
+                          onPressed: onButtonPressed ??
+                              () => Navigator.of(context).pop(),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: MyColors.primary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: Text(
+                            buttonText,
+                            style: const TextStyle(
+                              fontFamily: 'IRANSans',
+                              fontWeight: FontWeight.w500,
+                              fontSize: 16,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      // Second button (secondary)
+                      Container(
+                        width: 140,
+                        height: 50,
+                        child: ElevatedButton(
+                          onPressed: onSecondButtonPressed ??
+                              () => Navigator.of(context).pop(),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            side: const BorderSide(
+                                color: MyColors.primary, width: 1),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: Text(
+                            secondButtonText!,
+                            style: const TextStyle(
+                              fontFamily: 'IRANSans',
+                              fontWeight: FontWeight.w500,
+                              fontSize: 16,
+                              color: MyColors.primary,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                else
+                  // Single button layout
                   Container(
-                    width: 140,
-                    height: 50,
+                    width: 172,
+                    height: 64,
                     child: ElevatedButton(
                       onPressed:
                           onButtonPressed ?? () => Navigator.of(context).pop(),
@@ -107,65 +171,38 @@ class ReusableModal extends StatelessWidget {
                         buttonText,
                         style: const TextStyle(
                           fontFamily: 'IRANSans',
-                          fontWeight: FontWeight.w500,
-                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
                           color: Colors.white,
                         ),
                       ),
                     ),
                   ),
-
-                  // Second button (secondary)
-                  Container(
-                    width: 140,
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: onSecondButtonPressed ??
-                          () => Navigator.of(context).pop(),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.transparent,
-                        side:
-                            const BorderSide(color: MyColors.primary, width: 1),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        elevation: 0,
-                      ),
-                      child: Text(
-                        secondButtonText!,
-                        style: const TextStyle(
-                          fontFamily: 'IRANSans',
-                          fontWeight: FontWeight.w500,
-                          fontSize: 16,
-                          color: MyColors.primary,
-                        ),
-                      ),
+              ],
+            ),
+            // Close Button (X) - Top Left (optional)
+            if (showCloseButton)
+              Positioned(
+                top: 12,
+                left: 12,
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: isDarkMode
+                          ? const Color(0xFF323548)
+                          : const Color(0xFFF6F9FE),
+                      shape: BoxShape.circle,
                     ),
-                  ),
-                ],
-              )
-            else
-              // Single button layout
-              Container(
-                width: 172,
-                height: 64,
-                child: ElevatedButton(
-                  onPressed:
-                      onButtonPressed ?? () => Navigator.of(context).pop(),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: MyColors.primary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: Text(
-                    buttonText,
-                    style: const TextStyle(
-                      fontFamily: 'IRANSans',
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                      color: Colors.white,
+                    child: Icon(
+                      Icons.close,
+                      size: 20,
+                      color:
+                          isDarkMode ? Colors.white : const Color(0xFF3D495C),
                     ),
                   ),
                 ),
@@ -234,6 +271,7 @@ class ReusableModal extends StatelessWidget {
     String? secondButtonText,
     VoidCallback? onSecondButtonPressed,
     bool showSecondButton = false,
+    bool showCloseButton = false,
   }) {
     showDialog(
       context: context,
@@ -248,6 +286,7 @@ class ReusableModal extends StatelessWidget {
           secondButtonText: secondButtonText,
           onSecondButtonPressed: onSecondButtonPressed,
           showSecondButton: showSecondButton,
+          showCloseButton: showCloseButton,
         );
       },
     );
@@ -264,6 +303,7 @@ class ReusableModal extends StatelessWidget {
     String? secondButtonText,
     VoidCallback? onSecondButtonPressed,
     bool showSecondButton = false,
+    bool showCloseButton = false,
   }) {
     show(
       context: context,
@@ -276,6 +316,7 @@ class ReusableModal extends StatelessWidget {
       secondButtonText: secondButtonText,
       onSecondButtonPressed: onSecondButtonPressed,
       showSecondButton: showSecondButton,
+      showCloseButton: showCloseButton,
     );
   }
 
@@ -289,6 +330,7 @@ class ReusableModal extends StatelessWidget {
     String? secondButtonText,
     VoidCallback? onSecondButtonPressed,
     bool showSecondButton = false,
+    bool showCloseButton = false,
   }) {
     show(
       context: context,
@@ -301,6 +343,7 @@ class ReusableModal extends StatelessWidget {
       secondButtonText: secondButtonText,
       onSecondButtonPressed: onSecondButtonPressed,
       showSecondButton: showSecondButton,
+      showCloseButton: showCloseButton,
     );
   }
 
@@ -314,6 +357,7 @@ class ReusableModal extends StatelessWidget {
     String? secondButtonText,
     VoidCallback? onSecondButtonPressed,
     bool showSecondButton = false,
+    bool showCloseButton = false,
   }) {
     show(
       context: context,
@@ -326,6 +370,7 @@ class ReusableModal extends StatelessWidget {
       secondButtonText: secondButtonText,
       onSecondButtonPressed: onSecondButtonPressed,
       showSecondButton: showSecondButton,
+      showCloseButton: showCloseButton,
     );
   }
 }

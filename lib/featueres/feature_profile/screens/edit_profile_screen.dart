@@ -27,19 +27,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final StorageService storageService = locator<StorageService>();
 
   String? selectedAvatar;
-  String? selectedAgeGroup;
+  // String? selectedAgeGroup;
   bool isLoading = false;
   bool isLoadingAvatars = true;
   List<AvatarWithUrl> avatars = [];
 
   // Age group options
-  final List<String> ageGroups = [
-    'کودک',
-    'نوجوان',
-    'جوان',
-    'میانسال',
-    'سالمند',
-  ];
+  // final List<String> ageGroups = [
+  //   'کودک',
+  //   'نوجوان',
+  //   'جوان',
+  //   'میانسال',
+  //   'سالمند',
+  // ];
 
   @override
   void initState() {
@@ -111,15 +111,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   void _updateProfile() {
     if (_formKey.currentState!.validate()) {
-      if (selectedAgeGroup == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('لطفاً رده سنی خود را انتخاب کنید'),
-            backgroundColor: Colors.red,
-          ),
-        );
-        return;
-      }
+      // if (selectedAgeGroup == null) {
+      //   ScaffoldMessenger.of(context).showSnackBar(
+      //     const SnackBar(
+      //       content: Text('لطفاً رده سنی خود را انتخاب کنید'),
+      //       backgroundColor: Colors.red,
+      //     ),
+      //   );
+      //   return;
+      // }
 
       setState(() {
         isLoading = true;
@@ -128,7 +128,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       final updateParams = UpdateProfileParams.only(
         firstName: _firstNameController.text.trim(),
         lastName: _lastNameController.text.trim(),
-        ageGroup: selectedAgeGroup!,
+        // ageGroup: selectedAgeGroup!,
         avatar: selectedAvatar ?? '',
       );
 
@@ -269,7 +269,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               const SizedBox(height: 7),
 
                               // Age group field
-                              _buildAgeGroupField(),
+                              // _buildAgeGroupField(),
 
                               const SizedBox(height: 40),
 
@@ -453,63 +453,63 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-  Widget _buildAgeGroupField() {
-    return Container(
-      height: 59,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(19),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 4,
-            offset: const Offset(0, 0),
-          ),
-        ],
-      ),
-      child: DropdownButtonFormField<String>(
-        value: selectedAgeGroup,
-        onChanged: (String? newValue) {
-          setState(() {
-            selectedAgeGroup = newValue;
-          });
-        },
-        decoration: InputDecoration(
-          labelText: 'رده سنی',
-          labelStyle: const TextStyle(
-            fontFamily: 'IRANSans',
-            fontWeight: FontWeight.w500,
-            fontSize: 16,
-            color: Color(0xFF3D495C),
-          ),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(19),
-            borderSide: BorderSide.none,
-          ),
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-        ),
-        style: const TextStyle(
-          fontFamily: 'IRANSans',
-          fontWeight: FontWeight.w500,
-          fontSize: 16,
-          color: Color(0xFF3D495C),
-        ),
-        items: ageGroups.map<DropdownMenuItem<String>>((String value) {
-          return DropdownMenuItem<String>(
-            value: value,
-            child: Text(value),
-          );
-        }).toList(),
-        validator: (value) {
-          if (value == null || value.isEmpty) {
-            return 'لطفاً رده سنی خود را انتخاب کنید';
-          }
-          return null;
-        },
-      ),
-    );
-  }
+  // Widget _buildAgeGroupField() {
+  //   return Container(
+  //     height: 59,
+  //     decoration: BoxDecoration(
+  //       color: Colors.white,
+  //       borderRadius: BorderRadius.circular(19),
+  //       boxShadow: [
+  //         BoxShadow(
+  //           color: Colors.black.withOpacity(0.04),
+  //           blurRadius: 4,
+  //           offset: const Offset(0, 0),
+  //         ),
+  //       ],
+  //     ),
+  //     child: DropdownButtonFormField<String>(
+  //       value: selectedAgeGroup,
+  //       onChanged: (String? newValue) {
+  //         setState(() {
+  //           selectedAgeGroup = newValue;
+  //         });
+  //       },
+  //       decoration: InputDecoration(
+  //         labelText: 'رده سنی',
+  //         labelStyle: const TextStyle(
+  //           fontFamily: 'IRANSans',
+  //           fontWeight: FontWeight.w500,
+  //           fontSize: 16,
+  //           color: Color(0xFF3D495C),
+  //         ),
+  //         border: OutlineInputBorder(
+  //           borderRadius: BorderRadius.circular(19),
+  //           borderSide: BorderSide.none,
+  //         ),
+  //         contentPadding:
+  //             const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+  //       ),
+  //       style: const TextStyle(
+  //         fontFamily: 'IRANSans',
+  //         fontWeight: FontWeight.w500,
+  //         fontSize: 16,
+  //         color: Color(0xFF3D495C),
+  //       ),
+  //       items: ageGroups.map<DropdownMenuItem<String>>((String value) {
+  //         return DropdownMenuItem<String>(
+  //           value: value,
+  //           child: Text(value),
+  //         );
+  //       }).toList(),
+  //       validator: (value) {
+  //         if (value == null || value.isEmpty) {
+  //           return 'لطفاً رده سنی خود را انتخاب کنید';
+  //         }
+  //         return null;
+  //       },
+  //     ),
+  //   );
+  // }
 }
 
 // Helper class to store avatar with its URL

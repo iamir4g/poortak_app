@@ -20,7 +20,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: MyColors.background2,
+      backgroundColor: MyColors.background3,
       body: SafeArea(
         child: Column(
           children: [
@@ -81,42 +81,39 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
   // Section 1: Header based on Figma design 467:5902
   Widget _buildHeaderSection() {
     return Container(
-      height: 80,
-      decoration: const BoxDecoration(
-        color: MyColors.background,
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(40),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Color(0x0D000000),
-            blurRadius: 2,
-            offset: Offset(0, 2),
+        height: 57,
+        decoration: const BoxDecoration(
+          color: MyColors.background,
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(40),
           ),
-        ],
-      ),
-      child: Row(
-        children: [
-          const Expanded(
-            child: Center(
-              child: Text(
+          boxShadow: [
+            BoxShadow(
+              color: Color(0x0D000000),
+              blurRadius: 2,
+              offset: Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
                 'تماس با ما',
                 style: MyTextStyle.textHeader16Bold,
+                
                 textAlign: TextAlign.center,
               ),
-            ),
+              Icon(
+                Icons.arrow_forward,
+                color: MyColors.textMatn1,
+                size: 24,
+              ),
+            ],
           ),
-          IconButton(
-            onPressed: () => Navigator.of(context).pop(),
-            icon: const Icon(
-              Icons.arrow_forward,
-              color: MyColors.textMatn1,
-              size: 28,
-            ),
-          ),
-        ],
-      ),
-    );
+        ));
   }
 
   // Section 2: Contact Information based on Figma design 769:10683
@@ -133,7 +130,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
             offset: Offset(0, 10),
           ),
         ],
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(10),
         border: Border.all(
           color: MyColors.background,
           width: 1,
@@ -177,7 +174,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: MyColors.background,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
             color: MyColors.shadow,
@@ -236,7 +233,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
             offset: Offset(0, 10),
           ),
         ],
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(10),
         border: Border.all(
           color: MyColors.background,
           width: 1,

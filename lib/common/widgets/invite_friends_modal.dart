@@ -113,202 +113,289 @@ class InviteFriendsModal extends StatelessWidget {
           color: isDarkMode ? const Color(0xFF2C2E3F) : Colors.white,
           borderRadius: BorderRadius.circular(20),
         ),
-        child: Column(
+        child: Stack(
           children: [
-            const SizedBox(height: 6),
-
-            // Lottie Animation
-            Container(
-              width: 231,
-              height: 231,
-              child: Lottie.asset(
-                'assets/images/points/refferal.json',
-                fit: BoxFit.contain,
-              ),
-            ),
-
-            const SizedBox(height: 3),
-
-            // Referral Code Container
-            Container(
-              width: 252,
-              height: 56,
-              decoration: BoxDecoration(
-                color: isDarkMode
-                    ? const Color(0xFF323548)
-                    : const Color(0xFFF6F9FE),
-                borderRadius: BorderRadius.circular(7),
-              ),
-              child: FutureBuilder<String?>(
-                future: _getReferralCode(),
-                builder: (context, snapshot) {
-                  final referralCode = snapshot.data ?? 'B12NJS';
-                  return Center(
-                    child: Text(
-                      referralCode,
-                      style: TextStyle(
-                        fontFamily: 'IranSans',
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
-                        color:
-                            isDarkMode ? Colors.white : const Color(0xFF3D495C),
-                        letterSpacing: 5.4,
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-
-            const SizedBox(height: 9),
-
-            // Description Text
-            Container(
-              width: 232,
-              child: RichText(
-                textAlign: TextAlign.center,
-                text: TextSpan(
-                  style: TextStyle(
-                    fontFamily: 'IranSans',
-                    fontSize: 10,
-                    fontWeight: FontWeight.w300,
-                    color: isDarkMode ? Colors.white : const Color(0xFF3D495C),
-                    height: 1.4,
-                  ),
-                  children: [
-                    const TextSpan(text: 'این '),
-                    TextSpan(
-                      text: 'کد معرف',
-                      style: TextStyle(
-                        fontFamily: 'IranSans',
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const TextSpan(
-                        text:
-                            ' را برای دوستان خود بفرستید تا آنها در زمان خرید از اپلیکیشن، این کد را وارد نمایند و پس از آن، '),
-                    TextSpan(
-                      text: '۱۰',
-                      style: TextStyle(
-                        fontFamily: 'IranSans',
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const TextSpan(text: ' امتیاز برای شما و '),
-                    TextSpan(
-                      text: '۱۰',
-                      style: TextStyle(
-                        fontFamily: 'IranSans',
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const TextSpan(text: ' امتیاز برای دوستتان ثبت می شود.'),
-                  ],
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 2),
-
-            // Help Icon
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+            Column(
               children: [
+                const SizedBox(height: 6),
+
+                // Lottie Animation
                 Container(
-                  width: 13,
-                  height: 13,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF474747),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: Text(
-                      '؟',
-                      style: TextStyle(
-                        fontFamily: 'IranSans',
-                        fontSize: 9,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 6),
-              ],
-            ),
-
-            const SizedBox(height: 20),
-
-            // Bottom Buttons Row
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Copy Button
-                GestureDetector(
-                  onTap: () async {
-                    final referralCode = await _getReferralCode() ?? 'B12NJS';
-                    print('🔍 Copying referral code: $referralCode');
-                    await Clipboard.setData(ClipboardData(text: referralCode));
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('کد معرف کپی شد'),
-                        duration: Duration(seconds: 2),
-                      ),
-                    );
-                  },
-                  child: Container(
-                    width: 179,
-                    height: 56,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF4281EC),
-                      borderRadius: BorderRadius.circular(56.5),
-                    ),
-                    child: Center(
-                      child: Text(
-                        'کپی کردن کد دعوت',
-                        style: const TextStyle(
-                          fontFamily: 'IRANSans',
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
+                  width: 231,
+                  height: 231,
+                  child: Lottie.asset(
+                    'assets/images/points/refferal.json',
+                    fit: BoxFit.contain,
                   ),
                 ),
 
-                const SizedBox(width: 16),
+                const SizedBox(height: 3),
 
-                // Share Button
-                GestureDetector(
-                  onTap: () {
-                    // TODO: Implement share functionality
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content:
-                            Text('قابلیت اشتراک‌گذاری به زودی اضافه خواهد شد'),
-                        duration: Duration(seconds: 2),
-                      ),
-                    );
-                  },
-                  child: Container(
-                    width: 56,
+                // Referral Code Container
+                Container(
+                    width: 252,
                     height: 56,
+                    padding: const EdgeInsets.only(right: 16, left: 16),
                     decoration: BoxDecoration(
                       color: isDarkMode
                           ? const Color(0xFF323548)
                           : const Color(0xFFF6F9FE),
-                      borderRadius: BorderRadius.circular(28),
+                      borderRadius: BorderRadius.circular(7),
                     ),
-                    child: Icon(
-                      Icons.share,
-                      color:
-                          isDarkMode ? Colors.white : const Color(0xFF3D495C),
-                      size: 24,
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Expanded(
+                            child: FutureBuilder<String?>(
+                              future: _getReferralCode(),
+                              builder: (context, snapshot) {
+                                final referralCode = snapshot.data ?? 'B12NJS';
+                                return Center(
+                                  child: Text(
+                                    referralCode,
+                                    style: TextStyle(
+                                      fontFamily: 'IranSans',
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w500,
+                                      color: isDarkMode
+                                          ? Colors.white
+                                          : const Color(0xFF3D495C),
+                                      letterSpacing: 5.4,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () async {
+                              final referralCode =
+                                  await _getReferralCode() ?? 'B12NJS';
+                              print('🔍 Copying referral code: $referralCode');
+                              await Clipboard.setData(
+                                  ClipboardData(text: referralCode));
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('کد معرف کپی شد'),
+                                  duration: Duration(seconds: 2),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              width: 20,
+                              height: 20,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                              ),
+                              child: Center(
+                                child: Icon(Icons.copy,
+                                    size: 20, color: Colors.black),
+                              ),
+                            ),
+                          ),
+                        ])),
+
+                const SizedBox(height: 9),
+
+//  Container(
+//                       width: 13,
+//                       height: 13,
+//                       decoration: BoxDecoration(
+//                         color: const Color(0xFF474747),
+//                         shape: BoxShape.circle,
+//                       ),
+//                       child: Center(
+//                         child: Text(
+//                           '؟',
+//                           style: TextStyle(
+//                             fontFamily: 'IranSans',
+//                             fontSize: 9,
+//                             fontWeight: FontWeight.w500,
+//                             color: Colors.white,
+//                           ),
+//                         ),
+//                       ),
+//                     ),
+                // Description Text
+                Container(
+                  width: 232,
+                  child: RichText(
+                    textAlign: TextAlign.center,
+                    text: TextSpan(
+                      style: TextStyle(
+                        fontFamily: 'IranSans',
+                        fontSize: 10,
+                        fontWeight: FontWeight.w300,
+                        color:
+                            isDarkMode ? Colors.white : const Color(0xFF3D495C),
+                        height: 1.4,
+                      ),
+                      children: [
+                        const TextSpan(text: 'این '),
+                        TextSpan(
+                          text: 'کد معرف',
+                          style: TextStyle(
+                            fontFamily: 'IranSans',
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        ),
+                        const TextSpan(
+                            text:
+                                ' را برای دوستان خود بفرستید تا آنها در زمان خرید از اپلیکیشن، این کد را وارد نمایند و پس از آن، '),
+                        TextSpan(
+                          text: '۱۰',
+                          style: TextStyle(
+                            fontFamily: 'IranSans',
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        ),
+                        const TextSpan(text: ' امتیاز برای شما و '),
+                        TextSpan(
+                          text: '۱۰',
+                          style: TextStyle(
+                            fontFamily: 'IranSans',
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const TextSpan(
+                            text: ' امتیاز برای دوستتان ثبت می شود.'),
+                      ],
                     ),
                   ),
                 ),
+
+                const SizedBox(height: 2),
+
+                // Help Icon
+                // Row(
+                //   mainAxisAlignment: MainAxisAlignment.end,
+                //   children: [
+                //     Container(
+                //       width: 13,
+                //       height: 13,
+                //       decoration: BoxDecoration(
+                //         color: const Color(0xFF474747),
+                //         shape: BoxShape.circle,
+                //       ),
+                //       child: Center(
+                //         child: Text(
+                //           '؟',
+                //           style: TextStyle(
+                //             fontFamily: 'IranSans',
+                //             fontSize: 9,
+                //             fontWeight: FontWeight.w500,
+                //             color: Colors.white,
+                //           ),
+                //         ),
+                //       ),
+                //     ),
+                //     const SizedBox(width: 6),
+                //   ],
+                // ),
+
+                const SizedBox(height: 20),
+
+                // Bottom Buttons Row
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Share Button
+                    GestureDetector(
+                      onTap: () {
+                        // TODO: Implement share functionality
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                                'قابلیت اشتراک‌گذاری به زودی اضافه خواهد شد'),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        width: 56,
+                        height: 56,
+                        decoration: BoxDecoration(
+                          color: isDarkMode
+                              ? const Color(0xFF323548)
+                              : const Color(0xFFF6F9FE),
+                          borderRadius: BorderRadius.circular(28),
+                        ),
+                        child: Icon(
+                          Icons.share,
+                          color: isDarkMode
+                              ? Colors.white
+                              : const Color(0xFF3D495C),
+                          size: 24,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+
+                    // Copy Button
+                    GestureDetector(
+                      onTap: () async {
+                        final referralCode =
+                            await _getReferralCode() ?? 'B12NJS';
+                        print('🔍 Copying referral code: $referralCode');
+                        await Clipboard.setData(
+                            ClipboardData(text: referralCode));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('کد معرف کپی شد'),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        width: 179,
+                        height: 56,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF4281EC),
+                          borderRadius: BorderRadius.circular(56.5),
+                        ),
+                        child: Center(
+                          child: Text(
+                            'کپی کردن کد دعوت',
+                            style: const TextStyle(
+                              fontFamily: 'IRANSans',
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ],
+            ),
+            // Close Button (X) - Top Left
+            Positioned(
+              top: 12,
+              left: 12,
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.of(context).pop();
+                },
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: isDarkMode
+                        ? const Color(0xFF323548)
+                        : const Color(0xFFF6F9FE),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.close,
+                    size: 20,
+                    color: isDarkMode ? Colors.white : const Color(0xFF3D495C),
+                  ),
+                ),
+              ),
             ),
           ],
         ),

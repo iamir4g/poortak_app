@@ -150,9 +150,17 @@ class _MainWrapperState extends State<MainWrapper> {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarColor: MyColors.primary,
-    ));
+    // تنظیم مرکزی status bar برای تمام صفحات
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   SystemChrome.setSystemUIOverlayStyle(
+    //     const SystemUiOverlayStyle(
+    //       statusBarColor: MyColors.primary,
+    //       statusBarIconBrightness: Brightness.dark,
+    //       statusBarBrightness: Brightness.light,
+    //     ),
+    //   );
+    // });
+
     return MultiBlocProvider(
       providers: [
         BlocProvider(

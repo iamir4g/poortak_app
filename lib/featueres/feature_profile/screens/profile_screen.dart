@@ -244,17 +244,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ),
                               const SizedBox(height: 16),
                               _ProfileActionCard(
-                                icon: Icons.favorite,
-                                label: 'علاقه مندی ها',
-                                onTap: () {
-                                  Navigator.pushNamed(
-                                    context,
-                                    FavoritScreen.routeName,
-                                  );
-                                },
-                              ),
-                              const SizedBox(height: 16),
-                              _ProfileActionCard(
                                 icon: Icons.history,
                                 label: 'تاریخچه خرید',
                                 onTap: () {
@@ -264,6 +253,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       builder: (context) =>
                                           const PaymentHistoryScreen(),
                                     ),
+                                  );
+                                },
+                              ),
+                              const SizedBox(height: 16),
+                              _ProfileActionCard(
+                                icon: Icons.bookmark,
+                                label: 'علاقه مندی ها',
+                                onTap: () {
+                                  Navigator.pushNamed(
+                                    context,
+                                    FavoritScreen.routeName,
                                   );
                                 },
                               ),

@@ -121,7 +121,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       // Title section
                       Text(
                         showOtpForm
-                            ? "تایید شماره موبایل"
+                            ? "کد ارسال شده را وارد کنید:"
                             : "شماره موبایل خود را وارد کنید:",
                         style: MyTextStyle.textMatn12Bold.copyWith(
                           fontSize: 16,
@@ -154,7 +154,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         // Timer display or resend button
                         if (!_canResend)
                           Text(
-                            "ارسال مجدد کد در ${_formatTime(_remainingSeconds)}",
+                            "ارسال مجدد کد:${_formatTime(_remainingSeconds)}",
                             style: MyTextStyle.textMatn13.copyWith(
                               color: MyColors.primary,
                               fontWeight: FontWeight.w600,
@@ -163,25 +163,29 @@ class _LoginScreenState extends State<LoginScreen> {
                             textAlign: TextAlign.center,
                           )
                         else
-                          TextButton(
-                            onPressed: () {
-                              if (mobileNumber != null) {
-                                context.read<ProfileBloc>().add(
-                                      RequestOtpEvent(
-                                          mobile: "09$mobileNumber"),
-                                    );
-                                // Reset timer after resending
-                                _resetTimer();
-                              }
+                          Builder(
+                            builder: (builderContext) {
+                              return TextButton(
+                                onPressed: () {
+                                  if (mobileNumber != null) {
+                                    builderContext.read<ProfileBloc>().add(
+                                          RequestOtpEvent(
+                                              mobile: "09$mobileNumber"),
+                                        );
+                                    // Reset timer after resending
+                                    _resetTimer();
+                                  }
+                                },
+                                child: Text(
+                                  "ارسال مجدد کد",
+                                  style: MyTextStyle.textMatn13.copyWith(
+                                    color: MyColors.primary,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              );
                             },
-                            child: Text(
-                              "ارسال مجدد کد",
-                              style: MyTextStyle.textMatn13.copyWith(
-                                color: MyColors.primary,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14,
-                              ),
-                            ),
                           ),
                       ],
 
@@ -326,14 +330,14 @@ class _LoginScreenState extends State<LoginScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          "کد تایید",
-          style: MyTextStyle.textMatn12Bold.copyWith(
-            color: MyColors.textMatn1,
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+        // Text(
+        //   "کد تایید",
+        //   style: MyTextStyle.textMatn12Bold.copyWith(
+        //     color: MyColors.textMatn1,
+        //     fontSize: 16,
+        //     fontWeight: FontWeight.w600,
+        //   ),
+        // ),
         const SizedBox(height: 12),
         Container(
           decoration: BoxDecoration(
@@ -376,10 +380,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 fontFamily: 'monospace',
               ),
               decoration: InputDecoration(
-                hintText: "0000",
+                hintText: "----",
                 hintStyle: MyTextStyle.textMatn13.copyWith(
                   color: MyColors.text4,
-                  letterSpacing: 2,
+                  letterSpacing: 4,
                   fontFamily: 'monospace',
                 ),
                 border: InputBorder.none,
@@ -387,14 +391,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   horizontal: 20,
                   vertical: 18,
                 ),
-                prefixIcon: Container(
-                  margin: const EdgeInsets.only(right: 12),
-                  child: Icon(
-                    Icons.lock_outline,
-                    color: MyColors.text3,
-                    size: 20,
-                  ),
-                ),
+                // prefixIcon: Container(
+                //   margin: const EdgeInsets.only(right: 12),
+                //   child: Icon(
+                //     Icons.lock_outline,
+                //     color: MyColors.text3,
+                //     size: 20,
+                //   ),
+                // ),
               ),
             ),
           ),

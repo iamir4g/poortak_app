@@ -89,7 +89,7 @@ class _FavoritScreenState extends State<FavoritScreen> {
                   color: Colors.transparent,
                 ),
                 child: Icon(
-                  Icons.arrow_back_ios,
+                  Icons.arrow_forward_ios,
                   color: isDarkMode ? Colors.white : MyColors.textMatn1,
                   size: 20,
                 ),

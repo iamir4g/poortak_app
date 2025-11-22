@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:poortak/config/myColors.dart';
 
 class PrizeScreen extends StatefulWidget {
@@ -15,14 +14,7 @@ class _PrizeScreenState extends State<PrizeScreen> {
   @override
   void initState() {
     super.initState();
-    // Set status bar to light content
-    SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
-        statusBarColor: MyColors.primary,
-        statusBarIconBrightness: Brightness.dark,
-        statusBarBrightness: Brightness.light,
-      ),
-    );
+    // Status bar is managed centrally in MainWrapper
   }
 
   @override
