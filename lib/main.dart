@@ -9,6 +9,7 @@ import 'package:poortak/featueres/featureMenu/screens/aboutUs_screen.dart';
 import 'package:poortak/featueres/featureMenu/screens/contactUs_screen.dart';
 import 'package:poortak/featueres/featureMenu/screens/faq_screen.dart';
 import 'package:poortak/featueres/featureMenu/screens/settings_screen.dart';
+import 'package:poortak/featueres/featureMenu/screens/main_reminder.dart';
 import 'package:poortak/featueres/feature_intro/presentation/screens/splash_screen.dart';
 import 'package:poortak/featueres/feature_match/screens/main_match_screen.dart';
 import 'package:poortak/featueres/feature_match/screens/match_screen.dart';
@@ -56,6 +57,7 @@ import 'package:poortak/featueres/feature_match/presentation/bloc/match_bloc/mat
 import 'package:poortak/featueres/fetures_sayareh/screens/pdf_reader_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/single_book_bloc/single_book_cubit.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:poortak/common/services/reminder_notification_service.dart';
 import 'dart:io' show Platform;
 
 final RouteObserver<ModalRoute<void>> routeObserver =
@@ -105,6 +107,7 @@ void main() async {
   await _requestStoragePermission();
 
   await locator<TTSService>().initialize();
+  await ReminderNotificationService.initialize();
   runApp(MultiBlocProvider(
       providers: [
         BlocProvider(create: (_) => SplashCubit()),
@@ -142,6 +145,7 @@ void main() async {
               ContactUsScreen.routeName: (context) => ContactUsScreen(),
               SettingsScreen.routeName: (context) => SettingsScreen(),
               FAQScreen.routeName: (context) => FAQScreen(),
+              ReminderScreen.routeName: (context) => ReminderScreen(),
               IntroMainWrapper.routeName: (context) => IntroMainWrapper(),
               TestScreen.routeName: (context) => TestScreen(),
               MainWrapper.routeName: (context) => MainWrapper(),

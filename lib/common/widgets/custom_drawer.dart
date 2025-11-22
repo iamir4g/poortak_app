@@ -10,6 +10,7 @@ import 'package:poortak/featueres/featureMenu/screens/aboutUs_screen.dart';
 import 'package:poortak/featueres/featureMenu/screens/faq_screen.dart';
 import 'package:poortak/featueres/featureMenu/screens/contactUs_screen.dart';
 import 'package:poortak/featueres/featureMenu/screens/settings_screen.dart';
+import 'package:poortak/featueres/featureMenu/screens/main_reminder.dart';
 import 'package:poortak/featueres/feature_profile/screens/profile_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
 import 'package:poortak/locator.dart';
@@ -343,6 +344,10 @@ class _CustomDrawerState extends State<CustomDrawer> {
                               _buildListTile(
                                 icon: "ic:baseline-more-time",
                                 title: "یادآور مطالعه",
+                                onTap: () {
+                                  Navigator.pushNamed(
+                                      context, ReminderScreen.routeName);
+                                },
                               ),
                               _buildListTile(
                                 icon: "famicons:settings-outline",
