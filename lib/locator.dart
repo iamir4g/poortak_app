@@ -30,6 +30,7 @@ import 'package:poortak/common/bloc/settings_cubit/settings_cubit.dart';
 import 'package:poortak/featueres/feature_match/presentation/bloc/match_bloc/match_bloc.dart';
 import 'package:poortak/featueres/feature_match/data/data_source/match_api_provider.dart';
 import 'package:poortak/featueres/feature_match/repositories/match_repository.dart';
+import 'package:poortak/common/bloc/connectivity_cubit/connectivity_cubit.dart';
 
 GetIt locator = GetIt.instance;
 
@@ -121,4 +122,7 @@ Future<void> initLocator() async {
 
   // Register SettingsCubit
   locator.registerSingleton<SettingsCubit>(SettingsCubit());
+
+  // Register ConnectivityCubit
+  locator.registerSingleton<ConnectivityCubit>(ConnectivityCubit());
 }

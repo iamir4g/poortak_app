@@ -22,6 +22,9 @@ class ReusableModal extends StatelessWidget {
   // Optional close button (X)
   final bool showCloseButton;
 
+  // Optional custom image
+  final String? customImagePath;
+
   const ReusableModal({
     Key? key,
     required this.title,
@@ -33,6 +36,7 @@ class ReusableModal extends StatelessWidget {
     this.onSecondButtonPressed,
     this.showSecondButton = false,
     this.showCloseButton = false,
+    this.customImagePath,
   }) : super(key: key);
 
   @override
@@ -43,7 +47,7 @@ class ReusableModal extends StatelessWidget {
       backgroundColor: Colors.transparent,
       child: Container(
         width: 350,
-        height: 311,
+        height: customImagePath != null ? 380 : 311,
         decoration: BoxDecoration(
           color: isDarkMode ? const Color(0xFF2C2E3F) : Colors.white,
           borderRadius: BorderRadius.circular(20),
@@ -53,8 +57,8 @@ class ReusableModal extends StatelessWidget {
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Icon based on type
-                _buildIcon(),
+                // Icon based on type or custom image
+                customImagePath != null ? _buildCustomImage() : _buildIcon(),
 
                 const SizedBox(height: 20),
 
@@ -260,6 +264,15 @@ class ReusableModal extends StatelessWidget {
     }
   }
 
+  Widget _buildCustomImage() {
+    return Image.asset(
+      customImagePath!,
+      width: 120,
+      height: 120,
+      fit: BoxFit.contain,
+    );
+  }
+
   static void show({
     required BuildContext context,
     required String title,
@@ -272,6 +285,7 @@ class ReusableModal extends StatelessWidget {
     VoidCallback? onSecondButtonPressed,
     bool showSecondButton = false,
     bool showCloseButton = false,
+    String? customImagePath,
   }) {
     showDialog(
       context: context,
@@ -287,6 +301,7 @@ class ReusableModal extends StatelessWidget {
           onSecondButtonPressed: onSecondButtonPressed,
           showSecondButton: showSecondButton,
           showCloseButton: showCloseButton,
+          customImagePath: customImagePath,
         );
       },
     );
@@ -304,6 +319,7 @@ class ReusableModal extends StatelessWidget {
     VoidCallback? onSecondButtonPressed,
     bool showSecondButton = false,
     bool showCloseButton = false,
+    String? customImagePath,
   }) {
     show(
       context: context,
@@ -317,6 +333,7 @@ class ReusableModal extends StatelessWidget {
       onSecondButtonPressed: onSecondButtonPressed,
       showSecondButton: showSecondButton,
       showCloseButton: showCloseButton,
+      customImagePath: customImagePath,
     );
   }
 
@@ -331,6 +348,7 @@ class ReusableModal extends StatelessWidget {
     VoidCallback? onSecondButtonPressed,
     bool showSecondButton = false,
     bool showCloseButton = false,
+    String? customImagePath,
   }) {
     show(
       context: context,
@@ -344,6 +362,7 @@ class ReusableModal extends StatelessWidget {
       onSecondButtonPressed: onSecondButtonPressed,
       showSecondButton: showSecondButton,
       showCloseButton: showCloseButton,
+      customImagePath: customImagePath,
     );
   }
 
@@ -358,6 +377,7 @@ class ReusableModal extends StatelessWidget {
     VoidCallback? onSecondButtonPressed,
     bool showSecondButton = false,
     bool showCloseButton = false,
+    String? customImagePath,
   }) {
     show(
       context: context,
@@ -371,6 +391,7 @@ class ReusableModal extends StatelessWidget {
       onSecondButtonPressed: onSecondButtonPressed,
       showSecondButton: showSecondButton,
       showCloseButton: showCloseButton,
+      customImagePath: customImagePath,
     );
   }
 }
