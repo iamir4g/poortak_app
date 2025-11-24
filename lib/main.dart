@@ -106,6 +106,20 @@ void main() async {
   // Request storage permission at app startup
   await _requestStoragePermission();
 
+  // Request notification and alarm permissions
+  if (Platform.isAndroid) {
+    final notificationStatus = await Permission.notification.status;
+    if (!notificationStatus.isGranted) {
+      await Permission.notification.request();
+    }
+
+    // Request exact alarm permission for Android 12+
+    final exactAlarmStatus = await Permission.scheduleExactAlarm.status;
+    if (!exactAlarmStatus.isGranted) {
+      await Permission.scheduleExactAlarm.request();
+    }
+  }
+
   await locator<TTSService>().initialize();
   await ReminderNotificationService.initialize();
   runApp(MultiBlocProvider(

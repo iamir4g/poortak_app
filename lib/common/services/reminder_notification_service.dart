@@ -35,18 +35,24 @@ class ReminderNotificationService {
       onDidReceiveNotificationResponse: _onNotificationTapped,
     );
 
-    // Create notification channel for Android
+    // Create notification channel for Android with sound
     const androidChannel = AndroidNotificationChannel(
       'reminder_channel',
       'یادآور مطالعه',
       description: 'یادآوری برای مطالعه لایتنر و درس',
       importance: Importance.high,
+      playSound: true,
+      enableVibration: true,
     );
 
-    await _notifications
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(androidChannel);
+    final androidImplementation =
+        _notifications.resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>();
+
+    await androidImplementation?.createNotificationChannel(androidChannel);
+
+    // Request exact alarm permission for Android 12+
+    await androidImplementation?.requestExactAlarmsPermission();
 
     _initialized = true;
   }
@@ -70,19 +76,27 @@ class ReminderNotificationService {
 
     await initialize();
 
-    final now = DateTime.now();
-    var scheduledDate = DateTime(
+    final now = tz.TZDateTime.now(tz.local);
+    var scheduledDate = tz.TZDateTime(
+      tz.local,
       now.year,
       now.month,
       now.day,
       time.hour,
       time.minute,
+      0, // seconds
     );
 
     // If the time has passed today, schedule for tomorrow
     if (scheduledDate.isBefore(now)) {
       scheduledDate = scheduledDate.add(const Duration(days: 1));
     }
+
+    print('📅 Scheduling reminder:');
+    print('   Now: $now');
+    print('   Scheduled: $scheduledDate');
+    print('   Time: ${time.hour}:${time.minute}');
+    print('   ID: $id');
 
     final androidDetails = AndroidNotificationDetails(
       'reminder_channel',
@@ -91,26 +105,39 @@ class ReminderNotificationService {
       importance: Importance.high,
       priority: Priority.high,
       icon: '@mipmap/ic_launcher',
+      enableVibration: true,
+      playSound: true,
+      channelShowBadge: true,
     );
 
-    const iosDetails = DarwinNotificationDetails();
+    const iosDetails = DarwinNotificationDetails(
+      presentAlert: true,
+      presentBadge: true,
+      presentSound: true,
+    );
 
     final notificationDetails = NotificationDetails(
       android: androidDetails,
       iOS: iosDetails,
     );
 
-    await _notifications.zonedSchedule(
-      id,
-      title,
-      body,
-      tz.TZDateTime.from(scheduledDate, tz.local),
-      notificationDetails,
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
-      matchDateTimeComponents: DateTimeComponents.time,
-    );
+    try {
+      await _notifications.zonedSchedule(
+        id,
+        title,
+        body,
+        scheduledDate,
+        notificationDetails,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+        matchDateTimeComponents: DateTimeComponents.time,
+      );
+      print('✅ Reminder scheduled successfully');
+    } catch (e) {
+      print('❌ Error scheduling reminder: $e');
+      rethrow;
+    }
 
     // Save reminder to SharedPreferences
     await _saveReminder(id, title, body, time, type, isActive);
@@ -192,6 +219,91 @@ class ReminderNotificationService {
           : ReminderType.lesson,
       isActive: isActive,
     );
+  }
+
+  // Test method to show immediate notification
+  static Future<void> showTestNotification() async {
+    await initialize();
+
+    const androidDetails = AndroidNotificationDetails(
+      'reminder_channel',
+      'یادآور مطالعه',
+      channelDescription: 'یادآوری برای مطالعه لایتنر و درس',
+      importance: Importance.high,
+      priority: Priority.high,
+      icon: '@mipmap/ic_launcher',
+      enableVibration: true,
+      playSound: true,
+    );
+
+    const iosDetails = DarwinNotificationDetails(
+      presentAlert: true,
+      presentBadge: true,
+      presentSound: true,
+    );
+
+    const notificationDetails = NotificationDetails(
+      android: androidDetails,
+      iOS: iosDetails,
+    );
+
+    await _notifications.show(
+      999,
+      'تست یادآور',
+      'این یک نوتیفیکیشن تست است',
+      notificationDetails,
+    );
+  }
+
+  // Test method to schedule notification in 1 minute
+  static Future<void> scheduleTestNotificationIn1Minute() async {
+    await initialize();
+
+    final now = tz.TZDateTime.now(tz.local);
+    final scheduledDate = now.add(const Duration(minutes: 1));
+
+    print('📅 Scheduling test notification:');
+    print('   Now: $now');
+    print('   Scheduled: $scheduledDate (in 1 minute)');
+
+    const androidDetails = AndroidNotificationDetails(
+      'reminder_channel',
+      'یادآور مطالعه',
+      channelDescription: 'یادآوری برای مطالعه لایتنر و درس',
+      importance: Importance.high,
+      priority: Priority.high,
+      icon: '@mipmap/ic_launcher',
+      enableVibration: true,
+      playSound: true,
+    );
+
+    const iosDetails = DarwinNotificationDetails(
+      presentAlert: true,
+      presentBadge: true,
+      presentSound: true,
+    );
+
+    const notificationDetails = NotificationDetails(
+      android: androidDetails,
+      iOS: iosDetails,
+    );
+
+    try {
+      await _notifications.zonedSchedule(
+        998,
+        'تست یادآور (1 دقیقه)',
+        'این یک نوتیفیکیشن تست برای 1 دقیقه بعد است',
+        scheduledDate,
+        notificationDetails,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+      );
+      print('✅ Test notification scheduled successfully for 1 minute');
+    } catch (e) {
+      print('❌ Error scheduling test notification: $e');
+      rethrow;
+    }
   }
 }
 
