@@ -64,6 +64,7 @@ import 'dart:io' show Platform;
 
 final RouteObserver<ModalRoute<void>> routeObserver =
     RouteObserver<ModalRoute<void>>();
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 /// Request storage permission with user-friendly explanation
 Future<void> _requestStoragePermission() async {
@@ -144,7 +145,9 @@ void main() async {
       child: BlocBuilder<ThemeCubit, ThemeState>(
         builder: (context, themeState) {
           return ConnectivityListener(
+            navigatorKey: navigatorKey,
             child: MaterialApp(
+              navigatorKey: navigatorKey,
               navigatorObservers: [routeObserver],
               themeMode: themeState.themeMode,
               theme: MyThemes.lightTheme,

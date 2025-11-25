@@ -56,42 +56,51 @@ class ReusableModal extends StatelessWidget {
           children: [
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 // Icon based on type or custom image
-                customImagePath != null ? _buildCustomImage() : _buildIcon(),
+                Center(
+                  child: customImagePath != null
+                      ? _buildCustomImage()
+                      : _buildIcon(),
+                ),
 
                 const SizedBox(height: 20),
 
                 // Title
-                Container(
-                  width: 250,
-                  margin: const EdgeInsets.only(bottom: 10),
-                  child: Text(
-                    title,
-                    style: const TextStyle(
-                      fontFamily: 'IRANSans',
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      color: MyColors.textMatn1,
+                Center(
+                  child: Container(
+                    width: 250,
+                    margin: const EdgeInsets.only(bottom: 10),
+                    child: Text(
+                      title,
+                      style: const TextStyle(
+                        fontFamily: 'IRANSans',
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: MyColors.textMatn1,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                    textAlign: TextAlign.center,
                   ),
                 ),
 
                 // Message
-                Container(
-                  width: 250,
-                  margin: const EdgeInsets.only(bottom: 30),
-                  child: Text(
-                    message,
-                    style: const TextStyle(
-                      fontFamily: 'IRANSans',
-                      fontWeight: FontWeight.w500,
-                      fontSize: 14,
-                      color: Color(0xFF3D495C),
-                      height: 1.4,
+                Center(
+                  child: Container(
+                    width: 250,
+                    margin: const EdgeInsets.only(bottom: 30),
+                    child: Text(
+                      message,
+                      style: const TextStyle(
+                        fontFamily: 'IRANSans',
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                        color: Color(0xFF3D495C),
+                        height: 1.4,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                    textAlign: TextAlign.center,
                   ),
                 ),
 
@@ -99,7 +108,7 @@ class ReusableModal extends StatelessWidget {
                 if (showSecondButton && secondButtonText != null)
                   // Two buttons layout
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       // First button (primary)
                       Container(
@@ -126,6 +135,8 @@ class ReusableModal extends StatelessWidget {
                           ),
                         ),
                       ),
+
+                      const SizedBox(width: 10),
 
                       // Second button (secondary)
                       Container(
@@ -158,26 +169,28 @@ class ReusableModal extends StatelessWidget {
                   )
                 else
                   // Single button layout
-                  Container(
-                    width: 172,
-                    height: 64,
-                    child: ElevatedButton(
-                      onPressed:
-                          onButtonPressed ?? () => Navigator.of(context).pop(),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: MyColors.primary,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
+                  Center(
+                    child: Container(
+                      width: 172,
+                      height: 64,
+                      child: ElevatedButton(
+                        onPressed: onButtonPressed ??
+                            () => Navigator.of(context).pop(),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: MyColors.primary,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          elevation: 0,
                         ),
-                        elevation: 0,
-                      ),
-                      child: Text(
-                        buttonText,
-                        style: const TextStyle(
-                          fontFamily: 'IRANSans',
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                          color: Colors.white,
+                        child: Text(
+                          buttonText,
+                          style: const TextStyle(
+                            fontFamily: 'IRANSans',
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
