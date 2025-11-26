@@ -429,6 +429,33 @@ class _FullscreenVideoPlayerState extends State<FullscreenVideoPlayer> {
     Navigator.of(context).pop();
   }
 
+  void _skipForward() {
+    final currentPosition = widget.videoPlayerController.value.position;
+    final duration = widget.videoPlayerController.value.duration;
+    final newPosition = currentPosition + const Duration(seconds: 15);
+
+    if (newPosition > duration) {
+      widget.videoPlayerController.seekTo(duration);
+    } else {
+      widget.videoPlayerController.seekTo(newPosition);
+    }
+    _showControls = true;
+    _startHideTimer();
+  }
+
+  void _skipBackward() {
+    final currentPosition = widget.videoPlayerController.value.position;
+    final newPosition = currentPosition - const Duration(seconds: 15);
+
+    if (newPosition.isNegative) {
+      widget.videoPlayerController.seekTo(Duration.zero);
+    } else {
+      widget.videoPlayerController.seekTo(newPosition);
+    }
+    _showControls = true;
+    _startHideTimer();
+  }
+
   Widget _buildFullscreenControls() {
     return AnimatedOpacity(
       opacity: _showControls ? 1.0 : 0.0,
@@ -524,10 +551,36 @@ class _FullscreenVideoPlayerState extends State<FullscreenVideoPlayer> {
                     ),
                   ),
 
-                  // Time display
+                  // Time display and skip buttons
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
+                      // Skip backward button
+                      IconButton(
+                        icon: const Icon(
+                          Icons.replay_10,
+                          color: Colors.white,
+                          size: 28,
+                        ),
+                        onPressed: _skipBackward,
+                        tooltip: '15 ثانیه به عقب',
+                      ),
+                      const SizedBox(width: 8),
+                      // Skip forward button
+                      IconButton(
+                        icon: const Icon(
+                          Icons.forward_10,
+                          color: Colors.white,
+                          size: 28,
+                        ),
+                        onPressed: _skipForward,
+                        tooltip: '15 ثانیه به جلو',
+                      ),
+                      Spacer(),
+                      // SizedBox(
+                      //   width: double.infinity,
+                      // ),
+                      // Time display
                       Text(
                         _formatDuration(
                             widget.videoPlayerController.value.position),
@@ -536,6 +589,15 @@ class _FullscreenVideoPlayerState extends State<FullscreenVideoPlayer> {
                           fontSize: 16,
                         ),
                       ),
+
+                      const Text(
+                        ' / ',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                      ),
+
                       Text(
                         _formatDuration(
                             widget.videoPlayerController.value.duration),
@@ -570,11 +632,15 @@ class _FullscreenVideoPlayerState extends State<FullscreenVideoPlayer> {
         },
         child: Stack(
           children: [
-            // Video player
-            Center(
-              child: AspectRatio(
-                aspectRatio: widget.videoPlayerController.value.aspectRatio,
-                child: VideoPlayer(widget.videoPlayerController),
+            // Video player - fill screen
+            Positioned.fill(
+              child: FittedBox(
+                fit: BoxFit.cover,
+                child: SizedBox(
+                  width: widget.videoPlayerController.value.size.width,
+                  height: widget.videoPlayerController.value.size.height,
+                  child: VideoPlayer(widget.videoPlayerController),
+                ),
               ),
             ),
 
