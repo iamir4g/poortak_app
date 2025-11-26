@@ -121,6 +121,72 @@ class BottomNav extends StatelessWidget {
     );
   }
 
+  Widget _buildIcon({
+    required BuildContext context,
+    required int index,
+    required int state,
+    required String icon,
+    required bool isSelected,
+    required ThemeState themeState,
+  }) {
+    // برای کاوش (index 1) و لایتنر (index 3) از تصویر استفاده می‌کنیم
+    if (index == 1 || index == 3) {
+      String imagePath = index == 1
+          ? 'assets/images/bottomNav/kavoshicon.png'
+          : 'assets/images/bottomNav/litnericon.png';
+
+      return Image.asset(
+        imagePath,
+        width: 24,
+        height: 24,
+        color: isSelected
+            ? MyColors.primary
+            : (themeState.isDark ? MyColors.darkTextSecondary : Colors.grey),
+        colorBlendMode: BlendMode.srcIn,
+      );
+    }
+
+    // برای بقیه از IconifyIcon استفاده می‌کنیم
+    Color iconColor = isSelected
+        ? MyColors.primary
+        : (themeState.isDark ? MyColors.darkTextSecondary : Colors.grey);
+
+    if (index == 2) {
+      // برای سبد خرید با badge
+      return BlocConsumer<ShoppingCartBloc, ShoppingCartState>(
+        listener: (context, state) {
+          if (state is ShoppingCartLoaded) {
+            // You can add any side effects here when cart changes
+          }
+        },
+        builder: (context, cartState) {
+          if (cartState is ShoppingCartInitial) {
+            return IconifyIcon(icon: icon, color: iconColor);
+          }
+
+          if (cartState is ShoppingCartLoading) {
+            return IconifyIcon(icon: icon, color: iconColor);
+          }
+
+          if (cartState is ShoppingCartLoaded) {
+            final cart = cartState.cart;
+            if (cart.items.isNotEmpty) {
+              return badges.Badge(
+                badgeContent: Text(cart.items.length.toString()),
+                child: IconifyIcon(icon: icon, color: iconColor),
+              );
+            }
+            return IconifyIcon(icon: icon, color: iconColor);
+          }
+
+          return IconifyIcon(icon: icon, color: iconColor);
+        },
+      );
+    }
+
+    return IconifyIcon(icon: icon, color: iconColor);
+  }
+
   Widget _buildNavItem({
     required BuildContext context,
     required int state,
@@ -131,6 +197,7 @@ class BottomNav extends StatelessWidget {
   }) {
     return BlocBuilder<ThemeCubit, ThemeState>(
       builder: (context, themeState) {
+        final isSelected = state == index;
         return Expanded(
           child: InkWell(
             onTap: () {
@@ -149,106 +216,14 @@ class BottomNav extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  (state == index
-                      ? state == 2 && index == 2
-                          ? BlocConsumer<ShoppingCartBloc, ShoppingCartState>(
-                              listener: (context, state) {
-                                if (state is ShoppingCartLoaded) {
-                                  // You can add any side effects here when cart changes
-                                  // For example, showing a snackbar or updating other UI elements
-                                }
-                              },
-                              builder: (context, cartState) {
-                                if (cartState is ShoppingCartInitial) {
-                                  return IconifyIcon(
-                                      icon: icon, color: MyColors.primary);
-                                }
-
-                                if (cartState is ShoppingCartLoading) {
-                                  return IconifyIcon(
-                                      icon: icon, color: MyColors.primary);
-                                }
-
-                                if (cartState is ShoppingCartLoaded) {
-                                  final cart = cartState.cart;
-                                  if (cart.items.isNotEmpty) {
-                                    return badges.Badge(
-                                      badgeContent:
-                                          Text(cart.items.length.toString()),
-                                      child: IconifyIcon(
-                                          icon: icon, color: MyColors.primary),
-                                    );
-                                  }
-                                  return IconifyIcon(
-                                      icon: icon, color: MyColors.primary);
-                                }
-
-                                return IconifyIcon(
-                                    icon: icon, color: MyColors.primary);
-                              },
-                            )
-                          : IconifyIcon(
-                              icon: icon,
-                              color: index == 1
-                                  ? MyColors.primary
-                                  : MyColors.primary)
-                      : index == 2
-                          ? BlocConsumer<ShoppingCartBloc, ShoppingCartState>(
-                              listener: (context, state) {
-                                if (state is ShoppingCartLoaded) {
-                                  // You can add any side effects here when cart changes
-                                  // For example, showing a snackbar or updating other UI elements
-                                }
-                              },
-                              builder: (context, cartState) {
-                                if (cartState is ShoppingCartInitial) {
-                                  return IconifyIcon(
-                                      icon: icon,
-                                      color: themeState.isDark
-                                          ? MyColors.darkTextSecondary
-                                          : Colors.grey);
-                                }
-
-                                if (cartState is ShoppingCartLoading) {
-                                  return IconifyIcon(
-                                      icon: icon,
-                                      color: themeState.isDark
-                                          ? MyColors.darkTextSecondary
-                                          : Colors.grey);
-                                }
-
-                                if (cartState is ShoppingCartLoaded) {
-                                  final cart = cartState.cart;
-                                  if (cart.items.isNotEmpty) {
-                                    return badges.Badge(
-                                      badgeContent:
-                                          Text(cart.items.length.toString()),
-                                      child: IconifyIcon(
-                                          icon: icon,
-                                          color: themeState.isDark
-                                              ? MyColors.darkTextSecondary
-                                              : Colors.grey),
-                                    );
-                                  }
-                                  return IconifyIcon(
-                                      icon: icon,
-                                      color: themeState.isDark
-                                          ? MyColors.darkTextSecondary
-                                          : Colors.grey);
-                                }
-
-                                return IconifyIcon(
-                                    icon: icon,
-                                    color: themeState.isDark
-                                        ? MyColors.darkTextSecondary
-                                        : Colors.grey);
-                              },
-                            )
-                          : IconifyIcon(
-                              icon: icon,
-                              color: themeState.isDark
-                                  ? MyColors.darkTextSecondary
-                                  : Colors.grey)),
+                  _buildIcon(
+                    context: context,
+                    index: index,
+                    state: state,
+                    icon: icon,
+                    isSelected: isSelected,
+                    themeState: themeState,
+                  ),
                   if (state == index)
                     Padding(
                       padding: const EdgeInsets.only(top: 4.0),
