@@ -128,6 +128,14 @@ class _ConversationScreenState extends State<ConversationScreen> {
               bottomLeft: Radius.circular(30),
             ),
           ),
+          automaticallyImplyLeading: false,
+          actions: [
+            IconButton(
+              onPressed: () => Navigator.of(context).pop(),
+              icon: const Icon(Icons.arrow_forward),
+            ),
+          ],
+          centerTitle: true,
           title: const Text(
             'مکالمه',
             style: MyTextStyle.textHeader16Bold,
@@ -159,7 +167,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                     // Navigator.pop(context);
                   },
                   icon: IconifyIcon(
-                    icon: "ri:skip-left-fill",
+                    icon: "ri:skip-right-fill",
                     size: 30,
                     color: Colors.black,
                   )),
@@ -172,7 +180,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                 },
                 icon: Icon(
                   isPlaying ? Icons.stop_circle : Icons.play_circle,
-                  size: 30,
+                  size: 50,
                   color: isPlaying ? Colors.red : Colors.green,
                 ),
               ),
@@ -181,7 +189,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                     // Navigator.pop(context);
                   },
                   icon: IconifyIcon(
-                    icon: "ri:skip-right-fill",
+                    icon: "ri:skip-left-fill",
                     size: 30,
                     color: Colors.black,
                   )),

@@ -106,10 +106,10 @@ class _QuizScreenState extends State<QuizScreen> {
                           ),
                         ),
                         const Spacer(),
-                        Text(
-                          widget.title,
-                          style: MyTextStyle.textHeader16Bold,
-                        ),
+                        // Text(
+                        //   widget.title,
+                        //   style: MyTextStyle.textHeader16Bold,
+                        // ),
                         const Spacer(flex: 2),
                       ],
                     ),

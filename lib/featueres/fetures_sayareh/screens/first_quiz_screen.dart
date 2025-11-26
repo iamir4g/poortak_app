@@ -84,6 +84,7 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                         const EdgeInsets.only(top: 24, left: 16, right: 16),
                     child: Row(
                       children: [
+                        const Spacer(),
                         GestureDetector(
                           onTap: () => Navigator.of(context).pop(),
                           child: Container(
@@ -93,16 +94,16 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(17),
                             ),
-                            child: const Icon(Icons.arrow_back_ios_new,
+                            child: const Icon(Icons.arrow_forward,
                                 color: Color(0xFF3D495C)),
                           ),
                         ),
-                        const Spacer(),
-                        Text(
-                          widget.title,
-                          style: MyTextStyle.textHeader16Bold,
-                        ),
-                        const Spacer(flex: 2),
+
+                        // Text(
+                        //   widget.title,
+                        //   style: MyTextStyle.textHeader16Bold,
+                        // ),
+                        // const Spacer(flex: 2),
                       ],
                     ),
                   ),

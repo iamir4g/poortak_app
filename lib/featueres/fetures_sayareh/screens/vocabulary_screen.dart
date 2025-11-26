@@ -136,14 +136,22 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                 bottomLeft: Radius.circular(30),
               ),
             ),
+            automaticallyImplyLeading: false,
+            actions: [
+              IconButton(
+                onPressed: _showExitModal,
+                icon: const Icon(Icons.arrow_forward),
+              ),
+            ],
+            centerTitle: true,
             title: const Text(
               'واژگان',
               style: MyTextStyle.textHeader16Bold,
             ),
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back),
-              onPressed: _showExitModal,
-            ),
+            // leading: IconButton(
+            //   icon: const Icon(Icons.arrow_back),
+            //   onPressed: _showExitModal,
+            // ),
           ),
           body: BlocBuilder<VocabularyBloc, VocabularyState>(
             builder: (context, state) {
