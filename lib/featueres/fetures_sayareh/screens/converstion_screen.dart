@@ -75,10 +75,14 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
         // پخش پیام با صدای مناسب
         if (message.voice == 'male') {
+          await ttsService.stop();
           await ttsService.setMaleVoice();
+          await Future.delayed(const Duration(milliseconds: 100));
           await ttsService.speak(message.text);
         } else if (message.voice == 'female') {
+          await ttsService.stop();
           await ttsService.setFemaleVoice();
+          await Future.delayed(const Duration(milliseconds: 100));
           await ttsService.speak(message.text);
         } else {
           await ttsService.speak(message.text, voice: message.voice);
@@ -100,11 +104,15 @@ class _ConversationScreenState extends State<ConversationScreen> {
   Future<void> speakText(String text, String voice) async {
     if (voice == 'male') {
       // استفاده مستقیم از صدای مردانه انتخابی
+      await ttsService.stop();
       await ttsService.setMaleVoice();
+      await Future.delayed(const Duration(milliseconds: 100));
       await ttsService.speak(text);
     } else if (voice == 'female') {
       // استفاده از صدای زنانه
+      await ttsService.stop();
       await ttsService.setFemaleVoice();
+      await Future.delayed(const Duration(milliseconds: 100));
       await ttsService.speak(text);
     } else {
       // استفاده از متد عادی
