@@ -133,6 +133,13 @@ class _MainWrapperState extends State<MainWrapper> {
   }
 
   Future<bool> _onWillPop() async {
+    // First, check if drawer is open
+    if (_scaffoldKey.currentState?.isDrawerOpen ?? false) {
+      // Close the drawer first
+      Navigator.of(context).pop();
+      return false; // Prevent default back behavior
+    }
+
     // If not on Sayareh screen (index 0), navigate to Sayareh
     if (currentPageIndex != 0) {
       controller.animateToPage(
