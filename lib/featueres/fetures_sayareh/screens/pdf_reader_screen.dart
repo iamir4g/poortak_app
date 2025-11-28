@@ -168,12 +168,13 @@ class PdfReaderScreen extends StatelessWidget {
           "User is logged in. purchased: ${bookData.purchased}, file: ${bookData.file}, trialFile: ${bookData.trialFile}");
       if (bookData.purchased == true &&
           bookData.file != null &&
-          bookData.file.isNotEmpty) {
+          bookData.file.toString().trim().isNotEmpty) {
         // User has purchased the book, use the full file
         fileToDownload = bookData.file;
         usePublicUrl = false;
         print("Using purchased file: $fileToDownload with authenticated URL");
-      } else if (bookData.trialFile != null && bookData.trialFile.isNotEmpty) {
+      } else if (bookData.trialFile != null &&
+          bookData.trialFile.toString().trim().isNotEmpty) {
         // User hasn't purchased or file is not available, use trial file with public URL
         fileToDownload = bookData.trialFile;
         usePublicUrl = true;
@@ -182,10 +183,13 @@ class PdfReaderScreen extends StatelessWidget {
     } else {
       // User is not logged in, always use trial file with public URL
       print("User is not logged in. trialFile: ${bookData.trialFile}");
-      if (bookData.trialFile != null && bookData.trialFile.isNotEmpty) {
+      if (bookData.trialFile != null &&
+          bookData.trialFile.toString().trim().isNotEmpty) {
         fileToDownload = bookData.trialFile;
         usePublicUrl = true;
         print("Using trial file: $fileToDownload with public URL");
+      } else {
+        print("Trial file is not available for non-logged in user");
       }
     }
 
