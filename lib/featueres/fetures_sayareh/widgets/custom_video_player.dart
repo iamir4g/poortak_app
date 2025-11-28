@@ -189,31 +189,34 @@ class CustomVideoPlayerState extends State<CustomVideoPlayer> {
                     onPressed: _togglePlayPause,
                   ),
                   Expanded(
-                    child: SliderTheme(
-                      data: SliderTheme.of(context).copyWith(
-                        activeTrackColor: Colors.white,
-                        inactiveTrackColor: Colors.white.withOpacity(0.3),
-                        thumbColor: Colors.white,
-                        overlayColor: Colors.white.withOpacity(0.3),
-                        trackHeight: 4,
-                        thumbShape:
-                            const RoundSliderThumbShape(enabledThumbRadius: 6),
-                        overlayShape:
-                            const RoundSliderOverlayShape(overlayRadius: 12),
-                      ),
-                      child: Slider(
-                        value: _videoPlayerController
-                            .value.position.inMilliseconds
-                            .toDouble(),
-                        min: 0,
-                        max: _videoPlayerController
-                            .value.duration.inMilliseconds
-                            .toDouble(),
-                        onChanged: (value) {
-                          final position =
-                              Duration(milliseconds: value.toInt());
-                          _videoPlayerController.seekTo(position);
-                        },
+                    child: Directionality(
+                      textDirection: TextDirection.ltr,
+                      child: SliderTheme(
+                        data: SliderTheme.of(context).copyWith(
+                          activeTrackColor: Colors.white,
+                          inactiveTrackColor: Colors.white.withOpacity(0.3),
+                          thumbColor: Colors.white,
+                          overlayColor: Colors.white.withOpacity(0.3),
+                          trackHeight: 4,
+                          thumbShape: const RoundSliderThumbShape(
+                              enabledThumbRadius: 6),
+                          overlayShape:
+                              const RoundSliderOverlayShape(overlayRadius: 12),
+                        ),
+                        child: Slider(
+                          value: _videoPlayerController
+                              .value.position.inMilliseconds
+                              .toDouble(),
+                          min: 0,
+                          max: _videoPlayerController
+                              .value.duration.inMilliseconds
+                              .toDouble(),
+                          onChanged: (value) {
+                            final position =
+                                Duration(milliseconds: value.toInt());
+                            _videoPlayerController.seekTo(position);
+                          },
+                        ),
                       ),
                     ),
                   ),
@@ -524,30 +527,34 @@ class _FullscreenVideoPlayerState extends State<FullscreenVideoPlayer> {
               child: Column(
                 children: [
                   // Progress bar
-                  SliderTheme(
-                    data: SliderTheme.of(context).copyWith(
-                      activeTrackColor: Colors.white,
-                      inactiveTrackColor: Colors.white.withOpacity(0.3),
-                      thumbColor: Colors.white,
-                      overlayColor: Colors.white.withOpacity(0.3),
-                      trackHeight: 4,
-                      thumbShape:
-                          const RoundSliderThumbShape(enabledThumbRadius: 8),
-                      overlayShape:
-                          const RoundSliderOverlayShape(overlayRadius: 16),
-                    ),
-                    child: Slider(
-                      value: widget
-                          .videoPlayerController.value.position.inMilliseconds
-                          .toDouble(),
-                      min: 0,
-                      max: widget
-                          .videoPlayerController.value.duration.inMilliseconds
-                          .toDouble(),
-                      onChanged: (value) {
-                        final position = Duration(milliseconds: value.toInt());
-                        widget.videoPlayerController.seekTo(position);
-                      },
+                  Directionality(
+                    textDirection: TextDirection.ltr,
+                    child: SliderTheme(
+                      data: SliderTheme.of(context).copyWith(
+                        activeTrackColor: Colors.white,
+                        inactiveTrackColor: Colors.white.withOpacity(0.3),
+                        thumbColor: Colors.white,
+                        overlayColor: Colors.white.withOpacity(0.3),
+                        trackHeight: 4,
+                        thumbShape:
+                            const RoundSliderThumbShape(enabledThumbRadius: 8),
+                        overlayShape:
+                            const RoundSliderOverlayShape(overlayRadius: 16),
+                      ),
+                      child: Slider(
+                        value: widget
+                            .videoPlayerController.value.position.inMilliseconds
+                            .toDouble(),
+                        min: 0,
+                        max: widget
+                            .videoPlayerController.value.duration.inMilliseconds
+                            .toDouble(),
+                        onChanged: (value) {
+                          final position =
+                              Duration(milliseconds: value.toInt());
+                          widget.videoPlayerController.seekTo(position);
+                        },
+                      ),
                     ),
                   ),
 
