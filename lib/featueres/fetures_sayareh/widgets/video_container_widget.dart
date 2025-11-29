@@ -12,6 +12,8 @@ class VideoContainerWidget extends StatelessWidget {
   final bool hasAccess;
   final VoidCallback onVideoEnded;
   final Function()? onShowPurchaseDialog;
+  final VoidCallback? onVideoPlaying;
+  final VoidCallback? onVideoPaused;
 
   const VideoContainerWidget({
     super.key,
@@ -24,6 +26,8 @@ class VideoContainerWidget extends StatelessWidget {
     required this.hasAccess,
     required this.onVideoEnded,
     this.onShowPurchaseDialog,
+    this.onVideoPlaying,
+    this.onVideoPaused,
   });
 
   @override
@@ -71,6 +75,8 @@ class VideoContainerWidget extends StatelessWidget {
           onShowPurchaseDialog!();
         }
       },
+      onVideoPlaying: onVideoPlaying,
+      onVideoPaused: onVideoPaused,
     );
   }
 
