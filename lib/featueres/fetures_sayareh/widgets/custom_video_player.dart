@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:video_player/video_player.dart';
-import 'package:flutter_windowmanager/flutter_windowmanager.dart';
 import 'dart:async';
 import 'dart:io';
 
@@ -16,8 +15,6 @@ class CustomVideoPlayer extends StatefulWidget {
   final bool showControls;
   final bool allowFullscreen;
   final VoidCallback? onVideoEnded;
-  final VoidCallback? onVideoPlaying;
-  final VoidCallback? onVideoPaused;
 
   const CustomVideoPlayer({
     Key? key,
@@ -30,8 +27,6 @@ class CustomVideoPlayer extends StatefulWidget {
     this.showControls = true,
     this.allowFullscreen = true,
     this.onVideoEnded,
-    this.onVideoPlaying,
-    this.onVideoPaused,
   }) : super(key: key);
 
   @override
@@ -110,7 +105,6 @@ class CustomVideoPlayerState extends State<CustomVideoPlayer> {
           setState(() {
             _isPlaying = true;
           });
-          widget.onVideoPlaying?.call();
         }
       }
     } catch (error) {
@@ -124,21 +118,6 @@ class CustomVideoPlayerState extends State<CustomVideoPlayer> {
   }
 
   void _videoPlayerListener() {
-    // Update playing state based on controller
-    if (mounted) {
-      final isCurrentlyPlaying = _videoPlayerController.value.isPlaying;
-      if (isCurrentlyPlaying != _isPlaying) {
-        setState(() {
-          _isPlaying = isCurrentlyPlaying;
-        });
-        if (isCurrentlyPlaying) {
-          widget.onVideoPlaying?.call();
-        } else {
-          widget.onVideoPaused?.call();
-        }
-      }
-    }
-
     if (_videoPlayerController.value.position >=
         _videoPlayerController.value.duration) {
       // Video has ended
@@ -146,7 +125,6 @@ class CustomVideoPlayerState extends State<CustomVideoPlayer> {
         setState(() {
           _isPlaying = false;
         });
-        widget.onVideoPaused?.call();
         // Call the callback if provided
         widget.onVideoEnded?.call();
       }
@@ -157,10 +135,8 @@ class CustomVideoPlayerState extends State<CustomVideoPlayer> {
     setState(() {
       if (_isPlaying) {
         _videoPlayerController.pause();
-        widget.onVideoPaused?.call();
       } else {
         _videoPlayerController.play();
-        widget.onVideoPlaying?.call();
       }
       _isPlaying = !_isPlaying;
       _showControls = true;
@@ -176,8 +152,6 @@ class CustomVideoPlayerState extends State<CustomVideoPlayer> {
           videoPath: widget.videoPath,
           isNetworkVideo: widget.isNetworkVideo,
           onVideoEnded: widget.onVideoEnded,
-          onVideoPlaying: widget.onVideoPlaying,
-          onVideoPaused: widget.onVideoPaused,
         ),
         fullscreenDialog: true,
       ),
@@ -357,8 +331,6 @@ class FullscreenVideoPlayer extends StatefulWidget {
   final String videoPath;
   final bool isNetworkVideo;
   final VoidCallback? onVideoEnded;
-  final VoidCallback? onVideoPlaying;
-  final VoidCallback? onVideoPaused;
 
   const FullscreenVideoPlayer({
     Key? key,
@@ -366,8 +338,6 @@ class FullscreenVideoPlayer extends StatefulWidget {
     required this.videoPath,
     required this.isNetworkVideo,
     this.onVideoEnded,
-    this.onVideoPlaying,
-    this.onVideoPaused,
   }) : super(key: key);
 
   @override
@@ -396,28 +366,13 @@ class _FullscreenVideoPlayerState extends State<FullscreenVideoPlayer> {
 
     // Add listener to update playing state
     widget.videoPlayerController.addListener(_videoListener);
-
-    // Enable FLAG_SECURE if video is already playing
-    if (_isPlaying) {
-      _enableSecureScreen();
-    }
   }
 
   void _videoListener() {
     if (mounted) {
-      final isCurrentlyPlaying = widget.videoPlayerController.value.isPlaying;
-      if (isCurrentlyPlaying != _isPlaying) {
-        setState(() {
-          _isPlaying = isCurrentlyPlaying;
-        });
-        if (isCurrentlyPlaying) {
-          _enableSecureScreen();
-          widget.onVideoPlaying?.call();
-        } else {
-          _disableSecureScreen();
-          widget.onVideoPaused?.call();
-        }
-      }
+      setState(() {
+        _isPlaying = widget.videoPlayerController.value.isPlaying;
+      });
     }
   }
 
@@ -425,9 +380,6 @@ class _FullscreenVideoPlayerState extends State<FullscreenVideoPlayer> {
   void dispose() {
     // Remove listener
     widget.videoPlayerController.removeListener(_videoListener);
-
-    // Disable FLAG_SECURE when leaving fullscreen
-    _disableSecureScreen();
 
     // Restore system UI
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
@@ -440,22 +392,6 @@ class _FullscreenVideoPlayerState extends State<FullscreenVideoPlayer> {
 
     _hideTimer?.cancel();
     super.dispose();
-  }
-
-  Future<void> _enableSecureScreen() async {
-    try {
-      await FlutterWindowManager.addFlags(FlutterWindowManager.FLAG_SECURE);
-    } catch (e) {
-      print('Error enabling secure screen: $e');
-    }
-  }
-
-  Future<void> _disableSecureScreen() async {
-    try {
-      await FlutterWindowManager.clearFlags(FlutterWindowManager.FLAG_SECURE);
-    } catch (e) {
-      print('Error disabling secure screen: $e');
-    }
   }
 
   String _formatDuration(Duration duration) {
@@ -483,12 +419,8 @@ class _FullscreenVideoPlayerState extends State<FullscreenVideoPlayer> {
     setState(() {
       if (_isPlaying) {
         widget.videoPlayerController.pause();
-        _disableSecureScreen();
-        widget.onVideoPaused?.call();
       } else {
         widget.videoPlayerController.play();
-        _enableSecureScreen();
-        widget.onVideoPlaying?.call();
       }
       _isPlaying = !_isPlaying;
       _showControls = true;
@@ -497,8 +429,6 @@ class _FullscreenVideoPlayerState extends State<FullscreenVideoPlayer> {
   }
 
   void _exitFullscreen() {
-    // Disable secure screen before exiting
-    _disableSecureScreen();
     Navigator.of(context).pop();
   }
 

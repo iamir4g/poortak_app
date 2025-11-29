@@ -15,7 +15,6 @@ import 'package:poortak/featueres/fetures_sayareh/widgets/video_container_widget
 import 'package:poortak/featueres/fetures_sayareh/widgets/video_progress_bar_widget.dart';
 import 'package:poortak/locator.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
-import 'package:flutter_windowmanager/flutter_windowmanager.dart';
 
 class LessonScreen extends StatefulWidget {
   static const routeName = "/lesson_screen";
@@ -51,7 +50,6 @@ class _LessonScreenState extends State<LessonScreen> {
   final GlobalKey<CustomVideoPlayerState> _videoPlayerKey =
       GlobalKey<CustomVideoPlayerState>();
   bool _isDisposed = false;
-  bool _isVideoPlaying = false;
 
   bool get hasAccess {
     final accessBloc = locator<IknowAccessBloc>();
@@ -163,44 +161,7 @@ class _LessonScreenState extends State<LessonScreen> {
   void dispose() {
     _isDisposed = true;
     _videoPlayerKey.currentState?.stopVideo();
-    // Disable FLAG_SECURE when leaving the lesson screen
-    _disableSecureScreen();
     super.dispose();
-  }
-  
-  Future<void> _enableSecureScreen() async {
-    if (!_isVideoPlaying) return;
-    try {
-      await FlutterWindowManager.addFlags(FlutterWindowManager.FLAG_SECURE);
-    } catch (e) {
-      print('Error enabling secure screen: $e');
-    }
-  }
-
-  Future<void> _disableSecureScreen() async {
-    try {
-      await FlutterWindowManager.clearFlags(FlutterWindowManager.FLAG_SECURE);
-    } catch (e) {
-      print('Error disabling secure screen: $e');
-    }
-  }
-  
-  void _onVideoPlaying() {
-    if (!_isDisposed && mounted) {
-      setState(() {
-        _isVideoPlaying = true;
-      });
-      _enableSecureScreen();
-    }
-  }
-  
-  void _onVideoPaused() {
-    if (!_isDisposed && mounted) {
-      setState(() {
-        _isVideoPlaying = false;
-      });
-      _disableSecureScreen();
-    }
   }
 
   @override
@@ -379,8 +340,6 @@ class _LessonScreenState extends State<LessonScreen> {
                 hasAccess: hasAccess,
                 onVideoEnded: () {},
                 onShowPurchaseDialog: _showPurchaseDialog,
-                onVideoPlaying: _onVideoPlaying,
-                onVideoPaused: _onVideoPaused,
               ),
               VideoProgressBarWidget(
                 isVisible: currentIsDownloading,
