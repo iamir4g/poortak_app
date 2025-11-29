@@ -11,7 +11,9 @@ android {
     // ndkVersion = flutter.ndkVersion
     //   ndkVersion = flutter.ndkVersion
     // ndkVersion = "26.2.11394342"
-    ndkVersion = "29.0.13113456"
+    //mac mini m4 must be uncommented
+    //  ndkVersion = "29.0.13113456"
+    ndkVersion = "29.0.14206865"
 
 // 26.2.11394342
 
