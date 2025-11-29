@@ -42,6 +42,7 @@ import 'package:poortak/featueres/feature_intro/presentation/screens/intro_main_
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/sayareh_bloc/sayareh_cubit.dart';
+import 'package:poortak/common/bloc/video_download_cubit/video_download_cubit.dart';
 import 'package:poortak/locator.dart';
 import 'package:poortak/test_screen.dart';
 import 'package:poortak/l10n/app_localizations.dart';
@@ -132,6 +133,7 @@ void main() async {
         BlocProvider(create: (_) => locator<ThemeCubit>()),
         BlocProvider(create: (_) => locator<SettingsCubit>()),
         BlocProvider(create: (_) => locator<ConnectivityCubit>()),
+        BlocProvider(create: (_) => locator<VideoDownloadCubit>()),
         BlocProvider(
           create: (_) {
             final bloc = ShoppingCartBloc(repository: locator());

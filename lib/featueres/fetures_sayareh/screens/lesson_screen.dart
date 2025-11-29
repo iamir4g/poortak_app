@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:poortak/common/services/storage_service.dart';
-import 'package:poortak/common/utils/video_downloader_util.dart';
+import 'package:poortak/common/services/video_download_service.dart';
+import 'package:poortak/common/bloc/video_download_cubit/video_download_cubit.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_home_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/iknow_access_bloc/iknow_access_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/lesson_bloc/lesson_bloc.dart';
@@ -43,8 +43,10 @@ class _LessonScreenState extends State<LessonScreen> {
   bool isDecrypting = false;
   double decryptionProgress = 0.0;
   bool isCheckingFiles = false;
-  final StorageService _storageService = locator<StorageService>();
+  final VideoDownloadService _downloadService = locator<VideoDownloadService>();
+  final VideoDownloadCubit _downloadCubit = locator<VideoDownloadCubit>();
   Lesson? _currentLesson;
+  String? _currentVideoName;
   final GlobalKey<CustomVideoPlayerState> _videoPlayerKey =
       GlobalKey<CustomVideoPlayerState>();
   bool _isDisposed = false;
@@ -57,38 +59,7 @@ class _LessonScreenState extends State<LessonScreen> {
   Future<void> _checkAndDownloadVideo(String videoToCheck) async {
     if (videoToCheck.isEmpty) return;
 
-    setState(() => isCheckingFiles = true);
-
-    // Check for existing files
-    final existingPath = await VideoDownloaderUtil.checkExistingFiles(
-      name: videoToCheck,
-      storageService: _storageService,
-      hasAccess: hasAccess,
-      onDecrypting: (decrypting) {
-        if (!_isDisposed && mounted) {
-          setState(() => isDecrypting = decrypting);
-        }
-      },
-      onDecryptionProgress: (progress) {
-        if (!_isDisposed && mounted) {
-          setState(() => decryptionProgress = progress);
-        }
-      },
-    );
-
-    if (existingPath != null) {
-      if (!_isDisposed && mounted) {
-        setState(() {
-          localVideoPath = existingPath;
-          isCheckingFiles = false;
-        });
-      }
-      return;
-    }
-
-    if (!_isDisposed && mounted) {
-      setState(() => isCheckingFiles = false);
-    }
+    _currentVideoName = videoToCheck;
 
     // Determine which video to download based on login and purchase status
     final prefsOperator = locator<PrefsOperator>();
@@ -111,76 +82,58 @@ class _LessonScreenState extends State<LessonScreen> {
 
     if (videoToDownload == null || videoToDownload.isEmpty) return;
 
-    // Start download
-    if (!_isDisposed && mounted) {
-      setState(() {
-        isDownloading = true;
-        downloadProgress = 0.0; // Reset progress to 0 when starting download
-      });
-    }
-
-    await VideoDownloaderUtil.downloadAndStoreVideo(
-      storageService: _storageService,
-      key: videoToDownload,
-      name: videoToDownload,
-      fileId: videoToDownload,
+    // Use global download service - download continues even if screen is disposed
+    await _downloadService.checkAndDownloadVideo(
+      videoName: videoToCheck,
       lessonId: widget.lessonId,
+      hasAccess: hasAccess,
       isEncrypted: !usePublicUrl,
       usePublicUrl: usePublicUrl,
-      onDownloading: (downloading) {
-        if (!_isDisposed && mounted) {
-          setState(() => isDownloading = downloading);
-        }
-      },
-      onDownloadProgress: (progress) {
-        if (!_isDisposed && mounted) {
-          setState(() => downloadProgress = progress);
-        }
-      },
-      onDecrypting: (decrypting) {
-        if (!_isDisposed && mounted) {
-          setState(() => isDecrypting = decrypting);
-        }
-      },
-      onDecryptionProgress: (progress) {
-        if (!_isDisposed && mounted) {
-          setState(() => decryptionProgress = progress);
-        }
-      },
-      onSuccess: (path) {
-        if (!_isDisposed && mounted) {
-          setState(() {
-            localVideoPath = path;
-            videoUrl = null;
-            isDownloading = false;
-            isDecrypting = false;
-          });
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content:
-                  Text(usePublicUrl ? 'تریلر دانلود شد' : 'فایل دانلود شد'),
-              backgroundColor: Colors.green,
-              duration: const Duration(seconds: 2),
-            ),
-          );
-        }
-      },
-      onError: (error) {
-        if (!_isDisposed && mounted) {
-          setState(() {
-            isDownloading = false;
-            isDecrypting = false;
-          });
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(error),
-              backgroundColor: Colors.red,
-              duration: const Duration(seconds: 3),
-            ),
-          );
-        }
-      },
+      videoKey: videoToDownload,
     );
+  }
+
+  void _updateLocalStateFromCubit(VideoDownloadInfo? downloadInfo) {
+    if (downloadInfo == null || _isDisposed || !mounted) return;
+
+    setState(() {
+      isCheckingFiles = downloadInfo.isCheckingFiles;
+      isDownloading = downloadInfo.isDownloading;
+      downloadProgress = downloadInfo.downloadProgress;
+      isDecrypting = downloadInfo.isDecrypting;
+      decryptionProgress = downloadInfo.decryptionProgress;
+      if (downloadInfo.localPath != null) {
+        localVideoPath = downloadInfo.localPath;
+        videoUrl = null;
+      }
+    });
+
+    // Show success/error messages only once
+    if (downloadInfo.status == DownloadStatus.completed && downloadInfo.localPath != null) {
+      final prefsOperator = locator<PrefsOperator>();
+      final isLoggedIn = prefsOperator.isLoggedIn();
+      final usePublicUrl = !(isLoggedIn && hasAccess && _currentLesson?.video != null && _currentLesson!.video!.isNotEmpty);
+      
+      // Only show snackbar if we just completed (check previous state)
+      final previousInfo = _downloadCubit.getDownloadInfo(_currentVideoName ?? '');
+      if (previousInfo?.status != DownloadStatus.completed) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(usePublicUrl ? 'تریلر دانلود شد' : 'فایل دانلود شد'),
+            backgroundColor: Colors.green,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    } else if (downloadInfo.status == DownloadStatus.error && downloadInfo.error != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(downloadInfo.error!),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    }
   }
 
   void _showPurchaseDialog() {
@@ -199,6 +152,9 @@ class _LessonScreenState extends State<LessonScreen> {
     super.initState();
     isCheckingFiles = true;
     context.read<LessonBloc>().add(GetLessonEvenet(id: widget.lessonId));
+    
+    // Check if there's an existing download for this lesson
+    // This will be updated when we know the video name
   }
 
   @override
@@ -210,46 +166,59 @@ class _LessonScreenState extends State<LessonScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<LessonBloc, LessonState>(
-      listener: (context, state) {
-        print("LessonBloc state changed: $state");
-        if (state is LessonSuccess) {
-          if (!_isDisposed && mounted) {
-            setState(() => _currentLesson = state.lesson);
-          }
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<LessonBloc, LessonState>(
+          listener: (context, state) {
+            print("LessonBloc state changed: $state");
+            if (state is LessonSuccess) {
+              if (!_isDisposed && mounted) {
+                setState(() => _currentLesson = state.lesson);
+              }
 
-          // Determine which video to use
-          final prefsOperator = locator<PrefsOperator>();
-          final isLoggedIn = prefsOperator.isLoggedIn();
-          String? videoToCheck;
+              // Determine which video to use
+              final prefsOperator = locator<PrefsOperator>();
+              final isLoggedIn = prefsOperator.isLoggedIn();
+              String? videoToCheck;
 
-          if (isLoggedIn &&
-              hasAccess &&
-              state.lesson.video != null &&
-              state.lesson.video!.isNotEmpty) {
-            videoToCheck = state.lesson.video;
-            print("Checking for purchased video: $videoToCheck");
-          } else {
-            videoToCheck = state.lesson.trailerVideo;
-            print("Checking for trailer video: $videoToCheck");
-          }
+              if (isLoggedIn &&
+                  hasAccess &&
+                  state.lesson.video != null &&
+                  state.lesson.video!.isNotEmpty) {
+                videoToCheck = state.lesson.video;
+                print("Checking for purchased video: $videoToCheck");
+              } else {
+                videoToCheck = state.lesson.trailerVideo;
+                print("Checking for trailer video: $videoToCheck");
+              }
 
-          if (videoToCheck != null && videoToCheck.isNotEmpty) {
-            _checkAndDownloadVideo(videoToCheck);
-          }
-        } else if (state is LessonError) {
-          print("LessonError: ${state.message}");
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: Colors.red,
-                duration: const Duration(seconds: 2),
-              ),
-            );
-          }
-        }
-      },
+              if (videoToCheck != null && videoToCheck.isNotEmpty) {
+                _checkAndDownloadVideo(videoToCheck);
+              }
+            } else if (state is LessonError) {
+              print("LessonError: ${state.message}");
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(state.message),
+                    backgroundColor: Colors.red,
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+              }
+            }
+          },
+        ),
+        BlocListener<VideoDownloadCubit, VideoDownloadState>(
+          bloc: _downloadCubit,
+          listener: (context, state) {
+            if (_currentVideoName != null && state is VideoDownloadLoaded) {
+              final downloadInfo = state.downloads[_currentVideoName];
+              _updateLocalStateFromCubit(downloadInfo);
+            }
+          },
+        ),
+      ],
       child: Scaffold(
         backgroundColor: const Color(0xFFF6F9FE),
         appBar: PreferredSize(
@@ -332,31 +301,59 @@ class _LessonScreenState extends State<LessonScreen> {
   }
 
   Widget _buildVideoSection() {
-    return Center(
-      child: Column(
-        children: [
-          VideoContainerWidget(
-            videoPath: localVideoPath,
-            videoUrl: videoUrl,
-            isCheckingFiles: isCheckingFiles,
-            isDownloading: isDownloading,
-            isDecrypting: isDecrypting,
-            videoPlayerKey: _videoPlayerKey,
-            hasAccess: hasAccess,
-            onVideoEnded: () {},
-            onShowPurchaseDialog: _showPurchaseDialog,
+    // Listen to download cubit for real-time updates
+    return BlocBuilder<VideoDownloadCubit, VideoDownloadState>(
+      bloc: _downloadCubit,
+      builder: (context, state) {
+        // Get current download info from cubit
+        VideoDownloadInfo? downloadInfo;
+        if (_currentVideoName != null && state is VideoDownloadLoaded) {
+          downloadInfo = state.downloads[_currentVideoName];
+          // Update local state from cubit state
+          if (downloadInfo != null) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted && !_isDisposed) {
+                _updateLocalStateFromCubit(downloadInfo);
+              }
+            });
+          }
+        }
+
+        // Use cubit state if available, otherwise use local state
+        final currentIsCheckingFiles = downloadInfo?.isCheckingFiles ?? isCheckingFiles;
+        final currentIsDownloading = downloadInfo?.isDownloading ?? isDownloading;
+        final currentDownloadProgress = downloadInfo?.downloadProgress ?? downloadProgress;
+        final currentIsDecrypting = downloadInfo?.isDecrypting ?? isDecrypting;
+        final currentDecryptionProgress = downloadInfo?.decryptionProgress ?? decryptionProgress;
+        final currentLocalPath = downloadInfo?.localPath ?? localVideoPath;
+
+        return Center(
+          child: Column(
+            children: [
+              VideoContainerWidget(
+                videoPath: currentLocalPath,
+                videoUrl: videoUrl,
+                isCheckingFiles: currentIsCheckingFiles,
+                isDownloading: currentIsDownloading,
+                isDecrypting: currentIsDecrypting,
+                videoPlayerKey: _videoPlayerKey,
+                hasAccess: hasAccess,
+                onVideoEnded: () {},
+                onShowPurchaseDialog: _showPurchaseDialog,
+              ),
+              VideoProgressBarWidget(
+                isVisible: currentIsDownloading,
+                progress: currentDownloadProgress,
+                label: 'در حال دانلود...',
+              ),
+              DecryptionProgressBarWidget(
+                isVisible: currentIsDecrypting,
+                progress: currentDecryptionProgress,
+              ),
+            ],
           ),
-          VideoProgressBarWidget(
-            isVisible: isDownloading,
-            progress: downloadProgress,
-            label: 'در حال دانلود...',
-          ),
-          DecryptionProgressBarWidget(
-            isVisible: isDecrypting,
-            progress: decryptionProgress,
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
