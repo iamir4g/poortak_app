@@ -433,13 +433,13 @@ class _LoginScreenState extends State<LoginScreen> {
         } else if (state is ProfileSuccessRequestOtp) {
           log("success request otp");
           log(state.data.data.result.otp);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('کد تایید: ${state.data.data.result.otp}'),
-              backgroundColor: MyColors.success,
-              duration: const Duration(seconds: 5),
-            ),
-          );
+          // ScaffoldMessenger.of(context).showSnackBar(
+          //   SnackBar(
+          //     content: Text('کد تایید: ${state.data.data.result.otp}'),
+          //     backgroundColor: MyColors.success,
+          //     duration: const Duration(seconds: 5),
+          //   ),
+          // );
           setState(() {
             showOtpForm = true;
             mobileNumber = _mobileController.text;
