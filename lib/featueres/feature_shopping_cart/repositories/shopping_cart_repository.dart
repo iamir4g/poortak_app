@@ -124,9 +124,34 @@ class ShoppingCartRepository {
     return _cart;
   }
 
-  Future<ShoppingCart> removeFromCart(String title) async {
-    _cart.removeItem(title);
-    return _cart;
+  Future<ShoppingCart> removeFromCart(String itemId) async {
+    log("🗑️ Removing item from cart: ItemId=$itemId");
+    
+    // Check if user is logged in
+    final isLoggedIn = _prefsOperator.isLoggedIn();
+    log("   User logged in: $isLoggedIn");
+    
+    if (isLoggedIn) {
+      // User is logged in - call API to remove from backend
+      try {
+        log("📤 Calling API to remove item from backend...");
+        await _apiProvider.removeFromCart(itemId);
+        log("✅ Item removed from backend successfully");
+        
+        // Refresh cart from server to get updated state
+        log("🔄 Refreshing cart from server...");
+        return await getCart();
+      } catch (e) {
+        log("❌ Failed to remove item from backend: $e");
+        rethrow;
+      }
+    } else {
+      // User is not logged in - just remove from local cart
+      log("📱 User not logged in - removing from local cart only");
+      // Find item by itemId and remove it
+      _cart.items = _cart.items.where((item) => item.itemId != itemId).toList();
+      return _cart;
+    }
   }
 
   Future<ShoppingCart> updateQuantity(String title, int quantity) async {

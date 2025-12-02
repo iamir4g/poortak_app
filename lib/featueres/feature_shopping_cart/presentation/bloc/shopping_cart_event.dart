@@ -10,8 +10,8 @@ class AddToCartEvent extends ShoppingCartEvent {
 }
 
 class RemoveFromCartEvent extends ShoppingCartEvent {
-  final String title;
-  RemoveFromCartEvent(this.title);
+  final String itemId;
+  RemoveFromCartEvent(this.itemId);
 }
 
 class UpdateQuantityEvent extends ShoppingCartEvent {

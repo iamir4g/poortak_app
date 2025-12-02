@@ -6,6 +6,7 @@ import 'package:iconify_design/iconify_design.dart';
 import 'package:persian_tools/persian_tools.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/common/widgets/primaryButton.dart';
+import 'package:poortak/common/widgets/reusable_modal.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/models/cart_enum.dart';
@@ -17,6 +18,7 @@ import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_home_model
 import 'package:poortak/featueres/fetures_sayareh/widgets/item_multi_card.dart';
 import 'package:poortak/l10n/app_localizations.dart';
 import 'package:poortak/locator.dart';
+import 'package:poortak/common/widgets/main_wrapper.dart';
 
 class DialogCart extends StatefulWidget {
   final Lesson item;
@@ -38,6 +40,9 @@ class _DialogCartState extends State<DialogCart> {
     log("   ID: $itemId");
     log("   User logged in: $isLoggedIn");
 
+    // Get root navigator context before closing dialog
+    final rootContext = Navigator.of(context, rootNavigator: true).context;
+
     if (isLoggedIn) {
       // User is logged in - add to server cart via API
       log("📤 Adding item to server cart via API");
@@ -48,20 +53,65 @@ class _DialogCartState extends State<DialogCart> {
         log("✅ Item added to server cart successfully");
         // Refresh cart after adding
         context.read<ShoppingCartBloc>().add(GetCartEvent());
+
+        // Close current dialog
+        Navigator.of(context).pop();
+
+        // Show success modal after dialog is closed
+        Future.microtask(() {
+          _showSuccessModal(rootContext, itemName);
+        });
       } catch (e) {
         log("❌ Failed to add item to server cart: $e");
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('خطا در افزودن به سبد خرید: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        Navigator.of(context).pop(); // Close dialog even on error
+        if (mounted) {
+          Future.microtask(() {
+            ScaffoldMessenger.of(rootContext).showSnackBar(
+              SnackBar(
+                content: Text('خطا در افزودن به سبد خرید: $e'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          });
+        }
       }
     } else {
       // User is not logged in - add to local cart
       log("📱 Adding item to local cart");
       context.read<ShoppingCartBloc>().add(AddToLocalCartEvent(type, itemId));
+
+      // Close current dialog
+      Navigator.of(context).pop();
+
+      // Show success modal after dialog is closed
+      Future.microtask(() {
+        _showSuccessModal(rootContext, itemName);
+      });
     }
+  }
+
+  void _showSuccessModal(BuildContext context, String itemName) {
+    ReusableModal.showSuccess(
+      context: context,
+      title: 'اضافه به سبد خرید',
+      message: '($itemName) به سبد خرید شما اضافه شد',
+      buttonText: 'مشاهده سبد خرید',
+      secondButtonText: 'بستن',
+      showSecondButton: true,
+      cartSuccessStyle: true,
+      onButtonPressed: () {
+        Navigator.of(context).pop(); // Close success modal
+        // Navigate to MainWrapper and switch to shopping cart (index 2)
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          MainWrapper.routeName,
+          (route) => false,
+          arguments: {'initialIndex': 2},
+        );
+      },
+      onSecondButtonPressed: () {
+        Navigator.of(context).pop(); // Close success modal
+      },
+    );
   }
 
   @override
@@ -238,7 +288,6 @@ class _DialogCartState extends State<DialogCart> {
                                         CartType.IKnowCourse.name,
                                         widget.item.id,
                                         widget.item.name);
-                                    Navigator.pop(context);
                                   })
                             ],
                           ),
@@ -545,7 +594,6 @@ class _DialogCartState extends State<DialogCart> {
                                       CartType.IKnow.name,
                                       "4a61cc6b-8e3c-46e5-ad3c-5f52d0aff181",
                                       "مجموعه کامل سیاره آی نو");
-                                  Navigator.pop(context);
                                 }),
                             SizedBox(
                               height: 20,

@@ -394,9 +394,11 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                           iconSize: 18,
                           icon: const Icon(Icons.close),
                           onPressed: () {
-                            context
-                                .read<ShoppingCartBloc>()
-                                .add(RemoveFromCartEvent(item.title));
+                            if (item.itemId != null) {
+                              context
+                                  .read<ShoppingCartBloc>()
+                                  .add(RemoveFromCartEvent(item.itemId!));
+                            }
                           },
                         ),
                       ),

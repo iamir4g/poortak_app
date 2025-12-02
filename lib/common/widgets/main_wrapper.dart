@@ -21,10 +21,12 @@ import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shoppi
 import 'package:poortak/locator.dart';
 import 'package:poortak/common/bloc/permission/permission_bloc.dart';
 import 'package:poortak/common/bloc/theme_cubit/theme_cubit.dart';
+import 'package:poortak/common/blocs/bottom_nav_cubit/bottom_nav_cubit.dart';
 
 class MainWrapper extends StatefulWidget {
   static const routeName = "/main_wrapper";
-  const MainWrapper({super.key});
+  final int? initialIndex;
+  const MainWrapper({super.key, this.initialIndex});
 
   @override
   State<MainWrapper> createState() => _MainWrapperState();
@@ -32,11 +34,11 @@ class MainWrapper extends StatefulWidget {
 
 class _MainWrapperState extends State<MainWrapper> {
   // Using late init to ensure PageController is created only once
-  final PageController controller = PageController();
+  late final PageController controller;
   final PrefsOperator prefsOperator = locator<PrefsOperator>();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  int currentPageIndex = 0;
+  late int currentPageIndex;
 
   // Define screens as getters to ensure they're created when needed
   List<Widget> get topLevelScreens => [
@@ -50,6 +52,11 @@ class _MainWrapperState extends State<MainWrapper> {
   @override
   void initState() {
     super.initState();
+    // Initialize currentPageIndex from widget.initialIndex or default to 0
+    currentPageIndex = widget.initialIndex ?? 0;
+    // Initialize PageController with initial page
+    controller = PageController(initialPage: currentPageIndex);
+
     // تنظیم status bar برای MainWrapper
     WidgetsBinding.instance.addPostFrameCallback((_) {
       SystemChrome.setSystemUIOverlayStyle(
@@ -59,6 +66,17 @@ class _MainWrapperState extends State<MainWrapper> {
           statusBarBrightness: Brightness.light,
         ),
       );
+
+      // Update BottomNavCubit if initialIndex is provided
+      if (widget.initialIndex != null) {
+        try {
+          context
+              .read<BottomNavCubit>()
+              .changeSelectedIndex(widget.initialIndex!);
+        } catch (e) {
+          // BottomNavCubit might not be available yet, ignore
+        }
+      }
     });
   }
 
@@ -211,6 +229,20 @@ class _MainWrapperState extends State<MainWrapper> {
 
             return BlocBuilder<ThemeCubit, ThemeState>(
               builder: (context, themeState) {
+                // Update BottomNavCubit if initialIndex is provided (only once)
+                if (widget.initialIndex != null &&
+                    currentPageIndex == widget.initialIndex) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    try {
+                      context
+                          .read<BottomNavCubit>()
+                          .changeSelectedIndex(widget.initialIndex!);
+                    } catch (e) {
+                      // BottomNavCubit might not be available yet, ignore
+                    }
+                  });
+                }
+
                 return PopScope(
                   canPop: false,
                   onPopInvoked: (didPop) async {

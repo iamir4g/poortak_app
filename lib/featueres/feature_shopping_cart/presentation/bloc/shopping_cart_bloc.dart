@@ -1,5 +1,4 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:poortak/featueres/feature_shopping_cart/data/models/shopping_cart_model.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_state.dart';
 import 'package:poortak/featueres/feature_shopping_cart/repositories/shopping_cart_repository.dart';
@@ -49,7 +48,7 @@ class ShoppingCartBloc extends Bloc<ShoppingCartEvent, ShoppingCartState> {
       RemoveFromCartEvent event, Emitter<ShoppingCartState> emit) async {
     emit(ShoppingCartLoading());
     try {
-      final cart = await repository.removeFromCart(event.title);
+      final cart = await repository.removeFromCart(event.itemId);
       emit(ShoppingCartLoaded(cart));
     } catch (e) {
       emit(ShoppingCartError(e.toString()));

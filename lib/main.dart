@@ -177,7 +177,13 @@ void main() async {
                 ReminderScreen.routeName: (context) => ReminderScreen(),
                 IntroMainWrapper.routeName: (context) => IntroMainWrapper(),
                 TestScreen.routeName: (context) => TestScreen(),
-                MainWrapper.routeName: (context) => MainWrapper(),
+                MainWrapper.routeName: (context) {
+                  final args = ModalRoute.of(context)?.settings.arguments;
+                  final initialIndex = args is Map<String, dynamic>
+                      ? args['initialIndex'] as int?
+                      : null;
+                  return MainWrapper(initialIndex: initialIndex);
+                },
                 LessonScreen.routeName: (context) {
                   final args = ModalRoute.of(context)?.settings.arguments
                       as Map<String, dynamic>;

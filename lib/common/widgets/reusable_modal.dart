@@ -25,6 +25,9 @@ class ReusableModal extends StatelessWidget {
   // Optional custom image
   final String? customImagePath;
 
+  // Special style for cart success modal
+  final bool cartSuccessStyle;
+
   const ReusableModal({
     Key? key,
     required this.title,
@@ -37,11 +40,16 @@ class ReusableModal extends StatelessWidget {
     this.showSecondButton = false,
     this.showCloseButton = false,
     this.customImagePath,
+    this.cartSuccessStyle = false,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+    if (cartSuccessStyle) {
+      return _buildCartSuccessModal(context, isDarkMode);
+    }
 
     return Dialog(
       backgroundColor: Colors.transparent,
@@ -230,6 +238,147 @@ class ReusableModal extends StatelessWidget {
     );
   }
 
+  Widget _buildCartSuccessModal(BuildContext context, bool isDarkMode) {
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      child: Container(
+        width: 350,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Top section with icon and text
+            Padding(
+              padding: const EdgeInsets.only(top: 30, left: 20, right: 20),
+              child: Column(
+                children: [
+                  // Success icon with gradient background
+                  Container(
+                      width: 140,
+                      height: 140,
+                      // decoration: BoxDecoration(
+                      //   gradient: const LinearGradient(
+                      //     begin: Alignment.topLeft,
+                      //     end: Alignment.bottomRight,
+                      //     colors: [
+                      //       Color(0xFF4CAF50), // Green
+                      //       Color(0xFF26A69A), // Teal
+                      //     ],
+                      //   ),
+                      //   borderRadius: BorderRadius.circular(16),
+                      //   boxShadow: [
+                      //     BoxShadow(
+                      //       color: Colors.green.withOpacity(0.3),
+                      //       blurRadius: 8,
+                      //       offset: const Offset(0, 4),
+                      //     ),
+                      //   ],
+                      // ),
+                      child: Image.asset("assets/images/cart/tick_cart.png")),
+
+                  SizedBox(),
+
+                  // Title
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontFamily: 'IRANSans',
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: Colors.black,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // Message
+                  Text(
+                    message,
+                    style: const TextStyle(
+                      fontFamily: 'IRANSans',
+                      fontWeight: FontWeight.w400,
+                      fontSize: 14,
+                      color: Colors.black,
+                      height: 1.4,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(
+                    height: 28,
+                  )
+                ],
+              ),
+            ),
+
+            // Bottom section with buttons
+            Container(
+              decoration: const BoxDecoration(
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(20),
+                  bottomRight: Radius.circular(20),
+                ),
+              ),
+              child: Column(
+                children: [
+                  // Primary button in light blue section
+                  GestureDetector(
+                    onTap: onButtonPressed ?? () => Navigator.of(context).pop(),
+                    child: Container(
+                      alignment: Alignment.center,
+                      height: 70,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Color(0xFFE8F0FE), // Light blue background
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      child: Text(
+                        buttonText,
+                        style: const TextStyle(
+                          fontFamily: 'IRANSans',
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                          color: Color(0xFF1A73E8), // Dark blue
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  // Secondary button in white section
+                  if (showSecondButton && secondButtonText != null)
+                    GestureDetector(
+                        onTap: onSecondButtonPressed ??
+                            () => Navigator.of(context).pop(),
+                        child: Container(
+                          alignment: Alignment.center,
+                          height: 70,
+                          decoration: BoxDecoration(),
+                          child: Text(
+                            secondButtonText!,
+                            style: const TextStyle(
+                              fontFamily: 'IRANSans',
+                              fontWeight: FontWeight.w500,
+                              fontSize: 16,
+                              color: Colors.black, // Dark gray
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        )),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildIcon() {
     switch (type) {
       case ModalType.error:
@@ -299,6 +448,7 @@ class ReusableModal extends StatelessWidget {
     bool showSecondButton = false,
     bool showCloseButton = false,
     String? customImagePath,
+    bool cartSuccessStyle = false,
   }) {
     showDialog(
       context: context,
@@ -315,6 +465,7 @@ class ReusableModal extends StatelessWidget {
           showSecondButton: showSecondButton,
           showCloseButton: showCloseButton,
           customImagePath: customImagePath,
+          cartSuccessStyle: cartSuccessStyle,
         );
       },
     );
@@ -391,6 +542,7 @@ class ReusableModal extends StatelessWidget {
     bool showSecondButton = false,
     bool showCloseButton = false,
     String? customImagePath,
+    bool cartSuccessStyle = false,
   }) {
     show(
       context: context,
@@ -405,6 +557,38 @@ class ReusableModal extends StatelessWidget {
       showSecondButton: showSecondButton,
       showCloseButton: showCloseButton,
       customImagePath: customImagePath,
+      cartSuccessStyle: cartSuccessStyle,
     );
   }
+}
+
+// Custom painter for dotted line
+class DottedLinePainter extends CustomPainter {
+  final Color color;
+
+  DottedLinePainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 2
+      ..style = PaintingStyle.stroke;
+
+    const dashWidth = 4.0;
+    const dashSpace = 4.0;
+    double startY = 0;
+
+    while (startY < size.height) {
+      canvas.drawLine(
+        Offset(size.width / 2, startY),
+        Offset(size.width / 2, startY + dashWidth),
+        paint,
+      );
+      startY += dashWidth + dashSpace;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

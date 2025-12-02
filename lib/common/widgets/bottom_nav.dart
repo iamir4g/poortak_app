@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconify_design/iconify_design.dart';
 import 'package:poortak/config/myColors.dart';
+import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -163,7 +164,10 @@ class BottomNav extends StatelessWidget {
             final cart = cartState.cart;
             if (cart.items.isNotEmpty) {
               return badges.Badge(
-                badgeContent: Text(cart.items.length.toString()),
+                badgeStyle:
+                    badges.BadgeStyle(badgeColor: MyColors.primaryShade2),
+                badgeContent: Text(cart.items.length.toString(),
+                    style: MyTextStyle.textMatn12W700),
                 child: IconifyIcon(icon: icon, color: iconColor),
               );
             }
