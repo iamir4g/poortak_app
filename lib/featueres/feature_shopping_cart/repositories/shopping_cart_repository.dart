@@ -49,25 +49,31 @@ class ShoppingCartRepository {
       for (final cartItem in getCartModel.data.cart.items!) {
         log("🔄 Converting server cart item: ${cartItem.itemId} (${cartItem.type})");
 
-        // Create display title based on type
-        String displayTitle = '';
-        String displayDescription = '';
+        // Use source data if available, otherwise use defaults
+        String displayTitle = cartItem.source.name ?? '';
+        String displayDescription = cartItem.source.description ?? '';
 
-        if (cartItem.type == 'IKnowCourse') {
-          displayTitle = 'دوره آموزشی';
-          displayDescription = 'دوره تک درس';
-        } else if (cartItem.type == 'IKnow') {
-          displayTitle = 'مجموعه کامل سیاره آی نو';
-          displayDescription = 'شامل تمام دوره ها و کتاب ها';
-        } else {
-          displayTitle = 'محصول';
-          displayDescription = 'محصول انتخابی';
+        // Fallback to default titles if source doesn't have name
+        if (displayTitle.isEmpty) {
+          if (cartItem.type == 'IKnowCourse') {
+            displayTitle = 'دوره آموزشی';
+            displayDescription = 'دوره تک درس';
+          } else if (cartItem.type == 'IKnow') {
+            displayTitle = 'مجموعه کامل سیاره آی نو';
+            displayDescription = 'شامل تمام دوره ها و کتاب ها';
+          } else {
+            displayTitle = 'محصول';
+            displayDescription = 'محصول انتخابی';
+          }
         }
+
+        // Use thumbnail from source if available
+        String imageUrl = cartItem.source.thumbnail ?? '';
 
         final shoppingCartItem = ShoppingCartItem(
           title: displayTitle,
           description: displayDescription,
-          image: '', // Server doesn't provide image URL, using empty for now
+          image: imageUrl,
           isLock: false, // Assuming items in cart are unlocked
           price: int.parse(cartItem.price),
           itemId: cartItem.itemId,
@@ -75,7 +81,14 @@ class ShoppingCartRepository {
           quantity: cartItem.quantity,
           source: {
             'id': cartItem.source.id,
+            'name': cartItem.source.name,
+            'description': cartItem.source.description,
+            'thumbnail': cartItem.source.thumbnail,
+            'isDemo': cartItem.source.isDemo,
             'price': cartItem.source.price,
+            'video': cartItem.source.video,
+            'trailerVideo': cartItem.source.trailerVideo,
+            'order': cartItem.source.order,
             'discountType': cartItem.source.discountType,
             'discountAmount': cartItem.source.discountAmount,
           },

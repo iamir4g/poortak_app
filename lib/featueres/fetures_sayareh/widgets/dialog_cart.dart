@@ -12,6 +12,7 @@ import 'package:poortak/featueres/feature_shopping_cart/data/models/cart_enum.da
 import 'package:poortak/featueres/feature_shopping_cart/data/models/shopping_cart_model.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
+import 'package:poortak/featueres/feature_shopping_cart/data/data_source/shopping_cart_api_provider.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_home_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/widgets/item_multi_card.dart';
 import 'package:poortak/l10n/app_localizations.dart';
@@ -29,7 +30,7 @@ class _DialogCartState extends State<DialogCart> {
   final PrefsOperator _prefsOperator = locator<PrefsOperator>();
 
   void _addItemToCart(
-      BuildContext context, String type, String itemId, String itemName) {
+      BuildContext context, String type, String itemId, String itemName) async {
     final isLoggedIn = _prefsOperator.isLoggedIn();
 
     log("🛒 Adding item to cart: $itemName");
@@ -38,18 +39,24 @@ class _DialogCartState extends State<DialogCart> {
     log("   User logged in: $isLoggedIn");
 
     if (isLoggedIn) {
-      // User is logged in - add to server cart
+      // User is logged in - add to server cart via API
       log("📤 Adding item to server cart via API");
-      context.read<ShoppingCartBloc>().add(AddToCartEvent(
-            ShoppingCartItem(
-              title: itemName,
-              description:
-                  type == 'IKnowCourse' ? 'دوره تک درس' : 'مجموعه کامل',
-              image: '',
-              isLock: false,
-              price: type == 'IKnowCourse' ? 75000 : 750000,
-            ),
-          ));
+      try {
+        final apiProvider = locator<ShoppingCartApiProvider>();
+        final cartType = CartType.values.firstWhere((e) => e.name == type);
+        await apiProvider.addToCart(cartType, itemId);
+        log("✅ Item added to server cart successfully");
+        // Refresh cart after adding
+        context.read<ShoppingCartBloc>().add(GetCartEvent());
+      } catch (e) {
+        log("❌ Failed to add item to server cart: $e");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('خطا در افزودن به سبد خرید: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     } else {
       // User is not logged in - add to local cart
       log("📱 Adding item to local cart");
@@ -120,8 +127,10 @@ class _DialogCartState extends State<DialogCart> {
                                     decoration: BoxDecoration(
                                       borderRadius:
                                           BorderRadius.all(Radius.circular(27)),
-                                      color: Colors.redAccent,
+                                      color: Colors.white,
                                     ),
+                                    child: Image.asset(
+                                        "assets/images/cart/single_lesson.png"),
                                   ),
                                   Positioned(
                                     bottom: 5,
@@ -249,8 +258,10 @@ class _DialogCartState extends State<DialogCart> {
                                   decoration: BoxDecoration(
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(27)),
-                                    color: Colors.redAccent,
+                                    color: Colors.white,
                                   ),
+                                  child: Image.asset(
+                                      "assets/images/cart/bundle_lesson.png"),
                                 ),
                                 Positioned(
                                     bottom: 35,

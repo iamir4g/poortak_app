@@ -41,6 +41,7 @@ import 'package:poortak/featueres/feature_intro/presentation/bloc/splash_bloc/sp
 import 'package:poortak/featueres/feature_intro/presentation/screens/intro_main_wrapper.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
+import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/sayareh_bloc/sayareh_cubit.dart';
 import 'package:poortak/common/bloc/video_download_cubit/video_download_cubit.dart';
 import 'package:poortak/locator.dart';
@@ -137,8 +138,13 @@ void main() async {
         BlocProvider(
           create: (_) {
             final bloc = ShoppingCartBloc(repository: locator());
-            // Load cart data when the app starts
-            bloc.add(GetCartEvent());
+            final prefsOperator = locator<PrefsOperator>();
+            // Load appropriate cart based on login status
+            if (prefsOperator.isLoggedIn()) {
+              bloc.add(GetCartEvent());
+            } else {
+              bloc.add(GetLocalCartEvent());
+            }
             return bloc;
           },
         ),

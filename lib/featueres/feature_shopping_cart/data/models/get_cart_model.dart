@@ -144,29 +144,57 @@ class CartItem {
 
 class CartItemSource {
   String id;
+  String? name;
+  String? description;
+  String? thumbnail;
+  bool? isDemo;
   String price;
-  String discountType;
-  String discountAmount;
+  String? video;
+  String? trailerVideo;
+  int? order;
+  String? discountType;
+  String? discountAmount;
 
   CartItemSource({
     required this.id,
+    this.name,
+    this.description,
+    this.thumbnail,
+    this.isDemo,
     required this.price,
-    required this.discountType,
-    required this.discountAmount,
+    this.video,
+    this.trailerVideo,
+    this.order,
+    this.discountType,
+    this.discountAmount,
   });
 
   factory CartItemSource.fromJson(Map<String, dynamic> json) => CartItemSource(
-        id: json["id"],
-        price: json["price"],
+        id: json["id"] ?? "",
+        name: json["name"],
+        description: json["description"],
+        thumbnail: json["thumbnail"],
+        isDemo: json["isDemo"],
+        price: json["price"] ?? "0",
+        video: json["video"],
+        trailerVideo: json["trailerVideo"],
+        order: json["order"],
         discountType: json["discountType"],
         discountAmount: json["discountAmount"],
       );
 
   Map<String, dynamic> toJson() => {
         "id": id,
+        if (name != null) "name": name,
+        if (description != null) "description": description,
+        if (thumbnail != null) "thumbnail": thumbnail,
+        if (isDemo != null) "isDemo": isDemo,
         "price": price,
-        "discountType": discountType,
-        "discountAmount": discountAmount,
+        if (video != null) "video": video,
+        if (trailerVideo != null) "trailerVideo": trailerVideo,
+        if (order != null) "order": order,
+        if (discountType != null) "discountType": discountType,
+        if (discountAmount != null) "discountAmount": discountAmount,
       };
 }
 

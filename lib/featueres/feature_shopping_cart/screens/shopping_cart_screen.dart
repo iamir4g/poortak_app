@@ -12,6 +12,7 @@ import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shoppi
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_state.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/data_source/shopping_cart_api_provider.dart';
+import 'package:poortak/common/services/getImageUrl_service.dart';
 import 'package:poortak/l10n/app_localizations.dart';
 import 'package:poortak/locator.dart';
 // import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -30,127 +31,123 @@ class ShoppingCartScreen extends StatefulWidget {
 
 class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
   @override
+  void initState() {
+    super.initState();
+    // Load appropriate cart when screen is initialized
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final bloc = context.read<ShoppingCartBloc>();
+      _loadAppropriateCart(bloc);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return BlocProvider(
-      create: (context) {
-        final bloc = ShoppingCartBloc(repository: locator());
-        // Check if user is logged in to determine which cart to load
-        _loadAppropriateCart(bloc);
-        return bloc;
-      },
-      child: Builder(
-        builder: (context) {
-          return BlocBuilder<ShoppingCartBloc, ShoppingCartState>(
-            builder: (context, state) {
-              log("🔄 Builder called with state: ${state.runtimeType}");
+    return BlocBuilder<ShoppingCartBloc, ShoppingCartState>(
+      builder: (context, state) {
+        log("🔄 Builder called with state: ${state.runtimeType}");
 
-              if (state is ShoppingCartLoading) {
-                return Container(
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Color(0xFFE8F0FC),
-                        Color(0xFFFCEBF1),
-                        Color(0xFFEFE8FC),
-                      ],
-                      stops: [0.1, 0.54, 1.0],
-                    ),
-                  ),
-                  child: const Center(child: DotLoadingWidget(size: 100)),
-                );
-              }
-
-              // Handle server cart (for logged-in users)
-              if (state is ShoppingCartLoaded) {
-                log("📦 Builder: ShoppingCartLoaded state - Cart has ${state.cart.items.length} items");
-                log("💰 Cart totals - SubTotal: ${state.cart.subTotal}, GrandTotal: ${state.cart.grandTotal}");
-                log("🆔 Cart ID: ${state.cart.id}");
-
-                if (state.cart.items.isEmpty) {
-                  log("📭 Builder: Server cart is empty - showing empty UI");
-                  return buildEmptyCartUI();
-                }
-
-                log("✅ Builder: Server cart has items - showing cart UI");
-                return _buildCartItemsUI(state.cart, l10n);
-              }
-
-              // Handle local cart (for non-logged-in users)
-              if (state is LocalCartLoaded) {
-                log("📱 Builder: LocalCartLoaded state - Cart has ${state.items.length} items");
-
-                if (state.items.isEmpty) {
-                  log("📭 Builder: Local cart is empty - showing empty UI");
-                  return buildEmptyCartUI();
-                }
-
-                log("✅ Builder: Local cart has items - showing local cart UI");
-                return _buildLocalCartItemsUI(state.items, l10n);
-              }
-
-              // Handle local cart item added/removed states
-              if (state is LocalCartItemAdded ||
-                  state is LocalCartItemRemoved) {
-                // Refresh the cart to show updated items
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  _loadAppropriateCart(context.read<ShoppingCartBloc>());
-                });
-              }
-
-              // Handle local cart cleared state
-              if (state is LocalCartCleared) {
-                // Refresh the cart to show empty state
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  _loadAppropriateCart(context.read<ShoppingCartBloc>());
-                });
-              }
-
-              if (state is ShoppingCartError) {
-                return Container(
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Color(0xFFE8F0FC),
-                        Color(0xFFFCEBF1),
-                        Color(0xFFEFE8FC),
-                      ],
-                      stops: [0.1, 0.54, 1.0],
-                    ),
-                  ),
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          state.message,
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                        const SizedBox(height: 10),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.amber.shade800),
-                          onPressed: () {
-                            _loadAppropriateCart(
-                                context.read<ShoppingCartBloc>());
-                          },
-                          child: const Text("Try Again"),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }
-
-              return Container();
-            },
+        if (state is ShoppingCartLoading) {
+          return Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color(0xFFE8F0FC),
+                  Color(0xFFFCEBF1),
+                  Color(0xFFEFE8FC),
+                ],
+                stops: [0.1, 0.54, 1.0],
+              ),
+            ),
+            child: const Center(child: DotLoadingWidget(size: 100)),
           );
-        },
-      ),
+        }
+
+        // Handle server cart (for logged-in users)
+        if (state is ShoppingCartLoaded) {
+          log("📦 Builder: ShoppingCartLoaded state - Cart has ${state.cart.items.length} items");
+          log("💰 Cart totals - SubTotal: ${state.cart.subTotal}, GrandTotal: ${state.cart.grandTotal}");
+          log("🆔 Cart ID: ${state.cart.id}");
+
+          if (state.cart.items.isEmpty) {
+            log("📭 Builder: Server cart is empty - showing empty UI");
+            return buildEmptyCartUI();
+          }
+
+          log("✅ Builder: Server cart has items - showing cart UI");
+          return _buildCartItemsUI(state.cart, l10n);
+        }
+
+        // Handle local cart (for non-logged-in users)
+        if (state is LocalCartLoaded) {
+          log("📱 Builder: LocalCartLoaded state - Cart has ${state.items.length} items");
+
+          if (state.items.isEmpty) {
+            log("📭 Builder: Local cart is empty - showing empty UI");
+            return buildEmptyCartUI();
+          }
+
+          log("✅ Builder: Local cart has items - showing local cart UI");
+          return _buildLocalCartItemsUI(state.items, l10n);
+        }
+
+        // Handle local cart item added/removed states
+        if (state is LocalCartItemAdded || state is LocalCartItemRemoved) {
+          // Refresh the cart to show updated items
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _loadAppropriateCart(context.read<ShoppingCartBloc>());
+          });
+        }
+
+        // Handle local cart cleared state
+        if (state is LocalCartCleared) {
+          // Refresh the cart to show empty state
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _loadAppropriateCart(context.read<ShoppingCartBloc>());
+          });
+        }
+
+        if (state is ShoppingCartError) {
+          return Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color(0xFFE8F0FC),
+                  Color(0xFFFCEBF1),
+                  Color(0xFFEFE8FC),
+                ],
+                stops: [0.1, 0.54, 1.0],
+              ),
+            ),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    state.message,
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                  const SizedBox(height: 10),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.amber.shade800),
+                    onPressed: () {
+                      _loadAppropriateCart(context.read<ShoppingCartBloc>());
+                    },
+                    child: const Text("Try Again"),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
+        return Container();
+      },
     );
   }
 
@@ -173,6 +170,121 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
     }
   }
 
+  // Build header section with points
+  Widget _buildPointsHeader() {
+    return Container(
+      height: 144,
+      padding: const EdgeInsets.symmetric(horizontal: 32),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(15),
+          bottomRight: Radius.circular(15),
+        ),
+      ),
+      child: Column(
+        children: [
+          const SizedBox(height: 12),
+          // Points section with star animation
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              // Star animation
+              SizedBox(
+                width: 50,
+                height: 50,
+                child: Lottie.asset(
+                  'assets/images/cart/star.json',
+                  fit: BoxFit.cover,
+                ),
+              ),
+              const SizedBox(width: 8),
+              const Text(
+                'مجموع امتیاز های شما : ',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF29303D),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                width: 79,
+                height: 33,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFE8CC),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Center(
+                  child: Text(
+                    '۲۰۰ سکه',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xFF29303D),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          // Progress bar section
+          Row(
+            children: [
+              Container(
+                width: 71,
+                height: 48,
+                decoration: BoxDecoration(
+                  border: Border.all(color: const Color(0xFFFFA73F)),
+                  borderRadius: BorderRadius.circular(22),
+                ),
+                child: const Center(
+                  child: Text(
+                    'راهنما ؟',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFFFFA73F),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                width: 247,
+                height: 48,
+                decoration: BoxDecoration(
+                  border: Border.all(color: const Color(0xFFC2C9D6)),
+                  borderRadius: BorderRadius.circular(22),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        height: 48,
+                        child: const Center(
+                          child: Text(
+                            'محاسبه امتیاز بر روی سبد خرید',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFFC2C9D6),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   // Build empty cart UI
   Widget buildEmptyCartUI() {
     return Container(
@@ -182,120 +294,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
       child: Column(
         children: [
           // Header section with points
-          Container(
-            height: 144,
-            padding: EdgeInsets.symmetric(horizontal: 32),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(15),
-                bottomRight: Radius.circular(15),
-              ),
-            ),
-            child: Column(
-              children: [
-                const SizedBox(height: 12),
-                // Points section with star animation
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    // Star animation
-                    SizedBox(
-                      width: 50,
-                      height: 50,
-                      child: Lottie.asset(
-                        'assets/images/cart/star.json',
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-
-                    const Text(
-                      'مجموع امتیاز های شما : ',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xFF29303D),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Container(
-                      width: 79,
-                      height: 33,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFFE8CC),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const Center(
-                        child: Text(
-                          '۲۰۰ سکه',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: Color(0xFF29303D),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                // Progress bar section
-                // Progress fill
-                Row(
-                  children: [
-                    Container(
-                      width: 71,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: const Color(0xFFFFA73F)),
-                        borderRadius: BorderRadius.circular(22),
-                      ),
-                      child: const Center(
-                        child: Text(
-                          'راهنما ؟',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFFFFA73F),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Container(
-                      width: 247,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: const Color(0xFFC2C9D6)),
-                        borderRadius: BorderRadius.circular(22),
-                      ),
-                      child: Row(
-                        children: [
-                          // Remaining space
-                          Expanded(
-                            child: Container(
-                              height: 48,
-                              child: const Center(
-                                child: Text(
-                                  'محاسبه امتیاز بر روی سبد خرید',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFFC2C9D6),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
+          _buildPointsHeader(),
           // Main content - empty cart
           Expanded(
             child: Column(
@@ -368,50 +367,8 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
       ),
       child: Column(
         children: [
-          // Cart metadata header
-          if (cart.id != null)
-            Container(
-              margin: const EdgeInsets.all(16),
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: MyColors.background,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'سبد خرید',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  if (cart.subTotal != null && cart.grandTotal != null)
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'قیمت کل: ${cart.subTotal!.addComma} تومان',
-                          style: TextStyle(
-                            color: Colors.grey[600],
-                            fontSize: 14,
-                          ),
-                        ),
-                        if (cart.subTotal != cart.grandTotal)
-                          Text(
-                            'تخفیف: ${(cart.subTotal! - cart.grandTotal!).addComma} تومان',
-                            style: TextStyle(
-                              color: Colors.green[600],
-                              fontSize: 14,
-                            ),
-                          ),
-                      ],
-                    ),
-                ],
-              ),
-            ),
+          // Header section with points
+          _buildPointsHeader(),
           Expanded(
             child: ListView.builder(
               itemCount: cart.items.length,
@@ -450,16 +407,11 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                             height: 100,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
-                              color: Colors.red,
+                              color: Colors.grey[300],
                             ),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(10),
-                              child: Image.network(
-                                item.image,
-                                fit: BoxFit.cover,
-                                width: 100,
-                                height: 100,
-                              ),
+                              child: _buildCartItemImage(item),
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -638,6 +590,8 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
       ),
       child: Column(
         children: [
+          // Header section with points
+          _buildPointsHeader(),
           Expanded(
             child: ListView.builder(
               itemCount: localCartItems.length,
@@ -858,5 +812,84 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
       }
     }
     return total;
+  }
+
+  // Helper method to build cart item image
+  Widget _buildCartItemImage(ShoppingCartItem item) {
+    // Check if source has thumbnail
+    String? thumbnailId;
+    if (item.source != null && item.source!['thumbnail'] != null) {
+      thumbnailId = item.source!['thumbnail'] as String?;
+    }
+
+    // If we have a thumbnail ID, use GetImageUrlService
+    if (thumbnailId != null && thumbnailId.isNotEmpty) {
+      return FutureBuilder<String>(
+        future: GetImageUrlService().getImageUrl(thumbnailId),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError ||
+              !snapshot.hasData ||
+              snapshot.data!.isEmpty) {
+            return Container(
+              color: Colors.grey[300],
+              child: const Icon(
+                Icons.image_not_supported,
+                size: 40,
+                color: Colors.grey,
+              ),
+            );
+          }
+          return Image.network(
+            snapshot.data!,
+            fit: BoxFit.cover,
+            width: 100,
+            height: 100,
+            errorBuilder: (context, error, stackTrace) {
+              return Container(
+                color: Colors.grey[300],
+                child: const Icon(
+                  Icons.image_not_supported,
+                  size: 40,
+                  color: Colors.grey,
+                ),
+              );
+            },
+          );
+        },
+      );
+    }
+
+    // If we have a direct image URL
+    if (item.image.isNotEmpty) {
+      return Image.network(
+        item.image,
+        fit: BoxFit.cover,
+        width: 100,
+        height: 100,
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            color: Colors.grey[300],
+            child: const Icon(
+              Icons.image_not_supported,
+              size: 40,
+              color: Colors.grey,
+            ),
+          );
+        },
+      );
+    }
+
+    // Default placeholder
+    return Container(
+      color: Colors.grey[300],
+      child: const Icon(
+        Icons.shopping_cart,
+        size: 40,
+        color: Colors.grey,
+      ),
+    );
   }
 }
