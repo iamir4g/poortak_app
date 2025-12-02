@@ -5,6 +5,7 @@ import 'package:poortak/common/services/getImageUrl_service.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_home_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/iknow_access_bloc/iknow_access_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/lesson_screen.dart';
+import 'package:poortak/featueres/fetures_sayareh/widgets/dialog_cart.dart';
 
 class ItemLeason extends StatelessWidget {
   final Lesson item;
@@ -31,13 +32,21 @@ class ItemLeason extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context, LessonScreen.routeName, arguments: {
-          'index': index,
-          'title': item.name,
-          'lessonId': item.id,
-          'purchased': hasAccess, // Use hasAccess instead of purchased
-        });
-        // }
+        // If isDemo is true, go directly to lesson screen
+        if (item.isDemo) {
+          Navigator.pushNamed(context, LessonScreen.routeName, arguments: {
+            'index': index,
+            'title': item.name,
+            'lessonId': item.id,
+            'purchased': hasAccess, // Use hasAccess instead of purchased
+          });
+        } else {
+          // If isDemo is false, show add to cart modal
+          showDialog(
+            context: context,
+            builder: (BuildContext context) => DialogCart(item: item),
+          );
+        }
       },
       child: Container(
         width: 360,

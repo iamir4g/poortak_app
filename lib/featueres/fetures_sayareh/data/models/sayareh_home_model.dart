@@ -43,6 +43,7 @@ class Lesson {
   String price;
   String? video;
   String trailerVideo;
+  bool isDemo;
   int order;
   DateTime createdAt;
   DateTime updatedAt;
@@ -58,6 +59,7 @@ class Lesson {
     this.video,
     required this.purchased,
     required this.trailerVideo,
+    required this.isDemo,
     required this.order,
     required this.createdAt,
     required this.updatedAt,
@@ -73,6 +75,7 @@ class Lesson {
         video: json["video"],
         purchased: json["purchased"] ?? false,
         trailerVideo: json["trailerVideo"] ?? "",
+        isDemo: json["isDemo"] ?? false,
         order: json["order"] ?? 0,
         createdAt: DateTime.parse(json["createdAt"]),
         updatedAt: DateTime.parse(json["updatedAt"]),
@@ -90,6 +93,7 @@ class Lesson {
         "video": video,
         "purchased": purchased,
         "trailerVideo": trailerVideo,
+        "isDemo": isDemo,
         "order": order,
         "createdAt": createdAt.toIso8601String(),
         "updatedAt": updatedAt.toIso8601String(),
