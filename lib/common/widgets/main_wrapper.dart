@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:developer';
 
+import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -18,6 +20,7 @@ import 'package:poortak/featueres/fetures_sayareh/screens/sayareh_screen.dart';
 import 'package:poortak/featueres/feature_shopping_cart/screens/shopping_cart_screen.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
+import 'package:poortak/featueres/feature_payment/presentation/screens/payment_result_screen.dart';
 import 'package:poortak/locator.dart';
 import 'package:poortak/common/bloc/permission/permission_bloc.dart';
 import 'package:poortak/common/bloc/theme_cubit/theme_cubit.dart';
@@ -39,6 +42,10 @@ class _MainWrapperState extends State<MainWrapper> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   late int currentPageIndex;
+  
+  // Deep link handling
+  late final AppLinks _appLinks;
+  StreamSubscription<Uri>? _linkSubscription;
 
   // Define screens as getters to ensure they're created when needed
   List<Widget> get topLevelScreens => [
@@ -78,10 +85,57 @@ class _MainWrapperState extends State<MainWrapper> {
         }
       }
     });
+    
+    // Initialize deep link handling for when app is already running
+    _initDeepLinks();
+  }
+  
+  Future<void> _initDeepLinks() async {
+    _appLinks = AppLinks();
+    
+    // Listen for deep links when app is already running
+    _linkSubscription = _appLinks.uriLinkStream.listen(
+      (Uri uri) {
+        log("🔗 MainWrapper: Deep link received: $uri");
+        _handleIncomingLink(uri);
+      },
+      onError: (error) {
+        log("❌ MainWrapper: Deep link stream error: $error");
+      },
+    );
+  }
+  
+  void _handleIncomingLink(Uri uri) {
+    log("📌 MainWrapper: Deep Link received: $uri");
+    log("📌 MainWrapper: URI scheme: ${uri.scheme}");
+    log("📌 MainWrapper: URI host: ${uri.host}");
+    log("📌 MainWrapper: URI query parameters: ${uri.queryParameters}");
+
+    if (uri.scheme == "return" && uri.host == "poortak") {
+      final okParam = uri.queryParameters["ok"];
+      if (okParam != null) {
+        log("📌 MainWrapper: Valid deep link detected, navigating to PaymentResultScreen");
+        
+        // Navigate to payment result screen for both success and failure
+        Navigator.pushNamed(
+          context,
+          PaymentResultScreen.routeName,
+          arguments: {
+            "status": int.parse(okParam),
+            "ref": uri.queryParameters["ref"],
+          },
+        );
+      } else {
+        log("📌 MainWrapper: Deep link missing 'ok' parameter");
+      }
+    } else {
+      log("📌 MainWrapper: Deep link does not match expected format");
+    }
   }
 
   @override
   void dispose() {
+    _linkSubscription?.cancel();
     controller.dispose();
     super.dispose();
   }

@@ -522,15 +522,6 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                   lable: l10n?.pay_now ?? "Pay Now",
                   onPressed: () async {
                     try {
-                      // Show loading message
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('در حال پردازش...'),
-                          backgroundColor: Colors.blue,
-                          duration: const Duration(seconds: 2),
-                        ),
-                      );
-
                       // Call checkout API directly
                       final apiProvider = locator<ShoppingCartApiProvider>();
                       final response = await apiProvider.checkoutCart();
@@ -541,28 +532,22 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                       final url = response.data['data']['url'] as String;
                       log("🔗 Payment URL: $url");
 
-                      // Show success message
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('در حال انتقال به درگاه پرداخت...'),
-                          backgroundColor: Colors.green,
-                          duration: const Duration(seconds: 2),
-                        ),
-                      );
-
-                      // Launch payment URL
-                      launchUrl(
+                      // Launch payment URL immediately without showing SnackBar
+                      // to avoid showing "در حال پردازش..." when user returns
+                      await launchUrl(
                         Uri.parse(url),
                         mode: LaunchMode.externalApplication,
                       );
                     } catch (e) {
                       log("❌ Checkout failed: $e");
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('خطا در پردازش پرداخت: $e'),
-                          backgroundColor: Colors.red,
-                        ),
-                      );
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('خطا در پردازش پرداخت: $e'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
                     }
                   },
                 ),
@@ -748,15 +733,6 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                   lable: l10n?.pay_now ?? "Pay Now",
                   onPressed: () async {
                     try {
-                      // Show loading message
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('در حال پردازش...'),
-                          backgroundColor: Colors.blue,
-                          duration: const Duration(seconds: 2),
-                        ),
-                      );
-
                       // Call checkout API directly
                       final apiProvider = locator<ShoppingCartApiProvider>();
                       final response = await apiProvider.checkoutCart();
@@ -767,28 +743,22 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                       final url = response.data['data']['url'] as String;
                       log("🔗 Payment URL: $url");
 
-                      // Show success message
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('در حال انتقال به درگاه پرداخت...'),
-                          backgroundColor: Colors.green,
-                          duration: const Duration(seconds: 2),
-                        ),
-                      );
-
-                      // Launch payment URL
-                      launchUrl(
+                      // Launch payment URL immediately without showing SnackBar
+                      // to avoid showing "در حال پردازش..." when user returns
+                      await launchUrl(
                         Uri.parse(url),
                         mode: LaunchMode.externalApplication,
                       );
                     } catch (e) {
                       log("❌ Checkout failed: $e");
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('خطا در پردازش پرداخت: $e'),
-                          backgroundColor: Colors.red,
-                        ),
-                      );
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('خطا در پردازش پرداخت: $e'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
                     }
                   },
                 ),

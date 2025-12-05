@@ -32,8 +32,8 @@ class ItemLeason extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
-        // If isDemo is true, go directly to lesson screen
-        if (item.isDemo) {
+        // If isDemo is true OR user has access, go directly to lesson screen
+        if (item.isDemo || hasAccess) {
           Navigator.pushNamed(context, LessonScreen.routeName, arguments: {
             'index': index,
             'title': item.name,
@@ -41,7 +41,7 @@ class ItemLeason extends StatelessWidget {
             'purchased': hasAccess, // Use hasAccess instead of purchased
           });
         } else {
-          // If isDemo is false, show add to cart modal
+          // If isDemo is false AND user doesn't have access, show add to cart modal
           showDialog(
             context: context,
             builder: (BuildContext context) => DialogCart(item: item),

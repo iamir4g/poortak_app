@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:poortak/common/widgets/main_wrapper.dart';
+import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/iknow_access_bloc/iknow_access_bloc.dart';
+import 'package:poortak/locator.dart';
 
-class PaymentResultScreen extends StatelessWidget {
+class PaymentResultScreen extends StatefulWidget {
   static const String routeName = '/payment-result';
 
   final int ok;
@@ -14,9 +16,27 @@ class PaymentResultScreen extends StatelessWidget {
   });
 
   @override
+  State<PaymentResultScreen> createState() => _PaymentResultScreenState();
+}
+
+class _PaymentResultScreenState extends State<PaymentResultScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Refresh access data if payment was successful
+    if (widget.ok == 1) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final accessBloc = locator<IknowAccessBloc>();
+        accessBloc.add(FetchIknowAccessEvent(forceRefresh: true));
+        debugPrint("🔄 PaymentResultScreen: Refreshing IknowAccessBloc after successful payment");
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    debugPrint("PaymentResultScreen: Building with status='$ok', ref='$ref'");
-    final isSuccess = ok == 1 ? true : false;
+    debugPrint("PaymentResultScreen: Building with status='${widget.ok}', ref='${widget.ref}'");
+    final isSuccess = widget.ok == 1 ? true : false;
 
     debugPrint("PaymentResultScreen: isSuccess=$isSuccess");
 
@@ -116,7 +136,7 @@ class PaymentResultScreen extends StatelessWidget {
                   _buildDetailRow('مبلغ', _getAmount()),
                   _buildDetailRow('روش پرداخت', _getPaymentMethod()),
                   _buildDetailRow('تاریخ و زمان', _getDateTime()),
-                  if (ref != null) _buildDetailRow('کد پیگیری', ref!),
+                  if (widget.ref != null) _buildDetailRow('کد پیگیری', widget.ref!),
                 ],
               ),
             ),

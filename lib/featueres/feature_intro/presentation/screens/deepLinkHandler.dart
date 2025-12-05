@@ -58,22 +58,26 @@ class _DeepLinkHandlerState extends State<DeepLinkHandler> {
     debugPrint(
         "📌 DeepLinkHandler: URI query parameters: ${uri.queryParameters}");
 
-    if (uri.scheme == "return" &&
-        uri.host == "poortak" &&
-        uri.queryParameters["ok"] == "1") {
-      debugPrint(
-          "📌 DeepLinkHandler: Valid deep link detected, navigating to PaymentResultScreen");
-      _hasReceivedDeepLink = true;
+    if (uri.scheme == "return" && uri.host == "poortak") {
+      final okParam = uri.queryParameters["ok"];
+      if (okParam != null) {
+        debugPrint(
+            "📌 DeepLinkHandler: Valid deep link detected, navigating to PaymentResultScreen");
+        _hasReceivedDeepLink = true;
 
-      // Navigate directly to payment result
-      Navigator.pushNamed(
-        context,
-        PaymentResultScreen.routeName,
-        arguments: {
-          "status": uri.queryParameters["ok"],
-          "ref": uri.queryParameters["ref"],
-        },
-      );
+        // Navigate directly to payment result for both success and failure
+        Navigator.pushNamed(
+          context,
+          PaymentResultScreen.routeName,
+          arguments: {
+            "status": int.parse(okParam),
+            "ref": uri.queryParameters["ref"],
+          },
+        );
+      } else {
+        debugPrint(
+            "📌 DeepLinkHandler: Deep link missing 'ok' parameter");
+      }
     } else {
       debugPrint(
           "📌 DeepLinkHandler: Deep link does not match expected format");

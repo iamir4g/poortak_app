@@ -292,7 +292,8 @@ class _SplashScreenState extends State<SplashScreen>
     // More flexible matching
     if (uri.scheme == "return" && uri.host == "poortak") {
       debugPrint("📌 Scheme and host match!");
-      if (uri.queryParameters["ok"] == "1") {
+      final okParam = uri.queryParameters["ok"];
+      if (okParam != null) {
         debugPrint(
             "📌 Valid deep link detected, navigating to PaymentResultScreen");
         _hasHandledDeepLink = true;
@@ -303,14 +304,14 @@ class _SplashScreenState extends State<SplashScreen>
             context,
             PaymentResultScreen.routeName,
             arguments: {
-              "status": int.parse(uri.queryParameters["ok"] ?? "0"),
+              "status": int.parse(okParam),
               "ref": uri.queryParameters["ref"],
             },
           );
         });
       } else {
         debugPrint(
-            "📌 Deep link ok parameter is not 1: ${uri.queryParameters["ok"]}");
+            "📌 Deep link missing 'ok' parameter");
       }
     } else {
       debugPrint("📌 Deep link does not match expected format");
