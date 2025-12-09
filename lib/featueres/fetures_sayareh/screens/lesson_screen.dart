@@ -126,6 +126,7 @@ class _LessonScreenState extends State<LessonScreen> {
         );
       }
     } else if (downloadInfo.status == DownloadStatus.error && downloadInfo.error != null) {
+      // Only show error toast for real errors, not connectivity issues (which are paused)
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(downloadInfo.error!),
@@ -134,6 +135,7 @@ class _LessonScreenState extends State<LessonScreen> {
         ),
       );
     }
+    // Note: paused status doesn't show toast - download will resume automatically when internet reconnects
   }
 
   void _showPurchaseDialog() {

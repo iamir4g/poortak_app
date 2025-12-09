@@ -19,6 +19,7 @@ import 'package:poortak/locator.dart';
 
 import 'package:url_launcher/url_launcher.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
+import 'package:poortak/common/error_handling/app_exception.dart';
 import 'dart:developer';
 
 class ShoppingCartScreen extends StatefulWidget {
@@ -541,12 +542,24 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                     } catch (e) {
                       log("❌ Checkout failed: $e");
                       if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('خطا در پردازش پرداخت: $e'),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
+                        // Check if error is UnauthorisedException (user not logged in)
+                        if (e is UnauthorisedException) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content:
+                                  Text('برای ادامه پرداخت باید لاگین کنید'),
+                              backgroundColor: Colors.orange,
+                              duration: Duration(seconds: 3),
+                            ),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('خطا در پردازش پرداخت: $e'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
                       }
                     }
                   },
@@ -752,12 +765,24 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                     } catch (e) {
                       log("❌ Checkout failed: $e");
                       if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('خطا در پردازش پرداخت: $e'),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
+                        // Check if error is UnauthorisedException (user not logged in)
+                        if (e is UnauthorisedException) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content:
+                                  Text('برای ادامه پرداخت باید لاگین کنید'),
+                              backgroundColor: Colors.orange,
+                              duration: Duration(seconds: 3),
+                            ),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('خطا در پردازش پرداخت: $e'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
                       }
                     }
                   },

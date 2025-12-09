@@ -403,7 +403,7 @@ class _DialogCartState extends State<DialogCart> {
                                         shrinkWrap: true,
                                         physics:
                                             const NeverScrollableScrollPhysics(),
-                                        itemCount: 10,
+                                        itemCount: 8,
                                         separatorBuilder: (context, index) {
                                           return const SizedBox(height: 6);
                                         },

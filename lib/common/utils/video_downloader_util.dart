@@ -293,11 +293,54 @@ class VideoDownloaderUtil {
         }
       } catch (e) {
         print("Error downloading file: $e");
-        onError?.call('خطا در دانلود فایل: $e');
+        // Pass the error message as-is so VideoDownloadService can determine if it's a connectivity error
+        // DioException contains more detailed error information
+        String errorMessage;
+        if (e is DioException) {
+          errorMessage = e.message ?? e.toString();
+          // Check DioException type for better connectivity error detection
+          // unknown type often occurs when connection is closed during download
+          if (e.type == DioExceptionType.connectionTimeout ||
+              e.type == DioExceptionType.receiveTimeout ||
+              e.type == DioExceptionType.sendTimeout ||
+              e.type == DioExceptionType.connectionError ||
+              e.type == DioExceptionType.unknown) {
+            errorMessage = 'Connection error: $errorMessage';
+          }
+        } else {
+          errorMessage = e.toString();
+          // Also check for HttpException (which wraps connection errors)
+          if (errorMessage.contains('Connection closed') ||
+              errorMessage.contains('HttpException')) {
+            errorMessage = 'Connection error: $errorMessage';
+          }
+        }
+        onError?.call(errorMessage);
       }
     } catch (e) {
       print('Error in download process: $e');
-      onError?.call('خطا در دانلود فایل: $e');
+      // Pass the error message as-is so VideoDownloadService can determine if it's a connectivity error
+      String errorMessage;
+      if (e is DioException) {
+        errorMessage = e.message ?? e.toString();
+        // Check DioException type for better connectivity error detection
+        // unknown type often occurs when connection is closed during download
+        if (e.type == DioExceptionType.connectionTimeout ||
+            e.type == DioExceptionType.receiveTimeout ||
+            e.type == DioExceptionType.sendTimeout ||
+            e.type == DioExceptionType.connectionError ||
+            e.type == DioExceptionType.unknown) {
+          errorMessage = 'Connection error: $errorMessage';
+        }
+      } else {
+        errorMessage = e.toString();
+        // Also check for HttpException (which wraps connection errors)
+        if (errorMessage.contains('Connection closed') ||
+            errorMessage.contains('HttpException')) {
+          errorMessage = 'Connection error: $errorMessage';
+        }
+      }
+      onError?.call(errorMessage);
     }
   }
 }

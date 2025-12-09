@@ -136,6 +136,7 @@ Future<void> initLocator() async {
     VideoDownloadService(
       storageService: locator<StorageService>(),
       downloadCubit: locator<VideoDownloadCubit>(),
+      connectivityCubit: locator<ConnectivityCubit>(),
     ),
   );
 }

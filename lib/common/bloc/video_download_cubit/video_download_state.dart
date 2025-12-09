@@ -63,5 +63,5 @@ enum DownloadStatus {
   decrypting,
   completed,
   error,
+  paused,
 }
-
