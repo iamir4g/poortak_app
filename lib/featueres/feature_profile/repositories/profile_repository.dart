@@ -8,6 +8,7 @@ import 'package:poortak/featueres/feature_profile/data/models/request_otp_model.
 import 'package:poortak/featueres/feature_profile/data/models/me_profile_model.dart';
 import 'package:poortak/featueres/feature_profile/data/models/update_profile_model.dart';
 import 'package:poortak/featueres/feature_profile/data/models/update_profile_params.dart';
+import 'package:poortak/featueres/feature_profile/data/models/user_points_total_model.dart';
 import 'dart:developer';
 
 // import 'package:poortak/featueres/feature_profile/data/models/login_otp_model.dart';
@@ -149,6 +150,26 @@ class ProfileRepository {
       }
     } catch (e) {
       log("Get Me Profile Error: $e");
+      return DataFailed(e.toString());
+    }
+  }
+
+  Future<DataState<UserPointsTotalModel>> callGetUserPointsTotal() async {
+    try {
+      final response = await profileApiProvider.callGetUserPointsTotal();
+      log("User Points Total Response: ${response.data}");
+      if ((response.statusCode == 200 || response.statusCode == 201) &&
+          response.data['ok'] == true) {
+        final UserPointsTotalModel userPointsTotalModel =
+            UserPointsTotalModel.fromJson(response.data);
+        log("User Points Total Success - Parsed Model: remaining=${userPointsTotalModel.data.remaining}, added=${userPointsTotalModel.data.added}, deducted=${userPointsTotalModel.data.deducted}");
+        return DataSuccess(userPointsTotalModel);
+      } else {
+        log("User Points Total Error - Status: ${response.statusCode}, Data: ${response.data}");
+        return DataFailed(response.data['message'] ?? "خطا در دریافت امتیازها");
+      }
+    } catch (e) {
+      log("User Points Total Error: $e");
       return DataFailed(e.toString());
     }
   }

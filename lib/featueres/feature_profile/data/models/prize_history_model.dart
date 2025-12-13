@@ -1,7 +1,7 @@
 class PrizeHistoryModel {
   final String id;
   final int amount;
-  final int remainingAmount;
+  final int runningAmount; // Changed from remainingAmount to runningAmount
   final String description;
   final String type;
   final String userId;
@@ -11,7 +11,7 @@ class PrizeHistoryModel {
   PrizeHistoryModel({
     required this.id,
     required this.amount,
-    required this.remainingAmount,
+    required this.runningAmount,
     required this.description,
     required this.type,
     required this.userId,
@@ -23,7 +23,7 @@ class PrizeHistoryModel {
     return PrizeHistoryModel(
       id: json['id'] ?? '',
       amount: json['amount'] ?? 0,
-      remainingAmount: json['remainingAmount'] ?? 0,
+      runningAmount: json['runningAmount'] ?? 0,
       description: json['description'] ?? '',
       type: json['type'] ?? '',
       userId: json['userId'] ?? '',
@@ -38,7 +38,7 @@ class PrizeHistoryModel {
     return {
       'id': id,
       'amount': amount,
-      'remainingAmount': remainingAmount,
+      'runningAmount': runningAmount,
       'description': description,
       'type': type,
       'userId': userId,

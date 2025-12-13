@@ -39,18 +39,20 @@ GetIt locator = GetIt.instance;
 Future<void> initLocator() async {
   final dio = Dio();
 
+  // Set x-lang header as default for all requests
+  dio.options.headers['x-lang'] = 'fa';
+
   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
   locator.registerSingleton<SharedPreferences>(sharedPreferences);
   locator.registerSingleton<PrefsOperator>(PrefsOperator());
 
   final prefsOperator = locator<PrefsOperator>();
 
-  // Add interceptor to set x-lang header and authorization token
+  // Add interceptor to set authorization token
   dio.interceptors.add(InterceptorsWrapper(
     onRequest: (options, handler) async {
-      // Set x-lang header for all requests
-      options.headers['x-lang'] =
-          'fa'; // You can change 'en' to your desired language code
+      // Ensure x-lang header is set (in case it was removed)
+      options.headers['x-lang'] = 'fa';
 
       // Add authorization token if available
       final token = await prefsOperator.getUserToken();

@@ -1,12 +1,17 @@
 import 'package:dio/dio.dart';
+import 'package:poortak/common/services/auth_service.dart';
 import 'package:poortak/config/constants.dart';
 import 'package:poortak/featueres/feature_profile/data/models/payment_history_params.dart';
 import 'package:poortak/featueres/feature_profile/data/models/update_profile_params.dart';
+import 'package:poortak/locator.dart';
 import 'dart:developer';
 
 class ProfileApiProvider {
   Dio dio;
-  ProfileApiProvider({required this.dio});
+  final AuthService _authService;
+  
+  ProfileApiProvider({required this.dio})
+      : _authService = locator<AuthService>();
 
   dynamic callRequestOtp(String phone) async {
     final response = await dio.post(
@@ -94,6 +99,16 @@ class ProfileApiProvider {
     final response = await dio.get(
       "${Constants.baseUrl}constants/avatars",
     );
+    return response;
+  }
+
+  /// Get user points total
+  /// api/v1/user/points/total
+  dynamic callGetUserPointsTotal() async {
+    final response = await _authService.get(
+      "${Constants.baseUrl}user/points/total",
+    );
+    log("User Points Total Response: ${response.data}");
     return response;
   }
 }

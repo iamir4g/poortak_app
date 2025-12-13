@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconify_design/iconify_design.dart';
@@ -30,6 +31,41 @@ class DialogCart extends StatefulWidget {
 
 class _DialogCartState extends State<DialogCart> {
   final PrefsOperator _prefsOperator = locator<PrefsOperator>();
+
+  /// Extracts error message from DioException or other exceptions
+  String _extractErrorMessage(dynamic error) {
+    if (error is DioException) {
+      // Check if there's a response with data
+      if (error.response != null && error.response!.data != null) {
+        final responseData = error.response!.data;
+
+        // Try to extract message from response data
+        if (responseData is Map<String, dynamic>) {
+          // Check for 'message' field
+          if (responseData.containsKey('message')) {
+            final message = responseData['message'];
+            if (message is String && message.isNotEmpty) {
+              return message;
+            }
+          }
+          // Check for 'error' field
+          if (responseData.containsKey('error')) {
+            final errorMsg = responseData['error'];
+            if (errorMsg is String && errorMsg.isNotEmpty) {
+              return errorMsg;
+            }
+          }
+        } else if (responseData is String) {
+          // If response data is a string, use it directly
+          return responseData;
+        }
+      }
+      // Fallback to DioException message
+      return error.message ?? 'خطا در افزودن به سبد خرید';
+    }
+    // For other exceptions, return string representation
+    return error.toString();
+  }
 
   void _addItemToCart(
       BuildContext context, String type, String itemId, String itemName) async {
@@ -63,12 +99,15 @@ class _DialogCartState extends State<DialogCart> {
         });
       } catch (e) {
         log("❌ Failed to add item to server cart: $e");
+        final errorMessage = _extractErrorMessage(e);
+        log("📝 Extracted error message: $errorMessage");
+
         Navigator.of(context).pop(); // Close dialog even on error
         if (mounted) {
           Future.microtask(() {
             ScaffoldMessenger.of(rootContext).showSnackBar(
               SnackBar(
-                content: Text('خطا در افزودن به سبد خرید: $e'),
+                content: Text(errorMessage),
                 backgroundColor: Colors.red,
               ),
             );

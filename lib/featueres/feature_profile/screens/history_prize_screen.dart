@@ -77,7 +77,7 @@ class _HistoryPrizeScreenState extends State<HistoryPrizeScreen> {
         PrizeHistoryModel(
           id: "dfbdad42-e930-42d4-8833-bfd553430d7a",
           amount: 4,
-          remainingAmount: 4,
+          runningAmount: 4,
           description: "",
           type: "همینجوری",
           userId: "ddda7ab9-c2b9-4abf-99cc-95eb51f15f9b",
@@ -87,7 +87,7 @@ class _HistoryPrizeScreenState extends State<HistoryPrizeScreen> {
         PrizeHistoryModel(
           id: "e713a2a3-baf6-4471-ad2b-a66d5ff6e7cf",
           amount: 1,
-          remainingAmount: 1,
+          runningAmount: 1,
           description: "",
           type: "پسر خوبی بوده",
           userId: "ddda7ab9-c2b9-4abf-99cc-95eb51f15f9b",
@@ -97,7 +97,7 @@ class _HistoryPrizeScreenState extends State<HistoryPrizeScreen> {
         PrizeHistoryModel(
           id: "63c44cde-b191-497e-9d01-886b4cd350d8",
           amount: 3,
-          remainingAmount: 3,
+          runningAmount: 3,
           description: "",
           type: "لاگین کرده",
           userId: "ddda7ab9-c2b9-4abf-99cc-95eb51f15f9b",
