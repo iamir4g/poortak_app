@@ -1,0 +1,21 @@
+name: avalai
+version: 1.0.0
+schema: v1
+
+models:
+  - name: AvalAi Chat
+    provider: openai
+    model: gpt-5-nano
+    # نکته 1: حذف اسلش آخر و چک کردن v1
+    apiBase: https://api.avalai.ir/v1
+    roles: [chat, edit, autocomplete]
+    requestOptions:
+      headers:
+        Authorization: Bearer aa-7IWQlR88ZCNr5ODQsHSR4ikWOLCdch1KQzJGBnNYc5FPbTdE
+    # نکته 2: غیرفعال کردن پارامترهایی که در مستندات Hiba اجباری نیستند
+    defaultCompletionOptions:
+      temperature: 1
+      maxTokens: 2048
+      topP: 1
+      presencePenalty: 0
+      frequencyPenalty: 0

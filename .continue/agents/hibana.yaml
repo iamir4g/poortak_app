@@ -1,0 +1,20 @@
+name: hibanacloud
+version: 1.0.0
+schema: v1
+
+models:
+  - name: Hibana Chat
+    provider: openai
+    model: gpt-5-nano
+    apiBase: https://api-ai.hibanacloud.com/v1/
+    apiKey: hb_live_8804d5e0695d4c75b31eda76547d1f10_811310
+    roles: [chat, edit, autocomplete]
+    # غیرفعال کردن استریم برای تست اینکه آیا مشکل از تکه‌های داده است یا خیر
+    stream: false
+    requestOptions:
+      headers:
+        # حذف هدر دستی چون apiKey خودش این کار را انجام می‌دهد
+        Accept: application/json
+    defaultCompletionOptions:
+      temperature: 0.7
+      maxTokens: 1024
