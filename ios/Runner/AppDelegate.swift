@@ -7,22 +7,9 @@ import UIKit
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
-    self.window?.makeSecure()
+    // makeSecure() removed to allow screenshots
+    // Note: iOS doesn't support blocking screen recording while allowing screenshots
     GeneratedPluginRegistrant.register(with: self)
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
-  }
-}
-
-
-extension UIWindow {
-  func makeSecure() {
-    let field = UITextField()
-    field.isSecureTextEntry = true
-    self.addSubview(field)
-
-    field.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true
-    field.centerXAnchor.constraint(equalTo: self.centerXAnchor).isActive = true
-    self.layer.superlayer?.addSubview(field.layer)
-    field.layer.superlayer?.first?.addSubview(self.layer)
   }
 }

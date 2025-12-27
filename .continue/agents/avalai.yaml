@@ -1,21 +1,88 @@
 name: avalai
-version: 1.0.0
+version: 1.0.4
 schema: v1
 
 models:
-  - name: AvalAi Chat
+  - name: AvalAi GPT-5.2
     provider: openai
-    model: gpt-5-nano
-    # نکته 1: حذف اسلش آخر و چک کردن v1
+    model: gpt-5.2-2025-12-11
     apiBase: https://api.avalai.ir/v1
-    roles: [chat, edit, autocomplete]
+    apiKey: aa-qagzSQPzxAVTTJIsHG5kc5gcvsKieAuKDwBatjpHFKJowfMJ
+    roles:
+      - chat
+      - edit
+      - autocomplete
     requestOptions:
       headers:
-        Authorization: Bearer aa-7IWQlR88ZCNr5ODQsHSR4ikWOLCdch1KQzJGBnNYc5FPbTdE
-    # نکته 2: غیرفعال کردن پارامترهایی که در مستندات Hiba اجباری نیستند
+        Accept: application/json
+        Content-Type: application/json
     defaultCompletionOptions:
-      temperature: 1
+      temperature: 0.7
+      maxTokens: 1000
+      topP: 1
+      presencePenalty: 0
+      frequencyPenalty: 0
+  - name: OpenRouter Claude 3.5 Sonnet
+    provider: openai
+    model: anthropic/claude-3.5-sonnet
+    apiBase: https://openrouter.ai/api/v1
+    apiKey: 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
+    roles:
+      - chat
+      - edit
+      - autocomplete
+    requestOptions:
+      headers:
+        Accept: application/json
+        Content-Type: application/json
+        HTTP-Referer: https://github.com/yourusername/yourrepo
+        X-Title: Continue Extension
+    defaultCompletionOptions:
+      temperature: 0.7
       maxTokens: 2048
       topP: 1
       presencePenalty: 0
       frequencyPenalty: 0
+
+context:
+  - provider: diff
+  - provider: terminal
+  - provider: file
+# name: avalai
+# version: 1.0.4
+# schema: v1
+
+# models:
+#   - name: AvalAi Chat
+#     provider: openai
+#     model: gpt-5-mini-2025-08-07
+#     apiBase: https://api.avalai.ir/v1
+#     apiKey: aa-Ke5g7YrmtTQJHTLguPujf7gPOTonmwQTzun6Md8lJ8u3dxIp
+#     roles:
+#       - chat
+#       - edit
+#       - autocomplete
+#     requestOptions:
+#       headers:
+#         Accept: application/json
+#         Content-Type: application/json
+#     defaultCompletionOptions:
+#       temperature: 1
+#       maxTokens: 2048
+#       topP: 1
+#       presencePenalty: 0
+#       frequencyPenalty: 0
+#   - name: Anthropic Claude 3.7 Sonnet
+#     provider: openai
+#     model: anthropic.claude-3-7-sonnet-20250219-v1:0
+#     apiBase: https://api.avalai.ir/v1
+#     apiKey: aa-Ke5g7YrmtTQJHTLguPujf7gPOTonmwQTzun6Md8lJ8u3dxIp
+#     roles:
+#       - chat
+#       - edit
+#       - autocomplete
+
+# context:
+#   - provider: diff
+#   - provider: terminal
+#   - provider: file

@@ -5,6 +5,9 @@ import 'package:video_player/video_player.dart';
 import 'dart:async';
 import 'dart:io';
 
+// Method Channel for screen security
+const MethodChannel _securityChannel = MethodChannel('poortak.security.flutter.dev/channel');
+
 class CustomVideoPlayer extends StatefulWidget {
   final String videoPath;
   final bool isNetworkVideo;
@@ -51,6 +54,8 @@ class CustomVideoPlayerState extends State<CustomVideoPlayer> {
     _videoPlayerController.removeListener(_videoPlayerListener);
     _videoPlayerController.dispose();
     _hideTimer?.cancel();
+    // Disable FLAG_SECURE when video player is disposed
+    _setSecureFlag(false);
     super.dispose();
   }
 
@@ -105,6 +110,7 @@ class CustomVideoPlayerState extends State<CustomVideoPlayer> {
           setState(() {
             _isPlaying = true;
           });
+          _setSecureFlag(true);
         }
       }
     } catch (error) {
@@ -118,6 +124,11 @@ class CustomVideoPlayerState extends State<CustomVideoPlayer> {
   }
 
   void _videoPlayerListener() {
+    // Update secure flag based on playing state
+    if (_videoPlayerController.value.isPlaying != _isPlaying) {
+      _setSecureFlag(_videoPlayerController.value.isPlaying);
+    }
+    
     if (_videoPlayerController.value.position >=
         _videoPlayerController.value.duration) {
       // Video has ended
@@ -125,6 +136,7 @@ class CustomVideoPlayerState extends State<CustomVideoPlayer> {
         setState(() {
           _isPlaying = false;
         });
+        _setSecureFlag(false);
         // Call the callback if provided
         widget.onVideoEnded?.call();
       }
@@ -135,13 +147,26 @@ class CustomVideoPlayerState extends State<CustomVideoPlayer> {
     setState(() {
       if (_isPlaying) {
         _videoPlayerController.pause();
+        _setSecureFlag(false);
       } else {
         _videoPlayerController.play();
+        _setSecureFlag(true);
       }
       _isPlaying = !_isPlaying;
       _showControls = true;
     });
     _startHideTimer();
+  }
+
+  Future<void> _setSecureFlag(bool enable) async {
+    try {
+      if (Platform.isAndroid) {
+        await _securityChannel.invokeMethod('setSecureFlag', {'enable': enable});
+      }
+    } catch (e) {
+      // Ignore errors - this is a security feature, not critical for functionality
+      print('Error setting secure flag: $e');
+    }
   }
 
   void _enterFullscreen() {
@@ -366,13 +391,23 @@ class _FullscreenVideoPlayerState extends State<FullscreenVideoPlayer> {
 
     // Add listener to update playing state
     widget.videoPlayerController.addListener(_videoListener);
+    
+    // Enable secure flag if video is playing
+    if (_isPlaying) {
+      _setSecureFlag(true);
+    }
   }
 
   void _videoListener() {
     if (mounted) {
+      final wasPlaying = _isPlaying;
       setState(() {
         _isPlaying = widget.videoPlayerController.value.isPlaying;
       });
+      // Update secure flag if playing state changed
+      if (wasPlaying != _isPlaying) {
+        _setSecureFlag(_isPlaying);
+      }
     }
   }
 
@@ -380,6 +415,9 @@ class _FullscreenVideoPlayerState extends State<FullscreenVideoPlayer> {
   void dispose() {
     // Remove listener
     widget.videoPlayerController.removeListener(_videoListener);
+
+    // Disable FLAG_SECURE when fullscreen player is disposed
+    _setSecureFlag(false);
 
     // Restore system UI
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
@@ -419,13 +457,26 @@ class _FullscreenVideoPlayerState extends State<FullscreenVideoPlayer> {
     setState(() {
       if (_isPlaying) {
         widget.videoPlayerController.pause();
+        _setSecureFlag(false);
       } else {
         widget.videoPlayerController.play();
+        _setSecureFlag(true);
       }
       _isPlaying = !_isPlaying;
       _showControls = true;
     });
     _startHideTimer();
+  }
+
+  Future<void> _setSecureFlag(bool enable) async {
+    try {
+      if (Platform.isAndroid) {
+        await _securityChannel.invokeMethod('setSecureFlag', {'enable': enable});
+      }
+    } catch (e) {
+      // Ignore errors - this is a security feature, not critical for functionality
+      print('Error setting secure flag: $e');
+    }
   }
 
   void _exitFullscreen() {

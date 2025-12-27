@@ -1,0 +1,52 @@
+name: openrouter
+version: 1.0.4
+schema: v1
+
+models:
+  - name: OpenRouter GPT-4
+    provider: openai
+    model: openai/gpt-4-turbo
+    apiBase: https://openrouter.ai/api/v1
+    apiKey: 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
+    roles:
+      - chat
+      - edit
+      - autocomplete
+    requestOptions:
+      headers:
+        Accept: application/json
+        Content-Type: application/json
+        HTTP-Referer: https://github.com/yourusername/yourrepo
+        X-Title: Continue Extension
+    defaultCompletionOptions:
+      temperature: 0.7
+      maxTokens: 1000
+      topP: 1
+      presencePenalty: 0
+      frequencyPenalty: 0
+  - name: OpenRouter Claude 3.5 Sonnet
+    provider: openai
+    model: anthropic/claude-3.5-sonnet
+    apiBase: https://openrouter.ai/api/v1
+    apiKey: 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
+    roles:
+      - chat
+      - edit
+      - autocomplete
+    requestOptions:
+      headers:
+        Accept: application/json
+        Content-Type: application/json
+        HTTP-Referer: https://github.com/yourusername/yourrepo
+        X-Title: Continue Extension
+    defaultCompletionOptions:
+      temperature: 0.7
+      maxTokens: 2048
+      topP: 1
+      presencePenalty: 0
+      frequencyPenalty: 0
+
+context:
+  - provider: diff
+  - provider: terminal
+  - provider: file
