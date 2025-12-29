@@ -1,8 +1,34 @@
 name: avalai
-version: 1.0.6
+version: 1.0.8
 schema: v1
 
 models:
+  - name: GLM 4.7 (Primary Chat/Edit)
+    provider: openai
+    model: glm-4.7
+    apiBase: https://api.avalai.ir/v1
+    apiKey: aa-qagzSQPzxAVTTJIsHG5kc5gcvsKieAuKDwBatjpHFKJowfMJ
+    roles:
+      - chat
+      - edit
+    defaultCompletionOptions:
+      temperature: 0.6
+      maxTokens: 2048
+      topP: 1
+
+  - name: Gemini 2.5 Flash
+    provider: openai
+    model: gemini-2.5-flash-preview-09-2025
+    apiBase: https://api.avalai.ir/v1
+    apiKey: aa-qagzSQPzxAVTTJIsHG5kc5gcvsKieAuKDwBatjpHFKJowfMJ
+    roles:
+      - chat
+      - edit
+    defaultCompletionOptions:
+      temperature: 0.7
+      maxTokens: 1024
+      topP: 1
+
   - name: AvalAi GPT-5.2
     provider: openai
     model: gpt-5.2-2025-12-11
@@ -11,13 +37,21 @@ models:
     roles:
       - chat
       - edit
-    requestOptions:
-      headers:
-        Accept: application/json
-        Content-Type: application/json
     defaultCompletionOptions:
       temperature: 0.7
       maxTokens: 1000
+
+  - name: DeepSeek R1 (Heavy Edit)
+    provider: openai
+    model: deepseek-r1-0528
+    apiBase: https://api.avalai.ir/v1
+    apiKey: aa-qagzSQPzxAVTTJIsHG5kc5gcvsKieAuKDwBatjpHFKJowfMJ
+    roles:
+      - edit
+    defaultCompletionOptions:
+      temperature: 0.4
+      maxTokens: 4096
+      topP: 1
 
   - name: Qwen 2.5 Coder Autocomplete
     provider: openai
@@ -29,19 +63,6 @@ models:
     defaultCompletionOptions:
       temperature: 0.2
       maxTokens: 256
-      topP: 1
-
-  - name: GLM 4.7
-    provider: openai
-    model: glm-4.7
-    apiBase: https://api.avalai.ir/v1
-    apiKey: aa-qagzSQPzxAVTTJIsHG5kc5gcvsKieAuKDwBatjpHFKJowfMJ
-    roles:
-      - chat
-      - edit
-    defaultCompletionOptions:
-      temperature: 0.6
-      maxTokens: 2048
       topP: 1
 
 context:
