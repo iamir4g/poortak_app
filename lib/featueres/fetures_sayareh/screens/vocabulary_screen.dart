@@ -119,7 +119,8 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
             );
           } else if (state is LitnerError) {
             // Check if it's the "word already exists" error
-            final isWordExistsError = state.message == "این لغت قبلا اضافه شده";
+            final isWordExistsError =
+                state.message == "این کلمه قبلا اضافه شده";
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.message),

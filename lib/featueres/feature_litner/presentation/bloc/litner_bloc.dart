@@ -28,7 +28,11 @@ class LitnerBloc extends Bloc<LitnerEvent, LitnerState> {
     if (result is DataSuccess) {
       emit(CreateWordSuccess(result.data!));
     } else if (result is DataFailed) {
-      emit(LitnerError(result.error ?? "خطا در ایجاد کلمه"));
+      String errorMessage = result.error ?? "خطا در ایجاد کلمه";
+      if (errorMessage == "این لغت قبلا اضافه شده") {
+        errorMessage = "این کلمه قبلا اضافه شده";
+      }
+      emit(LitnerError(errorMessage));
     }
   }
 

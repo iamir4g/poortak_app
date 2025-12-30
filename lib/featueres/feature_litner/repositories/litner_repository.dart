@@ -43,6 +43,11 @@ class LitnerRepository {
       } else {
         return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
       }
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 409) {
+        return DataFailed("این لغت قبلا اضافه شده");
+      }
+      return DataFailed(e.response?.data['message'] ?? "خطا در دریافت اطلاعات");
     } on AppException catch (e) {
       return CheckExceptions.getError<CreateWord>(e);
     }
