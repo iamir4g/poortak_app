@@ -221,8 +221,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
                               const SizedBox(height: 20),
 
-                              // Avatar selection grid
-                              _buildAvatarGrid(),
+                              // Selected avatar display
+                              _buildSelectedAvatar(),
 
                               const SizedBox(height: 20),
 
@@ -326,83 +326,167 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
+  Widget _buildSelectedAvatar() {
+    final selectedAvatarUrl = _getSelectedAvatarUrl();
+
+    return Center(
+      child: GestureDetector(
+        onTap: _showAvatarSelectionModal,
+        child: Container(
+          width: 100,
+          height: 100,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: const Color(0xFFC2C9D6),
+              width: 3,
+            ),
+          ),
+          child: ClipOval(
+            child: selectedAvatarUrl != null
+                ? Image.network(
+                    selectedAvatarUrl,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        color: const Color(0xFFE3F2FD),
+                        child: const Icon(
+                          Icons.person,
+                          size: 50,
+                          color: Color(0xFFA3AFC2),
+                        ),
+                      );
+                    },
+                  )
+                : Container(
+                    color: const Color(0xFFE3F2FD),
+                    child: const Icon(
+                      Icons.person,
+                      size: 50,
+                      color: Color(0xFFA3AFC2),
+                    ),
+                  ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  String? _getSelectedAvatarUrl() {
+    if (selectedAvatar == null) return null;
+    final avatar = avatars.firstWhere(
+      (a) => a.fileKey == selectedAvatar,
+      orElse: () => AvatarWithUrl(id: '', fileKey: '', url: ''),
+    );
+    return avatar.url.isNotEmpty ? avatar.url : null;
+  }
+
+  void _showAvatarSelectionModal() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            'انتخاب آواتار',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontFamily: 'IRANSans',
+              fontWeight: FontWeight.w500,
+              fontSize: 16,
+              color: Color(0xFF29303D),
+            ),
+          ),
+          content: SizedBox(
+            width: double.maxFinite,
+            height: 300,
+            child: _buildAvatarGrid(),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text(
+                'بستن',
+                style: TextStyle(
+                  fontFamily: 'IRANSans',
+                  color: Color(0xFF29303D),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Widget _buildAvatarGrid() {
     if (isLoadingAvatars) {
-      return const SizedBox(
-        height: 270,
-        child: Center(
-          child: CircularProgressIndicator(),
-        ),
+      return const Center(
+        child: CircularProgressIndicator(),
       );
     }
 
     if (avatars.isEmpty) {
-      return const SizedBox(
-        height: 270,
-        child: Center(
-          child: Text(
-            'آواتار موجود نیست',
-            style: TextStyle(
-              fontFamily: 'IRANSans',
-              fontSize: 14,
-              color: Color(0xFF29303D),
-            ),
+      return const Center(
+        child: Text(
+          'آواتار موجود نیست',
+          style: TextStyle(
+            fontFamily: 'IRANSans',
+            fontSize: 14,
+            color: Color(0xFF29303D),
           ),
         ),
       );
     }
 
-    return Container(
-      height: 270,
-      child: GridView.builder(
-        physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
-          childAspectRatio: 1,
-          crossAxisSpacing: 0,
-          mainAxisSpacing: 0,
-        ),
-        itemCount: avatars.length,
-        itemBuilder: (context, index) {
-          final avatar = avatars[index];
-          final isSelected = selectedAvatar == avatar.id;
+    return GridView.builder(
+      physics: const ScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        childAspectRatio: 1,
+        crossAxisSpacing: 0,
+        mainAxisSpacing: 0,
+      ),
+      itemCount: avatars.length,
+      itemBuilder: (context, index) {
+        final avatar = avatars[index];
+        final isSelected = selectedAvatar == avatar.fileKey;
 
-          return GestureDetector(
-            onTap: () {
-              setState(() {
-                selectedAvatar = avatar.id;
-              });
-            },
-            child: Container(
-              margin: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color:
-                      isSelected ? const Color(0xFFC2C9D6) : Colors.transparent,
-                  width: 3,
-                ),
-              ),
-              child: ClipOval(
-                child: Image.network(
-                  avatar.url,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      color: const Color(0xFFE3F2FD),
-                      child: const Icon(
-                        Icons.person,
-                        size: 40,
-                        color: Color(0xFFA3AFC2),
-                      ),
-                    );
-                  },
-                ),
+        return GestureDetector(
+          onTap: () {
+            setState(() {
+              selectedAvatar = avatar.fileKey;
+            });
+            Navigator.of(context).pop(); // Close modal after selection
+          },
+          child: Container(
+            margin: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color:
+                    isSelected ? const Color(0xFFC2C9D6) : Colors.transparent,
+                width: 3,
               ),
             ),
-          );
-        },
-      ),
+            child: ClipOval(
+              child: Image.network(
+                avatar.url,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    color: const Color(0xFFE3F2FD),
+                    child: const Icon(
+                      Icons.person,
+                      size: 40,
+                      color: Color(0xFFA3AFC2),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
