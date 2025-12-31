@@ -33,45 +33,52 @@ class _ConversationScreenState extends State<ConversationScreen> {
   final TTSService ttsService = locator<TTSService>();
 
   // مشخص می‌کند که آیا در حال پخش تمام مکالمه است
-  bool isPlaying = false;
+  final ValueNotifier<bool> isPlayingNotifier = ValueNotifier(false);
 
   // ایندکس پیام فعلی که در حال پخش است
-  int currentPlayingIndex = 0;
+  final ValueNotifier<int> currentPlayingIndexNotifier = ValueNotifier(0);
 
   // لیست پیام‌های مرتب شده بر اساس order
   List<Datum>? sortedMessages;
 
   // مشخص می‌کند که آیا ترجمه‌ها باید نمایش داده شوند
-  bool showTranslations = false;
+  final ValueNotifier<bool> showTranslationsNotifier = ValueNotifier(false);
+
+  @override
+  void dispose() {
+    isPlayingNotifier.dispose();
+    currentPlayingIndexNotifier.dispose();
+    showTranslationsNotifier.dispose();
+    super.dispose();
+  }
 
   /// پخش تمام پیام‌های مکالمه به ترتیب
   /// در صورت فعال بودن پخش، با فراخوانی این متد پخش متوقف می‌شود
   Future<void> playAllConversations(List<Datum> messages) async {
     // اگر در حال پخش است، پخش را متوقف کن
-    if (isPlaying) {
+    if (isPlayingNotifier.value) {
       await ttsService.stop();
-      setState(() {
-        isPlaying = false;
-        currentPlayingIndex = 0;
-      });
+      isPlayingNotifier.value = false;
+      // currentPlayingIndex را صفر نمی‌کنیم تا موقع ادامه از همین‌جا شروع شود
       return;
     }
 
     // شروع پخش
-    setState(() {
-      isPlaying = true;
-      currentPlayingIndex = 0;
-    });
+    isPlayingNotifier.value = true;
+    // اگر مکالمه قبلاً تمام شده بود، از اول شروع کن
+    if (currentPlayingIndexNotifier.value >= messages.length) {
+      currentPlayingIndexNotifier.value = 0;
+    }
 
     try {
-      // پخش هر پیام به ترتیب
-      for (var i = 0; i < messages.length; i++) {
-        if (!isPlaying) break;
+      // پخش هر پیام به ترتیب (شروع از ایندکس فعلی)
+      for (var i = currentPlayingIndexNotifier.value;
+          i < messages.length;
+          i++) {
+        if (!isPlayingNotifier.value) break;
 
         final message = messages[i];
-        setState(() {
-          currentPlayingIndex = i;
-        });
+        currentPlayingIndexNotifier.value = i;
 
         // پخش پیام با صدای مناسب
         if (message.voice == 'male') {
@@ -91,11 +98,11 @@ class _ConversationScreenState extends State<ConversationScreen> {
         await Future.delayed(const Duration(milliseconds: 500));
       }
     } finally {
-      // پاک کردن وضعیت پخش
-      setState(() {
-        isPlaying = false;
-        currentPlayingIndex = 0;
-      });
+      // فقط اگر پخش به صورت طبیعی تمام شد (توسط کاربر متوقف نشد)، وضعیت را ریست کن
+      if (isPlayingNotifier.value) {
+        isPlayingNotifier.value = false;
+        currentPlayingIndexNotifier.value = 0;
+      }
     }
   }
 
@@ -117,6 +124,48 @@ class _ConversationScreenState extends State<ConversationScreen> {
     } else {
       // استفاده از متد عادی
       await ttsService.speak(text, voice: voice);
+    }
+  }
+
+  /// رفتن به جمله بعدی
+  Future<void> _playNext() async {
+    if (sortedMessages == null || sortedMessages!.isEmpty) return;
+
+    // اگر به انتهای لیست نرسیدیم
+    if (currentPlayingIndexNotifier.value < sortedMessages!.length - 1) {
+      bool wasPlaying = isPlayingNotifier.value;
+
+      // اگر در حال پخش است، ابتدا متوقف کن
+      if (wasPlaying) {
+        await playAllConversations(sortedMessages!);
+      }
+
+      currentPlayingIndexNotifier.value++;
+
+      // اگر قبلا در حال پخش بود، دوباره پخش را شروع کن
+      if (wasPlaying) {
+        playAllConversations(sortedMessages!);
+      }
+    }
+  }
+
+  /// رفتن به جمله قبلی
+  Future<void> _playPrevious() async {
+    if (sortedMessages == null || sortedMessages!.isEmpty) return;
+
+    // اگر در ابتدای لیست نیستیم
+    if (currentPlayingIndexNotifier.value > 0) {
+      bool wasPlaying = isPlayingNotifier.value;
+
+      if (wasPlaying) {
+        await playAllConversations(sortedMessages!);
+      }
+
+      currentPlayingIndexNotifier.value--;
+
+      if (wasPlaying) {
+        playAllConversations(sortedMessages!);
+      }
     }
   }
 
@@ -159,20 +208,24 @@ class _ConversationScreenState extends State<ConversationScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // دکمه نمایش/مخفی کردن ترجمه
-              IconButton(
-                onPressed: () {
-                  setState(() {
-                    showTranslations = !showTranslations;
-                  });
+              ValueListenableBuilder<bool>(
+                valueListenable: showTranslationsNotifier,
+                builder: (context, showTranslations, _) {
+                  return IconButton(
+                    onPressed: () {
+                      showTranslationsNotifier.value =
+                          !showTranslationsNotifier.value;
+                    },
+                    icon: Icon(
+                      Icons.translate,
+                      color: showTranslations ? Colors.blue : Colors.grey,
+                    ),
+                  );
                 },
-                icon: Icon(
-                  Icons.translate,
-                  color: showTranslations ? Colors.blue : Colors.grey,
-                ),
               ),
               IconButton(
                   onPressed: () {
-                    // Navigator.pop(context);
+                    _playNext();
                   },
                   icon: IconifyIcon(
                     icon: "ri:skip-right-fill",
@@ -180,21 +233,26 @@ class _ConversationScreenState extends State<ConversationScreen> {
                     color: Colors.black,
                   )),
               // دکمه پخش/توقف تمام مکالمه
-              IconButton(
-                onPressed: () {
-                  if (sortedMessages != null) {
-                    playAllConversations(sortedMessages!);
-                  }
+              ValueListenableBuilder<bool>(
+                valueListenable: isPlayingNotifier,
+                builder: (context, isPlaying, _) {
+                  return IconButton(
+                    onPressed: () {
+                      if (sortedMessages != null) {
+                        playAllConversations(sortedMessages!);
+                      }
+                    },
+                    icon: Icon(
+                      isPlaying ? Icons.stop_circle : Icons.play_circle,
+                      size: 50,
+                      color: isPlaying ? Colors.red : Colors.green,
+                    ),
+                  );
                 },
-                icon: Icon(
-                  isPlaying ? Icons.stop_circle : Icons.play_circle,
-                  size: 50,
-                  color: isPlaying ? Colors.red : Colors.green,
-                ),
               ),
               IconButton(
                   onPressed: () {
-                    // Navigator.pop(context);
+                    _playPrevious();
                   },
                   icon: IconifyIcon(
                     icon: "ri:skip-left-fill",
@@ -237,26 +295,36 @@ class _ConversationScreenState extends State<ConversationScreen> {
   Widget _buildConversationList(BuildContext context, ConversationModel data) {
     final ScrollController scrollController = ScrollController();
 
-    return ListView.builder(
-      controller: scrollController,
-      padding: const EdgeInsets.all(16),
-      itemCount: sortedMessages?.length ?? 0,
-      itemBuilder: (context, index) {
-        final message = sortedMessages![index];
+    return ValueListenableBuilder<bool>(
+      valueListenable: showTranslationsNotifier,
+      builder: (context, showTranslations, _) {
+        return ValueListenableBuilder<int>(
+          valueListenable: currentPlayingIndexNotifier,
+          builder: (context, currentPlayingIndex, _) {
+            return ListView.builder(
+              controller: scrollController,
+              padding: const EdgeInsets.all(16),
+              itemCount: sortedMessages?.length ?? 0,
+              itemBuilder: (context, index) {
+                final message = sortedMessages![index];
 
-        // بررسی اینکه آیا این پیام در حال پخش است
-        final isCurrentPlaying = sortedMessages != null &&
-            currentPlayingIndex < sortedMessages!.length &&
-            sortedMessages![currentPlayingIndex].id == message.id;
+                // بررسی اینکه آیا این پیام در حال پخش است
+                final isCurrentPlaying = sortedMessages != null &&
+                    currentPlayingIndex < sortedMessages!.length &&
+                    sortedMessages![currentPlayingIndex].id == message.id;
 
-        // استفاده از widget جداگانه برای نمایش هر حباب پیام
-        return ConversationMessageBubble(
-          message: message,
-          isCurrentPlaying: isCurrentPlaying,
-          showTranslations: showTranslations,
-          onTap: () {
-            // پخش صوتی پیام هنگام لمس
-            speakText(message.text, message.voice);
+                // استفاده از widget جداگانه برای نمایش هر حباب پیام
+                return ConversationMessageBubble(
+                  message: message,
+                  isCurrentPlaying: isCurrentPlaying,
+                  showTranslations: showTranslations,
+                  onTap: () {
+                    // پخش صوتی پیام هنگام لمس
+                    speakText(message.text, message.voice);
+                  },
+                );
+              },
+            );
           },
         );
       },
