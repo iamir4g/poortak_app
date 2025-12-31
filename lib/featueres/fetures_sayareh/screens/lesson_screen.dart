@@ -311,14 +311,6 @@ class _LessonScreenState extends State<LessonScreen> {
         VideoDownloadInfo? downloadInfo;
         if (_currentVideoName != null && state is VideoDownloadLoaded) {
           downloadInfo = state.downloads[_currentVideoName];
-          // Update local state from cubit state
-          if (downloadInfo != null) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (mounted && !_isDisposed) {
-                _updateLocalStateFromCubit(downloadInfo);
-              }
-            });
-          }
         }
 
         // Use cubit state if available, otherwise use local state
