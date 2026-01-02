@@ -13,6 +13,7 @@ import 'package:poortak/featueres/fetures_sayareh/widgets/dialog_cart.dart';
 import 'package:poortak/featueres/fetures_sayareh/widgets/lesson_card_widget.dart';
 import 'package:poortak/featueres/fetures_sayareh/widgets/video_container_widget.dart';
 import 'package:poortak/featueres/fetures_sayareh/widgets/video_progress_bar_widget.dart';
+import 'package:poortak/featueres/fetures_sayareh/widgets/dictionary_bottom_sheet.dart';
 import 'package:poortak/locator.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 
@@ -109,13 +110,18 @@ class _LessonScreenState extends State<LessonScreen> {
     });
 
     // Show success/error messages only once
-    if (downloadInfo.status == DownloadStatus.completed && downloadInfo.localPath != null) {
+    if (downloadInfo.status == DownloadStatus.completed &&
+        downloadInfo.localPath != null) {
       final prefsOperator = locator<PrefsOperator>();
       final isLoggedIn = prefsOperator.isLoggedIn();
-      final usePublicUrl = !(isLoggedIn && hasAccess && _currentLesson?.video != null && _currentLesson!.video!.isNotEmpty);
-      
+      final usePublicUrl = !(isLoggedIn &&
+          hasAccess &&
+          _currentLesson?.video != null &&
+          _currentLesson!.video!.isNotEmpty);
+
       // Only show snackbar if we just completed (check previous state)
-      final previousInfo = _downloadCubit.getDownloadInfo(_currentVideoName ?? '');
+      final previousInfo =
+          _downloadCubit.getDownloadInfo(_currentVideoName ?? '');
       if (previousInfo?.status != DownloadStatus.completed) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -125,7 +131,8 @@ class _LessonScreenState extends State<LessonScreen> {
           ),
         );
       }
-    } else if (downloadInfo.status == DownloadStatus.error && downloadInfo.error != null) {
+    } else if (downloadInfo.status == DownloadStatus.error &&
+        downloadInfo.error != null) {
       // Only show error toast for real errors, not connectivity issues (which are paused)
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -154,7 +161,7 @@ class _LessonScreenState extends State<LessonScreen> {
     super.initState();
     isCheckingFiles = true;
     context.read<LessonBloc>().add(GetLessonEvenet(id: widget.lessonId));
-    
+
     // Check if there's an existing download for this lesson
     // This will be updated when we know the video name
   }
@@ -314,11 +321,15 @@ class _LessonScreenState extends State<LessonScreen> {
         }
 
         // Use cubit state if available, otherwise use local state
-        final currentIsCheckingFiles = downloadInfo?.isCheckingFiles ?? isCheckingFiles;
-        final currentIsDownloading = downloadInfo?.isDownloading ?? isDownloading;
-        final currentDownloadProgress = downloadInfo?.downloadProgress ?? downloadProgress;
+        final currentIsCheckingFiles =
+            downloadInfo?.isCheckingFiles ?? isCheckingFiles;
+        final currentIsDownloading =
+            downloadInfo?.isDownloading ?? isDownloading;
+        final currentDownloadProgress =
+            downloadInfo?.downloadProgress ?? downloadProgress;
         final currentIsDecrypting = downloadInfo?.isDecrypting ?? isDecrypting;
-        final currentDecryptionProgress = downloadInfo?.decryptionProgress ?? decryptionProgress;
+        final currentDecryptionProgress =
+            downloadInfo?.decryptionProgress ?? decryptionProgress;
         final currentLocalPath = downloadInfo?.localPath ?? localVideoPath;
 
         return Center(
@@ -449,7 +460,12 @@ class _LessonScreenState extends State<LessonScreen> {
           ),
           child: IconButton(
             onPressed: () {
-              // Add your action here
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                builder: (context) => const DictionaryBottomSheet(),
+              );
             },
             icon: Image.asset(
               "assets/images/iknow/dictionary_icon.png",
