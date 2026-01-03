@@ -5,6 +5,7 @@ import 'custom_video_player.dart';
 class VideoContainerWidget extends StatelessWidget {
   final String? videoPath;
   final String? videoUrl;
+  final String? thumbnailUrl;
   final bool isCheckingFiles;
   final bool isDownloading;
   final bool isDecrypting;
@@ -17,6 +18,7 @@ class VideoContainerWidget extends StatelessWidget {
     super.key,
     required this.videoPath,
     required this.videoUrl,
+    this.thumbnailUrl,
     required this.isCheckingFiles,
     required this.isDownloading,
     required this.isDecrypting,
@@ -64,6 +66,7 @@ class VideoContainerWidget extends StatelessWidget {
       borderRadius: 37,
       autoPlay: false,
       showControls: true,
+      thumbnailUrl: thumbnailUrl,
       onVideoEnded: () {
         print('Video ended');
         // If user hasn't purchased and this was a trailer video, show purchase dialog
@@ -75,34 +78,50 @@ class VideoContainerWidget extends StatelessWidget {
   }
 
   Widget _buildLoadingState(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: MyColors.brandSecondary,
-        borderRadius: BorderRadius.circular(37),
-      ),
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(
-              color: Theme.of(context).textTheme.titleMedium?.color,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              isDecrypting
-                  ? 'در حال رمزگشایی ویدیو...'
-                  : isDownloading
-                      ? 'در حال دانلود ویدیو...'
-                      : 'در حال پردازش ویدیو...',
-              style: TextStyle(
-                color: Theme.of(context).textTheme.titleMedium?.color,
-                fontSize: 16,
-                fontFamily: 'IranSans',
-              ),
-            ),
-          ],
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            color: MyColors.brandSecondary,
+            borderRadius: BorderRadius.circular(37),
+          ),
         ),
-      ),
+        if (thumbnailUrl != null)
+          ClipRRect(
+            borderRadius: BorderRadius.circular(37),
+            child: Image.network(
+              thumbnailUrl!,
+              width: 350,
+              height: 240,
+              fit: BoxFit.cover,
+            ),
+          ),
+        Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (thumbnailUrl == null)
+                CircularProgressIndicator(
+                  color: Theme.of(context).textTheme.titleMedium?.color,
+                ),
+              const SizedBox(height: 16),
+              Text(
+                isDecrypting
+                    ? 'در حال رمزگشایی ویدیو...'
+                    : isDownloading
+                        ? 'در حال دانلود ویدیو...'
+                        : 'در حال پردازش ویدیو...',
+                style: TextStyle(
+                  color: Theme.of(context).textTheme.titleMedium?.color,
+                  fontSize: 16,
+                  fontFamily: 'IranSans',
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 

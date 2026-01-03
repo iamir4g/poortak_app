@@ -18,6 +18,7 @@ class CustomVideoPlayer extends StatefulWidget {
   final bool showControls;
   final bool allowFullscreen;
   final VoidCallback? onVideoEnded;
+  final String? thumbnailUrl;
 
   const CustomVideoPlayer({
     Key? key,
@@ -30,6 +31,7 @@ class CustomVideoPlayer extends StatefulWidget {
     this.showControls = true,
     this.allowFullscreen = true,
     this.onVideoEnded,
+    this.thumbnailUrl,
   }) : super(key: key);
 
   @override
@@ -307,8 +309,21 @@ class CustomVideoPlayerState extends State<CustomVideoPlayer> {
                   ),
                 )
               else
-                const Center(
-                  child: CircularProgressIndicator(),
+                Positioned.fill(
+                  child: ClipRRect(
+                    borderRadius:
+                        BorderRadius.all(Radius.circular(widget.borderRadius)),
+                    child: widget.thumbnailUrl != null
+                        ? Image.network(
+                            widget.thumbnailUrl!,
+                            fit: BoxFit.cover,
+                            width: widget.width,
+                            height: widget.height,
+                          )
+                        : const Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                  ),
                 ),
 
               if (_isVideoInitialized && widget.showControls)

@@ -16,6 +16,7 @@ import 'package:poortak/featueres/fetures_sayareh/widgets/video_progress_bar_wid
 import 'package:poortak/featueres/fetures_sayareh/widgets/dictionary_bottom_sheet.dart';
 import 'package:poortak/locator.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
+import 'package:poortak/common/services/getImageUrl_service.dart';
 
 class LessonScreen extends StatefulWidget {
   static const routeName = "/lesson_screen";
@@ -51,6 +52,7 @@ class _LessonScreenState extends State<LessonScreen> {
   final GlobalKey<CustomVideoPlayerState> _videoPlayerKey =
       GlobalKey<CustomVideoPlayerState>();
   bool _isDisposed = false;
+  String? _thumbnailUrl;
 
   bool get hasAccess {
     final accessBloc = locator<IknowAccessBloc>();
@@ -184,6 +186,19 @@ class _LessonScreenState extends State<LessonScreen> {
               if (!_isDisposed && mounted) {
                 setState(() => _currentLesson = state.lesson);
               }
+
+              () async {
+                final key = state.lesson.thumbnail;
+                if (key.isNotEmpty) {
+                  final imageUrl =
+                      await GetImageUrlService().getImageUrl(key);
+                  if (mounted) {
+                    setState(() {
+                      _thumbnailUrl = imageUrl.isNotEmpty ? imageUrl : null;
+                    });
+                  }
+                }
+              }();
 
               // Determine which video to use
               final prefsOperator = locator<PrefsOperator>();
@@ -338,6 +353,7 @@ class _LessonScreenState extends State<LessonScreen> {
               VideoContainerWidget(
                 videoPath: currentLocalPath,
                 videoUrl: videoUrl,
+                thumbnailUrl: _thumbnailUrl,
                 isCheckingFiles: currentIsCheckingFiles,
                 isDownloading: currentIsDownloading,
                 isDecrypting: currentIsDecrypting,
