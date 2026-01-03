@@ -14,6 +14,8 @@ import 'package:poortak/featueres/feature_profile/presentation/bloc/profile_bloc
 import 'package:poortak/featueres/feature_profile/presentation/bloc/profile_event.dart';
 import 'package:poortak/featueres/feature_profile/presentation/bloc/profile_state.dart';
 import 'package:poortak/locator.dart';
+import 'dart:io' show Platform;
+import 'package:android_sms_retriever/android_sms_retriever.dart';
 
 class LoginScreen extends StatefulWidget {
   static const routeName = "/login_screen";
@@ -30,6 +32,7 @@ class _LoginScreenState extends State<LoginScreen> {
   String? mobileNumber;
   final FocusNode _mobileFocusNode = FocusNode();
   final FocusNode _otpFocusNode = FocusNode();
+  bool _smsListening = false;
 
   // Timer variables
   Timer? _timer;
@@ -38,6 +41,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void dispose() {
+    if (_smsListening) {
+      AndroidSmsRetriever.stopSmsListener();
+      _smsListening = false;
+    }
     _timer?.cancel();
     _mobileController.dispose();
     _otpController.dispose();
@@ -168,10 +175,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               return TextButton(
                                 onPressed: () {
                                   if (mobileNumber != null) {
-                                    builderContext.read<ProfileBloc>().add(
-                                          RequestOtpEvent(
-                                              mobile: "09$mobileNumber"),
-                                        );
+                                    _requestOtpWithAppSignature();
                                     // Reset timer after resending
                                     _resetTimer();
                                   }
@@ -447,6 +451,10 @@ class _LoginScreenState extends State<LoginScreen> {
           // Start the timer when OTP is successfully requested
           log("🕐 Starting OTP timer...");
           _startTimer();
+          // Start SMS listener to auto-fill OTP on Android
+          if (Platform.isAndroid) {
+            _startSmsListening();
+          }
         } else if (state is ProfileSuccessLogin) {
           // Save user data and login state
           locator<PrefsOperator>().saveUserData(
@@ -515,11 +523,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 } else {
                   if (_mobileController.text.isNotEmpty &&
                       _mobileController.text.length == 9) {
-                    context.read<ProfileBloc>().add(
-                          RequestOtpEvent(
-                            mobile: "09${_mobileController.text}",
-                          ),
-                        );
+                    _requestOtpWithAppSignature();
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
@@ -546,6 +550,56 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       },
     );
+  }
+
+  Future<void> _requestOtpWithAppSignature() async {
+    String? appSignature;
+    if (Platform.isAndroid) {
+      try {
+        appSignature = await AndroidSmsRetriever.getAppSignature();
+        log("📲 App signature: $appSignature");
+      } catch (e) {
+        log("⚠️ Failed to get app signature: $e");
+      }
+    }
+    if (!mounted) return;
+    context.read<ProfileBloc>().add(
+          RequestOtpEvent(
+            mobile: "09${(mobileNumber ?? _mobileController.text)}",
+            appSignatureHash: appSignature,
+          ),
+        );
+  }
+
+  Future<void> _startSmsListening() async {
+    if (_smsListening) return;
+    _smsListening = true;
+    try {
+      final message = await AndroidSmsRetriever.listenForSms();
+      if (message != null && message.isNotEmpty) {
+        log("📩 Received SMS: $message");
+        final otpMatch = RegExp(r'\b(\d{4})\b').firstMatch(message);
+        final code = otpMatch?.group(1);
+        if (code != null) {
+          _otpController.text = code;
+          log("✅ Auto-filled OTP: $code");
+          if (!mounted) return;
+          if (mobileNumber != null && code.isNotEmpty) {
+            context.read<ProfileBloc>().add(
+                  LoginWithOtpEvent(
+                    mobile: mobileNumber!,
+                    otp: code,
+                  ),
+                );
+          }
+        }
+      }
+    } catch (e) {
+      log("💥 SMS listening error: $e");
+    } finally {
+      AndroidSmsRetriever.stopSmsListener();
+      _smsListening = false;
+    }
   }
 
   Widget _buildTermsLink() {

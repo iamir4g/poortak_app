@@ -17,9 +17,15 @@ class ProfileRepository {
 
   ProfileRepository(this.profileApiProvider);
 
-  Future<DataState<AuthRequestOtpModel>> callRequestOtp(String phone) async {
+  Future<DataState<AuthRequestOtpModel>> callRequestOtp(
+      String phone, {
+      String? appSignatureHash,
+    }) async {
     try {
-      Response response = await profileApiProvider.callRequestOtp(phone);
+      Response response = await profileApiProvider.callRequestOtp(
+        phone,
+        appSignatureHash: appSignatureHash,
+      );
       log("Repository Response: ${response.data}");
 
       if ((response.statusCode == 200 || response.statusCode == 201) &&

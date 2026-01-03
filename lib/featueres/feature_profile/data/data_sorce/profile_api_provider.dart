@@ -13,10 +13,14 @@ class ProfileApiProvider {
   ProfileApiProvider({required this.dio})
       : _authService = locator<AuthService>();
 
-  dynamic callRequestOtp(String phone) async {
+  dynamic callRequestOtp(String phone, {String? appSignatureHash}) async {
     final response = await dio.post(
       "${Constants.baseUrl}auth/otp",
-      data: {"phone": phone},
+      data: {
+        "phone": phone,
+        if (appSignatureHash != null && appSignatureHash.isNotEmpty)
+          "hash": appSignatureHash,
+      },
     );
     log(response.data.toString());
     return response;

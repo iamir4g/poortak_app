@@ -25,7 +25,10 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   void _onRequestOtp(RequestOtpEvent event, Emitter<ProfileState> emit) async {
     emit(ProfileLoading());
     try {
-      final response = await repository.callRequestOtp(event.mobile);
+      final response = await repository.callRequestOtp(
+        event.mobile,
+        appSignatureHash: event.appSignatureHash,
+      );
 
       if (response is DataSuccess) {
         if (response.data != null) {

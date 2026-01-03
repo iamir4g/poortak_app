@@ -4,7 +4,8 @@ abstract class ProfileEvent {}
 
 class RequestOtpEvent extends ProfileEvent {
   final String mobile;
-  RequestOtpEvent({required this.mobile});
+  final String? appSignatureHash;
+  RequestOtpEvent({required this.mobile, this.appSignatureHash});
 }
 
 class LoginWithOtpEvent extends ProfileEvent {
