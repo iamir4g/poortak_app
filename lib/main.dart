@@ -19,6 +19,7 @@ import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_bloc.d
 import 'package:poortak/featueres/feature_litner/screens/litner_word_completed_screen.dart';
 import 'package:poortak/featueres/feature_litner/screens/litner_word_box_screen.dart';
 import 'package:poortak/featueres/feature_litner/screens/litner_words_inprogress_screen.dart';
+import 'package:poortak/featueres/fetures_sayareh/screens/word_detail_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/favorit_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/main_points_screen.dart';
@@ -296,6 +297,28 @@ void main() async {
                     LitnerWordBoxScreen(),
                 LitnerWordCompletedScreen.routeName: (context) =>
                     LitnerWordCompletedScreen(),
+                WordDetailScreen.routeName: (context) {
+                  final raw = ModalRoute.of(context)?.settings.arguments;
+                  if (raw is Map<String, dynamic>) {
+                    final w = raw['word'];
+                    final t = raw['translation'];
+                    if (w is String && t is String && w.isNotEmpty) {
+                      print(
+                          '[Routes] Navigating to WordDetailScreen word="$w" translation="$t"');
+                      return WordDetailScreen(
+                        word: w,
+                        translation: t,
+                      );
+                    }
+                  }
+                  print(
+                      '[Routes] Invalid arguments for WordDetailScreen: $raw');
+                  return const Scaffold(
+                    body: Center(
+                        child:
+                            Text('پارامترهای ورودی صفحه کلمه نامعتبر هستند')),
+                  );
+                },
                 KavooshMainScreen.routeName: (context) => KavooshMainScreen(),
                 PaymentResultScreen.routeName: (context) {
                   final args = ModalRoute.of(context)?.settings.arguments

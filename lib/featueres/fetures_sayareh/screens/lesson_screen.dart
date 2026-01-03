@@ -190,8 +190,7 @@ class _LessonScreenState extends State<LessonScreen> {
               () async {
                 final key = state.lesson.thumbnail;
                 if (key.isNotEmpty) {
-                  final imageUrl =
-                      await GetImageUrlService().getImageUrl(key);
+                  final imageUrl = await GetImageUrlService().getImageUrl(key);
                   if (mounted) {
                     setState(() {
                       _thumbnailUrl = imageUrl.isNotEmpty ? imageUrl : null;
@@ -317,7 +316,7 @@ class _LessonScreenState extends State<LessonScreen> {
           _buildVocabularyCard(),
           const SizedBox(height: 12),
           _buildQuizCard(),
-          const SizedBox(height: 110),
+          const SizedBox(height: 88),
           _buildDictionaryButton(),
         ],
       ),

@@ -1,10 +1,12 @@
 class DictionaryEntry {
   final String word;
   final List<String> persianTranslations;
+  final List<DictionaryExample> examples;
 
   DictionaryEntry({
     required this.word,
     required this.persianTranslations,
+    required this.examples,
   });
 
   factory DictionaryEntry.fromJson(Map<String, dynamic> json) {
@@ -12,6 +14,7 @@ class DictionaryEntry {
     final entries = json['entries'] as List<dynamic>? ?? [];
 
     final Set<String> translations = {};
+    final List<DictionaryExample> examples = [];
 
     for (var entry in entries) {
       final senses = entry['senses'] as List<dynamic>? ?? [];
@@ -21,6 +24,13 @@ class DictionaryEntry {
           final lang = t['language'] as Map<String, dynamic>?;
           if (lang != null && lang['code'] == 'fa') {
             translations.add(t['word'] as String);
+          }
+        }
+
+        final exs = sense['examples'] as List<dynamic>? ?? [];
+        for (var ex in exs) {
+          if (ex is String && ex.isNotEmpty) {
+            examples.add(DictionaryExample(text: ex));
           }
         }
 
@@ -34,6 +44,13 @@ class DictionaryEntry {
               translations.add(t['word'] as String);
             }
           }
+
+          final subExs = sub['examples'] as List<dynamic>? ?? [];
+          for (var ex in subExs) {
+            if (ex is String && ex.isNotEmpty) {
+              examples.add(DictionaryExample(text: ex));
+            }
+          }
         }
       }
     }
@@ -41,6 +58,14 @@ class DictionaryEntry {
     return DictionaryEntry(
       word: word,
       persianTranslations: translations.toList(),
+      examples: examples,
     );
   }
+}
+
+class DictionaryExample {
+  final String text;
+  final String? persian;
+
+  DictionaryExample({required this.text, this.persian});
 }
