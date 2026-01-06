@@ -101,24 +101,24 @@ class TTSService {
         await _flutterTts
             .setVoice({'name': 'en-gb-x-gbd-local', 'locale': 'en-GB'});
         await _flutterTts.setPitch(0.9);
-        await _flutterTts.setSpeechRate(0.4);
+        await _flutterTts.setSpeechRate(0.5);
         await _flutterTts.setVolume(0.9);
         print(
-            'Setting male voice: en-gb-x-gbd-local, pitch=0.9, rate=0.4, volume=0.9');
+            'Setting male voice: en-gb-x-gbd-local, pitch=0.9, rate=0.5, volume=0.9');
       } catch (e) {
         print('Failed to set male voice, using fallback: $e');
         await _flutterTts.setLanguage('en-GB');
         await _flutterTts.setPitch(0.3);
-        await _flutterTts.setSpeechRate(0.3);
+        await _flutterTts.setSpeechRate(0.4);
         await _flutterTts.setVolume(0.9);
       }
     } else if (voice == 'female') {
       // صدای زن: استفاده از تنظیمات pitch و rate
       await _flutterTts.setLanguage('en-US');
       await _flutterTts.setPitch(1.5);
-      await _flutterTts.setSpeechRate(0.6);
+      await _flutterTts.setSpeechRate(0.5);
       await _flutterTts.setVolume(1.0);
-      print('Setting female voice: pitch=1.5, rate=0.6, volume=1.0');
+      print('Setting female voice: pitch=1.5, rate=0.5, volume=1.0');
     }
   }
 
@@ -186,7 +186,7 @@ class TTSService {
       await _flutterTts
           .setVoice({'name': 'en-gb-x-gbd-local', 'locale': 'en-GB'});
       await _flutterTts.setPitch(0.9);
-      await _flutterTts.setSpeechRate(0.4);
+      await _flutterTts.setSpeechRate(0.5);
       await _flutterTts.setVolume(0.9);
       _currentVoice = 'male';
       print('Male voice set: en-gb-x-gbd-local');
@@ -200,7 +200,7 @@ class TTSService {
   /// This method sets the voice to 'en-us-x-sfg-local' which is the
   /// selected female voice for the application with the following settings:
   /// - Pitch: 1.2
-  /// - Rate: 0.5
+  /// - Rate: 0.45
   /// - Volume: 1.0
   /// - Locale: en-US
   ///
@@ -218,7 +218,7 @@ class TTSService {
       await _flutterTts
           .setVoice({'name': 'en-us-x-sfg-local', 'locale': 'en-US'});
       await _flutterTts.setPitch(1.2);
-      await _flutterTts.setSpeechRate(0.5);
+      await _flutterTts.setSpeechRate(0.45);
       await _flutterTts.setVolume(1.0);
       _currentVoice = 'female';
       print('Female voice set: en-us-x-sfg-local');
