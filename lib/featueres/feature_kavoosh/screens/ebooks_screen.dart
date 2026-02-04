@@ -3,18 +3,17 @@ import 'package:poortak/featueres/feature_kavoosh/widgets/course_card.dart';
 import 'package:poortak/featueres/feature_kavoosh/widgets/section_header.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/course_list_screen.dart';
 
-class EducationalVideosScreen extends StatefulWidget {
-  static const String routeName = '/educational-videos';
+class EBooksScreen extends StatefulWidget {
+  static const String routeName = '/ebooks';
 
-  const EducationalVideosScreen({super.key});
+  const EBooksScreen({super.key});
 
   @override
-  State<EducationalVideosScreen> createState() =>
-      _EducationalVideosScreenState();
+  State<EBooksScreen> createState() => _EBooksScreenState();
 }
 
-class _EducationalVideosScreenState extends State<EducationalVideosScreen> {
-  int _selectedTabIndex = 0; // 0 for Courses, 1 for Shorts
+class _EBooksScreenState extends State<EBooksScreen> {
+  int _selectedTabIndex = 0; // 0 for Books, 1 for Sample Questions
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +42,7 @@ class _EducationalVideosScreenState extends State<EducationalVideosScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
-                  'ویدئو های آموزشی',
+                  'کتاب الکترونیکی',
                   style: TextStyle(
                     fontFamily: 'IRANSans',
                     fontSize: 16,
@@ -93,9 +92,9 @@ class _EducationalVideosScreenState extends State<EducationalVideosScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _buildTabItem(0, 'دوره ها', Icons.play_circle_outline),
+                  _buildTabItem(0, 'کتاب ها', Icons.book_outlined),
                   const SizedBox(width: 24),
-                  _buildTabItem(1, 'کوتاه آموزشی', Icons.movie_outlined),
+                  _buildTabItem(1, 'نمونه سوالات', Icons.quiz_outlined),
                 ],
               ),
             ),
@@ -131,7 +130,7 @@ class _EducationalVideosScreenState extends State<EducationalVideosScreen> {
             ] else ...[
               const SizedBox(
                 height: 200,
-                child: Center(child: Text('محتوای کوتاه آموزشی')),
+                child: Center(child: Text('نمونه سوالات')),
               ),
             ],
 
@@ -181,7 +180,7 @@ class _EducationalVideosScreenState extends State<EducationalVideosScreen> {
             Navigator.pushNamed(
               context,
               CourseListScreen.routeName,
-              arguments: {'title': 'ویدئو های آموزشی $title'},
+              arguments: {'title': 'کتاب های $title'},
             );
           },
         ),

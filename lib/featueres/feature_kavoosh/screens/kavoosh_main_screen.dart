@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/educational_videos_screen.dart';
+import 'package:poortak/featueres/feature_kavoosh/screens/ebooks_screen.dart';
 
 class KavooshMainScreen extends StatefulWidget {
   static const String routeName = '/kavoosh-main';
@@ -73,9 +74,8 @@ class _KavooshMainScreenState extends State<KavooshMainScreen> {
                         Color(0xFFFFDBDB),
                       ],
                       onTap: () {
-                        // Handle e-books tap
+                        Navigator.pushNamed(context, EBooksScreen.routeName);
                       },
-                      showComingSoonBadge: true,
                     ),
 
                     const SizedBox(height: 13),
