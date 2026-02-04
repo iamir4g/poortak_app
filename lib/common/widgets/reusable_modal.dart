@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:poortak/config/myColors.dart';
 
 enum ModalType {
@@ -24,6 +25,7 @@ class ReusableModal extends StatelessWidget {
 
   // Optional custom image
   final String? customImagePath;
+  final String? customLottiePath;
 
   // Special style for cart success modal
   final bool cartSuccessStyle;
@@ -40,6 +42,7 @@ class ReusableModal extends StatelessWidget {
     this.showSecondButton = false,
     this.showCloseButton = false,
     this.customImagePath,
+    this.customLottiePath,
     this.cartSuccessStyle = false,
   }) : super(key: key);
 
@@ -55,7 +58,8 @@ class ReusableModal extends StatelessWidget {
       backgroundColor: Colors.transparent,
       child: Container(
         width: 350,
-        height: customImagePath != null ? 380 : 311,
+        height:
+            (customImagePath != null || customLottiePath != null) ? 380 : 311,
         decoration: BoxDecoration(
           color: isDarkMode ? const Color(0xFF2C2E3F) : Colors.white,
           borderRadius: BorderRadius.circular(20),
@@ -68,9 +72,11 @@ class ReusableModal extends StatelessWidget {
               children: [
                 // Icon based on type or custom image
                 Center(
-                  child: customImagePath != null
-                      ? _buildCustomImage()
-                      : _buildIcon(),
+                  child: customLottiePath != null
+                      ? _buildCustomLottie()
+                      : customImagePath != null
+                          ? _buildCustomImage()
+                          : _buildIcon(),
                 ),
 
                 const SizedBox(height: 20),
@@ -435,6 +441,16 @@ class ReusableModal extends StatelessWidget {
     );
   }
 
+  Widget _buildCustomLottie() {
+    return Lottie.asset(
+      customLottiePath!,
+      width: 150,
+      height: 150,
+      fit: BoxFit.contain,
+      repeat: false,
+    );
+  }
+
   static void show({
     required BuildContext context,
     required String title,
@@ -448,6 +464,7 @@ class ReusableModal extends StatelessWidget {
     bool showSecondButton = false,
     bool showCloseButton = false,
     String? customImagePath,
+    String? customLottiePath,
     bool cartSuccessStyle = false,
   }) {
     showDialog(
@@ -465,6 +482,7 @@ class ReusableModal extends StatelessWidget {
           showSecondButton: showSecondButton,
           showCloseButton: showCloseButton,
           customImagePath: customImagePath,
+          customLottiePath: customLottiePath,
           cartSuccessStyle: cartSuccessStyle,
         );
       },
@@ -542,6 +560,7 @@ class ReusableModal extends StatelessWidget {
     bool showSecondButton = false,
     bool showCloseButton = false,
     String? customImagePath,
+    String? customLottiePath,
     bool cartSuccessStyle = false,
   }) {
     show(
@@ -557,6 +576,7 @@ class ReusableModal extends StatelessWidget {
       showSecondButton: showSecondButton,
       showCloseButton: showCloseButton,
       customImagePath: customImagePath,
+      customLottiePath: customLottiePath,
       cartSuccessStyle: cartSuccessStyle,
     );
   }

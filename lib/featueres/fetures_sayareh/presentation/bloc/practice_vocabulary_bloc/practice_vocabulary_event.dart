@@ -42,3 +42,21 @@ final class PracticeVocabularySaveAnswerEvent extends PracticeVocabularyEvent {
 final class PracticeVocabularyResetEvent extends PracticeVocabularyEvent {
   const PracticeVocabularyResetEvent();
 }
+
+final class PracticeVocabularySubmitEvent extends PracticeVocabularyEvent {
+  final String courseId;
+  final String vocabularyId;
+  final String answer;
+  final List<String> previousVocabularyIds;
+
+  const PracticeVocabularySubmitEvent({
+    required this.courseId,
+    required this.vocabularyId,
+    required this.answer,
+    required this.previousVocabularyIds,
+  });
+
+  @override
+  List<Object> get props =>
+      [courseId, vocabularyId, answer, previousVocabularyIds];
+}

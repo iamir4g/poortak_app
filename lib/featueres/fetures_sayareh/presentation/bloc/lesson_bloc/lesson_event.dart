@@ -11,3 +11,8 @@ class GetLessonEvenet extends LessonEvent {
   final String id;
   GetLessonEvenet({required this.id});
 }
+
+class ResetLessonProgressEvent extends LessonEvent {
+  final String id;
+  ResetLessonProgressEvent({required this.id});
+}

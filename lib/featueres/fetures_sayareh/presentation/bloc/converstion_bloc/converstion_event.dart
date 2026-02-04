@@ -11,3 +11,15 @@ class GetConversationEvent extends ConverstionEvent {
   final String id;
   GetConversationEvent({required this.id});
 }
+
+class SaveConversationPlaybackEvent extends ConverstionEvent {
+  final String courseId;
+  final String conversationId;
+  SaveConversationPlaybackEvent({
+    required this.courseId,
+    required this.conversationId,
+  });
+
+  @override
+  List<Object> get props => [courseId, conversationId];
+}

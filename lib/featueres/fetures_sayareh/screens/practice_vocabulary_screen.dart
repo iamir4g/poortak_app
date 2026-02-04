@@ -60,6 +60,16 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
           ),
         );
 
+    // Submit the answer to the API
+    context.read<PracticeVocabularyBloc>().add(
+          PracticeVocabularySubmitEvent(
+            courseId: widget.courseId,
+            vocabularyId: correctWord.id,
+            answer: word,
+            previousVocabularyIds: currentState.correctWords,
+          ),
+        );
+
     // If correct, also save the word ID for fetching next question
     if (isCorrect) {
       context.read<PracticeVocabularyBloc>().add(

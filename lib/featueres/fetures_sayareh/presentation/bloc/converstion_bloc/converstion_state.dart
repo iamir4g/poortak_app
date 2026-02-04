@@ -18,5 +18,9 @@ final class ConverstionError extends ConverstionState {
 
 final class ConverstionSuccess extends ConverstionState {
   final ConversationModel data;
-  ConverstionSuccess(this.data);
+  final String? lastConversationId;
+  ConverstionSuccess(this.data, {this.lastConversationId});
+
+  @override
+  List<Object> get props => [data, lastConversationId ?? ""];
 }

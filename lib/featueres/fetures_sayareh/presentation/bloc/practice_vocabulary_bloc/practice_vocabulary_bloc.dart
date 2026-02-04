@@ -121,5 +121,14 @@ class PracticeVocabularyBloc
       // Reset to initial state
       emit(PracticeVocabularyInitial());
     });
+
+    on<PracticeVocabularySubmitEvent>((event, emit) async {
+      await sayarehRepository.submitVocabulary(
+        event.courseId,
+        event.vocabularyId,
+        event.answer,
+        event.previousVocabularyIds,
+      );
+    });
   }
 }

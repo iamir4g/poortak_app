@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poortak/common/services/video_download_service.dart';
 import 'package:poortak/common/bloc/video_download_cubit/video_download_cubit.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_home_model.dart';
+import 'package:poortak/featueres/fetures_sayareh/data/models/course_progress_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/iknow_access_bloc/iknow_access_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/lesson_bloc/lesson_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/converstion_screen.dart';
@@ -17,6 +18,8 @@ import 'package:poortak/featueres/fetures_sayareh/widgets/dictionary_bottom_shee
 import 'package:poortak/locator.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/common/services/getImageUrl_service.dart';
+import 'package:poortak/common/widgets/reusable_modal.dart';
+import 'package:lottie/lottie.dart';
 
 class LessonScreen extends StatefulWidget {
   static const routeName = "/lesson_screen";
@@ -48,11 +51,13 @@ class _LessonScreenState extends State<LessonScreen> {
   final VideoDownloadService _downloadService = locator<VideoDownloadService>();
   final VideoDownloadCubit _downloadCubit = locator<VideoDownloadCubit>();
   Lesson? _currentLesson;
+  CourseProgressData? _progress;
   String? _currentVideoName;
   final GlobalKey<CustomVideoPlayerState> _videoPlayerKey =
       GlobalKey<CustomVideoPlayerState>();
   bool _isDisposed = false;
   String? _thumbnailUrl;
+  bool _isCompletionPopupShown = false;
 
   bool get hasAccess {
     final accessBloc = locator<IknowAccessBloc>();
@@ -184,7 +189,32 @@ class _LessonScreenState extends State<LessonScreen> {
             print("LessonBloc state changed: $state");
             if (state is LessonSuccess) {
               if (!_isDisposed && mounted) {
-                setState(() => _currentLesson = state.lesson);
+                setState(() {
+                  _currentLesson = state.lesson;
+                  _progress = state.progress;
+                });
+              }
+
+              if (state.progress != null) {
+                final p = state.progress!;
+                final isCompleted = p.vocabulary == 100 &&
+                    p.conversation == 100 &&
+                    p.quiz == 100;
+
+                if (isCompleted && !_isCompletionPopupShown) {
+                  _isCompletionPopupShown = true;
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    if (mounted) {
+                      ReusableModal.showSuccess(
+                        context: context,
+                        title: 'تبریک!',
+                        message: 'شما این درس را با موفقیت به پایان رساندید.',
+                        customLottiePath: 'assets/lottie/Happy_Star.json',
+                        buttonText: 'متوجه شدم',
+                      );
+                    }
+                  });
+                }
               }
 
               () async {
@@ -323,7 +353,104 @@ class _LessonScreenState extends State<LessonScreen> {
     );
   }
 
+  Widget _buildCompletionHeader() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text(
+                      'خوانده شده',
+                      style: TextStyle(
+                        fontFamily: 'IranSans',
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF3D495C),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    const Icon(
+                      Icons.check_circle,
+                      color: Color(0xFF4CAF50),
+                      size: 24,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                SizedBox(
+                  height: 48,
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      context
+                          .read<LessonBloc>()
+                          .add(ResetLessonProgressEvent(id: widget.lessonId));
+                      setState(() {
+                        _isCompletionPopupShown = false;
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFFF9F29),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: const Text(
+                      'مرور دوباره درس',
+                      style: TextStyle(
+                        fontFamily: 'IranSans',
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 16),
+          Image.asset(
+            'assets/images/iknow/medal.png',
+            width: 90,
+            height: 90,
+            fit: BoxFit.contain,
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildVideoSection() {
+    // Check if completed
+    if (_progress != null &&
+        _progress!.vocabulary == 100 &&
+        _progress!.conversation == 100 &&
+        _progress!.quiz == 100) {
+      return _buildCompletionHeader();
+    }
+
     // Listen to download cubit for real-time updates
     return BlocBuilder<VideoDownloadCubit, VideoDownloadState>(
       bloc: _downloadCubit,
@@ -382,13 +509,17 @@ class _LessonScreenState extends State<LessonScreen> {
       iconPath: "assets/images/chat_icon.png",
       englishLabel: "conversation",
       persianLabel: "مکالمه",
-      onTap: () {
+      progress: _progress?.conversation,
+      onTap: () async {
         if (!hasAccess) {
           _showPurchaseDialog();
           return;
         }
-        Navigator.pushNamed(context, ConversationScreen.routeName,
+        await Navigator.pushNamed(context, ConversationScreen.routeName,
             arguments: {"conversationId": widget.lessonId});
+        if (mounted) {
+          context.read<LessonBloc>().add(GetLessonEvenet(id: widget.lessonId));
+        }
       },
     );
   }
@@ -398,6 +529,7 @@ class _LessonScreenState extends State<LessonScreen> {
       iconPath: "assets/images/words_icon.png",
       englishLabel: "vocabulary",
       persianLabel: "واژگان",
+      progress: _progress?.vocabulary,
       badge: Container(
         width: 40,
         height: 15,
@@ -417,13 +549,16 @@ class _LessonScreenState extends State<LessonScreen> {
           ),
         ),
       ),
-      onTap: () {
+      onTap: () async {
         if (!hasAccess) {
           _showPurchaseDialog();
           return;
         }
-        Navigator.pushNamed(context, VocabularyScreen.routeName,
+        await Navigator.pushNamed(context, VocabularyScreen.routeName,
             arguments: {"id": widget.lessonId});
+        if (mounted) {
+          context.read<LessonBloc>().add(GetLessonEvenet(id: widget.lessonId));
+        }
       },
     );
   }
@@ -433,7 +568,8 @@ class _LessonScreenState extends State<LessonScreen> {
       iconPath: "assets/images/quiz_icon.png",
       englishLabel: "Quiz",
       persianLabel: "آزمون",
-      onTap: () {
+      progress: _progress?.quiz,
+      onTap: () async {
         if (!hasAccess) {
           _showPurchaseDialog();
           return;
@@ -448,8 +584,11 @@ class _LessonScreenState extends State<LessonScreen> {
           );
           return;
         }
-        Navigator.pushNamed(context, QuizzesScreen.routeName,
+        await Navigator.pushNamed(context, QuizzesScreen.routeName,
             arguments: {"courseId": widget.lessonId});
+        if (mounted) {
+          context.read<LessonBloc>().add(GetLessonEvenet(id: widget.lessonId));
+        }
       },
     );
   }

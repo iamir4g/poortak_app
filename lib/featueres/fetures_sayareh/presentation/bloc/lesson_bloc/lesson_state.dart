@@ -13,7 +13,8 @@ final class LessonLoading extends LessonState {}
 
 final class LessonSuccess extends LessonState {
   final Lesson lesson;
-  LessonSuccess({required this.lesson});
+  final CourseProgressData? progress;
+  LessonSuccess({required this.lesson, this.progress});
 }
 
 final class LessonError extends LessonState {

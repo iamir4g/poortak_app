@@ -32,6 +32,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
   // سرویس TTS برای پخش صوتی متن‌ها
   final TTSService ttsService = locator<TTSService>();
 
+  late ConverstionBloc _converstionBloc;
+
   // مشخص می‌کند که آیا در حال پخش تمام مکالمه است
   final ValueNotifier<bool> isPlayingNotifier = ValueNotifier(false);
 
@@ -44,12 +46,35 @@ class _ConversationScreenState extends State<ConversationScreen> {
   // مشخص می‌کند که آیا ترجمه‌ها باید نمایش داده شوند
   final ValueNotifier<bool> showTranslationsNotifier = ValueNotifier(false);
 
+  // شمارنده برای ارسال دوره‌ای وضعیت پخش به سرور
+  int _messagesPlayedSinceLastSave = 0;
+  static const int _saveInterval = 3;
+
+  @override
+  void initState() {
+    super.initState();
+    _converstionBloc = ConverstionBloc(
+      sayarehRepository: locator(),
+    )..add(GetConversationEvent(id: widget.conversationId));
+  }
+
   @override
   void dispose() {
+    _converstionBloc.close();
     isPlayingNotifier.dispose();
     currentPlayingIndexNotifier.dispose();
     showTranslationsNotifier.dispose();
     super.dispose();
+  }
+
+  /// ذخیره وضعیت پخش در سرور
+  void _savePlayback(String conversationId) {
+    _converstionBloc.add(
+      SaveConversationPlaybackEvent(
+        courseId: widget.conversationId,
+        conversationId: conversationId,
+      ),
+    );
   }
 
   /// پخش تمام پیام‌های مکالمه به ترتیب
@@ -80,6 +105,13 @@ class _ConversationScreenState extends State<ConversationScreen> {
         final message = messages[i];
         currentPlayingIndexNotifier.value = i;
 
+        // ذخیره وضعیت پخش در صورت رسیدن به حد نصاب
+        _messagesPlayedSinceLastSave++;
+        if (_messagesPlayedSinceLastSave >= _saveInterval) {
+          _savePlayback(message.id);
+          _messagesPlayedSinceLastSave = 0;
+        }
+
         // پخش پیام با صدای مناسب
         if (message.voice == 'male') {
           await ttsService.stop();
@@ -108,7 +140,11 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
   /// پخش یک متن با صدای مشخص شده
   /// این متد زمانی که کاربر روی یک پیام کلیک می‌کند فراخوانی می‌شود
-  Future<void> speakText(String text, String voice) async {
+  Future<void> speakText(
+      String text, String voice, String conversationId) async {
+    // ذخیره وضعیت پخش به عنوان آخرین متن پخش شده
+    _savePlayback(conversationId);
+
     if (voice == 'male') {
       // استفاده مستقیم از صدای مردانه انتخابی
       await ttsService.stop();
@@ -171,11 +207,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      // ایجاد و راه‌اندازی Bloc برای مدیریت وضعیت مکالمه
-      create: (context) => ConverstionBloc(
-        sayarehRepository: locator(),
-      )..add(GetConversationEvent(id: widget.conversationId)),
+    return BlocProvider.value(
+      value: _converstionBloc,
       child: Scaffold(
         backgroundColor: MyColors.secondaryTint4,
         // نوار بالای صفحه با عنوان "مکالمه"
@@ -263,28 +296,45 @@ class _ConversationScreenState extends State<ConversationScreen> {
           ),
         ),
         // بدنه صفحه که بر اساس وضعیت Bloc محتوا را نمایش می‌دهد
-        body: BlocBuilder<ConverstionBloc, ConverstionState>(
-          builder: (context, state) {
-            // نمایش Loading در هنگام بارگذاری داده‌ها
-            if (state is ConverstionLoading) {
-              return const Center(child: CircularProgressIndicator());
-            }
-
-            // نمایش پیام خطا در صورت بروز مشکل
-            if (state is ConverstionError) {
-              return Center(child: Text(state.message));
-            }
-
-            // نمایش لیست مکالمه در صورت موفقیت‌آمیز بودن درخواست
-            if (state is ConverstionSuccess) {
-              // مرتب‌سازی پیام‌ها بر اساس order
-              sortedMessages = state.data.data
+        body: BlocListener<ConverstionBloc, ConverstionState>(
+          listener: (context, state) {
+            if (state is ConverstionSuccess &&
+                state.lastConversationId != null) {
+              // ابتدا پیام‌ها را استخراج و مرتب می‌کنیم تا بتوانیم ایندکس را پیدا کنیم
+              final messages = List<Datum>.from(state.data.data)
                 ..sort((a, b) => a.order.compareTo(b.order));
-              return _buildConversationList(context, state.data);
-            }
 
-            return const SizedBox.shrink();
+              final index =
+                  messages.indexWhere((m) => m.id == state.lastConversationId);
+
+              if (index != -1) {
+                currentPlayingIndexNotifier.value = index;
+              }
+            }
           },
+          child: BlocBuilder<ConverstionBloc, ConverstionState>(
+            builder: (context, state) {
+              // نمایش Loading در هنگام بارگذاری داده‌ها
+              if (state is ConverstionLoading) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              // نمایش پیام خطا در صورت بروز مشکل
+              if (state is ConverstionError) {
+                return Center(child: Text(state.message));
+              }
+
+              // نمایش لیست مکالمه در صورت موفقیت‌آمیز بودن درخواست
+              if (state is ConverstionSuccess) {
+                // مرتب‌سازی پیام‌ها بر اساس order
+                sortedMessages = state.data.data
+                  ..sort((a, b) => a.order.compareTo(b.order));
+                return _buildConversationList(context, state.data);
+              }
+
+              return const SizedBox.shrink();
+            },
+          ),
         ),
       ),
     );
@@ -294,6 +344,20 @@ class _ConversationScreenState extends State<ConversationScreen> {
   /// این متد پیام‌های مرتب شده را به صورت اسکرول‌پذیر نمایش می‌دهد
   Widget _buildConversationList(BuildContext context, ConversationModel data) {
     final ScrollController scrollController = ScrollController();
+
+    // اسکرول به آخرین پیام پخش شده پس از رندر شدن لیست
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (currentPlayingIndexNotifier.value > 0 &&
+          scrollController.hasClients) {
+        // تخمین حدودی برای اسکرول (چون ارتفاع حباب‌ها متغیر است)
+        final double targetOffset = currentPlayingIndexNotifier.value * 100.0;
+        scrollController.animateTo(
+          targetOffset.clamp(0, scrollController.position.maxScrollExtent),
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
 
     return ValueListenableBuilder<bool>(
       valueListenable: showTranslationsNotifier,
@@ -320,7 +384,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                   showTranslations: showTranslations,
                   onTap: () {
                     // پخش صوتی پیام هنگام لمس
-                    speakText(message.text, message.voice);
+                    speakText(message.text, message.voice, message.id);
                   },
                 );
               },
