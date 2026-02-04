@@ -15,6 +15,7 @@ import 'package:poortak/featueres/feature_match/screens/main_match_screen.dart';
 import 'package:poortak/featueres/feature_match/screens/match_screen.dart';
 import 'package:poortak/featueres/feature_payment/presentation/screens/payment_result_screen.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/kavoosh_main_screen.dart';
+import 'package:poortak/featueres/feature_kavoosh/screens/educational_videos_screen.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_bloc.dart';
 import 'package:poortak/featueres/feature_litner/screens/litner_word_completed_screen.dart';
 import 'package:poortak/featueres/feature_litner/screens/litner_word_box_screen.dart';
@@ -320,6 +321,8 @@ void main() async {
                   );
                 },
                 KavooshMainScreen.routeName: (context) => KavooshMainScreen(),
+                EducationalVideosScreen.routeName: (context) =>
+                    const EducationalVideosScreen(),
                 PaymentResultScreen.routeName: (context) {
                   final args = ModalRoute.of(context)?.settings.arguments
                       as Map<String, dynamic>;

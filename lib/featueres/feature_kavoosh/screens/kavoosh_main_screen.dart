@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:poortak/featueres/feature_kavoosh/screens/educational_videos_screen.dart';
 
 class KavooshMainScreen extends StatefulWidget {
   static const String routeName = '/kavoosh-main';
@@ -39,26 +40,26 @@ class _KavooshMainScreenState extends State<KavooshMainScreen> {
                         Color(0xFFFFF3D6),
                       ],
                       onTap: () {
-                        // Handle video tap
+                        Navigator.pushNamed(
+                            context, EducationalVideosScreen.routeName);
                       },
-                      showComingSoonBadge: true,
                     ),
 
                     const SizedBox(height: 13),
 
                     // Audio Books Card
-                    _buildContentCard(
-                      title: 'کتاب های صوتی',
-                      subtitle: 'کتاب های آموزشی صوتی برای پایه های تحصیلی',
-                      gradientColors: const [
-                        Color(0xFFECE2FD),
-                        Color(0xFFF6DDF8),
-                      ],
-                      onTap: () {
-                        // Handle audio books tap
-                      },
-                      showComingSoonBadge: true,
-                    ),
+                    // _buildContentCard(
+                    //   title: 'کتاب های صوتی',
+                    //   subtitle: 'کتاب های آموزشی صوتی برای پایه های تحصیلی',
+                    //   gradientColors: const [
+                    //     Color(0xFFECE2FD),
+                    //     Color(0xFFF6DDF8),
+                    //   ],
+                    //   onTap: () {
+                    //     // Handle audio books tap
+                    //   },
+                    //   showComingSoonBadge: true,
+                    // ),
 
                     const SizedBox(height: 13),
 
