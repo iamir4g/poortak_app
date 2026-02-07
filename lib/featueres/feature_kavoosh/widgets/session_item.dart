@@ -22,7 +22,9 @@ class SessionItem extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         margin: const EdgeInsets.only(bottom: 8),
         decoration: BoxDecoration(
-          color: isPlaying ? const Color(0xFFF9F6C6) : Colors.transparent, // Highlight if playing
+          color: isPlaying
+              ? const Color(0xFFF9F6C6)
+              : Colors.transparent, // Highlight if playing
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -33,9 +35,9 @@ class SessionItem extends StatelessWidget {
               color: isLocked ? Colors.amber : const Color(0xFF29303D),
               size: 20,
             ),
-            
+
             const SizedBox(width: 12),
-            
+
             // Title
             Expanded(
               child: Text(
@@ -50,7 +52,7 @@ class SessionItem extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            
+
             // Play Arrow Icon (Left side in RTL)
             if (!isLocked)
               const Icon(

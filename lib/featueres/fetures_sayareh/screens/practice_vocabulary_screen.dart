@@ -45,6 +45,7 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
     final currentState = context.read<PracticeVocabularyBloc>().state
         as PracticeVocabularySuccess;
     final correctWord = currentState.practiceVocabulary.data.correctWord;
+    final wrongWord = currentState.practiceVocabulary.data.wrongWord;
 
     setState(() {
       selectedWord = word;
@@ -60,12 +61,15 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
           ),
         );
 
+    // Determine answer ID
+    final answerId = word == correctWord.word ? correctWord.id : wrongWord.id;
+
     // Submit the answer to the API
     context.read<PracticeVocabularyBloc>().add(
           PracticeVocabularySubmitEvent(
             courseId: widget.courseId,
             vocabularyId: correctWord.id,
-            answer: word,
+            answer: answerId,
             previousVocabularyIds: currentState.correctWords,
           ),
         );
@@ -181,15 +185,19 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
                     bottomLeft: Radius.circular(30),
                   ),
                 ),
+                automaticallyImplyLeading: false,
+                actions: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_forward),
+                    onPressed: () {
+                      _navigateToLessonScreen();
+                    },
+                  ),
+                ],
+                centerTitle: true,
                 title: const Text(
                   'تمرین واژگان',
                   style: MyTextStyle.textHeader16Bold,
-                ),
-                leading: IconButton(
-                  icon: const Icon(Icons.arrow_back),
-                  onPressed: () {
-                    _navigateToLessonScreen();
-                  },
                 ),
               ),
               body: Builder(

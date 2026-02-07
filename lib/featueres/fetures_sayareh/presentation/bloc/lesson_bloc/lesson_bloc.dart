@@ -4,6 +4,8 @@ import 'package:poortak/common/resources/data_state.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/course_progress_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_home_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/repositories/sayareh_repository.dart';
+import 'package:poortak/common/utils/prefs_operator.dart';
+import 'package:poortak/locator.dart';
 
 part 'lesson_event.dart';
 part 'lesson_state.dart';
@@ -16,12 +18,18 @@ class LessonBloc extends Bloc<LessonEvent, LessonState> {
       final response = await sayarehRepository.fetchCourseById(event.id);
 
       if (response is DataSuccess) {
-        // Fetch progress
-        final progressResponse =
-            await sayarehRepository.fetchCourseProgress(event.id);
+        // Fetch progress only if user is logged in
         CourseProgressData? progress;
-        if (progressResponse is DataSuccess && progressResponse.data != null) {
-          progress = progressResponse.data!.data;
+        final prefsOperator = locator<PrefsOperator>();
+
+        if (prefsOperator.isLoggedIn()) {
+          final progressResponse =
+              await sayarehRepository.fetchCourseProgress(event.id);
+
+          if (progressResponse is DataSuccess &&
+              progressResponse.data != null) {
+            progress = progressResponse.data!.data;
+          }
         }
 
         emit(LessonSuccess(lesson: response.data!, progress: progress));
