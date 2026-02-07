@@ -92,6 +92,12 @@ class _QuizScreenState extends State<QuizScreen> {
                         const EdgeInsets.only(top: 24, left: 16, right: 16),
                     child: Row(
                       children: [
+                        const Spacer(),
+                        // Text(
+                        //   widget.title,
+                        //   style: MyTextStyle.textHeader16Bold,
+                        // ),
+                        const Spacer(flex: 2),
                         GestureDetector(
                           onTap: () => Navigator.of(context).pop(),
                           child: Container(
@@ -101,16 +107,10 @@ class _QuizScreenState extends State<QuizScreen> {
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(17),
                             ),
-                            child: const Icon(Icons.arrow_back_ios_new,
+                            child: const Icon(Icons.arrow_forward,
                                 color: Color(0xFF3D495C)),
                           ),
                         ),
-                        const Spacer(),
-                        // Text(
-                        //   widget.title,
-                        //   style: MyTextStyle.textHeader16Bold,
-                        // ),
-                        const Spacer(flex: 2),
                       ],
                     ),
                   ),
@@ -140,16 +140,8 @@ class _QuizScreenState extends State<QuizScreen> {
                             courseId: widget.courseId,
                             quizId: widget.quizId,
                           ));
-                    } else {
-                      setState(() {
-                        currentQuestion = answerState.nextQuestion!;
-                        selectedAnswerId = null;
-                        isSelected = false;
-                        isCorrectAnswer = false;
-                        isWrongSelected = false;
-                      });
-                      context.read<QuizAnswerBloc>().emit(QuizAnswerInitial());
                     }
+                    // Don't auto-advance here. Wait for user to click "Next".
                   }
                 },
                 child: BlocListener<QuizResultBloc, QuizResultState>(
@@ -214,14 +206,23 @@ class _QuizScreenState extends State<QuizScreen> {
                               itemBuilder: (context, index) {
                                 final answer = questionData.answers[index];
                                 isSelected = selectedAnswerId == answer.id;
-                                if (answerState is QuizAnswerLoaded &&
-                                    answerState.selectedAnswerId == answer.id) {
-                                  isCorrectAnswer = answer.id ==
-                                          answerState.correctAnswerId &&
-                                      answerState.isCorrect;
-                                  isWrongSelected = answer.id ==
+                                if (answerState is QuizAnswerLoaded) {
+                                  // Always highlight the correct answer
+                                  if (answer.id ==
+                                      answerState.correctAnswerId) {
+                                    isCorrectAnswer = true;
+                                    isWrongSelected = false;
+                                  }
+                                  // Highlight the selected answer as wrong if it's incorrect
+                                  else if (answer.id ==
                                           answerState.selectedAnswerId &&
-                                      !answerState.isCorrect;
+                                      !answerState.isCorrect) {
+                                    isCorrectAnswer = false;
+                                    isWrongSelected = true;
+                                  } else {
+                                    isCorrectAnswer = false;
+                                    isWrongSelected = false;
+                                  }
                                 } else {
                                   isCorrectAnswer = false;
                                   isWrongSelected = false;
@@ -351,6 +352,68 @@ class _QuizScreenState extends State<QuizScreen> {
                                         children: [
                                           Text(
                                             "بررسی پاسخ",
+                                            style: MyTextStyle.textMatnBtn
+                                                .copyWith(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Icon(Icons.arrow_forward_ios,
+                                              color: Colors.white, size: 18),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              )
+                            else if (answerState is QuizAnswerLoaded)
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 24.0),
+                                child: Center(
+                                  child: SizedBox(
+                                    width: 176,
+                                    height: 54,
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        if (answerState.nextQuestion != null) {
+                                          setState(() {
+                                            currentQuestion =
+                                                answerState.nextQuestion!;
+                                            selectedAnswerId = null;
+                                            isSelected = false;
+                                            isCorrectAnswer = false;
+                                            isWrongSelected = false;
+                                          });
+                                          context
+                                              .read<QuizAnswerBloc>()
+                                              .emit(QuizAnswerInitial());
+                                        } else {
+                                          // Handle end of quiz if needed, though listener handles it
+                                          context.read<QuizResultBloc>().add(
+                                                FetchQuizResultEvent(
+                                                  courseId: widget.courseId,
+                                                  quizId: widget.quizId,
+                                                ),
+                                              );
+                                        }
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor:
+                                            const Color(0xFFFF9F29),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(30),
+                                        ),
+                                        elevation: 0,
+                                        padding: EdgeInsets.zero,
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            "بعدی",
                                             style: MyTextStyle.textMatnBtn
                                                 .copyWith(
                                               fontSize: 14,

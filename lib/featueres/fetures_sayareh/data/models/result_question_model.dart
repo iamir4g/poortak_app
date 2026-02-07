@@ -52,7 +52,7 @@ class Data {
         totalQuestions: json["totalQuestions"],
         answeredQuestions: json["answeredQuestions"],
         correctAnswers: json["correctAnswers"],
-        score: json["score"],
+        score: (json["score"] as num).toDouble(),
         answers: List<AnswerElement>.from(
             json["answers"].map((x) => AnswerElement.fromJson(x))),
       );

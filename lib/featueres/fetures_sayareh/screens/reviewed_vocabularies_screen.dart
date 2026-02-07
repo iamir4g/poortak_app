@@ -59,24 +59,42 @@ class _ReviewedVocabulariesScreenState
             bottomLeft: Radius.circular(30),
           ),
         ),
+        automaticallyImplyLeading: false,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.arrow_forward),
+            onPressed: () {
+              Navigator.pushReplacementNamed(
+                context,
+                LessonScreen.routeName,
+                arguments: {
+                  'index': 0,
+                  'title': 'درس',
+                  'lessonId': widget.courseId,
+                },
+              );
+            },
+          ),
+        ],
+        centerTitle: true,
         title: const Text(
           'واژگان مرور شده',
           style: MyTextStyle.textHeader16Bold,
         ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pushReplacementNamed(
-              context,
-              LessonScreen.routeName,
-              arguments: {
-                'index': 0,
-                'title': 'درس',
-                'lessonId': widget.courseId,
-              },
-            );
-          },
-        ),
+        // leading: IconButton(
+        //   icon: const Icon(Icons.arrow_back),
+        //   onPressed: () {
+        //     Navigator.pushReplacementNamed(
+        //       context,
+        //       LessonScreen.routeName,
+        //       arguments: {
+        //         'index': 0,
+        //         'title': 'درس',
+        //         'lessonId': widget.courseId,
+        //       },
+        //     );
+        //   },
+        // ),
       ),
       body: Column(
         children: [
@@ -271,17 +289,10 @@ class _ReviewedVocabulariesScreenState
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
-                        // Reset the bloc state and navigate to practice
-                        context.read<PracticeVocabularyBloc>().add(
-                              const PracticeVocabularyResetEvent(),
-                            );
-                        Navigator.pushReplacement(
+                        Navigator.pushReplacementNamed(
                           context,
-                          MaterialPageRoute(
-                            builder: (context) => PracticeVocabularyScreen(
-                              courseId: widget.courseId,
-                            ),
-                          ),
+                          PracticeVocabularyScreen.routeName,
+                          arguments: {'courseId': widget.courseId},
                         );
                       },
                       style: ElevatedButton.styleFrom(
@@ -307,17 +318,10 @@ class _ReviewedVocabulariesScreenState
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
-                        // Reset the bloc state and navigate to practice
-                        context.read<PracticeVocabularyBloc>().add(
-                              const PracticeVocabularyResetEvent(),
-                            );
-                        Navigator.pushReplacement(
+                        Navigator.pushReplacementNamed(
                           context,
-                          MaterialPageRoute(
-                            builder: (context) => PracticeVocabularyScreen(
-                              courseId: widget.courseId,
-                            ),
-                          ),
+                          PracticeVocabularyScreen.routeName,
+                          arguments: {'courseId': widget.courseId},
                         );
                       },
                       style: ElevatedButton.styleFrom(
