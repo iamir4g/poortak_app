@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:poortak/featueres/feature_kavoosh/widgets/course_card.dart';
 import 'package:poortak/featueres/feature_kavoosh/widgets/section_header.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/course_list_screen.dart';
+import 'package:poortak/featueres/feature_kavoosh/screens/book_details_screen.dart';
 
 class EBooksScreen extends StatefulWidget {
   static const String routeName = '/ebooks';
@@ -180,7 +181,7 @@ class _EBooksScreenState extends State<EBooksScreen> {
             Navigator.pushNamed(
               context,
               CourseListScreen.routeName,
-              arguments: {'title': 'کتاب های $title'},
+              arguments: {'title': 'کتاب های $title', 'type': 'book'},
             );
           },
         ),
@@ -200,6 +201,13 @@ class _EBooksScreenState extends State<EBooksScreen> {
               return CourseCard(
                 title: 'ریاضی',
                 backgroundColor: colors[index % colors.length],
+                onTap: () {
+                  Navigator.pushNamed(
+                    context,
+                    BookDetailsScreen.routeName,
+                    arguments: {'title': 'ریاضی'},
+                  );
+                },
                 // imagePath: 'assets/images/placeholder_book.png',
               );
             },

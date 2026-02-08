@@ -9,6 +9,7 @@ class DetailedCourseCard extends StatelessWidget {
   final bool isPurchased;
   final String? imagePath;
   final Color backgroundColor;
+  final VoidCallback? onTap;
 
   const DetailedCourseCard({
     super.key,
@@ -18,18 +19,20 @@ class DetailedCourseCard extends StatelessWidget {
     this.isPurchased = false,
     this.imagePath,
     this.backgroundColor = Colors.white,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        Navigator.pushNamed(
-          context,
-          VideoDetailScreen.routeName,
-          arguments: {'title': title},
-        );
-      },
+      onTap: onTap ??
+          () {
+            Navigator.pushNamed(
+              context,
+              VideoDetailScreen.routeName,
+              arguments: {'title': title},
+            );
+          },
       child: Container(
         margin: const EdgeInsets.only(bottom: 16, left: 16, right: 16),
         height: 140,

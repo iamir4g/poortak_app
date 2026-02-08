@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:poortak/featueres/feature_kavoosh/widgets/detailed_course_card.dart';
+import 'package:poortak/featueres/feature_kavoosh/screens/book_details_screen.dart';
 
 class CourseListScreen extends StatefulWidget {
   static const String routeName = '/course-list';
   final String title;
+  final String? type;
 
   const CourseListScreen({
     super.key,
     required this.title,
+    this.type,
   });
 
   @override
@@ -149,6 +152,15 @@ class _CourseListScreenState extends State<CourseListScreen> {
                   date: '۵ ماه پیش',
                   isPurchased: index % 2 == 0, // Alternate purchased status
                   backgroundColor: colors[index % colors.length],
+                  onTap: widget.type == 'book'
+                      ? () {
+                          Navigator.pushNamed(
+                            context,
+                            BookDetailsScreen.routeName,
+                            arguments: {'title': 'ریاضی سوم دبستان'},
+                          );
+                        }
+                      : null,
                   // imagePath: 'assets/images/placeholder_book.png',
                 );
               },

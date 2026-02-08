@@ -6,24 +6,27 @@ class CourseCard extends StatelessWidget {
   final String title;
   final String? imagePath; // For now we might use placeholder or assets
   final Color backgroundColor;
+  final VoidCallback? onTap;
 
   const CourseCard({
     super.key,
     required this.title,
     this.imagePath,
     this.backgroundColor = Colors.white,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        Navigator.pushNamed(
-          context,
-          VideoDetailScreen.routeName,
-          arguments: {'title': title},
-        );
-      },
+      onTap: onTap ??
+          () {
+            Navigator.pushNamed(
+              context,
+              VideoDetailScreen.routeName,
+              arguments: {'title': title},
+            );
+          },
       child: Container(
         width: 140,
         margin: const EdgeInsets.only(left: 16),

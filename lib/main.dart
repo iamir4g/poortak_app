@@ -19,6 +19,7 @@ import 'package:poortak/featueres/feature_kavoosh/screens/educational_videos_scr
 import 'package:poortak/featueres/feature_kavoosh/screens/ebooks_screen.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/course_list_screen.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/video_detail_screen.dart';
+import 'package:poortak/featueres/feature_kavoosh/screens/book_details_screen.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_bloc.dart';
 import 'package:poortak/featueres/feature_litner/screens/litner_word_completed_screen.dart';
 import 'package:poortak/featueres/feature_litner/screens/litner_word_box_screen.dart';
@@ -330,12 +331,20 @@ void main() async {
                 CourseListScreen.routeName: (context) {
                   final args = ModalRoute.of(context)?.settings.arguments
                       as Map<String, dynamic>;
-                  return CourseListScreen(title: args['title']);
+                  return CourseListScreen(
+                    title: args['title'],
+                    type: args['type'],
+                  );
                 },
                 VideoDetailScreen.routeName: (context) {
                   final args = ModalRoute.of(context)?.settings.arguments
                       as Map<String, dynamic>;
                   return VideoDetailScreen(title: args['title']);
+                },
+                BookDetailsScreen.routeName: (context) {
+                  final args = ModalRoute.of(context)?.settings.arguments
+                      as Map<String, dynamic>;
+                  return BookDetailsScreen(title: args['title']);
                 },
                 PaymentResultScreen.routeName: (context) {
                   final args = ModalRoute.of(context)?.settings.arguments
