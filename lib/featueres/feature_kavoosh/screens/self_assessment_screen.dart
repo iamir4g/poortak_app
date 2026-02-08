@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:poortak/featueres/feature_kavoosh/widgets/self_assessment_subject_card.dart';
 import 'package:poortak/config/myColors.dart';
+import 'package:poortak/featueres/feature_kavoosh/screens/self_assessment_grades_screen.dart';
 
 class SelfAssessmentScreen extends StatelessWidget {
   static const String routeName = '/self-assessment';
@@ -109,7 +110,11 @@ class SelfAssessmentScreen extends StatelessWidget {
               iconPath: subject['icon'],
               backgroundColor: subject['color'],
               onTap: () {
-                // Future: Navigate to quizzes for this subject
+                Navigator.pushNamed(
+                  context,
+                  SelfAssessmentGradesScreen.routeName,
+                  arguments: {'subjectTitle': subject['title']},
+                );
               },
             );
           },

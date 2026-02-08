@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:poortak/config/myTextStyle.dart';
 
 class SelfAssessmentSubjectCard extends StatelessWidget {
   final String title;
@@ -41,20 +42,15 @@ class SelfAssessmentSubjectCard extends StatelessWidget {
               ),
               child: Image.asset(
                 iconPath,
-                width: 50,
-                height: 50,
+                width: 70,
+                height: 70,
                 fit: BoxFit.contain,
               ),
             ),
             const SizedBox(height: 12),
             Text(
               title,
-              style: const TextStyle(
-                fontFamily: 'IRANSans',
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF29303D),
-              ),
+              style: MyTextStyle.textMatn14Bold,
               textAlign: TextAlign.center,
             ),
           ],
