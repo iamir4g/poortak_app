@@ -20,6 +20,7 @@ import 'package:poortak/featueres/feature_kavoosh/screens/ebooks_screen.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/course_list_screen.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/video_detail_screen.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/book_details_screen.dart';
+import 'package:poortak/featueres/feature_kavoosh/screens/self_assessment_screen.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_bloc.dart';
 import 'package:poortak/featueres/feature_litner/screens/litner_word_completed_screen.dart';
 import 'package:poortak/featueres/feature_litner/screens/litner_word_box_screen.dart';
@@ -346,6 +347,8 @@ void main() async {
                       as Map<String, dynamic>;
                   return BookDetailsScreen(title: args['title']);
                 },
+                SelfAssessmentScreen.routeName: (context) =>
+                    const SelfAssessmentScreen(),
                 PaymentResultScreen.routeName: (context) {
                   final args = ModalRoute.of(context)?.settings.arguments
                       as Map<String, dynamic>;

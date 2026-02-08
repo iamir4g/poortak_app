@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/educational_videos_screen.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/ebooks_screen.dart';
+import 'package:poortak/featueres/feature_kavoosh/screens/self_assessment_screen.dart';
+import 'package:poortak/config/myColors.dart';
 
 class KavooshMainScreen extends StatefulWidget {
   static const String routeName = '/kavoosh-main';
@@ -20,8 +22,7 @@ class _KavooshMainScreenState extends State<KavooshMainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:
-          const Color(0xFFF6F9FE), // Light blue background from Figma
+      backgroundColor: MyColors.background3,
       body: SafeArea(
         child: Column(
           children: [
@@ -89,9 +90,10 @@ class _KavooshMainScreenState extends State<KavooshMainScreen> {
                         Color(0xFFD9FFEA),
                       ],
                       onTap: () {
-                        // Handle self-assessment tap
+                        Navigator.pushNamed(
+                            context, SelfAssessmentScreen.routeName);
                       },
-                      showComingSoonBadge: true,
+                      showComingSoonBadge: false,
                     ),
                   ],
                 ),
