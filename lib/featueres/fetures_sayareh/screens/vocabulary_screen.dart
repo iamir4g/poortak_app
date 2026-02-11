@@ -278,6 +278,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           IconButton(
+                            key: const Key('vocabulary_forward_button'),
                             onPressed: () {
                               if (currentIndex <
                                   state.vocabulary.data.length - 1) {
