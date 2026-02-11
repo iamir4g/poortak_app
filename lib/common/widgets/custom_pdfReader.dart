@@ -455,6 +455,11 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
                   children: [
                     PdfView(
                       controller: _pdfController!,
+                      onPageChanged: (page) {
+                        setState(() {
+                          _currentPage = page;
+                        });
+                      },
                       builders: PdfViewBuilders<DefaultBuilderOptions>(
                         options: const DefaultBuilderOptions(
                           loaderSwitchDuration: Duration(milliseconds: 500),

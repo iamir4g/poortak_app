@@ -199,11 +199,18 @@ class PdfReaderScreen extends StatelessWidget {
           bookData.title,
           style: MyTextStyle.textMatn14Bold,
         ),
+        automaticallyImplyLeading: false,
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.arrow_forward),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ],
+        // leading: IconButton(
+        //   icon: const Icon(Icons.arrow_back),
+        //   onPressed: () => Navigator.of(context).pop(),
+        // ),
       ),
       body: Container(
         decoration: const BoxDecoration(

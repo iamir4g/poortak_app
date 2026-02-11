@@ -66,6 +66,7 @@ import 'package:poortak/common/bloc/connectivity_cubit/connectivity_cubit.dart';
 import 'package:poortak/common/widgets/connectivity_listener.dart';
 import 'package:poortak/featueres/feature_match/presentation/bloc/match_bloc/match_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/pdf_reader_screen.dart';
+import 'package:poortak/featueres/fetures_sayareh/screens/book_detail_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/single_book_bloc/single_book_cubit.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:poortak/common/services/reminder_notification_service.dart';
@@ -377,6 +378,8 @@ void main() async {
                 HowToGetPointsScreen.routeName: (context) =>
                     HowToGetPointsScreen(),
                 FavoritScreen.routeName: (context) => FavoritScreen(),
+                BookDetailScreen.routeName: (context) =>
+                    const BookDetailScreen(),
                 PdfReaderScreen.routeName: (context) {
                   final args = ModalRoute.of(context)?.settings.arguments
                       as Map<String, dynamic>;
