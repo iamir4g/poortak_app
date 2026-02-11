@@ -6,7 +6,6 @@ import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quizes_cubit/cubit/quizes_cubit.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/first_quiz_screen.dart';
-import 'package:poortak/featueres/fetures_sayareh/screens/quiz_screen.dart';
 import 'package:poortak/locator.dart';
 
 class QuizzesScreen extends StatefulWidget {

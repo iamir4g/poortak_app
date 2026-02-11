@@ -6,10 +6,10 @@ class LogoutConfirmationModal extends StatelessWidget {
   final VoidCallback onStay;
 
   const LogoutConfirmationModal({
-    Key? key,
+    super.key,
     required this.onLogout,
     required this.onStay,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +61,7 @@ class LogoutConfirmationModal extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     // Logout button
-                    Container(
+                    SizedBox(
                       width: 144, // 36 * 4 = 144 (w-36 from Figma)
                       height: 56, // h-14 = 56px
                       child: ElevatedButton(
@@ -88,7 +88,7 @@ class LogoutConfirmationModal extends StatelessWidget {
                     const SizedBox(width: 8),
 
                     // Stay button
-                    Container(
+                    SizedBox(
                       width: 132,
                       height: 56,
                       child: OutlinedButton(

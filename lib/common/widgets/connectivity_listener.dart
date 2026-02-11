@@ -8,10 +8,10 @@ class ConnectivityListener extends StatefulWidget {
   final GlobalKey<NavigatorState>? navigatorKey;
 
   const ConnectivityListener({
-    Key? key,
+    super.key,
     required this.child,
     this.navigatorKey,
-  }) : super(key: key);
+  });
 
   @override
   State<ConnectivityListener> createState() => _ConnectivityListenerState();

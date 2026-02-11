@@ -13,13 +13,13 @@ final class ConverstionLoading extends ConverstionState {}
 
 final class ConverstionError extends ConverstionState {
   final String message;
-  ConverstionError(this.message);
+  const ConverstionError(this.message);
 }
 
 final class ConverstionSuccess extends ConverstionState {
   final ConversationModel data;
   final String? lastConversationId;
-  ConverstionSuccess(this.data, {this.lastConversationId});
+  const ConverstionSuccess(this.data, {this.lastConversationId});
 
   @override
   List<Object> get props => [data, lastConversationId ?? ""];

@@ -5,7 +5,7 @@ import 'package:poortak/featueres/feature_match/screens/match_screen.dart';
 
 class MainMatchScreen extends StatelessWidget {
   static const routeName = '/main_match_screen';
-  const MainMatchScreen({Key? key}) : super(key: key);
+  const MainMatchScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

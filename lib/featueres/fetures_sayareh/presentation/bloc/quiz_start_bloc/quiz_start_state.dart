@@ -14,7 +14,7 @@ class QuizStartLoading extends QuizStartState {}
 class QuizStartLoaded extends QuizStartState {
   final QuizesQuestion question;
 
-  QuizStartLoaded(this.question);
+  const QuizStartLoaded(this.question);
 
   @override
   List<Object> get props => [question];
@@ -23,7 +23,7 @@ class QuizStartLoaded extends QuizStartState {
 class QuizStartError extends QuizStartState {
   final String message;
 
-  QuizStartError(this.message);
+  const QuizStartError(this.message);
 
   @override
   List<Object> get props => [message];

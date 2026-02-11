@@ -188,7 +188,7 @@ class _MainPointsScreenState extends State<MainPointsScreen> {
       child: Row(
         children: [
           // Star icon
-          Container(
+          SizedBox(
             width: 36,
             height: 34,
             child: Image.asset(
@@ -201,7 +201,7 @@ class _MainPointsScreenState extends State<MainPointsScreen> {
 
           // Yellow container
           Expanded(
-            child: Container(
+            child: SizedBox(
               height: 60,
               child: Center(
                 child: Text(
@@ -284,7 +284,7 @@ class _MainPointsScreenState extends State<MainPointsScreen> {
               ),
             ),
             // Calendar animation placeholder
-            Container(
+            SizedBox(
               width: 100,
               height: 100,
               child: Lottie.asset(

@@ -27,8 +27,8 @@ class DataParsingException extends AppException {
 }
 
 class BadRequestException extends AppException {
-  BadRequestException({String? message, Response? response})
-      : super(message: message ?? "bad request exception.", response: response);
+  BadRequestException({String? message, super.response})
+      : super(message: message ?? "bad request exception.");
 }
 
 class FetchDataException extends AppException {

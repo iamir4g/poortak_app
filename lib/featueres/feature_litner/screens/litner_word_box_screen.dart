@@ -26,7 +26,7 @@ class LitnerWordBoxScreen extends StatelessWidget {
 }
 
 class _LitnerWordBoxView extends StatefulWidget {
-  const _LitnerWordBoxView({Key? key}) : super(key: key);
+  const _LitnerWordBoxView({super.key});
 
   @override
   State<_LitnerWordBoxView> createState() => _LitnerWordBoxViewState();

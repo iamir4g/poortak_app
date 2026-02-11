@@ -305,7 +305,7 @@ class _DialogCartState extends State<DialogCart> {
                                                 style: MyTextStyle.textMatn16,
                                                 "${widget.item.price.toString().addComma} "),
                                             Text(
-                                              "${l10n!.toman}",
+                                              l10n.toman,
                                               style: MyTextStyle.textMatn13,
                                             )
                                           ],
@@ -354,7 +354,7 @@ class _DialogCartState extends State<DialogCart> {
                                 Positioned(
                                     bottom: 35,
                                     right: 8,
-                                    child: Container(
+                                    child: SizedBox(
                                       width: 30,
                                       height: 30,
                                       // decoration: BoxDecoration(
@@ -368,7 +368,7 @@ class _DialogCartState extends State<DialogCart> {
                                 Positioned(
                                   bottom: 5,
                                   right: 8,
-                                  child: Container(
+                                  child: SizedBox(
                                     width: 30,
                                     height: 30,
                                     // decoration: BoxDecoration(
@@ -406,7 +406,7 @@ class _DialogCartState extends State<DialogCart> {
                                                 .textMatn13PrimaryShade1,
                                           ),
                                           Text(
-                                            l10n?.coin_with_buy ?? "",
+                                            l10n.coin_with_buy ?? "",
                                             style: MyTextStyle.textMatn9,
                                           )
                                         ],
@@ -506,7 +506,7 @@ class _DialogCartState extends State<DialogCart> {
                                             style: MyTextStyle.textMatn14Bold,
                                           ),
                                           Text(
-                                            l10n!.toman,
+                                            l10n.toman,
                                             style: MyTextStyle.textMatn10W300,
                                           )
                                         ],
@@ -566,7 +566,7 @@ class _DialogCartState extends State<DialogCart> {
                                               width: 4,
                                             ),
                                             Text(
-                                              l10n!.toman,
+                                              l10n.toman,
                                               style: MyTextStyle.textMatn10W300,
                                             ),
                                           ],
@@ -608,7 +608,7 @@ class _DialogCartState extends State<DialogCart> {
                                               width: 4,
                                             ),
                                             Text(
-                                              l10n!.toman,
+                                              l10n.toman,
                                               style: MyTextStyle.textMatn10W300,
                                             )
                                           ],
@@ -658,7 +658,7 @@ class _DialogCartState extends State<DialogCart> {
                   child: Row(
                     children: [
                       Image.asset("assets/images/cart/subtract.png"),
-                      Container(
+                      SizedBox(
                         // margin: EdgeInsets.only(right: 10),
                         width: 230,
                         child: Text(

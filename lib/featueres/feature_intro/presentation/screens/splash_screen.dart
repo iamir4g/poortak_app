@@ -86,7 +86,7 @@ class _SplashScreenState extends State<SplashScreen>
       body: AnimatedBuilder(
         animation: _backgroundAnimation,
         builder: (context, child) {
-          return Container(
+          return SizedBox(
             width: width,
             child: Stack(
               children: [
@@ -310,8 +310,7 @@ class _SplashScreenState extends State<SplashScreen>
           );
         });
       } else {
-        debugPrint(
-            "📌 Deep link missing 'ok' parameter");
+        debugPrint("📌 Deep link missing 'ok' parameter");
       }
     } else {
       debugPrint("📌 Deep link does not match expected format");

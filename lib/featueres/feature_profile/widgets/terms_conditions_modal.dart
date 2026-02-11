@@ -60,7 +60,7 @@ class TermsConditionsModal extends StatelessWidget {
                       // Close button
                       GestureDetector(
                         onTap: () => Navigator.of(context).pop(),
-                        child: Container(
+                        child: SizedBox(
                           width: 24,
                           height: 24,
                           // decoration: BoxDecoration(

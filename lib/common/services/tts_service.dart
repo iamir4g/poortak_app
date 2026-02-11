@@ -26,6 +26,7 @@
 /// Author: Poortak Development Team
 /// Version: 1.0.0
 /// Last Updated: January 2025
+library;
 
 import 'package:flutter_tts/flutter_tts.dart';
 import 'dart:async';

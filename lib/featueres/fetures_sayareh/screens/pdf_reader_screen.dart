@@ -12,7 +12,7 @@ import 'package:poortak/common/widgets/dot_loading_widget.dart';
 class PdfReaderScreen extends StatelessWidget {
   static const routeName = "/pdf_reader_screen";
 
-  const PdfReaderScreen({Key? key}) : super(key: key);
+  const PdfReaderScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -3,7 +3,6 @@ import 'package:poortak/common/resources/data_state.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_event.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_state.dart';
 import 'package:poortak/featueres/feature_litner/repositories/litner_repository.dart';
-import 'package:poortak/featueres/feature_litner/data/models/list_words_model.dart';
 
 class LitnerBloc extends Bloc<LitnerEvent, LitnerState> {
   final LitnerRepository litnerRepository;

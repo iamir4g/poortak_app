@@ -243,7 +243,7 @@ class ReminderCard extends StatelessWidget {
                   Switch(
                     value: isActive,
                     onChanged: onToggle,
-                    activeColor: MyColors.primary,
+                    activeThumbColor: MyColors.primary,
                   ),
                 ],
               ),

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:poortak/config/myColors.dart';
-import 'dart:developer';
 
 class QuizAnswerItem extends StatefulWidget {
   final String title;

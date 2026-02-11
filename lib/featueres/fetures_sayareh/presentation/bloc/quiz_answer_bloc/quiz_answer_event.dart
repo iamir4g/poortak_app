@@ -13,7 +13,7 @@ class SubmitAnswerEvent extends QuizAnswerEvent {
   final String questionId;
   final String answerId;
 
-  SubmitAnswerEvent({
+  const SubmitAnswerEvent({
     required this.courseId,
     required this.quizId,
     required this.questionId,

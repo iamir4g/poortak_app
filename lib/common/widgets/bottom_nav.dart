@@ -16,7 +16,7 @@ import '../blocs/bottom_nav_cubit/bottom_nav_cubit.dart';
 class BottomNav extends StatelessWidget {
   final PageController controller;
 
-  const BottomNav({Key? key, required this.controller}) : super(key: key);
+  const BottomNav({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {

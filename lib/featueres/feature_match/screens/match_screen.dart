@@ -155,7 +155,7 @@ class _MatchScreenState extends State<MatchScreen> {
           ),
 
           // Back button
-          Container(
+          SizedBox(
             width: 40,
             height: 40,
             // margin: const EdgeInsets.only(left: 16),

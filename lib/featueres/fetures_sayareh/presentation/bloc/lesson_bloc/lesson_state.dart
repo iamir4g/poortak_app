@@ -14,10 +14,10 @@ final class LessonLoading extends LessonState {}
 final class LessonSuccess extends LessonState {
   final Lesson lesson;
   final CourseProgressData? progress;
-  LessonSuccess({required this.lesson, this.progress});
+  const LessonSuccess({required this.lesson, this.progress});
 }
 
 final class LessonError extends LessonState {
   final String message;
-  LessonError({required this.message});
+  const LessonError({required this.message});
 }

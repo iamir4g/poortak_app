@@ -305,7 +305,7 @@ class _AddReminderModalState extends State<AddReminderModal> {
                             ),
                           ),
                           const SizedBox(width: 12),
-                          Container(
+                          SizedBox(
                             width: 128,
                             height: 58,
                             child: OutlinedButton(

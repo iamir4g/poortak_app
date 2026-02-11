@@ -15,7 +15,7 @@ class CustomPdfReader extends StatefulWidget {
   final StorageService storageService;
 
   const CustomPdfReader({
-    Key? key,
+    super.key,
     this.fileKey,
     this.localPath,
     required this.fileName,
@@ -25,7 +25,7 @@ class CustomPdfReader extends StatefulWidget {
     this.showDownloadButton = true,
     this.autoDownload = false,
     this.usePublicUrl = false,
-  }) : super(key: key);
+  });
 
   @override
   State<CustomPdfReader> createState() => _CustomPdfReaderState();

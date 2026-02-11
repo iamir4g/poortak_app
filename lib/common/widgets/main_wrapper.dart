@@ -42,7 +42,7 @@ class _MainWrapperState extends State<MainWrapper> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   late int currentPageIndex;
-  
+
   // Deep link handling
   late final AppLinks _appLinks;
   StreamSubscription<Uri>? _linkSubscription;
@@ -85,14 +85,14 @@ class _MainWrapperState extends State<MainWrapper> {
         }
       }
     });
-    
+
     // Initialize deep link handling for when app is already running
     _initDeepLinks();
   }
-  
+
   Future<void> _initDeepLinks() async {
     _appLinks = AppLinks();
-    
+
     // Listen for deep links when app is already running
     _linkSubscription = _appLinks.uriLinkStream.listen(
       (Uri uri) {
@@ -104,7 +104,7 @@ class _MainWrapperState extends State<MainWrapper> {
       },
     );
   }
-  
+
   void _handleIncomingLink(Uri uri) {
     log("📌 MainWrapper: Deep Link received: $uri");
     log("📌 MainWrapper: URI scheme: ${uri.scheme}");
@@ -115,7 +115,7 @@ class _MainWrapperState extends State<MainWrapper> {
       final okParam = uri.queryParameters["ok"];
       if (okParam != null) {
         log("📌 MainWrapper: Valid deep link detected, navigating to PaymentResultScreen");
-        
+
         // Navigate to payment result screen for both success and failure
         Navigator.pushNamed(
           context,
@@ -369,8 +369,9 @@ class _MainWrapperState extends State<MainWrapper> {
                                         ? MyColors.darkTextPrimary
                                         : const Color(0xFF3D495C)),
                                 onSelected: (value) {
-                                  if (value == 'logout')
+                                  if (value == 'logout') {
                                     _showLogoutConfirmation();
+                                  }
                                 },
                                 itemBuilder: (context) => [
                                   PopupMenuItem(

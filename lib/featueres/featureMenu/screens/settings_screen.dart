@@ -12,7 +12,6 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<SettingsCubit, SettingsState>(
@@ -42,7 +41,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               title: "نمایش اپلیکیشن به صورت تمام صفحه",
                               value: state.fullScreenMode,
                               onChanged: (value) {
-                                context.read<SettingsCubit>().updateFullScreenMode(value);
+                                context
+                                    .read<SettingsCubit>()
+                                    .updateFullScreenMode(value);
                               },
                             ),
                           ],
@@ -59,7 +60,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               title: "دریافت اعلان هنگام دستاورد جدید",
                               value: state.achievementNotifications,
                               onChanged: (value) {
-                                context.read<SettingsCubit>().updateAchievementNotifications(value);
+                                context
+                                    .read<SettingsCubit>()
+                                    .updateAchievementNotifications(value);
                               },
                               activeColor: Colors.orange,
                             ),
@@ -67,7 +70,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               title: "دریافت اعلان های عمومی",
                               value: state.generalNotifications,
                               onChanged: (value) {
-                                context.read<SettingsCubit>().updateGeneralNotifications(value);
+                                context
+                                    .read<SettingsCubit>()
+                                    .updateGeneralNotifications(value);
                               },
                               activeColor: Colors.orange,
                             ),
@@ -85,7 +90,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               title: "پخش خودکار تلفظ در صفحه واژگان جدید",
                               value: state.autoPlayPronunciation,
                               onChanged: (value) {
-                                context.read<SettingsCubit>().updateAutoPlayPronunciation(value);
+                                context
+                                    .read<SettingsCubit>()
+                                    .updateAutoPlayPronunciation(value);
                               },
                               activeColor: Colors.orange,
                             ),
@@ -93,7 +100,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               title: "پخش خودکار صوت تمرین ها",
                               value: state.autoPlayExerciseSounds,
                               onChanged: (value) {
-                                context.read<SettingsCubit>().updateAutoPlayExerciseSounds(value);
+                                context
+                                    .read<SettingsCubit>()
+                                    .updateAutoPlayExerciseSounds(value);
                               },
                               activeColor: Colors.orange,
                             ),
@@ -101,7 +110,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               title: "پخش افکت های صوتی",
                               value: state.playSoundEffects,
                               onChanged: (value) {
-                                context.read<SettingsCubit>().updatePlaySoundEffects(value);
+                                context
+                                    .read<SettingsCubit>()
+                                    .updatePlaySoundEffects(value);
                               },
                               activeColor: Colors.orange,
                             ),
@@ -215,7 +226,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Switch(
             value: value,
             onChanged: onChanged,
-            activeColor: activeColor ?? Colors.grey,
+            activeThumbColor: activeColor ?? Colors.grey,
             activeTrackColor:
                 activeColor?.withOpacity(0.3) ?? Colors.grey.withOpacity(0.3),
             inactiveThumbColor: Colors.white,
@@ -273,7 +284,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     // محاسبه اندازه فونت بر اساس مقدار اسلایدر
     // حداقل 12 و حداکثر 24 پیکسل
     double fontSize = 12 + (textSize * 12);
-    
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),

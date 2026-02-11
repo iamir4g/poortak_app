@@ -6,7 +6,8 @@ import 'dart:async';
 import 'dart:io';
 
 // Method Channel for screen security
-const MethodChannel _securityChannel = MethodChannel('poortak.security.flutter.dev/channel');
+const MethodChannel _securityChannel =
+    MethodChannel('poortak.security.flutter.dev/channel');
 
 class CustomVideoPlayer extends StatefulWidget {
   final String videoPath;
@@ -21,7 +22,7 @@ class CustomVideoPlayer extends StatefulWidget {
   final String? thumbnailUrl;
 
   const CustomVideoPlayer({
-    Key? key,
+    super.key,
     required this.videoPath,
     this.isNetworkVideo = false,
     this.width = 350,
@@ -32,7 +33,7 @@ class CustomVideoPlayer extends StatefulWidget {
     this.allowFullscreen = true,
     this.onVideoEnded,
     this.thumbnailUrl,
-  }) : super(key: key);
+  });
 
   @override
   State<CustomVideoPlayer> createState() => CustomVideoPlayerState();
@@ -130,7 +131,7 @@ class CustomVideoPlayerState extends State<CustomVideoPlayer> {
     if (_videoPlayerController.value.isPlaying != _isPlaying) {
       _setSecureFlag(_videoPlayerController.value.isPlaying);
     }
-    
+
     if (_videoPlayerController.value.position >=
         _videoPlayerController.value.duration) {
       // Video has ended
@@ -163,7 +164,8 @@ class CustomVideoPlayerState extends State<CustomVideoPlayer> {
   Future<void> _setSecureFlag(bool enable) async {
     try {
       if (Platform.isAndroid) {
-        await _securityChannel.invokeMethod('setSecureFlag', {'enable': enable});
+        await _securityChannel
+            .invokeMethod('setSecureFlag', {'enable': enable});
       }
     } catch (e) {
       // Ignore errors - this is a security feature, not critical for functionality
@@ -373,12 +375,12 @@ class FullscreenVideoPlayer extends StatefulWidget {
   final VoidCallback? onVideoEnded;
 
   const FullscreenVideoPlayer({
-    Key? key,
+    super.key,
     required this.videoPlayerController,
     required this.videoPath,
     required this.isNetworkVideo,
     this.onVideoEnded,
-  }) : super(key: key);
+  });
 
   @override
   State<FullscreenVideoPlayer> createState() => _FullscreenVideoPlayerState();
@@ -406,7 +408,7 @@ class _FullscreenVideoPlayerState extends State<FullscreenVideoPlayer> {
 
     // Add listener to update playing state
     widget.videoPlayerController.addListener(_videoListener);
-    
+
     // Enable secure flag if video is playing
     if (_isPlaying) {
       _setSecureFlag(true);
@@ -486,7 +488,8 @@ class _FullscreenVideoPlayerState extends State<FullscreenVideoPlayer> {
   Future<void> _setSecureFlag(bool enable) async {
     try {
       if (Platform.isAndroid) {
-        await _securityChannel.invokeMethod('setSecureFlag', {'enable': enable});
+        await _securityChannel
+            .invokeMethod('setSecureFlag', {'enable': enable});
       }
     } catch (e) {
       // Ignore errors - this is a security feature, not critical for functionality

@@ -36,7 +36,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
             // Section 5: Illustration/Image
             _buildEmailSection(),
 
-            Container(
+            SizedBox(
               height: 187,
               width: 350,
               child: Image.asset(
@@ -103,7 +103,6 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
               Text(
                 'تماس با ما',
                 style: MyTextStyle.textHeader16Bold,
-                
                 textAlign: TextAlign.center,
               ),
               Icon(

@@ -3,7 +3,7 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class DotLoadingWidget extends StatelessWidget {
   final double size;
-  const DotLoadingWidget({Key? key, required this.size}) : super(key: key);
+  const DotLoadingWidget({super.key, required this.size});
 
   @override
   Widget build(BuildContext context) {

@@ -2,7 +2,7 @@ import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/locator.dart';
 
 class GetImageUrlService {
-  Map<String, String> _imageUrls = {};
+  final Map<String, String> _imageUrls = {};
 
   final StorageService _storageService = locator<StorageService>();
   Future<String> getImageUrl(String thumbnailId) async {

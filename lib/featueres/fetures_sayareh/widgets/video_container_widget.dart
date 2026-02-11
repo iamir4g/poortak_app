@@ -39,7 +39,7 @@ class VideoContainerWidget extends StatelessWidget {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(37),
-        child: Container(
+        child: SizedBox(
           width: 350,
           height: 240,
           child: _buildContent(context),

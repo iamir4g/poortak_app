@@ -48,7 +48,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     try {
       log("🔄 Starting login process for mobile: ${event.mobile}");
       final response = await repository.callLoginWithOtp(event.otp);
-      log("📡 Login Response: ${response}");
+      log("📡 Login Response: $response");
 
       if (response is DataSuccess) {
         if (response.data != null) {
@@ -174,7 +174,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         log("💾 User profile data saved to preferences successfully");
       } else {
         log("⚠️ Failed to get user profile data, but login will continue");
-        log("   Response: ${response}");
+        log("   Response: $response");
       }
     } catch (e) {
       log("💥 Error getting user profile data: $e");
@@ -189,7 +189,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     try {
       log("🔄 Getting user profile...");
       final response = await repository.callGetMeProfile();
-      log("📡 Get Me Profile Response: ${response}");
+      log("📡 Get Me Profile Response: $response");
 
       if (response is DataSuccess) {
         if (response.data != null) {
@@ -217,7 +217,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       log("📝 Update data: firstName=${event.updateProfileParams.firstName}, lastName=${event.updateProfileParams.lastName}");
       final response =
           await repository.callPutUserProfile(event.updateProfileParams);
-      log("📡 Update Profile Response: ${response}");
+      log("📡 Update Profile Response: $response");
 
       if (response is DataSuccess) {
         if (response.data != null) {

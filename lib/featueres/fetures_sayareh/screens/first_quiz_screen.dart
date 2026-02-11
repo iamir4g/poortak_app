@@ -2,7 +2,6 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:poortak/common/error_handling/app_exception.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_start_bloc/quiz_start_bloc.dart';
@@ -10,7 +9,6 @@ import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_answer_
 import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/quiz_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/widgets/item_question.dart';
-import 'package:poortak/locator.dart';
 
 class FirstQuizScreen extends StatefulWidget {
   static const routeName = "/first-quiz";

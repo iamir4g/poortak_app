@@ -9,13 +9,13 @@ sealed class ConverstionEvent extends Equatable {
 
 class GetConversationEvent extends ConverstionEvent {
   final String id;
-  GetConversationEvent({required this.id});
+  const GetConversationEvent({required this.id});
 }
 
 class SaveConversationPlaybackEvent extends ConverstionEvent {
   final String courseId;
   final String conversationId;
-  SaveConversationPlaybackEvent({
+  const SaveConversationPlaybackEvent({
     required this.courseId,
     required this.conversationId,
   });

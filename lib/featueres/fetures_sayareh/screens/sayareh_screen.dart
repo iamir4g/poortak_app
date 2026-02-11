@@ -142,7 +142,7 @@ class _SayarehScreenState extends State<SayarehScreen> {
                         ),
                         Text(
                           l10n?.sayareh ?? "",
-                          style: MyTextStyle.textMatn12W700?.copyWith(
+                          style: MyTextStyle.textMatn12W700.copyWith(
                             color:
                                 Theme.of(context).textTheme.titleMedium?.color,
                           ),
@@ -207,7 +207,7 @@ class _SayarehScreenState extends State<SayarehScreen> {
                       ),
                       Text(
                         "کتاب های سیاره آی نو",
-                        style: MyTextStyle.textMatn12W700?.copyWith(
+                        style: MyTextStyle.textMatn12W700.copyWith(
                           color: Theme.of(context).textTheme.titleMedium?.color,
                         ),
                       ),

@@ -166,7 +166,7 @@ class _PaymentHistoryScreenState extends State<PaymentHistoryScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           // Empty state illustration
-          Container(
+          SizedBox(
             width: 150,
             height: 230,
             child: Image(

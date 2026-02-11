@@ -15,14 +15,16 @@ class DictionaryRepository {
 
       print('[DictionaryRepository] Status: ${response.statusCode}');
       if (response.statusCode == 200) {
-        print('[DictionaryRepository] Payload type: ${response.data.runtimeType}');
+        print(
+            '[DictionaryRepository] Payload type: ${response.data.runtimeType}');
         return DictionaryEntry.fromJson(response.data);
       }
       print('[DictionaryRepository] Non-200 response');
       return null;
     } catch (e) {
       if (e is DioException) {
-        print('[DictionaryRepository] DioException: code=${e.response?.statusCode} message=${e.message}');
+        print(
+            '[DictionaryRepository] DioException: code=${e.response?.statusCode} message=${e.message}');
         print('[DictionaryRepository] Dio data: ${e.response?.data}');
         if (e.response?.statusCode == 404) {
           return null;
@@ -30,7 +32,7 @@ class DictionaryRepository {
       } else {
         print('[DictionaryRepository] Error: $e');
       }
-      throw e;
+      rethrow;
     }
   }
 }

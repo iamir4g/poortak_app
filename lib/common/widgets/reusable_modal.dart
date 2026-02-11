@@ -31,7 +31,7 @@ class ReusableModal extends StatelessWidget {
   final bool cartSuccessStyle;
 
   const ReusableModal({
-    Key? key,
+    super.key,
     required this.title,
     required this.message,
     this.buttonText = 'متوجه شدم',
@@ -44,7 +44,7 @@ class ReusableModal extends StatelessWidget {
     this.customImagePath,
     this.customLottiePath,
     this.cartSuccessStyle = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -125,7 +125,7 @@ class ReusableModal extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       // First button (primary)
-                      Container(
+                      SizedBox(
                         width: 140,
                         height: 50,
                         child: ElevatedButton(
@@ -153,7 +153,7 @@ class ReusableModal extends StatelessWidget {
                       const SizedBox(width: 10),
 
                       // Second button (secondary)
-                      Container(
+                      SizedBox(
                         width: 140,
                         height: 50,
                         child: ElevatedButton(
@@ -184,7 +184,7 @@ class ReusableModal extends StatelessWidget {
                 else
                   // Single button layout
                   Center(
-                    child: Container(
+                    child: SizedBox(
                       width: 172,
                       height: 64,
                       child: ElevatedButton(
@@ -262,7 +262,7 @@ class ReusableModal extends StatelessWidget {
               child: Column(
                 children: [
                   // Success icon with gradient background
-                  Container(
+                  SizedBox(
                       width: 140,
                       height: 140,
                       // decoration: BoxDecoration(

@@ -21,7 +21,7 @@ import 'package:poortak/main.dart'; // For routeObserver
 class LitnerMainScreen extends StatefulWidget {
   static const routeName = '/litner_main';
 
-  LitnerMainScreen({super.key});
+  const LitnerMainScreen({super.key});
 
   @override
   State<LitnerMainScreen> createState() => _LitnerMainScreenState();
@@ -87,7 +87,7 @@ class _LitnerMainScreenState extends State<LitnerMainScreen> with RouteAware {
                       ),
                     ),
                     PrimaryButton(
-                      lable: l10n!.login,
+                      lable: l10n.login,
                       onPressed: () {
                         Navigator.pushNamed(context, LoginScreen.routeName);
                       },

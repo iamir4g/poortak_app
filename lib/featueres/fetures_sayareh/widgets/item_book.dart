@@ -87,7 +87,7 @@ class ItemBook extends StatelessWidget {
               ),
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: Container(
+                child: SizedBox(
                   width: 81,
                   height: 81,
                   child: FutureBuilder<String>(

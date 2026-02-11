@@ -312,7 +312,7 @@ class _LessonScreenState extends State<LessonScreen> {
                       );
                     },
                   ),
-                  Container(
+                  SizedBox(
                     width: 40,
                     height: 40,
                     child: IconButton(

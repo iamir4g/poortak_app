@@ -6,7 +6,7 @@ import 'package:poortak/common/widgets/reusable_modal.dart';
 /// You can delete this file after understanding the usage
 
 class ModalExampleUsage extends StatelessWidget {
-  const ModalExampleUsage({Key? key}) : super(key: key);
+  const ModalExampleUsage({super.key});
 
   @override
   Widget build(BuildContext context) {

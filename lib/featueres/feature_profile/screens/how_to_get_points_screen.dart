@@ -114,7 +114,7 @@ class _HowToGetPointsScreenState extends State<HowToGetPointsScreen> {
   }
 
   Widget _buildCoinAnimation() {
-    return Container(
+    return SizedBox(
       height: 145,
       width: 267,
       child: Lottie.asset(
