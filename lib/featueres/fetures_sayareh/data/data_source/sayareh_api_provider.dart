@@ -184,6 +184,15 @@ class SayarehApiProvider {
     return response;
   }
 
+  dynamic callGetAllCoursesProgress() async {
+    final response = await dio.get(
+      "${Constants.baseUrl}iknow/courses/progress",
+    );
+
+    log("Sayareh All Courses Progress Response: ${response.data}");
+    return response;
+  }
+
   dynamic callDeleteCourseProgress(String courseId) async {
     final response = await dio.delete(
       "${Constants.baseUrl}iknow/courses/$courseId/progress",

@@ -133,6 +133,12 @@ class MyTextStyle {
     color: MyColors.textMatn1,
   );
 
+  static const TextStyle textProgressBar = TextStyle(
+    color: MyColors.progressBarColor,
+    fontWeight: FontWeight.w700,
+    fontSize: 12,
+  );
+
   // static const TextStyle bottomNavDisabledTextStyle = TextStyle(
   //   fontFamily: "IranSans",
   //   fontSize: 14,

@@ -14,6 +14,7 @@ import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shoppi
 import 'package:poortak/featueres/fetures_sayareh/widgets/item_book.dart';
 
 import 'package:poortak/featueres/fetures_sayareh/widgets/contest_card.dart';
+import 'package:poortak/featueres/fetures_sayareh/data/models/all_courses_progress_model.dart';
 import 'package:poortak/locator.dart';
 // import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
@@ -161,11 +162,23 @@ class _SayarehScreenState extends State<SayarehScreen> {
                           },
                           itemBuilder: (context, index) {
                             final item = sayarehDataCompleted.data.data[index];
+                            CourseProgressItem? progress;
+                            if (sayarehDataCompleted.progressData != null) {
+                              try {
+                                progress = sayarehDataCompleted
+                                    .progressData!.data
+                                    .firstWhere((element) =>
+                                        element.iKnowCourseId == item.id);
+                              } catch (e) {
+                                progress = null;
+                              }
+                            }
                             return ItemLeason(
                                 item: item,
                                 onTap: () {},
                                 index: index,
-                                purchased: item.purchased);
+                                purchased: item.purchased,
+                                progress: progress);
                           },
                         ),
                       ],

@@ -85,4 +85,8 @@ class MyColors {
   // Dark Mode Specific Colors
   static const Color darkMatn1 = Color(0xFF363A53); // Dark text color
   static const Color darkText1 = Color(0xFF29303D); // Dark text variant
+
+  // Progress Bar Colors
+  static const Color progressBarColor = Color(0xFF5E85F2);
+  static const Color progressBarBackground = Color(0xFFE0E0E0);
 }

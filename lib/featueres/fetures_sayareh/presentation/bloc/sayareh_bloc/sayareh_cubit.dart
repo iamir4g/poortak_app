@@ -6,6 +6,8 @@ import 'package:poortak/featueres/fetures_sayareh/data/models/book_list_model.da
 import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_storage_test_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/repositories/sayareh_repository.dart';
 
+import 'package:poortak/featueres/fetures_sayareh/data/models/all_courses_progress_model.dart';
+
 part 'sayareh_state.dart';
 part 'sayareh_data_status.dart';
 
@@ -19,15 +21,21 @@ class SayarehCubit extends Cubit<SayarehState> {
 
     DataState dataState = await sayarehRepository.fetchAllCourses();
     DataState bookListState = await sayarehRepository.fetchBookList();
+    DataState progressState = await sayarehRepository.fetchAllCoursesProgress();
 
     // Check if cubit is still open before emitting
     if (isClosed) return;
 
     if (dataState is DataSuccess && bookListState is DataSuccess) {
+      AllCoursesProgressModel? progressData;
+      if (progressState is DataSuccess) {
+        progressData = progressState.data;
+      }
       // emit completed when both succeed
       emit(state.copyWith(
-          sayarehDataStatus:
-              SayarehDataCompleted(dataState.data, bookListState.data)));
+          sayarehDataStatus: SayarehDataCompleted(
+              dataState.data, bookListState.data,
+              progressData: progressData)));
     } else if (dataState is DataFailed) {
       // emit error for courses
       emit(state.copyWith(
