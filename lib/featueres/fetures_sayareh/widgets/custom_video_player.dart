@@ -45,6 +45,8 @@ class CustomVideoPlayerState extends State<CustomVideoPlayer> {
   bool _isPlaying = false;
   bool _showControls = true;
   Timer? _hideTimer;
+  bool _isDragging = false;
+  double _dragValue = 0.0;
 
   @override
   void initState() {
@@ -54,11 +56,13 @@ class CustomVideoPlayerState extends State<CustomVideoPlayer> {
 
   @override
   void dispose() {
-    _videoPlayerController.removeListener(_videoPlayerListener);
-    _videoPlayerController.dispose();
-    _hideTimer?.cancel();
+    if (_isVideoInitialized) {
+      _videoPlayerController.removeListener(_videoPlayerListener);
+      _videoPlayerController.dispose();
+    }
     // Disable FLAG_SECURE when video player is disposed
     _setSecureFlag(false);
+    _hideTimer?.cancel();
     super.dispose();
   }
 
@@ -95,13 +99,20 @@ class CustomVideoPlayerState extends State<CustomVideoPlayer> {
 
   Future<void> initializeVideoPlayer() async {
     try {
+      final options = VideoPlayerOptions(mixWithOthers: true);
       _videoPlayerController = widget.isNetworkVideo
-          ? VideoPlayerController.network(widget.videoPath)
-          : VideoPlayerController.file(File(widget.videoPath));
+          ? VideoPlayerController.networkUrl(
+              Uri.parse(widget.videoPath),
+              videoPlayerOptions: options,
+            )
+          : VideoPlayerController.file(
+              File(widget.videoPath),
+              videoPlayerOptions: options,
+            );
 
       await _videoPlayerController.initialize();
 
-      // Add listener for video completion
+      // Add listener for video completion and buffering
       _videoPlayerController.addListener(_videoPlayerListener);
 
       if (mounted) {
@@ -113,8 +124,9 @@ class CustomVideoPlayerState extends State<CustomVideoPlayer> {
           setState(() {
             _isPlaying = true;
           });
-          _setSecureFlag(true);
         }
+        // Enable secure flag once when initialized
+        _setSecureFlag(true);
       }
     } catch (error) {
       print('Error initializing video player: $error');
@@ -127,9 +139,16 @@ class CustomVideoPlayerState extends State<CustomVideoPlayer> {
   }
 
   void _videoPlayerListener() {
-    // Update secure flag based on playing state
-    if (_videoPlayerController.value.isPlaying != _isPlaying) {
-      _setSecureFlag(_videoPlayerController.value.isPlaying);
+    // Only update UI if buffering state changes
+    if (mounted) {
+      final isBuffering = _videoPlayerController.value.isBuffering;
+      // You can add a local state for buffering if needed for UI
+      // For now we just ensure UI updates on state changes
+      if (_videoPlayerController.value.isPlaying != _isPlaying) {
+        setState(() {
+          _isPlaying = _videoPlayerController.value.isPlaying;
+        });
+      }
     }
 
     if (_videoPlayerController.value.position >=
@@ -139,7 +158,6 @@ class CustomVideoPlayerState extends State<CustomVideoPlayer> {
         setState(() {
           _isPlaying = false;
         });
-        _setSecureFlag(false);
         // Call the callback if provided
         widget.onVideoEnded?.call();
       }
@@ -150,10 +168,8 @@ class CustomVideoPlayerState extends State<CustomVideoPlayer> {
     setState(() {
       if (_isPlaying) {
         _videoPlayerController.pause();
-        _setSecureFlag(false);
       } else {
         _videoPlayerController.play();
-        _setSecureFlag(true);
       }
       _isPlaying = !_isPlaying;
       _showControls = true;
@@ -207,69 +223,94 @@ class CustomVideoPlayerState extends State<CustomVideoPlayer> {
           children: [
             Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: Icon(
-                      _isPlaying ? Icons.pause : Icons.play_arrow,
-                      color: Colors.white,
-                      size: 30,
-                    ),
-                    onPressed: _togglePlayPause,
-                  ),
-                  Expanded(
-                    child: Directionality(
-                      textDirection: TextDirection.ltr,
-                      child: SliderTheme(
-                        data: SliderTheme.of(context).copyWith(
-                          activeTrackColor: Colors.white,
-                          inactiveTrackColor: Colors.white.withOpacity(0.3),
-                          thumbColor: Colors.white,
-                          overlayColor: Colors.white.withOpacity(0.3),
-                          trackHeight: 4,
-                          thumbShape: const RoundSliderThumbShape(
-                              enabledThumbRadius: 6),
-                          overlayShape:
-                              const RoundSliderOverlayShape(overlayRadius: 12),
+              child: ValueListenableBuilder(
+                valueListenable: _videoPlayerController,
+                builder: (context, value, child) {
+                  return Row(
+                    children: [
+                      IconButton(
+                        icon: Icon(
+                          value.isPlaying ? Icons.pause : Icons.play_arrow,
+                          color: Colors.white,
+                          size: 30,
                         ),
-                        child: Slider(
-                          value: _videoPlayerController
-                              .value.position.inMilliseconds
-                              .toDouble(),
-                          min: 0,
-                          max: _videoPlayerController
-                              .value.duration.inMilliseconds
-                              .toDouble(),
-                          onChanged: (value) {
-                            final position =
-                                Duration(milliseconds: value.toInt());
-                            _videoPlayerController.seekTo(position);
-                          },
+                        onPressed: _togglePlayPause,
+                      ),
+                      Expanded(
+                        child: Directionality(
+                          textDirection: TextDirection.ltr,
+                          child: SliderTheme(
+                            data: SliderTheme.of(context).copyWith(
+                              activeTrackColor: Colors.white,
+                              inactiveTrackColor: Colors.white.withOpacity(0.3),
+                              thumbColor: Colors.white,
+                              overlayColor: Colors.white.withOpacity(0.3),
+                              trackHeight: 4,
+                              thumbShape: const RoundSliderThumbShape(
+                                  enabledThumbRadius: 6),
+                              overlayShape: const RoundSliderOverlayShape(
+                                  overlayRadius: 12),
+                            ),
+                            child: Slider(
+                              value: (_isDragging
+                                      ? _dragValue
+                                      : value.position.inMilliseconds
+                                          .toDouble())
+                                  .clamp(0.0,
+                                      value.duration.inMilliseconds.toDouble()),
+                              min: 0,
+                              max: value.duration.inMilliseconds.toDouble(),
+                              onChangeStart: (val) {
+                                _hideTimer?.cancel();
+                                setState(() {
+                                  _isDragging = true;
+                                  _dragValue = val;
+                                });
+                              },
+                              onChanged: (val) {
+                                setState(() {
+                                  _dragValue = val;
+                                });
+                                _videoPlayerController.seekTo(
+                                    Duration(milliseconds: val.toInt()));
+                              },
+                              onChangeEnd: (val) {
+                                _videoPlayerController.seekTo(
+                                    Duration(milliseconds: val.toInt()));
+                                setState(() {
+                                  _isDragging = false;
+                                });
+                                _startHideTimer();
+                              },
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                  Text(
-                    _formatDuration(_videoPlayerController.value.position),
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    _formatDuration(_videoPlayerController.value.duration),
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                  if (widget.allowFullscreen) ...[
-                    const SizedBox(width: 8),
-                    IconButton(
-                      icon: const Icon(
-                        Icons.fullscreen,
-                        color: Colors.white,
-                        size: 24,
+                      Text(
+                        _formatDuration(_isDragging
+                            ? Duration(milliseconds: _dragValue.toInt())
+                            : value.position),
+                        style: const TextStyle(color: Colors.white),
                       ),
-                      onPressed: _enterFullscreen,
-                    ),
-                  ],
-                ],
+                      const SizedBox(width: 8),
+                      Text(
+                        _formatDuration(value.duration),
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                      if (widget.allowFullscreen) ...[
+                        const SizedBox(width: 8),
+                        IconButton(
+                          icon: const Icon(
+                            Icons.fullscreen,
+                            color: Colors.white,
+                            size: 24,
+                          ),
+                          onPressed: _enterFullscreen,
+                        ),
+                      ],
+                    ],
+                  );
+                },
               ),
             ),
           ],
