@@ -108,7 +108,7 @@ class _DialogCartState extends State<DialogCart> {
             ScaffoldMessenger.of(rootContext).showSnackBar(
               SnackBar(
                 content: Text(errorMessage),
-                backgroundColor: Colors.red,
+                backgroundColor: MyColors.error,
               ),
             );
           });
@@ -164,6 +164,8 @@ class _DialogCartState extends State<DialogCart> {
     );
 
     final l10n = AppLocalizations.of(context);
+    final width = MediaQuery.of(context).size.width;
+    final isSmallWidth = width < 360;
     return Dialog(
         backgroundColor: MyColors.background,
         child: ConstrainedBox(
@@ -178,20 +180,19 @@ class _DialogCartState extends State<DialogCart> {
                 Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16),
                     child: TabBar(
+                        isScrollable: isSmallWidth,
                         dividerHeight: 0.0,
-                        labelStyle: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            fontFamily: "IranSans"),
+                        labelStyle: MyTextStyle.tabLabel16
+                            .copyWith(fontSize: isSmallWidth ? 14 : 16),
                         indicatorColor: Colors.transparent,
-                        labelColor: Colors.white,
-                        unselectedLabelColor: Colors.grey,
+                        labelColor: MyColors.textLight,
+                        unselectedLabelColor: MyColors.textSecondary,
                         indicator: BoxDecoration(
                           color: MyColors.darkBackground,
                           borderRadius: BorderRadius.circular(20),
                         ),
                         indicatorSize: TabBarIndicatorSize.tab,
-                        tabs: [
+                        tabs: const [
                           Tab(
                             text: "خرید تکی",
                           ),
@@ -216,7 +217,7 @@ class _DialogCartState extends State<DialogCart> {
                                     decoration: BoxDecoration(
                                       borderRadius:
                                           BorderRadius.all(Radius.circular(27)),
-                                      color: Colors.white,
+                                      color: MyColors.background,
                                     ),
                                     child: Image.asset(
                                         "assets/images/cart/single_lesson.png"),
@@ -230,7 +231,7 @@ class _DialogCartState extends State<DialogCart> {
                                       decoration: BoxDecoration(
                                           borderRadius: BorderRadius.all(
                                               Radius.circular(20)),
-                                          color: Colors.white),
+                                          color: MyColors.background),
                                       child: Padding(
                                         padding:
                                             EdgeInsets.fromLTRB(4, 0, 4, 0),
@@ -346,7 +347,7 @@ class _DialogCartState extends State<DialogCart> {
                                   decoration: BoxDecoration(
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(27)),
-                                    color: Colors.white,
+                                    color: MyColors.background,
                                   ),
                                   child: Image.asset(
                                       "assets/images/cart/bundle_lesson.png"),
@@ -362,7 +363,7 @@ class _DialogCartState extends State<DialogCart> {
                                       //   borderRadius: BorderRadius.circular(15),
                                       // ),
                                       child: IconifyIcon(
-                                          color: Colors.white,
+                                          color: MyColors.textLight,
                                           icon: "arcticons:pdf-viewer"),
                                     )),
                                 Positioned(
@@ -376,7 +377,7 @@ class _DialogCartState extends State<DialogCart> {
                                     //   borderRadius: BorderRadius.circular(15),
                                     // ),
                                     child: IconifyIcon(
-                                        color: Colors.white,
+                                        color: MyColors.textLight,
                                         icon: "carbon:play-outline"),
                                   ),
                                 ),
@@ -389,7 +390,7 @@ class _DialogCartState extends State<DialogCart> {
                                     decoration: BoxDecoration(
                                         borderRadius: BorderRadius.all(
                                             Radius.circular(20)),
-                                        color: Colors.white),
+                                        color: MyColors.background),
                                     child: Padding(
                                       padding: EdgeInsets.fromLTRB(4, 0, 2, 0),
                                       child: Row(
@@ -420,8 +421,8 @@ class _DialogCartState extends State<DialogCart> {
                               height: 26,
                             ),
                             Container(
-                              decoration:
-                                  BoxDecoration(color: MyColors.background1),
+                              decoration: const BoxDecoration(
+                                  color: MyColors.background1),
                               child: Column(
                                 children: [
                                   SizedBox(
@@ -520,7 +521,7 @@ class _DialogCartState extends State<DialogCart> {
                                     width: 286,
                                     height: 42,
                                     decoration: ShapeDecoration(
-                                      color: const Color(0xFFFEF3E6),
+                                      color: MyColors.discountBackground,
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(10),
                                       ),
@@ -542,7 +543,7 @@ class _DialogCartState extends State<DialogCart> {
                                               height: 17.84,
                                               alignment: Alignment.center,
                                               decoration: ShapeDecoration(
-                                                color: const Color(0xFFFF5353),
+                                                color: MyColors.darkErrorLight,
                                                 shape: RoundedRectangleBorder(
                                                   borderRadius:
                                                       BorderRadius.circular(
@@ -581,11 +582,11 @@ class _DialogCartState extends State<DialogCart> {
                                     width: 286,
                                     height: 54,
                                     decoration: ShapeDecoration(
-                                      color: const Color(0xFFF5F6F9),
+                                      color: MyColors.background2,
                                       shape: RoundedRectangleBorder(
-                                        side: BorderSide(
+                                        side: const BorderSide(
                                           width: 2,
-                                          color: const Color(0xFFFFA63E),
+                                          color: MyColors.primary,
                                         ),
                                         borderRadius: BorderRadius.circular(10),
                                       ),
@@ -647,8 +648,8 @@ class _DialogCartState extends State<DialogCart> {
                   width: 360,
                   height: 112,
                   decoration: ShapeDecoration(
-                    color: const Color(0xFFEFF1F4),
-                    shape: RoundedRectangleBorder(
+                    color: MyColors.cartFooterBackground,
+                    shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.only(
                         bottomLeft: Radius.circular(25),
                         bottomRight: Radius.circular(25),
@@ -658,9 +659,8 @@ class _DialogCartState extends State<DialogCart> {
                   child: Row(
                     children: [
                       Image.asset("assets/images/cart/subtract.png"),
-                      SizedBox(
-                        // margin: EdgeInsets.only(right: 10),
-                        width: 230,
+                      const SizedBox(width: 8),
+                      Expanded(
                         child: Text(
                           "جهت کسب اطلاعات بیشتر به وبسایت پورتک به نشانی www.poortak.ir مراجه کنید.",
                           style: MyTextStyle.textMatn11,

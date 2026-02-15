@@ -116,6 +116,12 @@ class SayarehApiProvider {
     );
   }
 
+  dynamic callDeleteQuizResult(String courseId, String quizId) async {
+    return await _authService.delete(
+      "${Constants.baseUrl}iknow/courses/$courseId/quiz/$quizId/result",
+    );
+  }
+
   dynamic callSayarehStorageApi() async {
     final response = await dio.get(
       "${Constants.baseUrl}storage",

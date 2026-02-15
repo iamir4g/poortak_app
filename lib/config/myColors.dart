@@ -89,4 +89,13 @@ class MyColors {
   // Progress Bar Colors
   static const Color progressBarColor = Color(0xFF5E85F2);
   static const Color progressBarBackground = Color(0xFFE0E0E0);
+
+  // Shopping / promo specific
+  static const Color discountBackground = Color(0xFFFEF3E6);
+  static const Color cartFooterBackground = Color(0xFFEFF1F4);
+
+  // New colors for AddWordBottomSheet
+  static const Color inputBackground = Color(0xFFF7F7FB);
+  static const Color textHint = Color(0xFFBDBDBD);
+  static const Color textCancelButton = Color(0xFF3D495C);
 }

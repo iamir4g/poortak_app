@@ -114,7 +114,8 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text('لغت به لایتنر اضافه شد'),
-                backgroundColor: Colors.green,
+                backgroundColor: MyColors.success,
+                duration: Duration(milliseconds: 800),
               ),
             );
           } else if (state is LitnerError) {
@@ -124,7 +125,9 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.message),
-                backgroundColor: isWordExistsError ? Colors.orange : Colors.red,
+                backgroundColor:
+                    isWordExistsError ? MyColors.warning : MyColors.error,
+                duration: const Duration(milliseconds: 800),
               ),
             );
           }

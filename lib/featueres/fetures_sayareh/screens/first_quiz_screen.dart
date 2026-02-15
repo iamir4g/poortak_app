@@ -9,6 +9,9 @@ import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_answer_
 import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/quiz_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/widgets/item_question.dart';
+import 'package:poortak/common/widgets/reusable_modal.dart';
+import 'package:poortak/locator.dart';
+import 'package:poortak/featueres/fetures_sayareh/repositories/sayareh_repository.dart';
 
 class FirstQuizScreen extends StatefulWidget {
   static const routeName = "/first-quiz";
@@ -50,6 +53,31 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
     Navigator.pushReplacementNamed(context, LoginScreen.routeName);
   }
 
+  void _showExitModal() {
+    ReusableModal.show(
+      context: context,
+      title: 'ترک آزمون',
+      message:
+          'با ترک آزمون، پاسخ های فعلی شما حذف می شود و باید دفعه ی بعد دوباره به آنها پاسخ دهید',
+      type: ModalType.info,
+      buttonText: 'ماندن',
+      secondButtonText: 'ترک آزمون',
+      showSecondButton: true,
+      onButtonPressed: () {
+        Navigator.of(context).pop(); // Close modal
+      },
+      onSecondButtonPressed: () async {
+        Navigator.of(context).pop(); // Close modal
+        // Call delete API
+        await locator<SayarehRepository>()
+            .deleteQuizResult(widget.courseId, widget.quizId);
+        if (context.mounted) {
+          Navigator.of(context).pop(); // Exit quiz screen
+        }
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -84,7 +112,7 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                       children: [
                         const Spacer(),
                         GestureDetector(
-                          onTap: () => Navigator.of(context).pop(),
+                          onTap: _showExitModal,
                           child: Container(
                             width: 34,
                             height: 34,

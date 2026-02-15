@@ -316,6 +316,20 @@ class SayarehRepository {
     }
   }
 
+  Future<DataState<void>> deleteQuizResult(String courseId, String quizId) async {
+    try {
+      Response response =
+          await sayarehApiProvider.callDeleteQuizResult(courseId, quizId);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return DataSuccess(null);
+      } else {
+        return DataFailed(response.data['message'] ?? "خطا در حذف اطلاعات");
+      }
+    } on AppException catch (e) {
+      return CheckExceptions.getError<void>(e);
+    }
+  }
+
   Future<DataState<SayarehStorageTest>> fetchSayarehStorage() async {
     try {
       Response response = await sayarehApiProvider.callSayarehStorageApi();

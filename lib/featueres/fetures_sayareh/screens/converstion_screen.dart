@@ -50,6 +50,9 @@ class _ConversationScreenState extends State<ConversationScreen> {
   int _messagesPlayedSinceLastSave = 0;
   static const int _saveInterval = 3;
 
+  // شناسه جلسه پخش برای جلوگیری از تداخل پخش‌ها
+  int _playbackSessionId = 0;
+
   @override
   void initState() {
     super.initState();
@@ -60,6 +63,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
   @override
   void dispose() {
+    // توقف پخش در صورت خروج از صفحه
+    ttsService.stop();
     _converstionBloc.close();
     isPlayingNotifier.dispose();
     currentPlayingIndexNotifier.dispose();
@@ -89,6 +94,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
     }
 
     // شروع پخش
+    _playbackSessionId++;
+    final int mySessionId = _playbackSessionId;
     isPlayingNotifier.value = true;
     // اگر مکالمه قبلاً تمام شده بود، از اول شروع کن
     if (currentPlayingIndexNotifier.value >= messages.length) {
@@ -100,7 +107,11 @@ class _ConversationScreenState extends State<ConversationScreen> {
       for (var i = currentPlayingIndexNotifier.value;
           i < messages.length;
           i++) {
-        if (!isPlayingNotifier.value) break;
+        // بررسی اینکه آیا ویجت هنوز زنده است
+        if (!mounted) break;
+
+        if (!isPlayingNotifier.value || _playbackSessionId != mySessionId)
+          break;
 
         final message = messages[i];
         currentPlayingIndexNotifier.value = i;
@@ -131,7 +142,10 @@ class _ConversationScreenState extends State<ConversationScreen> {
       }
     } finally {
       // فقط اگر پخش به صورت طبیعی تمام شد (توسط کاربر متوقف نشد)، وضعیت را ریست کن
-      if (isPlayingNotifier.value) {
+      // همچنین بررسی می‌کنیم که ویجت هنوز زنده باشد (mounted)
+      if (mounted &&
+          isPlayingNotifier.value &&
+          _playbackSessionId == mySessionId) {
         isPlayingNotifier.value = false;
         currentPlayingIndexNotifier.value = 0;
       }
@@ -235,7 +249,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
         bottomNavigationBar: Container(
           height: 60,
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: MyColors.background,
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -251,7 +265,9 @@ class _ConversationScreenState extends State<ConversationScreen> {
                     },
                     icon: Icon(
                       Icons.translate,
-                      color: showTranslations ? Colors.blue : Colors.grey,
+                      color: showTranslations
+                          ? MyColors.secondary
+                          : MyColors.textSecondary,
                     ),
                   );
                 },
@@ -263,7 +279,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                   icon: IconifyIcon(
                     icon: "ri:skip-right-fill",
                     size: 30,
-                    color: Colors.black,
+                    color: MyColors.textPrimary,
                   )),
               // دکمه پخش/توقف تمام مکالمه
               ValueListenableBuilder<bool>(
@@ -278,7 +294,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                     icon: Icon(
                       isPlaying ? Icons.stop_circle : Icons.play_circle,
                       size: 50,
-                      color: isPlaying ? Colors.red : Colors.green,
+                      color: isPlaying ? MyColors.error : MyColors.success,
                     ),
                   );
                 },
@@ -290,7 +306,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                   icon: IconifyIcon(
                     icon: "ri:skip-left-fill",
                     size: 30,
-                    color: Colors.black,
+                    color: MyColors.textPrimary,
                   )),
             ],
           ),

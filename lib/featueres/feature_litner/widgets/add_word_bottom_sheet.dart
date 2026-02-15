@@ -34,7 +34,8 @@ class _AddWordBottomSheetState extends State<AddWordBottomSheet> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('لغت به لایتنر اضافه شد'),
-              backgroundColor: Colors.green,
+              backgroundColor: MyColors.success,
+              duration: Duration(milliseconds: 800),
             ),
           );
           _wordController.clear();
@@ -44,14 +45,16 @@ class _AddWordBottomSheetState extends State<AddWordBottomSheet> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message),
-              backgroundColor: isWordExistsError ? Colors.orange : Colors.red,
+              backgroundColor:
+                  isWordExistsError ? MyColors.warning : MyColors.error,
+              duration: const Duration(milliseconds: 800),
             ),
           );
         }
       },
       child: Container(
         decoration: const BoxDecoration(
-          color: Colors.white,
+          color: MyColors.background,
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(20),
             topRight: Radius.circular(20),
@@ -87,7 +90,7 @@ class _AddWordBottomSheetState extends State<AddWordBottomSheet> {
               // English Word Input
               Container(
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF7F7FB),
+                  color: MyColors.inputBackground,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: TextFormField(
@@ -96,8 +99,7 @@ class _AddWordBottomSheetState extends State<AddWordBottomSheet> {
                   style: MyTextStyle.textMatn15,
                   decoration: const InputDecoration(
                     hintText: 'واژه را وارد کنید',
-                    hintStyle: TextStyle(
-                        color: Color(0xFFBDBDBD), fontFamily: 'IranSans'),
+                    hintStyle: MyTextStyle.textHint,
                     border: InputBorder.none,
                     contentPadding: EdgeInsets.symmetric(vertical: 18),
                   ),
@@ -120,7 +122,7 @@ class _AddWordBottomSheetState extends State<AddWordBottomSheet> {
               // Persian Translation Input
               Container(
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF7F7FB),
+                  color: MyColors.inputBackground,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: TextFormField(
@@ -129,8 +131,7 @@ class _AddWordBottomSheetState extends State<AddWordBottomSheet> {
                   style: MyTextStyle.textMatn15,
                   decoration: const InputDecoration(
                     hintText: 'معنی واژه را وارد کنید',
-                    hintStyle: TextStyle(
-                        color: Color(0xFFBDBDBD), fontFamily: 'IranSans'),
+                    hintStyle: MyTextStyle.textHint,
                     border: InputBorder.none,
                     contentPadding: EdgeInsets.symmetric(vertical: 18),
                   ),
@@ -181,13 +182,14 @@ class _AddWordBottomSheetState extends State<AddWordBottomSheet> {
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
                                     valueColor: AlwaysStoppedAnimation<Color>(
-                                        Colors.white),
+                                        MyColors.textLight),
                                   ),
                                 )
                               : Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    const Icon(Icons.add, color: Colors.white),
+                                    const Icon(Icons.add,
+                                        color: MyColors.textLight),
                                     const SizedBox(width: 6),
                                     Text(
                                       'ذخیره کردن',
@@ -207,16 +209,15 @@ class _AddWordBottomSheetState extends State<AddWordBottomSheet> {
                     child: OutlinedButton(
                       onPressed: () => Navigator.pop(context),
                       style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Color(0xFFE0E0E0)),
+                        side: const BorderSide(color: MyColors.divider),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
-                      child: Text(
+                      child: const Text(
                         'لغو',
-                        style: MyTextStyle.textMatn14Bold
-                            .copyWith(color: const Color(0xFF3D495C)),
+                        style: MyTextStyle.textCancelButton,
                       ),
                     ),
                   ),

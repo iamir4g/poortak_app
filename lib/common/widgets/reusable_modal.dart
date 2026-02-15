@@ -57,77 +57,143 @@ class ReusableModal extends StatelessWidget {
     return Dialog(
       backgroundColor: Colors.transparent,
       child: Container(
-        width: 350,
-        height:
-            (customImagePath != null || customLottiePath != null) ? 380 : 311,
+        width: MediaQuery.of(context).size.width * 0.9,
+        constraints: const BoxConstraints(maxWidth: 350),
         decoration: BoxDecoration(
           color: isDarkMode ? const Color(0xFF2C2E3F) : Colors.white,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Stack(
           children: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                // Icon based on type or custom image
-                Center(
-                  child: customLottiePath != null
-                      ? _buildCustomLottie()
-                      : customImagePath != null
-                          ? _buildCustomImage()
-                          : _buildIcon(),
-                ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // Icon based on type or custom image
+                  Center(
+                    child: customLottiePath != null
+                        ? _buildCustomLottie()
+                        : customImagePath != null
+                            ? _buildCustomImage()
+                            : _buildIcon(),
+                  ),
 
-                const SizedBox(height: 20),
+                  const SizedBox(height: 20),
 
-                // Title
-                Center(
-                  child: Container(
-                    width: 250,
-                    margin: const EdgeInsets.only(bottom: 10),
-                    child: Text(
-                      title,
-                      style: const TextStyle(
-                        fontFamily: 'IRANSans',
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                        color: MyColors.textMatn1,
+                  // Title
+                  Center(
+                    child: Container(
+                      width: 250,
+                      margin: const EdgeInsets.only(bottom: 10),
+                      child: Text(
+                        title,
+                        style: const TextStyle(
+                          fontFamily: 'IRANSans',
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: MyColors.textMatn1,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                      textAlign: TextAlign.center,
                     ),
                   ),
-                ),
 
-                // Message
-                Center(
-                  child: Container(
-                    width: 250,
-                    margin: const EdgeInsets.only(bottom: 30),
-                    child: Text(
-                      message,
-                      style: const TextStyle(
-                        fontFamily: 'IRANSans',
-                        fontWeight: FontWeight.w500,
-                        fontSize: 14,
-                        color: Color(0xFF3D495C),
-                        height: 1.4,
+                  // Message
+                  Center(
+                    child: Container(
+                      width: 250,
+                      margin: const EdgeInsets.only(bottom: 30),
+                      child: Text(
+                        message,
+                        style: const TextStyle(
+                          fontFamily: 'IRANSans',
+                          fontWeight: FontWeight.w500,
+                          fontSize: 14,
+                          color: Color(0xFF3D495C),
+                          height: 1.4,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                      textAlign: TextAlign.center,
                     ),
                   ),
-                ),
 
-                // Buttons
-                if (showSecondButton && secondButtonText != null)
-                  // Two buttons layout
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // First button (primary)
-                      SizedBox(
-                        width: 140,
-                        height: 50,
+                  // Buttons
+                  if (showSecondButton && secondButtonText != null)
+                    // Two buttons layout
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // First button (primary)
+                          Expanded(
+                            child: SizedBox(
+                              height: 50,
+                              child: ElevatedButton(
+                                onPressed: onButtonPressed ??
+                                    () => Navigator.of(context).pop(),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: MyColors.primary,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  elevation: 0,
+                                ),
+                                child: Text(
+                                  buttonText,
+                                  style: const TextStyle(
+                                    fontFamily: 'IRANSans',
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 16,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(width: 10),
+
+                          // Second button (secondary)
+                          Expanded(
+                            child: SizedBox(
+                              height: 50,
+                              child: ElevatedButton(
+                                onPressed: onSecondButtonPressed ??
+                                    () => Navigator.of(context).pop(),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.transparent,
+                                  side: const BorderSide(
+                                      color: MyColors.primary, width: 1),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  elevation: 0,
+                                ),
+                                child: Text(
+                                  secondButtonText!,
+                                  style: const TextStyle(
+                                    fontFamily: 'IRANSans',
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 16,
+                                    color: MyColors.primary,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  else
+                    // Single button layout
+                    Center(
+                      child: SizedBox(
+                        width: 172,
+                        height: 64,
                         child: ElevatedButton(
                           onPressed: onButtonPressed ??
                               () => Navigator.of(context).pop(),
@@ -142,74 +208,16 @@ class ReusableModal extends StatelessWidget {
                             buttonText,
                             style: const TextStyle(
                               fontFamily: 'IRANSans',
-                              fontWeight: FontWeight.w500,
-                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
                               color: Colors.white,
                             ),
                           ),
                         ),
                       ),
-
-                      const SizedBox(width: 10),
-
-                      // Second button (secondary)
-                      SizedBox(
-                        width: 140,
-                        height: 50,
-                        child: ElevatedButton(
-                          onPressed: onSecondButtonPressed ??
-                              () => Navigator.of(context).pop(),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.transparent,
-                            side: const BorderSide(
-                                color: MyColors.primary, width: 1),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            elevation: 0,
-                          ),
-                          child: Text(
-                            secondButtonText!,
-                            style: const TextStyle(
-                              fontFamily: 'IRANSans',
-                              fontWeight: FontWeight.w500,
-                              fontSize: 16,
-                              color: MyColors.primary,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  )
-                else
-                  // Single button layout
-                  Center(
-                    child: SizedBox(
-                      width: 172,
-                      height: 64,
-                      child: ElevatedButton(
-                        onPressed: onButtonPressed ??
-                            () => Navigator.of(context).pop(),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: MyColors.primary,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          elevation: 0,
-                        ),
-                        child: Text(
-                          buttonText,
-                          style: const TextStyle(
-                            fontFamily: 'IRANSans',
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
                     ),
-                  ),
-              ],
+                ],
+              ),
             ),
             // Close Button (X) - Top Left (optional)
             if (showCloseButton)
@@ -248,7 +256,8 @@ class ReusableModal extends StatelessWidget {
     return Dialog(
       backgroundColor: Colors.transparent,
       child: Container(
-        width: 350,
+        width: MediaQuery.of(context).size.width * 0.9,
+        constraints: const BoxConstraints(maxWidth: 350),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
