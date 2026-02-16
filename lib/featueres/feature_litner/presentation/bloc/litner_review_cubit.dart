@@ -22,6 +22,8 @@ class LitnerReviewError extends LitnerReviewState {
   LitnerReviewError(this.message);
 }
 
+class LitnerReviewCompleted extends LitnerReviewState {}
+
 // Cubit
 class LitnerReviewCubit extends Cubit<LitnerReviewState> {
   final LitnerRepository repository;
@@ -47,11 +49,14 @@ class LitnerReviewCubit extends Cubit<LitnerReviewState> {
   }
 
   void nextWord() {
+    print('nextWord called. CurrentIndex: $_currentIndex, Words length: ${_words.length}');
     if (_currentIndex < _words.length - 1) {
       _currentIndex++;
       emit(LitnerReviewLoaded(words: _words, currentIndex: _currentIndex));
+    } else {
+      print('Emitting LitnerReviewCompleted');
+      emit(LitnerReviewCompleted());
     }
-    // Optionally handle end of list
   }
 
   void previousWord() {

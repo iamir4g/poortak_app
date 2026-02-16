@@ -109,7 +109,7 @@ class _FavoritScreenState extends State<FavoritScreen> {
           // Empty State Image
           Transform.rotate(
             angle: 0.025, // تقریباً 1.435 درجه
-            child: Container(
+            child: SizedBox(
               width: 110.7,
               height: 212.8,
               child: Image.asset(

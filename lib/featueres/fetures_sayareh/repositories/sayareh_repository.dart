@@ -12,6 +12,8 @@ import 'package:poortak/featueres/fetures_sayareh/data/models/practice_vocabular
 import 'package:poortak/featueres/fetures_sayareh/data/models/quiz_question_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/quizzes_list_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/result_question_model.dart';
+import 'package:poortak/featueres/fetures_sayareh/data/models/course_progress_model.dart';
+import 'package:poortak/featueres/fetures_sayareh/data/models/all_courses_progress_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/iknow_access_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_home_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_storage_test_model.dart';
@@ -95,6 +97,80 @@ class SayarehRepository {
     }
   }
 
+  Future<DataState<String?>> fetchConversationPlayback(String courseId) async {
+    try {
+      Response response =
+          await sayarehApiProvider.callGetConversationPlayback(courseId);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final conversationId = response.data['data']?['iKnowConversationId'];
+        return DataSuccess(conversationId);
+      } else {
+        return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
+      }
+    } on AppException catch (e) {
+      return CheckExceptions.getError<String?>(e);
+    }
+  }
+
+  Future<DataState<void>> saveConversationPlayback(
+      String courseId, String conversationId) async {
+    try {
+      Response response = await sayarehApiProvider.callPostConversationPlayback(
+          courseId, conversationId);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return DataSuccess(null);
+      } else {
+        return DataFailed(response.data['message'] ?? "خطا در ذخیره اطلاعات");
+      }
+    } on AppException catch (e) {
+      return CheckExceptions.getError<void>(e);
+    }
+  }
+
+  Future<DataState<CourseProgressModel>> fetchCourseProgress(
+      String courseId) async {
+    try {
+      Response response =
+          await sayarehApiProvider.callGetCourseProgress(courseId);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = CourseProgressModel.fromJson(response.data);
+        return DataSuccess(data);
+      } else {
+        return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
+      }
+    } on AppException catch (e) {
+      return CheckExceptions.getError<CourseProgressModel>(e);
+    }
+  }
+
+  Future<DataState<AllCoursesProgressModel>> fetchAllCoursesProgress() async {
+    try {
+      Response response = await sayarehApiProvider.callGetAllCoursesProgress();
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = AllCoursesProgressModel.fromJson(response.data);
+        return DataSuccess(data);
+      } else {
+        return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
+      }
+    } on AppException catch (e) {
+      return CheckExceptions.getError<AllCoursesProgressModel>(e);
+    }
+  }
+
+  Future<DataState<void>> resetCourseProgress(String courseId) async {
+    try {
+      Response response =
+          await sayarehApiProvider.callDeleteCourseProgress(courseId);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return DataSuccess(null);
+      } else {
+        return DataFailed(response.data['message'] ?? "خطا در حذف اطلاعات");
+      }
+    } on AppException catch (e) {
+      return CheckExceptions.getError<void>(e);
+    }
+  }
+
   Future<DataState<VocabularyModel>> fetchVocabulary(String id) async {
     try {
       Response response = await sayarehApiProvider.callGetVocabulary(id);
@@ -125,6 +201,29 @@ class SayarehRepository {
       }
     } on AppException catch (e) {
       return CheckExceptions.getError<PracticeVocabularyModel>(e);
+    }
+  }
+
+  Future<DataState<void>> submitVocabulary(
+    String courseId,
+    String vocabularyId,
+    String answer,
+    List<String> previousVocabularyIds,
+  ) async {
+    try {
+      Response response = await sayarehApiProvider.callPostSubmitVocabulary(
+        courseId,
+        vocabularyId,
+        answer,
+        previousVocabularyIds,
+      );
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return DataSuccess(null);
+      } else {
+        return DataFailed(response.data['message'] ?? "خطا در ارسال اطلاعات");
+      }
+    } on AppException catch (e) {
+      return CheckExceptions.getError<void>(e);
     }
   }
 
@@ -214,6 +313,20 @@ class SayarehRepository {
       }
     } on AppException catch (e) {
       return CheckExceptions.getError<ResultQuestion>(e);
+    }
+  }
+
+  Future<DataState<void>> deleteQuizResult(String courseId, String quizId) async {
+    try {
+      Response response =
+          await sayarehApiProvider.callDeleteQuizResult(courseId, quizId);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return DataSuccess(null);
+      } else {
+        return DataFailed(response.data['message'] ?? "خطا در حذف اطلاعات");
+      }
+    } on AppException catch (e) {
+      return CheckExceptions.getError<void>(e);
     }
   }
 

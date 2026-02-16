@@ -11,7 +11,7 @@ class ContestCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: 360,
       height: 105,
       // margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),

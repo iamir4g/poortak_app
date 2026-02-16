@@ -79,7 +79,7 @@ class Data {
         "translation": translation,
         "boxLevel": boxLevel,
         "nextReview": nextReview.toIso8601String(),
-        "lastReviewed": lastReviewed?.toIso8601String() ?? null,
+        "lastReviewed": lastReviewed?.toIso8601String(),
         "createdAt": createdAt.toIso8601String(),
         "updatedAt": updatedAt.toIso8601String(),
       };

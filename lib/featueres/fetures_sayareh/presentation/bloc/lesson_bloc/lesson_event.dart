@@ -9,5 +9,10 @@ sealed class LessonEvent extends Equatable {
 
 class GetLessonEvenet extends LessonEvent {
   final String id;
-  GetLessonEvenet({required this.id});
+  const GetLessonEvenet({required this.id});
+}
+
+class ResetLessonProgressEvent extends LessonEvent {
+  final String id;
+  const ResetLessonProgressEvent({required this.id});
 }

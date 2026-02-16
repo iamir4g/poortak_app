@@ -16,11 +16,27 @@ class ConverstionBloc extends Bloc<ConverstionEvent, ConverstionState> {
       emit(ConverstionLoading());
       final response =
           await sayarehRepository.fetchSayarehConversation(event.id);
+
       if (response is DataSuccess) {
-        emit(ConverstionSuccess(response.data!));
+        // Fetch last playback position
+        final playbackResponse =
+            await sayarehRepository.fetchConversationPlayback(event.id);
+        String? lastId;
+        if (playbackResponse is DataSuccess) {
+          lastId = playbackResponse.data;
+        }
+
+        emit(ConverstionSuccess(response.data!, lastConversationId: lastId));
       } else {
         emit(ConverstionError(response.error ?? "خطا در دریافت اطلاعات"));
       }
+    });
+
+    on<SaveConversationPlaybackEvent>((event, emit) async {
+      await sayarehRepository.saveConversationPlayback(
+        event.courseId,
+        event.conversationId,
+      );
     });
   }
 }

@@ -32,7 +32,7 @@ class PrizeHistoryItem extends StatelessWidget {
           child: Row(
             children: [
               // Check icon
-              Container(
+              SizedBox(
                 width: 25,
                 height: 25,
                 // margin: const EdgeInsets.only(left: 16),

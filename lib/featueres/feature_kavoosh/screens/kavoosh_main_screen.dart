@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:poortak/featueres/feature_kavoosh/screens/educational_videos_screen.dart';
+import 'package:poortak/featueres/feature_kavoosh/screens/ebooks_screen.dart';
+import 'package:poortak/featueres/feature_kavoosh/screens/self_assessment_screen.dart';
+import 'package:poortak/config/myColors.dart';
 
 class KavooshMainScreen extends StatefulWidget {
   static const String routeName = '/kavoosh-main';
@@ -18,8 +22,7 @@ class _KavooshMainScreenState extends State<KavooshMainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:
-          const Color(0xFFF6F9FE), // Light blue background from Figma
+      backgroundColor: MyColors.background3,
       body: SafeArea(
         child: Column(
           children: [
@@ -39,26 +42,26 @@ class _KavooshMainScreenState extends State<KavooshMainScreen> {
                         Color(0xFFFFF3D6),
                       ],
                       onTap: () {
-                        // Handle video tap
+                        Navigator.pushNamed(
+                            context, EducationalVideosScreen.routeName);
                       },
-                      showComingSoonBadge: true,
                     ),
 
                     const SizedBox(height: 13),
 
                     // Audio Books Card
-                    _buildContentCard(
-                      title: 'کتاب های صوتی',
-                      subtitle: 'کتاب های آموزشی صوتی برای پایه های تحصیلی',
-                      gradientColors: const [
-                        Color(0xFFECE2FD),
-                        Color(0xFFF6DDF8),
-                      ],
-                      onTap: () {
-                        // Handle audio books tap
-                      },
-                      showComingSoonBadge: true,
-                    ),
+                    // _buildContentCard(
+                    //   title: 'کتاب های صوتی',
+                    //   subtitle: 'کتاب های آموزشی صوتی برای پایه های تحصیلی',
+                    //   gradientColors: const [
+                    //     Color(0xFFECE2FD),
+                    //     Color(0xFFF6DDF8),
+                    //   ],
+                    //   onTap: () {
+                    //     // Handle audio books tap
+                    //   },
+                    //   showComingSoonBadge: true,
+                    // ),
 
                     const SizedBox(height: 13),
 
@@ -72,9 +75,8 @@ class _KavooshMainScreenState extends State<KavooshMainScreen> {
                         Color(0xFFFFDBDB),
                       ],
                       onTap: () {
-                        // Handle e-books tap
+                        Navigator.pushNamed(context, EBooksScreen.routeName);
                       },
-                      showComingSoonBadge: true,
                     ),
 
                     const SizedBox(height: 13),
@@ -88,9 +90,10 @@ class _KavooshMainScreenState extends State<KavooshMainScreen> {
                         Color(0xFFD9FFEA),
                       ],
                       onTap: () {
-                        // Handle self-assessment tap
+                        Navigator.pushNamed(
+                            context, SelfAssessmentScreen.routeName);
                       },
-                      showComingSoonBadge: true,
+                      showComingSoonBadge: false,
                     ),
                   ],
                 ),

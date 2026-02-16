@@ -15,6 +15,13 @@ import 'package:poortak/featueres/feature_match/screens/main_match_screen.dart';
 import 'package:poortak/featueres/feature_match/screens/match_screen.dart';
 import 'package:poortak/featueres/feature_payment/presentation/screens/payment_result_screen.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/kavoosh_main_screen.dart';
+import 'package:poortak/featueres/feature_kavoosh/screens/educational_videos_screen.dart';
+import 'package:poortak/featueres/feature_kavoosh/screens/ebooks_screen.dart';
+import 'package:poortak/featueres/feature_kavoosh/screens/course_list_screen.dart';
+import 'package:poortak/featueres/feature_kavoosh/screens/video_detail_screen.dart';
+import 'package:poortak/featueres/feature_kavoosh/screens/book_details_screen.dart';
+import 'package:poortak/featueres/feature_kavoosh/screens/self_assessment_screen.dart';
+import 'package:poortak/featueres/feature_kavoosh/screens/self_assessment_grades_screen.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_bloc.dart';
 import 'package:poortak/featueres/feature_litner/screens/litner_word_completed_screen.dart';
 import 'package:poortak/featueres/feature_litner/screens/litner_word_box_screen.dart';
@@ -28,7 +35,6 @@ import 'package:poortak/featueres/feature_profile/screens/prize_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/how_to_get_points_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/profile_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/edit_profile_screen.dart';
-import 'package:poortak/featueres/feature_profile/presentation/bloc/profile_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/lesson_bloc/lesson_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/practice_vocabulary_bloc/practice_vocabulary_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/converstion_screen.dart';
@@ -53,13 +59,14 @@ import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_start_b
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_answer_bloc/quiz_answer_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/first_quiz_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_result_bloc/quiz_result_bloc.dart';
-import 'package:flutter/widgets.dart'; // For RouteAware
+// For RouteAware
 import 'package:poortak/common/bloc/theme_cubit/theme_cubit.dart';
 import 'package:poortak/common/bloc/settings_cubit/settings_cubit.dart';
 import 'package:poortak/common/bloc/connectivity_cubit/connectivity_cubit.dart';
 import 'package:poortak/common/widgets/connectivity_listener.dart';
 import 'package:poortak/featueres/feature_match/presentation/bloc/match_bloc/match_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/pdf_reader_screen.dart';
+import 'package:poortak/featueres/fetures_sayareh/screens/book_detail_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/single_book_bloc/single_book_cubit.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:poortak/common/services/reminder_notification_service.dart';
@@ -320,6 +327,36 @@ void main() async {
                   );
                 },
                 KavooshMainScreen.routeName: (context) => KavooshMainScreen(),
+                EducationalVideosScreen.routeName: (context) =>
+                    const EducationalVideosScreen(),
+                EBooksScreen.routeName: (context) => const EBooksScreen(),
+                CourseListScreen.routeName: (context) {
+                  final args = ModalRoute.of(context)?.settings.arguments
+                      as Map<String, dynamic>;
+                  return CourseListScreen(
+                    title: args['title'],
+                    type: args['type'],
+                  );
+                },
+                VideoDetailScreen.routeName: (context) {
+                  final args = ModalRoute.of(context)?.settings.arguments
+                      as Map<String, dynamic>;
+                  return VideoDetailScreen(title: args['title']);
+                },
+                BookDetailsScreen.routeName: (context) {
+                  final args = ModalRoute.of(context)?.settings.arguments
+                      as Map<String, dynamic>;
+                  return BookDetailsScreen(title: args['title']);
+                },
+                SelfAssessmentScreen.routeName: (context) =>
+                    const SelfAssessmentScreen(),
+                SelfAssessmentGradesScreen.routeName: (context) {
+                  final args = ModalRoute.of(context)?.settings.arguments
+                      as Map<String, dynamic>;
+                  return SelfAssessmentGradesScreen(
+                    subjectTitle: args['subjectTitle'],
+                  );
+                },
                 PaymentResultScreen.routeName: (context) {
                   final args = ModalRoute.of(context)?.settings.arguments
                       as Map<String, dynamic>;
@@ -341,6 +378,8 @@ void main() async {
                 HowToGetPointsScreen.routeName: (context) =>
                     HowToGetPointsScreen(),
                 FavoritScreen.routeName: (context) => FavoritScreen(),
+                BookDetailScreen.routeName: (context) =>
+                    const BookDetailScreen(),
                 PdfReaderScreen.routeName: (context) {
                   final args = ModalRoute.of(context)?.settings.arguments
                       as Map<String, dynamic>;

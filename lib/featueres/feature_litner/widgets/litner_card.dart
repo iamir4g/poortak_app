@@ -14,8 +14,8 @@ class LitnerCard extends StatelessWidget {
     required this.label,
     required this.subLabel,
     required this.onTap,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -115,9 +115,9 @@ class LitnerTodayCard extends StatelessWidget {
     this.label = 'کارت های امروز',
     this.buttonText = 'شروع',
     this.imageAsset = 'assets/images/litner/flash-card.png',
-    Key? key,
+    super.key,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

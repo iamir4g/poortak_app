@@ -10,7 +10,8 @@ class SayarehDataLoading extends SayarehDataStatus {}
 class SayarehDataCompleted extends SayarehDataStatus {
   final SayarehHomeModel data;
   final GetBookListModel bookListData;
-  SayarehDataCompleted(this.data, this.bookListData);
+  final AllCoursesProgressModel? progressData;
+  SayarehDataCompleted(this.data, this.bookListData, {this.progressData});
 }
 
 class SayarehDataError extends SayarehDataStatus {

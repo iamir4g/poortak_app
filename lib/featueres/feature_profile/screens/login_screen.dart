@@ -14,6 +14,7 @@ import 'package:poortak/featueres/feature_profile/presentation/bloc/profile_bloc
 import 'package:poortak/featueres/feature_profile/presentation/bloc/profile_event.dart';
 import 'package:poortak/featueres/feature_profile/presentation/bloc/profile_state.dart';
 import 'package:poortak/locator.dart';
+import 'package:smart_auth/smart_auth.dart';
 
 class LoginScreen extends StatefulWidget {
   static const routeName = "/login_screen";
@@ -37,7 +38,49 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _canResend = false;
 
   @override
+  void initState() {
+    super.initState();
+    _getAppSignature();
+  }
+
+  void _getAppSignature() async {
+    try {
+      final res = await SmartAuth.instance.getAppSignature();
+      log("📱 App Signature for SMS Retriever: ${res.data}");
+    } catch (e) {
+      log("Error getting app signature: $e");
+    }
+  }
+
+  void _startSmsListener() async {
+    try {
+      final res = await SmartAuth.instance.getSmsWithRetrieverApi();
+      if (!mounted) return;
+      if (res.hasData) {
+        final code = res.data?.code;
+        if (code != null) {
+          setState(() {
+            _otpController.text = code;
+          });
+          // Optional: Auto submit
+          if (mobileNumber != null) {
+            context.read<ProfileBloc>().add(
+                  LoginWithOtpEvent(
+                    mobile: mobileNumber!,
+                    otp: code,
+                  ),
+                );
+          }
+        }
+      }
+    } catch (e) {
+      log("Error listening for SMS: $e");
+    }
+  }
+
+  @override
   void dispose() {
+    SmartAuth.instance.removeSmsRetrieverApiListener();
     _timer?.cancel();
     _mobileController.dispose();
     _otpController.dispose();
@@ -330,14 +373,6 @@ class _LoginScreenState extends State<LoginScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Text(
-        //   "کد تایید",
-        //   style: MyTextStyle.textMatn12Bold.copyWith(
-        //     color: MyColors.textMatn1,
-        //     fontSize: 16,
-        //     fontWeight: FontWeight.w600,
-        //   ),
-        // ),
         const SizedBox(height: 12),
         Container(
           decoration: BoxDecoration(
@@ -361,6 +396,7 @@ class _LoginScreenState extends State<LoginScreen> {
             child: TextField(
               controller: _otpController,
               focusNode: _otpFocusNode,
+              autofillHints: const [AutofillHints.oneTimeCode],
               keyboardType: TextInputType.number,
               textAlign: TextAlign.center,
               inputFormatters: [
@@ -391,14 +427,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   horizontal: 20,
                   vertical: 18,
                 ),
-                // prefixIcon: Container(
-                //   margin: const EdgeInsets.only(right: 12),
-                //   child: Icon(
-                //     Icons.lock_outline,
-                //     color: MyColors.text3,
-                //     size: 20,
-                //   ),
-                // ),
               ),
             ),
           ),
@@ -447,6 +475,7 @@ class _LoginScreenState extends State<LoginScreen> {
           // Start the timer when OTP is successfully requested
           log("🕐 Starting OTP timer...");
           _startTimer();
+          _startSmsListener();
         } else if (state is ProfileSuccessLogin) {
           // Save user data and login state
           locator<PrefsOperator>().saveUserData(

@@ -10,6 +10,7 @@ import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_review_cubit.dart';
 import 'package:poortak/featueres/feature_litner/repositories/litner_repository.dart';
 import 'package:poortak/locator.dart';
+import 'package:poortak/common/widgets/reusable_modal.dart';
 
 class LitnerWordBoxScreen extends StatelessWidget {
   static const routeName = '/litner_word_box';
@@ -26,7 +27,7 @@ class LitnerWordBoxScreen extends StatelessWidget {
 }
 
 class _LitnerWordBoxView extends StatefulWidget {
-  const _LitnerWordBoxView({Key? key}) : super(key: key);
+  const _LitnerWordBoxView({super.key});
 
   @override
   State<_LitnerWordBoxView> createState() => _LitnerWordBoxViewState();
@@ -56,14 +57,46 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
+        actions: [
+          IconButton(
+            onPressed: () => Navigator.of(context).pop(),
+            icon: const Icon(Icons.arrow_forward),
+          ),
+        ],
+        centerTitle: true,
         title: Text(l10n!.litner_review, style: MyTextStyle.textHeader16Bold),
       ),
-      body: BlocBuilder<LitnerReviewCubit, LitnerReviewState>(
+      body: BlocConsumer<LitnerReviewCubit, LitnerReviewState>(
+        listener: (context, state) {
+          print('State changed to: $state');
+          if (state is LitnerReviewCompleted) {
+            print('Showing completion modal');
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              ReusableModal.show(
+                context: context,
+                title: 'تبریک!',
+                message: 'تمام لغات امروز مرور شدند.',
+                type: ModalType.success,
+                buttonText: 'متوجه شدم',
+                onButtonPressed: () {
+                  Navigator.of(context).pop(); // Close modal
+                  Navigator.of(context).pop(); // Go back to Litner home
+                },
+              );
+            });
+          }
+        },
         builder: (context, state) {
           if (state is LitnerReviewLoading) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is LitnerReviewError) {
             return Center(child: Text(state.message));
+          } else if (state is LitnerReviewCompleted) {
+            return const Center(
+                child: Text('تبریک! تمام لغات مرور شدند.',
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)));
           } else if (state is LitnerReviewLoaded) {
             // Check if words list is empty
             if (state.words.isEmpty) {

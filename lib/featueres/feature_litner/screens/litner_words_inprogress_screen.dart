@@ -10,7 +10,6 @@ import 'package:poortak/featueres/feature_litner/data/models/list_words_model.da
 import 'package:iconify_design/iconify_design.dart';
 import 'package:poortak/locator.dart';
 import 'package:poortak/common/services/tts_service.dart';
-import 'package:poortak/featueres/fetures_sayareh/screens/word_detail_screen.dart';
 import 'dart:async';
 
 class LitnerWordsInprogressScreen extends StatefulWidget {

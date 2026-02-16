@@ -12,7 +12,7 @@ import 'package:poortak/common/widgets/dot_loading_widget.dart';
 class PdfReaderScreen extends StatelessWidget {
   static const routeName = "/pdf_reader_screen";
 
-  const PdfReaderScreen({Key? key}) : super(key: key);
+  const PdfReaderScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -199,11 +199,18 @@ class PdfReaderScreen extends StatelessWidget {
           bookData.title,
           style: MyTextStyle.textMatn14Bold,
         ),
+        automaticallyImplyLeading: false,
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.arrow_forward),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ],
+        // leading: IconButton(
+        //   icon: const Icon(Icons.arrow_back),
+        //   onPressed: () => Navigator.of(context).pop(),
+        // ),
       ),
       body: Container(
         decoration: const BoxDecoration(

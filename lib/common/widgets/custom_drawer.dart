@@ -336,7 +336,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                                     context.read<ThemeCubit>().toggleTheme();
                                   },
                                   inactiveThumbColor: Colors.white,
-                                  activeColor: MyColors.primary,
+                                  activeThumbColor: MyColors.primary,
                                   trackOutlineColor: WidgetStateProperty.all(
                                       Colors.transparent),
                                 ),

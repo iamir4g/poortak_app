@@ -86,7 +86,7 @@ class VideoDownloaderUtil {
               try {
                 final decryptionKeyResponse =
                     await storageService.callGetDecryptedFile(fileName);
-                final decryptedFileName = '${fileName}.mp4';
+                final decryptedFileName = '$fileName.mp4';
                 final decryptedFile =
                     File('${videoDir.path}/$decryptedFileName');
 

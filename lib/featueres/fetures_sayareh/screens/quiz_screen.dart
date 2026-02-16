@@ -1,21 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:poortak/common/error_handling/app_exception.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/common/utils/font_size_helper.dart';
-import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_start_bloc/quiz_start_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_answer_bloc/quiz_answer_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_result_bloc/quiz_result_bloc.dart';
 import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/quiz_question_model.dart';
-import 'package:poortak/featueres/fetures_sayareh/screens/first_quiz_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/widgets/quiz_result_modal.dart';
-import 'package:poortak/featueres/fetures_sayareh/repositories/sayareh_repository.dart';
-import 'package:poortak/common/resources/data_state.dart';
 import 'package:poortak/featueres/fetures_sayareh/widgets/item_question.dart';
+import 'package:poortak/common/widgets/reusable_modal.dart';
 import 'package:poortak/locator.dart';
-import 'dart:developer';
+import 'package:poortak/featueres/fetures_sayareh/repositories/sayareh_repository.dart';
 
 class QuizScreen extends StatefulWidget {
   static const routeName = "/quiz";
@@ -60,6 +56,31 @@ class _QuizScreenState extends State<QuizScreen> {
     Navigator.pushReplacementNamed(context, LoginScreen.routeName);
   }
 
+  void _showExitModal() {
+    ReusableModal.show(
+      context: context,
+      title: 'ترک آزمون',
+      message:
+          'با ترک آزمون، پاسخ های فعلی شما حذف می شود و باید دفعه ی بعد دوباره به آنها پاسخ دهید',
+      type: ModalType.info,
+      buttonText: 'ماندن',
+      secondButtonText: 'ترک آزمون',
+      showSecondButton: true,
+      onButtonPressed: () {
+        Navigator.of(context).pop(); // Close modal
+      },
+      onSecondButtonPressed: () async {
+        Navigator.of(context).pop(); // Close modal
+        // Call delete API
+        await locator<SayarehRepository>()
+            .deleteQuizResult(widget.courseId, widget.quizId);
+        if (context.mounted) {
+          Navigator.of(context).pop(); // Exit quiz screen
+        }
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -92,8 +113,14 @@ class _QuizScreenState extends State<QuizScreen> {
                         const EdgeInsets.only(top: 24, left: 16, right: 16),
                     child: Row(
                       children: [
+                        const Spacer(),
+                        // Text(
+                        //   widget.title,
+                        //   style: MyTextStyle.textHeader16Bold,
+                        // ),
+                        const Spacer(flex: 2),
                         GestureDetector(
-                          onTap: () => Navigator.of(context).pop(),
+                          onTap: _showExitModal,
                           child: Container(
                             width: 34,
                             height: 34,
@@ -101,16 +128,10 @@ class _QuizScreenState extends State<QuizScreen> {
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(17),
                             ),
-                            child: const Icon(Icons.arrow_back_ios_new,
+                            child: const Icon(Icons.arrow_forward,
                                 color: Color(0xFF3D495C)),
                           ),
                         ),
-                        const Spacer(),
-                        // Text(
-                        //   widget.title,
-                        //   style: MyTextStyle.textHeader16Bold,
-                        // ),
-                        const Spacer(flex: 2),
                       ],
                     ),
                   ),
@@ -140,16 +161,8 @@ class _QuizScreenState extends State<QuizScreen> {
                             courseId: widget.courseId,
                             quizId: widget.quizId,
                           ));
-                    } else {
-                      setState(() {
-                        currentQuestion = answerState.nextQuestion!;
-                        selectedAnswerId = null;
-                        isSelected = false;
-                        isCorrectAnswer = false;
-                        isWrongSelected = false;
-                      });
-                      context.read<QuizAnswerBloc>().emit(QuizAnswerInitial());
                     }
+                    // Don't auto-advance here. Wait for user to click "Next".
                   }
                 },
                 child: BlocListener<QuizResultBloc, QuizResultState>(
@@ -214,14 +227,23 @@ class _QuizScreenState extends State<QuizScreen> {
                               itemBuilder: (context, index) {
                                 final answer = questionData.answers[index];
                                 isSelected = selectedAnswerId == answer.id;
-                                if (answerState is QuizAnswerLoaded &&
-                                    answerState.selectedAnswerId == answer.id) {
-                                  isCorrectAnswer = answer.id ==
-                                          answerState.correctAnswerId &&
-                                      answerState.isCorrect;
-                                  isWrongSelected = answer.id ==
+                                if (answerState is QuizAnswerLoaded) {
+                                  // Always highlight the correct answer
+                                  if (answer.id ==
+                                      answerState.correctAnswerId) {
+                                    isCorrectAnswer = true;
+                                    isWrongSelected = false;
+                                  }
+                                  // Highlight the selected answer as wrong if it's incorrect
+                                  else if (answer.id ==
                                           answerState.selectedAnswerId &&
-                                      !answerState.isCorrect;
+                                      !answerState.isCorrect) {
+                                    isCorrectAnswer = false;
+                                    isWrongSelected = true;
+                                  } else {
+                                    isCorrectAnswer = false;
+                                    isWrongSelected = false;
+                                  }
                                 } else {
                                   isCorrectAnswer = false;
                                   isWrongSelected = false;
@@ -351,6 +373,68 @@ class _QuizScreenState extends State<QuizScreen> {
                                         children: [
                                           Text(
                                             "بررسی پاسخ",
+                                            style: MyTextStyle.textMatnBtn
+                                                .copyWith(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Icon(Icons.arrow_forward_ios,
+                                              color: Colors.white, size: 18),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              )
+                            else if (answerState is QuizAnswerLoaded)
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 24.0),
+                                child: Center(
+                                  child: SizedBox(
+                                    width: 176,
+                                    height: 54,
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        if (answerState.nextQuestion != null) {
+                                          setState(() {
+                                            currentQuestion =
+                                                answerState.nextQuestion!;
+                                            selectedAnswerId = null;
+                                            isSelected = false;
+                                            isCorrectAnswer = false;
+                                            isWrongSelected = false;
+                                          });
+                                          context
+                                              .read<QuizAnswerBloc>()
+                                              .emit(QuizAnswerInitial());
+                                        } else {
+                                          // Handle end of quiz if needed, though listener handles it
+                                          context.read<QuizResultBloc>().add(
+                                                FetchQuizResultEvent(
+                                                  courseId: widget.courseId,
+                                                  quizId: widget.quizId,
+                                                ),
+                                              );
+                                        }
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor:
+                                            const Color(0xFFFF9F29),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(30),
+                                        ),
+                                        elevation: 0,
+                                        padding: EdgeInsets.zero,
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            "بعدی",
                                             style: MyTextStyle.textMatnBtn
                                                 .copyWith(
                                               fontSize: 14,

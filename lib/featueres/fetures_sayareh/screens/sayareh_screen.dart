@@ -14,6 +14,7 @@ import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shoppi
 import 'package:poortak/featueres/fetures_sayareh/widgets/item_book.dart';
 
 import 'package:poortak/featueres/fetures_sayareh/widgets/contest_card.dart';
+import 'package:poortak/featueres/fetures_sayareh/data/models/all_courses_progress_model.dart';
 import 'package:poortak/locator.dart';
 // import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
@@ -142,7 +143,7 @@ class _SayarehScreenState extends State<SayarehScreen> {
                         ),
                         Text(
                           l10n?.sayareh ?? "",
-                          style: MyTextStyle.textMatn12W700?.copyWith(
+                          style: MyTextStyle.textMatn12W700.copyWith(
                             color:
                                 Theme.of(context).textTheme.titleMedium?.color,
                           ),
@@ -161,11 +162,23 @@ class _SayarehScreenState extends State<SayarehScreen> {
                           },
                           itemBuilder: (context, index) {
                             final item = sayarehDataCompleted.data.data[index];
+                            CourseProgressItem? progress;
+                            if (sayarehDataCompleted.progressData != null) {
+                              try {
+                                progress = sayarehDataCompleted
+                                    .progressData!.data
+                                    .firstWhere((element) =>
+                                        element.iKnowCourseId == item.id);
+                              } catch (e) {
+                                progress = null;
+                              }
+                            }
                             return ItemLeason(
                                 item: item,
                                 onTap: () {},
                                 index: index,
-                                purchased: item.purchased);
+                                purchased: item.purchased,
+                                progress: progress);
                           },
                         ),
                       ],
@@ -207,7 +220,7 @@ class _SayarehScreenState extends State<SayarehScreen> {
                       ),
                       Text(
                         "کتاب های سیاره آی نو",
-                        style: MyTextStyle.textMatn12W700?.copyWith(
+                        style: MyTextStyle.textMatn12W700.copyWith(
                           color: Theme.of(context).textTheme.titleMedium?.color,
                         ),
                       ),

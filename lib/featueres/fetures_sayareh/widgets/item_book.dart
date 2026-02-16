@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:poortak/common/services/getImageUrl_service.dart';
+import 'package:poortak/featueres/fetures_sayareh/screens/book_detail_screen.dart';
 
 class ItemBook extends StatelessWidget {
   final String? title;
@@ -87,7 +88,7 @@ class ItemBook extends StatelessWidget {
               ),
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: Container(
+                child: SizedBox(
                   width: 81,
                   height: 81,
                   child: FutureBuilder<String>(
@@ -135,10 +136,10 @@ class ItemBook extends StatelessWidget {
   void _navigateToPdfReader(BuildContext context) {
     if (bookId == null || bookId!.isEmpty) return;
 
-    // Navigate to PDF reader with book ID
+    // Navigate to BookDetailScreen with book ID
     Navigator.pushNamed(
       context,
-      '/pdf_reader_screen',
+      BookDetailScreen.routeName,
       arguments: {
         'bookId': bookId!,
       },

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_bloc.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_event.dart';

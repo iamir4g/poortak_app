@@ -91,8 +91,7 @@ class PdfDownloader {
 
     // Ensure filename is not empty
     if (sanitized.isEmpty || sanitized == '.pdf') {
-      sanitized =
-          'book_' + DateTime.now().millisecondsSinceEpoch.toString() + '.pdf';
+      sanitized = 'book_${DateTime.now().millisecondsSinceEpoch}.pdf';
     }
 
     return sanitized;

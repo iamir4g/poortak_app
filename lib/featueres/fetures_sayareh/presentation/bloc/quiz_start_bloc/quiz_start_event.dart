@@ -11,7 +11,7 @@ class StartQuizEvent extends QuizStartEvent {
   final String courseId;
   final String quizId;
 
-  StartQuizEvent({
+  const StartQuizEvent({
     required this.courseId,
     required this.quizId,
   });

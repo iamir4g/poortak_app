@@ -75,129 +75,106 @@ class _DictionaryContentState extends State<_DictionaryContent> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.6,
-      decoration: const BoxDecoration(
-        color: MyColors.background,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(20),
-        ),
-      ),
-      child: Column(
-        children: [
-          const SizedBox(height: 16),
-          Container(
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: MyColors.divider,
-              borderRadius: BorderRadius.circular(2),
+    return Padding(
+        padding:
+            EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+        child: Container(
+          height: MediaQuery.of(context).size.height * 0.6,
+          decoration: const BoxDecoration(
+            color: MyColors.background,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
             ),
           ),
-          const SizedBox(height: 16),
-          Text(
-            'دیکشنری',
-            style: MyTextStyle.textHeader16Bold.copyWith(fontSize: 18),
-          ),
-          const SizedBox(height: 20),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Container(
-              decoration: BoxDecoration(
-                color: MyColors.background3,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: MyColors.divider),
-              ),
-              child: TextField(
-                controller: _controller,
-                onChanged: _onSearchChanged,
-                textAlign: TextAlign.right,
-                textDirection: TextDirection.ltr,
-                decoration: InputDecoration(
-                  hintText: 'جستجوی معنی کلمه',
-                  hintStyle: MyTextStyle.textMatn14Bold.copyWith(
-                    color: MyColors.textSecondary,
-                    fontWeight: FontWeight.normal,
-                  ),
-                  border: InputBorder.none,
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                  prefixIcon:
-                      const Icon(Icons.search, color: MyColors.textSecondary),
+          child: Column(
+            children: [
+              const SizedBox(height: 16),
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: MyColors.divider,
+                  borderRadius: BorderRadius.circular(2),
                 ),
               ),
-            ),
-          ),
-          const SizedBox(height: 10),
-          Expanded(
-            child: BlocBuilder<DictionaryBloc, DictionaryState>(
-              builder: (context, state) {
-                if (state is DictionaryLoading) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (state is DictionaryLoaded) {
-                  final entry = state.entry;
-                  return AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 250),
-                    transitionBuilder: (child, anim) => SlideTransition(
-                      position: Tween<Offset>(
-                        begin: const Offset(0, 0.05),
-                        end: Offset.zero,
-                      ).animate(anim),
-                      child: FadeTransition(opacity: anim, child: child),
+              const SizedBox(height: 16),
+              Text(
+                'دیکشنری',
+                style: MyTextStyle.textHeader16Bold.copyWith(fontSize: 18),
+              ),
+              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: MyColors.background3,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: MyColors.divider),
+                  ),
+                  child: TextField(
+                    controller: _controller,
+                    onChanged: _onSearchChanged,
+                    textAlign: TextAlign.right,
+                    textDirection: TextDirection.ltr,
+                    decoration: InputDecoration(
+                      hintText: 'جستجوی معنی کلمه',
+                      hintStyle: MyTextStyle.textMatn14Bold.copyWith(
+                        color: MyColors.textSecondary,
+                        fontWeight: FontWeight.normal,
+                      ),
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 14),
+                      prefixIcon: const Icon(Icons.search,
+                          color: MyColors.textSecondary),
                     ),
-                    child: _showDetail
-                        ? _buildDetailView(
-                            entry.word, _selectedTranslation, entry.examples)
-                        : ListView.separated(
-                            key: const ValueKey('list_view'),
-                            padding: const EdgeInsets.all(20),
-                            itemCount: entry.persianTranslations.length,
-                            separatorBuilder: (context, index) =>
-                                const Divider(),
-                            itemBuilder: (context, index) {
-                              final translation =
-                                  entry.persianTranslations[index];
-                              return Material(
-                                color: Colors.transparent,
-                                child: InkWell(
-                                  onTap: () {
-                                    _openFullPage(
-                                        context, entry.word, translation);
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 8.0),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        GestureDetector(
-                                          behavior: HitTestBehavior.opaque,
-                                          onTap: () {
-                                            _openFullPage(context, entry.word,
-                                                translation);
-                                          },
-                                          child: Text(
-                                            translation,
-                                            style: MyTextStyle.textMatn16,
-                                          ),
-                                        ),
-                                        Row(
-                                          mainAxisSize: MainAxisSize.min,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              Expanded(
+                child: BlocBuilder<DictionaryBloc, DictionaryState>(
+                  builder: (context, state) {
+                    if (state is DictionaryLoading) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (state is DictionaryLoaded) {
+                      final entry = state.entry;
+                      return AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 250),
+                        transitionBuilder: (child, anim) => SlideTransition(
+                          position: Tween<Offset>(
+                            begin: const Offset(0, 0.05),
+                            end: Offset.zero,
+                          ).animate(anim),
+                          child: FadeTransition(opacity: anim, child: child),
+                        ),
+                        child: _showDetail
+                            ? _buildDetailView(entry.word, _selectedTranslation,
+                                entry.examples)
+                            : ListView.separated(
+                                key: const ValueKey('list_view'),
+                                padding: const EdgeInsets.all(20),
+                                itemCount: entry.persianTranslations.length,
+                                separatorBuilder: (context, index) =>
+                                    const Divider(),
+                                itemBuilder: (context, index) {
+                                  final translation =
+                                      entry.persianTranslations[index];
+                                  return Material(
+                                    color: Colors.transparent,
+                                    child: InkWell(
+                                      onTap: () {
+                                        _openFullPage(
+                                            context, entry.word, translation);
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 8.0),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
                                           children: [
-                                            IconButton(
-                                              onPressed: () {
-                                                locator<TTSService>()
-                                                    .speak(entry.word);
-                                              },
-                                              icon: const Icon(
-                                                Icons.volume_up_rounded,
-                                                color: MyColors.textSecondary,
-                                                size: 20,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 8),
                                             GestureDetector(
                                               behavior: HitTestBehavior.opaque,
                                               onTap: () {
@@ -205,53 +182,83 @@ class _DictionaryContentState extends State<_DictionaryContent> {
                                                     entry.word, translation);
                                               },
                                               child: Text(
-                                                entry.word,
-                                                style:
-                                                    MyTextStyle.textMatn16Bold,
+                                                translation,
+                                                style: MyTextStyle.textMatn16,
                                               ),
+                                            ),
+                                            Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                IconButton(
+                                                  onPressed: () {
+                                                    locator<TTSService>()
+                                                        .speak(entry.word);
+                                                  },
+                                                  icon: const Icon(
+                                                    Icons.volume_up_rounded,
+                                                    color:
+                                                        MyColors.textSecondary,
+                                                    size: 20,
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 8),
+                                                GestureDetector(
+                                                  behavior:
+                                                      HitTestBehavior.opaque,
+                                                  onTap: () {
+                                                    _openFullPage(
+                                                        context,
+                                                        entry.word,
+                                                        translation);
+                                                  },
+                                                  child: Text(
+                                                    entry.word,
+                                                    style: MyTextStyle
+                                                        .textMatn16Bold,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ],
                                         ),
-                                      ],
+                                      ),
                                     ),
-                                  ),
-                                ),
-                              );
-                            },
+                                  );
+                                },
+                              ),
+                      );
+                    } else if (state is DictionaryEmpty) {
+                      return Center(
+                        child: Text(
+                          'موردی یافت نشد',
+                          style: MyTextStyle.textMatn14Bold.copyWith(
+                            color: MyColors.textSecondary,
                           ),
-                  );
-                } else if (state is DictionaryEmpty) {
-                  return Center(
-                    child: Text(
-                      'موردی یافت نشد',
-                      style: MyTextStyle.textMatn14Bold.copyWith(
-                        color: MyColors.textSecondary,
+                        ),
+                      );
+                    } else if (state is DictionaryError) {
+                      return Center(
+                        child: Text(
+                          state.message,
+                          style: MyTextStyle.textMatn14Bold.copyWith(
+                            color: MyColors.error,
+                          ),
+                        ),
+                      );
+                    }
+                    return Center(
+                      child: Lottie.asset(
+                        'assets/lottie/Search.json',
+                        width: 200,
+                        height: 200,
                       ),
-                    ),
-                  );
-                } else if (state is DictionaryError) {
-                  return Center(
-                    child: Text(
-                      state.message,
-                      style: MyTextStyle.textMatn14Bold.copyWith(
-                        color: MyColors.error,
-                      ),
-                    ),
-                  );
-                }
-                return Center(
-                  child: Lottie.asset(
-                    'assets/lottie/Search.json',
-                    width: 200,
-                    height: 200,
-                  ),
-                );
-              },
-            ),
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
-    );
+        ));
   }
 
   Widget _buildDetailView(String word, String? translation, List examples) {

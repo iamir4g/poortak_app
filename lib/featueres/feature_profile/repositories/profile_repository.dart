@@ -121,7 +121,7 @@ class ProfileRepository {
           response.data['ok'] == true) {
         final UpdateProfileModel updateProfileModel =
             UpdateProfileModel.fromJson(response.data);
-        log("Update Profile Success - Parsed Model: ${updateProfileModel}");
+        log("Update Profile Success - Parsed Model: $updateProfileModel");
         return DataSuccess(updateProfileModel);
       } else {
         log("Update Profile Error - Status: ${response.statusCode}, Data: ${response.data}");
@@ -142,7 +142,7 @@ class ProfileRepository {
           response.data['ok'] == true) {
         final MeProfileModel meProfileModel =
             MeProfileModel.fromJson(response.data);
-        log("Get Me Profile Success - Parsed Model: ${meProfileModel}");
+        log("Get Me Profile Success - Parsed Model: $meProfileModel");
         return DataSuccess(meProfileModel);
       } else {
         log("Get Me Profile Error - Status: ${response.statusCode}, Data: ${response.data}");

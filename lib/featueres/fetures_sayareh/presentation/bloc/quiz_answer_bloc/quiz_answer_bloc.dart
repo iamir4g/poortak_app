@@ -38,7 +38,7 @@ class QuizAnswerBloc extends Bloc<QuizAnswerEvent, QuizAnswerState> {
 
       if (result is DataSuccess) {
         log("Result is DataSuccess");
-        if (result.data == null || result.data!.data == null) {
+        if (result.data == null) {
           log("Result data or data.data is null, emitting QuizAnswerError");
           emit(QuizAnswerError(
               "خطا در دریافت داده از سرور. لطفا دوباره تلاش کنید."));

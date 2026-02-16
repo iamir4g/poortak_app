@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconify_design/iconify_design.dart';
 import 'package:poortak/common/services/getImageUrl_service.dart';
+import 'package:poortak/common/widgets/global_progress_bar.dart';
+import 'package:poortak/featueres/fetures_sayareh/data/models/all_courses_progress_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_home_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/iknow_access_bloc/iknow_access_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/lesson_screen.dart';
@@ -12,12 +14,16 @@ class ItemLeason extends StatelessWidget {
   final int index;
   final bool purchased;
   final Function() onTap;
-  const ItemLeason(
-      {super.key,
-      required this.item,
-      required this.onTap,
-      required this.purchased,
-      required this.index});
+  final CourseProgressItem? progress;
+
+  const ItemLeason({
+    super.key,
+    required this.item,
+    required this.onTap,
+    required this.purchased,
+    required this.index,
+    this.progress,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -29,6 +35,12 @@ class ItemLeason extends StatelessWidget {
 
     // Use hasAccess instead of purchased
     final isLocked = !hasAccess;
+
+    double average = 0;
+    if (progress != null) {
+      average =
+          (progress!.vocabulary + progress!.conversation + progress!.quiz) / 3;
+    }
 
     return GestureDetector(
       onTap: () {
@@ -85,7 +97,7 @@ class ItemLeason extends StatelessWidget {
                     },
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 4),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -105,12 +117,24 @@ class ItemLeason extends StatelessWidget {
             ),
             Row(
               children: [
+                if (progress != null)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: average >= 100
+                        ? Row(
+                            children: List.generate(
+                                3,
+                                (index) => Icon(Icons.star,
+                                    color: Colors.amber, size: 20)))
+                        : GlobalProgressBar(
+                            percentage: average, width: 60, height: 8),
+                  ),
                 isLocked
                     ? Image(image: AssetImage("assets/images/lock_image.png"))
                     : SizedBox(),
                 // : SizedBox(),
                 SizedBox(
-                  width: 8,
+                  width: 4,
                 ),
                 IconifyIcon(
                   size: 32,

@@ -68,6 +68,25 @@ class SayarehApiProvider {
     return response;
   }
 
+  dynamic callPostSubmitVocabulary(
+    String courseId,
+    String vocabularyId,
+    String answer,
+    List<String> previousVocabularyIds,
+  ) async {
+    final response = await dio.post(
+      "${Constants.baseUrl}iknow/courses/$courseId/vocabulary/$vocabularyId/submit",
+      data: {
+        "answer": answer,
+        "previousVocabularyIds": previousVocabularyIds,
+        "vocabularyId": vocabularyId,
+      },
+    );
+
+    log("Sayareh Submit Vocabulary Response: ${response.data}");
+    return response;
+  }
+
   dynamic callGetQuizzes(String id) async {
     return await _authService.get(
       "${Constants.baseUrl}iknow/courses/$id/quiz",
@@ -93,6 +112,12 @@ class SayarehApiProvider {
 
   dynamic callGetResultQuestion(String courseId, String quizId) async {
     return await _authService.get(
+      "${Constants.baseUrl}iknow/courses/$courseId/quiz/$quizId/result",
+    );
+  }
+
+  dynamic callDeleteQuizResult(String courseId, String quizId) async {
+    return await _authService.delete(
       "${Constants.baseUrl}iknow/courses/$courseId/quiz/$quizId/result",
     );
   }
@@ -130,6 +155,57 @@ class SayarehApiProvider {
     );
 
     log("Sayareh Conversation Response: ${response.data}");
+    return response;
+  }
+
+  dynamic callGetConversationPlayback(String courseId) async {
+    final response = await dio.get(
+      "${Constants.baseUrl}iknow/courses/$courseId/conversation/playback",
+    );
+
+    log("Sayareh Conversation Playback Response: ${response.data}");
+    return response;
+  }
+
+  dynamic callPostConversationPlayback(
+      String courseId, String conversationId) async {
+    log("Sayareh save converstion courseId: $courseId, conversationId: $conversationId");
+    final response = await dio.post(
+      "${Constants.baseUrl}iknow/courses/$courseId/conversation/playback",
+      data: {
+        "courseId": courseId,
+        "conversationId": conversationId,
+      },
+    );
+
+    log("Sayareh Post Conversation Playback Response: ${response.data}");
+    return response;
+  }
+
+  dynamic callGetCourseProgress(String courseId) async {
+    final response = await dio.get(
+      "${Constants.baseUrl}iknow/courses/$courseId/progress",
+    );
+
+    log("Sayareh Course Progress Response: ${response.data}");
+    return response;
+  }
+
+  dynamic callGetAllCoursesProgress() async {
+    final response = await dio.get(
+      "${Constants.baseUrl}iknow/courses/progress",
+    );
+
+    log("Sayareh All Courses Progress Response: ${response.data}");
+    return response;
+  }
+
+  dynamic callDeleteCourseProgress(String courseId) async {
+    final response = await dio.delete(
+      "${Constants.baseUrl}iknow/courses/$courseId/progress",
+    );
+
+    log("Sayareh Delete Course Progress Response: ${response.data}");
     return response;
   }
 

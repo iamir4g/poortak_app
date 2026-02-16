@@ -142,7 +142,7 @@ class _PrizeScreenState extends State<PrizeScreen> {
           ),
 
           // Arrow
-          Container(
+          SizedBox(
             width: 52,
             height: 52,
             child: Icon(
@@ -163,7 +163,7 @@ class _PrizeScreenState extends State<PrizeScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Container(
+                SizedBox(
                   width: 28,
                   height: 26,
                   child: Image.asset(
@@ -375,7 +375,7 @@ class _PrizeScreenState extends State<PrizeScreen> {
                 ),
               );
             },
-            child: Container(
+            child: SizedBox(
               width: 128,
               height: 23,
               child: Center(

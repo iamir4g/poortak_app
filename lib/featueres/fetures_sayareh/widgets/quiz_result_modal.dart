@@ -125,11 +125,8 @@ class QuizResultModal extends StatelessWidget {
               height: 50,
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                    QuizzesScreen.routeName,
-                    (Route<dynamic> route) => false,
-                    arguments: {"courseId": courseId},
-                  );
+                  Navigator.of(context)
+                      .popUntil(ModalRoute.withName(QuizzesScreen.routeName));
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: MyColors.primary,

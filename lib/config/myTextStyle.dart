@@ -46,6 +46,12 @@ class MyTextStyle {
     fontWeight: FontWeight.bold,
     color: MyColors.textMatn1,
   );
+  static const TextStyle textMatn18Bold = TextStyle(
+    fontFamily: "IranSans",
+    fontSize: 18,
+    fontWeight: FontWeight.bold,
+    color: MyColors.textMatn1,
+  );
   static const TextStyle textMatn17W700 = TextStyle(
     fontFamily: "IranSans",
     fontSize: 17,
@@ -127,10 +133,34 @@ class MyTextStyle {
     color: MyColors.textMatn1,
   );
 
+  static const TextStyle textProgressBar = TextStyle(
+    color: MyColors.progressBarColor,
+    fontWeight: FontWeight.w700,
+    fontSize: 12,
+  );
+
+  static const TextStyle tabLabel16 = TextStyle(
+    fontFamily: "IranSans",
+    fontSize: 16,
+    fontWeight: FontWeight.w500,
+    color: MyColors.textMatn1,
+  );
+
   // static const TextStyle bottomNavDisabledTextStyle = TextStyle(
   //   fontFamily: "IranSans",
   //   fontSize: 14,
   //   fontWeight: FontWeight.w400,
   //   color: MyColors.primary,
   // );
+  static const TextStyle textHint = TextStyle(
+    fontFamily: "IranSans",
+    color: MyColors.textHint,
+  );
+
+  static const TextStyle textCancelButton = TextStyle(
+    fontFamily: "IranSans",
+    fontSize: 14,
+    fontWeight: FontWeight.bold,
+    color: MyColors.textCancelButton,
+  );
 }

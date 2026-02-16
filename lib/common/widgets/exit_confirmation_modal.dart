@@ -7,10 +7,10 @@ class ExitConfirmationModal extends StatelessWidget {
   final VoidCallback onStay;
 
   const ExitConfirmationModal({
-    Key? key,
+    super.key,
     required this.onExit,
     required this.onStay,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +81,7 @@ class ExitConfirmationModal extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 // Exit button (primary)
-                Container(
+                SizedBox(
                   width: 140,
                   height: 50,
                   child: ElevatedButton(
@@ -109,7 +109,7 @@ class ExitConfirmationModal extends StatelessWidget {
                 ),
 
                 // Stay button (secondary)
-                Container(
+                SizedBox(
                   width: 140,
                   height: 50,
                   child: ElevatedButton(

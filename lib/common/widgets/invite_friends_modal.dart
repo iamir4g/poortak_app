@@ -93,7 +93,7 @@ class InviteFriendsModal extends StatelessWidget {
         print('💾 Updated profile data saved to preferences');
       } else {
         print('⚠️ Failed to refresh user profile data');
-        print('   Response: ${response}');
+        print('   Response: $response');
       }
     } catch (e) {
       print('💥 Error refreshing user profile: $e');
@@ -120,7 +120,7 @@ class InviteFriendsModal extends StatelessWidget {
                 const SizedBox(height: 6),
 
                 // Lottie Animation
-                Container(
+                SizedBox(
                   width: 231,
                   height: 231,
                   child: Lottie.asset(
@@ -217,7 +217,7 @@ class InviteFriendsModal extends StatelessWidget {
 //                       ),
 //                     ),
                 // Description Text
-                Container(
+                SizedBox(
                   width: 232,
                   child: RichText(
                     textAlign: TextAlign.center,

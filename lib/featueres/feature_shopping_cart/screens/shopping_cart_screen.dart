@@ -262,7 +262,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                 child: Row(
                   children: [
                     Expanded(
-                      child: Container(
+                      child: SizedBox(
                         height: 48,
                         child: const Center(
                           child: Text(
@@ -321,7 +321,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       // Shopping cart image
-                      Container(
+                      SizedBox(
                         width: 138.716,
                         height: 117.656,
                         child: Image.asset(
