@@ -56,3 +56,15 @@
 -keepattributes Signature
 -keepattributes InnerClasses
 -keepattributes EnclosingMethod
+
+# Fix for java.util.concurrent warnings
+-keep class j$.util.concurrent.ConcurrentHashMap$TreeBin { int lockState; }
+-keep class j$.util.concurrent.ConcurrentHashMap { int sizeCtl; int transferIndex; long baseCount; int cellsBusy; }
+-keep class j$.util.concurrent.ConcurrentHashMap$CounterCell { long value; }
+-keep class j$.util.IntSummaryStatistics { long count; long sum; int min; int max; }
+-keep class j$.util.LongSummaryStatistics { long count; long sum; long min; long max; }
+-keep class j$.util.DoubleSummaryStatistics { long count; double sum; double min; double max; }
+
+# Prevent warnings about the above rules
+-dontwarn j$.util.concurrent.**
+-dontwarn j$.util.**
