@@ -10,6 +10,10 @@ import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/dictionary_b
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/dictionary_bloc/dictionary_state.dart';
 import 'package:poortak/locator.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/word_detail_screen.dart';
+import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_bloc.dart';
+import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_event.dart';
+import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_state.dart';
+import 'package:poortak/featueres/fetures_sayareh/data/models/dictionary_model.dart';
 import 'package:poortak/main.dart';
 
 class DictionaryBottomSheet extends StatelessWidget {
@@ -17,8 +21,15 @@ class DictionaryBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => locator<DictionaryBloc>(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => locator<DictionaryBloc>(),
+        ),
+        BlocProvider.value(
+          value: locator<LitnerBloc>(),
+        ),
+      ],
       child: const _DictionaryContent(),
     );
   }
@@ -68,197 +79,254 @@ class _DictionaryContentState extends State<_DictionaryContent> {
       print('[DictionaryBottomSheet] Navigation error: $e');
       print(st);
       ScaffoldMessenger.of(ctx).showSnackBar(
-        const SnackBar(content: Text('خطا در ناوبری')),
+        const SnackBar(
+          content: Text('خطا در ناوبری'),
+          duration: Duration(seconds: 2),
+        ),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-        padding:
-            EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-        child: Container(
-          height: MediaQuery.of(context).size.height * 0.6,
-          decoration: const BoxDecoration(
-            color: MyColors.background,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(20),
-              topRight: Radius.circular(20),
+    return BlocListener<LitnerBloc, LitnerState>(
+      listener: (context, state) {
+        if (state is CreateWordSuccess) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('لغت به لایتنر اضافه شد'),
+              backgroundColor: MyColors.success,
+              duration: Duration(seconds: 2),
             ),
-          ),
-          child: Column(
-            children: [
-              const SizedBox(height: 16),
-              Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: MyColors.divider,
-                  borderRadius: BorderRadius.circular(2),
-                ),
+          );
+        } else if (state is LitnerError) {
+          final isWordExistsError = state.message == "این کلمه قبلا اضافه شده";
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.message),
+              backgroundColor:
+                  isWordExistsError ? MyColors.warning : MyColors.error,
+              duration: const Duration(seconds: 2),
+            ),
+          );
+        }
+      },
+      child: Padding(
+          padding:
+              EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          child: Container(
+            height: MediaQuery.of(context).size.height * 0.6,
+            decoration: const BoxDecoration(
+              color: MyColors.background,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
               ),
-              const SizedBox(height: 16),
-              Text(
-                'دیکشنری',
-                style: MyTextStyle.textHeader16Bold.copyWith(fontSize: 18),
-              ),
-              const SizedBox(height: 20),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Container(
+            ),
+            child: Column(
+              children: [
+                const SizedBox(height: 16),
+                Container(
+                  width: 40,
+                  height: 4,
                   decoration: BoxDecoration(
-                    color: MyColors.background3,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: MyColors.divider),
+                    color: MyColors.divider,
+                    borderRadius: BorderRadius.circular(2),
                   ),
-                  child: TextField(
-                    controller: _controller,
-                    onChanged: _onSearchChanged,
-                    textAlign: TextAlign.right,
-                    textDirection: TextDirection.ltr,
-                    decoration: InputDecoration(
-                      hintText: 'جستجوی معنی کلمه',
-                      hintStyle: MyTextStyle.textMatn14Bold.copyWith(
-                        color: MyColors.textSecondary,
-                        fontWeight: FontWeight.normal,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'دیکشنری',
+                  style: MyTextStyle.textHeader16Bold.copyWith(fontSize: 18),
+                ),
+                const SizedBox(height: 20),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: MyColors.background3,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: MyColors.divider),
+                    ),
+                    child: TextField(
+                      controller: _controller,
+                      onChanged: _onSearchChanged,
+                      textAlign: TextAlign.right,
+                      textDirection: TextDirection.ltr,
+                      decoration: InputDecoration(
+                        hintText: 'جستجوی معنی کلمه',
+                        hintStyle: MyTextStyle.textMatn14Bold.copyWith(
+                          color: MyColors.textSecondary,
+                          fontWeight: FontWeight.normal,
+                        ),
+                        border: InputBorder.none,
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 14),
+                        prefixIcon: const Icon(Icons.search,
+                            color: MyColors.textSecondary),
                       ),
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 14),
-                      prefixIcon: const Icon(Icons.search,
-                          color: MyColors.textSecondary),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 10),
-              Expanded(
-                child: BlocBuilder<DictionaryBloc, DictionaryState>(
-                  builder: (context, state) {
-                    if (state is DictionaryLoading) {
-                      return const Center(child: CircularProgressIndicator());
-                    } else if (state is DictionaryLoaded) {
-                      final entry = state.entry;
-                      return AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 250),
-                        transitionBuilder: (child, anim) => SlideTransition(
-                          position: Tween<Offset>(
-                            begin: const Offset(0, 0.05),
-                            end: Offset.zero,
-                          ).animate(anim),
-                          child: FadeTransition(opacity: anim, child: child),
-                        ),
-                        child: _showDetail
-                            ? _buildDetailView(entry.word, _selectedTranslation,
-                                entry.examples)
-                            : ListView.separated(
-                                key: const ValueKey('list_view'),
-                                padding: const EdgeInsets.all(20),
-                                itemCount: entry.persianTranslations.length,
-                                separatorBuilder: (context, index) =>
-                                    const Divider(),
-                                itemBuilder: (context, index) {
-                                  final translation =
-                                      entry.persianTranslations[index];
-                                  return Material(
-                                    color: Colors.transparent,
-                                    child: InkWell(
-                                      onTap: () {
-                                        _openFullPage(
-                                            context, entry.word, translation);
-                                      },
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 8.0),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            GestureDetector(
-                                              behavior: HitTestBehavior.opaque,
-                                              onTap: () {
-                                                _openFullPage(context,
-                                                    entry.word, translation);
-                                              },
-                                              child: Text(
-                                                translation,
-                                                style: MyTextStyle.textMatn16,
-                                              ),
-                                            ),
-                                            Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                IconButton(
-                                                  onPressed: () {
-                                                    locator<TTSService>()
-                                                        .speak(entry.word);
-                                                  },
-                                                  icon: const Icon(
-                                                    Icons.volume_up_rounded,
-                                                    color:
-                                                        MyColors.textSecondary,
-                                                    size: 20,
-                                                  ),
-                                                ),
-                                                const SizedBox(width: 8),
-                                                GestureDetector(
-                                                  behavior:
-                                                      HitTestBehavior.opaque,
-                                                  onTap: () {
-                                                    _openFullPage(
-                                                        context,
-                                                        entry.word,
-                                                        translation);
-                                                  },
-                                                  child: Text(
-                                                    entry.word,
-                                                    style: MyTextStyle
-                                                        .textMatn16Bold,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
+                const SizedBox(height: 10),
+                Expanded(
+                  child: BlocBuilder<DictionaryBloc, DictionaryState>(
+                    builder: (context, state) {
+                      if (state is DictionaryLoading) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (state is DictionaryLoaded) {
+                        final entry = state.entry;
+                        return AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 250),
+                          transitionBuilder: (child, anim) => SlideTransition(
+                            position: Tween<Offset>(
+                              begin: const Offset(0, 0.05),
+                              end: Offset.zero,
+                            ).animate(anim),
+                            child: FadeTransition(opacity: anim, child: child),
+                          ),
+                          child: _showDetail
+                              ? _buildDetailView(entry.word,
+                                  _selectedTranslation, entry.examples)
+                              : ListView(
+                                  key: const ValueKey('list_view'),
+                                  padding: const EdgeInsets.all(20),
+                                  children: [
+                                    _buildGroupedItem(context, entry),
+                                    if (entry.relatedWords.isNotEmpty) ...[
+                                      const SizedBox(height: 24),
+                                      const Divider(),
+                                      const SizedBox(height: 12),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        children: [
+                                          Text('کلمات مرتبط',
+                                              style:
+                                                  MyTextStyle.textHeader16Bold),
+                                        ],
                                       ),
-                                    ),
-                                  );
-                                },
-                              ),
-                      );
-                    } else if (state is DictionaryEmpty) {
-                      return Center(
-                        child: Text(
-                          'موردی یافت نشد',
-                          style: MyTextStyle.textMatn14Bold.copyWith(
-                            color: MyColors.textSecondary,
+                                      const SizedBox(height: 12),
+                                      Wrap(
+                                        spacing: 8,
+                                        runSpacing: 8,
+                                        alignment: WrapAlignment.end,
+                                        children: entry.relatedWords
+                                            .map((w) => ActionChip(
+                                                label: Text(w),
+                                                onPressed: () {
+                                                  _controller.text = w;
+                                                  _onSearchChanged(w);
+                                                }))
+                                            .toList(),
+                                      )
+                                    ]
+                                  ],
+                                ),
+                        );
+                      } else if (state is DictionaryEmpty) {
+                        return Center(
+                          child: Text(
+                            'موردی یافت نشد',
+                            style: MyTextStyle.textMatn14Bold.copyWith(
+                              color: MyColors.textSecondary,
+                            ),
                           ),
+                        );
+                      } else if (state is DictionaryError) {
+                        return Center(
+                          child: Text(
+                            state.message,
+                            style: MyTextStyle.textMatn14Bold.copyWith(
+                              color: MyColors.error,
+                            ),
+                          ),
+                        );
+                      }
+                      return Center(
+                        child: Lottie.asset(
+                          'assets/lottie/Search.json',
+                          width: 200,
+                          height: 200,
                         ),
                       );
-                    } else if (state is DictionaryError) {
-                      return Center(
-                        child: Text(
-                          state.message,
-                          style: MyTextStyle.textMatn14Bold.copyWith(
-                            color: MyColors.error,
-                          ),
+                    },
+                  ),
+                ),
+              ],
+            ),
+          )),
+    );
+  }
+
+  Widget _buildGroupedItem(BuildContext context, DictionaryEntry entry) {
+    final translations = entry.persianTranslations.join('، ');
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          setState(() {
+            _showDetail = true;
+            _selectedTranslation = translations;
+          });
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    entry.word,
+                    style: MyTextStyle.textMatn16Bold,
+                  ),
+                  const SizedBox(width: 8),
+                  IconButton(
+                    onPressed: () {
+                      locator<TTSService>().speak(entry.word);
+                    },
+                    icon: const Icon(
+                      Icons.volume_up_rounded,
+                      color: MyColors.textSecondary,
+                      size: 20,
+                    ),
+                  ),
+                  BlocBuilder<LitnerBloc, LitnerState>(
+                    builder: (context, litnerState) {
+                      return IconButton(
+                        onPressed: litnerState is LitnerLoading
+                            ? null
+                            : () => context.read<LitnerBloc>().add(
+                                  CreateWordEvent(
+                                    word: entry.word,
+                                    translation: translations,
+                                  ),
+                                ),
+                        icon: Image.asset(
+                          'assets/images/icons/litner_icon.png',
+                          width: 22,
+                          height: 22,
                         ),
                       );
-                    }
-                    return Center(
-                      child: Lottie.asset(
-                        'assets/lottie/Search.json',
-                        width: 200,
-                        height: 200,
-                      ),
-                    );
-                  },
+                    },
+                  ),
+                ],
+              ),
+              Expanded(
+                child: Text(
+                  translations,
+                  style: MyTextStyle.textMatn16,
+                  textAlign: TextAlign.right,
                 ),
               ),
             ],
           ),
-        ));
+        ),
+      ),
+    );
   }
 
   Widget _buildDetailView(String word, String? translation, List examples) {

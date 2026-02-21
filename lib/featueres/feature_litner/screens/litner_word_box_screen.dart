@@ -67,160 +67,162 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
         centerTitle: true,
         title: Text(l10n!.litner_review, style: MyTextStyle.textHeader16Bold),
       ),
-      body: BlocConsumer<LitnerReviewCubit, LitnerReviewState>(
-        listener: (context, state) {
-          print('State changed to: $state');
-          if (state is LitnerReviewCompleted) {
-            print('Showing completion modal');
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              ReusableModal.show(
-                context: context,
-                title: 'تبریک!',
-                message: 'تمام لغات امروز مرور شدند.',
-                type: ModalType.success,
-                buttonText: 'متوجه شدم',
-                onButtonPressed: () {
-                  Navigator.of(context).pop(); // Close modal
-                  Navigator.of(context).pop(); // Go back to Litner home
-                },
-              );
-            });
-          }
-        },
-        builder: (context, state) {
-          if (state is LitnerReviewLoading) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (state is LitnerReviewError) {
-            return Center(child: Text(state.message));
-          } else if (state is LitnerReviewCompleted) {
-            return const Center(
-                child: Text('تبریک! تمام لغات مرور شدند.',
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)));
-          } else if (state is LitnerReviewLoaded) {
-            // Check if words list is empty
-            if (state.words.isEmpty) {
-              return Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(32.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.book_outlined,
-                        size: 80,
-                        color: Colors.grey[400],
-                      ),
-                      const SizedBox(height: 24),
-                      Text(
-                        'شما ابتدا باید لغاتی را به لاینتر اضافه کنید',
-                        style: MyTextStyle.textHeader16Bold.copyWith(
-                          color: Colors.grey[600],
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 32),
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.pushNamed(
-                              context, '/litner-words-inprogress');
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF4285F4),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 32, vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: const Text(
-                          'اضافه کردن لغت',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
+      body: SafeArea(
+        child: BlocConsumer<LitnerReviewCubit, LitnerReviewState>(
+          listener: (context, state) {
+            print('State changed to: $state');
+            if (state is LitnerReviewCompleted) {
+              print('Showing completion modal');
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                ReusableModal.show(
+                  context: context,
+                  title: 'تبریک!',
+                  message: 'تمام لغات امروز مرور شدند.',
+                  type: ModalType.success,
+                  buttonText: 'متوجه شدم',
+                  onButtonPressed: () {
+                    Navigator.of(context).pop(); // Close modal
+                    Navigator.of(context).pop(); // Go back to Litner home
+                  },
+                );
+              });
             }
-
-            final word = state.words[state.currentIndex];
-            final totalSteps = state.words.length;
-            final currentStep = state.currentIndex;
-            return Column(
-              children: [
-                const SizedBox(height: 16),
-                StepProgress(
-                  currentIndex: currentStep,
-                  totalSteps: totalSteps,
-                ),
-                const SizedBox(height: 64),
-                // Expanded(
-                //   child:
-                Center(
-                  child: FlipCard(
-                    controller: _flipController,
-                    rotateSide: RotateSide.right,
-                    axis: FlipAxis.vertical,
-                    frontWidget: _buildFront(context, word.word, _flipToBack),
-                    backWidget: _buildBack(
-                        context, word.word, word.translation, _flipToFront),
-                  ),
-                ),
-                // ),
-                const SizedBox(height: 16),
-                if (isBack)
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          },
+          builder: (context, state) {
+            if (state is LitnerReviewLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is LitnerReviewError) {
+              return Center(child: Text(state.message));
+            } else if (state is LitnerReviewCompleted) {
+              return const Center(
+                  child: Text('تبریک! تمام لغات مرور شدند.',
+                      style: TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold)));
+            } else if (state is LitnerReviewLoaded) {
+              // Check if words list is empty
+              if (state.words.isEmpty) {
+                return Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(32.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        litnerChoiceButton(
-                          circleColor: Color(0xFFEAF9F1), // light green
-                          icon: Icons.check, // or use a custom SVG if needed
-                          iconColor: Color(0xFF4DC591), // green
-                          label: 'می دانستم',
-                          onTap: () {
-                            setState(() {
-                              isBack = false;
-                              if (_flipController.state?.isFront == false) {
-                                _flipController.flipcard();
-                              }
-                            });
-                            context
-                                .read<LitnerReviewCubit>()
-                                .submitReviewAndNext(word.id, true);
-                          },
+                        Icon(
+                          Icons.book_outlined,
+                          size: 80,
+                          color: Colors.grey[400],
                         ),
-                        litnerChoiceButton(
-                          circleColor: Color(0xFFFDEAEA), // light red
-                          icon: Icons.close, // or use a custom SVG if needed
-                          iconColor: Color(0xFFF16063), // red
-                          label: 'نمی دانستم',
-                          onTap: () {
-                            setState(() {
-                              isBack = false;
-                              if (_flipController.state?.isFront == false) {
-                                _flipController.flipcard();
-                              }
-                            });
-                            context
-                                .read<LitnerReviewCubit>()
-                                .submitReviewAndNext(word.id, false);
+                        const SizedBox(height: 24),
+                        Text(
+                          'شما ابتدا باید لغاتی را به لاینتر اضافه کنید',
+                          style: MyTextStyle.textHeader16Bold.copyWith(
+                            color: Colors.grey[600],
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 32),
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.pushNamed(
+                                context, '/litner-words-inprogress');
                           },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF4285F4),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 32, vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: const Text(
+                            'اضافه کردن لغت',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
                       ],
                     ),
                   ),
-              ],
-            );
-          }
-          return Container();
-        },
+                );
+              }
+
+              final word = state.words[state.currentIndex];
+              final totalSteps = state.words.length;
+              final currentStep = state.currentIndex;
+              return Column(
+                children: [
+                  const SizedBox(height: 16),
+                  StepProgress(
+                    currentIndex: currentStep,
+                    totalSteps: totalSteps,
+                  ),
+                  const SizedBox(height: 64),
+                  // Expanded(
+                  //   child:
+                  Center(
+                    child: FlipCard(
+                      controller: _flipController,
+                      rotateSide: RotateSide.right,
+                      axis: FlipAxis.vertical,
+                      frontWidget: _buildFront(context, word.word, _flipToBack),
+                      backWidget: _buildBack(
+                          context, word.word, word.translation, _flipToFront),
+                    ),
+                  ),
+                  // ),
+                  const SizedBox(height: 16),
+                  if (isBack)
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          litnerChoiceButton(
+                            circleColor: Color(0xFFEAF9F1), // light green
+                            icon: Icons.check, // or use a custom SVG if needed
+                            iconColor: Color(0xFF4DC591), // green
+                            label: 'می دانستم',
+                            onTap: () {
+                              setState(() {
+                                isBack = false;
+                                if (_flipController.state?.isFront == false) {
+                                  _flipController.flipcard();
+                                }
+                              });
+                              context
+                                  .read<LitnerReviewCubit>()
+                                  .submitReviewAndNext(word.id, true);
+                            },
+                          ),
+                          litnerChoiceButton(
+                            circleColor: Color(0xFFFDEAEA), // light red
+                            icon: Icons.close, // or use a custom SVG if needed
+                            iconColor: Color(0xFFF16063), // red
+                            label: 'نمی دانستم',
+                            onTap: () {
+                              setState(() {
+                                isBack = false;
+                                if (_flipController.state?.isFront == false) {
+                                  _flipController.flipcard();
+                                }
+                              });
+                              context
+                                  .read<LitnerReviewCubit>()
+                                  .submitReviewAndNext(word.id, false);
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              );
+            }
+            return Container();
+          },
+        ),
       ),
     );
   }

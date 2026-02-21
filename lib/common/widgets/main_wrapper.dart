@@ -262,6 +262,7 @@ class _MainWrapperState extends State<MainWrapper> {
               SnackBar(
                 content: Text('خطا در دسترسی به حافظه: ${state.message}'),
                 backgroundColor: Colors.red,
+                duration: const Duration(seconds: 2),
               ),
             );
           } else if (state is PermissionDenied) {
@@ -270,6 +271,7 @@ class _MainWrapperState extends State<MainWrapper> {
                 content: Text(
                     'برای استفاده از برنامه نیاز به دسترسی به حافظه دارید'),
                 backgroundColor: Colors.red,
+                duration: Duration(seconds: 2),
               ),
             );
           }

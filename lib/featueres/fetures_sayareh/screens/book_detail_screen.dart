@@ -66,39 +66,41 @@ class BookDetailScreen extends StatelessWidget {
             )
           ],
         ),
-        body: BlocBuilder<SingleBookCubit, SingleBookState>(
-          builder: (context, state) {
-            if (state.singleBookDataStatus is SingleBookDataLoading) {
-              return const Center(child: DotLoadingWidget(size: 50));
-            }
+        body: SafeArea(
+          child: BlocBuilder<SingleBookCubit, SingleBookState>(
+            builder: (context, state) {
+              if (state.singleBookDataStatus is SingleBookDataLoading) {
+                return const Center(child: DotLoadingWidget(size: 50));
+              }
 
-            if (state.singleBookDataStatus is SingleBookDataCompleted) {
-              final bookData =
-                  (state.singleBookDataStatus as SingleBookDataCompleted)
-                      .data
-                      .data;
-              return _buildContent(context, bookData);
-            }
+              if (state.singleBookDataStatus is SingleBookDataCompleted) {
+                final bookData =
+                    (state.singleBookDataStatus as SingleBookDataCompleted)
+                        .data
+                        .data;
+                return _buildContent(context, bookData);
+              }
 
-            if (state.singleBookDataStatus is SingleBookDataError) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text('خطا در دریافت اطلاعات'),
-                    ElevatedButton(
-                      onPressed: () {
-                        context.read<SingleBookCubit>().fetchBookById(bookId);
-                      },
-                      child: const Text('تلاش دوباره'),
-                    ),
-                  ],
-                ),
-              );
-            }
+              if (state.singleBookDataStatus is SingleBookDataError) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text('خطا در دریافت اطلاعات'),
+                      ElevatedButton(
+                        onPressed: () {
+                          context.read<SingleBookCubit>().fetchBookById(bookId);
+                        },
+                        child: const Text('تلاش دوباره'),
+                      ),
+                    ],
+                  ),
+                );
+              }
 
-            return const SizedBox();
-          },
+              return const SizedBox();
+            },
+          ),
         ),
       ),
     );
@@ -373,8 +375,10 @@ class BookDetailScreen extends StatelessWidget {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-                content: Text(_extractErrorMessage(e)),
-                backgroundColor: Colors.red),
+              content: Text(_extractErrorMessage(e)),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 2),
+            ),
           );
         }
       }

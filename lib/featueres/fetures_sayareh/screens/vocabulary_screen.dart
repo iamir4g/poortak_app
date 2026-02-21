@@ -48,6 +48,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
             "لطفا وارد شوید",
           ),
           backgroundColor: Colors.red,
+          duration: const Duration(seconds: 2),
         ),
       );
       return;
@@ -115,7 +116,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
               const SnackBar(
                 content: Text('لغت به لایتنر اضافه شد'),
                 backgroundColor: MyColors.success,
-                duration: Duration(milliseconds: 800),
+                duration: Duration(seconds: 2),
               ),
             );
           } else if (state is LitnerError) {
@@ -127,7 +128,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                 content: Text(state.message),
                 backgroundColor:
                     isWordExistsError ? MyColors.warning : MyColors.error,
-                duration: const Duration(milliseconds: 800),
+                duration: const Duration(seconds: 2),
               ),
             );
           }
@@ -157,219 +158,224 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
             //   onPressed: _showExitModal,
             // ),
           ),
-          body: BlocBuilder<VocabularyBloc, VocabularyState>(
-            builder: (context, state) {
-              if (state is VocabularyLoading) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              if (state is VocabularySuccess) {
-                if (state.vocabulary.data.isEmpty) {
-                  return const Center(child: Text('واژگانی یافت نشد'));
+          body: SafeArea(
+            child: BlocBuilder<VocabularyBloc, VocabularyState>(
+              builder: (context, state) {
+                if (state is VocabularyLoading) {
+                  return const Center(child: CircularProgressIndicator());
                 }
+                if (state is VocabularySuccess) {
+                  if (state.vocabulary.data.isEmpty) {
+                    return const Center(child: Text('واژگانی یافت نشد'));
+                  }
 
-                final currentWord = state.vocabulary.data[currentIndex];
-                totalWords = state.vocabulary.data.length;
+                  final currentWord = state.vocabulary.data[currentIndex];
+                  totalWords = state.vocabulary.data.length;
 
-                // Auto-play word when it changes
-                if (lastPlayedWord != currentWord.word) {
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    _readWord(currentWord.word);
-                    if (mounted) {
-                      setState(() {
-                        lastPlayedWord = currentWord.word;
-                      });
-                    }
-                  });
-                }
+                  // Auto-play word when it changes
+                  if (lastPlayedWord != currentWord.word) {
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      _readWord(currentWord.word);
+                      if (mounted) {
+                        setState(() {
+                          lastPlayedWord = currentWord.word;
+                        });
+                      }
+                    });
+                  }
 
-                return Column(
-                  children: [
-                    Expanded(
-                      child: GestureDetector(
-                        onHorizontalDragEnd: (details) {
-                          final velocity = details.primaryVelocity;
-                          if (velocity == null) return;
+                  return Column(
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onHorizontalDragEnd: (details) {
+                            final velocity = details.primaryVelocity;
+                            if (velocity == null) return;
 
-                          final currentWordObj =
-                              state.vocabulary.data[currentIndex];
-                          // Swipe right (to previous) - positive velocity
-                          if (velocity > 0) {
-                            if (currentIndex > 0) {
-                              final previousWord =
-                                  state.vocabulary.data[currentIndex - 1].word;
-                              _previousWord(totalWords, previousWord);
-                            }
-                          }
-                          // Swipe left (to next) - negative velocity
-                          else if (velocity < 0) {
-                            if (currentIndex < totalWords - 1) {
-                              final nextWord =
-                                  state.vocabulary.data[currentIndex + 1].word;
-                              _nextWord(totalWords, nextWord);
-                            }
-                          }
-                        },
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              SizedBox(
-                                height: 20,
-                              ),
-                              //step progress bar
-                              StepProgress(
-                                  currentIndex: currentIndex,
-                                  totalSteps: totalWords),
-
-                              SizedBox(
-                                height: 85,
-                              ),
-                              FutureBuilder<String>(
-                                future: storageService.callGetDownloadPublicUrl(
-                                    currentWord.thumbnail),
-                                builder: (context, snapshot) {
-                                  if (snapshot.connectionState ==
-                                      ConnectionState.waiting) {
-                                    return const CircularProgressIndicator();
-                                  }
-                                  if (snapshot.hasError) {
-                                    return const Icon(Icons.error);
-                                  }
-                                  if (snapshot.hasData) {
-                                    return Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(16),
-                                      ),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(16),
-                                        child: Image.network(
-                                          snapshot.data!,
-                                          height: 264,
-                                          width: 264,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                  return const SizedBox.shrink();
-                                },
-                              ),
-                              const SizedBox(height: 20),
-                              Text(
-                                currentWord.word,
-                                style: const TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 10),
-                              Text(
-                                currentWord.translation,
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          IconButton(
-                            key: const Key('vocabulary_forward_button'),
-                            onPressed: () {
-                              if (currentIndex <
-                                  state.vocabulary.data.length - 1) {
-                                final nextWord = state
-                                    .vocabulary.data[currentIndex + 1].word;
-                                _nextWord(
-                                    state.vocabulary.data.length, nextWord);
-                              }
-                            },
-                            icon: const Icon(Icons.arrow_back),
-                            iconSize: 32,
-                          ),
-                          BlocBuilder<LitnerBloc, LitnerState>(
-                            builder: (context, litnerState) {
-                              return IconButton(
-                                onPressed: litnerState is LitnerLoading
-                                    ? null
-                                    : () => _addToLitner(
-                                          currentWord.word,
-                                          currentWord.translation,
-                                        ),
-                                icon: litnerState is LitnerLoading
-                                    ? const SizedBox(
-                                        width: 20,
-                                        height: 20,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                        ),
-                                      )
-                                    : const Icon(Icons.add_circle_outline),
-                                iconSize: 32,
-                              );
-                            },
-                          ),
-                          IconButton(
-                            onPressed: () => _readWord(currentWord.word),
-                            icon: IconifyIcon(
-                              icon: "cuida:volume-2-outline",
-                              size: 32,
-                            ),
-                          ),
-                          IconButton(
-                            onPressed: () {
+                            final currentWordObj =
+                                state.vocabulary.data[currentIndex];
+                            // Swipe right (to previous) - positive velocity
+                            if (velocity > 0) {
                               if (currentIndex > 0) {
                                 final previousWord = state
                                     .vocabulary.data[currentIndex - 1].word;
-                                _previousWord(
-                                    state.vocabulary.data.length, previousWord);
+                                _previousWord(totalWords, previousWord);
                               }
-                            },
-                            icon: const Icon(Icons.arrow_forward),
-                            iconSize: 32,
-                          ),
-                        ],
-                      ),
-                    ),
-                    if (currentIndex == totalWords - 1)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 16.0),
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.pushNamed(
-                              context,
-                              PracticeVocabularyScreen.routeName,
-                              arguments: {'courseId': widget.id},
-                            );
+                            }
+                            // Swipe left (to next) - negative velocity
+                            else if (velocity < 0) {
+                              if (currentIndex < totalWords - 1) {
+                                final nextWord = state
+                                    .vocabulary.data[currentIndex + 1].word;
+                                _nextWord(totalWords, nextWord);
+                              }
+                            }
                           },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: MyColors.primary,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 32,
-                              vertical: 16,
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                SizedBox(
+                                  height: 20,
+                                ),
+                                //step progress bar
+                                StepProgress(
+                                    currentIndex: currentIndex,
+                                    totalSteps: totalWords),
+
+                                SizedBox(
+                                  height: 85,
+                                ),
+                                FutureBuilder<String>(
+                                  future:
+                                      storageService.callGetDownloadPublicUrl(
+                                          currentWord.thumbnail),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return const CircularProgressIndicator();
+                                    }
+                                    if (snapshot.hasError) {
+                                      return const Icon(Icons.error);
+                                    }
+                                    if (snapshot.hasData) {
+                                      return Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(16),
+                                        ),
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(16),
+                                          child: Image.network(
+                                            snapshot.data!,
+                                            height: 264,
+                                            width: 264,
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                    return const SizedBox.shrink();
+                                  },
+                                ),
+                                const SizedBox(height: 20),
+                                Text(
+                                  currentWord.word,
+                                  style: const TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                Text(
+                                  currentWord.translation,
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                          child: const Text(
-                            'تمرین ها',
-                            style: MyTextStyle.textMatnBtn,
                           ),
                         ),
                       ),
-                  ],
-                );
-              }
-              if (state is VocabularyError) {
-                return Center(child: Text(state.message));
-              }
-              return const SizedBox.shrink();
-            },
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            IconButton(
+                              key: const Key('vocabulary_forward_button'),
+                              onPressed: () {
+                                if (currentIndex <
+                                    state.vocabulary.data.length - 1) {
+                                  final nextWord = state
+                                      .vocabulary.data[currentIndex + 1].word;
+                                  _nextWord(
+                                      state.vocabulary.data.length, nextWord);
+                                }
+                              },
+                              icon: const Icon(Icons.arrow_back),
+                              iconSize: 32,
+                            ),
+                            BlocBuilder<LitnerBloc, LitnerState>(
+                              builder: (context, litnerState) {
+                                return IconButton(
+                                  onPressed: litnerState is LitnerLoading
+                                      ? null
+                                      : () => _addToLitner(
+                                            currentWord.word,
+                                            currentWord.translation,
+                                          ),
+                                  icon: litnerState is LitnerLoading
+                                      ? const SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                          ),
+                                        )
+                                      : const Icon(Icons.add_circle_outline),
+                                  iconSize: 32,
+                                );
+                              },
+                            ),
+                            IconButton(
+                              onPressed: () => _readWord(currentWord.word),
+                              icon: IconifyIcon(
+                                icon: "cuida:volume-2-outline",
+                                size: 32,
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: () {
+                                if (currentIndex > 0) {
+                                  final previousWord = state
+                                      .vocabulary.data[currentIndex - 1].word;
+                                  _previousWord(state.vocabulary.data.length,
+                                      previousWord);
+                                }
+                              },
+                              icon: const Icon(Icons.arrow_forward),
+                              iconSize: 32,
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (currentIndex == totalWords - 1)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 16.0),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.pushNamed(
+                                context,
+                                PracticeVocabularyScreen.routeName,
+                                arguments: {'courseId': widget.id},
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: MyColors.primary,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 32,
+                                vertical: 16,
+                              ),
+                            ),
+                            child: const Text(
+                              'تمرین ها',
+                              style: MyTextStyle.textMatnBtn,
+                            ),
+                          ),
+                        ),
+                    ],
+                  );
+                }
+                if (state is VocabularyError) {
+                  return Center(child: Text(state.message));
+                }
+                return const SizedBox.shrink();
+              },
+            ),
           ),
         ),
       ),

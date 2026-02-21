@@ -74,6 +74,7 @@ class _MatchScreenState extends State<MatchScreen> {
                   SnackBar(
                     content: Text(state.message),
                     backgroundColor: MyColors.error,
+                    duration: const Duration(seconds: 2),
                   ),
                 );
               }
@@ -604,6 +605,7 @@ class _MatchScreenState extends State<MatchScreen> {
         const SnackBar(
           content: Text('اطلاعات مسابقه در دسترس نیست'),
           backgroundColor: MyColors.error,
+          duration: Duration(seconds: 2),
         ),
       );
       return;

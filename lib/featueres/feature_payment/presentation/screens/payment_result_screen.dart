@@ -28,14 +28,16 @@ class _PaymentResultScreenState extends State<PaymentResultScreen> {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         final accessBloc = locator<IknowAccessBloc>();
         accessBloc.add(FetchIknowAccessEvent(forceRefresh: true));
-        debugPrint("🔄 PaymentResultScreen: Refreshing IknowAccessBloc after successful payment");
+        debugPrint(
+            "🔄 PaymentResultScreen: Refreshing IknowAccessBloc after successful payment");
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    debugPrint("PaymentResultScreen: Building with status='${widget.ok}', ref='${widget.ref}'");
+    debugPrint(
+        "PaymentResultScreen: Building with status='${widget.ok}', ref='${widget.ref}'");
     final isSuccess = widget.ok == 1 ? true : false;
 
     debugPrint("PaymentResultScreen: isSuccess=$isSuccess");
@@ -58,179 +60,182 @@ class _PaymentResultScreenState extends State<PaymentResultScreen> {
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          children: [
-            const SizedBox(height: 40),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            children: [
+              const SizedBox(height: 40),
 
-            // Status Icon
-            Container(
-              width: 120,
-              height: 120,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: isSuccess ? Colors.green[50] : Colors.red[50],
-                border: Border.all(
+              // Status Icon
+              Container(
+                width: 120,
+                height: 120,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: isSuccess ? Colors.green[50] : Colors.red[50],
+                  border: Border.all(
+                    color: isSuccess ? Colors.green : Colors.red,
+                    width: 3,
+                  ),
+                ),
+                child: Icon(
+                  isSuccess ? Icons.check_circle : Icons.cancel,
+                  size: 80,
                   color: isSuccess ? Colors.green : Colors.red,
-                  width: 3,
                 ),
               ),
-              child: Icon(
-                isSuccess ? Icons.check_circle : Icons.cancel,
-                size: 80,
-                color: isSuccess ? Colors.green : Colors.red,
+
+              const SizedBox(height: 30),
+
+              // Status Text
+              Text(
+                isSuccess
+                    ? 'پرداخت با موفقیت انجام شد'
+                    : 'پرداخت با خطا مواجه شد',
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: isSuccess ? Colors.green[700] : Colors.red[700],
+                ),
+                textAlign: TextAlign.center,
               ),
-            ),
 
-            const SizedBox(height: 30),
+              const SizedBox(height: 10),
 
-            // Status Text
-            Text(
-              isSuccess
-                  ? 'پرداخت با موفقیت انجام شد'
-                  : 'پرداخت با خطا مواجه شد',
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: isSuccess ? Colors.green[700] : Colors.red[700],
+              const SizedBox(height: 40),
+
+              // Payment Details Card
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.1),
+                      spreadRadius: 1,
+                      blurRadius: 10,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Text(
+                        'جزئیات پرداخت',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey[800],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    _buildDetailRow('کد پیگیری', _getTransactionId()),
+                    _buildDetailRow('مبلغ', _getAmount()),
+                    _buildDetailRow('روش پرداخت', _getPaymentMethod()),
+                    _buildDetailRow('تاریخ و زمان', _getDateTime()),
+                    if (widget.ref != null)
+                      _buildDetailRow('کد پیگیری', widget.ref!),
+                  ],
+                ),
               ),
-              textAlign: TextAlign.center,
-            ),
 
-            const SizedBox(height: 10),
+              const SizedBox(height: 30),
 
-            const SizedBox(height: 40),
-
-            // Payment Details Card
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.1),
-                    spreadRadius: 1,
-                    blurRadius: 10,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(
-                    child: Text(
-                      'جزئیات پرداخت',
+              // Action Buttons
+              if (isSuccess) ...[
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // Navigate to main app or specific screen
+                      Navigator.of(context).pushNamedAndRemoveUntil(
+                        MainWrapper.routeName,
+                        (route) => false,
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Text(
+                      'بازگشت به صفحه اصلی',
                       style: TextStyle(
-                        fontSize: 18,
+                        color: Colors.white,
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: Colors.grey[800],
                       ),
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  _buildDetailRow('کد پیگیری', _getTransactionId()),
-                  _buildDetailRow('مبلغ', _getAmount()),
-                  _buildDetailRow('روش پرداخت', _getPaymentMethod()),
-                  _buildDetailRow('تاریخ و زمان', _getDateTime()),
-                  if (widget.ref != null) _buildDetailRow('کد پیگیری', widget.ref!),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 30),
-
-            // Action Buttons
-            if (isSuccess) ...[
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  onPressed: () {
-                    // Navigate to main app or specific screen
-                    Navigator.of(context).pushNamedAndRemoveUntil(
-                      MainWrapper.routeName,
-                      (route) => false,
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                ),
+              ] else ...[
+                const SizedBox(height: 15),
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: OutlinedButton(
+                    onPressed: () {
+                      Navigator.of(context).pushNamedAndRemoveUntil(
+                        MainWrapper.routeName,
+                        (route) => false,
+                      );
+                    },
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: Colors.grey[400]!),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
-                  ),
-                  child: const Text(
-                    'بازگشت به صفحه اصلی',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                    child: Text(
+                      'بازگشت به صفحه اصلی',
+                      style: TextStyle(
+                        color: Colors.grey[700],
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ] else ...[
-              const SizedBox(height: 15),
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: OutlinedButton(
-                  onPressed: () {
-                    Navigator.of(context).pushNamedAndRemoveUntil(
-                      MainWrapper.routeName,
-                      (route) => false,
-                    );
-                  },
-                  style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: Colors.grey[400]!),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+              ],
+
+              const SizedBox(height: 20),
+
+              // Additional Info
+              Container(
+                padding: const EdgeInsets.all(15),
+                decoration: BoxDecoration(
+                  color: Colors.blue[50],
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.blue[200]!),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.info_outline, color: Colors.blue[600], size: 20),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        isSuccess
+                            ? 'شما به زودی یک ایمیل تایید خواهید گرفت'
+                            : 'لطفا با پشتیبانی تماس بگیرید اگر مشکلات خود را ادامه دهید',
+                        style: TextStyle(
+                          color: Colors.blue[700],
+                          fontSize: 14,
+                        ),
+                      ),
                     ),
-                  ),
-                  child: Text(
-                    'بازگشت به صفحه اصلی',
-                    style: TextStyle(
-                      color: Colors.grey[700],
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  ],
                 ),
               ),
             ],
-
-            const SizedBox(height: 20),
-
-            // Additional Info
-            Container(
-              padding: const EdgeInsets.all(15),
-              decoration: BoxDecoration(
-                color: Colors.blue[50],
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.blue[200]!),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.info_outline, color: Colors.blue[600], size: 20),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      isSuccess
-                          ? 'شما به زودی یک ایمیل تایید خواهید گرفت'
-                          : 'لطفا با پشتیبانی تماس بگیرید اگر مشکلات خود را ادامه دهید',
-                      style: TextStyle(
-                        color: Colors.blue[700],
-                        fontSize: 14,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );

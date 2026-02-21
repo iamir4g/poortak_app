@@ -370,7 +370,10 @@ class _CustomDrawerState extends State<CustomDrawer> {
                                 title: "پشتیبانی",
                                 onTap: () {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text("به زودی")),
+                                    const SnackBar(
+                                      content: Text("به زودی"),
+                                      duration: Duration(seconds: 2),
+                                    ),
                                   );
                                   // Navigator.pushNamed(context, PaymentResultScreen.routeName,
                                   //     arguments: {
@@ -401,7 +404,10 @@ class _CustomDrawerState extends State<CustomDrawer> {
                                 title: "اشتراک گذاری به دوستان",
                                 onTap: () {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text("به زودی.")),
+                                    const SnackBar(
+                                      content: Text("به زودی."),
+                                      duration: Duration(seconds: 2),
+                                    ),
                                   );
                                   // Navigator.pushNamed(context, PaymentResultScreen.routeName,
                                   //     arguments: {
@@ -415,7 +421,10 @@ class _CustomDrawerState extends State<CustomDrawer> {
                                 title: "ثبت نظر درباره برنامه",
                                 onTap: () {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text("به زودی.")),
+                                    const SnackBar(
+                                      content: Text("به زودی."),
+                                      duration: Duration(seconds: 2),
+                                    ),
                                   );
                                 },
                               )

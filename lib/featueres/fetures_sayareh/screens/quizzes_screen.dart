@@ -60,62 +60,64 @@ class _QuizzesScreenState extends State<QuizzesScreen> {
           style: MyTextStyle.textHeader16Bold,
         ),
       ),
-      body: BlocBuilder<QuizesCubit, QuizesState>(
-        bloc: _quizesCubit,
-        builder: (context, state) {
-          if (state is QuizesLoading) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (state is QuizesLoaded) {
-            return SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const SizedBox(height: 40),
-                  ListView.separated(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    separatorBuilder: (context, index) {
-                      return const SizedBox(height: 12);
-                    },
-                    itemBuilder: (context, index) {
-                      final quiz = state.quizzes.data[index];
-                      return InkWell(
-                        onTap: () {
-                          Navigator.pushNamed(
-                            context,
-                            FirstQuizScreen.routeName,
-                            arguments: {
-                              "quizId": quiz.id,
-                              "courseId": widget.courseId,
-                              "title": quiz.title,
-                            },
-                          );
-                        },
-                        child: QuizItem(
-                          title: quiz.title,
-                          image: quiz.thumbnail,
-                          description: quiz.difficulty,
-                          id: quiz.id,
-                        ),
-                      );
-                    },
-                    itemCount: state.quizzes.data.length,
-                  ),
-                ],
-              ),
-            );
-          } else if (state is QuizesError) {
-            return Center(
-              child: Text(
-                state.message,
-                style: const TextStyle(color: Colors.red),
-              ),
-            );
-          }
-          return const SizedBox();
-        },
+      body: SafeArea(
+        child: BlocBuilder<QuizesCubit, QuizesState>(
+          bloc: _quizesCubit,
+          builder: (context, state) {
+            if (state is QuizesLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is QuizesLoaded) {
+              return SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 40),
+                    ListView.separated(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      separatorBuilder: (context, index) {
+                        return const SizedBox(height: 12);
+                      },
+                      itemBuilder: (context, index) {
+                        final quiz = state.quizzes.data[index];
+                        return InkWell(
+                          onTap: () {
+                            Navigator.pushNamed(
+                              context,
+                              FirstQuizScreen.routeName,
+                              arguments: {
+                                "quizId": quiz.id,
+                                "courseId": widget.courseId,
+                                "title": quiz.title,
+                              },
+                            );
+                          },
+                          child: QuizItem(
+                            title: quiz.title,
+                            image: quiz.thumbnail,
+                            description: quiz.difficulty,
+                            id: quiz.id,
+                          ),
+                        );
+                      },
+                      itemCount: state.quizzes.data.length,
+                    ),
+                  ],
+                ),
+              );
+            } else if (state is QuizesError) {
+              return Center(
+                child: Text(
+                  state.message,
+                  style: const TextStyle(color: Colors.red),
+                ),
+              );
+            }
+            return const SizedBox();
+          },
+        ),
       ),
     );
   }

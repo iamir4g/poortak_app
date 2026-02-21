@@ -170,6 +170,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 SnackBar(
                   content: Text(state.message),
                   backgroundColor: Colors.red,
+                  duration: const Duration(seconds: 2),
                 ),
               );
             }

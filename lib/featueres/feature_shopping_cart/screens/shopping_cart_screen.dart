@@ -549,7 +549,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                               content:
                                   Text('برای ادامه پرداخت باید لاگین کنید'),
                               backgroundColor: Colors.orange,
-                              duration: Duration(seconds: 3),
+                              duration: Duration(seconds: 2),
                             ),
                           );
                         } else {
@@ -557,6 +557,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                             SnackBar(
                               content: Text('خطا در پردازش پرداخت: $e'),
                               backgroundColor: Colors.red,
+                              duration: const Duration(seconds: 2),
                             ),
                           );
                         }
@@ -772,7 +773,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                               content:
                                   Text('برای ادامه پرداخت باید لاگین کنید'),
                               backgroundColor: Colors.orange,
-                              duration: Duration(seconds: 3),
+                              duration: Duration(seconds: 2),
                             ),
                           );
                         } else {
@@ -780,6 +781,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                             SnackBar(
                               content: Text('خطا در پردازش پرداخت: $e'),
                               backgroundColor: Colors.red,
+                              duration: const Duration(seconds: 2),
                             ),
                           );
                         }

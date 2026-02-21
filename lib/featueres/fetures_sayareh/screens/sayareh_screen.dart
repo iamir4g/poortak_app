@@ -101,7 +101,8 @@ class _SayarehScreenState extends State<SayarehScreen> {
                         stops: [0.1, 0.54, 1.0],
                       ),
               ),
-              child: const Center(child: DotLoadingWidget(size: 100)),
+              child:
+                  SafeArea(child: Center(child: DotLoadingWidget(size: 100))),
             );
           }
 
@@ -109,40 +110,118 @@ class _SayarehScreenState extends State<SayarehScreen> {
           if (state.sayarehDataStatus is SayarehDataCompleted) {
             final SayarehDataCompleted sayarehDataCompleted =
                 state.sayarehDataStatus as SayarehDataCompleted;
-            return Column(
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    gradient: Theme.of(context).brightness == Brightness.dark
-                        ? const LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Color(0xFF1A1D2E),
-                              Color(0xFF2C2E3F),
-                              Color(0xFF3B3D54),
-                            ],
-                            stops: [0.1, 0.54, 1.0],
-                          )
-                        : const LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Color(0xFFE8F0FC),
-                              Color(0xFFFCEBF1),
-                              Color(0xFFEFE8FC),
-                            ],
-                            stops: [0.1, 0.54, 1.0],
+            return SingleChildScrollView(
+              child: Column(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: Theme.of(context).brightness == Brightness.dark
+                          ? const LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Color(0xFF1A1D2E),
+                                Color(0xFF2C2E3F),
+                                Color(0xFF3B3D54),
+                              ],
+                              stops: [0.1, 0.54, 1.0],
+                            )
+                          : const LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Color(0xFFE8F0FC),
+                                Color(0xFFFCEBF1),
+                                Color(0xFFEFE8FC),
+                              ],
+                              stops: [0.1, 0.54, 1.0],
+                            ),
+                    ),
+                    child: SafeArea(
+                      child: Column(
+                        children: [
+                          SizedBox(
+                            height: 28,
                           ),
+                          Text(
+                            l10n?.sayareh ?? "",
+                            style: MyTextStyle.textMatn12W700.copyWith(
+                              color: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium
+                                  ?.color,
+                            ),
+                          ),
+                          SizedBox(
+                            height: 12,
+                          ),
+                          // Sayareh List Section
+
+                          ListView.separated(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: sayarehDataCompleted.data.data.length,
+                            separatorBuilder: (context, index) {
+                              return const SizedBox(height: 12);
+                            },
+                            itemBuilder: (context, index) {
+                              final item =
+                                  sayarehDataCompleted.data.data[index];
+                              CourseProgressItem? progress;
+                              if (sayarehDataCompleted.progressData != null) {
+                                try {
+                                  progress = sayarehDataCompleted
+                                      .progressData!.data
+                                      .firstWhere((element) =>
+                                          element.iKnowCourseId == item.id);
+                                } catch (e) {
+                                  progress = null;
+                                }
+                              }
+                              return ItemLeason(
+                                  item: item,
+                                  onTap: () {},
+                                  index: index,
+                                  purchased: item.purchased,
+                                  progress: progress);
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                  child: SingleChildScrollView(
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    decoration: BoxDecoration(
+                      gradient: Theme.of(context).brightness == Brightness.dark
+                          ? LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Color(0xFF2C2E3F), // Dark card background
+                                Color(0xFF3B3D54), // Darker card background
+                              ],
+                              stops: [0.0, 1.0],
+                            )
+                          : LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Color(0xFFFFF7F1), //#FFF7F1
+                                Color(0xFFFFE2CE), //#FFE2CE
+                              ],
+                              stops: [0.0, 1.0],
+                            ),
+                    ),
+                    // margin: const EdgeInsets.symmetric(horizontal: 16),
                     child: Column(
                       children: [
                         SizedBox(
-                          height: 28,
+                          height: 30,
                         ),
                         Text(
-                          l10n?.sayareh ?? "",
+                          "کتاب های سیاره آی نو",
                           style: MyTextStyle.textMatn12W700.copyWith(
                             color:
                                 Theme.of(context).textTheme.titleMedium?.color,
@@ -151,154 +230,80 @@ class _SayarehScreenState extends State<SayarehScreen> {
                         SizedBox(
                           height: 12,
                         ),
-                        // Sayareh List Section
-
-                        ListView.separated(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: sayarehDataCompleted.data.data.length,
-                          separatorBuilder: (context, index) {
-                            return const SizedBox(height: 12);
-                          },
-                          itemBuilder: (context, index) {
-                            final item = sayarehDataCompleted.data.data[index];
-                            CourseProgressItem? progress;
-                            if (sayarehDataCompleted.progressData != null) {
-                              try {
-                                progress = sayarehDataCompleted
-                                    .progressData!.data
-                                    .firstWhere((element) =>
-                                        element.iKnowCourseId == item.id);
-                              } catch (e) {
-                                progress = null;
-                              }
-                            }
-                            return ItemLeason(
-                                item: item,
-                                onTap: () {},
-                                index: index,
-                                purchased: item.purchased,
-                                progress: progress);
-                          },
+                        if (sayarehDataCompleted.bookListData.data != null &&
+                            sayarehDataCompleted.bookListData.data!.isNotEmpty)
+                          ListView.separated(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount:
+                                sayarehDataCompleted.bookListData.data!.length,
+                            separatorBuilder: (context, index) {
+                              return SizedBox(height: 12);
+                            },
+                            itemBuilder: (context, index) {
+                              return ItemBook(
+                                title: sayarehDataCompleted
+                                    .bookListData.data![index].title,
+                                description: sayarehDataCompleted
+                                    .bookListData.data![index].description,
+                                thumbnail: sayarehDataCompleted
+                                    .bookListData.data![index].thumbnail,
+                                fileKey: sayarehDataCompleted
+                                    .bookListData.data![index].file,
+                                trialFile: sayarehDataCompleted
+                                    .bookListData.data![index].trialFile,
+                                purchased: sayarehDataCompleted
+                                    .bookListData.data![index].purchased,
+                                price: sayarehDataCompleted
+                                    .bookListData.data![index].price,
+                                bookId: sayarehDataCompleted
+                                    .bookListData.data![index].id,
+                              );
+                            },
+                          )
+                        else
+                          Container(
+                            // padding: const EdgeInsets.all(20),
+                            child: Center(
+                              child: Text(
+                                "هیچ کتابی یافت نشد",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.color,
+                                ),
+                              ),
+                            ),
+                          ),
+                        // Example Box 1
+                        SizedBox(
+                          height: 12,
                         ),
                       ],
                     ),
                   ),
-                ),
 
-                // Additional Boxes Section
-                // const SizedBox(height: 20),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  decoration: BoxDecoration(
-                    gradient: Theme.of(context).brightness == Brightness.dark
-                        ? LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Color(0xFF2C2E3F), // Dark card background
-                              Color(0xFF3B3D54), // Darker card background
-                            ],
-                            stops: [0.0, 1.0],
-                          )
-                        : LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Color(0xFFFFF7F1), //#FFF7F1
-                              Color(0xFFFFE2CE), //#FFE2CE
-                            ],
-                            stops: [0.0, 1.0],
-                          ),
+                  // Contest Card Section
+                  const SizedBox(height: 20),
+                  ContestCard(
+                    onTap: () {
+                      if (locator<PrefsOperator>().isLoggedIn()) {
+                        Navigator.pushNamed(context, MainMatchScreen.routeName);
+                      } else {
+                        ReusableModal.show(
+                          context: context,
+                          title: '',
+                          message: 'لطفا ابتدا وارد حساب کاربری خود شوید',
+                          type: ModalType.info,
+                        );
+                      }
+                    },
                   ),
-                  // margin: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height: 30,
-                      ),
-                      Text(
-                        "کتاب های سیاره آی نو",
-                        style: MyTextStyle.textMatn12W700.copyWith(
-                          color: Theme.of(context).textTheme.titleMedium?.color,
-                        ),
-                      ),
-                      SizedBox(
-                        height: 12,
-                      ),
-                      if (sayarehDataCompleted.bookListData.data != null &&
-                          sayarehDataCompleted.bookListData.data!.isNotEmpty)
-                        ListView.separated(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount:
-                              sayarehDataCompleted.bookListData.data!.length,
-                          separatorBuilder: (context, index) {
-                            return SizedBox(height: 12);
-                          },
-                          itemBuilder: (context, index) {
-                            return ItemBook(
-                              title: sayarehDataCompleted
-                                  .bookListData.data![index].title,
-                              description: sayarehDataCompleted
-                                  .bookListData.data![index].description,
-                              thumbnail: sayarehDataCompleted
-                                  .bookListData.data![index].thumbnail,
-                              fileKey: sayarehDataCompleted
-                                  .bookListData.data![index].file,
-                              trialFile: sayarehDataCompleted
-                                  .bookListData.data![index].trialFile,
-                              purchased: sayarehDataCompleted
-                                  .bookListData.data![index].purchased,
-                              price: sayarehDataCompleted
-                                  .bookListData.data![index].price,
-                              bookId: sayarehDataCompleted
-                                  .bookListData.data![index].id,
-                            );
-                          },
-                        )
-                      else
-                        Container(
-                          // padding: const EdgeInsets.all(20),
-                          child: Center(
-                            child: Text(
-                              "هیچ کتابی یافت نشد",
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Theme.of(context)
-                                    .textTheme
-                                    .bodySmall
-                                    ?.color,
-                              ),
-                            ),
-                          ),
-                        ),
-                      // Example Box 1
-                      SizedBox(
-                        height: 12,
-                      ),
-                    ],
-                  ),
-                ),
-
-                // Contest Card Section
-                const SizedBox(height: 20),
-                ContestCard(
-                  onTap: () {
-                    if (locator<PrefsOperator>().isLoggedIn()) {
-                      Navigator.pushNamed(context, MainMatchScreen.routeName);
-                    } else {
-                      ReusableModal.show(
-                        context: context,
-                        title: '',
-                        message: 'لطفا ابتدا وارد حساب کاربری خود شوید',
-                        type: ModalType.info,
-                      );
-                    }
-                  },
-                ),
-              ],
+                  const SizedBox(height: 20),
+                ],
+              ),
             );
           }
 
@@ -331,30 +336,32 @@ class _SayarehScreenState extends State<SayarehScreen> {
                         stops: [0.1, 0.54, 1.0],
                       ),
               ),
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      sayarehDataError.errorMessage,
-                      style: TextStyle(
-                        color: Theme.of(context).textTheme.titleMedium?.color,
+              child: SafeArea(
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        sayarehDataError.errorMessage,
+                        style: TextStyle(
+                          color: Theme.of(context).textTheme.titleMedium?.color,
+                        ),
                       ),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.amber.shade800),
-                      onPressed: () {
-                        /// call all data again
-                        BlocProvider.of<SayarehCubit>(context)
-                            .callSayarehDataEvent();
-                      },
-                      child: const Text("تلاش دوباره"),
-                    )
-                  ],
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.amber.shade800),
+                        onPressed: () {
+                          /// call all data again
+                          BlocProvider.of<SayarehCubit>(context)
+                              .callSayarehDataEvent();
+                        },
+                        child: const Text("تلاش دوباره"),
+                      )
+                    ],
+                  ),
                 ),
               ),
             );

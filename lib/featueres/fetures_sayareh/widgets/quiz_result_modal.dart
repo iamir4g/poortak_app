@@ -3,12 +3,15 @@ import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:lottie/lottie.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/quizzes_screen.dart';
+import 'package:poortak/locator.dart';
+import 'package:poortak/featueres/fetures_sayareh/repositories/sayareh_repository.dart';
 
 class QuizResultModal extends StatelessWidget {
   final int totalQuestions;
   final int correctAnswers;
   final double score;
   final String courseId;
+  final String quizId;
 
   const QuizResultModal({
     super.key,
@@ -16,6 +19,7 @@ class QuizResultModal extends StatelessWidget {
     required this.correctAnswers,
     required this.score,
     required this.courseId,
+    required this.quizId,
   });
 
   @override
@@ -26,6 +30,14 @@ class QuizResultModal extends StatelessWidget {
     final double wrongPercent = totalQuestions > 0
         ? ((totalQuestions - correctAnswers) / totalQuestions) * 100
         : 0;
+
+    String getResultText(double percent) {
+      if (percent >= 80) return 'عالی';
+      if (percent >= 60) return 'خوب';
+      if (percent >= 40) return 'قابل قبول';
+      return 'ضعیف';
+    }
+
     return Dialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(25),
@@ -45,7 +57,7 @@ class QuizResultModal extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'نمره شما : ${correctPercent >= 60 ? 'قابل قبول' : 'نیاز به تلاش بیشتر'}',
+              'نمره شما : ${getResultText(correctPercent)}',
               style: MyTextStyle.textHeader16Bold.copyWith(
                 color: const Color(0xFF3D495C),
                 fontWeight: FontWeight.w700,
@@ -124,9 +136,13 @@ class QuizResultModal extends StatelessWidget {
               width: double.infinity,
               height: 50,
               child: ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context)
-                      .popUntil(ModalRoute.withName(QuizzesScreen.routeName));
+                onPressed: () async {
+                  await locator<SayarehRepository>()
+                      .deleteQuizResult(courseId, quizId);
+                  if (context.mounted) {
+                    Navigator.of(context)
+                        .popUntil(ModalRoute.withName(QuizzesScreen.routeName));
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: MyColors.primary,

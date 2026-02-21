@@ -109,6 +109,7 @@ class _DialogCartState extends State<DialogCart> {
               SnackBar(
                 content: Text(errorMessage),
                 backgroundColor: MyColors.error,
+                duration: const Duration(seconds: 2),
               ),
             );
           });

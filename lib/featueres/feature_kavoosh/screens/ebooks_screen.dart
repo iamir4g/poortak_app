@@ -68,75 +68,79 @@ class _EBooksScreenState extends State<EBooksScreen> {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // Slider Placeholder
-            Container(
-              height: 200,
-              width: double.infinity,
-              decoration: const BoxDecoration(
-                color: Color(0xFFF9F6C6), // Light yellow placeholder
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(0), // Figma might show different
-                  bottomRight: Radius.circular(0),
+      body: SafeArea(
+        top: false,
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              // Slider Placeholder
+              Container(
+                height: 200,
+                width: double.infinity,
+                decoration: const BoxDecoration(
+                  color: Color(0xFFF9F6C6), // Light yellow placeholder
+                  borderRadius: BorderRadius.only(
+                    bottomLeft:
+                        Radius.circular(0), // Figma might show different
+                    bottomRight: Radius.circular(0),
+                  ),
+                ),
+                child: const Center(
+                    // child: Text('Slider Placeholder'),
+                    ),
+              ),
+
+              // Custom Tabs
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _buildTabItem(0, 'کتاب ها', Icons.book_outlined),
+                    const SizedBox(width: 24),
+                    _buildTabItem(1, 'نمونه سوالات', Icons.quiz_outlined),
+                  ],
                 ),
               ),
-              child: const Center(
-                  // child: Text('Slider Placeholder'),
-                  ),
-            ),
-
-            // Custom Tabs
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _buildTabItem(0, 'کتاب ها', Icons.book_outlined),
-                  const SizedBox(width: 24),
-                  _buildTabItem(1, 'نمونه سوالات', Icons.quiz_outlined),
-                ],
+              // Divider line for tabs
+              Container(
+                height: 2,
+                width: double.infinity,
+                color: Colors.grey.withValues(alpha: 0.1),
+                child: Row(
+                  children: [
+                    Expanded(
+                        child: Container(
+                            color: _selectedTabIndex == 0
+                                ? Colors.orange
+                                : Colors.transparent)),
+                    Expanded(
+                        child: Container(
+                            color: _selectedTabIndex == 1
+                                ? Colors.orange
+                                : Colors.transparent)),
+                  ],
+                ),
               ),
-            ),
-            // Divider line for tabs
-            Container(
-              height: 2,
-              width: double.infinity,
-              color: Colors.grey.withValues(alpha: 0.1),
-              child: Row(
-                children: [
-                  Expanded(
-                      child: Container(
-                          color: _selectedTabIndex == 0
-                              ? Colors.orange
-                              : Colors.transparent)),
-                  Expanded(
-                      child: Container(
-                          color: _selectedTabIndex == 1
-                              ? Colors.orange
-                              : Colors.transparent)),
-                ],
-              ),
-            ),
 
-            const SizedBox(height: 16),
+              const SizedBox(height: 16),
 
-            // Content Sections
-            if (_selectedTabIndex == 0) ...[
-              _buildSection('پایه اول دبستان'),
-              _buildSection('پایه دوم دبستان'),
-              _buildSection('پایه سوم دبستان'),
-              _buildSection('پایه چهارم دبستان'),
-            ] else ...[
-              const SizedBox(
-                height: 200,
-                child: Center(child: Text('نمونه سوالات')),
-              ),
+              // Content Sections
+              if (_selectedTabIndex == 0) ...[
+                _buildSection('پایه اول دبستان'),
+                _buildSection('پایه دوم دبستان'),
+                _buildSection('پایه سوم دبستان'),
+                _buildSection('پایه چهارم دبستان'),
+              ] else ...[
+                const SizedBox(
+                  height: 200,
+                  child: Center(child: Text('نمونه سوالات')),
+                ),
+              ],
+
+              const SizedBox(height: 20),
             ],
-
-            const SizedBox(height: 20),
-          ],
+          ),
         ),
       ),
     );

@@ -65,20 +65,22 @@ class PdfReaderScreen extends StatelessWidget {
                   onPressed: () => Navigator.of(context).pop(),
                 ),
               ),
-              body: Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Color(0xFFE8F0FC),
-                      Color(0xFFFCEBF1),
-                      Color(0xFFEFE8FC),
-                    ],
-                    stops: [0.1, 0.54, 1.0],
+              body: SafeArea(
+                child: Container(
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Color(0xFFE8F0FC),
+                        Color(0xFFFCEBF1),
+                        Color(0xFFEFE8FC),
+                      ],
+                      stops: [0.1, 0.54, 1.0],
+                    ),
                   ),
+                  child: const Center(child: DotLoadingWidget(size: 100)),
                 ),
-                child: const Center(child: DotLoadingWidget(size: 100)),
               ),
             );
           }
@@ -106,41 +108,44 @@ class PdfReaderScreen extends StatelessWidget {
                   onPressed: () => Navigator.of(context).pop(),
                 ),
               ),
-              body: Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Color(0xFFE8F0FC),
-                      Color(0xFFFCEBF1),
-                      Color(0xFFEFE8FC),
-                    ],
-                    stops: [0.1, 0.54, 1.0],
+              body: SafeArea(
+                child: Container(
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Color(0xFFE8F0FC),
+                        Color(0xFFFCEBF1),
+                        Color(0xFFEFE8FC),
+                      ],
+                      stops: [0.1, 0.54, 1.0],
+                    ),
                   ),
-                ),
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        bookDataError.errorMessage,
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.titleMedium?.color,
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          bookDataError.errorMessage,
+                          style: TextStyle(
+                            color:
+                                Theme.of(context).textTheme.titleMedium?.color,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 10),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.amber.shade800),
-                        onPressed: () {
-                          /// call data again
-                          BlocProvider.of<SingleBookCubit>(context)
-                              .fetchBookById(bookId);
-                        },
-                        child: const Text("تلاش دوباره"),
-                      )
-                    ],
+                        const SizedBox(height: 10),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.amber.shade800),
+                          onPressed: () {
+                            /// call data again
+                            BlocProvider.of<SingleBookCubit>(context)
+                                .fetchBookById(bookId);
+                          },
+                          child: const Text("تلاش دوباره"),
+                        )
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -225,62 +230,64 @@ class PdfReaderScreen extends StatelessWidget {
             stops: [0.1, 0.54, 1.0],
           ),
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(6.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // PDF Reader
-              Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
-                        spreadRadius: 1,
-                        blurRadius: 3,
-                        offset: const Offset(0, 1),
-                      ),
-                    ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: fileToDownload != null && fileToDownload.isNotEmpty
-                        ? CustomPdfReader(
-                            fileKey: fileToDownload,
-                            fileName: '${bookData.title}.pdf',
-                            fileId: 'book_${bookData.id}',
-                            storageService: locator<StorageService>(),
-                            showDownloadButton: false,
-                            autoDownload: true,
-                            usePublicUrl: usePublicUrl,
-                          )
-                        : const Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.error_outline,
-                                  size: 64,
-                                  color: Colors.red,
-                                ),
-                                SizedBox(height: 16),
-                                Text(
-                                  'فایل کتاب در دسترس نیست',
-                                  style: TextStyle(
-                                    fontSize: 16,
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(6.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // PDF Reader
+                Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.1),
+                          spreadRadius: 1,
+                          blurRadius: 3,
+                          offset: const Offset(0, 1),
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: fileToDownload != null && fileToDownload.isNotEmpty
+                          ? CustomPdfReader(
+                              fileKey: fileToDownload,
+                              fileName: '${bookData.title}.pdf',
+                              fileId: 'book_${bookData.id}',
+                              storageService: locator<StorageService>(),
+                              showDownloadButton: false,
+                              autoDownload: true,
+                              usePublicUrl: usePublicUrl,
+                            )
+                          : const Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.error_outline,
+                                    size: 64,
                                     color: Colors.red,
                                   ),
-                                ),
-                              ],
+                                  SizedBox(height: 16),
+                                  Text(
+                                    'فایل کتاب در دسترس نیست',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.red,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

@@ -247,109 +247,116 @@ class _ConversationScreenState extends State<ConversationScreen> {
         ),
         // نوار پایین صفحه شامل دکمه‌های پخش و نمایش ترجمه
         bottomNavigationBar: Container(
-          height: 60,
           decoration: BoxDecoration(
             color: MyColors.background,
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // دکمه نمایش/مخفی کردن ترجمه
-              ValueListenableBuilder<bool>(
-                valueListenable: showTranslationsNotifier,
-                builder: (context, showTranslations, _) {
-                  return IconButton(
-                    onPressed: () {
-                      showTranslationsNotifier.value =
-                          !showTranslationsNotifier.value;
+          child: SafeArea(
+            child: Container(
+              height: 60,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // دکمه نمایش/مخفی کردن ترجمه
+                  ValueListenableBuilder<bool>(
+                    valueListenable: showTranslationsNotifier,
+                    builder: (context, showTranslations, _) {
+                      return IconButton(
+                        onPressed: () {
+                          showTranslationsNotifier.value =
+                              !showTranslationsNotifier.value;
+                        },
+                        icon: Icon(
+                          Icons.translate,
+                          color: showTranslations
+                              ? MyColors.secondary
+                              : MyColors.textSecondary,
+                        ),
+                      );
                     },
-                    icon: Icon(
-                      Icons.translate,
-                      color: showTranslations
-                          ? MyColors.secondary
-                          : MyColors.textSecondary,
-                    ),
-                  );
-                },
-              ),
-              IconButton(
-                  onPressed: () {
-                    _playNext();
-                  },
-                  icon: IconifyIcon(
-                    icon: "ri:skip-right-fill",
-                    size: 30,
-                    color: MyColors.textPrimary,
-                  )),
-              // دکمه پخش/توقف تمام مکالمه
-              ValueListenableBuilder<bool>(
-                valueListenable: isPlayingNotifier,
-                builder: (context, isPlaying, _) {
-                  return IconButton(
-                    onPressed: () {
-                      if (sortedMessages != null) {
-                        playAllConversations(sortedMessages!);
-                      }
+                  ),
+                  IconButton(
+                      onPressed: () {
+                        _playNext();
+                      },
+                      icon: IconifyIcon(
+                        icon: "ri:skip-right-fill",
+                        size: 30,
+                        color: MyColors.textPrimary,
+                      )),
+                  // دکمه پخش/توقف تمام مکالمه
+                  ValueListenableBuilder<bool>(
+                    valueListenable: isPlayingNotifier,
+                    builder: (context, isPlaying, _) {
+                      return IconButton(
+                        onPressed: () {
+                          if (sortedMessages != null) {
+                            playAllConversations(sortedMessages!);
+                          }
+                        },
+                        icon: Icon(
+                          isPlaying ? Icons.stop_circle : Icons.play_circle,
+                          size: 50,
+                          color: isPlaying ? MyColors.error : MyColors.success,
+                        ),
+                      );
                     },
-                    icon: Icon(
-                      isPlaying ? Icons.stop_circle : Icons.play_circle,
-                      size: 50,
-                      color: isPlaying ? MyColors.error : MyColors.success,
-                    ),
-                  );
-                },
+                  ),
+                  IconButton(
+                      onPressed: () {
+                        _playPrevious();
+                      },
+                      icon: IconifyIcon(
+                        icon: "ri:skip-left-fill",
+                        size: 30,
+                        color: MyColors.textPrimary,
+                      )),
+                ],
               ),
-              IconButton(
-                  onPressed: () {
-                    _playPrevious();
-                  },
-                  icon: IconifyIcon(
-                    icon: "ri:skip-left-fill",
-                    size: 30,
-                    color: MyColors.textPrimary,
-                  )),
-            ],
+            ),
           ),
         ),
         // بدنه صفحه که بر اساس وضعیت Bloc محتوا را نمایش می‌دهد
-        body: BlocListener<ConverstionBloc, ConverstionState>(
-          listener: (context, state) {
-            if (state is ConverstionSuccess &&
-                state.lastConversationId != null) {
-              // ابتدا پیام‌ها را استخراج و مرتب می‌کنیم تا بتوانیم ایندکس را پیدا کنیم
-              final messages = List<Datum>.from(state.data.data)
-                ..sort((a, b) => a.order.compareTo(b.order));
-
-              final index =
-                  messages.indexWhere((m) => m.id == state.lastConversationId);
-
-              if (index != -1) {
-                currentPlayingIndexNotifier.value = index;
-              }
-            }
-          },
-          child: BlocBuilder<ConverstionBloc, ConverstionState>(
-            builder: (context, state) {
-              // نمایش Loading در هنگام بارگذاری داده‌ها
-              if (state is ConverstionLoading) {
-                return const Center(child: CircularProgressIndicator());
-              }
-
-              // نمایش پیام خطا در صورت بروز مشکل
-              if (state is ConverstionError) {
-                return Center(child: Text(state.message));
-              }
-
-              // نمایش لیست مکالمه در صورت موفقیت‌آمیز بودن درخواست
-              if (state is ConverstionSuccess) {
-                // مرتب‌سازی پیام‌ها بر اساس order
-                sortedMessages = state.data.data
+        body: SafeArea(
+          top: false,
+          child: BlocListener<ConverstionBloc, ConverstionState>(
+            listener: (context, state) {
+              if (state is ConverstionSuccess &&
+                  state.lastConversationId != null) {
+                // ابتدا پیام‌ها را استخراج و مرتب می‌کنیم تا بتوانیم ایندکس را پیدا کنیم
+                final messages = List<Datum>.from(state.data.data)
                   ..sort((a, b) => a.order.compareTo(b.order));
-                return _buildConversationList(context, state.data);
-              }
 
-              return const SizedBox.shrink();
+                final index = messages
+                    .indexWhere((m) => m.id == state.lastConversationId);
+
+                if (index != -1) {
+                  currentPlayingIndexNotifier.value = index;
+                }
+              }
             },
+            child: BlocBuilder<ConverstionBloc, ConverstionState>(
+              builder: (context, state) {
+                // نمایش Loading در هنگام بارگذاری داده‌ها
+                if (state is ConverstionLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                // نمایش پیام خطا در صورت بروز مشکل
+                if (state is ConverstionError) {
+                  return Center(child: Text(state.message));
+                }
+
+                // نمایش لیست مکالمه در صورت موفقیت‌آمیز بودن درخواست
+                if (state is ConverstionSuccess) {
+                  // مرتب‌سازی پیام‌ها بر اساس order
+                  sortedMessages = state.data.data
+                    ..sort((a, b) => a.order.compareTo(b.order));
+                  return _buildConversationList(context, state.data);
+                }
+
+                return const SizedBox.shrink();
+              },
+            ),
           ),
         ),
       ),

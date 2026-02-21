@@ -130,18 +130,18 @@ class _LoginScreenState extends State<LoginScreen> {
       create: (context) => ProfileBloc(repository: locator()),
       child: Scaffold(
         backgroundColor: Colors.white,
-        body: SafeArea(
-          child: Stack(
-            children: [
-              // Background
-              Positioned.fill(
-                child: Image.asset(
-                  'assets/images/login/login_background.png',
-                  fit: BoxFit.cover,
-                ),
+        body: Stack(
+          children: [
+            // Background
+            Positioned.fill(
+              child: Image.asset(
+                'assets/images/login/login_background.png',
+                fit: BoxFit.cover,
               ),
-              // Content
-              SingleChildScrollView(
+            ),
+            // Content
+            SafeArea(
+              child: SingleChildScrollView(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 28.0),
                   child: Column(
@@ -264,8 +264,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -445,7 +445,7 @@ class _LoginScreenState extends State<LoginScreen> {
             SnackBar(
               content: Text(state.message),
               backgroundColor: MyColors.error,
-              duration: const Duration(seconds: 10),
+              duration: const Duration(seconds: 2),
             ),
           );
         } else if (state is ProfileErrorLogin) {
@@ -455,7 +455,7 @@ class _LoginScreenState extends State<LoginScreen> {
             SnackBar(
               content: Text(state.message),
               backgroundColor: MyColors.error,
-              duration: const Duration(seconds: 10),
+              duration: const Duration(seconds: 2),
             ),
           );
         } else if (state is ProfileSuccessRequestOtp) {
@@ -555,6 +555,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         content:
                             const Text('لطفا شماره موبایل معتبر وارد کنید'),
                         backgroundColor: MyColors.warning,
+                        duration: const Duration(seconds: 2),
                       ),
                     );
                   }

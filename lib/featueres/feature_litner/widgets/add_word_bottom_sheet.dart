@@ -35,7 +35,7 @@ class _AddWordBottomSheetState extends State<AddWordBottomSheet> {
             const SnackBar(
               content: Text('لغت به لایتنر اضافه شد'),
               backgroundColor: MyColors.success,
-              duration: Duration(milliseconds: 800),
+              duration: Duration(seconds: 2),
             ),
           );
           _wordController.clear();
@@ -47,7 +47,7 @@ class _AddWordBottomSheetState extends State<AddWordBottomSheet> {
               content: Text(state.message),
               backgroundColor:
                   isWordExistsError ? MyColors.warning : MyColors.error,
-              duration: const Duration(milliseconds: 800),
+              duration: const Duration(seconds: 2),
             ),
           );
         }

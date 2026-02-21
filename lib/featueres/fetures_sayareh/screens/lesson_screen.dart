@@ -145,7 +145,7 @@ class _LessonScreenState extends State<LessonScreen> {
         SnackBar(
           content: Text(downloadInfo.error!),
           backgroundColor: Colors.red,
-          duration: const Duration(seconds: 3),
+          duration: const Duration(seconds: 2),
         ),
       );
     }
@@ -329,7 +329,7 @@ class _LessonScreenState extends State<LessonScreen> {
             ),
           ),
         ),
-        body: _buildContent(context),
+        body: SafeArea(child: _buildContent(context)),
       ),
     );
   }

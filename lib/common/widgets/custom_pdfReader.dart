@@ -137,7 +137,7 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
           const SnackBar(
             content: Text('برای مشاهده کتاب، روی دکمه دانلود کلیک کنید'),
             backgroundColor: Colors.blue,
-            duration: Duration(seconds: 3),
+            duration: Duration(seconds: 2),
           ),
         );
       }

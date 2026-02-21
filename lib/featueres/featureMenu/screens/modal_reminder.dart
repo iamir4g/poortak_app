@@ -44,7 +44,10 @@ class _AddReminderModalState extends State<AddReminderModal> {
   Future<void> _saveReminder() async {
     if (_selectedType == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('لطفا نوع یادآور را انتخاب کنید')),
+        const SnackBar(
+          content: Text('لطفا نوع یادآور را انتخاب کنید'),
+          duration: Duration(seconds: 2),
+        ),
       );
       return;
     }
@@ -68,7 +71,10 @@ class _AddReminderModalState extends State<AddReminderModal> {
     widget.onReminderAdded();
     Navigator.pop(context);
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('یادآور با موفقیت اضافه شد')),
+      const SnackBar(
+        content: Text('یادآور با موفقیت اضافه شد'),
+        duration: Duration(seconds: 2),
+      ),
     );
   }
 
