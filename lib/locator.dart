@@ -1,4 +1,6 @@
 import 'package:dio/dio.dart';
+import 'package:dio/io.dart';
+import 'dart:io';
 import 'package:poortak/featueres/fetures_sayareh/repositories/dictionary_repository.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/dictionary_bloc/dictionary_bloc.dart';
 import 'package:get_it/get_it.dart';
@@ -40,6 +42,16 @@ GetIt locator = GetIt.instance;
 
 Future<void> initLocator() async {
   final dio = Dio();
+
+  // Configure Dio to ignore bad certificates (SSL handshake errors)
+  dio.httpClientAdapter = IOHttpClientAdapter(
+    createHttpClient: () {
+      final client = HttpClient();
+      client.badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+      return client;
+    },
+  );
 
   // Set x-lang header as default for all requests
   dio.options.headers['x-lang'] = 'fa';
@@ -96,7 +108,8 @@ Future<void> initLocator() async {
   locator.registerSingleton<ProfileBloc>(ProfileBloc(repository: locator()));
   locator.registerSingleton<LitnerRepository>(LitnerRepository(locator()));
   locator.registerSingleton<MatchRepository>(MatchRepository(locator()));
-  locator.registerSingleton<DictionaryRepository>(DictionaryRepository());
+  locator.registerSingleton<DictionaryRepository>(
+      DictionaryRepository(dio: locator()));
   locator.registerSingleton<BlocStorageBloc>(
       BlocStorageBloc(sayarehRepository: locator()));
   locator.registerSingleton<IknowAccessBloc>(

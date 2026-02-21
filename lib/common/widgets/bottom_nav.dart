@@ -40,71 +40,75 @@ class BottomNav extends StatelessWidget {
               ),
             ],
           ),
-          child: Container(
-            height: 70,
-            padding: const EdgeInsets.only(bottom: 8),
-            child: BlocProvider(
-              create: (context) => BottomNavCubit(),
-              child: Builder(builder: (context) {
-                return BlocBuilder<BottomNavCubit, int>(
-                  builder: (context, state) {
-                    return Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        _buildNavItem(
-                          context: context,
-                          state: state,
-                          index: 0,
-                          icon: "mage:video-player",
-                          label: 'سیاره آینو',
-                          controller: controller,
-                        ),
-                        _buildNavItem(
-                          context: context,
-                          state: state,
-                          index: 1,
-                          icon: "mage:search", //mdi:text-box-search-outline
-                          label: 'کاوش',
-                          controller: controller,
-                          // useCustomIcon: false,
-                        ),
-                        _buildNavItem(
-                          context: context,
-                          state: state,
-                          index: 2,
-                          label: 'سبد خرید',
-                          icon:
-                              "hugeicons:shopping-cart-02", //"mage:shopping-cart",
-                          controller: controller,
-                          // useCustomIcon: false,
-                          // materialIcon: Icons.shopping_cart_outlined,
-                        ),
-                        _buildNavItem(
-                          context: context,
-                          state: state,
-                          index: 3,
-                          label: 'لایتنر',
-                          icon: "hugeicons:book-open-02", //"mage:book",
-                          controller: controller,
-                          // useCustomIcon: false,
-                          // materialIcon: Icons.folder_outlined,
-                        ),
-                        _buildNavItem(
-                          context: context,
-                          state: state,
-                          index: 4,
-                          label: 'پروفایل',
-                          controller: controller,
-                          icon: "mynaui:user-square", //"mage:user",
-                          // useCustomIcon: false,
-                          // materialIcon: Icons.account_box_outlined,
-                        ),
-                      ],
-                    );
-                  },
-                );
-              }),
+          child: Padding(
+            padding:
+                EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
+            child: Container(
+              height: 70,
+              padding: const EdgeInsets.only(bottom: 8),
+              child: BlocProvider(
+                create: (context) => BottomNavCubit(),
+                child: Builder(builder: (context) {
+                  return BlocBuilder<BottomNavCubit, int>(
+                    builder: (context, state) {
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          _buildNavItem(
+                            context: context,
+                            state: state,
+                            index: 0,
+                            icon: "mage:video-player",
+                            label: 'سیاره آینو',
+                            controller: controller,
+                          ),
+                          _buildNavItem(
+                            context: context,
+                            state: state,
+                            index: 1,
+                            icon: "mage:search", //mdi:text-box-search-outline
+                            label: 'کاوش',
+                            controller: controller,
+                            // useCustomIcon: false,
+                          ),
+                          _buildNavItem(
+                            context: context,
+                            state: state,
+                            index: 2,
+                            label: 'سبد خرید',
+                            icon:
+                                "hugeicons:shopping-cart-02", //"mage:shopping-cart",
+                            controller: controller,
+                            // useCustomIcon: false,
+                            // materialIcon: Icons.shopping_cart_outlined,
+                          ),
+                          _buildNavItem(
+                            context: context,
+                            state: state,
+                            index: 3,
+                            label: 'لایتنر',
+                            icon: "hugeicons:book-open-02", //"mage:book",
+                            controller: controller,
+                            // useCustomIcon: false,
+                            // materialIcon: Icons.folder_outlined,
+                          ),
+                          _buildNavItem(
+                            context: context,
+                            state: state,
+                            index: 4,
+                            label: 'پروفایل',
+                            controller: controller,
+                            icon: "mynaui:user-square", //"mage:user",
+                            // useCustomIcon: false,
+                            // materialIcon: Icons.account_box_outlined,
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }),
+              ),
             ),
           ),
         );

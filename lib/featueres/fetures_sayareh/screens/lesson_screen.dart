@@ -515,6 +515,16 @@ class _LessonScreenState extends State<LessonScreen> {
           _showPurchaseDialog();
           return;
         }
+        final prefsOperator = locator<PrefsOperator>();
+        if (!prefsOperator.isLoggedIn()) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('لطفا ابتدا وارد حساب کاربری خود شوید'),
+              duration: Duration(seconds: 2),
+            ),
+          );
+          return;
+        }
         await Navigator.pushNamed(context, ConversationScreen.routeName,
             arguments: {"conversationId": widget.lessonId});
         if (mounted) {

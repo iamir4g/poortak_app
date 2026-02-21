@@ -2,8 +2,10 @@ import 'package:dio/dio.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/dictionary_model.dart';
 
 class DictionaryRepository {
-  final Dio _dio = Dio();
+  final Dio _dio;
   final String _baseUrl = 'https://freedictionaryapi.com/api/v1';
+
+  DictionaryRepository({required Dio dio}) : _dio = dio;
 
   Future<DictionaryEntry?> searchWord(String word) async {
     try {
@@ -11,6 +13,11 @@ class DictionaryRepository {
       final response = await _dio.get(
         '$_baseUrl/entries/en/$word',
         queryParameters: {'translations': true},
+        options: Options(
+          headers: {'User-Agent': 'PostmanRuntime/7.32.3'},
+          sendTimeout: const Duration(seconds: 20),
+          receiveTimeout: const Duration(seconds: 20),
+        ),
       );
 
       print('[DictionaryRepository] Status: ${response.statusCode}');

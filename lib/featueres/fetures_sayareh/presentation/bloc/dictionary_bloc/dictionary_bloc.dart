@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/repositories/dictionary_repository.dart';
+import 'package:poortak/locator.dart';
 import 'dictionary_event.dart';
 import 'dictionary_state.dart';
 
@@ -7,7 +8,7 @@ class DictionaryBloc extends Bloc<DictionaryEvent, DictionaryState> {
   final DictionaryRepository _repository;
 
   DictionaryBloc({DictionaryRepository? repository})
-      : _repository = repository ?? DictionaryRepository(),
+      : _repository = repository ?? locator<DictionaryRepository>(),
         super(DictionaryInitial()) {
     on<SearchWord>(_onSearchWord);
   }
@@ -31,7 +32,8 @@ class DictionaryBloc extends Bloc<DictionaryEvent, DictionaryState> {
           print('[DictionaryBloc] No translations found for ${event.word}');
           emit(DictionaryEmpty());
         } else {
-          print('[DictionaryBloc] Loaded ${entry.persianTranslations.length} translations and ${entry.examples.length} examples');
+          print(
+              '[DictionaryBloc] Loaded ${entry.persianTranslations.length} translations and ${entry.examples.length} examples');
           emit(DictionaryLoaded(entry));
         }
       } else {

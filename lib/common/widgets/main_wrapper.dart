@@ -313,48 +313,6 @@ class _MainWrapperState extends State<MainWrapper> {
                         : Colors.white,
                     extendBodyBehindAppBar: false,
                     drawerScrimColor: Colors.black54,
-                    // onDrawerChanged: (isOpened) async {
-                    //   // تنظیم status bar وقتی drawer باز یا بسته می‌شود
-                    //   final backgroundColor = themeState.isDark
-                    //       ? MyColors.darkBackground
-                    //       : Colors.white;
-                    //   final statusBarIconBrightness = themeState.isDark
-                    //       ? Brightness.light
-                    //       : Brightness.dark;
-
-                    //   if (isOpened) {
-                    //     // وقتی drawer باز است، status bar را کاملاً شفاف می‌کنیم
-                    //     await SystemChrome.setEnabledSystemUIMode(
-                    //       SystemUiMode.edgeToEdge,
-                    //     );
-                    //     SystemChrome.setSystemUIOverlayStyle(
-                    //       SystemUiOverlayStyle(
-                    //         statusBarColor: MyColors.primary,
-                    //         statusBarIconBrightness: statusBarIconBrightness,
-                    //         statusBarBrightness: themeState.isDark
-                    //             ? Brightness.dark
-                    //             : Brightness.light,
-                    //         systemNavigationBarColor: MyColors.primary,
-                    //         systemNavigationBarIconBrightness:
-                    //             statusBarIconBrightness,
-                    //       ),
-                    //     );
-                    //   } else {
-                    //     // وقتی drawer بسته است، status bar را به MyColors.statusBarColor برمی‌گردانیم
-                    //     SystemChrome.setSystemUIOverlayStyle(
-                    //       SystemUiOverlayStyle(
-                    //         statusBarColor: MyColors.primary,
-                    //         statusBarIconBrightness: statusBarIconBrightness,
-                    //         statusBarBrightness: themeState.isDark
-                    //             ? Brightness.dark
-                    //             : Brightness.light,
-                    //         systemNavigationBarColor: backgroundColor,
-                    //         systemNavigationBarIconBrightness:
-                    //             statusBarIconBrightness,
-                    //       ),
-                    //     );
-                    //   }
-                    // },
                     appBar: AppBar(
                       backgroundColor: themeState.isDark
                           ? MyColors.darkBackground

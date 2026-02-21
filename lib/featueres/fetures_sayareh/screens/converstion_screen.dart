@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconify_design/iconify_design.dart';
@@ -53,6 +54,9 @@ class _ConversationScreenState extends State<ConversationScreen> {
   // شناسه جلسه پخش برای جلوگیری از تداخل پخش‌ها
   int _playbackSessionId = 0;
 
+  // تایمر برای جلوگیری از ارسال درخواست‌های تکراری و پشت سر هم
+  Timer? _savePlaybackDebounceTimer;
+
   @override
   void initState() {
     super.initState();
@@ -69,17 +73,28 @@ class _ConversationScreenState extends State<ConversationScreen> {
     isPlayingNotifier.dispose();
     currentPlayingIndexNotifier.dispose();
     showTranslationsNotifier.dispose();
+    _savePlaybackDebounceTimer?.cancel();
     super.dispose();
   }
 
   /// ذخیره وضعیت پخش در سرور
   void _savePlayback(String conversationId) {
-    _converstionBloc.add(
-      SaveConversationPlaybackEvent(
-        courseId: widget.conversationId,
-        conversationId: conversationId,
-      ),
-    );
+    // اگر تایمری فعال است، آن را کنسل کن
+    if (_savePlaybackDebounceTimer?.isActive ?? false) {
+      _savePlaybackDebounceTimer!.cancel();
+    }
+
+    // ایجاد تایمر جدید
+    _savePlaybackDebounceTimer = Timer(const Duration(milliseconds: 1000), () {
+      if (mounted) {
+        _converstionBloc.add(
+          SaveConversationPlaybackEvent(
+            courseId: widget.conversationId,
+            conversationId: conversationId,
+          ),
+        );
+      }
+    });
   }
 
   /// پخش تمام پیام‌های مکالمه به ترتیب
