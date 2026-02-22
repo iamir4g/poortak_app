@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:video_player/video_player.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 import 'dart:async';
 import 'dart:io';
 
@@ -62,6 +63,7 @@ class CustomVideoPlayerState extends State<CustomVideoPlayer> {
     }
     // Disable FLAG_SECURE when video player is disposed
     _setSecureFlag(false);
+    WakelockPlus.disable();
     _hideTimer?.cancel();
     super.dispose();
   }
@@ -121,6 +123,7 @@ class CustomVideoPlayerState extends State<CustomVideoPlayer> {
         });
         if (widget.autoPlay) {
           _videoPlayerController.play();
+          WakelockPlus.enable();
           setState(() {
             _isPlaying = true;
           });
@@ -148,6 +151,11 @@ class CustomVideoPlayerState extends State<CustomVideoPlayer> {
         setState(() {
           _isPlaying = _videoPlayerController.value.isPlaying;
         });
+        if (_isPlaying) {
+          WakelockPlus.enable();
+        } else {
+          WakelockPlus.disable();
+        }
       }
     }
 
@@ -158,6 +166,7 @@ class CustomVideoPlayerState extends State<CustomVideoPlayer> {
         setState(() {
           _isPlaying = false;
         });
+        WakelockPlus.disable();
         // Call the callback if provided
         widget.onVideoEnded?.call();
       }
@@ -168,8 +177,10 @@ class CustomVideoPlayerState extends State<CustomVideoPlayer> {
     setState(() {
       if (_isPlaying) {
         _videoPlayerController.pause();
+        WakelockPlus.disable();
       } else {
         _videoPlayerController.play();
+        WakelockPlus.enable();
       }
       _isPlaying = !_isPlaying;
       _showControls = true;
@@ -453,6 +464,7 @@ class _FullscreenVideoPlayerState extends State<FullscreenVideoPlayer> {
     // Enable secure flag if video is playing
     if (_isPlaying) {
       _setSecureFlag(true);
+      WakelockPlus.enable();
     }
   }
 
@@ -465,6 +477,11 @@ class _FullscreenVideoPlayerState extends State<FullscreenVideoPlayer> {
       // Update secure flag if playing state changed
       if (wasPlaying != _isPlaying) {
         _setSecureFlag(_isPlaying);
+        if (_isPlaying) {
+          WakelockPlus.enable();
+        } else {
+          WakelockPlus.disable();
+        }
       }
     }
   }
@@ -516,9 +533,11 @@ class _FullscreenVideoPlayerState extends State<FullscreenVideoPlayer> {
       if (_isPlaying) {
         widget.videoPlayerController.pause();
         _setSecureFlag(false);
+        WakelockPlus.disable();
       } else {
         widget.videoPlayerController.play();
         _setSecureFlag(true);
+        WakelockPlus.enable();
       }
       _isPlaying = !_isPlaying;
       _showControls = true;
