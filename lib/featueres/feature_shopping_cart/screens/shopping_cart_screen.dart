@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
 
 import 'package:persian_tools/persian_tools.dart';
@@ -62,7 +63,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                 stops: [0.1, 0.54, 1.0],
               ),
             ),
-            child: const Center(child: DotLoadingWidget(size: 100)),
+            child: Center(child: DotLoadingWidget(size: 100.r)),
           );
         }
 

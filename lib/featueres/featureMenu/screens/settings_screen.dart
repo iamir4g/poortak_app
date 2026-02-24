@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/common/bloc/settings_cubit/settings_cubit.dart';
+import 'package:poortak/config/myColors.dart';
+import 'package:poortak/config/myTextStyle.dart';
 
 class SettingsScreen extends StatefulWidget {
   static const String routeName = "/settings";
@@ -17,7 +20,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return BlocBuilder<SettingsCubit, SettingsState>(
       builder: (context, state) {
         return Scaffold(
-          backgroundColor: Colors.white,
+          backgroundColor: MyColors.background,
           body: SafeArea(
             child: Column(
               children: [
@@ -27,10 +30,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 // Settings Sections
                 Expanded(
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    padding: EdgeInsets.symmetric(horizontal: 20.w),
                     child: Column(
                       children: [
-                        const SizedBox(height: 20),
+                        SizedBox(height: 20.h),
 
                         // Display Settings
                         _buildSettingsSection(
@@ -49,7 +52,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ],
                         ),
 
-                        const SizedBox(height: 24),
+                        SizedBox(height: 24.h),
 
                         // App Notifications
                         _buildSettingsSection(
@@ -64,7 +67,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     .read<SettingsCubit>()
                                     .updateAchievementNotifications(value);
                               },
-                              activeColor: Colors.orange,
+                              activeColor: MyColors.primary,
                             ),
                             _buildToggleOption(
                               title: "دریافت اعلان های عمومی",
@@ -74,12 +77,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     .read<SettingsCubit>()
                                     .updateGeneralNotifications(value);
                               },
-                              activeColor: Colors.orange,
+                              activeColor: MyColors.primary,
                             ),
                           ],
                         ),
 
-                        const SizedBox(height: 24),
+                        SizedBox(height: 24.h),
 
                         // Sound Settings
                         _buildSettingsSection(
@@ -94,7 +97,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     .read<SettingsCubit>()
                                     .updateAutoPlayPronunciation(value);
                               },
-                              activeColor: Colors.orange,
+                              activeColor: MyColors.primary,
                             ),
                             _buildToggleOption(
                               title: "پخش خودکار صوت تمرین ها",
@@ -104,7 +107,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     .read<SettingsCubit>()
                                     .updateAutoPlayExerciseSounds(value);
                               },
-                              activeColor: Colors.orange,
+                              activeColor: MyColors.primary,
                             ),
                             _buildToggleOption(
                               title: "پخش افکت های صوتی",
@@ -114,12 +117,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     .read<SettingsCubit>()
                                     .updatePlaySoundEffects(value);
                               },
-                              activeColor: Colors.orange,
+                              activeColor: MyColors.primary,
                             ),
                           ],
                         ),
 
-                        const SizedBox(height: 24),
+                        SizedBox(height: 24.h),
 
                         // Content Text Size
                         _buildSettingsSection(
@@ -130,12 +133,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ],
                         ),
 
-                        const SizedBox(height: 40),
+                        SizedBox(height: 40.h),
 
                         // Test Text Box
                         _buildTestTextBox(state.textSize),
 
-                        const SizedBox(height: 20),
+                        SizedBox(height: 20.h),
                       ],
                     ),
                   ),
@@ -150,27 +153,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Widget _buildHeader() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
       child: Row(
         children: [
           IconButton(
             onPressed: () => Navigator.pop(context),
-            icon: const Icon(Icons.arrow_back_ios, size: 24),
+            icon: Icon(Icons.arrow_back_ios,
+                size: 24.r, color: MyColors.textMatn1),
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(),
           ),
-          const Expanded(
+          Expanded(
             child: Text(
               "تنظیمات",
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-                color: Colors.black87,
+              style: MyTextStyle.textHeader16Bold.copyWith(
+                fontSize: 20.sp,
               ),
             ),
           ),
-          const SizedBox(width: 48), // Balance the back button
+          SizedBox(width: 24.r), // Balance the back button
         ],
       ),
     );
@@ -186,19 +188,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
       children: [
         Row(
           children: [
-            Icon(icon, size: 20, color: Colors.grey[600]),
-            const SizedBox(width: 8),
+            Icon(icon, size: 20.r, color: MyColors.textSecondary),
+            SizedBox(width: 8.w),
             Text(
               title,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Colors.grey[800],
+              style: MyTextStyle.textMatn16Bold.copyWith(
+                color: MyColors.textMatn1,
               ),
             ),
           ],
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: 12.h),
         ...children,
       ],
     );
@@ -211,26 +211,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
     Color? activeColor,
   }) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
+      padding: EdgeInsets.only(bottom: 16.h),
       child: Row(
         children: [
           Expanded(
             child: Text(
               title,
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.black87,
+              style: MyTextStyle.textMatn14Bold.copyWith(
+                color: MyColors.textMatn1,
+                fontWeight: FontWeight.normal,
               ),
             ),
           ),
           Switch(
             value: value,
             onChanged: onChanged,
-            activeThumbColor: activeColor ?? Colors.grey,
-            activeTrackColor:
-                activeColor?.withOpacity(0.3) ?? Colors.grey.withOpacity(0.3),
+            activeThumbColor: activeColor ?? MyColors.textSecondary,
+            activeTrackColor: activeColor?.withOpacity(0.3) ??
+                MyColors.textSecondary.withOpacity(0.3),
             inactiveThumbColor: Colors.white,
-            inactiveTrackColor: Colors.grey.withOpacity(0.3),
+            inactiveTrackColor: MyColors.textSecondary.withOpacity(0.3),
           ),
         ],
       ),
@@ -242,11 +242,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
       children: [
         SliderTheme(
           data: SliderTheme.of(context).copyWith(
-            activeTrackColor: Colors.orange,
-            inactiveTrackColor: Colors.blueGrey.withOpacity(0.3),
-            thumbColor: Colors.orange,
-            trackHeight: 4,
-            thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
+            activeTrackColor: MyColors.primary,
+            inactiveTrackColor: MyColors.text4.withOpacity(0.3),
+            thumbColor: MyColors.primary,
+            trackHeight: 4.h,
+            thumbShape: RoundSliderThumbShape(enabledThumbRadius: 8.r),
           ),
           child: Slider(
             value: textSize,
@@ -262,16 +262,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
           children: [
             Text(
               "اندازه کوچک",
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey[600],
+              style: MyTextStyle.textMatn12W500.copyWith(
+                color: MyColors.textSecondary,
               ),
             ),
             Text(
               "اندازه بزرگ",
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey[600],
+              style: MyTextStyle.textMatn12W500.copyWith(
+                color: MyColors.textSecondary,
               ),
             ),
           ],
@@ -287,17 +285,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16.r),
       decoration: BoxDecoration(
-        color: Colors.grey[100],
-        borderRadius: BorderRadius.circular(12),
+        color: MyColors.background2,
+        borderRadius: BorderRadius.circular(12.r),
       ),
       child: Text(
         "این یک متن آزمایشی است",
         textAlign: TextAlign.center,
-        style: TextStyle(
-          fontSize: fontSize,
-          color: Colors.black87,
+        style: MyTextStyle.textMatn14Bold.copyWith(
+          fontSize: fontSize.sp,
+          color: MyColors.textMatn1,
         ),
       ),
     );

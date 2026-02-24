@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconify_design/iconify_design.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/common/services/storage_service.dart';
+import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/featureMenu/screens/aboutUs_screen.dart';
@@ -43,17 +45,17 @@ class _CustomDrawerState extends State<CustomDrawer> {
         return ListTile(
           onTap: onTap,
           leading: Container(
-            width: 32,
-            height: 32,
+            width: Dimens.iconLarge,
+            height: Dimens.iconLarge,
             decoration: BoxDecoration(
               color: themeState.isDark
                   ? MyColors.darkCardBackground
                   : MyColors.background1,
-              borderRadius: BorderRadius.circular(100),
+              borderRadius: BorderRadius.circular(Dimens.radiusCircle),
             ),
             child: Center(
               child: IconifyIcon(
-                size: 16,
+                size: Dimens.iconSmall,
                 icon: icon,
                 color: themeState.isDark
                     ? MyColors.darkTextSecondary
@@ -139,23 +141,20 @@ class _CustomDrawerState extends State<CustomDrawer> {
                       // Drawer content
                       Expanded(
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 16,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: Dimens.medium,
+                            vertical: Dimens.medium,
                           ),
                           child: ListView(
                             children: [
                               SizedBox(
-                                height:
-                                    100, // افزایش ارتفاع برای جا دادن دایره نارنجی
-                                width: 240,
+                                height: 100.h,
+                                width: 240.w,
                                 child: Stack(
-                                  clipBehavior:
-                                      Clip.none, // اجازه نمایش خارج از محدوده
+                                  clipBehavior: Clip.none,
                                   children: [
                                     Positioned(
-                                      top:
-                                          20, // فاصله از بالا برای جا دادن دایره
+                                      top: 20.h,
                                       child: GestureDetector(
                                         onTap: () {
                                           if (isLoggedIn) {
@@ -167,16 +166,17 @@ class _CustomDrawerState extends State<CustomDrawer> {
                                           }
                                         },
                                         child: SizedBox(
-                                          height: 80,
-                                          width: 240,
+                                          height: 80.h,
+                                          width: 240.w,
                                           child: Container(
-                                            padding: const EdgeInsets.all(12),
+                                            padding:
+                                                EdgeInsets.all(Dimens.medium),
                                             decoration: BoxDecoration(
                                               color: themeState.isDark
                                                   ? MyColors.darkCardBackground
                                                   : MyColors.background1,
                                               borderRadius:
-                                                  BorderRadius.circular(10),
+                                                  BorderRadius.circular(10.r),
                                             ),
                                             child: Row(
                                               mainAxisAlignment:
@@ -186,8 +186,8 @@ class _CustomDrawerState extends State<CustomDrawer> {
                                                   child: userAvatarUrl != null
                                                       ? Image.network(
                                                           userAvatarUrl!,
-                                                          width: 50,
-                                                          height: 50,
+                                                          width: 50.w,
+                                                          height: 50.h,
                                                           fit: BoxFit.cover,
                                                           errorBuilder:
                                                               (context, error,
@@ -198,7 +198,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                                                                 borderRadius:
                                                                     BorderRadius
                                                                         .circular(
-                                                                            100),
+                                                                            Dimens.radiusCircle),
                                                                 color:
                                                                     Colors.red,
                                                                 image:
@@ -209,18 +209,17 @@ class _CustomDrawerState extends State<CustomDrawer> {
                                                                   ),
                                                                 ),
                                                               ),
-                                                              width: 50,
-                                                              height: 50,
+                                                              width: 50.w,
+                                                              height: 50.h,
                                                             );
                                                           },
                                                         )
                                                       : Container(
                                                           decoration:
                                                               BoxDecoration(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        100),
+                                                            borderRadius: BorderRadius
+                                                                .circular(Dimens
+                                                                    .radiusCircle),
                                                             color: Colors.red,
                                                             image:
                                                                 const DecorationImage(
@@ -229,11 +228,11 @@ class _CustomDrawerState extends State<CustomDrawer> {
                                                               ),
                                                             ),
                                                           ),
-                                                          width: 50,
-                                                          height: 50,
+                                                          width: 50.w,
+                                                          height: 50.h,
                                                         ),
                                                 ),
-                                                const SizedBox(width: 10),
+                                                SizedBox(width: 10.w),
                                                 Text(
                                                   isLoggedIn
                                                       ? (userFirstName !=
@@ -263,30 +262,31 @@ class _CustomDrawerState extends State<CustomDrawer> {
                                     // Edit button positioned above the container
                                     if (isLoggedIn)
                                       Positioned(
-                                        top: 10,
-                                        left: 20,
+                                        top: 10.h,
+                                        left: 20.w,
                                         child: GestureDetector(
                                           onTap: () {
                                             Navigator.pushNamed(context,
                                                 ProfileScreen.routeName);
                                           },
                                           child: Container(
-                                            width: 30,
-                                            height: 30,
+                                            width: 30.w,
+                                            height: 30.h,
                                             decoration: BoxDecoration(
                                               color: MyColors.secondary,
                                               borderRadius:
-                                                  BorderRadius.circular(100),
+                                                  BorderRadius.circular(
+                                                      Dimens.radiusCircle),
                                               border: Border.all(
                                                 color: Colors.white,
-                                                width: 2,
+                                                width: 2.w,
                                               ),
                                             ),
                                             child: Center(
                                               child: IconifyIcon(
                                                 icon: "tdesign:edit",
                                                 color: Colors.white,
-                                                size: 12,
+                                                size: 12.w,
                                               ),
                                             ),
                                           ),
@@ -295,24 +295,25 @@ class _CustomDrawerState extends State<CustomDrawer> {
                                   ],
                                 ),
                               ),
-                              const SizedBox(height: 20),
-                              const SizedBox(height: 20),
+                              SizedBox(height: 20.h),
+                              SizedBox(height: 20.h),
                               ListTile(
                                 onTap: () {
                                   context.read<ThemeCubit>().toggleTheme();
                                 },
                                 leading: Container(
-                                  width: 32,
-                                  height: 32,
+                                  width: Dimens.iconLarge,
+                                  height: Dimens.iconLarge,
                                   decoration: BoxDecoration(
                                     color: themeState.isDark
                                         ? MyColors.darkCardBackground
                                         : MyColors.background1,
-                                    borderRadius: BorderRadius.circular(100),
+                                    borderRadius: BorderRadius.circular(
+                                        Dimens.radiusCircle),
                                   ),
                                   child: Center(
                                     child: IconifyIcon(
-                                      size: 16,
+                                      size: Dimens.iconSmall,
                                       icon: themeState.isDark
                                           ? "famicons:sun"
                                           : "famicons:moon",
@@ -375,11 +376,6 @@ class _CustomDrawerState extends State<CustomDrawer> {
                                       duration: Duration(seconds: 2),
                                     ),
                                   );
-                                  // Navigator.pushNamed(context, PaymentResultScreen.routeName,
-                                  //     arguments: {
-                                  //       'status': 0,
-                                  //       'ref': '1234567890',
-                                  //     });
                                 },
                               ),
                               _buildListTile(
@@ -409,11 +405,6 @@ class _CustomDrawerState extends State<CustomDrawer> {
                                       duration: Duration(seconds: 2),
                                     ),
                                   );
-                                  // Navigator.pushNamed(context, PaymentResultScreen.routeName,
-                                  //     arguments: {
-                                  //       'status': 1,
-                                  //       'ref': '1234567890',
-                                  //     });
                                 },
                               ),
                               _buildListTile(

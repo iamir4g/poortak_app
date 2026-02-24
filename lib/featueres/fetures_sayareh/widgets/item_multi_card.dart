@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/l10n/app_localizations.dart';
 // import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:poortak/config/myColors.dart';
@@ -19,14 +20,14 @@ class ItemMultiCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
 
     return Container(
-      width: 248,
-      height: 25,
+      width: 248.w,
+      height: 25.h,
       decoration: BoxDecoration(
         color: MyColors.background,
-        borderRadius: BorderRadius.all(Radius.circular(10)),
+        borderRadius: BorderRadius.all(Radius.circular(10.r)),
       ),
       child: Padding(
-        padding: EdgeInsets.fromLTRB(18, 0, 8, 0),
+        padding: EdgeInsets.fromLTRB(18.w, 0, 8.w, 0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -34,7 +35,7 @@ class ItemMultiCard extends StatelessWidget {
               children: [
                 Image.asset("assets/images/check_icon.png"),
                 SizedBox(
-                  width: 10,
+                  width: 10.w,
                 ),
                 Text(
                   title,

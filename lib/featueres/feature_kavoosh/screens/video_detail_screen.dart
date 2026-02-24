@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/config/myColors.dart';
+import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_kavoosh/widgets/session_item.dart';
 
 class VideoDetailScreen extends StatefulWidget {
@@ -20,23 +23,23 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F9FE),
+      backgroundColor: MyColors.background1,
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(57),
+        preferredSize: Size.fromHeight(57.h),
         child: SafeArea(
           child: Container(
-            padding: const EdgeInsets.fromLTRB(16, 0, 32, 0),
-            height: 57,
+            padding: EdgeInsets.fromLTRB(16.w, 0, 32.w, 0),
+            height: 57.h,
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: const BorderRadius.only(
-                bottomLeft: Radius.circular(33.5),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(33.5.r),
               ),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.05),
-                  offset: const Offset(0, 1),
-                  blurRadius: 1,
+                  offset: Offset(0, 1.h),
+                  blurRadius: 1.r,
                 ),
               ],
             ),
@@ -45,22 +48,19 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
               children: [
                 Text(
                   widget.title,
-                  style: const TextStyle(
-                    fontFamily: 'IRANSans',
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF29303D),
+                  style: MyTextStyle.textHeader16Bold.copyWith(
+                    color: MyColors.textMatn2,
                   ),
                 ),
                 SizedBox(
-                  width: 40,
-                  height: 40,
+                  width: 40.w,
+                  height: 40.h,
                   child: IconButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.arrow_forward,
-                      color: Color(0xFF29303D),
-                      size: 28,
+                      color: MyColors.textMatn2,
+                      size: 28.r,
                     ),
                   ),
                 ),
@@ -70,21 +70,21 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
         ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16.r),
         child: Column(
           children: [
             // Video Player Placeholder
             Container(
-              height: 200,
+              height: 200.h,
               width: double.infinity,
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(20.r),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
+                    blurRadius: 10.r,
+                    offset: Offset(0, 4.h),
                   ),
                 ],
               ),
@@ -93,26 +93,25 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
                 children: [
                   // Placeholder Icon
                   Container(
-                    width: 60,
-                    height: 60,
+                    width: 60.w,
+                    height: 60.h,
                     decoration: BoxDecoration(
                       color: const Color(0xFFE3F2FD),
-                      borderRadius: BorderRadius.circular(30),
+                      borderRadius: BorderRadius.circular(30.r),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.movie_creation_outlined,
-                      color: Color(0xFF2196F3),
-                      size: 30,
+                      color: const Color(0xFF2196F3),
+                      size: 30.r,
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  const Text(
+                  SizedBox(height: 16.h),
+                  Text(
                     'برای تماشای ویدئو روی بخش مورد نظر\nکلیک کنید.',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontFamily: 'IRANSans',
-                      fontSize: 14,
-                      color: Color(0xFF52617A),
+                    style: MyTextStyle.textMatn14Bold.copyWith(
+                      color: MyColors.text3,
+                      fontWeight: FontWeight.normal,
                       height: 1.5,
                     ),
                   ),
@@ -120,19 +119,19 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
               ),
             ),
 
-            const SizedBox(height: 16),
+            SizedBox(height: 16.h),
 
             // Teacher Info Card
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16.r),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(20.r),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
+                    blurRadius: 10.r,
+                    offset: Offset(0, 4.h),
                   ),
                 ],
               ),
@@ -143,15 +142,15 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
                     children: [
                       // Teacher Image
                       ClipRRect(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(16.r),
                         child: Container(
-                          width: 60,
-                          height: 60,
+                          width: 60.w,
+                          height: 60.h,
                           color: Colors.grey[200],
                           // child: Image.asset(...), 
                         ),
                       ),
-                      const SizedBox(width: 16),
+                      SizedBox(width: 16.w),
                       // Info
                       Expanded(
                         child: Column(
@@ -159,55 +158,42 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
                           children: [
                             Text(
                               widget.title,
-                              style: const TextStyle(
-                                fontFamily: 'IRANSans',
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF29303D),
+                              style: MyTextStyle.textMatn16Bold.copyWith(
+                                color: MyColors.textMatn2,
                               ),
                             ),
-                            const SizedBox(height: 8),
+                            SizedBox(height: 8.h),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: const [
+                              children: [
                                 Text(
                                   'نام استاد:',
-                                  style: TextStyle(
-                                    fontFamily: 'IRANSans',
-                                    fontSize: 12,
-                                    color: Color(0xFF9BA7C6),
+                                  style: MyTextStyle.textMatn12W500.copyWith(
+                                    color: MyColors.text4,
                                   ),
                                 ),
                                 Text(
                                   'فاطمه میرایی', // Mock data
-                                  style: TextStyle(
-                                    fontFamily: 'IRANSans',
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF29303D),
+                                  style: MyTextStyle.textMatn12Bold.copyWith(
+                                    color: MyColors.textMatn2,
                                   ),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 4),
+                            SizedBox(height: 4.h),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: const [
+                              children: [
                                 Text(
                                   'قیمت دوره:',
-                                  style: TextStyle(
-                                    fontFamily: 'IRANSans',
-                                    fontSize: 12,
-                                    color: Color(0xFF9BA7C6),
+                                  style: MyTextStyle.textMatn12W500.copyWith(
+                                    color: MyColors.text4,
                                   ),
                                 ),
                                 Text(
                                   '۷۵,۰۰۰ تومان', // Mock data
-                                  style: TextStyle(
-                                    fontFamily: 'IRANSans',
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF29303D),
+                                  style: MyTextStyle.textMatn12Bold.copyWith(
+                                    color: MyColors.textMatn2,
                                   ),
                                 ),
                               ],
@@ -220,53 +206,43 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
                   
                   // Expandable Description
                   if (_isDescriptionExpanded) ...[
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16.h),
                     const Divider(),
-                    const SizedBox(height: 8),
-                    const Text(
+                    SizedBox(height: 8.h),
+                    Text(
                       'درباره ی استاد:',
-                      style: TextStyle(
-                        fontFamily: 'IRANSans',
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF9BA7C6),
+                      style: MyTextStyle.textMatn12Bold.copyWith(
+                        color: MyColors.text4,
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    const Text(
+                    SizedBox(height: 8.h),
+                    Text(
                       'تالیف کتاب کار ریاضی چهارم کلاغ سپید - ریاضی چهارم چهل قدم کلاغ سپید - کتاب فارسی ششم منتشران - موسسه المپیاد ریاضی - مدرس غیر انتفاعی',
-                      style: TextStyle(
-                        fontFamily: 'IRANSans',
-                        fontSize: 12,
-                        color: Color(0xFF52617A),
+                      style: MyTextStyle.textMatn12W500.copyWith(
+                        color: MyColors.text3,
                         height: 1.6,
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16.h),
                     Container(
-                      padding: const EdgeInsets.all(8),
+                      padding: EdgeInsets.all(8.r),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF6F9FE),
-                        borderRadius: BorderRadius.circular(8),
+                        color: MyColors.background1,
+                        borderRadius: BorderRadius.circular(8.r),
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: const [
+                        children: [
                           Text(
                             'مدت زمان کل این دوره:',
-                            style: TextStyle(
-                              fontFamily: 'IRANSans',
-                              fontSize: 12,
-                              color: Color(0xFF9BA7C6),
+                            style: MyTextStyle.textMatn12W500.copyWith(
+                              color: MyColors.text4,
                             ),
                           ),
                           Text(
                             '۱۴ ساعت و ۲۰ دقیقه',
-                            style: TextStyle(
-                              fontFamily: 'IRANSans',
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF29303D),
+                            style: MyTextStyle.textMatn12Bold.copyWith(
+                              color: MyColors.textMatn2,
                             ),
                           ),
                         ],
@@ -274,7 +250,7 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
                     ),
                   ],
 
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8.h),
                   GestureDetector(
                     onTap: () {
                       setState(() {
@@ -286,19 +262,16 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
                       children: [
                         Text(
                           _isDescriptionExpanded ? 'بستن اطلاعات' : 'اطلاعات دوره',
-                          style: const TextStyle(
-                            fontFamily: 'IRANSans',
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFFFF9F29),
+                          style: MyTextStyle.textMatn12Bold.copyWith(
+                            color: MyColors.primary,
                           ),
                         ),
                         Icon(
                           _isDescriptionExpanded
                               ? Icons.keyboard_arrow_up
                               : Icons.keyboard_arrow_left,
-                          color: const Color(0xFFFF9F29),
-                          size: 20,
+                          color: MyColors.primary,
+                          size: 20.r,
                         ),
                       ],
                     ),
@@ -307,19 +280,19 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
               ),
             ),
 
-            const SizedBox(height: 16),
+            SizedBox(height: 16.h),
 
             // Sessions List
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16.r),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(20.r),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
+                    blurRadius: 10.r,
+                    offset: Offset(0, 4.h),
                   ),
                 ],
               ),
@@ -349,13 +322,13 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
                     isPlaying: false,
                     onTap: () {},
                   ),
-                   SessionItem(
+                  SessionItem(
                     title: 'جلسه چهار - احتمال',
                     isLocked: true,
                     isPlaying: false,
                     onTap: () {},
                   ),
-                   SessionItem(
+                  SessionItem(
                     title: 'جلسه پنج - نمودار دایره ای',
                     isLocked: true,
                     isPlaying: false,
@@ -366,33 +339,30 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
               ),
             ),
             
-            const SizedBox(height: 80), // Space for bottom button
+            SizedBox(height: 80.h), // Space for bottom button
           ],
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        padding: EdgeInsets.symmetric(horizontal: 16.w),
         child: SizedBox(
           width: double.infinity,
-          height: 56,
+          height: 56.h,
           child: ElevatedButton(
             onPressed: () {
               // Add to cart action
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF4A80F0), // Blue button
+              backgroundColor: MyColors.secondary, // Blue button
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(16.r),
               ),
               elevation: 4,
             ),
-            child: const Text(
+            child: Text(
               'اضافه به سبد خرید',
-              style: TextStyle(
-                fontFamily: 'IRANSans',
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
+              style: MyTextStyle.textHeader16Bold.copyWith(
                 color: Colors.white,
               ),
             ),

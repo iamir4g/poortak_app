@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/config/myTextStyle.dart';
 
 class SelfAssessmentSubjectCard extends StatelessWidget {
@@ -22,12 +23,12 @@ class SelfAssessmentSubjectCard extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: backgroundColor,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(20.r),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+              blurRadius: 10.r,
+              offset: Offset(0, 4.h),
             ),
           ],
         ),
@@ -35,19 +36,19 @@ class SelfAssessmentSubjectCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: EdgeInsets.all(12.r),
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.5),
                 shape: BoxShape.circle,
               ),
               child: Image.asset(
                 iconPath,
-                width: 70,
-                height: 70,
+                width: 70.w,
+                height: 70.h,
                 fit: BoxFit.contain,
               ),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12.h),
             Text(
               title,
               style: MyTextStyle.textMatn14Bold,

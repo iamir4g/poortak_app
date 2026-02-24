@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
 
 class LogoutConfirmationModal extends StatelessWidget {
@@ -18,11 +19,11 @@ class LogoutConfirmationModal extends StatelessWidget {
     return Dialog(
       backgroundColor: Colors.transparent,
       child: Container(
-        width: 350,
-        height: 365,
+        width: 350.w,
+        height: 365.h,
         decoration: BoxDecoration(
           color: isDarkMode ? const Color(0xFF2C2E3F) : Colors.white,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(20.r),
         ),
         child: Stack(
           children: [
@@ -31,9 +32,9 @@ class LogoutConfirmationModal extends StatelessWidget {
               children: [
                 // Exit animation/image
                 Container(
-                  height: 115,
-                  width: 121.601,
-                  margin: const EdgeInsets.only(bottom: 20),
+                  height: 115.h,
+                  width: 121.601.w,
+                  margin: EdgeInsets.only(bottom: 20.h),
                   child: Lottie.asset(
                     'assets/lottie/Exit.json', // Replace with your actual Lottie file
                     fit: BoxFit.contain,
@@ -42,15 +43,15 @@ class LogoutConfirmationModal extends StatelessWidget {
 
                 // Confirmation text
                 Container(
-                  width: 211.48,
-                  margin: const EdgeInsets.only(bottom: 40),
-                  child: const Text(
+                  width: 211.48.w,
+                  margin: EdgeInsets.only(bottom: 40.h),
+                  child: Text(
                     'از حساب کاربری خود خارج می شوید؟',
                     style: TextStyle(
                       fontFamily: 'IRANSans',
                       fontWeight: FontWeight.w500,
-                      fontSize: 13,
-                      color: Color(0xFF3D495C),
+                      fontSize: 13.sp,
+                      color: const Color(0xFF3D495C),
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -62,35 +63,35 @@ class LogoutConfirmationModal extends StatelessWidget {
                   children: [
                     // Logout button
                     SizedBox(
-                      width: 144, // 36 * 4 = 144 (w-36 from Figma)
-                      height: 56, // h-14 = 56px
+                      width: 144.w, // 36 * 4 = 144 (w-36 from Figma)
+                      height: 56.h, // h-14 = 56px
                       child: ElevatedButton(
                         onPressed: onLogout,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFFFF5A5A),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(20.r),
                           ),
                           elevation: 0,
                         ),
-                        child: const Text(
+                        child: Text(
                           'خروج از حساب',
                           style: TextStyle(
                             fontFamily: 'IRANSans',
                             fontWeight: FontWeight.bold,
-                            fontSize: 14,
+                            fontSize: 14.sp,
                             color: Colors.white,
                           ),
                         ),
                       ),
                     ),
 
-                    const SizedBox(width: 8),
+                    SizedBox(width: 8.w),
 
                     // Stay button
                     SizedBox(
-                      width: 132,
-                      height: 56,
+                      width: 132.w,
+                      height: 56.h,
                       child: OutlinedButton(
                         onPressed: onStay,
                         style: OutlinedButton.styleFrom(
@@ -99,16 +100,16 @@ class LogoutConfirmationModal extends StatelessWidget {
                             width: 1,
                           ),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(20.r),
                           ),
                         ),
-                        child: const Text(
-                          'ماندن',
+                        child: Text(
+                          'بمانم',
                           style: TextStyle(
                             fontFamily: 'IRANSans',
                             fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                            color: Color(0xFF3D495C),
+                            fontSize: 14.sp,
+                            color: const Color(0xFF3D495C),
                           ),
                         ),
                       ),
@@ -119,15 +120,15 @@ class LogoutConfirmationModal extends StatelessWidget {
             ),
             // Close Button (X) - Top Left
             Positioned(
-              top: 12,
-              left: 12,
+              top: 12.h,
+              left: 12.w,
               child: GestureDetector(
                 onTap: () {
                   Navigator.of(context).pop();
                 },
                 child: Container(
-                  width: 32,
-                  height: 32,
+                  width: 32.w,
+                  height: 32.h,
                   decoration: BoxDecoration(
                     color: isDarkMode
                         ? const Color(0xFF323548)
@@ -136,7 +137,7 @@ class LogoutConfirmationModal extends StatelessWidget {
                   ),
                   child: Icon(
                     Icons.close,
-                    size: 20,
+                    size: 20.sp,
                     color: isDarkMode ? Colors.white : const Color(0xFF3D495C),
                   ),
                 ),

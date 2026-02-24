@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/config/myColors.dart';
+import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/video_detail_screen.dart';
 
 class DetailedCourseCard extends StatelessWidget {
@@ -8,7 +10,7 @@ class DetailedCourseCard extends StatelessWidget {
   final String date;
   final bool isPurchased;
   final String? imagePath;
-  final Color backgroundColor;
+  final Color? backgroundColor;
   final VoidCallback? onTap;
 
   const DetailedCourseCard({
@@ -18,7 +20,7 @@ class DetailedCourseCard extends StatelessWidget {
     required this.date,
     this.isPurchased = false,
     this.imagePath,
-    this.backgroundColor = Colors.white,
+    this.backgroundColor,
     this.onTap,
   });
 
@@ -34,46 +36,40 @@ class DetailedCourseCard extends StatelessWidget {
             );
           },
       child: Container(
-        margin: const EdgeInsets.only(bottom: 16, left: 16, right: 16),
-        height: 140,
+        margin: EdgeInsets.only(bottom: 16.h, left: 16.w, right: 16.w),
+        height: 140.h,
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(20.r),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+              blurRadius: 10.r,
+              offset: Offset(0, 4.h),
             ),
           ],
         ),
         child: Row(
           children: [
-            // Content Section (Left side in LTR, Right in RTL - but Row lays out start-to-end)
-            // Since app is RTL, we want Image on the Right (Start) and Text on the Left (End)?
-            // Wait, in RTL, the first child of a Row is on the Right.
-            // Looking at the screenshot: Image is on the Right. Text is on the Left.
-            // So in RTL, Image should be the first child.
-
             // Image Container
             Padding(
-              padding: const EdgeInsets.all(12.0),
+              padding: EdgeInsets.all(12.0.r),
               child: Container(
-                width: 100,
+                width: 100.w,
                 decoration: BoxDecoration(
-                  color: backgroundColor,
-                  borderRadius: BorderRadius.circular(16),
+                  color: backgroundColor ?? MyColors.background1,
+                  borderRadius: BorderRadius.circular(16.r),
                 ),
                 child: imagePath != null
                     ? ClipRRect(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(16.r),
                         child: Image.asset(
                           imagePath!,
                           fit: BoxFit.cover,
                         ),
                       )
-                    : const Center(
-                        child: Icon(Icons.image, color: Colors.grey),
+                    : Center(
+                        child: Icon(Icons.image, color: Colors.grey, size: 40.r),
                       ),
               ),
             ),
@@ -81,32 +77,26 @@ class DetailedCourseCard extends StatelessWidget {
             // Text Content
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
+                padding: EdgeInsets.symmetric(vertical: 16.0.h, horizontal: 8.0.w),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Title
                     Text(
                       title,
-                      style: const TextStyle(
-                        fontFamily: 'IRANSans',
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF29303D),
+                      style: MyTextStyle.textMatn16Bold.copyWith(
+                        color: MyColors.textMatn2,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8.h),
                     
                     // Author
                     Text(
                       author,
-                      style: const TextStyle(
-                        fontFamily: 'IRANSans',
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xFF52617A),
+                      style: MyTextStyle.textMatn12W500.copyWith(
+                        color: MyColors.text3,
                       ),
                     ),
                     
@@ -116,60 +106,46 @@ class DetailedCourseCard extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        // Date (Left side of the text area)
+                        // Date
                         Row(
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.access_time,
-                              size: 14,
-                              color: Color(0xFF9BA7C6),
+                              size: 14.r,
+                              color: MyColors.text4,
                             ),
-                            const SizedBox(width: 4),
+                            SizedBox(width: 4.w),
                             Text(
                               date,
-                              style: const TextStyle(
-                                fontFamily: 'IRANSans',
-                                fontSize: 10,
-                                color: Color(0xFF9BA7C6),
+                              style: MyTextStyle.textMatn10W300.copyWith(
+                                color: MyColors.text4,
                               ),
                             ),
                           ],
                         ),
                         
-                        // Purchased Badge (Right side of the text area - closer to image?)
-                        // Actually in the design, the badge is on the far left (end of row in RTL).
-                        // The date is closer to the image (start of row in RTL).
-                        // Let's swap them if needed. 
-                        // In RTL: Row starts right.
-                        // Child 1: Date. Child 2: Badge.
-                        // So Date is right, Badge is left.
-                        // Screenshot shows: Badge is Left, Date is Right (closer to text start).
-                        // So Badge should be at the end of the Row (Left).
-                        
                         if (isPurchased)
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFE8F7ED),
-                              borderRadius: BorderRadius.circular(20),
+                              color: MyColors.success.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(20.r),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
-                              children: const [
+                              children: [
                                 Text(
                                   'خریداری شده',
-                                  style: TextStyle(
-                                    fontFamily: 'IRANSans',
-                                    fontSize: 10,
+                                  style: MyTextStyle.textMatn10W300.copyWith(
                                     fontWeight: FontWeight.bold,
-                                    color: Color(0xFF4CAF50),
+                                    color: MyColors.success,
                                   ),
                                 ),
-                                SizedBox(width: 4),
+                                SizedBox(width: 4.w),
                                 Icon(
                                   Icons.check_circle,
-                                  size: 14,
-                                  color: Color(0xFF4CAF50),
+                                  size: 14.r,
+                                  color: MyColors.success,
                                 ),
                               ],
                             ),

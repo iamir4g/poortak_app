@@ -16,6 +16,8 @@ import 'package:poortak/locator.dart';
 import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/common/services/tts_service.dart';
 import 'package:poortak/common/widgets/reusable_modal.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/config/dimens.dart';
 
 class VocabularyScreen extends StatefulWidget {
   static const routeName = "/vocabulary_screen";
@@ -136,9 +138,9 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
         child: Scaffold(
           backgroundColor: MyColors.secondaryTint4,
           appBar: AppBar(
-            shape: const RoundedRectangleBorder(
+            shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(30),
+                bottomLeft: Radius.circular(30.r),
               ),
             ),
             automaticallyImplyLeading: false,
@@ -149,7 +151,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
               ),
             ],
             centerTitle: true,
-            title: const Text(
+            title: Text(
               'واژگان',
               style: MyTextStyle.textHeader16Bold,
             ),
@@ -216,7 +218,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 SizedBox(
-                                  height: 20,
+                                  height: 20.h,
                                 ),
                                 //step progress bar
                                 StepProgress(
@@ -224,7 +226,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                                     totalSteps: totalWords),
 
                                 SizedBox(
-                                  height: 85,
+                                  height: 85.h,
                                 ),
                                 FutureBuilder<String>(
                                   future:
@@ -242,15 +244,15 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                                       return Container(
                                         decoration: BoxDecoration(
                                           borderRadius:
-                                              BorderRadius.circular(16),
+                                              BorderRadius.circular(16.r),
                                         ),
                                         child: ClipRRect(
                                           borderRadius:
-                                              BorderRadius.circular(16),
+                                              BorderRadius.circular(16.r),
                                           child: Image.network(
                                             snapshot.data!,
-                                            height: 264,
-                                            width: 264,
+                                            height: 264.h,
+                                            width: 264.w,
                                             fit: BoxFit.cover,
                                           ),
                                         ),
@@ -259,19 +261,19 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                                     return const SizedBox.shrink();
                                   },
                                 ),
-                                const SizedBox(height: 20),
+                                SizedBox(height: 20.h),
                                 Text(
                                   currentWord.word,
-                                  style: const TextStyle(
-                                    fontSize: 24,
+                                  style: TextStyle(
+                                    fontSize: 24.sp,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                const SizedBox(height: 10),
+                                SizedBox(height: 10.h),
                                 Text(
                                   currentWord.translation,
-                                  style: const TextStyle(
-                                    fontSize: 18,
+                                  style: TextStyle(
+                                    fontSize: 18.sp,
                                     color: Colors.grey,
                                   ),
                                 ),
@@ -281,7 +283,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.all(16.0),
+                        padding: EdgeInsets.all(16.0.r),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
@@ -297,7 +299,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                                 }
                               },
                               icon: const Icon(Icons.arrow_back),
-                              iconSize: 32,
+                              iconSize: 32.r,
                             ),
                             BlocBuilder<LitnerBloc, LitnerState>(
                               builder: (context, litnerState) {
@@ -309,15 +311,15 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                                             currentWord.translation,
                                           ),
                                   icon: litnerState is LitnerLoading
-                                      ? const SizedBox(
-                                          width: 20,
-                                          height: 20,
+                                      ? SizedBox(
+                                          width: 20.w,
+                                          height: 20.h,
                                           child: CircularProgressIndicator(
-                                            strokeWidth: 2,
+                                            strokeWidth: 2.w,
                                           ),
                                         )
                                       : const Icon(Icons.add_circle_outline),
-                                  iconSize: 32,
+                                  iconSize: 32.r,
                                 );
                               },
                             ),
@@ -325,7 +327,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                               onPressed: () => _readWord(currentWord.word),
                               icon: IconifyIcon(
                                 icon: "cuida:volume-2-outline",
-                                size: 32,
+                                size: 32.r,
                               ),
                             ),
                             IconButton(
@@ -338,14 +340,14 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                                 }
                               },
                               icon: const Icon(Icons.arrow_forward),
-                              iconSize: 32,
+                              iconSize: 32.r,
                             ),
                           ],
                         ),
                       ),
                       if (currentIndex == totalWords - 1)
                         Padding(
-                          padding: const EdgeInsets.only(bottom: 16.0),
+                          padding: EdgeInsets.only(bottom: 16.0.h),
                           child: ElevatedButton(
                             onPressed: () {
                               Navigator.pushNamed(
@@ -356,12 +358,12 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: MyColors.primary,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 32,
-                                vertical: 16,
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 32.w,
+                                vertical: 16.h,
                               ),
                             ),
-                            child: const Text(
+                            child: Text(
                               'تمرین ها',
                               style: MyTextStyle.textMatnBtn,
                             ),

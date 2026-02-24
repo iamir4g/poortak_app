@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/config/myColors.dart';
+import 'package:poortak/config/myTextStyle.dart';
 
 class QuizAnswerItem extends StatefulWidget {
   final String title;
@@ -68,22 +70,22 @@ class _QuizAnswerItemState extends State<QuizAnswerItem> {
     }
     return Container(
       width: double.infinity,
-      height: 68,
+      height: 68.h,
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(22.r),
         border: Border.all(
           color: borderColor,
-          width: 2,
+          width: 2.w,
         ),
       ),
       child: Center(
         child: Text(
           widget.title,
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'IRANSans',
             fontWeight: FontWeight.w500,
-            fontSize: 14,
+            fontSize: 14.sp,
             color: Color(0xFF494E6A),
           ),
           textAlign: TextAlign.center,

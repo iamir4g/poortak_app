@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/config/dimens.dart';
 import 'package:poortak/l10n/app_localizations.dart';
 // import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:poortak/common/services/tts_service.dart';
@@ -94,25 +96,25 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
             } else if (state is LitnerReviewError) {
               return Center(child: Text(state.message));
             } else if (state is LitnerReviewCompleted) {
-              return const Center(
+              return Center(
                   child: Text('تبریک! تمام لغات مرور شدند.',
                       style: TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.bold)));
+                          fontSize: 18.sp, fontWeight: FontWeight.bold)));
             } else if (state is LitnerReviewLoaded) {
               // Check if words list is empty
               if (state.words.isEmpty) {
                 return Center(
                   child: Padding(
-                    padding: const EdgeInsets.all(32.0),
+                    padding: EdgeInsets.all(Dimens.large.r),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
                           Icons.book_outlined,
-                          size: 80,
+                          size: 80.r,
                           color: Colors.grey[400],
                         ),
-                        const SizedBox(height: 24),
+                        SizedBox(height: Dimens.medium.h),
                         Text(
                           'شما ابتدا باید لغاتی را به لاینتر اضافه کنید',
                           style: MyTextStyle.textHeader16Bold.copyWith(
@@ -120,7 +122,7 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
                           ),
                           textAlign: TextAlign.center,
                         ),
-                        const SizedBox(height: 32),
+                        SizedBox(height: Dimens.large.h),
                         ElevatedButton(
                           onPressed: () {
                             Navigator.pushNamed(
@@ -128,17 +130,17 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF4285F4),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 32, vertical: 16),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 32.w, vertical: 16.h),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(12.r),
                             ),
                           ),
-                          child: const Text(
+                          child: Text(
                             'اضافه کردن لغت',
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: 16,
+                              fontSize: 16.sp,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -154,12 +156,12 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
               final currentStep = state.currentIndex;
               return Column(
                 children: [
-                  const SizedBox(height: 16),
+                  SizedBox(height: Dimens.medium.h),
                   StepProgress(
                     currentIndex: currentStep,
                     totalSteps: totalSteps,
                   ),
-                  const SizedBox(height: 64),
+                  SizedBox(height: 64.h),
                   // Expanded(
                   //   child:
                   Center(
@@ -173,10 +175,10 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
                     ),
                   ),
                   // ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: Dimens.medium.h),
                   if (isBack)
                     Padding(
-                      padding: const EdgeInsets.all(16.0),
+                      padding: EdgeInsets.all(Dimens.medium.r),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
@@ -230,11 +232,11 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
   Widget _buildFront(
       BuildContext context, String englishWord, VoidCallback onFlip) {
     return Container(
-      width: 260,
-      height: 320,
+      width: 260.w,
+      height: 320.h,
       decoration: BoxDecoration(
         color: const Color(0xFFE8F0FE),
-        borderRadius: BorderRadius.circular(32),
+        borderRadius: BorderRadius.circular(32.r),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -246,18 +248,18 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
             children: [
               Text(
                 englishWord,
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 28,
-                  color: Color(0xFF3A465A),
+                  fontSize: 28.sp,
+                  color: const Color(0xFF3A465A),
                 ),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: Dimens.small.w),
               GestureDetector(
                 onTap: () => ttsService.speak(englishWord),
                 child: IconifyIcon(
                   icon: "cuida:volume-2-outline",
-                  size: 28,
+                  size: 28.r,
                   color: const Color(0xFF3A465A),
                 ),
               ),
@@ -266,13 +268,13 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
           const Spacer(),
           GestureDetector(
             onTap: onFlip,
-            child: const IconifyIcon(
+            child: IconifyIcon(
               icon: "solar:smartphone-rotate-angle-outline",
-              size: 32,
-              color: Color(0xFF3A465A),
+              size: 32.r,
+              color: const Color(0xFF3A465A),
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: Dimens.medium.h),
         ],
       ),
     );
@@ -281,11 +283,11 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
   Widget _buildBack(BuildContext context, String englishWord,
       String persianWord, VoidCallback onFlip) {
     return Container(
-      width: 260,
-      height: 320,
+      width: 260.w,
+      height: 320.h,
       decoration: BoxDecoration(
         color: const Color(0xFF4285F4),
-        borderRadius: BorderRadius.circular(32),
+        borderRadius: BorderRadius.circular(32.r),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -297,18 +299,18 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
               children: [
                 Text(
                   englishWord,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 28,
+                    fontSize: 28.sp,
                     color: Colors.white,
                   ),
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: Dimens.small.w),
                 GestureDetector(
                   onTap: () => ttsService.speak(englishWord),
                   child: IconifyIcon(
                     icon: "cuida:volume-2-outline",
-                    size: 28,
+                    size: 28.r,
                     color: Colors.white,
                   ),
                 ),
@@ -317,22 +319,22 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
           ),
           Text(
             persianWord,
-            style: const TextStyle(
+            style: TextStyle(
               fontWeight: FontWeight.bold,
-              fontSize: 28,
+              fontSize: 28.sp,
               color: Colors.white,
             ),
           ),
           const Spacer(),
           GestureDetector(
             onTap: onFlip,
-            child: const IconifyIcon(
+            child: IconifyIcon(
               icon: "solar:smartphone-rotate-angle-outline",
-              size: 32,
+              size: 32.r,
               color: Colors.white,
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: Dimens.medium.h),
         ],
       ),
     );
@@ -351,21 +353,21 @@ Widget litnerChoiceButton({
     child: Column(
       children: [
         Container(
-          width: 56,
-          height: 56,
+          width: 56.w,
+          height: 56.h,
           decoration: BoxDecoration(
             color: circleColor,
             shape: BoxShape.circle,
           ),
-          child: Icon(icon, color: iconColor, size: 32),
+          child: Icon(icon, color: iconColor, size: 32.r),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: Dimens.small.h),
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontWeight: FontWeight.bold,
-            color: Color(0xFF3A465A), // dark color
-            fontSize: 16,
+            color: const Color(0xFF3A465A), // dark color
+            fontSize: 16.sp,
           ),
         ),
       ],

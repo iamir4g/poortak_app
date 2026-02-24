@@ -13,6 +13,8 @@ import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/practice_voc
 import 'package:poortak/featueres/fetures_sayareh/widgets/practice_vocabulary_result_modal.dart';
 import 'package:poortak/locator.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/lesson_screen.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/config/dimens.dart';
 
 class PracticeVocabularyScreen extends StatefulWidget {
   static const routeName = "/practice_vocabulary_screen";
@@ -183,14 +185,15 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
             child: Scaffold(
               backgroundColor: MyColors.secondaryTint4,
               appBar: AppBar(
-                shape: const RoundedRectangleBorder(
+                shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(30),
+                    bottomLeft: Radius.circular(30.r),
                   ),
                 ),
                 automaticallyImplyLeading: false,
                 actions: [
                   IconButton(
+                    iconSize: 24.r,
                     icon: const Icon(Icons.arrow_forward),
                     onPressed: () {
                       _navigateToLessonScreen();
@@ -198,7 +201,7 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
                   ),
                 ],
                 centerTitle: true,
-                title: const Text(
+                title: Text(
                   'تمرین واژگان',
                   style: MyTextStyle.textHeader16Bold,
                 ),
@@ -207,7 +210,8 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
                 child: Builder(
                   builder: (innerContext) {
                     if (state is PracticeVocabularyLoading) {
-                      return const Center(child: CircularProgressIndicator());
+                      return Center(
+                          child: CircularProgressIndicator(strokeWidth: 4.w));
                     }
                     if (state is PracticeVocabularyCompleted) {
                       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -223,7 +227,8 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
                           ),
                         );
                       });
-                      return const Center(child: CircularProgressIndicator());
+                      return Center(
+                          child: CircularProgressIndicator(strokeWidth: 4.w));
                     }
                     if (state is PracticeVocabularySuccess) {
                       final correctWord =
@@ -238,14 +243,14 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   SizedBox(
-                                    height: 18,
+                                    height: 18.h,
                                   ),
                                   Container(
-                                    width: 268,
-                                    height: 45,
+                                    width: 268.w,
+                                    height: 45.h,
                                     decoration: BoxDecoration(
                                       color: MyColors.infoBg,
-                                      borderRadius: BorderRadius.circular(20),
+                                      borderRadius: BorderRadius.circular(20.r),
                                     ),
                                     child: Row(
                                       mainAxisAlignment:
@@ -259,7 +264,7 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
                                     ),
                                   ),
                                   SizedBox(
-                                    height: 24,
+                                    height: 24.h,
                                   ),
                                   FutureBuilder<String>(
                                     future:
@@ -268,19 +273,20 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
                                     builder: (context, snapshot) {
                                       if (snapshot.connectionState ==
                                           ConnectionState.waiting) {
-                                        return const CircularProgressIndicator();
+                                        return CircularProgressIndicator(
+                                            strokeWidth: 4.w);
                                       }
                                       if (snapshot.hasError) {
-                                        return const Icon(Icons.error);
+                                        return Icon(Icons.error, size: 24.r);
                                       }
                                       if (snapshot.hasData) {
                                         return ClipRRect(
                                           borderRadius:
-                                              BorderRadius.circular(24),
+                                              BorderRadius.circular(24.r),
                                           child: Image.network(
                                             snapshot.data!,
-                                            height: 264,
-                                            width: 264,
+                                            height: 264.h,
+                                            width: 264.w,
                                             fit: BoxFit.cover,
                                           ),
                                         );
@@ -288,7 +294,7 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
                                       return const SizedBox.shrink();
                                     },
                                   ),
-                                  const SizedBox(height: 60),
+                                  SizedBox(height: 60.h),
                                   if (!showAnswer)
                                     Row(
                                       mainAxisAlignment:
@@ -298,28 +304,28 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
                                         _buildWordButton(wrongWord.word),
                                       ],
                                     ),
-                                  const SizedBox(height: 60),
+                                  SizedBox(height: 60.h),
                                   if (showAnswer) ...[
                                     if (!isCorrect) ...[
                                       Text(
                                         selectedWord!,
                                         style: MyTextStyle.text14Wrong,
                                       ),
-                                      const SizedBox(height: 10),
+                                      SizedBox(height: 10.h),
                                     ],
                                     Text(
                                       correctWord.word,
                                       style: MyTextStyle.text24Correct,
                                     ),
-                                    const SizedBox(height: 5),
+                                    SizedBox(height: 5.h),
                                     Text(
                                       correctWord.translation,
-                                      style: const TextStyle(
-                                        fontSize: 18,
+                                      style: TextStyle(
+                                        fontSize: 18.sp,
                                         color: Colors.grey,
                                       ),
                                     ),
-                                    const SizedBox(height: 20),
+                                    SizedBox(height: 20.h),
                                     Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
@@ -327,12 +333,12 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
                                         IconButton(
                                           onPressed: () =>
                                               _readWord(correctWord.word),
-                                          icon: const IconifyIcon(
+                                          icon: IconifyIcon(
                                             icon: "cuida:volume-2-outline",
-                                            size: 32,
+                                            size: 32.r,
                                           ),
                                         ),
-                                        const SizedBox(width: 20),
+                                        SizedBox(width: 20.w),
                                         BlocBuilder<LitnerBloc, LitnerState>(
                                           builder: (context, litnerState) {
                                             return IconButton(
@@ -344,35 +350,35 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
                                                         correctWord.translation,
                                                       ),
                                               icon: litnerState is LitnerLoading
-                                                  ? const SizedBox(
-                                                      width: 20,
-                                                      height: 20,
+                                                  ? SizedBox(
+                                                      width: 20.w,
+                                                      height: 20.h,
                                                       child:
                                                           CircularProgressIndicator(
-                                                        strokeWidth: 2,
+                                                        strokeWidth: 2.w,
                                                       ),
                                                     )
                                                   : const Icon(
                                                       Icons.add_circle_outline),
-                                              iconSize: 32,
+                                              iconSize: 32.r,
                                             );
                                           },
                                         ),
                                       ],
                                     ),
-                                    const SizedBox(height: 20),
+                                    SizedBox(height: 20.h),
                                     ElevatedButton(
                                       onPressed: _nextQuestion,
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: MyColors.primary,
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 32, vertical: 16),
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 32.w, vertical: 16.h),
                                       ),
-                                      child: const Text(
+                                      child: Text(
                                         'سوال بعدی',
                                         style: TextStyle(
                                           color: Colors.white,
-                                          fontSize: 16,
+                                          fontSize: 16.sp,
                                           fontFamily: "IranSans",
                                           fontWeight: FontWeight.bold,
                                         ),
@@ -405,13 +411,13 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
       onPressed: () => _checkAnswer(word),
       style: ElevatedButton.styleFrom(
         backgroundColor: MyColors.primary,
-        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+        padding: EdgeInsets.symmetric(horizontal: 32.w, vertical: 16.h),
       ),
       child: Text(
         word,
-        style: const TextStyle(
+        style: TextStyle(
           color: Colors.white,
-          fontSize: 16,
+          fontSize: 16.sp,
           fontFamily: "IranSans",
           fontWeight: FontWeight.bold,
         ),

@@ -20,6 +20,8 @@ import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/common/services/getImageUrl_service.dart';
 import 'package:poortak/common/widgets/reusable_modal.dart';
 import 'package:lottie/lottie.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/config/dimens.dart';
 
 class LessonScreen extends StatefulWidget {
   static const routeName = "/lesson_screen";
@@ -275,21 +277,21 @@ class _LessonScreenState extends State<LessonScreen> {
       child: Scaffold(
         backgroundColor: const Color(0xFFF6F9FE),
         appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(57),
+          preferredSize: Size.fromHeight(57.h),
           child: SafeArea(
             child: Container(
-              padding: const EdgeInsets.fromLTRB(16, 0, 32, 0),
-              height: 57,
+              padding: EdgeInsets.fromLTRB(16.w, 0, 32.w, 0),
+              height: 57.h,
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(33.5),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(33.5.r),
                 ),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.05),
                     offset: const Offset(0, 1),
-                    blurRadius: 1,
+                    blurRadius: 1.r,
                   ),
                 ],
               ),
@@ -303,24 +305,24 @@ class _LessonScreenState extends State<LessonScreen> {
                             ? state.lesson.name
                             : widget.title,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'IranSans',
-                          fontSize: 16,
+                          fontSize: 16.sp,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF3D495C),
+                          color: const Color(0xFF3D495C),
                         ),
                       );
                     },
                   ),
                   SizedBox(
-                    width: 40,
-                    height: 40,
+                    width: 40.w,
+                    height: 40.h,
                     child: IconButton(
                       onPressed: () => Navigator.pop(context),
-                      icon: const Icon(
+                      icon: Icon(
                         Icons.arrow_forward,
-                        color: Color(0xFF3D495C),
-                        size: 28,
+                        color: const Color(0xFF3D495C),
+                        size: 28.sp,
                       ),
                     ),
                   ),
@@ -338,15 +340,15 @@ class _LessonScreenState extends State<LessonScreen> {
     return SingleChildScrollView(
       child: Column(
         children: [
-          const SizedBox(height: 28),
+          SizedBox(height: 28.h),
           _buildVideoSection(),
-          const SizedBox(height: 18),
+          SizedBox(height: 18.h),
           _buildConversationCard(),
-          const SizedBox(height: 12),
+          SizedBox(height: 12.h),
           _buildVocabularyCard(),
-          const SizedBox(height: 12),
+          SizedBox(height: 12.h),
           _buildQuizCard(),
-          const SizedBox(height: 88),
+          SizedBox(height: 88.h),
           _buildDictionaryButton(),
         ],
       ),
@@ -356,16 +358,16 @@ class _LessonScreenState extends State<LessonScreen> {
   Widget _buildCompletionHeader() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: EdgeInsets.all(Dimens.medium),
+      margin: EdgeInsets.symmetric(horizontal: Dimens.medium),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(20.r),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            blurRadius: 10.r,
+            offset: Offset(0, 4.h),
           ),
         ],
       ),
@@ -379,26 +381,26 @@ class _LessonScreenState extends State<LessonScreen> {
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text(
+                    Text(
                       'خوانده شده',
                       style: TextStyle(
                         fontFamily: 'IranSans',
-                        fontSize: 14,
+                        fontSize: 14.sp,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF3D495C),
+                        color: const Color(0xFF3D495C),
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    const Icon(
+                    SizedBox(width: 8.w),
+                    Icon(
                       Icons.check_circle,
-                      color: Color(0xFF4CAF50),
-                      size: 24,
+                      color: const Color(0xFF4CAF50),
+                      size: 24.sp,
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16.h),
                 SizedBox(
-                  height: 48,
+                  height: 48.h,
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () {
@@ -412,15 +414,15 @@ class _LessonScreenState extends State<LessonScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFFF9F29),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(25),
+                        borderRadius: BorderRadius.circular(25.r),
                       ),
                       elevation: 0,
                     ),
-                    child: const Text(
+                    child: Text(
                       'مرور دوباره درس',
                       style: TextStyle(
                         fontFamily: 'IranSans',
-                        fontSize: 16,
+                        fontSize: 16.sp,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),
@@ -430,11 +432,11 @@ class _LessonScreenState extends State<LessonScreen> {
               ],
             ),
           ),
-          const SizedBox(width: 16),
+          SizedBox(width: 16.w),
           Image.asset(
             'assets/images/iknow/medal.png',
-            width: 90,
-            height: 90,
+            width: 90.w,
+            height: 90.h,
             fit: BoxFit.contain,
           ),
         ],
@@ -541,20 +543,20 @@ class _LessonScreenState extends State<LessonScreen> {
       persianLabel: "واژگان",
       progress: _progress?.vocabulary,
       badge: Container(
-        width: 40,
-        height: 15,
+        width: 40.w,
+        height: 15.h,
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(8.r),
         ),
-        child: const Center(
+        child: Center(
           child: Text(
             "Word",
             style: TextStyle(
               fontFamily: 'IranSans',
-              fontSize: 10,
+              fontSize: 10.sp,
               fontWeight: FontWeight.w900,
-              color: Color(0xFF95D6A4),
+              color: const Color(0xFF95D6A4),
             ),
           ),
         ),
@@ -607,18 +609,18 @@ class _LessonScreenState extends State<LessonScreen> {
     return Align(
       alignment: Alignment.centerLeft,
       child: Padding(
-        padding: const EdgeInsets.only(left: 20),
+        padding: EdgeInsets.only(left: 20.w),
         child: Container(
-          width: 63,
-          height: 63,
+          width: 63.w,
+          height: 63.h,
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(50),
+            borderRadius: BorderRadius.circular(50.r),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.04),
                 offset: const Offset(0, 0),
-                blurRadius: 4,
+                blurRadius: 4.r,
               ),
             ],
           ),
@@ -633,8 +635,8 @@ class _LessonScreenState extends State<LessonScreen> {
             },
             icon: Image.asset(
               "assets/images/iknow/dictionary_icon.png",
-              width: 36,
-              height: 36,
+              width: 36.w,
+              height: 36.h,
             ),
           ),
         ),

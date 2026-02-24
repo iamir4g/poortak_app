@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/common/widgets/custom_pdfReader.dart';
 import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/config/myTextStyle.dart';
@@ -79,7 +80,7 @@ class PdfReaderScreen extends StatelessWidget {
                       stops: [0.1, 0.54, 1.0],
                     ),
                   ),
-                  child: const Center(child: DotLoadingWidget(size: 100)),
+                  child: Center(child: DotLoadingWidget(size: 100.r)),
                 ),
               ),
             );

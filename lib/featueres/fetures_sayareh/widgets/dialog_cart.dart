@@ -10,6 +10,7 @@ import 'package:poortak/common/widgets/primaryButton.dart';
 import 'package:poortak/common/widgets/reusable_modal.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/models/cart_enum.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/models/shopping_cart_model.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
@@ -156,17 +157,7 @@ class _DialogCartState extends State<DialogCart> {
 
   @override
   Widget build(BuildContext context) {
-    final cartItem = ShoppingCartItem(
-      title: widget.item.name,
-      description: widget.item.description,
-      image: widget.item.thumbnail,
-      isLock: widget.item.price != "0",
-      price: int.parse(widget.item.price),
-    );
-
     final l10n = AppLocalizations.of(context);
-    final width = MediaQuery.of(context).size.width;
-    final isSmallWidth = width < 360;
     return Dialog(
         backgroundColor: MyColors.background,
         child: ConstrainedBox(
@@ -176,66 +167,79 @@ class _DialogCartState extends State<DialogCart> {
             child: Column(
               children: [
                 SizedBox(
-                  height: 18,
+                  height: 18.h,
                 ),
                 Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    padding: EdgeInsets.symmetric(horizontal: 16.w),
                     child: TabBar(
-                        isScrollable: isSmallWidth,
+                        isScrollable: false,
                         dividerHeight: 0.0,
-                        labelStyle: MyTextStyle.tabLabel16
-                            .copyWith(fontSize: isSmallWidth ? 14 : 16),
+                        labelStyle:
+                            MyTextStyle.tabLabel16.copyWith(fontSize: 14.sp),
+                        labelPadding: EdgeInsets.symmetric(horizontal: 4.w),
                         indicatorColor: Colors.transparent,
                         labelColor: MyColors.textLight,
                         unselectedLabelColor: MyColors.textSecondary,
                         indicator: BoxDecoration(
                           color: MyColors.darkBackground,
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(20.r),
                         ),
                         indicatorSize: TabBarIndicatorSize.tab,
-                        tabs: const [
+                        tabs: [
                           Tab(
-                            text: "خرید تکی",
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                "خرید تکی",
+                              ),
+                            ),
                           ),
-                          Tab(text: "خرید مجموعه %"),
+                          Tab(
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                "خرید مجموعه %",
+                              ),
+                            ),
+                          ),
                         ])),
                 SizedBox(
-                  height: 16,
+                  height: 16.h,
                 ),
                 Expanded(
                   child: TabBarView(
                     children: [
                       SingleChildScrollView(
                         child: Padding(
-                          padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
+                          padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 0),
                           child: Column(
                             children: [
                               Stack(
                                 children: [
                                   Container(
-                                    width: 286,
-                                    height: 177,
+                                    width: 286.w,
+                                    height: 177.h,
                                     decoration: BoxDecoration(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(27)),
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(27.r)),
                                       color: MyColors.background,
                                     ),
                                     child: Image.asset(
                                         "assets/images/cart/single_lesson.png"),
                                   ),
                                   Positioned(
-                                    bottom: 5,
-                                    left: 8,
+                                    bottom: 5.h,
+                                    left: 8.w,
                                     child: Container(
-                                      width: 104,
-                                      height: 30,
+                                      width: 104.w,
+                                      height: 30.h,
                                       decoration: BoxDecoration(
                                           borderRadius: BorderRadius.all(
-                                              Radius.circular(20)),
+                                              Radius.circular(20.r)),
                                           color: MyColors.background),
                                       child: Padding(
                                         padding:
-                                            EdgeInsets.fromLTRB(4, 0, 4, 0),
+                                            EdgeInsets.fromLTRB(4.w, 0, 4.w, 0),
                                         child: Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceAround,
@@ -261,7 +265,7 @@ class _DialogCartState extends State<DialogCart> {
                                 ],
                               ),
                               SizedBox(
-                                height: 26,
+                                height: 26.h,
                               ),
                               Center(
                                 child: Row(
@@ -271,7 +275,7 @@ class _DialogCartState extends State<DialogCart> {
                                         image: AssetImage(
                                             "assets/images/lock_image.png")),
                                     SizedBox(
-                                      width: 8,
+                                      width: 8.w,
                                     ),
                                     Text(
                                       "درس اول انیمیشن سیاره آی نو",
@@ -281,18 +285,18 @@ class _DialogCartState extends State<DialogCart> {
                                 ),
                               ),
                               SizedBox(
-                                height: 18,
+                                height: 18.h,
                               ),
                               Container(
-                                  height: 54,
+                                  height: 54.h,
                                   decoration: BoxDecoration(
                                     color: MyColors.cardBackground1,
                                     borderRadius:
-                                        BorderRadius.all(Radius.circular(10)),
+                                        BorderRadius.all(Radius.circular(10.r)),
                                   ),
                                   child: Padding(
                                     padding:
-                                        EdgeInsets.symmetric(horizontal: 16),
+                                        EdgeInsets.symmetric(horizontal: 16.w),
                                     child: Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
@@ -316,11 +320,11 @@ class _DialogCartState extends State<DialogCart> {
                                     ),
                                   )),
                               SizedBox(
-                                height: 20,
+                                height: 20.h,
                               ),
                               PrimaryButton(
-                                  width: 286,
-                                  height: 65,
+                                  width: 286.w,
+                                  height: 65.h,
                                   lable: l10n.add_to_cart,
                                   onPressed: () {
                                     // Add single course to cart using item ID and IKnowCourse type
@@ -338,27 +342,27 @@ class _DialogCartState extends State<DialogCart> {
                         child: Column(
                           children: [
                             SizedBox(
-                              height: 16,
+                              height: 16.h,
                             ),
                             Stack(
                               children: [
                                 Container(
-                                  width: 286,
-                                  height: 177,
+                                  width: 286.w,
+                                  height: 177.h,
                                   decoration: BoxDecoration(
                                     borderRadius:
-                                        BorderRadius.all(Radius.circular(27)),
+                                        BorderRadius.all(Radius.circular(27.r)),
                                     color: MyColors.background,
                                   ),
                                   child: Image.asset(
                                       "assets/images/cart/bundle_lesson.png"),
                                 ),
                                 Positioned(
-                                    bottom: 35,
-                                    right: 8,
+                                    bottom: 35.h,
+                                    right: 8.w,
                                     child: SizedBox(
-                                      width: 30,
-                                      height: 30,
+                                      width: 30.w,
+                                      height: 30.h,
                                       // decoration: BoxDecoration(
                                       //   color: Colors.white,
                                       //   borderRadius: BorderRadius.circular(15),
@@ -368,11 +372,11 @@ class _DialogCartState extends State<DialogCart> {
                                           icon: "arcticons:pdf-viewer"),
                                     )),
                                 Positioned(
-                                  bottom: 5,
-                                  right: 8,
+                                  bottom: 5.h,
+                                  right: 8.w,
                                   child: SizedBox(
-                                    width: 30,
-                                    height: 30,
+                                    width: 30.w,
+                                    height: 30.h,
                                     // decoration: BoxDecoration(
                                     //   color: Colors.white,
                                     //   borderRadius: BorderRadius.circular(15),
@@ -383,17 +387,18 @@ class _DialogCartState extends State<DialogCart> {
                                   ),
                                 ),
                                 Positioned(
-                                  bottom: 5,
-                                  left: 8,
+                                  bottom: 5.h,
+                                  left: 8.w,
                                   child: Container(
-                                    width: 104,
-                                    height: 30,
+                                    width: 104.w,
+                                    height: 30.h,
                                     decoration: BoxDecoration(
                                         borderRadius: BorderRadius.all(
-                                            Radius.circular(20)),
+                                            Radius.circular(20.r)),
                                         color: MyColors.background),
                                     child: Padding(
-                                      padding: EdgeInsets.fromLTRB(4, 0, 2, 0),
+                                      padding:
+                                          EdgeInsets.fromLTRB(4.w, 0, 2.w, 0),
                                       child: Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceAround,
@@ -419,7 +424,7 @@ class _DialogCartState extends State<DialogCart> {
                               ],
                             ),
                             SizedBox(
-                              height: 26,
+                              height: 26.h,
                             ),
                             Container(
                               decoration: const BoxDecoration(
@@ -427,7 +432,7 @@ class _DialogCartState extends State<DialogCart> {
                               child: Column(
                                 children: [
                                   SizedBox(
-                                    height: 16,
+                                    height: 16.h,
                                   ),
                                   Center(
                                       child: Text(
@@ -435,18 +440,18 @@ class _DialogCartState extends State<DialogCart> {
                                     style: MyTextStyle.textMatn14Bold,
                                   )),
                                   SizedBox(
-                                    height: 18,
+                                    height: 18.h,
                                   ),
                                   //items in shopping cart
                                   SizedBox(
-                                    width: 248,
+                                    width: 248.w,
                                     child: ListView.separated(
                                         shrinkWrap: true,
                                         physics:
                                             const NeverScrollableScrollPhysics(),
                                         itemCount: 8,
                                         separatorBuilder: (context, index) {
-                                          return const SizedBox(height: 6);
+                                          return SizedBox(height: 6.h);
                                         },
                                         itemBuilder: (context, index) {
                                           return ItemMultiCard(
@@ -458,7 +463,7 @@ class _DialogCartState extends State<DialogCart> {
                                   ),
 
                                   SizedBox(
-                                    height: 20,
+                                    height: 20.h,
                                   ),
                                   Center(
                                       child: Text(
@@ -466,30 +471,30 @@ class _DialogCartState extends State<DialogCart> {
                                     style: MyTextStyle.textMatn14Bold,
                                   )),
                                   SizedBox(
-                                    height: 16,
+                                    height: 16.h,
                                   ),
                                   ItemMultiCard(
                                     title: "فرهنگ لغت پورتک ",
                                     price: "75000",
                                   ),
                                   SizedBox(
-                                    height: 4,
+                                    height: 4.h,
                                   ),
                                   ItemMultiCard(
                                     title: "گرامر پورتک",
                                     price: "75000",
                                   ),
                                   SizedBox(
-                                    height: 14,
+                                    height: 14.h,
                                   )
                                 ],
                               ),
                             ),
                             SizedBox(
-                              height: 16,
+                              height: 16.h,
                             ),
                             Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 16),
+                              padding: EdgeInsets.symmetric(horizontal: 16.w),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
@@ -516,15 +521,16 @@ class _DialogCartState extends State<DialogCart> {
                                     ],
                                   ),
                                   SizedBox(
-                                    height: 16,
+                                    height: 16.h,
                                   ),
                                   Container(
-                                    width: 286,
-                                    height: 42,
+                                    width: 286.w,
+                                    height: 42.h,
                                     decoration: ShapeDecoration(
                                       color: MyColors.discountBackground,
                                       shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10),
+                                        borderRadius:
+                                            BorderRadius.circular(10.r),
                                       ),
                                     ),
                                     child: Row(
@@ -540,15 +546,15 @@ class _DialogCartState extends State<DialogCart> {
                                           //     MainAxisAlignment.spaceAround,
                                           children: [
                                             Container(
-                                              width: 33,
-                                              height: 17.84,
+                                              width: 33.w,
+                                              height: 17.84.h,
                                               alignment: Alignment.center,
                                               decoration: ShapeDecoration(
                                                 color: MyColors.darkErrorLight,
                                                 shape: RoundedRectangleBorder(
                                                   borderRadius:
                                                       BorderRadius.circular(
-                                                          11.50),
+                                                          11.50.r),
                                                 ),
                                               ),
                                               child: Text(
@@ -558,14 +564,14 @@ class _DialogCartState extends State<DialogCart> {
                                               ),
                                             ),
                                             SizedBox(
-                                              width: 4,
+                                              width: 4.w,
                                             ),
                                             Text(
                                               "150000",
                                               style: MyTextStyle.textMatn12W300,
                                             ),
                                             SizedBox(
-                                              width: 4,
+                                              width: 4.w,
                                             ),
                                             Text(
                                               l10n.toman,
@@ -577,19 +583,20 @@ class _DialogCartState extends State<DialogCart> {
                                     ),
                                   ),
                                   SizedBox(
-                                    height: 16,
+                                    height: 16.h,
                                   ),
                                   Container(
-                                    width: 286,
-                                    height: 54,
+                                    width: 286.w,
+                                    height: 54.h,
                                     decoration: ShapeDecoration(
                                       color: MyColors.background2,
                                       shape: RoundedRectangleBorder(
-                                        side: const BorderSide(
-                                          width: 2,
+                                        side: BorderSide(
+                                          width: 2.w,
                                           color: MyColors.primary,
                                         ),
-                                        borderRadius: BorderRadius.circular(10),
+                                        borderRadius:
+                                            BorderRadius.circular(10.r),
                                       ),
                                     ),
                                     child: Row(
@@ -607,7 +614,7 @@ class _DialogCartState extends State<DialogCart> {
                                               style: MyTextStyle.textMatn14Bold,
                                             ),
                                             SizedBox(
-                                              width: 4,
+                                              width: 4.w,
                                             ),
                                             Text(
                                               l10n.toman,
@@ -619,14 +626,14 @@ class _DialogCartState extends State<DialogCart> {
                                     ),
                                   ),
                                   SizedBox(
-                                    height: 16,
+                                    height: 16.h,
                                   ),
                                 ],
                               ),
                             ),
                             PrimaryButton(
-                                width: 286,
-                                height: 65,
+                                width: 286.w,
+                                height: 65.h,
                                 lable: l10n.add_to_cart,
                                 onPressed: () {
                                   // Add bundle to cart using specific item ID and IKnow type
@@ -637,7 +644,7 @@ class _DialogCartState extends State<DialogCart> {
                                       "مجموعه کامل سیاره آی نو");
                                 }),
                             SizedBox(
-                              height: 20,
+                              height: 20.h,
                             )
                           ],
                         ),
@@ -646,21 +653,21 @@ class _DialogCartState extends State<DialogCart> {
                   ),
                 ),
                 Container(
-                  width: 360,
-                  height: 112,
+                  width: 360.w,
+                  height: 112.h,
                   decoration: ShapeDecoration(
                     color: MyColors.cartFooterBackground,
-                    shape: const RoundedRectangleBorder(
+                    shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(25),
-                        bottomRight: Radius.circular(25),
+                        bottomLeft: Radius.circular(25.r),
+                        bottomRight: Radius.circular(25.r),
                       ),
                     ),
                   ),
                   child: Row(
                     children: [
                       Image.asset("assets/images/cart/subtract.png"),
-                      const SizedBox(width: 8),
+                      SizedBox(width: 8.w),
                       Expanded(
                         child: Text(
                           "جهت کسب اطلاعات بیشتر به وبسایت پورتک به نشانی www.poortak.ir مراجه کنید.",

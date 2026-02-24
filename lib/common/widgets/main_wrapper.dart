@@ -5,6 +5,7 @@ import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/common/widgets/bottom_nav.dart';
 import 'package:poortak/common/widgets/custom_drawer.dart';
@@ -354,24 +355,24 @@ class _MainWrapperState extends State<MainWrapper> {
                           color: themeState.isDark
                               ? MyColors.darkBackground
                               : Colors.white,
-                          borderRadius: const BorderRadius.only(
-                            bottomLeft: Radius.circular(33.5),
+                          borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(33.5.r),
                           ),
                           boxShadow: [
                             BoxShadow(
                               color: themeState.isDark
                                   ? Colors.black.withOpacity(0.3)
                                   : const Color.fromRGBO(0, 0, 0, 0.05),
-                              offset: const Offset(0, 1),
-                              blurRadius: 1,
+                              offset: Offset(0, 1.h),
+                              blurRadius: 1.r,
                               spreadRadius: 0,
                             ),
                           ],
                         ),
                       ),
-                      shape: const RoundedRectangleBorder(
+                      shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(33.5),
+                          bottomLeft: Radius.circular(33.5.r),
                         ),
                       ),
                     ),

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/config/myTextStyle.dart';
 
 class LitnerCard extends StatelessWidget {
   final LinearGradient gradient;
@@ -22,20 +24,20 @@ class LitnerCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 359,
-        height: 143,
+        width: 359.w,
+        height: 143.h,
         decoration: BoxDecoration(
           gradient: gradient,
-          borderRadius: BorderRadius.circular(40),
+          borderRadius: BorderRadius.circular(40.r),
         ),
         child: Row(
           children: [
             // Right: White circle with image
             Padding(
-              padding: const EdgeInsets.only(right: 16, left: 8),
+              padding: EdgeInsets.only(right: 16.w, left: 8.w),
               child: Container(
-                width: 79,
-                height: 79,
+                width: 79.w,
+                height: 79.h,
                 decoration: const BoxDecoration(
                   color: Colors.white,
                   shape: BoxShape.circle,
@@ -43,8 +45,8 @@ class LitnerCard extends StatelessWidget {
                 child: Center(
                   child: Image.asset(
                     icon,
-                    width: 44,
-                    height: 44,
+                    width: 44.w,
+                    height: 44.h,
                     fit: BoxFit.contain,
                   ),
                 ),
@@ -53,8 +55,8 @@ class LitnerCard extends StatelessWidget {
             // Center/Left: Texts
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.only(
-                    right: 16, left: 24, top: 32, bottom: 32),
+                padding: EdgeInsets.only(
+                    right: 16.w, left: 24.w, top: 32.h, bottom: 32.h),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -64,33 +66,26 @@ class LitnerCard extends StatelessWidget {
                       children: [
                         Text(
                           number,
-                          style: const TextStyle(
-                            fontFamily: 'IRANSans',
-                            fontWeight: FontWeight.w900,
-                            fontSize: 20,
-                            color: Color(0xFF29303D),
+                          style: MyTextStyle.textMatn18Bold.copyWith(
+                            fontSize: 20.sp,
+                            color: const Color(0xFF29303D),
                           ),
                         ),
-                        const SizedBox(width: 8),
+                        SizedBox(width: 8.w),
                         Text(
                           label,
-                          style: const TextStyle(
-                            fontFamily: 'IRANSans',
-                            fontWeight: FontWeight.w500,
-                            fontSize: 20,
-                            color: Color(0xFF29303D),
+                          style: MyTextStyle.textMatn17W700.copyWith(
+                            fontSize: 20.sp,
+                            color: const Color(0xFF29303D),
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8.h),
                     Text(
                       subLabel,
-                      style: const TextStyle(
-                        fontFamily: 'IRANSans',
-                        fontWeight: FontWeight.w500,
-                        fontSize: 12,
-                        color: Color(0xFF52617A),
+                      style: MyTextStyle.textMatn12W500.copyWith(
+                        color: const Color(0xFF52617A),
                       ),
                     ),
                   ],
@@ -124,24 +119,24 @@ class LitnerTodayCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 359,
-        height: 112,
+        width: 359.w,
+        height: 112.h,
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             colors: [Color(0xFFFFF5DB), Color(0xFFFEE8DB)],
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
           ),
-          borderRadius: BorderRadius.circular(40),
+          borderRadius: BorderRadius.circular(40.r),
         ),
         child: Row(
           children: [
             // Right: White circle with image
             Padding(
-              padding: const EdgeInsets.only(right: 16, left: 8),
+              padding: EdgeInsets.only(right: 16.w, left: 8.w),
               child: Container(
-                width: 79,
-                height: 79,
+                width: 79.w,
+                height: 79.h,
                 decoration: const BoxDecoration(
                   color: Colors.white,
                   shape: BoxShape.circle,
@@ -149,8 +144,8 @@ class LitnerTodayCard extends StatelessWidget {
                 child: Center(
                   child: Image.asset(
                     imageAsset,
-                    width: 42,
-                    height: 41,
+                    width: 42.w,
+                    height: 41.h,
                     fit: BoxFit.contain,
                   ),
                 ),
@@ -164,21 +159,16 @@ class LitnerTodayCard extends StatelessWidget {
                 children: [
                   Text(
                     number,
-                    style: const TextStyle(
-                      fontFamily: 'IRANSans',
-                      fontWeight: FontWeight.w900,
-                      fontSize: 20,
-                      color: Color(0xFF29303D),
+                    style: MyTextStyle.textMatn18Bold.copyWith(
+                      fontSize: 20.sp,
+                      color: const Color(0xFF29303D),
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  SizedBox(height: 2.h),
                   Text(
                     label,
-                    style: const TextStyle(
-                      fontFamily: 'IRANSans',
-                      fontWeight: FontWeight.w500,
-                      fontSize: 12,
-                      color: Color(0xFF52617A),
+                    style: MyTextStyle.textMatn12W500.copyWith(
+                      color: const Color(0xFF52617A),
                     ),
                   ),
                 ],
@@ -186,22 +176,20 @@ class LitnerTodayCard extends StatelessWidget {
             ),
             // Left: Button
             Padding(
-              padding: const EdgeInsets.only(left: 18, right: 8),
+              padding: EdgeInsets.only(left: 18.w, right: 8.w),
               child: Container(
-                width: 105,
-                height: 44,
+                width: 105.w,
+                height: 44.h,
                 decoration: BoxDecoration(
                   color: const Color(0xFFFFA73F),
-                  borderRadius: BorderRadius.circular(30),
+                  borderRadius: BorderRadius.circular(30.r),
                 ),
                 alignment: Alignment.center,
                 child: Text(
                   buttonText,
-                  style: const TextStyle(
-                    fontFamily: 'IRANSans',
-                    fontWeight: FontWeight.w700,
-                    fontSize: 14,
-                    color: Color(0xFFFFFFFF),
+                  style: MyTextStyle.textMatnBtn.copyWith(
+                    fontSize: 14.sp,
+                    color: const Color(0xFFFFFFFF),
                   ),
                 ),
               ),

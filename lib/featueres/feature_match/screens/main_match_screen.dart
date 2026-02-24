@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
 import 'package:poortak/config/myColors.dart';
+import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_match/screens/match_screen.dart';
 
 class MainMatchScreen extends StatelessWidget {
@@ -26,19 +28,19 @@ class MainMatchScreen extends StatelessWidget {
             children: [
               // Header
               Container(
-                height: 57,
+                height: 57.h,
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: const BoxDecoration(
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(33.5),
+                    bottomLeft: Radius.circular(33.5.r),
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Color(0x0D000000),
-                      offset: Offset(0, 1),
-                      blurRadius: 1,
+                      color: const Color(0x0D000000),
+                      offset: Offset(0, 1.h),
+                      blurRadius: 1.r,
                     ),
                   ],
                 ),
@@ -46,30 +48,25 @@ class MainMatchScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     // Title
-
                     Text(
                       'مسابقه پورتک',
-                      style: TextStyle(
-                        fontFamily: 'IRANSans',
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF3D495C),
+                      style: MyTextStyle.textHeader16Bold.copyWith(
+                        color: MyColors.textMatn2,
                       ),
                       textAlign: TextAlign.center,
                     ),
-                    // ),
 
                     // Back Button
                     Container(
-                      width: 50,
-                      height: 50,
-                      margin: const EdgeInsets.only(left: 16),
+                      width: 50.w,
+                      height: 50.h,
+                      margin: EdgeInsets.only(left: 16.w),
                       child: IconButton(
                         onPressed: () => Navigator.of(context).pop(),
-                        icon: const Icon(
+                        icon: Icon(
                           Icons.arrow_forward,
                           color: MyColors.textMatn1,
-                          size: 20,
+                          size: 20.r,
                         ),
                       ),
                     ),
@@ -81,10 +78,10 @@ class MainMatchScreen extends StatelessWidget {
               Expanded(
                 child: SingleChildScrollView(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                      EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
                   child: Column(
                     children: [
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20.h),
 
                       // Match Option Cards
                       _buildMatchCard(
@@ -92,23 +89,11 @@ class MainMatchScreen extends StatelessWidget {
                         title: 'شرکت در مسابقه',
                         onTap: () {
                           // Navigate to join match screen
-                          // _showComingSoonDialog(context);
                           Navigator.pushNamed(context, MatchScreen.routeName);
                         },
                       ),
 
-                      const SizedBox(height: 20),
-
-                      // _buildMatchCard(
-                      //   iconLottiePath: 'assets/images/match/mylists.json',
-                      //   title: 'اسامی برندگان مسابقه',
-                      //   onTap: () {
-                      //     // Navigate to winners list screen
-                      //     _showComingSoonDialog(context);
-                      //   },
-                      // ),
-
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20.h),
 
                       _buildMatchCard(
                         iconLottiePath: 'assets/images/match/prize.json',
@@ -119,7 +104,7 @@ class MainMatchScreen extends StatelessWidget {
                         },
                       ),
 
-                      const SizedBox(height: 40),
+                      SizedBox(height: 40.h),
                     ],
                   ),
                 ),
@@ -139,16 +124,16 @@ class MainMatchScreen extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 350,
-        height: 162,
+        width: 350.w,
+        height: 162.h,
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: const [
+          borderRadius: BorderRadius.circular(20.r),
+          boxShadow: [
             BoxShadow(
-              color: Color(0x0A000000),
-              offset: Offset(0, 0),
-              blurRadius: 4,
+              color: const Color(0x0A000000),
+              offset: const Offset(0, 0),
+              blurRadius: 4.r,
             ),
           ],
         ),
@@ -157,28 +142,26 @@ class MainMatchScreen extends StatelessWidget {
           children: [
             // Icon
             Container(
-              width: 80,
-              height: 80,
+              width: 80.w,
+              height: 80.h,
               decoration: BoxDecoration(
                 color: MyColors.primary.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
               child: Lottie.asset(
-                iconLottiePath, // Replace with your actual Lottie file
+                iconLottiePath,
                 fit: BoxFit.contain,
               ),
             ),
 
-            const SizedBox(height: 16),
+            SizedBox(height: 16.h),
 
             // Title
             Text(
               title,
-              style: const TextStyle(
-                fontFamily: 'IRANSans',
-                fontSize: 16,
+              style: MyTextStyle.textMatn16.copyWith(
                 fontWeight: FontWeight.w500,
-                color: Color(0xFF29303D),
+                color: const Color(0xFF29303D),
               ),
               textAlign: TextAlign.center,
             ),
@@ -195,23 +178,19 @@ class MainMatchScreen extends StatelessWidget {
         return AlertDialog(
           backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(20.r),
           ),
-          title: const Text(
+          title: Text(
             'به زودی',
-            style: TextStyle(
-              fontFamily: 'IRANSans',
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
+            style: MyTextStyle.textMatn18Bold.copyWith(
               color: MyColors.textMatn1,
             ),
             textAlign: TextAlign.center,
           ),
-          content: const Text(
+          content: Text(
             'این بخش به زودی راه‌اندازی خواهد شد.',
-            style: TextStyle(
-              fontFamily: 'IRANSans',
-              fontSize: 14,
+            style: MyTextStyle.textMatn14Bold.copyWith(
+              fontWeight: FontWeight.normal,
               color: MyColors.textMatn1,
             ),
             textAlign: TextAlign.center,
@@ -223,17 +202,14 @@ class MainMatchScreen extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: MyColors.primary,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(20.r),
                   ),
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                      EdgeInsets.symmetric(horizontal: 30.w, vertical: 12.h),
                 ),
-                child: const Text(
+                child: Text(
                   'متوجه شدم',
-                  style: TextStyle(
-                    fontFamily: 'IRANSans',
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
+                  style: MyTextStyle.textMatn14Bold.copyWith(
                     color: Colors.white,
                   ),
                 ),

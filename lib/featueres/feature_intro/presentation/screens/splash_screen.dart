@@ -4,6 +4,7 @@ import 'package:app_links/app_links.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 import 'package:poortak/common/utils/prefs_operator.dart';
@@ -142,13 +143,13 @@ class _SplashScreenState extends State<SplashScreen>
                                 height:
                                     width * 0.7 * 0.5, // Maintain aspect ratio
                               ),
-                              const SizedBox(height: 30),
+                              SizedBox(height: 30.h),
                               // Persian text
-                              const Text(
+                              Text(
                                 'ایده ای جدید از انتشارات تاجیک',
                                 style: TextStyle(
                                   fontFamily: 'IranSans',
-                                  fontSize: 15,
+                                  fontSize: 15.sp,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,
                                   height: 1.4,
@@ -172,7 +173,7 @@ class _SplashScreenState extends State<SplashScreen>
                               textDirection: TextDirection.ltr,
                               child: LoadingAnimationWidget.progressiveDots(
                                 color: Colors.white,
-                                size: 50,
+                                size: 50.r,
                               ),
                             );
                           }

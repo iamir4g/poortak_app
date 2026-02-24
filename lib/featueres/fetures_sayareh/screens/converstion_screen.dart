@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconify_design/iconify_design.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
+import 'package:poortak/config/dimens.dart';
 import 'package:poortak/locator.dart';
 import 'package:poortak/common/services/tts_service.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/conversation_model.dart';
@@ -242,9 +244,9 @@ class _ConversationScreenState extends State<ConversationScreen> {
         backgroundColor: MyColors.secondaryTint4,
         // نوار بالای صفحه با عنوان "مکالمه"
         appBar: AppBar(
-          shape: const RoundedRectangleBorder(
+          shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(30),
+              bottomLeft: Radius.circular(30.r),
             ),
           ),
           automaticallyImplyLeading: false,
@@ -255,7 +257,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
             ),
           ],
           centerTitle: true,
-          title: const Text(
+          title: Text(
             'مکالمه',
             style: MyTextStyle.textHeader16Bold,
           ),
@@ -267,7 +269,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
           ),
           child: SafeArea(
             child: Container(
-              height: 60,
+              height: 60.h,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -295,7 +297,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                       },
                       icon: IconifyIcon(
                         icon: "ri:skip-right-fill",
-                        size: 30,
+                        size: 30.r,
                         color: MyColors.textPrimary,
                       )),
                   // دکمه پخش/توقف تمام مکالمه
@@ -310,7 +312,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                         },
                         icon: Icon(
                           isPlaying ? Icons.stop_circle : Icons.play_circle,
-                          size: 50,
+                          size: 50.r,
                           color: isPlaying ? MyColors.error : MyColors.success,
                         ),
                       );
@@ -322,7 +324,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                       },
                       icon: IconifyIcon(
                         icon: "ri:skip-left-fill",
-                        size: 30,
+                        size: 30.r,
                         color: MyColors.textPrimary,
                       )),
                 ],
@@ -388,7 +390,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
       if (currentPlayingIndexNotifier.value > 0 &&
           scrollController.hasClients) {
         // تخمین حدودی برای اسکرول (چون ارتفاع حباب‌ها متغیر است)
-        final double targetOffset = currentPlayingIndexNotifier.value * 100.0;
+        final double targetOffset = currentPlayingIndexNotifier.value * 100.0.h;
         scrollController.animateTo(
           targetOffset.clamp(0, scrollController.position.maxScrollExtent),
           duration: const Duration(milliseconds: 500),
@@ -405,7 +407,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
           builder: (context, currentPlayingIndex, _) {
             return ListView.builder(
               controller: scrollController,
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16.r),
               itemCount: sortedMessages?.length ?? 0,
               itemBuilder: (context, index) {
                 final message = sortedMessages![index];

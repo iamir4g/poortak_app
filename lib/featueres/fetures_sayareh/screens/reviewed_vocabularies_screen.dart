@@ -8,6 +8,8 @@ import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/practice_voc
 import 'package:poortak/locator.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/lesson_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/practice_vocabulary_screen.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/config/dimens.dart';
 
 class ReviewedVocabulariesScreen extends StatefulWidget {
   static const routeName = "/reviewed_vocabularies_screen";
@@ -53,9 +55,9 @@ class _ReviewedVocabulariesScreenState
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        shape: const RoundedRectangleBorder(
+        shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(30),
+            bottomLeft: Radius.circular(30.r),
           ),
         ),
         automaticallyImplyLeading: false,
@@ -76,38 +78,24 @@ class _ReviewedVocabulariesScreenState
           ),
         ],
         centerTitle: true,
-        title: const Text(
+        title: Text(
           'واژگان مرور شده',
           style: MyTextStyle.textHeader16Bold,
         ),
-        // leading: IconButton(
-        //   icon: const Icon(Icons.arrow_back),
-        //   onPressed: () {
-        //     Navigator.pushReplacementNamed(
-        //       context,
-        //       LessonScreen.routeName,
-        //       arguments: {
-        //         'index': 0,
-        //         'title': 'درس',
-        //         'lessonId': widget.courseId,
-        //       },
-        //     );
-        //   },
-        // ),
       ),
       body: SafeArea(
         child: Column(
           children: [
             Expanded(
               child: widget.reviewedVocabularies.isEmpty
-                  ? const Center(
+                  ? Center(
                       child: Text(
                         'هیچ واژه‌ای مرور نشده است',
                         style: MyTextStyle.textMatn14Bold,
                       ),
                     )
                   : ListView.builder(
-                      padding: const EdgeInsets.all(16),
+                      padding: EdgeInsets.all(16.r),
                       itemCount: widget.reviewedVocabularies.length,
                       itemBuilder: (context, index) {
                         final reviewedVocab =
@@ -116,19 +104,19 @@ class _ReviewedVocabulariesScreenState
                         final isCorrect = reviewedVocab.isCorrect;
 
                         return Container(
-                          margin: const EdgeInsets.only(bottom: 16),
+                          margin: EdgeInsets.only(bottom: 16.h),
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(20.r),
                             border: Border.all(
                               color: isCorrect
                                   ? const Color(0xFFADFF99)
                                   : const Color(0xFFFFB199),
-                              width: 2,
+                              width: 2.w,
                             ),
                           ),
                           child: Padding(
-                            padding: const EdgeInsets.all(16),
+                            padding: EdgeInsets.all(16.r),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -143,12 +131,12 @@ class _ReviewedVocabulariesScreenState
                                         if (snapshot.connectionState ==
                                             ConnectionState.waiting) {
                                           return Container(
-                                            width: 80,
-                                            height: 80,
+                                            width: 80.w,
+                                            height: 80.h,
                                             decoration: BoxDecoration(
                                               color: Colors.grey[200],
                                               borderRadius:
-                                                  BorderRadius.circular(16),
+                                                  BorderRadius.circular(16.r),
                                             ),
                                             child: const Center(
                                               child:
@@ -159,29 +147,29 @@ class _ReviewedVocabulariesScreenState
                                         if (snapshot.hasError ||
                                             !snapshot.hasData) {
                                           return Container(
-                                            width: 80,
-                                            height: 80,
+                                            width: 80.w,
+                                            height: 80.h,
                                             decoration: BoxDecoration(
                                               color: Colors.grey[200],
                                               borderRadius:
-                                                  BorderRadius.circular(16),
+                                                  BorderRadius.circular(16.r),
                                             ),
                                             child: const Icon(Icons.error),
                                           );
                                         }
                                         return ClipRRect(
                                           borderRadius:
-                                              BorderRadius.circular(16),
+                                              BorderRadius.circular(16.r),
                                           child: Image.network(
                                             snapshot.data!,
-                                            width: 80,
-                                            height: 80,
+                                            width: 80.w,
+                                            height: 80.h,
                                             fit: BoxFit.cover,
                                           ),
                                         );
                                       },
                                     ),
-                                    const SizedBox(width: 16),
+                                    SizedBox(width: 16.w),
                                     // Word Details
                                     Expanded(
                                       child: Column(
@@ -198,7 +186,7 @@ class _ReviewedVocabulariesScreenState
                                                       .copyWith(
                                                     color:
                                                         const Color(0xFF3D495C),
-                                                    fontSize: 18,
+                                                    fontSize: 18.sp,
                                                   ),
                                                 ),
                                               ),
@@ -209,17 +197,17 @@ class _ReviewedVocabulariesScreenState
                                                 color: isCorrect
                                                     ? const Color(0xFF4CAF50)
                                                     : const Color(0xFFFF5252),
-                                                size: 24,
+                                                size: 24.r,
                                               ),
                                             ],
                                           ),
-                                          const SizedBox(height: 4),
+                                          SizedBox(height: 4.h),
                                           Text(
                                             word.translation,
                                             style: MyTextStyle.textMatn14Bold
                                                 .copyWith(
                                               color: const Color(0xFF52617A),
-                                              fontSize: 14,
+                                              fontSize: 14.sp,
                                             ),
                                           ),
                                         ],
@@ -227,7 +215,7 @@ class _ReviewedVocabulariesScreenState
                                     ),
                                   ],
                                 ),
-                                const SizedBox(height: 16),
+                                SizedBox(height: 16.h),
                                 // Action Buttons
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
@@ -236,7 +224,8 @@ class _ReviewedVocabulariesScreenState
                                     Container(
                                       decoration: BoxDecoration(
                                         color: MyColors.secondaryTint4,
-                                        borderRadius: BorderRadius.circular(12),
+                                        borderRadius:
+                                            BorderRadius.circular(12.r),
                                       ),
                                       child: IconButton(
                                         onPressed: () =>
@@ -245,16 +234,17 @@ class _ReviewedVocabulariesScreenState
                                           Icons.add_circle_outline,
                                           color: Color(0xFF3D495C),
                                         ),
-                                        iconSize: 28,
+                                        iconSize: 28.r,
                                       ),
                                     ),
-                                    const SizedBox(width: 12),
+                                    SizedBox(width: 12.w),
                                     // Speak Button
                                     Container(
                                       decoration: BoxDecoration(
                                         color:
                                             MyColors.primary.withOpacity(0.1),
-                                        borderRadius: BorderRadius.circular(12),
+                                        borderRadius:
+                                            BorderRadius.circular(12.r),
                                       ),
                                       child: IconButton(
                                         onPressed: () => _readWord(word.word),
@@ -262,7 +252,7 @@ class _ReviewedVocabulariesScreenState
                                           icon: "cuida:volume-2-outline",
                                           color: Color(0xFF3D495C),
                                         ),
-                                        iconSize: 28,
+                                        iconSize: 28.r,
                                       ),
                                     ),
                                   ],
@@ -281,12 +271,12 @@ class _ReviewedVocabulariesScreenState
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.1),
-                    blurRadius: 10,
-                    offset: const Offset(0, -2),
+                    blurRadius: 10.r,
+                    offset: Offset(0, -2.h),
                   ),
                 ],
               ),
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16.r),
               child: SafeArea(
                 child: Row(
                   children: [
@@ -302,23 +292,23 @@ class _ReviewedVocabulariesScreenState
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: MyColors.primary,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          padding: EdgeInsets.symmetric(vertical: 16.h),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(16.r),
                           ),
                         ),
-                        child: const Text(
+                        child: Text(
                           'تمرین ها',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 16,
+                            fontSize: 16.sp,
                             fontFamily: "IranSans",
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: 12.w),
                     // مرور دوباره Button
                     Expanded(
                       child: ElevatedButton(
@@ -331,16 +321,16 @@ class _ReviewedVocabulariesScreenState
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: MyColors.secondaryTint4,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          padding: EdgeInsets.symmetric(vertical: 16.h),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(16.r),
                           ),
                         ),
-                        child: const Text(
+                        child: Text(
                           'مرور دوباره',
                           style: TextStyle(
                             color: Color(0xFF3D495C),
-                            fontSize: 16,
+                            fontSize: 16.sp,
                             fontFamily: "IranSans",
                             fontWeight: FontWeight.bold,
                           ),

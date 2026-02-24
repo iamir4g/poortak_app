@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconify_design/iconify_design.dart';
+import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/dictionary_bloc/dictionary_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/dictionary_bloc/dictionary_event.dart';
@@ -91,7 +93,7 @@ class _WordDetailView extends StatelessWidget {
             }
           },
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: EdgeInsets.all(16.0.r),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -102,49 +104,49 @@ class _WordDetailView extends StatelessWidget {
                       onPressed: () => _addToLitner(context),
                       icon: Image.asset(
                         'assets/images/icons/litner_icon.png',
-                        width: 22,
-                        height: 22,
+                        width: 22.r,
+                        height: 22.r,
                       ),
                     ),
                     Row(
                       children: [
                         Text(word,
-                            style: const TextStyle(
+                            style: TextStyle(
                                 fontFamily: 'IRANSans',
-                                fontSize: 22,
+                                fontSize: 22.sp,
                                 fontWeight: FontWeight.w700,
-                                color: Color(0xFF29303D))),
+                                color: const Color(0xFF29303D))),
                         IconButton(
                           onPressed: () => locator<TTSService>().speak(word),
-                          icon: const IconifyIcon(
+                          icon: IconifyIcon(
                               icon: "cuida:volume-2-outline",
-                              size: 22,
-                              color: Color(0xFFA3AFC2)),
+                              size: 22.r,
+                              color: const Color(0xFFA3AFC2)),
                         ),
                       ],
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: Dimens.small.h),
                 Text(translation,
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontFamily: 'IRANSans',
-                        fontSize: 16,
+                        fontSize: 16.sp,
                         fontWeight: FontWeight.w500,
-                        color: Color(0xFF3A465A))),
-                const SizedBox(height: 16),
+                        color: const Color(0xFF3A465A))),
+                SizedBox(height: 16.h),
                 Expanded(
                   child: Container(
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(12.r),
                       border: Border.all(color: const Color(0xFFE5E7EB)),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Padding(
-                          padding: const EdgeInsets.all(12.0),
+                          padding: EdgeInsets.all(12.0.r),
                           child: Text('مثال ها',
                               style: MyTextStyle.textHeader16Bold),
                         ),
@@ -168,55 +170,55 @@ class _WordDetailView extends StatelessWidget {
                                   itemBuilder: (context, index) {
                                     final ex = examples[index];
                                     return Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 12.0, vertical: 10),
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 12.0.w, vertical: 10.h),
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
                                           Row(
                                             children: [
-                                              const Text('• ',
-                                                  style:
-                                                      TextStyle(fontSize: 18)),
+                                              Text('• ',
+                                                  style: TextStyle(
+                                                      fontSize: 18.sp)),
                                               Expanded(
                                                 child: Text(
                                                   ex.text,
-                                                  style: const TextStyle(
+                                                  style: TextStyle(
                                                       fontFamily: 'IRANSans',
-                                                      fontSize: 15,
+                                                      fontSize: 15.sp,
                                                       fontWeight:
                                                           FontWeight.w500,
-                                                      color: Color(0xFF29303D)),
+                                                      color: const Color(
+                                                          0xFF29303D)),
                                                 ),
                                               ),
                                               IconButton(
                                                 onPressed: () =>
                                                     locator<TTSService>()
                                                         .speak(ex.text),
-                                                icon: const IconifyIcon(
+                                                icon: IconifyIcon(
                                                     icon:
                                                         "cuida:volume-2-outline",
-                                                    size: 18,
-                                                    color: Color(0xFFA3AFC2)),
-                                                padding: EdgeInsets.zero,
-                                                constraints:
-                                                    const BoxConstraints(),
+                                                    size: 18.r,
+                                                    color: const Color(
+                                                        0xFFA3AFC2)),
                                               ),
                                             ],
                                           ),
                                           if (ex.persian != null &&
                                               ex.persian!.isNotEmpty)
                                             Padding(
-                                              padding: const EdgeInsets.only(
-                                                  top: 6.0, right: 24.0),
+                                              padding: EdgeInsets.only(
+                                                  top: 6.0.h, right: 24.0.w),
                                               child: Text(
                                                 ex.persian!,
-                                                style: const TextStyle(
+                                                style: TextStyle(
                                                     fontFamily: 'IRANSans',
-                                                    fontSize: 14,
+                                                    fontSize: 14.sp,
                                                     fontWeight: FontWeight.w400,
-                                                    color: Color(0xFF3A465A)),
+                                                    color: const Color(
+                                                        0xFF3A465A)),
                                                 textAlign: TextAlign.right,
                                               ),
                                             ),
@@ -227,13 +229,8 @@ class _WordDetailView extends StatelessWidget {
                                 );
                               } else if (state is DictionaryError) {
                                 return Center(child: Text(state.message));
-                              } else if (state is DictionaryEmpty) {
-                                return const Center(
-                                    child: Text('نتیجه‌ای یافت نشد'));
                               }
-                              return const Center(
-                                  child: Text(
-                                      'برای بارگیری مثال‌ها در حال آماده‌سازی'));
+                              return const SizedBox();
                             },
                           ),
                         ),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/config/myColors.dart';
+import 'package:poortak/config/myTextStyle.dart';
 
 class LeaderboardScreen extends StatelessWidget {
   static const routeName = '/leaderboard_screen';
@@ -39,17 +41,17 @@ class LeaderboardScreen extends StatelessWidget {
 
   Widget _buildHeader(BuildContext context) {
     return Container(
-      height: 57,
+      height: 57.h,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(33.5),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(33.5.r),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            offset: const Offset(0, 1),
-            blurRadius: 1,
+            color: Colors.black.withValues(alpha: 0.05),
+            offset: Offset(0, 1.h),
+            blurRadius: 1.r,
           ),
         ],
       ),
@@ -57,35 +59,32 @@ class LeaderboardScreen extends StatelessWidget {
         children: [
           // Back button
           Container(
-            width: 40,
-            height: 40,
-            margin: const EdgeInsets.only(left: 16),
+            width: 40.w,
+            height: 40.h,
+            margin: EdgeInsets.only(left: 16.w),
             child: IconButton(
               onPressed: () => Navigator.pop(context),
-              icon: const Icon(
+              icon: Icon(
                 Icons.arrow_back_ios,
                 color: MyColors.textMatn1,
-                size: 20,
+                size: 20.r,
               ),
             ),
           ),
 
           // Title
-          const Expanded(
+          Expanded(
             child: Text(
               'اسامی برندگان مسابقه',
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontFamily: 'IranSans',
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
+              style: MyTextStyle.textHeader16Bold.copyWith(
                 color: MyColors.textMatn2,
               ),
             ),
           ),
 
           // Spacer for balance
-          const SizedBox(width: 40),
+          SizedBox(width: 40.w),
         ],
       ),
     );
@@ -93,20 +92,18 @@ class LeaderboardScreen extends StatelessWidget {
 
   Widget _buildLeaderboardList() {
     return Container(
-      margin: const EdgeInsets.only(top: 20),
+      margin: EdgeInsets.only(top: 20.h),
       child: SingleChildScrollView(
         child: Column(
           children: [
             // Month label - مهر ۱۴۰۳
             Container(
-              width: 350,
-              margin: const EdgeInsets.only(bottom: 28),
-              child: const Text(
+              width: 350.w,
+              margin: EdgeInsets.only(bottom: 28.h),
+              child: Text(
                 'مهر ۱۴۰۳',
                 textAlign: TextAlign.right,
-                style: TextStyle(
-                  fontFamily: 'IranSans',
-                  fontSize: 13,
+                style: MyTextStyle.textMatn13.copyWith(
                   fontWeight: FontWeight.w500,
                   color: MyColors.textMatn1,
                 ),
@@ -123,14 +120,12 @@ class LeaderboardScreen extends StatelessWidget {
 
             // Month label - شهریور ۱۴۰۳
             Container(
-              width: 350,
-              margin: const EdgeInsets.only(top: 28, bottom: 28),
-              child: const Text(
+              width: 350.w,
+              margin: EdgeInsets.only(top: 28.h, bottom: 28.h),
+              child: Text(
                 'شهریور ۱۴۰۳',
                 textAlign: TextAlign.right,
-                style: TextStyle(
-                  fontFamily: 'IranSans',
-                  fontSize: 13,
+                style: MyTextStyle.textMatn13.copyWith(
                   fontWeight: FontWeight.w500,
                   color: MyColors.textMatn1,
                 ),
@@ -152,17 +147,17 @@ class LeaderboardScreen extends StatelessWidget {
 
   Widget _buildWinnerCard({required String name, required String phoneNumber}) {
     return Container(
-      width: 350,
-      height: 50,
-      margin: const EdgeInsets.only(bottom: 8),
+      width: 350.w,
+      height: 50.h,
+      margin: EdgeInsets.only(bottom: 8.h),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(20.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.12),
-            offset: const Offset(0, 2),
-            blurRadius: 7.3,
+            color: Colors.black.withValues(alpha: 0.12),
+            offset: Offset(0, 2.h),
+            blurRadius: 7.3.r,
           ),
         ],
       ),
@@ -172,13 +167,11 @@ class LeaderboardScreen extends StatelessWidget {
           Expanded(
             flex: 2,
             child: Container(
-              padding: const EdgeInsets.only(right: 20),
+              padding: EdgeInsets.only(right: 20.w),
               child: Text(
                 phoneNumber,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontFamily: 'IranSans',
-                  fontSize: 14,
+                style: MyTextStyle.textMatn14Bold.copyWith(
                   fontWeight: FontWeight.w300,
                   color: Colors.black,
                 ),
@@ -190,13 +183,11 @@ class LeaderboardScreen extends StatelessWidget {
           Expanded(
             flex: 3,
             child: Container(
-              padding: const EdgeInsets.only(left: 20),
+              padding: EdgeInsets.only(left: 20.w),
               child: Text(
                 name,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontFamily: 'IranSans',
-                  fontSize: 14,
+                style: MyTextStyle.textMatn14Bold.copyWith(
                   fontWeight: FontWeight.w300,
                   color: Colors.black,
                 ),

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/educational_videos_screen.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/ebooks_screen.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/self_assessment_screen.dart';
 import 'package:poortak/config/myColors.dart';
+import 'package:poortak/config/myTextStyle.dart';
 
 class KavooshMainScreen extends StatefulWidget {
   static const String routeName = '/kavoosh-main';
@@ -29,8 +31,7 @@ class _KavooshMainScreenState extends State<KavooshMainScreen> {
             // Content
             Expanded(
               child: SingleChildScrollView(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 20.h),
                 child: Column(
                   children: [
                     // Educational Videos Card
@@ -47,23 +48,7 @@ class _KavooshMainScreenState extends State<KavooshMainScreen> {
                       },
                     ),
 
-                    const SizedBox(height: 13),
-
-                    // Audio Books Card
-                    // _buildContentCard(
-                    //   title: 'کتاب های صوتی',
-                    //   subtitle: 'کتاب های آموزشی صوتی برای پایه های تحصیلی',
-                    //   gradientColors: const [
-                    //     Color(0xFFECE2FD),
-                    //     Color(0xFFF6DDF8),
-                    //   ],
-                    //   onTap: () {
-                    //     // Handle audio books tap
-                    //   },
-                    //   showComingSoonBadge: true,
-                    // ),
-
-                    const SizedBox(height: 13),
+                    SizedBox(height: 13.h),
 
                     // E-Books Card
                     _buildContentCard(
@@ -79,7 +64,7 @@ class _KavooshMainScreenState extends State<KavooshMainScreen> {
                       },
                     ),
 
-                    const SizedBox(height: 13),
+                    SizedBox(height: 13.h),
 
                     // Self-Assessment Card
                     _buildContentCard(
@@ -117,17 +102,17 @@ class _KavooshMainScreenState extends State<KavooshMainScreen> {
       child: Stack(
         children: [
           Container(
-            height: 150,
+            height: 150.h,
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: gradientColors,
               ),
-              borderRadius: BorderRadius.circular(30),
+              borderRadius: BorderRadius.circular(30.r),
               border: Border.all(
                 color: Colors.white,
-                width: 5,
+                width: 5.w,
               ),
               boxShadow: const [
                 BoxShadow(
@@ -138,7 +123,7 @@ class _KavooshMainScreenState extends State<KavooshMainScreen> {
               ],
             ),
             child: Padding(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(20.r),
               child: Row(
                 children: [
                   Expanded(
@@ -148,48 +133,41 @@ class _KavooshMainScreenState extends State<KavooshMainScreen> {
                       children: [
                         Text(
                           title,
-                          style: const TextStyle(
-                            fontFamily: 'IRANSans',
-                            fontSize: 17,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF29303D),
+                          style: MyTextStyle.textMatn17W700.copyWith(
+                            color: const Color(0xFF29303D),
                           ),
                           textAlign: TextAlign.right,
                         ),
-                        const SizedBox(height: 4),
+                        SizedBox(height: 4.h),
                         Text(
                           subtitle,
-                          style: const TextStyle(
-                            fontFamily: 'IRANSans',
-                            fontSize: 10,
+                          style: MyTextStyle.textMatn10W300.copyWith(
                             fontWeight: FontWeight.w500,
-                            color: Color(0xFF52617A),
+                            color: const Color(0xFF52617A),
                           ),
                           textAlign: TextAlign.right,
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(width: 20),
+                  SizedBox(width: 20.w),
                   // Icon placeholder
                   Container(
-                    width: 100,
-                    height: 70,
+                    width: 100.w,
+                    height: 70.h,
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.3),
-                      borderRadius: BorderRadius.circular(15),
+                      borderRadius: BorderRadius.circular(15.r),
                     ),
                     child: Center(
                       child: Image.asset(
                         _getIconPathForTitle(title),
-                        width: 114,
-                        height: 70,
+                        width: 114.w,
+                        height: 70.h,
                         fit: BoxFit.contain,
                       ),
                     ),
                   ),
-
-                  // Text content
                 ],
               ),
             ),
@@ -197,13 +175,13 @@ class _KavooshMainScreenState extends State<KavooshMainScreen> {
           // Coming Soon Badge
           if (showComingSoonBadge)
             Positioned(
-              top: 10,
-              right: 10,
+              top: 10.h,
+              right: 10.w,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
                 decoration: BoxDecoration(
                   color: const Color(0xFFFF6B6B),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(12.r),
                   boxShadow: const [
                     BoxShadow(
                       color: Color(0x1F000000),
@@ -212,11 +190,9 @@ class _KavooshMainScreenState extends State<KavooshMainScreen> {
                     ),
                   ],
                 ),
-                child: const Text(
+                child: Text(
                   'به زودی',
-                  style: TextStyle(
-                    fontFamily: 'IRANSans',
-                    fontSize: 10,
+                  style: MyTextStyle.textMatn10W300.copyWith(
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),

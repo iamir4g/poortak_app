@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/config/myColors.dart';
+import 'package:poortak/config/myTextStyle.dart';
 
 class SessionItem extends StatelessWidget {
   final String title;
@@ -19,46 +22,44 @@ class SessionItem extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        margin: const EdgeInsets.only(bottom: 8),
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+        margin: EdgeInsets.only(bottom: 8.h),
         decoration: BoxDecoration(
           color: isPlaying
               ? const Color(0xFFF9F6C6)
               : Colors.transparent, // Highlight if playing
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(12.r),
         ),
         child: Row(
           children: [
-            // Lock/Status Icon (Right side in RTL)
+            // Lock/Status Icon
             Icon(
               isLocked ? Icons.lock : Icons.play_circle_outline,
-              color: isLocked ? Colors.amber : const Color(0xFF29303D),
-              size: 20,
+              color: isLocked ? Colors.amber : MyColors.textMatn2,
+              size: 20.r,
             ),
 
-            const SizedBox(width: 12),
+            SizedBox(width: 12.w),
 
             // Title
             Expanded(
               child: Text(
                 title,
-                style: TextStyle(
-                  fontFamily: 'IRANSans',
-                  fontSize: 12,
+                style: MyTextStyle.textMatn12W500.copyWith(
                   fontWeight: isPlaying ? FontWeight.bold : FontWeight.normal,
-                  color: const Color(0xFF29303D),
+                  color: MyColors.textMatn2,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
 
-            // Play Arrow Icon (Left side in RTL)
+            // Play Arrow Icon
             if (!isLocked)
-              const Icon(
+              Icon(
                 Icons.play_arrow,
-                size: 16,
-                color: Color(0xFF9BA7C6),
+                size: 16.r,
+                color: MyColors.text4,
               ),
           ],
         ),

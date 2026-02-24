@@ -75,6 +75,7 @@ dependencies:
   timezone: ^0.9.2
   openai_tts: ^0.0.3
   wakelock_plus: ^1.4.0
+  flutter_screenutil: ^5.9.3
   # برای رمزنگاری و رمزگشایی
   # cryptography: ^2.7.0
   # برای خواندن فایل .env

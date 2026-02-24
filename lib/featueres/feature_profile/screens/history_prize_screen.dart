@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/config/myColors.dart';
+import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_profile/data/models/prize_history_model.dart';
 import 'package:poortak/featueres/feature_profile/widgets/prize_history_item.dart';
 import 'package:poortak/featueres/feature_profile/widgets/date_separator.dart';
@@ -134,19 +136,19 @@ class _HistoryPrizeScreenState extends State<HistoryPrizeScreen> {
 
   Widget _buildHeader(bool isDarkMode) {
     return Container(
-      height: 57,
+      height: 57.h,
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
       decoration: BoxDecoration(
         color: isDarkMode ? MyColors.darkBackgroundSecondary : Colors.white,
-        borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(33.5),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(33.5.r),
         ),
         boxShadow: [
           BoxShadow(
             color: const Color(0x0D000000),
-            offset: const Offset(0, 1),
-            blurRadius: 1,
+            offset: Offset(0, 1.h),
+            blurRadius: 1.r,
           ),
         ],
       ),
@@ -156,10 +158,7 @@ class _HistoryPrizeScreenState extends State<HistoryPrizeScreen> {
           // Title
           Text(
             'تاریخچه امتیاز',
-            style: TextStyle(
-              fontFamily: 'IRANSans',
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
+            style: MyTextStyle.textHeader16Bold.copyWith(
               color: isDarkMode
                   ? MyColors.darkTextPrimary
                   : const Color(0xFF3D495C),
@@ -169,9 +168,9 @@ class _HistoryPrizeScreenState extends State<HistoryPrizeScreen> {
 
           // Back Button
           Container(
-            width: 50,
-            height: 50,
-            margin: const EdgeInsets.only(left: 16),
+            width: 50.r,
+            height: 50.r,
+            margin: EdgeInsets.only(left: 16.w),
             child: IconButton(
               onPressed: () => Navigator.of(context).pop(),
               icon: Icon(
@@ -179,7 +178,7 @@ class _HistoryPrizeScreenState extends State<HistoryPrizeScreen> {
                 color: isDarkMode
                     ? MyColors.darkTextPrimary
                     : const Color(0xFF3D495C),
-                size: 20,
+                size: 20.r,
               ),
             ),
           ),
@@ -190,7 +189,7 @@ class _HistoryPrizeScreenState extends State<HistoryPrizeScreen> {
 
   Widget _buildTotalPointsSection(bool isDarkMode, int totalAmount) {
     return Container(
-      height: 89,
+      height: 89.h,
       width: double.infinity,
       color: isDarkMode ? MyColors.darkBackground : const Color(0xFFFFF8E4),
       child: Row(
@@ -199,32 +198,28 @@ class _HistoryPrizeScreenState extends State<HistoryPrizeScreen> {
           // Total points text
           Text(
             'جمع امتیاز ها:',
-            style: TextStyle(
-              fontFamily: 'IRANSans',
-              fontSize: 16,
+            style: MyTextStyle.textMatn16.copyWith(
               fontWeight: FontWeight.w500,
               color: isDarkMode ? MyColors.darkTextPrimary : Colors.black,
             ),
           ),
 
-          const SizedBox(width: 16),
+          SizedBox(width: 16.w),
 
           // Points container
           Container(
-            width: 88,
-            height: 33,
+            width: 88.w,
+            height: 33.h,
             decoration: BoxDecoration(
               color: const Color(0xFFFFDCB2),
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(10.r),
             ),
             child: Center(
               child: Text(
                 '$totalAmount سکه',
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: MyTextStyle.textMatn16.copyWith(
                   color: const Color(0xFF29303D),
-                  fontSize: 16,
-                  fontFamily: 'IRANSans',
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -237,7 +232,7 @@ class _HistoryPrizeScreenState extends State<HistoryPrizeScreen> {
 
   Widget _buildHistoryList(List<PrizeHistoryGroup> historyGroups) {
     return ListView.builder(
-      padding: const EdgeInsets.only(top: 16),
+      padding: EdgeInsets.only(top: 16.h),
       itemCount: historyGroups.length,
       itemBuilder: (context, groupIndex) {
         final group = historyGroups[groupIndex];
@@ -249,7 +244,7 @@ class _HistoryPrizeScreenState extends State<HistoryPrizeScreen> {
 
             // Items for this date
             ...group.items.map((item) => Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
+                  padding: EdgeInsets.only(bottom: 8.h),
                   child: PrizeHistoryItem(
                     title: item.type,
                     points: item.pointsDisplay,
@@ -258,8 +253,7 @@ class _HistoryPrizeScreenState extends State<HistoryPrizeScreen> {
                 )),
 
             // Add some spacing between groups
-            if (groupIndex < historyGroups.length - 1)
-              const SizedBox(height: 16),
+            if (groupIndex < historyGroups.length - 1) SizedBox(height: 16.h),
           ],
         );
       },

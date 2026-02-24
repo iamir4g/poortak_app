@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pdfx/pdfx.dart';
+import 'package:poortak/config/dimens.dart';
 import '../utils/pdfDownloader.dart';
 import '../services/storage_service.dart';
 
@@ -297,20 +299,20 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
           children: [
             Icon(
               Icons.error_outline,
-              size: 64,
+              size: 64.r,
               color: Colors.red[300],
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: Dimens.medium),
             Text(
               _errorMessage!,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 16,
+              style: TextStyle(
+                fontSize: 16.sp,
                 color: Colors.red,
               ),
             ),
             if (widget.fileKey != null && !widget.autoDownload) ...[
-              const SizedBox(height: 16),
+              SizedBox(height: Dimens.medium),
               ElevatedButton.icon(
                 onPressed: _downloadPdf,
                 icon: const Icon(Icons.download),
@@ -319,7 +321,7 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
                   backgroundColor: Theme.of(context).primaryColor,
                   foregroundColor: Colors.white,
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
                 ),
               ),
             ],
@@ -336,16 +338,16 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
             CircularProgressIndicator(
               value: _downloadProgress,
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: Dimens.medium),
             Text(
               'در حال بارگذاری کتاب... ${(_downloadProgress * 100).toInt()}%',
-              style: const TextStyle(fontSize: 16),
+              style: TextStyle(fontSize: 16.sp),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: Dimens.small),
             Text(
               'لطفاً صبر کنید',
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 14.sp,
                 color: Colors.grey[600],
               ),
             ),
@@ -369,10 +371,10 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
               // Page navigation controls
               if (_totalPages > 0)
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: EdgeInsets.all(8.r),
                   decoration: BoxDecoration(
                     color: Colors.grey[100],
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(8.r),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -391,25 +393,25 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
                           children: [
                             Text(
                               'صفحه $_currentPage از $_totalPages',
-                              style: const TextStyle(
-                                fontSize: 16,
+                              style: TextStyle(
+                                fontSize: 16.sp,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            const SizedBox(width: 16),
+                            SizedBox(width: Dimens.medium),
                             // Page input field
                             SizedBox(
-                              width: 80,
+                              width: 80.w,
                               child: TextField(
                                 controller: TextEditingController(
                                     text: _currentPage.toString()),
                                 keyboardType: TextInputType.number,
                                 textAlign: TextAlign.center,
-                                decoration: const InputDecoration(
+                                decoration: InputDecoration(
                                   hintText: 'صفحه',
                                   border: OutlineInputBorder(),
                                   contentPadding: EdgeInsets.symmetric(
-                                      horizontal: 8, vertical: 4),
+                                      horizontal: 8.w, vertical: 4.h),
                                   isDense: true,
                                 ),
                                 onSubmitted: (value) {
@@ -479,13 +481,13 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
                     // Page loading indicator
                     if (_isPageLoading)
                       Positioned(
-                        top: 16,
-                        right: 16,
+                        top: 16.h,
+                        right: 16.w,
                         child: Container(
-                          padding: const EdgeInsets.all(8),
+                          padding: EdgeInsets.all(8.r),
                           decoration: BoxDecoration(
                             color: Colors.black54,
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(8.r),
                           ),
                           child: const CircularProgressIndicator(
                             valueColor:
@@ -496,7 +498,7 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
 
                     // Zoom info
                     Positioned(
-                      bottom: 16,
+                      bottom: 16.h,
                       right: 16,
                       child: Container(
                         padding: const EdgeInsets.all(8),

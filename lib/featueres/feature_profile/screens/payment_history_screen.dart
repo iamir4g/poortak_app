@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/config/myColors.dart';
+import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_profile/presentation/bloc/payment_history_bloc/payment_history_bloc.dart';
 import 'package:poortak/featueres/feature_profile/presentation/bloc/payment_history_bloc/payment_history_event.dart';
 import 'package:poortak/featueres/feature_profile/presentation/bloc/payment_history_bloc/payment_history_state.dart';
@@ -44,19 +46,19 @@ class _PaymentHistoryScreenState extends State<PaymentHistoryScreen> {
           children: [
             // Header
             Container(
-              height: 57,
+              height: 57.h,
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              decoration: const BoxDecoration(
+              padding: EdgeInsets.symmetric(horizontal: 16.w),
+              decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(33.5),
+                  bottomLeft: Radius.circular(33.5.r),
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Color(0x0D000000),
-                    offset: Offset(0, 1),
-                    blurRadius: 1,
+                    color: const Color(0x0D000000),
+                    offset: Offset(0, 1.h),
+                    blurRadius: 1.r,
                   ),
                 ],
               ),
@@ -66,10 +68,7 @@ class _PaymentHistoryScreenState extends State<PaymentHistoryScreen> {
                   // Title
                   Text(
                     'تاریخچه خرید',
-                    style: TextStyle(
-                      fontFamily: 'IRANSans',
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                    style: MyTextStyle.textHeader16Bold.copyWith(
                       color: MyColors.textMatn1,
                     ),
                     textAlign: TextAlign.center,
@@ -77,15 +76,15 @@ class _PaymentHistoryScreenState extends State<PaymentHistoryScreen> {
 
                   // Back Button
                   Container(
-                    width: 50,
-                    height: 50,
-                    margin: const EdgeInsets.only(left: 16),
+                    width: 50.r,
+                    height: 50.r,
+                    margin: EdgeInsets.only(left: 16.w),
                     child: IconButton(
                       onPressed: () => Navigator.of(context).pop(),
-                      icon: const Icon(
+                      icon: Icon(
                         Icons.arrow_forward,
                         color: MyColors.textMatn1,
-                        size: 20,
+                        size: 20.r,
                       ),
                     ),
                   ),
@@ -132,23 +131,20 @@ class _PaymentHistoryScreenState extends State<PaymentHistoryScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(
+          Icon(
             Icons.error_outline,
-            size: 64,
+            size: 64.r,
             color: Colors.red,
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16.h),
           Text(
             message,
-            style: const TextStyle(
-              fontFamily: 'IRANSans',
-              fontWeight: FontWeight.w400,
-              fontSize: 16,
+            style: MyTextStyle.textMatn16.copyWith(
               color: MyColors.textMatn1,
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16.h),
           ElevatedButton(
             onPressed: () {
               _paymentHistoryBloc.add(LoadPaymentHistoryEvent());
@@ -167,26 +163,24 @@ class _PaymentHistoryScreenState extends State<PaymentHistoryScreen> {
         children: [
           // Empty state illustration
           SizedBox(
-            width: 150,
-            height: 230,
-            child: Image(
+            width: 150.w,
+            height: 230.h,
+            child: const Image(
               image:
                   AssetImage('assets/images/profile/emptyPaymentHistory.png'),
             ),
           ),
-          const SizedBox(height: 32),
+          SizedBox(height: 32.h),
           // Empty state text
           Text(
             message ?? 'هنوز خریدی انجام نشده!',
-            style: const TextStyle(
-              fontFamily: 'IRANSans',
+            style: MyTextStyle.textMatn16.copyWith(
               fontWeight: FontWeight.w300,
-              fontSize: 16,
               color: MyColors.textMatn1,
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16.h),
           ElevatedButton(
             onPressed: () {
               _paymentHistoryBloc.add(RefreshPaymentHistoryEvent());
@@ -204,14 +198,14 @@ class _PaymentHistoryScreenState extends State<PaymentHistoryScreen> {
         _paymentHistoryBloc.add(RefreshPaymentHistoryEvent());
       },
       child: ListView.builder(
-        padding: const EdgeInsets.symmetric(vertical: 8),
+        padding: EdgeInsets.symmetric(vertical: 8.h),
         itemCount: (state.paymentHistoryList.data?.length ?? 0) +
             (state.hasReachedMax ? 0 : 1),
         itemBuilder: (context, index) {
           if (index == (state.paymentHistoryList.data?.length ?? 0)) {
             // Load more button
             return Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: EdgeInsets.all(16.r),
               child: ElevatedButton(
                 onPressed: () {
                   _paymentHistoryBloc.add(LoadMorePaymentHistoryEvent());
@@ -243,21 +237,18 @@ class _PaymentHistoryScreenState extends State<PaymentHistoryScreen> {
     showModalBottomSheet(
       context: context,
       builder: (context) => Container(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(16.r),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'جزئیات تراکنش',
-              style: const TextStyle(
-                fontFamily: 'IRANSans',
-                fontWeight: FontWeight.w700,
-                fontSize: 18,
+              style: MyTextStyle.textMatn18Bold.copyWith(
                 color: MyColors.textMatn1,
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16.h),
             Text('کد پیگیری: ${payment.trackingCode ?? 'نامشخص'}'),
             Text('وضعیت: ${_getStatusText(payment.status)}'),
             Text(

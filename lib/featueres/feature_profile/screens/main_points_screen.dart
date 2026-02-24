@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
 import 'package:poortak/config/myTextStyle.dart';
 
@@ -27,19 +28,19 @@ class _MainPointsScreenState extends State<MainPointsScreen> {
           children: [
             // Header
             Container(
-              height: 57,
+              height: 57.h,
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              decoration: const BoxDecoration(
+              padding: EdgeInsets.symmetric(horizontal: 16.w),
+              decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(33.5),
+                  bottomLeft: Radius.circular(33.5.r),
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Color(0x0D000000),
-                    offset: Offset(0, 1),
-                    blurRadius: 1,
+                    color: const Color(0x0D000000),
+                    offset: Offset(0, 1.h),
+                    blurRadius: 1.r,
                   ),
                 ],
               ),
@@ -49,26 +50,23 @@ class _MainPointsScreenState extends State<MainPointsScreen> {
                   // Title
                   Text(
                     'امتیازات',
-                    style: TextStyle(
-                      fontFamily: 'IRANSans',
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF3D495C),
+                    style: MyTextStyle.textHeader16Bold.copyWith(
+                      color: const Color(0xFF3D495C),
                     ),
                     textAlign: TextAlign.center,
                   ),
 
                   // Back Button
                   Container(
-                    width: 50,
-                    height: 50,
-                    margin: const EdgeInsets.only(left: 16),
+                    width: 50.r,
+                    height: 50.r,
+                    margin: EdgeInsets.only(left: 16.w),
                     child: IconButton(
                       onPressed: () => Navigator.of(context).pop(),
-                      icon: const Icon(
+                      icon: Icon(
                         Icons.arrow_forward,
-                        color: Color(0xFF3D495C),
-                        size: 20,
+                        color: const Color(0xFF3D495C),
+                        size: 20.r,
                       ),
                     ),
                   ),
@@ -101,7 +99,7 @@ class _MainPointsScreenState extends State<MainPointsScreen> {
 
   Widget _buildPointsEarnedSection() {
     return Container(
-      height: 193,
+      height: 193.h,
       width: double.infinity,
       color: const Color(0xFFFBFCFE),
       child: Column(
@@ -121,45 +119,30 @@ class _MainPointsScreenState extends State<MainPointsScreen> {
                     "امتیاز کسب شده:",
                     textAlign: TextAlign.right,
                     style: MyTextStyle.textMatn16Bold,
-                    // TextStyle(
-                    //   color: Colors.black,
-                    //   fontSize: 16,
-                    //   fontFamily: 'IRANSans',
-                    //   fontWeight: FontWeight.w500,
-                    // ),
                   ),
                   Text(
                     "امتیاز کسب شده از ابتدای آموزش",
                     textAlign: TextAlign.right,
                     style: MyTextStyle.textMatn12W300,
-                    // TextStyle(
-                    //   color: const Color(0xFF3D485B),
-                    //   fontSize: 10,
-                    //   fontFamily: 'IRANSans',
-                    //   fontWeight: FontWeight.w300,
-                    // ),
                   ),
                 ],
               ),
-              SizedBox(width: 55),
+              SizedBox(width: 55.w),
               // const Spacer(),
               // 200 coins container
               Container(
-                width: 88,
-                height: 33,
+                width: 88.w,
+                height: 33.h,
                 decoration: BoxDecoration(
                   color: const Color(0xFFFFE8CC),
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(10.r),
                 ),
                 child: Center(
                   child: Text(
                     "۲۰۰ سکه",
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: MyTextStyle.textMatn16Bold.copyWith(
                       color: const Color(0xFF28303D),
-                      fontSize: 16,
-                      fontFamily: 'IRANSans',
-                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
@@ -167,7 +150,7 @@ class _MainPointsScreenState extends State<MainPointsScreen> {
             ],
           ),
 
-          const SizedBox(height: 20),
+          SizedBox(height: 20.h),
           // Ways to earn points section
           _buildWaysToEarnSection(),
         ],
@@ -177,20 +160,20 @@ class _MainPointsScreenState extends State<MainPointsScreen> {
 
   Widget _buildWaysToEarnSection() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 30),
-      width: 254,
-      height: 60,
+      padding: EdgeInsets.symmetric(horizontal: 30.w),
+      width: 254.w,
+      height: 60.h,
       decoration: BoxDecoration(
         color: const Color(0xFFFFDB80),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(20.r),
       ),
       // padding: const EdgeInsets.symmetric(horizontal: 70, vertical: 20),
       child: Row(
         children: [
           // Star icon
           SizedBox(
-            width: 36,
-            height: 34,
+            width: 36.r,
+            height: 34.r,
             child: Image.asset(
               'assets/images/points/star_icon.png',
               fit: BoxFit.contain,
@@ -202,18 +185,12 @@ class _MainPointsScreenState extends State<MainPointsScreen> {
           // Yellow container
           Expanded(
             child: SizedBox(
-              height: 60,
+              height: 60.h,
               child: Center(
                 child: Text(
                   "روش های کسب امتیاز",
                   textAlign: TextAlign.center,
                   style: MyTextStyle.textMatn15,
-                  // TextStyle(
-                  //   color: const Color(0xFF28303D),
-                  //   fontSize: 15,
-                  //   fontFamily: 'IRANSans',
-                  //   fontWeight: FontWeight.w500,
-                  // ),
                 ),
               ),
             ),
@@ -229,17 +206,17 @@ class _MainPointsScreenState extends State<MainPointsScreen> {
         Navigator.pushNamed(context, '/history_prize_screen');
       },
       child: Container(
-        width: 350,
-        height: 119,
-        margin: const EdgeInsets.symmetric(horizontal: 23, vertical: 20),
+        width: 350.w,
+        height: 119.h,
+        margin: EdgeInsets.symmetric(horizontal: 23.w, vertical: 20.h),
         decoration: BoxDecoration(
           color: const Color(0xFFE9EFFF),
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: const [
+          borderRadius: BorderRadius.circular(20.r),
+          boxShadow: [
             BoxShadow(
-              color: Color(0x0A000000),
-              blurRadius: 4,
-              offset: Offset(0, 0),
+              color: const Color(0x0A000000),
+              blurRadius: 4.r,
+              offset: const Offset(0, 0),
             ),
           ],
         ),
@@ -251,7 +228,7 @@ class _MainPointsScreenState extends State<MainPointsScreen> {
             // Text content
             Expanded(
               child: Padding(
-                padding: EdgeInsets.only(right: 20),
+                padding: EdgeInsets.only(right: 20.w),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -260,24 +237,12 @@ class _MainPointsScreenState extends State<MainPointsScreen> {
                       "تاریخچه امتیاز",
                       textAlign: TextAlign.right,
                       style: MyTextStyle.textMatn13,
-                      // TextStyle(
-                      //   color: const Color(0xFF28303D),
-                      //   fontSize: 13,
-                      //   fontFamily: 'IRANSans',
-                      //   fontWeight: FontWeight.w500,
-                      // ),
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8.h),
                     Text(
                       "تاریخچه ی امتیازهای کسب شده خود را ببینید.",
                       textAlign: TextAlign.right,
                       style: MyTextStyle.textMatn10W300,
-                      // TextStyle(
-                      //   color: const Color(0xFF3D485B),
-                      //   fontSize: 10,
-                      //   fontFamily: 'IRANSans',
-                      //   fontWeight: FontWeight.w300,
-                      // ),
                     ),
                   ],
                 ),
@@ -285,12 +250,12 @@ class _MainPointsScreenState extends State<MainPointsScreen> {
             ),
             // Calendar animation placeholder
             SizedBox(
-              width: 100,
-              height: 100,
+              width: 100.r,
+              height: 100.r,
               child: Lottie.asset(
                 'assets/images/points/calendar.json',
-                width: 79,
-                height: 78,
+                width: 79.r,
+                height: 78.r,
                 fit: BoxFit.cover,
               ),
             ),
@@ -309,22 +274,22 @@ class _MainPointsScreenState extends State<MainPointsScreen> {
         Navigator.pushNamed(context, '/prize_screen');
       },
       child: Container(
-        width: 350,
-        height: 119,
-        margin: const EdgeInsets.symmetric(horizontal: 23, vertical: 20),
+        width: 350.w,
+        height: 119.h,
+        margin: EdgeInsets.symmetric(horizontal: 23.w, vertical: 20.h),
         decoration: BoxDecoration(
           color: const Color(0xFFFFF9EB),
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: const [
+          borderRadius: BorderRadius.circular(20.r),
+          boxShadow: [
             BoxShadow(
-              color: Color(0x0A000000),
-              blurRadius: 4,
-              offset: Offset(0, 0),
+              color: const Color(0x0A000000),
+              blurRadius: 4.r,
+              offset: const Offset(0, 0),
             ),
           ],
         ),
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20),
+          padding: EdgeInsets.symmetric(horizontal: 20.w),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -340,24 +305,12 @@ class _MainPointsScreenState extends State<MainPointsScreen> {
                       "تخفیف ها و جایزه",
                       textAlign: TextAlign.right,
                       style: MyTextStyle.textMatn13,
-                      // TextStyle(
-                      //   color: const Color(0xFF28303D),
-                      //   fontSize: 13,
-                      //   fontFamily: 'IRANSans',
-                      //   fontWeight: FontWeight.w500,
-                      // ),
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8.h),
                     Text(
                       "جایزه سکه های جمع شده خود را مشاهده کنید.",
                       textAlign: TextAlign.right,
                       style: MyTextStyle.textMatn10W300,
-                      // TextStyle(
-                      //   color: const Color(0xFF3D485B),
-                      //   fontSize: 10,
-                      //   fontFamily: 'IRANSans',
-                      //   fontWeight: FontWeight.w300,
-                      // ),
                     ),
                   ],
                 ),
@@ -365,8 +318,8 @@ class _MainPointsScreenState extends State<MainPointsScreen> {
 
               // Prize animation placeholder with background circle
               Container(
-                width: 70,
-                height: 70,
+                width: 70.r,
+                height: 70.r,
                 // margin: const EdgeInsets.only(left: 23),
                 decoration: const BoxDecoration(
                   shape: BoxShape.circle,
@@ -374,8 +327,8 @@ class _MainPointsScreenState extends State<MainPointsScreen> {
                 ),
                 child: Lottie.asset(
                   'assets/images/points/prize.json',
-                  width: 78,
-                  height: 78,
+                  width: 78.r,
+                  height: 78.r,
                   fit: BoxFit.cover,
                 ),
               ),

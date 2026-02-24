@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/common/utils/font_size_helper.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/conversation_model.dart';
@@ -45,15 +47,15 @@ class ConversationMessageBubble extends StatelessWidget {
             maxWidth: screenWidth * 0.75,
           ),
           child: Container(
-            margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+            margin: EdgeInsets.symmetric(vertical: 4.h, horizontal: 8.w),
+            padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 16.w),
             decoration: BoxDecoration(
               // رنگ نارنجی برای پیام‌های شخص اول و خاکستری برای شخص دوم
               color: isFirstPerson ? MyColors.primary : Colors.grey[300],
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(20.r),
               // نمایش border سبز اگر پیام در حال پخش است
               border: isCurrentPlaying
-                  ? Border.all(color: Colors.green, width: 2)
+                  ? Border.all(color: Colors.green, width: 2.w)
                   : null,
             ),
             child: Column(
@@ -70,7 +72,7 @@ class ConversationMessageBubble extends StatelessWidget {
                         message.text,
                         style: FontSizeHelper.getContentTextStyle(
                           context,
-                          baseFontSize: 16.0,
+                          baseFontSize: 16.0.sp,
                           color: isFirstPerson ? Colors.white : Colors.black,
                         ),
                         softWrap: true,
@@ -91,12 +93,12 @@ class ConversationMessageBubble extends StatelessWidget {
                 ),
                 // نمایش ترجمه در صورت فعال بودن
                 if (showTranslations) ...[
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4.h),
                   Text(
                     message.translation,
                     style: FontSizeHelper.getContentTextStyle(
                       context,
-                      baseFontSize: 12.0,
+                      baseFontSize: 12.0.sp,
                       color: isFirstPerson ? Colors.white70 : Colors.black54,
                     ),
                     softWrap: true,

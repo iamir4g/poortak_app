@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/common/widgets/reusable_modal.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/iknow_access_bloc/iknow_access_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/widgets/item_leason.dart';
@@ -102,7 +103,7 @@ class _SayarehScreenState extends State<SayarehScreen> {
                       ),
               ),
               child:
-                  SafeArea(child: Center(child: DotLoadingWidget(size: 100))),
+                  SafeArea(child: Center(child: DotLoadingWidget(size: 100.r))),
             );
           }
 

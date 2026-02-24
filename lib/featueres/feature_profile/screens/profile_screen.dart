@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/config/myColors.dart';
+import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_profile/screens/favorit_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/main_points_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
@@ -61,7 +63,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         isLoggedIn = loggedIn;
       });
     }
-    print("token: \\${await prefsOperator.getAccessToken()}");
+    print("token: ${await prefsOperator.getAccessToken()}");
   }
 
   String _getDisplayName() {
@@ -97,28 +99,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ClipPath(
                         clipper: MyClipper(),
                         child: Container(
-                          height: 300, //double.infinity - 500,
+                          height: 300.h, //double.infinity - 500,
                           color: Colors.white,
                         ),
                       ),
                       // Content
                       Column(
                         children: [
-                          const SizedBox(height: 24),
+                          SizedBox(height: 24.h),
                           // Avatar
                           Center(
                             child: Container(
-                              width: 94,
-                              height: 94,
+                              width: 94.r,
+                              height: 94.r,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 border: Border.all(
-                                    color: Color(0xFFE6EBF2), width: 5),
+                                    color: const Color(0xFFE6EBF2), width: 5.r),
                                 color: Colors.white,
                                 boxShadow: [
                                   BoxShadow(
                                     color: Colors.black.withOpacity(0.04),
-                                    blurRadius: 4,
+                                    blurRadius: 4.r,
                                   ),
                                 ],
                               ),
@@ -142,35 +144,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ),
                             ),
                           ),
-                          const SizedBox(height: 16),
+                          SizedBox(height: 16.h),
                           // Name
                           Text(
                             _getDisplayName(),
-                            style: const TextStyle(
-                              fontFamily: 'IRANSans',
-                              fontWeight: FontWeight.w700,
-                              fontSize: 16,
-                              color: Color(0xFF3D495C),
+                            style: MyTextStyle.textMatn16Bold.copyWith(
+                              color: MyColors.textCancelButton,
                             ),
                           ),
-                          const SizedBox(height: 8),
+                          SizedBox(height: 8.h),
                           // Mobile
                           Text(
                             ' موبایل: ${userMobile ?? 'نامشخص'}',
-                            style: const TextStyle(
-                              fontFamily: 'IRANSans',
-                              fontWeight: FontWeight.w700,
-                              fontSize: 12,
-                              color: Color(0xFF52617A),
+                            style: MyTextStyle.textMatn12Bold.copyWith(
+                              color: MyColors.text3,
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 16.0, vertical: 16),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 16.w, vertical: 16.h),
                             child: Center(
                               child: SizedBox(
-                                width: 180,
-                                height: 42,
+                                width: 180.w,
+                                height: 42.h,
                                 child: OutlinedButton(
                                   onPressed: () {
                                     Navigator.pushNamed(
@@ -182,14 +178,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     });
                                   },
                                   style: OutlinedButton.styleFrom(
-                                    side: const BorderSide(
-                                        color: Color(0xFFE0E4EB), width: 2),
+                                    side: BorderSide(
+                                        color: const Color(0xFFE0E4EB),
+                                        width: 2.r),
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(15),
+                                      borderRadius: BorderRadius.circular(15.r),
                                     ),
                                     backgroundColor: Colors.transparent,
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 16),
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 16.w),
                                   ),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
@@ -197,26 +194,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       // Custom edit icon - using a simple icon for now
                                       // You can replace this with the actual SVG from Figma
                                       Container(
-                                        width: 16,
-                                        height: 16,
+                                        width: 16.r,
+                                        height: 16.r,
                                         decoration: const BoxDecoration(
                                           color: Color(0xFFA3AFC2),
                                           shape: BoxShape.circle,
                                         ),
-                                        child: const Icon(
+                                        child: Icon(
                                           Icons.edit,
                                           color: Colors.white,
-                                          size: 10,
+                                          size: 10.r,
                                         ),
                                       ),
-                                      const SizedBox(width: 8),
-                                      const Text(
+                                      SizedBox(width: 8.w),
+                                      Text(
                                         'ویرایش حساب',
-                                        style: TextStyle(
-                                          fontFamily: 'IRANSans',
+                                        style: MyTextStyle.textMatn11.copyWith(
                                           fontWeight: FontWeight.w500,
-                                          fontSize: 11,
-                                          color: Color(0xFF52617A),
+                                          color: MyColors.text3,
                                         ),
                                       ),
                                     ],
@@ -226,7 +221,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                           ),
                           // const Spacer(),
-                          const SizedBox(height: 80),
+                          SizedBox(height: 80.h),
                           // Padding(
                           // padding: const EdgeInsets.symmetric(horizontal: 16.0),
                           // child:
@@ -242,7 +237,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   );
                                 },
                               ),
-                              const SizedBox(height: 16),
+                              SizedBox(height: 16.h),
                               _ProfileActionCard(
                                 icon: Icons.history,
                                 label: 'تاریخچه خرید',
@@ -256,7 +251,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   );
                                 },
                               ),
-                              const SizedBox(height: 16),
+                              SizedBox(height: 16.h),
                               _ProfileActionCard(
                                 icon: Icons.bookmark,
                                 label: 'علاقه مندی ها',
@@ -303,41 +298,39 @@ class _ProfileActionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 84,
-      width: 357.838,
-      margin: const EdgeInsets.symmetric(horizontal: 17),
+      height: 84.h,
+      width: 357.838.w,
+      margin: EdgeInsets.symmetric(horizontal: 17.w),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(22.r),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.04),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
+            blurRadius: 4.r,
+            offset: Offset(0, 2.h),
           ),
         ],
       ),
       child: Material(
         color: Colors.transparent,
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(22.r),
         child: InkWell(
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(22.r),
           onTap: onTap,
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: EdgeInsets.symmetric(horizontal: 24.w),
             alignment: Alignment.centerRight,
             child: Row(
               children: [
-                Icon(icon, color: Color(0xFFFFB200), size: 32),
-                const SizedBox(width: 16),
+                Icon(icon, color: const Color(0xFFFFB200), size: 32.r),
+                SizedBox(width: 16.w),
                 Expanded(
                   child: Text(
                     label,
-                    style: const TextStyle(
-                      fontFamily: 'IRANSans',
+                    style: MyTextStyle.textMatn16.copyWith(
                       fontWeight: FontWeight.w500,
-                      fontSize: 16,
-                      color: Color(0xFF3D495C),
+                      color: MyColors.textCancelButton,
                       height: 1.375, // 22px line height for 16px font
                     ),
                     textAlign: TextAlign.right,
@@ -364,22 +357,23 @@ class MyClipper extends CustomClipper<Path> {
     path.lineTo(size.width, 0);
 
     // Go to bottom-right
-    path.lineTo(size.width, size.height - 50);
+    path.lineTo(size.width, size.height - 50.h);
 
     // Create the concave curve at the bottom
     path.quadraticBezierTo(
       size.width * 0.5, // Control point x (center)
-      size.height + 30, // Control point y (below the bottom for concave effect)
+      size.height +
+          30.h, // Control point y (below the bottom for concave effect)
       size.width * 0.2, // End point x (20% from left)
-      size.height - 20, // End point y
+      size.height - 20.h, // End point y
     );
 
     // Continue the curve to the left
     path.quadraticBezierTo(
       size.width * 0.05, // Control point x (5% from left)
-      size.height - 45, // Control point y
+      size.height - 45.h, // Control point y
       0, // End point x (left edge)
-      size.height - 50, // End point y
+      size.height - 50.h, // End point y
     );
 
     // Close the path

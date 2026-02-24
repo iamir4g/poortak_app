@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/config/myColors.dart';
+import 'package:poortak/config/myTextStyle.dart';
 
 class DateSeparator extends StatelessWidget {
   final String date;
@@ -15,13 +17,11 @@ class DateSeparator extends StatelessWidget {
 
     return Center(
         child: Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16.5, vertical: 8),
+      padding: EdgeInsets.symmetric(horizontal: 16.5.w, vertical: 8.h),
       child: Text(
         date,
         textAlign: TextAlign.center,
-        style: TextStyle(
-          fontFamily: 'IranSans',
-          fontSize: 13,
+        style: MyTextStyle.textMatn13.copyWith(
           fontWeight: FontWeight.w500,
           color: isDarkMode ? MyColors.darkTextPrimary : MyColors.textMatn2,
         ),

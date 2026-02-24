@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_kavoosh/widgets/course_card.dart';
 import 'package:poortak/featueres/feature_kavoosh/widgets/section_header.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/course_list_screen.dart';
@@ -21,45 +23,42 @@ class _EducationalVideosScreenState extends State<EducationalVideosScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(57),
+        preferredSize: Size.fromHeight(57.h),
         child: SafeArea(
           child: Container(
-            padding: const EdgeInsets.fromLTRB(16, 0, 32, 0),
-            height: 57,
+            padding: EdgeInsets.fromLTRB(16.w, 0, 32.w, 0),
+            height: 57.h,
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: const BorderRadius.only(
-                bottomLeft: Radius.circular(33.5),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(33.5.r),
               ),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.05),
-                  offset: const Offset(0, 1),
-                  blurRadius: 1,
+                  offset: Offset(0, 1.h),
+                  blurRadius: 1.r,
                 ),
               ],
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   'ویدئو های آموزشی',
-                  style: TextStyle(
-                    fontFamily: 'IRANSans',
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF29303D),
+                  style: MyTextStyle.textMatn16Bold.copyWith(
+                    color: const Color(0xFF29303D),
                   ),
                 ),
                 SizedBox(
-                  width: 40,
-                  height: 40,
+                  width: 40.w,
+                  height: 40.h,
                   child: IconButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.arrow_forward,
-                      color: Color(0xFF29303D),
-                      size: 28,
+                      color: const Color(0xFF29303D),
+                      size: 28.sp,
                     ),
                   ),
                 ),
@@ -75,7 +74,7 @@ class _EducationalVideosScreenState extends State<EducationalVideosScreen> {
             children: [
               // Slider Placeholder
               Container(
-                height: 200,
+                height: 200.h,
                 width: double.infinity,
                 decoration: const BoxDecoration(
                   color: Color(0xFFF9F6C6), // Light yellow placeholder
@@ -92,19 +91,19 @@ class _EducationalVideosScreenState extends State<EducationalVideosScreen> {
 
               // Custom Tabs
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                padding: EdgeInsets.symmetric(vertical: 16.0.h),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     _buildTabItem(0, 'دوره ها', Icons.play_circle_outline),
-                    const SizedBox(width: 24),
+                    SizedBox(width: 24.w),
                     _buildTabItem(1, 'کوتاه آموزشی', Icons.movie_outlined),
                   ],
                 ),
               ),
               // Divider line for tabs
               Container(
-                height: 2,
+                height: 2.h,
                 width: double.infinity,
                 color: Colors.grey.withValues(alpha: 0.1),
                 child: Row(
@@ -123,7 +122,7 @@ class _EducationalVideosScreenState extends State<EducationalVideosScreen> {
                 ),
               ),
 
-              const SizedBox(height: 16),
+              SizedBox(height: 16.h),
 
               // Content Sections
               if (_selectedTabIndex == 0) ...[
@@ -132,13 +131,13 @@ class _EducationalVideosScreenState extends State<EducationalVideosScreen> {
                 _buildSection('پایه سوم دبستان'),
                 _buildSection('پایه چهارم دبستان'),
               ] else ...[
-                const SizedBox(
-                  height: 200,
-                  child: Center(child: Text('محتوای کوتاه آموزشی')),
+                SizedBox(
+                  height: 200.h,
+                  child: const Center(child: Text('محتوای کوتاه آموزشی')),
                 ),
               ],
 
-              const SizedBox(height: 20),
+              SizedBox(height: 20.h),
             ],
           ),
         ),
@@ -158,18 +157,16 @@ class _EducationalVideosScreenState extends State<EducationalVideosScreen> {
         children: [
           Text(
             title,
-            style: TextStyle(
-              fontFamily: 'IRANSans',
-              fontSize: 14,
+            style: MyTextStyle.textMatn14Bold.copyWith(
               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               color: isSelected ? Colors.orange : Colors.grey,
             ),
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: 8.w),
           Icon(
             icon,
             color: isSelected ? Colors.orange : Colors.grey,
-            size: 20,
+            size: 20.sp,
           ),
         ],
       ),
@@ -190,10 +187,10 @@ class _EducationalVideosScreenState extends State<EducationalVideosScreen> {
           },
         ),
         SizedBox(
-          height: 180,
+          height: 180.h,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: EdgeInsets.symmetric(horizontal: 16.w),
             itemCount: 5,
             itemBuilder: (context, index) {
               // Alternating background colors for demo
@@ -210,7 +207,7 @@ class _EducationalVideosScreenState extends State<EducationalVideosScreen> {
             },
           ),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16.h),
       ],
     );
   }

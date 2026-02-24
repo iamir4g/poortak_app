@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 
@@ -9,27 +10,26 @@ class TermsConditionsModal extends StatelessWidget {
   Widget build(BuildContext context) {
     return Dialog(
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(20.r),
       ),
       child: Container(
-        width: 333,
-        height: 848,
+        width: 333.w,
+        height: 600.h, // Adjusted height to be more reasonable
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(20.r),
         ),
         child: Column(
           children: [
             // Header
             Container(
-              height: 73,
-              padding: const EdgeInsets.symmetric(horizontal: 19),
+              height: 73.h,
+              padding: EdgeInsets.symmetric(horizontal: 19.w),
               child: Column(
                 children: [
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24.h),
                   Row(
                     children: [
-                      // const Spacer(),
                       // Title
                       RichText(
                         textAlign: TextAlign.center,
@@ -38,7 +38,7 @@ class TermsConditionsModal extends StatelessWidget {
                             TextSpan(
                               text: "قوانین و مقررات ",
                               style: MyTextStyle.textMatn12Bold.copyWith(
-                                fontSize: 15,
+                                fontSize: 15.sp,
                                 color: const Color(0xFFF88F48), // Orange color
                                 fontWeight: FontWeight.bold,
                               ),
@@ -46,7 +46,7 @@ class TermsConditionsModal extends StatelessWidget {
                             TextSpan(
                               text: "خرید از پورتک",
                               style: MyTextStyle.textMatn12Bold.copyWith(
-                                fontSize: 15,
+                                fontSize: 15.sp,
                                 color: MyColors.textMatn1,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -56,29 +56,25 @@ class TermsConditionsModal extends StatelessWidget {
                       ),
                       const Spacer(),
                       // Empty space to balance the close button
-                      const SizedBox(width: 24),
+                      SizedBox(width: 24.w),
                       // Close button
                       GestureDetector(
                         onTap: () => Navigator.of(context).pop(),
                         child: SizedBox(
-                          width: 24,
-                          height: 24,
-                          // decoration: BoxDecoration(
-                          //   color: MyColors.secondary,
-                          //   borderRadius: BorderRadius.circular(12),
-                          // ),
-                          child: const Icon(
+                          width: 24.w,
+                          height: 24.h,
+                          child: Icon(
                             Icons.close,
                             color: Colors.black,
-                            size: 24,
+                            size: 24.sp,
                           ),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16.h),
                   Container(
-                    height: 1,
+                    height: 1.h,
                     color: MyColors.divider,
                   ),
                 ],
@@ -87,61 +83,61 @@ class TermsConditionsModal extends StatelessWidget {
             // Content
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 19),
+                padding: EdgeInsets.symmetric(horizontal: 19.w),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 12),
+                    SizedBox(height: 12.h),
                     Text(
                       'اطلاعات شخصی کاربران همانند ایمیل، شماره همراه و… با حفظ حریم شخصی در اپلیکیشن ثبت می‌شود. علاوه‌ بر آن به منظور اطلاع رسانی بهتر تخفیفات ویژه و سایر تخفیفات مناسبتی سایت، ایمیل یا پیامک به آدرس الکترونیک و یا شماره‌ همراه ثبت شده‌ کاربر ارسال خواهد شد.',
                       style: MyTextStyle.textMatn13.copyWith(
-                        fontSize: 14,
+                        fontSize: 14.sp,
                         color: MyColors.textMatn1,
                         height: 1.5,
                       ),
                       textAlign: TextAlign.right,
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16.h),
                     Text(
                       'کلیه حقوق و امتیازات مجموعه آموزشی سیاره آی نو متعلق به انتشارات تاجیک می باشد و هر گونه کپی برداری و تکثیر از آن غیر مجاز بوده و پیگرد قانونی به همراه خواهد داشت.',
                       style: MyTextStyle.textMatn13.copyWith(
-                        fontSize: 14,
+                        fontSize: 14.sp,
                         color: MyColors.textMatn1,
                         height: 1.5,
                       ),
                       textAlign: TextAlign.right,
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16.h),
                     Text(
                       'ثبت، پردازش و ارسال سفارش سفارش های فبزیکی ثبت شده در طول روزهای کاری و اولین روز پس از تعطیلات پردازش می شوند، و ارسال از طریق پست به تهران و شهرستان ها میسر می باشد.',
                       style: MyTextStyle.textMatn13.copyWith(
-                        fontSize: 14,
+                        fontSize: 14.sp,
                         color: MyColors.textMatn1,
                         height: 1.5,
                       ),
                       textAlign: TextAlign.right,
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16.h),
                     Text(
                       'کاربران باید هنگام سفارش کالای مورد نظر خود، فرم سفارش را با اطلاعات صحیح و به طور کامل تکمیل کنند. بدیهی است درصورت ورود اطلاعات ناقص یا نادرست، سفارش کاربر قابل پیگیری و تحویل نخواهد بود. بنابراین درج آدرس، ایمیل و شماره تماس همراه مشتری، به منزله مورد تایید بودن صحت آنها است و در صورتی که این موارد به صورت صحیح یا کامل درج نشده باشد،همچنین، مشتریان می‌توانند نام، آدرس و تلفن شخص دیگری را برای تحویل گرفتن سفارش وارد کنند و تحویل گیرنده سفارش هنگام دریافت کالا باید کارت شناسایی همراه داشته باشد.',
                       style: MyTextStyle.textMatn13.copyWith(
-                        fontSize: 14,
+                        fontSize: 14.sp,
                         color: MyColors.textMatn1,
                         height: 1.5,
                       ),
                       textAlign: TextAlign.right,
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16.h),
                     Text(
                       'برای سفارش یک کالا به تعداد بالا، لازم است پیش از ارسال، سفارش مشتریان ابتدا توسط پشتیبان بررسی و در صورت تایید، پردازش گردد. در صورت عدم تایید سفارشات با هماهنگی مشتری کنسل شده و در صورت واریز وجه، مبلغ پرداخت شده طی 5 الی 7 روز کاری به حساب مشتری عودت داده خواهد شد.',
                       style: MyTextStyle.textMatn13.copyWith(
-                        fontSize: 14,
+                        fontSize: 14.sp,
                         color: MyColors.textMatn1,
                         height: 1.5,
                       ),
                       textAlign: TextAlign.right,
                     ),
-                    const SizedBox(height: 20),
+                    SizedBox(height: 20.h),
                   ],
                 ),
               ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 
@@ -22,10 +23,10 @@ class _QuestionCountModalState extends State<QuestionCountModal> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.all(24.r),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(30),
+        borderRadius: BorderRadius.circular(30.r),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -35,15 +36,15 @@ class _QuestionCountModalState extends State<QuestionCountModal> {
             children: [
               IconButton(
                 onPressed: () => Navigator.pop(context),
-                icon: const Icon(Icons.close, color: Color(0xFF52617A)),
+                icon: Icon(Icons.close, color: MyColors.text3, size: 24.r),
               ),
-              const SizedBox(width: 40), // Spacer for centering if needed
+              SizedBox(width: 40.w), // Spacer for centering if needed
             ],
           ),
           // Icon Placeholder
           Container(
-            width: 80,
-            height: 80,
+            width: 80.w,
+            height: 80.h,
             decoration: const BoxDecoration(
               shape: BoxShape.circle,
               color: Color(0xFFFF4081), // Pinkish red background from design
@@ -51,19 +52,19 @@ class _QuestionCountModalState extends State<QuestionCountModal> {
             child: Center(
               child: Image.asset(
                 'assets/images/kavoosh/khodsanji/reiazi_logo.png', // Placeholder, should be dynamic
-                width: 50,
-                height: 50,
+                width: 50.w,
+                height: 50.h,
                 fit: BoxFit.contain,
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16.h),
           Text(
             widget.title,
             style: MyTextStyle.textHeader16Bold,
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 32),
+          SizedBox(height: 32.h),
 
           // Slider Section
           Directionality(
@@ -76,11 +77,11 @@ class _QuestionCountModalState extends State<QuestionCountModal> {
                     inactiveTrackColor: const Color(0xFFE0E0E0),
                     thumbColor: MyColors.primary,
                     overlayColor: MyColors.primary.withValues(alpha: 0.2),
-                    trackHeight: 4.0,
+                    trackHeight: 4.0.h,
                     thumbShape:
-                        const RoundSliderThumbShape(enabledThumbRadius: 10.0),
+                        RoundSliderThumbShape(enabledThumbRadius: 10.0.r),
                     overlayShape:
-                        const RoundSliderOverlayShape(overlayRadius: 20.0),
+                        RoundSliderOverlayShape(overlayRadius: 20.0.r),
                   ),
                   child: Slider(
                     value: _currentSliderValue,
@@ -96,7 +97,7 @@ class _QuestionCountModalState extends State<QuestionCountModal> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                  padding: EdgeInsets.symmetric(horizontal: 10.0.w),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -116,32 +117,27 @@ class _QuestionCountModalState extends State<QuestionCountModal> {
             ),
           ),
 
-          const SizedBox(height: 32),
+          SizedBox(height: 32.h),
 
           SizedBox(
             width: double.infinity,
-            height: 56,
+            height: 56.h,
             child: ElevatedButton(
               onPressed: widget.onStart,
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF3F445A), // Dark button color
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(20.r),
                 ),
                 elevation: 0,
               ),
-              child: const Text(
+              child: Text(
                 'بزن بریم!',
-                style: TextStyle(
-                  fontFamily: 'IRANSans',
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
+                style: MyTextStyle.textHeader16Bold.copyWith(color: Colors.white),
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16.h),
         ],
       ),
     );

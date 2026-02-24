@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/common/bloc/theme_cubit/theme_cubit.dart';
 import 'package:poortak/common/services/reminder_notification_service.dart';
 import 'package:poortak/config/myColors.dart';
@@ -88,51 +89,51 @@ class _AddReminderModalState extends State<AddReminderModal> {
             themeState.isDark ? MyColors.darkTextPrimary : MyColors.textMatn1;
 
         return Container(
-          height: MediaQuery.of(context).size.height * 0.65,
+          height: 0.65.sh,
           decoration: BoxDecoration(
             color: backgroundColor,
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(24),
-              topRight: Radius.circular(24),
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(24.r),
+              topRight: Radius.circular(24.r),
             ),
           ),
           child: Column(
             children: [
               // Handle bar
               Container(
-                margin: const EdgeInsets.only(top: 12),
-                width: 40,
-                height: 4,
+                margin: EdgeInsets.only(top: 12.h),
+                width: 40.w,
+                height: 4.h,
                 decoration: BoxDecoration(
                   color: themeState.isDark
                       ? MyColors.darkTextSecondary
                       : MyColors.text4,
-                  borderRadius: BorderRadius.circular(2),
+                  borderRadius: BorderRadius.circular(2.r),
                 ),
               ),
               Expanded(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  padding: EdgeInsets.symmetric(horizontal: 20.w),
                   child: Column(
                     children: [
-                      const SizedBox(height: 24),
+                      SizedBox(height: 24.h),
                       // Time Display
                       GestureDetector(
                         onTap: _selectTime,
                         child: Container(
                           width: double.infinity,
-                          padding: const EdgeInsets.symmetric(vertical: 20),
+                          padding: EdgeInsets.symmetric(vertical: 20.h),
                           child: Text(
                             '${_selectedTime.minute.toString().padLeft(2, '0').toPersianDigit()} : ${_selectedTime.hour.toString().padLeft(2, '0').toPersianDigit()} ',
                             textAlign: TextAlign.center,
                             style: MyTextStyle.textMatn17W700.copyWith(
                               color: textColor,
-                              fontSize: 36,
+                              fontSize: 36.sp,
                             ),
                           ),
                         ),
                       ),
-                      const SizedBox(height: 24),
+                      SizedBox(height: 24.h),
                       // Question
                       Text(
                         'یاد آور برای کدام بخش تنظیم شود؟',
@@ -140,7 +141,7 @@ class _AddReminderModalState extends State<AddReminderModal> {
                           color: textColor,
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20.h),
                       // Reminder Type Cards
                       Row(
                         children: [
@@ -156,7 +157,7 @@ class _AddReminderModalState extends State<AddReminderModal> {
                               },
                             ),
                           ),
-                          const SizedBox(width: 12),
+                          SizedBox(width: 12.w),
                           Expanded(
                             child: ReminderTypeCard(
                               title: 'یادآوری درس',
@@ -171,7 +172,7 @@ class _AddReminderModalState extends State<AddReminderModal> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 32),
+                      SizedBox(height: 32.h),
                       // Test Buttons
                       Row(
                         children: [
@@ -203,7 +204,7 @@ class _AddReminderModalState extends State<AddReminderModal> {
                               },
                               icon: Icon(
                                 Icons.notifications_active,
-                                size: 18,
+                                size: 18.r,
                                 color: themeState.isDark
                                     ? MyColors.darkTextPrimary
                                     : MyColors.primary,
@@ -223,14 +224,14 @@ class _AddReminderModalState extends State<AddReminderModal> {
                                       : MyColors.primary,
                                 ),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30),
+                                  borderRadius: BorderRadius.circular(30.r),
                                 ),
                                 padding:
-                                    const EdgeInsets.symmetric(vertical: 12),
+                                    EdgeInsets.symmetric(vertical: 12.h),
                               ),
                             ),
                           ),
-                          const SizedBox(width: 12),
+                          SizedBox(width: 12.w),
                           Expanded(
                             child: OutlinedButton.icon(
                               onPressed: () async {
@@ -260,7 +261,7 @@ class _AddReminderModalState extends State<AddReminderModal> {
                               },
                               icon: Icon(
                                 Icons.schedule,
-                                size: 18,
+                                size: 18.r,
                                 color: themeState.isDark
                                     ? MyColors.darkTextPrimary
                                     : MyColors.primary,
@@ -280,16 +281,16 @@ class _AddReminderModalState extends State<AddReminderModal> {
                                       : MyColors.primary,
                                 ),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30),
+                                  borderRadius: BorderRadius.circular(30.r),
                                 ),
                                 padding:
-                                    const EdgeInsets.symmetric(vertical: 12),
+                                    EdgeInsets.symmetric(vertical: 12.h),
                               ),
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 16),
+                      SizedBox(height: 16.h),
                       // Action Buttons
                       Row(
                         children: [
@@ -299,10 +300,10 @@ class _AddReminderModalState extends State<AddReminderModal> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: MyColors.primary,
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30),
+                                  borderRadius: BorderRadius.circular(30.r),
                                 ),
                                 padding:
-                                    const EdgeInsets.symmetric(vertical: 14),
+                                    EdgeInsets.symmetric(vertical: 14.h),
                               ),
                               child: Text(
                                 'افزودن',
@@ -310,10 +311,10 @@ class _AddReminderModalState extends State<AddReminderModal> {
                               ),
                             ),
                           ),
-                          const SizedBox(width: 12),
+                          SizedBox(width: 12.w),
                           SizedBox(
-                            width: 128,
-                            height: 58,
+                            width: 128.w,
+                            height: 58.h,
                             child: OutlinedButton(
                               onPressed: () => Navigator.pop(context),
                               style: OutlinedButton.styleFrom(
@@ -323,10 +324,10 @@ class _AddReminderModalState extends State<AddReminderModal> {
                                       : MyColors.text4,
                                 ),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30),
+                                  borderRadius: BorderRadius.circular(30.r),
                                 ),
                                 padding:
-                                    const EdgeInsets.symmetric(vertical: 14),
+                                    EdgeInsets.symmetric(vertical: 14.h),
                               ),
                               child: Text(
                                 'لغو',
@@ -380,12 +381,12 @@ class ReminderTypeCard extends StatelessWidget {
         return GestureDetector(
           onTap: onTap,
           child: Container(
-            width: 154,
-            height: 136,
-            padding: const EdgeInsets.all(20),
+            width: 154.w,
+            height: 136.h,
+            padding: EdgeInsets.all(20.r),
             decoration: BoxDecoration(
               color: isSelected ? selectedBackground : cardBackground,
-              borderRadius: BorderRadius.circular(30),
+              borderRadius: BorderRadius.circular(30.r),
               border: Border.all(
                 color: isSelected
                     ? MyColors.primary
@@ -396,21 +397,21 @@ class ReminderTypeCard extends StatelessWidget {
             child: Column(
               children: [
                 Container(
-                  width: 56,
-                  height: 56,
+                  width: 56.r,
+                  height: 56.r,
                   decoration: BoxDecoration(
                     color: isSelected
                         ? MyColors.primary
                         : (themeState.isDark
                             ? MyColors.darkCardBackground
                             : Colors.transparent),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(12.r),
                   ),
                   child: Center(
                     child: Image.asset(
                       iconPath,
-                      width: 32,
-                      height: 32,
+                      width: 32.r,
+                      height: 32.r,
                       color: isSelected
                           ? Colors.black
                           : (themeState.isDark
@@ -419,7 +420,7 @@ class ReminderTypeCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: 12.h),
                 Text(
                   title,
                   textAlign: TextAlign.center,

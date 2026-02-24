@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_kavoosh/widgets/self_assessment_subject_card.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/self_assessment_grades_screen.dart';
@@ -46,45 +48,42 @@ class SelfAssessmentScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: MyColors.background3,
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(57),
+        preferredSize: Size.fromHeight(57.h),
         child: SafeArea(
           child: Container(
-            padding: const EdgeInsets.fromLTRB(16, 0, 32, 0),
-            height: 57,
+            padding: EdgeInsets.fromLTRB(16.w, 0, 32.w, 0),
+            height: 57.h,
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: const BorderRadius.only(
-                bottomLeft: Radius.circular(33.5),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(33.5.r),
               ),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.05),
-                  offset: const Offset(0, 1),
-                  blurRadius: 1,
+                  offset: Offset(0, 1.h),
+                  blurRadius: 1.r,
                 ),
               ],
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   'خودسنجی',
-                  style: TextStyle(
-                    fontFamily: 'IRANSans',
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF29303D),
+                  style: MyTextStyle.textMatn16Bold.copyWith(
+                    color: const Color(0xFF29303D),
                   ),
                 ),
                 SizedBox(
-                  width: 40,
-                  height: 40,
+                  width: 40.w,
+                  height: 40.h,
                   child: IconButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.arrow_forward,
-                      color: Color(0xFF29303D),
-                      size: 28,
+                      color: const Color(0xFF29303D),
+                      size: 28.sp,
                     ),
                   ),
                 ),
@@ -96,33 +95,33 @@ class SelfAssessmentScreen extends StatelessWidget {
       body: SafeArea(
         top: false,
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: EdgeInsets.all(16.0.r),
           child: GridView.builder(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-            childAspectRatio: 1.1,
+              crossAxisSpacing: 16.w,
+              mainAxisSpacing: 16.h,
+              childAspectRatio: 1.1,
+            ),
+            itemCount: subjects.length,
+            itemBuilder: (context, index) {
+              final subject = subjects[index];
+              return SelfAssessmentSubjectCard(
+                title: subject['title'],
+                iconPath: subject['icon'],
+                backgroundColor: subject['color'],
+                onTap: () {
+                  Navigator.pushNamed(
+                    context,
+                    SelfAssessmentGradesScreen.routeName,
+                    arguments: {'subjectTitle': subject['title']},
+                  );
+                },
+              );
+            },
           ),
-          itemCount: subjects.length,
-          itemBuilder: (context, index) {
-            final subject = subjects[index];
-            return SelfAssessmentSubjectCard(
-              title: subject['title'],
-              iconPath: subject['icon'],
-              backgroundColor: subject['color'],
-              onTap: () {
-                Navigator.pushNamed(
-                  context,
-                  SelfAssessmentGradesScreen.routeName,
-                  arguments: {'subjectTitle': subject['title']},
-                );
-              },
-            );
-          },
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 }

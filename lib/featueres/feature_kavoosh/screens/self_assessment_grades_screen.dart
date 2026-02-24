@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_kavoosh/widgets/self_assessment_grade_card.dart';
@@ -32,21 +33,21 @@ class SelfAssessmentGradesScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: MyColors.background3,
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(57),
+        preferredSize: Size.fromHeight(57.h),
         child: SafeArea(
           child: Container(
-            padding: const EdgeInsets.fromLTRB(16, 0, 32, 0),
-            height: 57,
+            padding: EdgeInsets.fromLTRB(16.w, 0, 32.w, 0),
+            height: 57.h,
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: const BorderRadius.only(
-                bottomLeft: Radius.circular(33.5),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(33.5.r),
               ),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.05),
-                  offset: const Offset(0, 1),
-                  blurRadius: 1,
+                  offset: Offset(0, 1.h),
+                  blurRadius: 1.r,
                 ),
               ],
             ),
@@ -58,14 +59,14 @@ class SelfAssessmentGradesScreen extends StatelessWidget {
                   style: MyTextStyle.textHeader16Bold,
                 ),
                 SizedBox(
-                  width: 40,
-                  height: 40,
+                  width: 40.w,
+                  height: 40.h,
                   child: IconButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.arrow_forward,
-                      color: Color(0xFF29303D),
-                      size: 28,
+                      color: const Color(0xFF29303D),
+                      size: 28.sp,
                     ),
                   ),
                 ),
@@ -75,7 +76,7 @@ class SelfAssessmentGradesScreen extends StatelessWidget {
         ),
       ),
       body: ListView.builder(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(16.r),
         itemCount: grades.length,
         itemBuilder: (context, index) {
           return SelfAssessmentGradeCard(
@@ -85,7 +86,7 @@ class SelfAssessmentGradesScreen extends StatelessWidget {
                 context: context,
                 builder: (context) => Dialog(
                   backgroundColor: Colors.transparent,
-                  insetPadding: const EdgeInsets.symmetric(horizontal: 16),
+                  insetPadding: EdgeInsets.symmetric(horizontal: 16.w),
                   child: QuestionCountModal(
                     title: 'آزمون $subjectTitle ${grades[index]}',
                     onStart: () {

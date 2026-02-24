@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/config/myColors.dart';
+import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/video_detail_screen.dart';
 
 class CourseCard extends StatelessWidget {
   final String title;
-  final String? imagePath; // For now we might use placeholder or assets
-  final Color backgroundColor;
+  final String? imagePath;
+  final Color? backgroundColor;
   final VoidCallback? onTap;
 
   const CourseCard({
     super.key,
     required this.title,
     this.imagePath,
-    this.backgroundColor = Colors.white,
+    this.backgroundColor,
     this.onTap,
   });
 
@@ -28,16 +30,16 @@ class CourseCard extends StatelessWidget {
             );
           },
       child: Container(
-        width: 140,
-        margin: const EdgeInsets.only(left: 16),
+        width: 140.w,
+        margin: EdgeInsets.only(left: 16.w),
         decoration: BoxDecoration(
-          color: backgroundColor,
-          borderRadius: BorderRadius.circular(20),
+          color: backgroundColor ?? Colors.white,
+          borderRadius: BorderRadius.circular(20.r),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+              blurRadius: 10.r,
+              offset: Offset(0, 4.h),
             ),
           ],
         ),
@@ -50,19 +52,19 @@ class CourseCard extends StatelessWidget {
               child: Container(
                 decoration: BoxDecoration(
                   color: Colors.grey[200],
-                  borderRadius: const BorderRadius.all(Radius.circular(20)),
+                  borderRadius: BorderRadius.all(Radius.circular(20.r)),
                 ),
                 child: imagePath != null
                     ? ClipRRect(
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(20)),
+                        borderRadius: BorderRadius.all(Radius.circular(20.r)),
                         child: Image.asset(
                           imagePath!,
                           fit: BoxFit.cover,
                         ),
                       )
-                    : const Center(
-                        child: Icon(Icons.image, color: Colors.grey),
+                    : Center(
+                        child:
+                            Icon(Icons.image, color: Colors.grey, size: 40.r),
                       ),
               ),
             ),
@@ -70,15 +72,12 @@ class CourseCard extends StatelessWidget {
             Expanded(
               flex: 1,
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: EdgeInsets.all(8.0.r),
                 child: Center(
                   child: Text(
                     title,
-                    style: const TextStyle(
-                      fontFamily: 'IRANSans',
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF29303D),
+                    style: MyTextStyle.textMatn12Bold.copyWith(
+                      color: MyColors.textMatn2,
                     ),
                     textAlign: TextAlign.center,
                     maxLines: 2,

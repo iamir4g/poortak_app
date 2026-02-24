@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 
 class ExitConfirmationModal extends StatelessWidget {
@@ -17,42 +18,42 @@ class ExitConfirmationModal extends StatelessWidget {
     return Dialog(
       backgroundColor: Colors.transparent,
       child: Container(
-        width: 350,
-        height: 311,
+        width: 350.w,
+        height: 311.h,
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(20.r),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // Exit icon
             Container(
-              width: 80,
-              height: 80,
+              width: 80.w,
+              height: 80.h,
               decoration: BoxDecoration(
                 color: MyColors.error.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.exit_to_app,
-                size: 40,
+                size: 40.w,
                 color: MyColors.error,
               ),
             ),
 
-            const SizedBox(height: 20),
+            SizedBox(height: 20.h),
 
             // Title
             Container(
-              width: 250,
-              margin: const EdgeInsets.only(bottom: 10),
-              child: const Text(
+              width: 250.w,
+              margin: EdgeInsets.only(bottom: 10.h),
+              child: Text(
                 'خروج از برنامه',
                 style: TextStyle(
                   fontFamily: 'IRANSans',
                   fontWeight: FontWeight.bold,
-                  fontSize: 16,
+                  fontSize: 16.sp,
                   color: MyColors.textMatn1,
                 ),
                 textAlign: TextAlign.center,
@@ -61,15 +62,15 @@ class ExitConfirmationModal extends StatelessWidget {
 
             // Message
             Container(
-              width: 250,
-              margin: const EdgeInsets.only(bottom: 30),
-              child: const Text(
+              width: 250.w,
+              margin: EdgeInsets.only(bottom: 30.h),
+              child: Text(
                 'آیا واقعاً می‌خواهید از برنامه خارج شوید؟',
                 style: TextStyle(
                   fontFamily: 'IRANSans',
                   fontWeight: FontWeight.w500,
-                  fontSize: 14,
-                  color: Color(0xFF3D495C),
+                  fontSize: 14.sp,
+                  color: const Color(0xFF3D495C),
                   height: 1.4,
                 ),
                 textAlign: TextAlign.center,
@@ -82,8 +83,8 @@ class ExitConfirmationModal extends StatelessWidget {
               children: [
                 // Exit button (primary)
                 SizedBox(
-                  width: 140,
-                  height: 50,
+                  width: 140.w,
+                  height: 50.h,
                   child: ElevatedButton(
                     onPressed: () {
                       Navigator.of(context).pop();
@@ -92,16 +93,16 @@ class ExitConfirmationModal extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: MyColors.error,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(20.r),
                       ),
                       elevation: 0,
                     ),
-                    child: const Text(
+                    child: Text(
                       'خروج',
                       style: TextStyle(
                         fontFamily: 'IRANSans',
-                        fontWeight: FontWeight.w500,
-                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16.sp,
                         color: Colors.white,
                       ),
                     ),
@@ -110,28 +111,27 @@ class ExitConfirmationModal extends StatelessWidget {
 
                 // Stay button (secondary)
                 SizedBox(
-                  width: 140,
-                  height: 50,
-                  child: ElevatedButton(
+                  width: 140.w,
+                  height: 50.h,
+                  child: OutlinedButton(
                     onPressed: () {
                       Navigator.of(context).pop();
                       onStay();
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.transparent,
-                      side: const BorderSide(color: MyColors.primary, width: 1),
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(
+                          color: Color(0xFF3D495C), width: 1),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(20.r),
                       ),
-                      elevation: 0,
                     ),
-                    child: const Text(
-                      'ماندن',
+                    child: Text(
+                      'بمانم',
                       style: TextStyle(
                         fontFamily: 'IRANSans',
                         fontWeight: FontWeight.w500,
-                        fontSize: 16,
-                        color: MyColors.primary,
+                        fontSize: 16.sp,
+                        color: const Color(0xFF3D495C),
                       ),
                     ),
                   ),

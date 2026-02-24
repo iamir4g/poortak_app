@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
+import 'package:poortak/config/dimens.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_bloc.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_event.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_state.dart';
@@ -145,7 +147,7 @@ class _LitnerWordsInprogressScreenState
       floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
       floatingActionButton: FloatingActionButton(
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(100),
+          borderRadius: BorderRadius.circular(100.r),
         ),
         backgroundColor: MyColors.brandPrimary,
         onPressed: _showAddWordBottomSheet,
@@ -192,15 +194,15 @@ class _LitnerWordsInprogressScreenState
               children: [
                 // Search Box
                 Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: EdgeInsets.all(16.0.r),
                   child: Container(
-                    height: 48,
+                    height: 48.h,
                     decoration: BoxDecoration(
                       color: const Color(0xFFF6F9FE),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(12.r),
                       border: Border.all(
                         color: const Color(0xFFE5E7EB),
-                        width: 1,
+                        width: 1.w,
                       ),
                     ),
                     child: TextField(
@@ -209,38 +211,38 @@ class _LitnerWordsInprogressScreenState
                       onChanged: _onSearchChanged,
                       decoration: InputDecoration(
                         hintText: 'جستجو در لغات...',
-                        hintStyle: const TextStyle(
+                        hintStyle: TextStyle(
                           fontFamily: 'IRANSans',
-                          fontSize: 14,
+                          fontSize: 14.sp,
                           color: Color(0xFF9CA3AF),
                         ),
                         prefixIcon: _isSearching
-                            ? const SizedBox(
-                                width: 20,
-                                height: 20,
+                            ? SizedBox(
+                                width: 20.w,
+                                height: 20.h,
                                 child: Padding(
-                                  padding: EdgeInsets.all(8.0),
+                                  padding: EdgeInsets.all(8.0.r),
                                   child: CircularProgressIndicator(
-                                    strokeWidth: 2,
+                                    strokeWidth: 2.w,
                                     valueColor: AlwaysStoppedAnimation<Color>(
                                         Color(0xFF9CA3AF)),
                                   ),
                                 ),
                               )
-                            : const Icon(
+                            : Icon(
                                 Icons.search,
                                 color: Color(0xFF9CA3AF),
-                                size: 20,
+                                size: 20.r,
                               ),
                         border: InputBorder.none,
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 16.w,
+                          vertical: 12.h,
                         ),
                       ),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'IRANSans',
-                        fontSize: 14,
+                        fontSize: 14.sp,
                         color: Color(0xFF29303D),
                       ),
                     ),
@@ -260,17 +262,17 @@ class _LitnerWordsInprogressScreenState
                                 children: [
                                   Icon(
                                     Icons.search_off,
-                                    size: 64,
+                                    size: 64.r,
                                     color: Color(0xFF9CA3AF),
                                   ),
-                                  const SizedBox(height: 16),
+                                  SizedBox(height: Dimens.small.h),
                                   Text(
                                     _searchWord.isNotEmpty
                                         ? 'هیچ لغتی یافت نشد.'
                                         : 'هیچ لغتی موجود نیست.',
                                     style: TextStyle(
                                       fontFamily: 'IRANSans',
-                                      fontSize: 14,
+                                      fontSize: 14.sp,
                                       color: Color(0xFF9CA3AF),
                                     ),
                                   ),
@@ -282,26 +284,27 @@ class _LitnerWordsInprogressScreenState
                               itemCount:
                                   _words.length + (_isLoadingMore ? 1 : 0),
                               separatorBuilder: (context, index) => Container(
-                                height: 1.5,
-                                width: 200,
+                                height: 1.5.h,
+                                width: 200.w,
                                 color: const Color(0xFFF2F2F2),
                               ),
                               itemBuilder: (context, index) {
                                 if (index == _words.length) {
-                                  return const Center(
+                                  return Center(
                                       child: Padding(
-                                    padding: EdgeInsets.symmetric(vertical: 16),
+                                    padding:
+                                        EdgeInsets.symmetric(vertical: 16.h),
                                     child: CircularProgressIndicator(),
                                   ));
                                 }
                                 final word = _words[index];
                                 return Center(
                                   child: Container(
-                                    width: 340,
-                                    height: 40,
+                                    width: 340.w,
+                                    height: 40.h,
                                     decoration: BoxDecoration(
                                       color: Colors.white,
-                                      borderRadius: BorderRadius.circular(8),
+                                      borderRadius: BorderRadius.circular(8.r),
                                     ),
                                     child: Row(
                                       mainAxisAlignment:
@@ -310,16 +313,15 @@ class _LitnerWordsInprogressScreenState
                                           CrossAxisAlignment.center,
                                       children: [
                                         Padding(
-                                          padding:
-                                              const EdgeInsets.only(left: 8),
+                                          padding: EdgeInsets.only(left: 8.w),
                                           child: Row(
                                             children: [
                                               Text(
                                                 word.translation,
-                                                style: const TextStyle(
+                                                style: TextStyle(
                                                   fontFamily: 'IRANSans',
                                                   fontWeight: FontWeight.w700,
-                                                  fontSize: 16,
+                                                  fontSize: 16.sp,
                                                   color: Color(0xFF29303D),
                                                 ),
                                               ),
@@ -327,18 +329,18 @@ class _LitnerWordsInprogressScreenState
                                           ),
                                         ),
                                         Padding(
-                                            padding: const EdgeInsets.only(
-                                                right: 16),
+                                            padding:
+                                                EdgeInsets.only(right: 16.w),
                                             child: Row(
                                               children: [
                                                 IconButton(
-                                                  icon: const IconifyIcon(
+                                                  icon: IconifyIcon(
                                                     icon:
                                                         "cuida:volume-2-outline",
-                                                    size: 18,
+                                                    size: 18.r,
                                                     color: Color(0xFFA3AFC2),
                                                   ),
-                                                  splashRadius: 18,
+                                                  splashRadius: 18.r,
                                                   padding: EdgeInsets.zero,
                                                   constraints:
                                                       const BoxConstraints(),
@@ -347,13 +349,13 @@ class _LitnerWordsInprogressScreenState
                                                         .speak(word.word);
                                                   },
                                                 ),
-                                                const SizedBox(width: 4),
+                                                SizedBox(width: 4.w),
                                                 Text(
                                                   word.word,
-                                                  style: const TextStyle(
+                                                  style: TextStyle(
                                                     fontFamily: 'IRANSans',
                                                     fontWeight: FontWeight.w400,
-                                                    fontSize: 14,
+                                                    fontSize: 14.sp,
                                                     color: Color(0xFF29303D),
                                                   ),
                                                   textAlign: TextAlign.right,

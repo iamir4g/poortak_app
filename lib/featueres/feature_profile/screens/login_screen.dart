@@ -10,6 +10,8 @@ import 'package:poortak/featueres/feature_profile/widgets/terms_conditions_modal
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
+import 'package:poortak/config/dimens.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/featueres/feature_profile/presentation/bloc/profile_bloc.dart';
 import 'package:poortak/featueres/feature_profile/presentation/bloc/profile_event.dart';
 import 'package:poortak/featueres/feature_profile/presentation/bloc/profile_state.dart';
@@ -143,23 +145,23 @@ class _LoginScreenState extends State<LoginScreen> {
             SafeArea(
               child: SingleChildScrollView(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 28.0),
+                  padding: EdgeInsets.symmetric(horizontal: 28.0.w),
                   child: Column(
                     children: [
                       // Top spacing
-                      const SizedBox(height: 100),
+                      SizedBox(height: 100.h),
 
                       // Logo section
                       Center(
                         child: Image.asset(
                           'assets/images/poortakLogo.png',
-                          height: 102,
-                          width: 153,
+                          height: 102.h,
+                          width: 153.w,
                           fit: BoxFit.contain,
                         ),
                       ),
 
-                      const SizedBox(height: 32),
+                      SizedBox(height: Dimens.medium.h),
 
                       // Title section
                       Text(
@@ -167,20 +169,20 @@ class _LoginScreenState extends State<LoginScreen> {
                             ? "کد ارسال شده را وارد کنید:"
                             : "شماره موبایل خود را وارد کنید:",
                         style: MyTextStyle.textMatn12Bold.copyWith(
-                          fontSize: 16,
+                          fontSize: 16.sp,
                           color: MyColors.textMatn1,
                           fontWeight: FontWeight.w500,
                         ),
                         textAlign: TextAlign.center,
                       ),
 
-                      const SizedBox(height: 32),
+                      SizedBox(height: Dimens.medium.h),
 
                       // Form section
                       if (!showOtpForm) _buildMobileInput(),
                       if (showOtpForm) _buildOtpInput(),
 
-                      const SizedBox(height: 16),
+                      SizedBox(height: Dimens.small.h),
 
                       // Subtitle for OTP
                       if (showOtpForm) ...[
@@ -189,11 +191,11 @@ class _LoginScreenState extends State<LoginScreen> {
                           style: MyTextStyle.textMatn13.copyWith(
                             color: MyColors.text3,
                             height: 1.4,
-                            fontSize: 13,
+                            fontSize: 13.sp,
                           ),
                           textAlign: TextAlign.center,
                         ),
-                        const SizedBox(height: 8),
+                        SizedBox(height: 8.h),
                         // Timer display or resend button
                         if (!_canResend)
                           Text(
@@ -201,7 +203,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             style: MyTextStyle.textMatn13.copyWith(
                               color: MyColors.primary,
                               fontWeight: FontWeight.w600,
-                              fontSize: 14,
+                              fontSize: 14.sp,
                             ),
                             textAlign: TextAlign.center,
                           )
@@ -224,7 +226,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   style: MyTextStyle.textMatn13.copyWith(
                                     color: MyColors.primary,
                                     fontWeight: FontWeight.w600,
-                                    fontSize: 14,
+                                    fontSize: 14.sp,
                                   ),
                                 ),
                               );
@@ -238,27 +240,27 @@ class _LoginScreenState extends State<LoginScreen> {
                           style: MyTextStyle.textMatn13.copyWith(
                             color: MyColors.text3,
                             height: 1.4,
-                            fontSize: 13,
+                            fontSize: 13.sp,
                           ),
                           textAlign: TextAlign.center,
                         ),
 
-                      const SizedBox(height: 100),
+                      SizedBox(height: 100.h),
 
                       // Terms and conditions link
                       if (!showOtpForm) _buildTermsLink(),
 
-                      const SizedBox(height: 16),
+                      SizedBox(height: Dimens.small.h),
 
                       // Action button
                       _buildActionButton(),
 
-                      const SizedBox(height: 16),
+                      SizedBox(height: Dimens.small.h),
 
                       // Footer buttons removed - resend button is now in OTP section
 
                       // Bottom spacing
-                      const SizedBox(height: 120),
+                      SizedBox(height: 120.h),
                       // const Expanded(child: SizedBox()),
                     ],
                   ),
@@ -273,16 +275,16 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget _buildMobileInput() {
     return Container(
-      width: 331,
-      height: 63,
+      width: 331.w,
+      height: 63.h,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(19),
+        borderRadius: BorderRadius.circular(19.r),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+            blurRadius: 10.r,
+            offset: Offset(0, 2.h),
           ),
         ],
       ),
@@ -308,21 +310,21 @@ class _LoginScreenState extends State<LoginScreen> {
                   }
                 },
                 style: MyTextStyle.textMatn16.copyWith(
-                  fontSize: 16,
+                  fontSize: 16.sp,
                   color: MyColors.textMatn1,
                   // fontFamily: 'monospace', // برای نمایش بهتر اعداد
                 ),
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   hintText: "xxxxxxxxx",
                   hintStyle: TextStyle(
                     color: Color(0xFF9E9E9E),
-                    fontSize: 16,
+                    fontSize: 16.sp,
                     fontFamily: 'monospace',
                   ),
                   border: InputBorder.none,
                   contentPadding: EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 18,
+                    horizontal: 8.w,
+                    vertical: 18.h,
                   ),
                 ),
               ),
@@ -330,28 +332,28 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
           // Divider line
           Container(
-            width: 1,
-            height: 20,
-            margin: const EdgeInsets.symmetric(horizontal: 12),
+            width: 1.w,
+            height: 20.h,
+            margin: EdgeInsets.symmetric(horizontal: 12.w),
             color: MyColors.divider,
           ),
           // Prefix "۰۹"
           Text(
             "۰۹",
             style: MyTextStyle.textMatn12Bold.copyWith(
-              fontSize: 24,
+              fontSize: 24.sp,
               color: MyColors.textMatn1,
               fontWeight: FontWeight.w500,
             ),
           ),
           // Phone icon
           Container(
-            width: 60,
-            height: 60,
-            margin: const EdgeInsets.only(right: 12),
+            width: 60.w,
+            height: 60.h,
+            margin: EdgeInsets.only(right: 12.w),
             decoration: BoxDecoration(
               color: const Color(0xFFF6F6F6),
-              borderRadius: BorderRadius.circular(19),
+              borderRadius: BorderRadius.circular(19.r),
             ),
             child: Transform.rotate(
               angle: 4.71238,
@@ -359,7 +361,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: IconifyIcon(
                   icon: "ion:call",
                   color: MyColors.text4,
-                  size: 18,
+                  size: 18.r,
                 ),
               ),
             ),
@@ -373,21 +375,21 @@ class _LoginScreenState extends State<LoginScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: 12),
+        SizedBox(height: 12.h),
         Container(
           decoration: BoxDecoration(
             color: MyColors.background,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(16.r),
             border: Border.all(
               color:
                   _otpFocusNode.hasFocus ? MyColors.primary : MyColors.divider,
-              width: _otpFocusNode.hasFocus ? 2 : 1,
+              width: _otpFocusNode.hasFocus ? 2.w : 1.w,
             ),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 10,
-                offset: const Offset(0, 2),
+                blurRadius: 10.r,
+                offset: Offset(0, 2.h),
               ),
             ],
           ),
@@ -410,22 +412,22 @@ class _LoginScreenState extends State<LoginScreen> {
                 }
               },
               style: MyTextStyle.textMatn16.copyWith(
-                fontSize: 18,
+                fontSize: 18.sp,
                 color: MyColors.textMatn1,
-                letterSpacing: 2,
+                letterSpacing: 2.w,
                 fontFamily: 'monospace',
               ),
               decoration: InputDecoration(
                 hintText: "----",
                 hintStyle: MyTextStyle.textMatn13.copyWith(
                   color: MyColors.text4,
-                  letterSpacing: 4,
+                  letterSpacing: 4.w,
                   fontFamily: 'monospace',
                 ),
                 border: InputBorder.none,
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 18,
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 20.w,
+                  vertical: 18.h,
                 ),
               ),
             ),
@@ -506,31 +508,31 @@ class _LoginScreenState extends State<LoginScreen> {
       builder: (context, state) {
         if (state is ProfileLoading) {
           return Container(
-            height: 56,
+            height: 56.h,
             decoration: BoxDecoration(
               color: MyColors.primary,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(16.r),
             ),
-            child: const Center(
+            child: Center(
               child: CircularProgressIndicator(
                 color: Colors.white,
-                strokeWidth: 2,
+                strokeWidth: 2.w,
               ),
             ),
           );
         }
 
         return Container(
-          width: 156,
-          height: 64,
+          width: 156.w,
+          height: 64.h,
           decoration: BoxDecoration(
             color: MyColors.primary,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(20.r),
           ),
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(20.r),
               onTap: () {
                 if (showOtpForm) {
                   if (_otpController.text.isNotEmpty && mobileNumber != null) {
@@ -565,7 +567,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Text(
                   showOtpForm ? "تایید و ورود" : "تأیید",
                   style: MyTextStyle.textMatn12Bold.copyWith(
-                    fontSize: 18,
+                    fontSize: 18.sp,
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),
@@ -590,7 +592,7 @@ class _LoginScreenState extends State<LoginScreen> {
             TextSpan(
               text: "قوانین و مقررات ",
               style: MyTextStyle.textMatn13.copyWith(
-                fontSize: 14,
+                fontSize: 14.sp,
                 color: MyColors.primary,
                 fontWeight: FontWeight.w500,
               ),
@@ -598,7 +600,7 @@ class _LoginScreenState extends State<LoginScreen> {
             TextSpan(
               text: "خرید از پورتک",
               style: MyTextStyle.textMatn13.copyWith(
-                fontSize: 14,
+                fontSize: 14.sp,
                 color: MyColors.textMatn1,
                 fontWeight: FontWeight.w500,
               ),
