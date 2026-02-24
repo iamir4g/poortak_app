@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
+import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 
 enum ModalType {
@@ -57,16 +59,16 @@ class ReusableModal extends StatelessWidget {
     return Dialog(
       backgroundColor: Colors.transparent,
       child: Container(
-        width: MediaQuery.of(context).size.width * 0.9,
-        constraints: const BoxConstraints(maxWidth: 350),
+        width: 0.9.sw,
+        constraints: BoxConstraints(maxWidth: 350.w),
         decoration: BoxDecoration(
           color: isDarkMode ? const Color(0xFF2C2E3F) : Colors.white,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(20.r),
         ),
         child: Stack(
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 24),
+              padding: EdgeInsets.symmetric(vertical: Dimens.large),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -81,19 +83,19 @@ class ReusableModal extends StatelessWidget {
                             : _buildIcon(),
                   ),
 
-                  const SizedBox(height: 20),
+                  SizedBox(height: 20.h),
 
                   // Title
                   Center(
                     child: Container(
-                      width: 250,
-                      margin: const EdgeInsets.only(bottom: 10),
+                      width: 250.w,
+                      margin: EdgeInsets.only(bottom: 10.h),
                       child: Text(
                         title,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'IRANSans',
                           fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                          fontSize: 16.sp,
                           color: MyColors.textMatn1,
                         ),
                         textAlign: TextAlign.center,
@@ -104,15 +106,15 @@ class ReusableModal extends StatelessWidget {
                   // Message
                   Center(
                     child: Container(
-                      width: 250,
-                      margin: const EdgeInsets.only(bottom: 30),
+                      width: 250.w,
+                      margin: EdgeInsets.only(bottom: 30.h),
                       child: Text(
                         message,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'IRANSans',
                           fontWeight: FontWeight.w500,
-                          fontSize: 14,
-                          color: Color(0xFF3D495C),
+                          fontSize: 14.sp,
+                          color: const Color(0xFF3D495C),
                           height: 1.4,
                         ),
                         textAlign: TextAlign.center,
@@ -124,30 +126,30 @@ class ReusableModal extends StatelessWidget {
                   if (showSecondButton && secondButtonText != null)
                     // Two buttons layout
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: EdgeInsets.symmetric(horizontal: Dimens.medium),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           // First button (primary)
                           Expanded(
                             child: SizedBox(
-                              height: 50,
+                              height: 50.h,
                               child: ElevatedButton(
                                 onPressed: onButtonPressed ??
                                     () => Navigator.of(context).pop(),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: MyColors.primary,
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
+                                    borderRadius: BorderRadius.circular(20.r),
                                   ),
                                   elevation: 0,
                                 ),
                                 child: Text(
                                   buttonText,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontFamily: 'IRANSans',
                                     fontWeight: FontWeight.w500,
-                                    fontSize: 16,
+                                    fontSize: 16.sp,
                                     color: Colors.white,
                                   ),
                                 ),
@@ -155,12 +157,12 @@ class ReusableModal extends StatelessWidget {
                             ),
                           ),
 
-                          const SizedBox(width: 10),
+                          SizedBox(width: 10.w),
 
                           // Second button (secondary)
                           Expanded(
                             child: SizedBox(
-                              height: 50,
+                              height: 50.h,
                               child: ElevatedButton(
                                 onPressed: onSecondButtonPressed ??
                                     () => Navigator.of(context).pop(),
@@ -169,16 +171,16 @@ class ReusableModal extends StatelessWidget {
                                   side: const BorderSide(
                                       color: MyColors.primary, width: 1),
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
+                                    borderRadius: BorderRadius.circular(20.r),
                                   ),
                                   elevation: 0,
                                 ),
                                 child: Text(
                                   secondButtonText!,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontFamily: 'IRANSans',
                                     fontWeight: FontWeight.w500,
-                                    fontSize: 16,
+                                    fontSize: 16.sp,
                                     color: MyColors.primary,
                                   ),
                                 ),
@@ -192,24 +194,24 @@ class ReusableModal extends StatelessWidget {
                     // Single button layout
                     Center(
                       child: SizedBox(
-                        width: 172,
-                        height: 64,
+                        width: 172.w,
+                        height: 64.h,
                         child: ElevatedButton(
                           onPressed: onButtonPressed ??
                               () => Navigator.of(context).pop(),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: MyColors.primary,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
+                              borderRadius: BorderRadius.circular(20.r),
                             ),
                             elevation: 0,
                           ),
                           child: Text(
                             buttonText,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: 'IRANSans',
                               fontWeight: FontWeight.bold,
-                              fontSize: 18,
+                              fontSize: 18.sp,
                               color: Colors.white,
                             ),
                           ),
@@ -222,15 +224,15 @@ class ReusableModal extends StatelessWidget {
             // Close Button (X) - Top Left (optional)
             if (showCloseButton)
               Positioned(
-                top: 12,
-                left: 12,
+                top: 12.h,
+                left: 12.w,
                 child: GestureDetector(
                   onTap: () {
                     Navigator.of(context).pop();
                   },
                   child: Container(
-                    width: 32,
-                    height: 32,
+                    width: 32.w,
+                    height: 32.h,
                     decoration: BoxDecoration(
                       color: isDarkMode
                           ? const Color(0xFF323548)
@@ -239,7 +241,7 @@ class ReusableModal extends StatelessWidget {
                     ),
                     child: Icon(
                       Icons.close,
-                      size: 20,
+                      size: 20.w,
                       color:
                           isDarkMode ? Colors.white : const Color(0xFF3D495C),
                     ),
@@ -256,42 +258,24 @@ class ReusableModal extends StatelessWidget {
     return Dialog(
       backgroundColor: Colors.transparent,
       child: Container(
-        width: MediaQuery.of(context).size.width * 0.9,
-        constraints: const BoxConstraints(maxWidth: 350),
+        width: 0.9.sw,
+        constraints: BoxConstraints(maxWidth: 350.w),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(20.r),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             // Top section with icon and text
             Padding(
-              padding: const EdgeInsets.only(top: 30, left: 20, right: 20),
+              padding: EdgeInsets.only(top: 30.h, left: 20.w, right: 20.w),
               child: Column(
                 children: [
                   // Success icon with gradient background
                   SizedBox(
-                      width: 140,
-                      height: 140,
-                      // decoration: BoxDecoration(
-                      //   gradient: const LinearGradient(
-                      //     begin: Alignment.topLeft,
-                      //     end: Alignment.bottomRight,
-                      //     colors: [
-                      //       Color(0xFF4CAF50), // Green
-                      //       Color(0xFF26A69A), // Teal
-                      //     ],
-                      //   ),
-                      //   borderRadius: BorderRadius.circular(16),
-                      //   boxShadow: [
-                      //     BoxShadow(
-                      //       color: Colors.green.withOpacity(0.3),
-                      //       blurRadius: 8,
-                      //       offset: const Offset(0, 4),
-                      //     ),
-                      //   ],
-                      // ),
+                      width: 140.w,
+                      height: 140.h,
                       child: Image.asset("assets/images/cart/tick_cart.png")),
 
                   SizedBox(),
@@ -299,31 +283,31 @@ class ReusableModal extends StatelessWidget {
                   // Title
                   Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'IRANSans',
                       fontWeight: FontWeight.bold,
-                      fontSize: 18,
+                      fontSize: 18.sp,
                       color: Colors.black,
                     ),
                     textAlign: TextAlign.center,
                   ),
 
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12.h),
 
                   // Message
                   Text(
                     message,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'IRANSans',
                       fontWeight: FontWeight.w400,
-                      fontSize: 14,
+                      fontSize: 14.sp,
                       color: Colors.black,
                       height: 1.4,
                     ),
                     textAlign: TextAlign.center,
                   ),
                   SizedBox(
-                    height: 28,
+                    height: 28.h,
                   )
                 ],
               ),
@@ -331,10 +315,10 @@ class ReusableModal extends StatelessWidget {
 
             // Bottom section with buttons
             Container(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(20),
-                  bottomRight: Radius.circular(20),
+                  bottomLeft: Radius.circular(20.r),
+                  bottomRight: Radius.circular(20.r),
                 ),
               ),
               child: Column(
@@ -344,18 +328,18 @@ class ReusableModal extends StatelessWidget {
                     onTap: onButtonPressed ?? () => Navigator.of(context).pop(),
                     child: Container(
                       alignment: Alignment.center,
-                      height: 70,
+                      height: 70.h,
                       width: double.infinity,
                       decoration: BoxDecoration(
                         color: Color(0xFFE8F0FE), // Light blue background
                       ),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      padding: EdgeInsets.symmetric(vertical: 14.h),
                       child: Text(
                         buttonText,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'IRANSans',
                           fontWeight: FontWeight.w600,
-                          fontSize: 16,
+                          fontSize: 16.sp,
                           color: Color(0xFF1A73E8), // Dark blue
                         ),
                         textAlign: TextAlign.center,
@@ -363,7 +347,7 @@ class ReusableModal extends StatelessWidget {
                     ),
                   ),
                   SizedBox(
-                    height: 10,
+                    height: 10.h,
                   ),
                   // Secondary button in white section
                   if (showSecondButton && secondButtonText != null)
@@ -372,14 +356,14 @@ class ReusableModal extends StatelessWidget {
                             () => Navigator.of(context).pop(),
                         child: Container(
                           alignment: Alignment.center,
-                          height: 70,
+                          height: 70.h,
                           decoration: BoxDecoration(),
                           child: Text(
                             secondButtonText!,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: 'IRANSans',
                               fontWeight: FontWeight.w500,
-                              fontSize: 16,
+                              fontSize: 16.sp,
                               color: Colors.black, // Dark gray
                             ),
                             textAlign: TextAlign.center,
@@ -398,43 +382,43 @@ class ReusableModal extends StatelessWidget {
     switch (type) {
       case ModalType.error:
         return Container(
-          width: 80,
-          height: 80,
+          width: 80.w,
+          height: 80.h,
           decoration: BoxDecoration(
             color: MyColors.error.withOpacity(0.1),
             shape: BoxShape.circle,
           ),
-          child: const Icon(
+          child: Icon(
             Icons.error_outline,
-            size: 40,
+            size: 40.w,
             color: MyColors.error,
           ),
         );
       case ModalType.info:
         return Container(
-          width: 80,
-          height: 80,
+          width: 80.w,
+          height: 80.h,
           decoration: BoxDecoration(
             color: MyColors.info.withOpacity(0.1),
             shape: BoxShape.circle,
           ),
-          child: const Icon(
+          child: Icon(
             Icons.info_outline,
-            size: 40,
+            size: 40.w,
             color: MyColors.info,
           ),
         );
       case ModalType.success:
         return Container(
-          width: 80,
-          height: 80,
+          width: 80.w,
+          height: 80.h,
           decoration: BoxDecoration(
             color: MyColors.success.withOpacity(0.1),
             shape: BoxShape.circle,
           ),
-          child: const Icon(
+          child: Icon(
             Icons.check_circle_outline,
-            size: 40,
+            size: 40.w,
             color: MyColors.success,
           ),
         );
@@ -444,8 +428,8 @@ class ReusableModal extends StatelessWidget {
   Widget _buildCustomImage() {
     return Image.asset(
       customImagePath!,
-      width: 120,
-      height: 120,
+      width: 120.w,
+      height: 120.h,
       fit: BoxFit.contain,
     );
   }
@@ -453,10 +437,79 @@ class ReusableModal extends StatelessWidget {
   Widget _buildCustomLottie() {
     return Lottie.asset(
       customLottiePath!,
-      width: 150,
-      height: 150,
+      width: 150.w,
+      height: 150.h,
       fit: BoxFit.contain,
       repeat: false,
+    );
+  }
+
+  static void showSuccess({
+    required BuildContext context,
+    required String title,
+    required String message,
+    String buttonText = 'متوجه شدم',
+    VoidCallback? onButtonPressed,
+    String? secondButtonText,
+    VoidCallback? onSecondButtonPressed,
+    bool showSecondButton = false,
+    bool cartSuccessStyle = false,
+    String? customLottiePath,
+  }) {
+    show(
+      context: context,
+      title: title,
+      message: message,
+      buttonText: buttonText,
+      type: ModalType.success,
+      onButtonPressed: onButtonPressed,
+      secondButtonText: secondButtonText,
+      onSecondButtonPressed: onSecondButtonPressed,
+      showSecondButton: showSecondButton,
+      cartSuccessStyle: cartSuccessStyle,
+      customLottiePath: customLottiePath,
+    );
+  }
+
+  static void showError({
+    required BuildContext context,
+    required String title,
+    required String message,
+    String buttonText = 'متوجه شدم',
+    VoidCallback? onButtonPressed,
+    bool barrierDismissible = true,
+    String? customImagePath,
+    String? customLottiePath,
+  }) {
+    show(
+      context: context,
+      title: title,
+      message: message,
+      buttonText: buttonText,
+      type: ModalType.error,
+      onButtonPressed: onButtonPressed,
+      barrierDismissible: barrierDismissible,
+      customImagePath: customImagePath,
+      customLottiePath: customLottiePath,
+    );
+  }
+
+  static void showInfo({
+    required BuildContext context,
+    required String title,
+    required String message,
+    String buttonText = 'متوجه شدم',
+    VoidCallback? onButtonPressed,
+    String? customLottiePath,
+  }) {
+    show(
+      context: context,
+      title: title,
+      message: message,
+      buttonText: buttonText,
+      type: ModalType.info,
+      onButtonPressed: onButtonPressed,
+      customLottiePath: customLottiePath,
     );
   }
 
@@ -497,127 +550,4 @@ class ReusableModal extends StatelessWidget {
       },
     );
   }
-
-  // Convenience methods for different modal types
-  static void showError({
-    required BuildContext context,
-    required String title,
-    required String message,
-    String buttonText = 'متوجه شدم',
-    VoidCallback? onButtonPressed,
-    bool barrierDismissible = true,
-    String? secondButtonText,
-    VoidCallback? onSecondButtonPressed,
-    bool showSecondButton = false,
-    bool showCloseButton = false,
-    String? customImagePath,
-  }) {
-    show(
-      context: context,
-      title: title,
-      message: message,
-      buttonText: buttonText,
-      type: ModalType.error,
-      onButtonPressed: onButtonPressed,
-      barrierDismissible: barrierDismissible,
-      secondButtonText: secondButtonText,
-      onSecondButtonPressed: onSecondButtonPressed,
-      showSecondButton: showSecondButton,
-      showCloseButton: showCloseButton,
-      customImagePath: customImagePath,
-    );
-  }
-
-  static void showInfo({
-    required BuildContext context,
-    required String title,
-    required String message,
-    String buttonText = 'متوجه شدم',
-    VoidCallback? onButtonPressed,
-    bool barrierDismissible = true,
-    String? secondButtonText,
-    VoidCallback? onSecondButtonPressed,
-    bool showSecondButton = false,
-    bool showCloseButton = false,
-    String? customImagePath,
-  }) {
-    show(
-      context: context,
-      title: title,
-      message: message,
-      buttonText: buttonText,
-      type: ModalType.info,
-      onButtonPressed: onButtonPressed,
-      barrierDismissible: barrierDismissible,
-      secondButtonText: secondButtonText,
-      onSecondButtonPressed: onSecondButtonPressed,
-      showSecondButton: showSecondButton,
-      showCloseButton: showCloseButton,
-      customImagePath: customImagePath,
-    );
-  }
-
-  static void showSuccess({
-    required BuildContext context,
-    required String title,
-    required String message,
-    String buttonText = 'متوجه شدم',
-    VoidCallback? onButtonPressed,
-    bool barrierDismissible = true,
-    String? secondButtonText,
-    VoidCallback? onSecondButtonPressed,
-    bool showSecondButton = false,
-    bool showCloseButton = false,
-    String? customImagePath,
-    String? customLottiePath,
-    bool cartSuccessStyle = false,
-  }) {
-    show(
-      context: context,
-      title: title,
-      message: message,
-      buttonText: buttonText,
-      type: ModalType.success,
-      onButtonPressed: onButtonPressed,
-      barrierDismissible: barrierDismissible,
-      secondButtonText: secondButtonText,
-      onSecondButtonPressed: onSecondButtonPressed,
-      showSecondButton: showSecondButton,
-      showCloseButton: showCloseButton,
-      customImagePath: customImagePath,
-      customLottiePath: customLottiePath,
-      cartSuccessStyle: cartSuccessStyle,
-    );
-  }
-}
-
-// Custom painter for dotted line
-class DottedLinePainter extends CustomPainter {
-  final Color color;
-
-  DottedLinePainter({required this.color});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = 2
-      ..style = PaintingStyle.stroke;
-
-    const dashWidth = 4.0;
-    const dashSpace = 4.0;
-    double startY = 0;
-
-    while (startY < size.height) {
-      canvas.drawLine(
-        Offset(size.width / 2, startY),
-        Offset(size.width / 2, startY + dashWidth),
-        paint,
-      );
-      startY += dashWidth + dashSpace;
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

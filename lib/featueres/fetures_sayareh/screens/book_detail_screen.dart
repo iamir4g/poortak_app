@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/common/services/getImageUrl_service.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/common/widgets/dot_loading_widget.dart';
@@ -66,39 +67,41 @@ class BookDetailScreen extends StatelessWidget {
             )
           ],
         ),
-        body: BlocBuilder<SingleBookCubit, SingleBookState>(
-          builder: (context, state) {
-            if (state.singleBookDataStatus is SingleBookDataLoading) {
-              return const Center(child: DotLoadingWidget(size: 50));
-            }
+        body: SafeArea(
+          child: BlocBuilder<SingleBookCubit, SingleBookState>(
+            builder: (context, state) {
+              if (state.singleBookDataStatus is SingleBookDataLoading) {
+                return Center(child: DotLoadingWidget(size: 50.r));
+              }
 
-            if (state.singleBookDataStatus is SingleBookDataCompleted) {
-              final bookData =
-                  (state.singleBookDataStatus as SingleBookDataCompleted)
-                      .data
-                      .data;
-              return _buildContent(context, bookData);
-            }
+              if (state.singleBookDataStatus is SingleBookDataCompleted) {
+                final bookData =
+                    (state.singleBookDataStatus as SingleBookDataCompleted)
+                        .data
+                        .data;
+                return _buildContent(context, bookData);
+              }
 
-            if (state.singleBookDataStatus is SingleBookDataError) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text('خطا در دریافت اطلاعات'),
-                    ElevatedButton(
-                      onPressed: () {
-                        context.read<SingleBookCubit>().fetchBookById(bookId);
-                      },
-                      child: const Text('تلاش دوباره'),
-                    ),
-                  ],
-                ),
-              );
-            }
+              if (state.singleBookDataStatus is SingleBookDataError) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text('خطا در دریافت اطلاعات'),
+                      ElevatedButton(
+                        onPressed: () {
+                          context.read<SingleBookCubit>().fetchBookById(bookId);
+                        },
+                        child: const Text('تلاش دوباره'),
+                      ),
+                    ],
+                  ),
+                );
+              }
 
-            return const SizedBox();
-          },
+              return const SizedBox();
+            },
+          ),
         ),
       ),
     );
@@ -373,8 +376,10 @@ class BookDetailScreen extends StatelessWidget {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-                content: Text(_extractErrorMessage(e)),
-                backgroundColor: Colors.red),
+              content: Text(_extractErrorMessage(e)),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 2),
+            ),
           );
         }
       }

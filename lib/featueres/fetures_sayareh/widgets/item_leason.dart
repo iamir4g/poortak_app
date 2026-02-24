@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconify_design/iconify_design.dart';
+import 'package:poortak/config/myColors.dart';
+import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/common/services/getImageUrl_service.dart';
 import 'package:poortak/common/widgets/global_progress_bar.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/all_courses_progress_model.dart';
@@ -61,13 +64,13 @@ class ItemLeason extends StatelessWidget {
         }
       },
       child: Container(
-        width: 360,
-        height: 88,
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        padding: const EdgeInsets.all(16),
+        width: 360.w,
+        height: 88.h,
+        margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+        padding: EdgeInsets.all(16.r),
         decoration: BoxDecoration(
           color: Theme.of(context).cardColor,
-          borderRadius: BorderRadius.circular(40),
+          borderRadius: BorderRadius.circular(40.r),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -75,7 +78,7 @@ class ItemLeason extends StatelessWidget {
             Container(
               child: Row(children: [
                 CircleAvatar(
-                  radius: 33.5,
+                  radius: 33.5.r,
                   child: FutureBuilder<String>(
                     future: GetImageUrlService().getImageUrl(item.thumbnail),
                     builder: (context, snapshot) {
@@ -97,7 +100,7 @@ class ItemLeason extends StatelessWidget {
                     },
                   ),
                 ),
-                const SizedBox(width: 4),
+                SizedBox(width: 4.w),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -106,7 +109,7 @@ class ItemLeason extends StatelessWidget {
                       item.name,
                       style: Theme.of(context).textTheme.titleSmall,
                     ),
-                    SizedBox(height: 6),
+                    SizedBox(height: 6.h),
                     Text(
                       item.description,
                       style: Theme.of(context).textTheme.labelMedium,
@@ -125,19 +128,19 @@ class ItemLeason extends StatelessWidget {
                             children: List.generate(
                                 3,
                                 (index) => Icon(Icons.star,
-                                    color: Colors.amber, size: 20)))
+                                    color: Colors.amber, size: 20.r)))
                         : GlobalProgressBar(
-                            percentage: average, width: 60, height: 8),
+                            percentage: average, width: 60.w, height: 8.h),
                   ),
                 isLocked
                     ? Image(image: AssetImage("assets/images/lock_image.png"))
                     : SizedBox(),
                 // : SizedBox(),
                 SizedBox(
-                  width: 4,
+                  width: 4.w,
                 ),
                 IconifyIcon(
-                  size: 32,
+                  size: 32.r,
                   icon: "iconamoon:arrow-left-2-bold",
                   color: Theme.of(context).textTheme.titleMedium?.color,
                 ),

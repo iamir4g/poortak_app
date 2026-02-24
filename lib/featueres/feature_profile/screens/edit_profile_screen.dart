@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/config/myColors.dart';
+import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/featueres/feature_profile/data/models/avatar_model.dart';
@@ -142,7 +145,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final profileBloc = locator<ProfileBloc>();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F6FB),
+      backgroundColor: MyColors.background3,
       body: SafeArea(
         child: BlocListener<ProfileBloc, ProfileState>(
           bloc: profileBloc,
@@ -170,6 +173,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 SnackBar(
                   content: Text(state.message),
                   backgroundColor: Colors.red,
+                  duration: const Duration(seconds: 2),
                 ),
               );
             }
@@ -178,67 +182,63 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             children: [
               // Status bar area
               Container(
-                height: 22,
+                height: 22.h,
                 color: const Color(0xFFFFF8E4),
               ),
 
               // Main content
               Column(
                 children: [
-                  const SizedBox(height: 22),
+                  SizedBox(height: 22.h),
 
                   // White background with curved bottom
                   Expanded(
                     child: Container(
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(81),
+                          bottomLeft: Radius.circular(81.r),
                         ),
                       ),
                       child: SingleChildScrollView(
-                        padding: const EdgeInsets.symmetric(horizontal: 22),
+                        padding: EdgeInsets.symmetric(horizontal: 22.w),
                         child: Form(
                           key: _formKey,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const SizedBox(height: 27),
+                              SizedBox(height: 27.h),
 
                               // Avatar selection title
-                              const Center(
+                              Center(
                                 child: Text(
                                   'عکس آواتار خود را انتخاب کنید!',
-                                  style: TextStyle(
-                                    fontFamily: 'IRANSans',
+                                  style: MyTextStyle.textMatn13.copyWith(
                                     fontWeight: FontWeight.w500,
-                                    fontSize: 13,
-                                    color: Color(0xFF29303D),
+                                    color: MyColors.textMatn1,
                                   ),
                                   textAlign: TextAlign.center,
                                 ),
                               ),
 
-                              const SizedBox(height: 20),
+                              SizedBox(height: 20.h),
 
                               // Selected avatar display
                               _buildSelectedAvatar(),
 
-                              const SizedBox(height: 20),
+                              SizedBox(height: 20.h),
 
                               // Form title
-                              const Text(
+                              Text(
                                 'مشخصات خود را وارد کنید:',
-                                style: TextStyle(
-                                  fontFamily: 'IRANSans',
+                                style: MyTextStyle.textMatn13.copyWith(
                                   fontWeight: FontWeight.w500,
-                                  fontSize: 13,
-                                  color: Color(0xFF29303D),
+                                  color: MyColors.textMatn1,
                                 ),
                                 textAlign: TextAlign.right,
                               ),
 
-                              const SizedBox(height: 20),
+                              SizedBox(height: 20.h),
 
                               // First name field
                               _buildTextField(
@@ -252,7 +252,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 },
                               ),
 
-                              const SizedBox(height: 7),
+                              SizedBox(height: 7.h),
 
                               // Last name field
                               _buildTextField(
@@ -266,43 +266,43 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 },
                               ),
 
-                              const SizedBox(height: 7),
+                              SizedBox(height: 7.h),
 
                               // Age group field
                               // _buildAgeGroupField(),
 
-                              const SizedBox(height: 40),
+                              SizedBox(height: 40.h),
 
                               // Confirm button
                               Center(
                                 child: SizedBox(
-                                  width: 154,
-                                  height: 64,
+                                  width: 154.w,
+                                  height: 64.h,
                                   child: ElevatedButton(
                                     onPressed:
                                         isLoading ? null : _updateProfile,
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: const Color(0xFFC2C9D6),
                                       shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(20),
+                                        borderRadius:
+                                            BorderRadius.circular(20.r),
                                       ),
                                       elevation: 0,
                                     ),
                                     child: isLoading
-                                        ? const SizedBox(
-                                            width: 20,
-                                            height: 20,
-                                            child: CircularProgressIndicator(
+                                        ? SizedBox(
+                                            width: 20.r,
+                                            height: 20.r,
+                                            child:
+                                                const CircularProgressIndicator(
                                               color: Colors.white,
                                               strokeWidth: 2,
                                             ),
                                           )
-                                        : const Text(
+                                        : Text(
                                             'تأیید',
-                                            style: TextStyle(
-                                              fontFamily: 'IRANSans',
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 18,
+                                            style: MyTextStyle.textMatn18Bold
+                                                .copyWith(
                                               color: Colors.white,
                                             ),
                                           ),
@@ -310,7 +310,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 ),
                               ),
 
-                              const SizedBox(height: 40),
+                              SizedBox(height: 40.h),
                             ],
                           ),
                         ),
@@ -333,13 +333,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       child: GestureDetector(
         onTap: _showAvatarSelectionModal,
         child: Container(
-          width: 100,
-          height: 100,
+          width: 100.r,
+          height: 100.r,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(
               color: const Color(0xFFC2C9D6),
-              width: 3,
+              width: 3.r,
             ),
           ),
           child: ClipOval(
@@ -350,20 +350,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     errorBuilder: (context, error, stackTrace) {
                       return Container(
                         color: const Color(0xFFE3F2FD),
-                        child: const Icon(
+                        child: Icon(
                           Icons.person,
-                          size: 50,
-                          color: Color(0xFFA3AFC2),
+                          size: 50.r,
+                          color: const Color(0xFFA3AFC2),
                         ),
                       );
                     },
                   )
                 : Container(
                     color: const Color(0xFFE3F2FD),
-                    child: const Icon(
+                    child: Icon(
                       Icons.person,
-                      size: 50,
-                      color: Color(0xFFA3AFC2),
+                      size: 50.r,
+                      color: const Color(0xFFA3AFC2),
                     ),
                   ),
           ),
@@ -386,29 +386,26 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text(
+          title: Text(
             'انتخاب آواتار',
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontFamily: 'IRANSans',
-              fontWeight: FontWeight.w500,
-              fontSize: 16,
-              color: Color(0xFF29303D),
+            style: MyTextStyle.textHeader16Bold.copyWith(
+              color: MyColors.textMatn1,
             ),
           ),
           content: SizedBox(
             width: double.maxFinite,
-            height: 300,
+            height: 300.h,
             child: _buildAvatarGrid(),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text(
+              child: Text(
                 'بستن',
-                style: TextStyle(
-                  fontFamily: 'IRANSans',
-                  color: Color(0xFF29303D),
+                style: MyTextStyle.textMatn14Bold.copyWith(
+                  fontWeight: FontWeight.normal,
+                  color: MyColors.textMatn1,
                 ),
               ),
             ),
@@ -426,13 +423,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
 
     if (avatars.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
           'آواتار موجود نیست',
-          style: TextStyle(
-            fontFamily: 'IRANSans',
-            fontSize: 14,
-            color: Color(0xFF29303D),
+          style: MyTextStyle.textMatn14Bold.copyWith(
+            fontWeight: FontWeight.normal,
+            color: MyColors.textMatn1,
           ),
         ),
       );
@@ -440,7 +436,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     return GridView.builder(
       physics: const ScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,
         childAspectRatio: 1,
         crossAxisSpacing: 0,
@@ -459,13 +455,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             Navigator.of(context).pop(); // Close modal after selection
           },
           child: Container(
-            margin: const EdgeInsets.all(8),
+            margin: EdgeInsets.all(8.r),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(
                 color:
                     isSelected ? const Color(0xFFC2C9D6) : Colors.transparent,
-                width: 3,
+                width: 3.r,
               ),
             ),
             child: ClipOval(
@@ -475,10 +471,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 errorBuilder: (context, error, stackTrace) {
                   return Container(
                     color: const Color(0xFFE3F2FD),
-                    child: const Icon(
+                    child: Icon(
                       Icons.person,
-                      size: 40,
-                      color: Color(0xFFA3AFC2),
+                      size: 40.r,
+                      color: const Color(0xFFA3AFC2),
                     ),
                   );
                 },
@@ -496,14 +492,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     String? Function(String?)? validator,
   }) {
     return Container(
-      height: 59,
+      height: 59.h,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(19),
+        borderRadius: BorderRadius.circular(19.r),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.04),
-            blurRadius: 4,
+            blurRadius: 4.r,
             offset: const Offset(0, 0),
           ),
         ],
@@ -512,26 +508,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         controller: controller,
         validator: validator,
         textAlign: TextAlign.right,
-        style: const TextStyle(
-          fontFamily: 'IRANSans',
-          fontWeight: FontWeight.w500,
-          fontSize: 16,
-          color: Color(0xFF3D495C),
+        style: MyTextStyle.textMatn16.copyWith(
+          color: MyColors.textMatn1,
         ),
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: const TextStyle(
-            fontFamily: 'IRANSans',
-            fontWeight: FontWeight.w500,
-            fontSize: 16,
-            color: Color(0xFF3D495C),
+          labelStyle: MyTextStyle.textMatn16.copyWith(
+            color: MyColors.textMatn1,
           ),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(19),
+            borderRadius: BorderRadius.circular(19.r),
             borderSide: BorderSide.none,
           ),
           contentPadding:
-              const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+              EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
         ),
       ),
     );

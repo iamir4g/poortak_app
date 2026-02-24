@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class VideoProgressBarWidget extends StatelessWidget {
   final bool isVisible;
@@ -17,9 +18,9 @@ class VideoProgressBarWidget extends StatelessWidget {
     if (!isVisible) return const SizedBox.shrink();
 
     return Container(
-      margin: const EdgeInsets.only(top: 12),
-      width: 350,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
+      margin: EdgeInsets.only(top: 12.h),
+      width: 350.w,
+      padding: EdgeInsets.symmetric(horizontal: 12.w),
       child: Column(
         children: [
           Row(
@@ -27,26 +28,26 @@ class VideoProgressBarWidget extends StatelessWidget {
             children: [
               Text(
                 label,
-                style: const TextStyle(
-                  fontSize: 12,
+                style: TextStyle(
+                  fontSize: 12.sp,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               Text(
                 '${((progress.clamp(0.0, 1.0) * 100).toInt())}%',
-                style: const TextStyle(
-                  fontSize: 12,
+                style: TextStyle(
+                  fontSize: 12.sp,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8.h),
           ClipRRect(
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: BorderRadius.circular(4.r),
             child: LinearProgressIndicator(
               value: progress.clamp(0.0, 1.0),
-              minHeight: 6,
+              minHeight: 6.h,
               backgroundColor: Colors.grey[300],
               valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
             ),
@@ -72,36 +73,36 @@ class DecryptionProgressBarWidget extends StatelessWidget {
     if (!isVisible) return const SizedBox.shrink();
 
     return Container(
-      margin: const EdgeInsets.only(top: 12),
-      width: 350,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
+      margin: EdgeInsets.only(top: 12.h),
+      width: 350.w,
+      padding: EdgeInsets.symmetric(horizontal: 12.w),
       child: Column(
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'در حال رمزگشایی...',
                 style: TextStyle(
-                  fontSize: 12,
+                  fontSize: 12.sp,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               Text(
                 '${((progress.clamp(0.0, 1.0) * 100).toInt())}%',
-                style: const TextStyle(
-                  fontSize: 12,
+                style: TextStyle(
+                  fontSize: 12.sp,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8.h),
           ClipRRect(
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: BorderRadius.circular(4.r),
             child: LinearProgressIndicator(
               value: progress.clamp(0.0, 1.0),
-              minHeight: 6,
+              minHeight: 6.h,
               backgroundColor: Colors.grey[300],
               valueColor: const AlwaysStoppedAnimation<Color>(Colors.green),
             ),

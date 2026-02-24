@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/config/myColors.dart';
+import 'package:poortak/config/myTextStyle.dart';
 
 class PrizeScreen extends StatefulWidget {
   static const routeName = "/prize_screen";
@@ -34,17 +36,17 @@ class _PrizeScreenState extends State<PrizeScreen> {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    const SizedBox(height: 20),
+                    SizedBox(height: 20.h),
 
                     // Prize conversion section
                     _buildPrizeConversionSection(),
 
-                    const SizedBox(height: 20),
+                    SizedBox(height: 20.h),
 
                     // Prize cards
                     _buildPrizeCards(isDarkMode),
 
-                    const SizedBox(height: 20),
+                    SizedBox(height: 20.h),
                   ],
                 ),
               ),
@@ -60,19 +62,19 @@ class _PrizeScreenState extends State<PrizeScreen> {
 
   Widget _buildHeader(bool isDarkMode) {
     return Container(
-      height: 57,
+      height: 57.h,
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
       decoration: BoxDecoration(
         color: isDarkMode ? MyColors.darkBackgroundSecondary : Colors.white,
-        borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(33.5),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(33.5.r),
         ),
         boxShadow: [
           BoxShadow(
             color: const Color(0x0D000000),
-            offset: const Offset(0, 1),
-            blurRadius: 1,
+            offset: Offset(0, 1.h),
+            blurRadius: 1.r,
           ),
         ],
       ),
@@ -82,10 +84,7 @@ class _PrizeScreenState extends State<PrizeScreen> {
           // Title
           Text(
             'جوایز ها',
-            style: TextStyle(
-              fontFamily: 'IRANSans',
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
+            style: MyTextStyle.textHeader16Bold.copyWith(
               color: isDarkMode
                   ? MyColors.darkTextPrimary
                   : const Color(0xFF3D495C),
@@ -95,9 +94,9 @@ class _PrizeScreenState extends State<PrizeScreen> {
 
           // Back Button
           Container(
-            width: 50,
-            height: 50,
-            margin: const EdgeInsets.only(left: 16),
+            width: 50.r,
+            height: 50.r,
+            margin: EdgeInsets.only(left: 16.w),
             child: IconButton(
               onPressed: () => Navigator.of(context).pop(),
               icon: Icon(
@@ -105,7 +104,7 @@ class _PrizeScreenState extends State<PrizeScreen> {
                 color: isDarkMode
                     ? MyColors.darkTextPrimary
                     : const Color(0xFF3D495C),
-                size: 20,
+                size: 20.r,
               ),
             ),
           ),
@@ -116,24 +115,22 @@ class _PrizeScreenState extends State<PrizeScreen> {
 
   Widget _buildPrizeConversionSection() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: EdgeInsets.symmetric(horizontal: 20.w),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           // 1000 Toman container
           Container(
-            width: 125,
-            height: 75,
+            width: 125.w,
+            height: 75.h,
             decoration: BoxDecoration(
               color: const Color(0xFFEFF7F1),
-              borderRadius: BorderRadius.circular(30),
+              borderRadius: BorderRadius.circular(30.r),
             ),
             child: Center(
               child: Text(
                 '۱۰۰۰ تومان',
-                style: TextStyle(
-                  fontFamily: 'IRANSans',
-                  fontSize: 15,
+                style: MyTextStyle.textMatn15.copyWith(
                   fontWeight: FontWeight.w500,
                   color: Colors.black,
                 ),
@@ -143,40 +140,38 @@ class _PrizeScreenState extends State<PrizeScreen> {
 
           // Arrow
           SizedBox(
-            width: 52,
-            height: 52,
+            width: 52.r,
+            height: 52.r,
             child: Icon(
               Icons.arrow_forward,
-              size: 32,
+              size: 32.r,
               color: const Color(0xFFFFA73F),
             ),
           ),
 
           // 1 Coin container
           Container(
-            width: 135,
-            height: 75,
+            width: 135.w,
+            height: 75.h,
             decoration: BoxDecoration(
               color: const Color(0xFFFFF5DB),
-              borderRadius: BorderRadius.circular(30),
+              borderRadius: BorderRadius.circular(30.r),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SizedBox(
-                  width: 28,
-                  height: 26,
+                  width: 28.r,
+                  height: 26.r,
                   child: Image.asset(
                     'assets/images/points/star_icon.png',
                     fit: BoxFit.contain,
                   ),
                 ),
-                const SizedBox(width: 8),
+                SizedBox(width: 8.w),
                 Text(
                   'هر ۱ سکه',
-                  style: TextStyle(
-                    fontFamily: 'IRANSans',
-                    fontSize: 15,
+                  style: MyTextStyle.textMatn15.copyWith(
                     fontWeight: FontWeight.w500,
                     color: Colors.black,
                   ),
@@ -191,7 +186,7 @@ class _PrizeScreenState extends State<PrizeScreen> {
 
   Widget _buildPrizeCards(bool isDarkMode) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: EdgeInsets.symmetric(horizontal: 20.w),
       child: Column(
         children: [
           // First prize card - Discount
@@ -203,7 +198,7 @@ class _PrizeScreenState extends State<PrizeScreen> {
             number: '۱',
           ),
 
-          const SizedBox(height: 20),
+          SizedBox(height: 20.h),
 
           // Second prize card - Cash purchase
           _buildPrizeCard(
@@ -225,29 +220,29 @@ class _PrizeScreenState extends State<PrizeScreen> {
     required String number,
   }) {
     return Container(
-      width: 315,
+      width: 315.w,
       decoration: BoxDecoration(
         color:
             isDarkMode ? MyColors.darkCardBackground : const Color(0xFFF4F5F5),
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(10.r),
       ),
       child: Column(
         children: [
           // Header with number
           Container(
-            width: 293,
-            height: 44,
-            margin: const EdgeInsets.only(top: 18),
+            width: 293.w,
+            height: 44.h,
+            margin: EdgeInsets.only(top: 18.h),
             decoration: BoxDecoration(
               color: isDarkMode ? const Color(0xFF323548) : Colors.white,
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(10.r),
             ),
             child: Row(
               children: [
-                const SizedBox(width: 8),
+                SizedBox(width: 8.w),
                 Container(
-                  width: 31,
-                  height: 31,
+                  width: 31.r,
+                  height: 31.r,
                   decoration: const BoxDecoration(
                     color: Color(0xFFFFA73F),
                     shape: BoxShape.circle,
@@ -255,21 +250,17 @@ class _PrizeScreenState extends State<PrizeScreen> {
                   child: Center(
                     child: Text(
                       number,
-                      style: const TextStyle(
-                        fontFamily: 'IranSans',
-                        fontSize: 16,
+                      style: MyTextStyle.textMatn16.copyWith(
                         fontWeight: FontWeight.w500,
                         color: Colors.white,
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
+                SizedBox(width: 8.w),
                 Text(
                   title,
-                  style: TextStyle(
-                    fontFamily: 'IranSans',
-                    fontSize: 16,
+                  style: MyTextStyle.textMatn16.copyWith(
                     fontWeight: FontWeight.w500,
                     color: isDarkMode
                         ? MyColors.darkTextPrimary
@@ -278,34 +269,15 @@ class _PrizeScreenState extends State<PrizeScreen> {
                 ),
               ],
             ),
-            // Stack(
-            //   children: [
-            //     // Title
-            //     Positioned(
-            //       right: 16,
-            //       top: 14,
-            //       child:
-            //     ),
-            //     // Number badge
-            //     Positioned(
-            //       left: 16,
-            //       top: 6,
-            //       child:
-            //     ),
-            //   ],
-            // ),
           ),
 
           // Description
           Container(
-            width: 293,
-            padding: const EdgeInsets.all(16),
+            width: 293.w,
+            padding: EdgeInsets.all(16.r),
             child: Text(
               description,
-              style: TextStyle(
-                fontFamily: 'IRANSans',
-                fontSize: 11,
-                fontWeight: FontWeight.w300,
+              style: MyTextStyle.textMatn11.copyWith(
                 color: isDarkMode
                     ? MyColors.darkTextPrimary
                     : const Color(0xFF29303D),
@@ -321,21 +293,21 @@ class _PrizeScreenState extends State<PrizeScreen> {
 
   Widget _buildBottomButton() {
     return Container(
-      height: 111,
+      height: 111.h,
       width: double.infinity,
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
-            offset: const Offset(0, -2),
-            blurRadius: 4,
+            offset: Offset(0, -2.h),
+            blurRadius: 4.r,
           ),
         ],
       ),
       child: Column(
         children: [
-          const SizedBox(height: 16),
+          SizedBox(height: 16.h),
           // Ways to earn points button
           GestureDetector(
             onTap: () {
@@ -343,18 +315,16 @@ class _PrizeScreenState extends State<PrizeScreen> {
               Navigator.pushNamed(context, '/how_to_get_points_screen');
             },
             child: Container(
-              width: 254,
-              height: 60,
+              width: 254.w,
+              height: 60.h,
               decoration: BoxDecoration(
                 color: const Color(0xFFFFDB80),
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(20.r),
               ),
               child: Center(
                 child: Text(
                   'روش های کسب امتیاز',
-                  style: TextStyle(
-                    fontFamily: 'IRANSans',
-                    fontSize: 15,
+                  style: MyTextStyle.textMatn15.copyWith(
                     fontWeight: FontWeight.w500,
                     color: const Color(0xFF29303D),
                   ),
@@ -362,7 +332,7 @@ class _PrizeScreenState extends State<PrizeScreen> {
               ),
             ),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8.h),
           // Continue and pay button
           GestureDetector(
             onTap: () {
@@ -376,14 +346,12 @@ class _PrizeScreenState extends State<PrizeScreen> {
               );
             },
             child: SizedBox(
-              width: 128,
-              height: 23,
+              width: 128.w,
+              height: 23.h,
               child: Center(
                 child: Text(
                   'ادامه و پرداخت',
-                  style: TextStyle(
-                    fontFamily: 'IRANSans',
-                    fontSize: 15,
+                  style: MyTextStyle.textMatn15.copyWith(
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),

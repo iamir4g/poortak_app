@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/featureMenu/models/faq_model.dart';
@@ -127,23 +128,23 @@ class _FAQScreenState extends State<FAQScreen> {
 
   Widget _buildHeader() {
     return Container(
-      height: 57,
-      decoration: const BoxDecoration(
+      height: 57.h,
+      decoration: BoxDecoration(
         color: MyColors.background,
         borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(33.5),
+          bottomLeft: Radius.circular(33.5.r),
         ),
         boxShadow: [
           BoxShadow(
-            color: Color(0x0D000000),
-            blurRadius: 1,
-            offset: Offset(0, 1),
+            color: const Color(0x0D000000),
+            blurRadius: 1.r,
+            offset: Offset(0, 1.h),
           ),
         ],
       ),
       child: Row(
         children: [
-          const Expanded(
+          Expanded(
             child: Center(
               child: Text(
                 'سوالات رایج',
@@ -154,10 +155,10 @@ class _FAQScreenState extends State<FAQScreen> {
           ),
           IconButton(
             onPressed: () => Navigator.of(context).pop(),
-            icon: const Icon(
+            icon: Icon(
               Icons.arrow_forward,
               color: MyColors.textMatn1,
-              size: 24,
+              size: 24.r,
             ),
           ),
         ],
@@ -167,23 +168,23 @@ class _FAQScreenState extends State<FAQScreen> {
 
   Widget _buildCategoryFilters() {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16),
+      padding: EdgeInsets.symmetric(vertical: 16.h),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 25),
+        padding: EdgeInsets.symmetric(horizontal: 25.w),
         child: Row(
           children: FAQCategory.values.map((category) {
             final isActive = _selectedCategory == category;
             return Padding(
-              padding: const EdgeInsets.only(right: 8),
+              padding: EdgeInsets.only(right: 8.w),
               child: GestureDetector(
                 onTap: () => _selectCategory(category),
                 child: Container(
-                  height: 33,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  height: 33.h,
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
                   decoration: BoxDecoration(
                     color: isActive ? MyColors.primary : MyColors.background,
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(20.r),
                     border: Border.all(
                       color:
                           isActive ? MyColors.primary : const Color(0xFFD9D9D9),
@@ -193,10 +194,7 @@ class _FAQScreenState extends State<FAQScreen> {
                   child: Center(
                     child: Text(
                       category.displayName,
-                      style: TextStyle(
-                        fontFamily: "IranSans",
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
+                      style: MyTextStyle.textMatn12W500.copyWith(
                         color: isActive ? MyColors.background : MyColors.text3,
                       ),
                     ),
@@ -212,7 +210,7 @@ class _FAQScreenState extends State<FAQScreen> {
 
   Widget _buildFAQList() {
     return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 25),
+      padding: EdgeInsets.symmetric(horizontal: 25.w),
       itemCount: _filteredFAQItems.length,
       itemBuilder: (context, index) {
         final faqItem = _filteredFAQItems[index];
@@ -223,10 +221,10 @@ class _FAQScreenState extends State<FAQScreen> {
 
   Widget _buildFAQCard(FAQItem faqItem) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: EdgeInsets.only(bottom: 16.h),
       decoration: BoxDecoration(
         color: const Color(0xFFFBFBFF),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(20.r),
         border: faqItem.isExpanded
             ? Border.all(color: MyColors.secondary, width: 1)
             : null,
@@ -237,20 +235,18 @@ class _FAQScreenState extends State<FAQScreen> {
           InkWell(
             onTap: () => _toggleFAQExpansion(faqItem.id),
             child: Container(
-              height: 80,
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              height: 80.h,
+              padding: EdgeInsets.symmetric(horizontal: 20.w),
               child: Row(
                 children: [
                   // Arrow Icon
 
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12.w),
                   // Question Text
                   Expanded(
                     child: Text(
                       faqItem.question,
-                      style: TextStyle(
-                        fontFamily: "IranSans",
-                        fontSize: 14,
+                      style: MyTextStyle.textMatn14Bold.copyWith(
                         fontWeight: faqItem.isExpanded
                             ? FontWeight.w500
                             : FontWeight.w400,
@@ -262,14 +258,14 @@ class _FAQScreenState extends State<FAQScreen> {
                     ),
                   ),
                   SizedBox(
-                    width: 20,
-                    height: 20,
+                    width: 20.r,
+                    height: 20.r,
                     child: Transform.rotate(
                       angle: faqItem.isExpanded ? 6.2 : 1.5, // 315° or 45°
                       child: Icon(
                         Icons.keyboard_arrow_down,
                         color: MyColors.textMatn1,
-                        size: 20,
+                        size: 20.r,
                       ),
                     ),
                   ),
@@ -280,13 +276,10 @@ class _FAQScreenState extends State<FAQScreen> {
           // Answer (if expanded)
           if (faqItem.isExpanded)
             Container(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+              padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 20.h),
               child: Text(
                 faqItem.answer,
-                style: const TextStyle(
-                  fontFamily: "IranSans",
-                  fontSize: 12,
-                  fontWeight: FontWeight.w400,
+                style: MyTextStyle.textMatn12W300.copyWith(
                   color: MyColors.text3,
                   height: 1.4,
                 ),

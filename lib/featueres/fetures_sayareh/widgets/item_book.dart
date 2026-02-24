@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/config/myColors.dart';
+import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/common/services/getImageUrl_service.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/book_detail_screen.dart';
 
@@ -29,19 +31,19 @@ class ItemBook extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(20.r),
         onTap: () {
           if (bookId != null && bookId!.isNotEmpty) {
             _navigateToPdfReader(context);
           }
         },
         child: Container(
-          width: 360,
-          height: 100,
-          padding: const EdgeInsets.all(16),
+          width: 360.w,
+          height: 100.h,
+          padding: EdgeInsets.all(16.r),
           decoration: BoxDecoration(
             color: Theme.of(context).cardColor,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(20.r),
             boxShadow: [
               BoxShadow(
                 color: Theme.of(context).brightness == Brightness.dark
@@ -65,19 +67,19 @@ class ItemBook extends StatelessWidget {
                       title ?? 'بدون عنوان',
                       style: TextStyle(
                         color: Theme.of(context).textTheme.titleMedium?.color,
-                        fontSize: 16,
+                        fontSize: 16.sp,
                         fontWeight: FontWeight.w600,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                     if (description != null && description!.isNotEmpty) ...[
-                      const SizedBox(height: 4),
+                      SizedBox(height: 4.h),
                       Text(
                         description!,
                         style: TextStyle(
                           color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontSize: 12,
+                          fontSize: 12.sp,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -87,10 +89,10 @@ class ItemBook extends StatelessWidget {
                 ),
               ),
               ClipRRect(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(12.r),
                 child: SizedBox(
-                  width: 81,
-                  height: 81,
+                  width: 81.w,
+                  height: 81.h,
                   child: FutureBuilder<String>(
                     future: GetImageUrlService().getImageUrl(thumbnail ?? ""),
                     builder: (context, snapshot) {
@@ -108,8 +110,8 @@ class ItemBook extends StatelessWidget {
                       }
                       return Image.network(
                         snapshot.data!,
-                        width: 81,
-                        height: 81,
+                        width: 81.w,
+                        height: 81.h,
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
                           return const Center(

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_kavoosh/widgets/course_card.dart';
 import 'package:poortak/featueres/feature_kavoosh/widgets/section_header.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/course_list_screen.dart';
@@ -21,45 +23,42 @@ class _EBooksScreenState extends State<EBooksScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(57),
+        preferredSize: Size.fromHeight(57.h),
         child: SafeArea(
           child: Container(
-            padding: const EdgeInsets.fromLTRB(16, 0, 32, 0),
-            height: 57,
+            padding: EdgeInsets.fromLTRB(16.w, 0, 32.w, 0),
+            height: 57.h,
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: const BorderRadius.only(
-                bottomLeft: Radius.circular(33.5),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(33.5.r),
               ),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.05),
-                  offset: const Offset(0, 1),
-                  blurRadius: 1,
+                  offset: Offset(0, 1.h),
+                  blurRadius: 1.r,
                 ),
               ],
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   'کتاب الکترونیکی',
-                  style: TextStyle(
-                    fontFamily: 'IRANSans',
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF29303D),
+                  style: MyTextStyle.textMatn16Bold.copyWith(
+                    color: const Color(0xFF29303D),
                   ),
                 ),
                 SizedBox(
-                  width: 40,
-                  height: 40,
+                  width: 40.w,
+                  height: 40.h,
                   child: IconButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.arrow_forward,
-                      color: Color(0xFF29303D),
-                      size: 28,
+                      color: const Color(0xFF29303D),
+                      size: 28.sp,
                     ),
                   ),
                 ),
@@ -68,75 +67,79 @@ class _EBooksScreenState extends State<EBooksScreen> {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // Slider Placeholder
-            Container(
-              height: 200,
-              width: double.infinity,
-              decoration: const BoxDecoration(
-                color: Color(0xFFF9F6C6), // Light yellow placeholder
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(0), // Figma might show different
-                  bottomRight: Radius.circular(0),
+      body: SafeArea(
+        top: false,
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              // Slider Placeholder
+              Container(
+                height: 200.h,
+                width: double.infinity,
+                decoration: const BoxDecoration(
+                  color: Color(0xFFF9F6C6), // Light yellow placeholder
+                  borderRadius: BorderRadius.only(
+                    bottomLeft:
+                        Radius.circular(0), // Figma might show different
+                    bottomRight: Radius.circular(0),
+                  ),
+                ),
+                child: const Center(
+                    // child: Text('Slider Placeholder'),
+                    ),
+              ),
+
+              // Custom Tabs
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 16.0.h),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _buildTabItem(0, 'کتاب ها', Icons.book_outlined),
+                    SizedBox(width: 24.w),
+                    _buildTabItem(1, 'نمونه سوالات', Icons.quiz_outlined),
+                  ],
                 ),
               ),
-              child: const Center(
-                  // child: Text('Slider Placeholder'),
-                  ),
-            ),
-
-            // Custom Tabs
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _buildTabItem(0, 'کتاب ها', Icons.book_outlined),
-                  const SizedBox(width: 24),
-                  _buildTabItem(1, 'نمونه سوالات', Icons.quiz_outlined),
-                ],
+              // Divider line for tabs
+              Container(
+                height: 2.h,
+                width: double.infinity,
+                color: Colors.grey.withValues(alpha: 0.1),
+                child: Row(
+                  children: [
+                    Expanded(
+                        child: Container(
+                            color: _selectedTabIndex == 0
+                                ? Colors.orange
+                                : Colors.transparent)),
+                    Expanded(
+                        child: Container(
+                            color: _selectedTabIndex == 1
+                                ? Colors.orange
+                                : Colors.transparent)),
+                  ],
+                ),
               ),
-            ),
-            // Divider line for tabs
-            Container(
-              height: 2,
-              width: double.infinity,
-              color: Colors.grey.withValues(alpha: 0.1),
-              child: Row(
-                children: [
-                  Expanded(
-                      child: Container(
-                          color: _selectedTabIndex == 0
-                              ? Colors.orange
-                              : Colors.transparent)),
-                  Expanded(
-                      child: Container(
-                          color: _selectedTabIndex == 1
-                              ? Colors.orange
-                              : Colors.transparent)),
-                ],
-              ),
-            ),
 
-            const SizedBox(height: 16),
+              SizedBox(height: 16.h),
 
-            // Content Sections
-            if (_selectedTabIndex == 0) ...[
-              _buildSection('پایه اول دبستان'),
-              _buildSection('پایه دوم دبستان'),
-              _buildSection('پایه سوم دبستان'),
-              _buildSection('پایه چهارم دبستان'),
-            ] else ...[
-              const SizedBox(
-                height: 200,
-                child: Center(child: Text('نمونه سوالات')),
-              ),
+              // Content Sections
+              if (_selectedTabIndex == 0) ...[
+                _buildSection('پایه اول دبستان'),
+                _buildSection('پایه دوم دبستان'),
+                _buildSection('پایه سوم دبستان'),
+                _buildSection('پایه چهارم دبستان'),
+              ] else ...[
+                SizedBox(
+                  height: 200.h,
+                  child: const Center(child: Text('نمونه سوالات')),
+                ),
+              ],
+
+              SizedBox(height: 20.h),
             ],
-
-            const SizedBox(height: 20),
-          ],
+          ),
         ),
       ),
     );
@@ -154,18 +157,16 @@ class _EBooksScreenState extends State<EBooksScreen> {
         children: [
           Text(
             title,
-            style: TextStyle(
-              fontFamily: 'IRANSans',
-              fontSize: 14,
+            style: MyTextStyle.textMatn14Bold.copyWith(
               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               color: isSelected ? Colors.orange : Colors.grey,
             ),
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: 8.w),
           Icon(
             icon,
             color: isSelected ? Colors.orange : Colors.grey,
-            size: 20,
+            size: 20.sp,
           ),
         ],
       ),
@@ -186,10 +187,10 @@ class _EBooksScreenState extends State<EBooksScreen> {
           },
         ),
         SizedBox(
-          height: 180,
+          height: 180.h,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: EdgeInsets.symmetric(horizontal: 16.w),
             itemCount: 5,
             itemBuilder: (context, index) {
               // Alternating background colors for demo
@@ -213,7 +214,7 @@ class _EBooksScreenState extends State<EBooksScreen> {
             },
           ),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16.h),
       ],
     );
   }

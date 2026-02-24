@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/common/utils/custom_textStyle.dart';
+import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
@@ -60,62 +62,64 @@ class _QuizzesScreenState extends State<QuizzesScreen> {
           style: MyTextStyle.textHeader16Bold,
         ),
       ),
-      body: BlocBuilder<QuizesCubit, QuizesState>(
-        bloc: _quizesCubit,
-        builder: (context, state) {
-          if (state is QuizesLoading) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (state is QuizesLoaded) {
-            return SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const SizedBox(height: 40),
-                  ListView.separated(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    separatorBuilder: (context, index) {
-                      return const SizedBox(height: 12);
-                    },
-                    itemBuilder: (context, index) {
-                      final quiz = state.quizzes.data[index];
-                      return InkWell(
-                        onTap: () {
-                          Navigator.pushNamed(
-                            context,
-                            FirstQuizScreen.routeName,
-                            arguments: {
-                              "quizId": quiz.id,
-                              "courseId": widget.courseId,
-                              "title": quiz.title,
-                            },
-                          );
-                        },
-                        child: QuizItem(
-                          title: quiz.title,
-                          image: quiz.thumbnail,
-                          description: quiz.difficulty,
-                          id: quiz.id,
-                        ),
-                      );
-                    },
-                    itemCount: state.quizzes.data.length,
-                  ),
-                ],
-              ),
-            );
-          } else if (state is QuizesError) {
-            return Center(
-              child: Text(
-                state.message,
-                style: const TextStyle(color: Colors.red),
-              ),
-            );
-          }
-          return const SizedBox();
-        },
+      body: SafeArea(
+        child: BlocBuilder<QuizesCubit, QuizesState>(
+          bloc: _quizesCubit,
+          builder: (context, state) {
+            if (state is QuizesLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is QuizesLoaded) {
+              return SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SizedBox(height: 40.h),
+                    ListView.separated(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      padding: EdgeInsets.symmetric(horizontal: 16.w),
+                      separatorBuilder: (context, index) {
+                        return SizedBox(height: Dimens.small.h);
+                      },
+                      itemBuilder: (context, index) {
+                        final quiz = state.quizzes.data[index];
+                        return InkWell(
+                          onTap: () {
+                            Navigator.pushNamed(
+                              context,
+                              FirstQuizScreen.routeName,
+                              arguments: {
+                                "quizId": quiz.id,
+                                "courseId": widget.courseId,
+                                "title": quiz.title,
+                              },
+                            );
+                          },
+                          child: QuizItem(
+                            title: quiz.title,
+                            image: quiz.thumbnail,
+                            description: quiz.difficulty,
+                            id: quiz.id,
+                          ),
+                        );
+                      },
+                      itemCount: state.quizzes.data.length,
+                    ),
+                  ],
+                ),
+              );
+            } else if (state is QuizesError) {
+              return Center(
+                child: Text(
+                  state.message,
+                  style: const TextStyle(color: Colors.red),
+                ),
+              );
+            }
+            return const SizedBox();
+          },
+        ),
       ),
     );
   }
@@ -144,22 +148,22 @@ class QuizItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 350,
-      height: 104,
+      width: 350.w,
+      height: 104.h,
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(40)),
+          borderRadius: BorderRadius.all(Radius.circular(40.r)),
           color: MyColors.background),
       child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 22, horizontal: 28),
+        padding: EdgeInsets.symmetric(vertical: 22.h, horizontal: 28.w),
         child: Row(
           children: [
             Image.asset(
               "assets/images/quiz_icon.png",
-              width: 48.0,
-              height: 48.0,
+              width: 48.0.r,
+              height: 48.0.r,
             ),
             SizedBox(
-              width: 18,
+              width: 18.w,
             ),
             Column(
               mainAxisAlignment: MainAxisAlignment.center,

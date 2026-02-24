@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/config/myColors.dart';
+import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_kavoosh/widgets/detailed_course_card.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/book_details_screen.dart';
 
@@ -31,23 +34,23 @@ class _CourseListScreenState extends State<CourseListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F9FE), // Light background color
+      backgroundColor: MyColors.background1, // Light background color
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(57),
+        preferredSize: Size.fromHeight(57.h),
         child: SafeArea(
           child: Container(
-            padding: const EdgeInsets.fromLTRB(16, 0, 32, 0),
-            height: 57,
+            padding: EdgeInsets.fromLTRB(16.w, 0, 32.w, 0),
+            height: 57.h,
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: const BorderRadius.only(
-                bottomLeft: Radius.circular(33.5),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(33.5.r),
               ),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.05),
-                  offset: const Offset(0, 1),
-                  blurRadius: 1,
+                  offset: Offset(0, 1.h),
+                  blurRadius: 1.r,
                 ),
               ],
             ),
@@ -56,22 +59,19 @@ class _CourseListScreenState extends State<CourseListScreen> {
               children: [
                 Text(
                   widget.title,
-                  style: const TextStyle(
-                    fontFamily: 'IRANSans',
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF29303D),
+                  style: MyTextStyle.textHeader16Bold.copyWith(
+                    color: MyColors.textMatn2,
                   ),
                 ),
                 SizedBox(
-                  width: 40,
-                  height: 40,
+                  width: 40.w,
+                  height: 40.h,
                   child: IconButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.arrow_forward,
-                      color: Color(0xFF29303D),
-                      size: 28,
+                      color: MyColors.textMatn2,
+                      size: 28.r,
                     ),
                   ),
                 ),
@@ -84,13 +84,13 @@ class _CourseListScreenState extends State<CourseListScreen> {
         children: [
           // Filter Chips
           Container(
-            height: 60,
-            margin: const EdgeInsets.symmetric(vertical: 8),
+            height: 60.h,
+            margin: EdgeInsets.symmetric(vertical: 8.h),
             child: ListView.separated(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: EdgeInsets.symmetric(horizontal: 16.w),
               scrollDirection: Axis.horizontal,
               itemCount: _filters.length,
-              separatorBuilder: (context, index) => const SizedBox(width: 8),
+              separatorBuilder: (context, index) => SizedBox(width: 8.w),
               itemBuilder: (context, index) {
                 final isSelected = _selectedFilterIndex == index;
                 return Center(
@@ -101,28 +101,24 @@ class _CourseListScreenState extends State<CourseListScreen> {
                       });
                     },
                     child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 8,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 20.w,
+                        vertical: 8.h,
                       ),
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? const Color(0xFFFF9F29) // Orange
+                            ? MyColors.secondary // Orange
                             : Colors.white,
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(20.r),
                         border: Border.all(
                           color: isSelected ? Colors.transparent : Colors.white,
                         ),
                       ),
                       child: Text(
                         _filters[index],
-                        style: TextStyle(
-                          fontFamily: 'IRANSans',
-                          fontSize: 12,
+                        style: MyTextStyle.textMatn12W500.copyWith(
                           fontWeight: FontWeight.bold,
-                          color: isSelected
-                              ? Colors.white
-                              : const Color(0xFF9BA7C6),
+                          color: isSelected ? Colors.white : MyColors.text4,
                         ),
                       ),
                     ),
@@ -135,7 +131,7 @@ class _CourseListScreenState extends State<CourseListScreen> {
           // List of Cards
           Expanded(
             child: ListView.builder(
-              padding: const EdgeInsets.only(top: 8, bottom: 20),
+              padding: EdgeInsets.only(top: 8.h, bottom: 20.h),
               itemCount: 10,
               itemBuilder: (context, index) {
                 // Mock data
@@ -145,7 +141,7 @@ class _CourseListScreenState extends State<CourseListScreen> {
                   const Color(0xFFF3E5F5), // Light purple
                   const Color(0xFFE8F5E9), // Light green
                 ];
-                
+
                 return DetailedCourseCard(
                   title: 'ریاضی سوم دبستان',
                   author: 'سمانه مراقی',

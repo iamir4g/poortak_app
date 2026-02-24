@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/config/myColors.dart';
+import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/common/widgets/reusable_modal.dart';
 import 'package:poortak/featueres/feature_match/presentation/bloc/match_bloc/match_bloc.dart';
 import 'package:poortak/featueres/feature_match/data/models/match_model.dart';
@@ -74,6 +76,7 @@ class _MatchScreenState extends State<MatchScreen> {
                   SnackBar(
                     content: Text(state.message),
                     backgroundColor: MyColors.error,
+                    duration: const Duration(seconds: 2),
                   ),
                 );
               }
@@ -88,20 +91,20 @@ class _MatchScreenState extends State<MatchScreen> {
                     // Main content
                     Expanded(
                       child: SingleChildScrollView(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        padding: EdgeInsets.symmetric(horizontal: 16.w),
                         child: Column(
                           children: [
-                            const SizedBox(height: 75),
+                            SizedBox(height: 75.h),
 
                             // Question section
                             _buildQuestionSection(state),
 
-                            const SizedBox(height: 20),
+                            SizedBox(height: 20.h),
 
                             // Description text
                             _buildDescriptionText(),
 
-                            const SizedBox(height: 40),
+                            SizedBox(height: 40.h),
                           ],
                         ),
                       ),
@@ -121,54 +124,46 @@ class _MatchScreenState extends State<MatchScreen> {
 
   Widget _buildHeader() {
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 0, 32, 0),
-      height: 57,
-      // margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: EdgeInsets.fromLTRB(16.w, 0, 32.w, 0),
+      height: 57.h,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(33.5),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(33.5.r),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            offset: const Offset(0, 1),
-            blurRadius: 1,
+            color: Colors.black.withValues(alpha: 0.05),
+            offset: Offset(0, 1.h),
+            blurRadius: 1.r,
           ),
         ],
       ),
       child: Row(
-        // padding: const EdgeInsets.symmetric(horizontal: 16),
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           // Title
-
           Text(
             'شرکت در مسابقه',
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontFamily: 'IranSans',
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
+            style: MyTextStyle.textHeader16Bold.copyWith(
               color: MyColors.textMatn2,
             ),
           ),
 
           // Back button
           SizedBox(
-            width: 40,
-            height: 40,
-            // margin: const EdgeInsets.only(left: 16),
+            width: 40.w,
+            height: 40.h,
             child: IconButton(
               onPressed: () => Navigator.pop(context),
-              icon: const Icon(
+              icon: Icon(
                 Icons.arrow_forward,
                 color: MyColors.textMatn1,
-                size: 28,
+                size: 28.r,
               ),
             ),
           ),
-          // Spacer for balance
         ],
       ),
     );
@@ -181,23 +176,23 @@ class _MatchScreenState extends State<MatchScreen> {
         // Main content area
         Container(
           width: double.infinity,
-          margin: const EdgeInsets.only(top: 20),
-          padding: const EdgeInsets.all(20),
+          margin: EdgeInsets.only(top: 20.h),
+          padding: EdgeInsets.all(20.r),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(22),
+            borderRadius: BorderRadius.circular(22.r),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                offset: const Offset(0, 2),
-                blurRadius: 8,
+                color: Colors.black.withValues(alpha: 0.1),
+                offset: Offset(0, 2.h),
+                blurRadius: 8.r,
               ),
             ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 20),
+              SizedBox(height: 20.h),
 
               // Question text
               if (state is MatchLoading)
@@ -209,9 +204,7 @@ class _MatchScreenState extends State<MatchScreen> {
                     child: Text(
                   state.match.data.match.question,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontFamily: 'IranSans',
-                    fontSize: 14,
+                  style: MyTextStyle.textMatn14Bold.copyWith(
                     fontWeight: FontWeight.w300,
                     color: MyColors.textMatn1,
                   ),
@@ -220,44 +213,37 @@ class _MatchScreenState extends State<MatchScreen> {
                 Text(
                   'خطا در بارگذاری سوال',
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontFamily: 'IranSans',
-                    fontSize: 14,
+                  style: MyTextStyle.textMatn14Bold.copyWith(
                     fontWeight: FontWeight.w300,
                     color: MyColors.error,
                   ),
                 )
               else
-                const Text(
+                Text(
                   'در حال بارگذاری...',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontFamily: 'IranSans',
-                    fontSize: 14,
+                  style: MyTextStyle.textMatn14Bold.copyWith(
                     fontWeight: FontWeight.w300,
                     color: MyColors.textMatn1,
                   ),
                 ),
 
-              const SizedBox(height: 20),
+              SizedBox(height: 20.h),
 
               // Answer input field
               Container(
-                height: 50,
+                height: 50.h,
                 decoration: BoxDecoration(
                   color: _isAnswerSubmitted()
                       ? const Color(0xFFE0E0E0)
                       : const Color(0xFFF8F8F8),
-                  borderRadius: BorderRadius.circular(30),
+                  borderRadius: BorderRadius.circular(30.r),
                 ),
                 child: TextField(
                   controller: _answerController,
                   enabled: !_isAnswerSubmitted(),
                   textAlign: TextAlign.right,
-                  style: TextStyle(
-                    fontFamily: 'IranSans',
-                    fontSize: 16,
-                    fontWeight: FontWeight.w300,
+                  style: MyTextStyle.textMatn16.copyWith(
                     color: _isAnswerSubmitted()
                         ? MyColors.text4.withOpacity(0.5)
                         : MyColors.text4,
@@ -266,38 +252,35 @@ class _MatchScreenState extends State<MatchScreen> {
                     hintText: _isAnswerSubmitted()
                         ? 'شما قبلاً پاسخ داده‌اید'
                         : 'جواب سوال:',
-                    hintStyle: TextStyle(
-                      fontFamily: 'IranSans',
-                      fontSize: 16,
-                      fontWeight: FontWeight.w300,
+                    hintStyle: MyTextStyle.textMatn16.copyWith(
                       color: _isAnswerSubmitted()
                           ? MyColors.text4.withOpacity(0.5)
                           : MyColors.text4,
                     ),
                     border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 15),
+                    contentPadding:
+                        EdgeInsets.symmetric(horizontal: 20.w, vertical: 15.h),
                   ),
                 ),
               ),
 
-              const SizedBox(height: 20),
+              SizedBox(height: 20.h),
 
               // Submit button
               Center(
                 child: Container(
-                  width: 164,
-                  height: 50,
+                  width: 164.w,
+                  height: 50.h,
                   decoration: BoxDecoration(
                     color: _isAnswerSubmitted()
                         ? const Color(0xFFBDBDBD)
                         : MyColors.textMatn2,
-                    borderRadius: BorderRadius.circular(56.5),
+                    borderRadius: BorderRadius.circular(56.5.r),
                   ),
                   child: Material(
                     color: Colors.transparent,
                     child: InkWell(
-                      borderRadius: BorderRadius.circular(56.5),
+                      borderRadius: BorderRadius.circular(56.5.r),
                       onTap: _isAnswerSubmitted()
                           ? null
                           : () {
@@ -324,9 +307,7 @@ class _MatchScreenState extends State<MatchScreen> {
                               _isAnswerSubmitted()
                                   ? 'پاسخ ارسال شده'
                                   : 'ارسال پاسخ',
-                              style: TextStyle(
-                                fontFamily: 'IranSans',
-                                fontSize: 16,
+                              style: MyTextStyle.textMatn16.copyWith(
                                 fontWeight: FontWeight.w500,
                                 color: _isAnswerSubmitted()
                                     ? Colors.white.withOpacity(0.7)
@@ -346,13 +327,13 @@ class _MatchScreenState extends State<MatchScreen> {
 
         // Avatar positioned on the left side above the main container
         Positioned(
-          top: -40,
+          top: -40.h,
           left: 0,
           child: Container(
-            width: 60,
-            height: 60,
+            width: 60.w,
+            height: 60.h,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(30),
+              borderRadius: BorderRadius.circular(30.r),
               image: const DecorationImage(
                 image: AssetImage('assets/images/match/match_avatar.png'),
                 fit: BoxFit.cover,
@@ -368,19 +349,17 @@ class _MatchScreenState extends State<MatchScreen> {
           right: 0,
           child: Center(
             child: Container(
-              width: 112,
-              height: 33,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              width: 112.w,
+              height: 33.h,
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
               decoration: BoxDecoration(
                 color: const Color(0xFFF2F2FE),
-                borderRadius: BorderRadius.circular(15),
+                borderRadius: BorderRadius.circular(15.r),
               ),
-              child: const Center(
+              child: Center(
                 child: Text(
                   'سوال این ماه',
-                  style: TextStyle(
-                    fontFamily: 'IranSans',
-                    fontSize: 14,
+                  style: MyTextStyle.textMatn14Bold.copyWith(
                     fontWeight: FontWeight.w300,
                     color: MyColors.textMatn1,
                   ),
@@ -397,25 +376,19 @@ class _MatchScreenState extends State<MatchScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        const Text(
+        Text(
           'پس از ارسال پاسخ مسابقه، به نفراتی که پاسخ صحیح داده باشند به قید قرعه جوایز ویژه داده خواهد شد.',
           textAlign: TextAlign.right,
-          style: TextStyle(
-            fontFamily: 'IranSans',
-            fontSize: 11,
-            fontWeight: FontWeight.w300,
+          style: MyTextStyle.textMatn11.copyWith(
             color: MyColors.text3,
             height: 1.5,
           ),
         ),
-        const SizedBox(height: 8),
-        const Text(
+        SizedBox(height: 8.h),
+        Text(
           'قرعه کشی در اوایل هر ماه انجام می شود و لیست برندگان در بخش (برندگان مسابقه) نمایش داده خواهد شد.',
           textAlign: TextAlign.right,
-          style: TextStyle(
-            fontFamily: 'IranSans',
-            fontSize: 11,
-            fontWeight: FontWeight.w300,
+          style: MyTextStyle.textMatn11.copyWith(
             color: MyColors.text3,
             height: 1.5,
           ),
@@ -427,12 +400,12 @@ class _MatchScreenState extends State<MatchScreen> {
   Widget _buildCountdownSection() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-      decoration: const BoxDecoration(
-        color: Color(0xFFF2F5FA),
+      padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 16.w),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF2F5FA),
         borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(20),
+          topLeft: Radius.circular(20.r),
+          topRight: Radius.circular(20.r),
         ),
       ),
       child: Row(
@@ -440,11 +413,9 @@ class _MatchScreenState extends State<MatchScreen> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           // Description text
-          const Text(
+          Text(
             'زمان باقی مانده ارسال پاسخ برای سوال این ماه :',
-            style: TextStyle(
-              fontFamily: 'IranSans',
-              fontSize: 10,
+            style: MyTextStyle.textMatn10W300.copyWith(
               fontWeight: FontWeight.w500,
               color: MyColors.textMatn2,
             ),
@@ -458,14 +429,14 @@ class _MatchScreenState extends State<MatchScreen> {
                 children: [
                   // Days box
                   Container(
-                    width: 54,
-                    height: 54,
+                    width: 54.w,
+                    height: 54.h,
                     decoration: BoxDecoration(
                       color: const Color(0xFFF2F5FA),
-                      borderRadius: BorderRadius.circular(5),
+                      borderRadius: BorderRadius.circular(5.r),
                       border: Border.all(
                         color: MyColors.text4.withOpacity(0.3),
-                        width: 1,
+                        width: 1.w,
                       ),
                     ),
                     child: Column(
@@ -473,10 +444,7 @@ class _MatchScreenState extends State<MatchScreen> {
                       children: [
                         Text(
                           '$hoursRemaining',
-                          style: const TextStyle(
-                            fontFamily: 'IranSans',
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
+                          style: MyTextStyle.text24Correct.copyWith(
                             color: MyColors.textMatn2,
                           ),
                         ),
@@ -484,31 +452,28 @@ class _MatchScreenState extends State<MatchScreen> {
                     ),
                   ),
 
-                  const SizedBox(width: 8),
+                  SizedBox(width: 8.w),
 
                   // Colon
-                  const Text(
+                  Text(
                     ':',
-                    style: TextStyle(
-                      fontFamily: 'IranSans',
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
+                    style: MyTextStyle.text24Correct.copyWith(
                       color: MyColors.text4,
                     ),
                   ),
 
-                  const SizedBox(width: 8),
+                  SizedBox(width: 8.w),
 
                   // Hours box
                   Container(
-                    width: 54,
-                    height: 54,
+                    width: 54.w,
+                    height: 54.h,
                     decoration: BoxDecoration(
                       color: const Color(0xFFF2F5FA),
-                      borderRadius: BorderRadius.circular(5),
+                      borderRadius: BorderRadius.circular(5.r),
                       border: Border.all(
                         color: MyColors.text4.withOpacity(0.3),
-                        width: 1,
+                        width: 1.w,
                       ),
                     ),
                     child: Column(
@@ -516,10 +481,7 @@ class _MatchScreenState extends State<MatchScreen> {
                       children: [
                         Text(
                           '$daysRemaining',
-                          style: const TextStyle(
-                            fontFamily: 'IranSans',
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
+                          style: MyTextStyle.text24Correct.copyWith(
                             color: MyColors.textMatn2,
                           ),
                         ),
@@ -529,27 +491,23 @@ class _MatchScreenState extends State<MatchScreen> {
                 ],
               ),
 
-              const SizedBox(height: 6),
+              SizedBox(height: 6.h),
 
               // Labels
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
+                  Text(
                     'ساعت',
-                    style: TextStyle(
-                      fontFamily: 'IranSans',
-                      fontSize: 10,
+                    style: MyTextStyle.textMatn10W300.copyWith(
                       fontWeight: FontWeight.bold,
                       color: MyColors.text4,
                     ),
                   ),
-                  const SizedBox(width: 54),
-                  const Text(
+                  SizedBox(width: 54.w),
+                  Text(
                     'روز',
-                    style: TextStyle(
-                      fontFamily: 'IranSans',
-                      fontSize: 10,
+                    style: MyTextStyle.textMatn10W300.copyWith(
                       fontWeight: FontWeight.bold,
                       color: MyColors.text4,
                     ),
@@ -557,7 +515,7 @@ class _MatchScreenState extends State<MatchScreen> {
                 ],
               ),
 
-              const SizedBox(height: 6),
+              SizedBox(height: 6.h),
             ],
           ),
         ],
@@ -604,6 +562,7 @@ class _MatchScreenState extends State<MatchScreen> {
         const SnackBar(
           content: Text('اطلاعات مسابقه در دسترس نیست'),
           backgroundColor: MyColors.error,
+          duration: Duration(seconds: 2),
         ),
       );
       return;

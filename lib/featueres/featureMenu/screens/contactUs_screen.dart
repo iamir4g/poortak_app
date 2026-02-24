@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -37,41 +38,14 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
             _buildEmailSection(),
 
             SizedBox(
-              height: 187,
-              width: 350,
+              height: 187.h,
+              width: 350.w,
               child: Image.asset(
                 "assets/images/contactUs/Poortak_Phone.png",
                 fit: BoxFit.cover,
-                // errorBuilder: (context, error, stackTrace) {
-                //   return Container(
-                //     decoration: BoxDecoration(
-                //       color: MyColors.background,
-                //       borderRadius: BorderRadius.circular(16),
-                //       border: Border.all(
-                //         color: MyColors.shadow.withOpacity(0.3),
-                //         width: 1,
-                //       ),
-                //     ),
-                //     child: Column(
-                //       mainAxisAlignment: MainAxisAlignment.center,
-                //       children: [
-                //         Icon(
-                //           Icons.phone_android_rounded,
-                //           size: 48,
-                //           color: MyColors.primary,
-                //         ),
-                //         const SizedBox(height: 8),
-                //         Text(
-                //           'Poortak Phone',
-                //           style: MyTextStyle.textMatn14Bold,
-                //         ),
-                //       ],
-                //     ),
-                //   );
-                // },
               ),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20.h),
           ],
         ),
       ),
@@ -81,22 +55,22 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
   // Section 1: Header based on Figma design 467:5902
   Widget _buildHeaderSection() {
     return Container(
-        height: 57,
-        decoration: const BoxDecoration(
+        height: 57.h,
+        decoration: BoxDecoration(
           color: MyColors.background,
           borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(40),
+            bottomLeft: Radius.circular(40.r),
           ),
           boxShadow: [
             BoxShadow(
-              color: Color(0x0D000000),
-              blurRadius: 2,
-              offset: Offset(0, 2),
+              color: const Color(0x0D000000),
+              blurRadius: 2.r,
+              offset: Offset(0, 2.h),
             ),
           ],
         ),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
+          padding: EdgeInsets.symmetric(horizontal: 24.w),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -108,7 +82,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
               Icon(
                 Icons.arrow_forward,
                 color: MyColors.textMatn1,
-                size: 24,
+                size: 24.r,
               ),
             ],
           ),
@@ -118,18 +92,18 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
   // Section 2: Contact Information based on Figma design 769:10683
   Widget _buildContactInfoSection() {
     return Container(
-      margin: const EdgeInsets.all(20),
-      padding: const EdgeInsets.all(24),
+      margin: EdgeInsets.all(20.r),
+      padding: EdgeInsets.all(24.r),
       decoration: BoxDecoration(
         color: MyColors.background,
         boxShadow: [
           BoxShadow(
             color: MyColors.shadow,
-            blurRadius: 10,
-            offset: Offset(0, 10),
+            blurRadius: 10.r,
+            offset: Offset(0, 10.h),
           ),
         ],
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(10.r),
         border: Border.all(
           color: MyColors.background,
           width: 1,
@@ -142,12 +116,12 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
             "مراکز پخش و پشتیبانی:",
             style: MyTextStyle.textHeader16Bold,
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: 24.h),
           Text(
             "تهران، خیابان انقلاب، خیابان 12 فروردین، پاساژ ناشران فروشگاه انتشارات تاجیک",
             style: MyTextStyle.textMatn14Bold,
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16.h),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -169,16 +143,16 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
   // Section 4: Additional Info based on Figma design 769:10685
   Widget _buildWebsiteInfoSection() {
     return Container(
-      margin: const EdgeInsets.all(20),
-      padding: const EdgeInsets.all(24),
+      margin: EdgeInsets.all(20.r),
+      padding: EdgeInsets.all(24.r),
       decoration: BoxDecoration(
         color: MyColors.background,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(10.r),
         boxShadow: [
           BoxShadow(
             color: MyColors.shadow,
-            blurRadius: 10,
-            offset: Offset(0, 10),
+            blurRadius: 10.r,
+            offset: Offset(0, 10.h),
           ),
         ],
         border: Border.all(
@@ -190,20 +164,15 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
         children: [
           Row(
             children: [
-              const Expanded(
+              Expanded(
                 child: Text(
                   'وبسایت های ما:',
-                  style: TextStyle(
-                    fontFamily: "IranSans",
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: MyColors.textMatn1,
-                  ),
+                  style: MyTextStyle.textMatn18Bold,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: 20.h),
           InkWell(
             onTap: () {
               launchUrl(Uri.parse("https://poortak.ir"));
@@ -221,18 +190,18 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
   // Section 5: Illustration/Image Section
   Widget _buildEmailSection() {
     return Container(
-      margin: const EdgeInsets.all(20),
-      padding: const EdgeInsets.all(24),
+      margin: EdgeInsets.all(20.r),
+      padding: EdgeInsets.all(24.r),
       decoration: BoxDecoration(
         color: MyColors.background,
         boxShadow: [
           BoxShadow(
             color: MyColors.shadow,
-            blurRadius: 10,
-            offset: Offset(0, 10),
+            blurRadius: 10.r,
+            offset: Offset(0, 10.h),
           ),
         ],
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(10.r),
         border: Border.all(
           color: MyColors.background,
           width: 1,
@@ -242,20 +211,15 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
         children: [
           Row(
             children: [
-              const Expanded(
+              Expanded(
                 child: Text(
                   'آدرس الکترونیکی:',
-                  style: TextStyle(
-                    fontFamily: "IranSans",
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: MyColors.textMatn1,
-                  ),
+                  style: MyTextStyle.textMatn18Bold,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: 20.h),
           InkWell(
             onTap: () {
               launchUrl(Uri.parse("mailto:info@poortak.ir"));

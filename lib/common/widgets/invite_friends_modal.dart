@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/common/resources/data_state.dart';
+import 'package:poortak/config/dimens.dart';
 import 'package:poortak/featueres/feature_profile/repositories/profile_repository.dart';
 import 'package:poortak/featueres/feature_profile/data/data_sorce/profile_api_provider.dart';
 import 'package:poortak/locator.dart';
@@ -107,40 +109,40 @@ class InviteFriendsModal extends StatelessWidget {
     return Dialog(
       backgroundColor: Colors.transparent,
       child: Container(
-        width: 350,
-        height: 462,
+        width: 350.w,
+        height: 462.h,
         decoration: BoxDecoration(
           color: isDarkMode ? const Color(0xFF2C2E3F) : Colors.white,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(20.r),
         ),
         child: Stack(
           children: [
             Column(
               children: [
-                const SizedBox(height: 6),
+                SizedBox(height: 6.h),
 
                 // Lottie Animation
                 SizedBox(
-                  width: 231,
-                  height: 231,
+                  width: 231.w,
+                  height: 231.h,
                   child: Lottie.asset(
                     'assets/images/points/refferal.json',
                     fit: BoxFit.contain,
                   ),
                 ),
 
-                const SizedBox(height: 3),
+                SizedBox(height: 3.h),
 
                 // Referral Code Container
                 Container(
-                    width: 252,
-                    height: 56,
-                    padding: const EdgeInsets.only(right: 16, left: 16),
+                    width: 252.w,
+                    height: 56.h,
+                    padding: EdgeInsets.only(right: 16.w, left: 16.w),
                     decoration: BoxDecoration(
                       color: isDarkMode
                           ? const Color(0xFF323548)
                           : const Color(0xFFF6F9FE),
-                      borderRadius: BorderRadius.circular(7),
+                      borderRadius: BorderRadius.circular(7.r),
                     ),
                     child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
@@ -155,12 +157,12 @@ class InviteFriendsModal extends StatelessWidget {
                                     referralCode,
                                     style: TextStyle(
                                       fontFamily: 'IranSans',
-                                      fontSize: 18,
+                                      fontSize: 18.sp,
                                       fontWeight: FontWeight.w500,
                                       color: isDarkMode
                                           ? Colors.white
                                           : const Color(0xFF3D495C),
-                                      letterSpacing: 5.4,
+                                      letterSpacing: 5.4.w,
                                     ),
                                   ),
                                 );
@@ -182,49 +184,30 @@ class InviteFriendsModal extends StatelessWidget {
                               );
                             },
                             child: Container(
-                              width: 20,
-                              height: 20,
+                              width: 20.w,
+                              height: 20.h,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                               ),
                               child: Center(
                                 child: Icon(Icons.copy,
-                                    size: 20, color: Colors.black),
+                                    size: 20.w, color: Colors.black),
                               ),
                             ),
                           ),
                         ])),
 
-                const SizedBox(height: 9),
+                SizedBox(height: 9.h),
 
-//  Container(
-//                       width: 13,
-//                       height: 13,
-//                       decoration: BoxDecoration(
-//                         color: const Color(0xFF474747),
-//                         shape: BoxShape.circle,
-//                       ),
-//                       child: Center(
-//                         child: Text(
-//                           '؟',
-//                           style: TextStyle(
-//                             fontFamily: 'IranSans',
-//                             fontSize: 9,
-//                             fontWeight: FontWeight.w500,
-//                             color: Colors.white,
-//                           ),
-//                         ),
-//                       ),
-//                     ),
                 // Description Text
                 SizedBox(
-                  width: 232,
+                  width: 232.w,
                   child: RichText(
                     textAlign: TextAlign.center,
                     text: TextSpan(
                       style: TextStyle(
                         fontFamily: 'IranSans',
-                        fontSize: 10,
+                        fontSize: 10.sp,
                         fontWeight: FontWeight.w300,
                         color:
                             isDarkMode ? Colors.white : const Color(0xFF3D495C),
@@ -237,7 +220,7 @@ class InviteFriendsModal extends StatelessWidget {
                           style: TextStyle(
                             fontFamily: 'IranSans',
                             fontWeight: FontWeight.bold,
-                            fontSize: 12,
+                            fontSize: 12.sp,
                           ),
                         ),
                         const TextSpan(
@@ -248,7 +231,7 @@ class InviteFriendsModal extends StatelessWidget {
                           style: TextStyle(
                             fontFamily: 'IranSans',
                             fontWeight: FontWeight.bold,
-                            fontSize: 12,
+                            fontSize: 12.sp,
                           ),
                         ),
                         const TextSpan(text: ' امتیاز برای شما و '),
@@ -266,36 +249,9 @@ class InviteFriendsModal extends StatelessWidget {
                   ),
                 ),
 
-                const SizedBox(height: 2),
+                SizedBox(height: 2.h),
 
-                // Help Icon
-                // Row(
-                //   mainAxisAlignment: MainAxisAlignment.end,
-                //   children: [
-                //     Container(
-                //       width: 13,
-                //       height: 13,
-                //       decoration: BoxDecoration(
-                //         color: const Color(0xFF474747),
-                //         shape: BoxShape.circle,
-                //       ),
-                //       child: Center(
-                //         child: Text(
-                //           '؟',
-                //           style: TextStyle(
-                //             fontFamily: 'IranSans',
-                //             fontSize: 9,
-                //             fontWeight: FontWeight.w500,
-                //             color: Colors.white,
-                //           ),
-                //         ),
-                //       ),
-                //     ),
-                //     const SizedBox(width: 6),
-                //   ],
-                // ),
-
-                const SizedBox(height: 20),
+                SizedBox(height: 20.h),
 
                 // Bottom Buttons Row
                 Row(
@@ -314,24 +270,24 @@ class InviteFriendsModal extends StatelessWidget {
                         );
                       },
                       child: Container(
-                        width: 56,
-                        height: 56,
+                        width: 56.w,
+                        height: 56.h,
                         decoration: BoxDecoration(
                           color: isDarkMode
                               ? const Color(0xFF323548)
                               : const Color(0xFFF6F9FE),
-                          borderRadius: BorderRadius.circular(28),
+                          borderRadius: BorderRadius.circular(28.r),
                         ),
                         child: Icon(
                           Icons.share,
                           color: isDarkMode
                               ? Colors.white
                               : const Color(0xFF3D495C),
-                          size: 24,
+                          size: 24.w,
                         ),
                       ),
                     ),
-                    const SizedBox(width: 16),
+                    SizedBox(width: 16.w),
 
                     // Copy Button
                     GestureDetector(
@@ -349,18 +305,18 @@ class InviteFriendsModal extends StatelessWidget {
                         );
                       },
                       child: Container(
-                        width: 179,
-                        height: 56,
+                        width: 179.w,
+                        height: 56.h,
                         decoration: BoxDecoration(
                           color: const Color(0xFF4281EC),
-                          borderRadius: BorderRadius.circular(56.5),
+                          borderRadius: BorderRadius.circular(56.5.r),
                         ),
                         child: Center(
                           child: Text(
                             'کپی کردن کد دعوت',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: 'IRANSans',
-                              fontSize: 14,
+                              fontSize: 14.sp,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                             ),
@@ -374,15 +330,15 @@ class InviteFriendsModal extends StatelessWidget {
             ),
             // Close Button (X) - Top Left
             Positioned(
-              top: 12,
-              left: 12,
+              top: 12.h,
+              left: 12.w,
               child: GestureDetector(
                 onTap: () {
                   Navigator.of(context).pop();
                 },
                 child: Container(
-                  width: 32,
-                  height: 32,
+                  width: 32.w,
+                  height: 32.h,
                   decoration: BoxDecoration(
                     color: isDarkMode
                         ? const Color(0xFF323548)
@@ -391,7 +347,7 @@ class InviteFriendsModal extends StatelessWidget {
                   ),
                   child: Icon(
                     Icons.close,
-                    size: 20,
+                    size: 20.w,
                     color: isDarkMode ? Colors.white : const Color(0xFF3D495C),
                   ),
                 ),

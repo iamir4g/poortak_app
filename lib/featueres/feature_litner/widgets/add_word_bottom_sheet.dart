@@ -5,6 +5,8 @@ import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_bloc.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_event.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_state.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/config/dimens.dart';
 
 class AddWordBottomSheet extends StatefulWidget {
   const AddWordBottomSheet({super.key});
@@ -35,7 +37,7 @@ class _AddWordBottomSheetState extends State<AddWordBottomSheet> {
             const SnackBar(
               content: Text('لغت به لایتنر اضافه شد'),
               backgroundColor: MyColors.success,
-              duration: Duration(milliseconds: 800),
+              duration: Duration(seconds: 2),
             ),
           );
           _wordController.clear();
@@ -47,7 +49,7 @@ class _AddWordBottomSheetState extends State<AddWordBottomSheet> {
               content: Text(state.message),
               backgroundColor:
                   isWordExistsError ? MyColors.warning : MyColors.error,
-              duration: const Duration(milliseconds: 800),
+              duration: const Duration(seconds: 2),
             ),
           );
         }
@@ -61,10 +63,10 @@ class _AddWordBottomSheetState extends State<AddWordBottomSheet> {
           ),
         ),
         padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom + 20,
-          left: 24,
-          right: 24,
-          top: 24,
+          bottom: MediaQuery.of(context).viewInsets.bottom + 20.h,
+          left: 24.w,
+          right: 24.w,
+          top: 24.h,
         ),
         child: Form(
           key: _formKey,
@@ -79,29 +81,29 @@ class _AddWordBottomSheetState extends State<AddWordBottomSheet> {
                     .copyWith(fontWeight: FontWeight.bold),
                 textAlign: TextAlign.right,
               ),
-              const SizedBox(height: 32),
+              SizedBox(height: 32.h),
               // English Word Label
               Text(
                 'واژه انگلیسی',
                 style: MyTextStyle.textMatn12W500,
                 textAlign: TextAlign.right,
               ),
-              const SizedBox(height: 8),
+              SizedBox(height: 8.h),
               // English Word Input
               Container(
                 decoration: BoxDecoration(
                   color: MyColors.inputBackground,
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(16.r),
                 ),
                 child: TextFormField(
                   controller: _wordController,
                   textAlign: TextAlign.center,
                   style: MyTextStyle.textMatn15,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: 'واژه را وارد کنید',
                     hintStyle: MyTextStyle.textHint,
                     border: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(vertical: 18),
+                    contentPadding: EdgeInsets.symmetric(vertical: 18.h),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -111,29 +113,29 @@ class _AddWordBottomSheetState extends State<AddWordBottomSheet> {
                   },
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20.h),
               // Persian Translation Label
               Text(
                 'معنی فارسی',
                 style: MyTextStyle.textMatn12W500,
                 textAlign: TextAlign.right,
               ),
-              const SizedBox(height: 8),
+              SizedBox(height: 8.h),
               // Persian Translation Input
               Container(
                 decoration: BoxDecoration(
                   color: MyColors.inputBackground,
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(16.r),
                 ),
                 child: TextFormField(
                   controller: _translationController,
                   textAlign: TextAlign.center,
                   style: MyTextStyle.textMatn15,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: 'معنی واژه را وارد کنید',
                     hintStyle: MyTextStyle.textHint,
                     border: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(vertical: 18),
+                    contentPadding: EdgeInsets.symmetric(vertical: 18.h),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -143,7 +145,7 @@ class _AddWordBottomSheetState extends State<AddWordBottomSheet> {
                   },
                 ),
               ),
-              const SizedBox(height: 32),
+              SizedBox(height: 32.h),
               // Buttons
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -170,19 +172,20 @@ class _AddWordBottomSheetState extends State<AddWordBottomSheet> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: MyColors.primary,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
+                              borderRadius: BorderRadius.circular(16.r),
                             ),
-                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            padding: EdgeInsets.symmetric(vertical: 16.h),
                             elevation: 0,
                           ),
                           child: state is LitnerLoading
-                              ? const SizedBox(
-                                  width: 20,
-                                  height: 20,
+                              ? SizedBox(
+                                  width: 20.w,
+                                  height: 20.h,
                                   child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                        MyColors.textLight),
+                                    strokeWidth: 2.w,
+                                    valueColor:
+                                        const AlwaysStoppedAnimation<Color>(
+                                            MyColors.textLight),
                                   ),
                                 )
                               : Row(
@@ -190,11 +193,11 @@ class _AddWordBottomSheetState extends State<AddWordBottomSheet> {
                                   children: [
                                     const Icon(Icons.add,
                                         color: MyColors.textLight),
-                                    const SizedBox(width: 6),
+                                    SizedBox(width: 6.w),
                                     Text(
                                       'ذخیره کردن',
                                       style: MyTextStyle.textMatnBtn
-                                          .copyWith(fontSize: 16),
+                                          .copyWith(fontSize: 16.sp),
                                     ),
                                   ],
                                 ),
@@ -202,7 +205,7 @@ class _AddWordBottomSheetState extends State<AddWordBottomSheet> {
                       },
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12.w),
 
                   // Cancel Button
                   Expanded(
@@ -211,11 +214,11 @@ class _AddWordBottomSheetState extends State<AddWordBottomSheet> {
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(color: MyColors.divider),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(16.r),
                         ),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        padding: EdgeInsets.symmetric(vertical: 16.h),
                       ),
-                      child: const Text(
+                      child: Text(
                         'لغو',
                         style: MyTextStyle.textCancelButton,
                       ),

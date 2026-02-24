@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/config/myColors.dart';
+import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_profile/data/models/payment_history_model.dart';
 
 class PaymentHistoryCard extends StatelessWidget {
@@ -14,15 +17,15 @@ class PaymentHistoryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 17, vertical: 8),
+      margin: EdgeInsets.symmetric(horizontal: 17.w, vertical: 8.h),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(10.r),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
-            offset: const Offset(0, 1),
-            blurRadius: 4,
+            offset: Offset(0, 1.h),
+            blurRadius: 4.r,
             spreadRadius: 0,
           ),
         ],
@@ -31,9 +34,9 @@ class PaymentHistoryCard extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(10.r),
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(16.r),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -41,10 +44,10 @@ class PaymentHistoryCard extends StatelessWidget {
                 Container(
                   width: double.infinity,
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                      EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
                   decoration: BoxDecoration(
                     color: const Color(0xFFF9F9F9),
-                    borderRadius: BorderRadius.circular(7),
+                    borderRadius: BorderRadius.circular(7.r),
                   ),
                   child: Row(
                     children: [
@@ -52,23 +55,20 @@ class PaymentHistoryCard extends StatelessWidget {
                       Expanded(
                         child: Text(
                           _getProductTitle(),
-                          style: const TextStyle(
-                            fontFamily: 'IRANSans',
-                            fontWeight: FontWeight.w500,
-                            fontSize: 14,
-                            color: Color(0xFF29303D),
+                          style: MyTextStyle.textMatn14Bold.copyWith(
+                            color: const Color(0xFF29303D),
                             height: 1.2,
                           ),
                           textAlign: TextAlign.right,
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      SizedBox(width: 8.w),
                       // Status icon
                       _buildStatusIcon(),
                     ],
                   ),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16.h),
                 // Details section
                 _buildDetailRow(
                   label: 'تاریخ خرید',
@@ -76,19 +76,19 @@ class PaymentHistoryCard extends StatelessWidget {
                       ? _formatDate(payment.createdAt!)
                       : 'نامشخص',
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: 8.h),
                 _buildDetailRow(
                   label: 'وضعیت خرید',
                   value: _getStatusText(),
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: 8.h),
                 _buildDetailRow(
                   label: 'مبلغ پرداخت شده',
                   value: payment.grandTotal != null
                       ? _formatAmount(payment.grandTotal!)
                       : 'نامشخص',
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: 8.h),
                 _buildDetailRow(
                   label: 'مبلغ کل خرید',
                   value: payment.grandTotal != null
@@ -105,8 +105,8 @@ class PaymentHistoryCard extends StatelessWidget {
 
   Widget _buildStatusIcon() {
     return Container(
-      width: 25,
-      height: 25,
+      width: 25.w,
+      height: 25.h,
       decoration: BoxDecoration(
         color: _getStatusColor(),
         shape: BoxShape.circle,
@@ -114,7 +114,7 @@ class PaymentHistoryCard extends StatelessWidget {
       child: Icon(
         _getStatusIcon(),
         color: Colors.white,
-        size: 16,
+        size: 16.sp,
       ),
     );
   }
@@ -129,22 +129,18 @@ class PaymentHistoryCard extends StatelessWidget {
         // Value (right side in RTL)
         Text(
           value,
-          style: const TextStyle(
-            fontFamily: 'IRANSans',
+          style: MyTextStyle.textMatn14Bold.copyWith(
             fontWeight: FontWeight.w500,
-            fontSize: 14,
-            color: Color(0xFF494E6A),
+            color: const Color(0xFF494E6A),
             height: 1.2,
           ),
         ),
         // Label (left side in RTL)
         Text(
           label,
-          style: const TextStyle(
-            fontFamily: 'IRANSans',
+          style: MyTextStyle.textMatn14Bold.copyWith(
             fontWeight: FontWeight.w300,
-            fontSize: 14,
-            color: Color(0xFF717483),
+            color: const Color(0xFF717483),
             height: 1.2,
           ),
         ),

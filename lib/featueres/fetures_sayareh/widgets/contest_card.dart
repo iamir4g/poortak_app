@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 
 class ContestCard extends StatelessWidget {
@@ -12,33 +14,33 @@ class ContestCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 360,
-      height: 105,
+      width: 360.w,
+      height: 105.h,
       // margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(20.r),
           onTap: onTap,
           child: Container(
             decoration: ShapeDecoration(
-              gradient: LinearGradient(
+              gradient: const LinearGradient(
                 begin: Alignment(0.00, 0.50),
                 end: Alignment(1.00, 0.50),
-                colors: [const Color(0xFFF1EFFF), const Color(0xFFF2F6FD)],
+                colors: [Color(0xFFF1EFFF), Color(0xFFF2F6FD)],
               ),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(20.r),
               ),
             ),
             child: Padding(
-              padding: EdgeInsetsGeometry.symmetric(horizontal: 8),
+              padding: EdgeInsetsGeometry.symmetric(horizontal: 8.w),
               child: Row(
                 children: [
                   // Text content - positioned exactly like Figma
                   Expanded(
                       child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          padding: EdgeInsets.symmetric(horizontal: 16.w),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -46,7 +48,7 @@ class ContestCard extends StatelessWidget {
                               Text(
                                 'مسابقه پورتک',
                                 style: TextStyle(
-                                  fontSize: 18,
+                                  fontSize: 18.sp,
                                   fontWeight: FontWeight.bold,
                                   color: Theme.of(context)
                                       .textTheme
@@ -57,7 +59,7 @@ class ContestCard extends StatelessWidget {
                               Text(
                                 'در مسابقه ماهانه پورتک شرکت کنید و جایزه ببرید.',
                                 style: TextStyle(
-                                  fontSize: 12,
+                                  fontSize: 12.sp,
                                   color: Theme.of(context)
                                       .textTheme
                                       .bodySmall
@@ -66,11 +68,11 @@ class ContestCard extends StatelessWidget {
                               ),
                             ],
                           ))),
-                  SizedBox(width: 16),
+                  SizedBox(width: 16.w),
                   // Gift box icon container - positioned exactly like Figma
                   Container(
-                    width: 77.5,
-                    height: 79,
+                    width: 77.5.w,
+                    height: 79.h,
                     decoration: BoxDecoration(
                       boxShadow: [
                         BoxShadow(
@@ -87,14 +89,14 @@ class ContestCard extends StatelessWidget {
                       color: Theme.of(context).brightness == Brightness.dark
                           ? const Color(0xFF4A4D6B) // Dark icon background
                           : MyColors.background, // Light icon background
-                      borderRadius: BorderRadius.circular(50),
+                      borderRadius: BorderRadius.circular(50.r),
                     ),
                     child: Center(
                       child: Container(
-                        width: 48,
-                        height: 49,
+                        width: 48.w,
+                        height: 49.h,
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(4),
+                          borderRadius: BorderRadius.circular(4.r),
                         ),
                         child: Image.asset("assets/images/main/gift-box.png"),
                       ),

@@ -2,6 +2,8 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_start_bloc/quiz_start_bloc.dart';
@@ -90,12 +92,12 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
               children: [
                 Container(
                   width: double.infinity,
-                  height: 80,
-                  decoration: const BoxDecoration(
+                  height: 80.h,
+                  decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(33.5),
-                      bottomRight: Radius.circular(33.5),
+                      bottomLeft: Radius.circular(33.5.r),
+                      bottomRight: Radius.circular(33.5.r),
                     ),
                     boxShadow: [
                       BoxShadow(
@@ -107,18 +109,18 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                   ),
                   child: Padding(
                     padding:
-                        const EdgeInsets.only(top: 24, left: 16, right: 16),
+                        EdgeInsets.only(top: 24.h, left: 16.w, right: 16.w),
                     child: Row(
                       children: [
                         const Spacer(),
                         GestureDetector(
                           onTap: _showExitModal,
                           child: Container(
-                            width: 34,
-                            height: 34,
+                            width: 34.w,
+                            height: 34.h,
                             decoration: BoxDecoration(
                               color: Colors.white,
-                              borderRadius: BorderRadius.circular(17),
+                              borderRadius: BorderRadius.circular(17.r),
                             ),
                             child: const Icon(Icons.arrow_forward,
                                 color: Color(0xFF3D495C)),
@@ -174,12 +176,12 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                       },
                       builder: (context, answerState) {
                         return Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 24, vertical: 16),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 24.w, vertical: 16.h),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              const SizedBox(height: 32),
+                              SizedBox(height: 32.h),
                               // Question Text
                               Text(
                                 state.question.data.title,
@@ -187,7 +189,7 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                                 style: MyTextStyle.textHeader16Bold,
                               ),
 
-                              const SizedBox(height: 32),
+                              SizedBox(height: 32.h),
                               // Feedback after answer submission
                               // if (answerState is QuizAnswerLoaded)
                               //   Padding(
@@ -261,7 +263,7 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                                 shrinkWrap: true,
                                 physics: const NeverScrollableScrollPhysics(),
                                 separatorBuilder: (context, index) =>
-                                    const SizedBox(height: 16),
+                                    SizedBox(height: 16.h),
                                 itemCount: state.question.data.answers.length,
                                 itemBuilder: (context, index) {
                                   final answer =
@@ -307,16 +309,16 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                                   !answerState.isCorrect &&
                                   answerState.explanation != null)
                                 Padding(
-                                  padding: const EdgeInsets.only(bottom: 16.0),
+                                  padding: EdgeInsets.only(bottom: 16.0.h),
                                   child: Container(
                                     width: double.infinity,
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 16, horizontal: 16),
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: 16.h, horizontal: 16.w),
                                     margin: const EdgeInsets.symmetric(
                                         horizontal: 0),
                                     decoration: BoxDecoration(
                                       color: MyColors.cardBackground1,
-                                      borderRadius: BorderRadius.circular(16),
+                                      borderRadius: BorderRadius.circular(16.r),
                                       boxShadow: [
                                         BoxShadow(
                                           color: Colors.black.withOpacity(0.03),
@@ -330,7 +332,7 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                                       style:
                                           MyTextStyle.textMatn12W500.copyWith(
                                         color: MyColors.textMatn1,
-                                        fontSize: 13,
+                                        fontSize: 13.sp,
                                       ),
                                       textAlign: TextAlign.center,
                                     ),
@@ -339,29 +341,28 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                               else if (answerState is QuizAnswerLoaded &&
                                   answerState.isCorrect)
                                 (Padding(
-                                    padding:
-                                        const EdgeInsets.only(bottom: 16.0),
+                                    padding: EdgeInsets.only(bottom: 16.0.h),
                                     child: Column(
                                       children: [
                                         Container(
-                                          width: 54,
-                                          height: 54,
+                                          width: 54.w,
+                                          height: 54.h,
                                           decoration: BoxDecoration(
                                             color: const Color(0xFFEDFAEB),
                                             borderRadius:
-                                                BorderRadius.circular(50),
+                                                BorderRadius.circular(50.r),
                                           ),
-                                          child: const Icon(Icons.check_circle,
+                                          child: Icon(Icons.check_circle,
                                               color: Color(0xFF6FC845),
-                                              size: 40),
+                                              size: 40.r),
                                         ),
-                                        const SizedBox(height: 12),
+                                        SizedBox(height: 12.h),
                                         Text(
                                           'آفرین درست گفتی!🥳',
                                           style: TextStyle(
                                             fontFamily: 'IRANSans',
                                             fontWeight: FontWeight.w300,
-                                            fontSize: 12,
+                                            fontSize: 12.sp,
                                             color: Color(0xFF3D495C),
                                           ),
                                           textAlign: TextAlign.center,
@@ -372,11 +373,11 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                               if (selectedAnswerId != null &&
                                   answerState is! QuizAnswerLoaded)
                                 Padding(
-                                  padding: const EdgeInsets.only(bottom: 24.0),
+                                  padding: EdgeInsets.only(bottom: 24.0.h),
                                   child: Center(
                                     child: SizedBox(
-                                      width: 176,
-                                      height: 54,
+                                      width: 176.w,
+                                      height: 54.h,
                                       child: ElevatedButton(
                                         onPressed: answerState
                                                 is QuizAnswerLoading
@@ -400,7 +401,7 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                                           backgroundColor: MyColors.primary,
                                           shape: RoundedRectangleBorder(
                                             borderRadius:
-                                                BorderRadius.circular(30),
+                                                BorderRadius.circular(30.r),
                                           ),
                                           elevation: 0,
                                           padding: EdgeInsets.zero,
@@ -413,13 +414,14 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                                               "بررسی پاسخ",
                                               style: MyTextStyle.textMatnBtn
                                                   .copyWith(
-                                                fontSize: 14,
+                                                fontSize: 14.sp,
                                                 fontWeight: FontWeight.w700,
                                               ),
                                             ),
-                                            const SizedBox(width: 8),
+                                            SizedBox(width: 8.w),
                                             Icon(Icons.arrow_forward_ios,
-                                                color: Colors.white, size: 18),
+                                                color: Colors.white,
+                                                size: 18.r),
                                           ],
                                         ),
                                       ),
@@ -428,11 +430,11 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                                 ),
                               if (answerState is QuizAnswerLoaded)
                                 Padding(
-                                  padding: const EdgeInsets.only(bottom: 24.0),
+                                  padding: EdgeInsets.only(bottom: 24.0.h),
                                   child: Center(
                                     child: SizedBox(
-                                      width: 176,
-                                      height: 54,
+                                      width: 176.w,
+                                      height: 54.h,
                                       child: ElevatedButton(
                                         onPressed: answerState.nextQuestion !=
                                                 null
@@ -455,7 +457,7 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                                           backgroundColor: MyColors.primary,
                                           shape: RoundedRectangleBorder(
                                             borderRadius:
-                                                BorderRadius.circular(30),
+                                                BorderRadius.circular(30.r),
                                           ),
                                           elevation: 0,
                                           padding: EdgeInsets.zero,
@@ -468,13 +470,14 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                                               "بعدی",
                                               style: MyTextStyle.textMatnBtn
                                                   .copyWith(
-                                                fontSize: 14,
+                                                fontSize: 14.sp,
                                                 fontWeight: FontWeight.w700,
                                               ),
                                             ),
-                                            const SizedBox(width: 8),
+                                            SizedBox(width: 8.w),
                                             Icon(Icons.arrow_forward_ios,
-                                                color: Colors.white, size: 18),
+                                                color: Colors.white,
+                                                size: 18.r),
                                           ],
                                         ),
                                       ),

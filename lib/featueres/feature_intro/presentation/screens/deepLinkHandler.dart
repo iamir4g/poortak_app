@@ -98,14 +98,16 @@ class _DeepLinkHandlerState extends State<DeepLinkHandler> {
     // If we have a deep link, show a simple loading screen
     if (_hasReceivedDeepLink) {
       return Scaffold(
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CircularProgressIndicator(),
-              SizedBox(height: 20),
-              Text('در حال پردازش...', style: TextStyle(fontSize: 18)),
-            ],
+        body: SafeArea(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(height: 20),
+                Text('در حال پردازش...', style: TextStyle(fontSize: 18)),
+              ],
+            ),
           ),
         ),
       );

@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconify_design/iconify_design.dart';
+import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_state.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:poortak/common/bloc/theme_cubit/theme_cubit.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../blocs/bottom_nav_cubit/bottom_nav_cubit.dart';
 
@@ -25,86 +27,90 @@ class BottomNav extends StatelessWidget {
         return Container(
           decoration: BoxDecoration(
             color: themeState.isDark ? MyColors.darkBackground : Colors.white,
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(20),
-              topRight: Radius.circular(20),
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20.r),
+              topRight: Radius.circular(20.r),
             ),
             boxShadow: [
               BoxShadow(
                 color: themeState.isDark
                     ? Colors.black.withOpacity(0.3)
                     : const Color(0xFF92A2BE).withOpacity(0.12),
-                offset: const Offset(0, -7),
-                blurRadius: 13,
+                offset: Offset(0, -7.h),
+                blurRadius: 13.r,
                 spreadRadius: 0,
               ),
             ],
           ),
-          child: Container(
-            height: 70,
-            padding: const EdgeInsets.only(bottom: 8),
-            child: BlocProvider(
-              create: (context) => BottomNavCubit(),
-              child: Builder(builder: (context) {
-                return BlocBuilder<BottomNavCubit, int>(
-                  builder: (context, state) {
-                    return Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        _buildNavItem(
-                          context: context,
-                          state: state,
-                          index: 0,
-                          icon: "mage:video-player",
-                          label: 'سیاره آینو',
-                          controller: controller,
-                        ),
-                        _buildNavItem(
-                          context: context,
-                          state: state,
-                          index: 1,
-                          icon: "mage:search", //mdi:text-box-search-outline
-                          label: 'کاوش',
-                          controller: controller,
-                          // useCustomIcon: false,
-                        ),
-                        _buildNavItem(
-                          context: context,
-                          state: state,
-                          index: 2,
-                          label: 'سبد خرید',
-                          icon:
-                              "hugeicons:shopping-cart-02", //"mage:shopping-cart",
-                          controller: controller,
-                          // useCustomIcon: false,
-                          // materialIcon: Icons.shopping_cart_outlined,
-                        ),
-                        _buildNavItem(
-                          context: context,
-                          state: state,
-                          index: 3,
-                          label: 'لایتنر',
-                          icon: "hugeicons:book-open-02", //"mage:book",
-                          controller: controller,
-                          // useCustomIcon: false,
-                          // materialIcon: Icons.folder_outlined,
-                        ),
-                        _buildNavItem(
-                          context: context,
-                          state: state,
-                          index: 4,
-                          label: 'پروفایل',
-                          controller: controller,
-                          icon: "mynaui:user-square", //"mage:user",
-                          // useCustomIcon: false,
-                          // materialIcon: Icons.account_box_outlined,
-                        ),
-                      ],
-                    );
-                  },
-                );
-              }),
+          child: Padding(
+            padding:
+                EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
+            child: Container(
+              height: 70.h,
+              padding: EdgeInsets.only(bottom: 8.h),
+              child: BlocProvider(
+                create: (context) => BottomNavCubit(),
+                child: Builder(builder: (context) {
+                  return BlocBuilder<BottomNavCubit, int>(
+                    builder: (context, state) {
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          _buildNavItem(
+                            context: context,
+                            state: state,
+                            index: 0,
+                            icon: "mage:video-player",
+                            label: 'سیاره آینو',
+                            controller: controller,
+                          ),
+                          _buildNavItem(
+                            context: context,
+                            state: state,
+                            index: 1,
+                            icon: "mage:search", //mdi:text-box-search-outline
+                            label: 'کاوش',
+                            controller: controller,
+                            // useCustomIcon: false,
+                          ),
+                          _buildNavItem(
+                            context: context,
+                            state: state,
+                            index: 2,
+                            label: 'سبد خرید',
+                            icon:
+                                "hugeicons:shopping-cart-02", //"mage:shopping-cart",
+                            controller: controller,
+                            // useCustomIcon: false,
+                            // materialIcon: Icons.shopping_cart_outlined,
+                          ),
+                          _buildNavItem(
+                            context: context,
+                            state: state,
+                            index: 3,
+                            label: 'لایتنر',
+                            icon: "hugeicons:book-open-02", //"mage:book",
+                            controller: controller,
+                            // useCustomIcon: false,
+                            // materialIcon: Icons.folder_outlined,
+                          ),
+                          _buildNavItem(
+                            context: context,
+                            state: state,
+                            index: 4,
+                            label: 'پروفایل',
+                            controller: controller,
+                            icon: "mynaui:user-square", //"mage:user",
+                            // useCustomIcon: false,
+                            // materialIcon: Icons.account_box_outlined,
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }),
+              ),
             ),
           ),
         );
@@ -128,8 +134,8 @@ class BottomNav extends StatelessWidget {
 
       return Image.asset(
         imagePath,
-        width: 24,
-        height: 24,
+        width: Dimens.iconMedium,
+        height: Dimens.iconMedium,
         color: isSelected
             ? MyColors.primary
             : (themeState.isDark ? MyColors.darkTextSecondary : Colors.grey),
@@ -152,11 +158,13 @@ class BottomNav extends StatelessWidget {
         },
         builder: (context, cartState) {
           if (cartState is ShoppingCartInitial) {
-            return IconifyIcon(icon: icon, color: iconColor);
+            return IconifyIcon(
+                icon: icon, color: iconColor, size: Dimens.iconMedium);
           }
 
           if (cartState is ShoppingCartLoading) {
-            return IconifyIcon(icon: icon, color: iconColor);
+            return IconifyIcon(
+                icon: icon, color: iconColor, size: Dimens.iconMedium);
           }
 
           // Handle server cart (logged-in users)
@@ -168,10 +176,12 @@ class BottomNav extends StatelessWidget {
                     badges.BadgeStyle(badgeColor: MyColors.primaryShade2),
                 badgeContent: Text(cart.items.length.toString(),
                     style: MyTextStyle.textMatn12W700),
-                child: IconifyIcon(icon: icon, color: iconColor),
+                child: IconifyIcon(
+                    icon: icon, color: iconColor, size: Dimens.iconMedium),
               );
             }
-            return IconifyIcon(icon: icon, color: iconColor);
+            return IconifyIcon(
+                icon: icon, color: iconColor, size: Dimens.iconMedium);
           }
 
           // Handle local cart (non-logged-in users)
@@ -179,10 +189,12 @@ class BottomNav extends StatelessWidget {
             if (cartState.items.isNotEmpty) {
               return badges.Badge(
                 badgeContent: Text(cartState.items.length.toString()),
-                child: IconifyIcon(icon: icon, color: iconColor),
+                child: IconifyIcon(
+                    icon: icon, color: iconColor, size: Dimens.iconMedium),
               );
             }
-            return IconifyIcon(icon: icon, color: iconColor);
+            return IconifyIcon(
+                icon: icon, color: iconColor, size: Dimens.iconMedium);
           }
 
           // Handle local cart item added/removed states
@@ -190,28 +202,33 @@ class BottomNav extends StatelessWidget {
             if (cartState.items.isNotEmpty) {
               return badges.Badge(
                 badgeContent: Text(cartState.items.length.toString()),
-                child: IconifyIcon(icon: icon, color: iconColor),
+                child: IconifyIcon(
+                    icon: icon, color: iconColor, size: Dimens.iconMedium),
               );
             }
-            return IconifyIcon(icon: icon, color: iconColor);
+            return IconifyIcon(
+                icon: icon, color: iconColor, size: Dimens.iconMedium);
           }
 
           if (cartState is LocalCartItemRemoved) {
             if (cartState.items.isNotEmpty) {
               return badges.Badge(
                 badgeContent: Text(cartState.items.length.toString()),
-                child: IconifyIcon(icon: icon, color: iconColor),
+                child: IconifyIcon(
+                    icon: icon, color: iconColor, size: Dimens.iconMedium),
               );
             }
-            return IconifyIcon(icon: icon, color: iconColor);
+            return IconifyIcon(
+                icon: icon, color: iconColor, size: Dimens.iconMedium);
           }
 
-          return IconifyIcon(icon: icon, color: iconColor);
+          return IconifyIcon(
+              icon: icon, color: iconColor, size: Dimens.iconMedium);
         },
       );
     }
 
-    return IconifyIcon(icon: icon, color: iconColor);
+    return IconifyIcon(icon: icon, color: iconColor, size: Dimens.iconMedium);
   }
 
   Widget _buildNavItem({
@@ -237,7 +254,7 @@ class BottomNav extends StatelessWidget {
               );
             },
             child: SizedBox(
-              height: 70,
+              height: 70.h,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -253,13 +270,13 @@ class BottomNav extends StatelessWidget {
                   ),
                   if (state == index)
                     Padding(
-                      padding: const EdgeInsets.only(top: 4.0),
+                      padding: EdgeInsets.only(top: 4.h),
                       child: Text(
                         label,
                         style: TextStyle(
                           fontFamily: 'IRANSans',
                           fontWeight: FontWeight.bold,
-                          fontSize: 9,
+                          fontSize: 9.sp,
                           color: MyColors.primary,
                         ),
                         maxLines: 1,

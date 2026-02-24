@@ -1,150 +1,151 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/config/myColors.dart';
 
 class MyTextStyle {
-  static const TextStyle bottomNavEnabledTextStyle = TextStyle(
-    fontFamily: "IranSans",
-    fontSize: 14,
-    fontWeight: FontWeight.bold,
-    color: MyColors.primary,
-  );
+  static TextStyle get bottomNavEnabledTextStyle => TextStyle(
+        fontFamily: "IranSans",
+        fontSize: 14.sp,
+        fontWeight: FontWeight.bold,
+        color: MyColors.primary,
+      );
 
-  static const TextStyle textHeader16Bold = TextStyle(
-    fontFamily: "IranSans",
-    fontSize: 16,
-    fontWeight: FontWeight.bold,
-    color: MyColors.textMatn1,
-  );
-  static const TextStyle text14Wrong = TextStyle(
-    fontFamily: "IranSans",
-    fontSize: 14,
-    fontWeight: FontWeight.normal,
-    decoration: TextDecoration.lineThrough,
-    color: MyColors.error,
-  );
-  static const TextStyle text24Correct = TextStyle(
-    fontFamily: "IranSans",
-    fontSize: 24,
-    fontWeight: FontWeight.bold,
-    color: MyColors.success,
-  );
-  static const TextStyle textMatn16 = TextStyle(
-    fontFamily: "IranSans",
-    fontSize: 16,
-    fontWeight: FontWeight.w300,
-    color: MyColors.textMatn1,
-  );
-  static const TextStyle textMatn16Bold = TextStyle(
-    fontFamily: "IranSans",
-    fontSize: 16,
-    fontWeight: FontWeight.bold,
-    color: MyColors.textMatn1,
-  );
-  static const TextStyle textMatn14Bold = TextStyle(
-    fontFamily: "IranSans",
-    fontSize: 14,
-    fontWeight: FontWeight.bold,
-    color: MyColors.textMatn1,
-  );
-  static const TextStyle textMatn18Bold = TextStyle(
-    fontFamily: "IranSans",
-    fontSize: 18,
-    fontWeight: FontWeight.bold,
-    color: MyColors.textMatn1,
-  );
-  static const TextStyle textMatn17W700 = TextStyle(
-    fontFamily: "IranSans",
-    fontSize: 17,
-    fontWeight: FontWeight.w700,
-    color: MyColors.textMatn1,
-  );
-  static const TextStyle textMatn12W700 = TextStyle(
-    fontFamily: "IranSans",
-    fontSize: 12,
-    fontWeight: FontWeight.bold,
-    color: MyColors.textMatn1,
-  );
-  static const TextStyle textMatn12Bold = TextStyle(
-    fontFamily: "IranSans",
-    fontSize: 12,
-    fontWeight: FontWeight.bold,
-    color: MyColors.textMatn1,
-  );
-  static const TextStyle textMatn12W500 = TextStyle(
-    fontFamily: "IranSans",
-    fontSize: 12,
-    fontWeight: FontWeight.w500,
-    color: MyColors.textMatn1,
-  );
-  static const TextStyle textMatn12W300 = TextStyle(
-    fontFamily: "IranSans",
-    fontSize: 12,
-    fontWeight: FontWeight.normal,
-    color: MyColors.textMatn1,
-  );
-  static const TextStyle textMatn10W300 = TextStyle(
-    fontFamily: "IranSans",
-    fontSize: 10,
-    fontWeight: FontWeight.normal,
-    color: MyColors.textMatn1,
-  );
-  static const TextStyle textMatn15 = TextStyle(
-    fontFamily: "IranSans",
-    fontSize: 15,
-    fontWeight: FontWeight.bold,
-    color: MyColors.textMatn1,
-  );
+  static TextStyle get textHeader16Bold => TextStyle(
+        fontFamily: "IranSans",
+        fontSize: 16.sp,
+        fontWeight: FontWeight.bold,
+        color: MyColors.textMatn1,
+      );
+  static TextStyle get text14Wrong => TextStyle(
+        fontFamily: "IranSans",
+        fontSize: 14.sp,
+        fontWeight: FontWeight.normal,
+        decoration: TextDecoration.lineThrough,
+        color: MyColors.error,
+      );
+  static TextStyle get text24Correct => TextStyle(
+        fontFamily: "IranSans",
+        fontSize: 24.sp,
+        fontWeight: FontWeight.bold,
+        color: MyColors.success,
+      );
+  static TextStyle get textMatn16 => TextStyle(
+        fontFamily: "IranSans",
+        fontSize: 16.sp,
+        fontWeight: FontWeight.w300,
+        color: MyColors.textMatn1,
+      );
+  static TextStyle get textMatn16Bold => TextStyle(
+        fontFamily: "IranSans",
+        fontSize: 16.sp,
+        fontWeight: FontWeight.bold,
+        color: MyColors.textMatn1,
+      );
+  static TextStyle get textMatn14Bold => TextStyle(
+        fontFamily: "IranSans",
+        fontSize: 14.sp,
+        fontWeight: FontWeight.bold,
+        color: MyColors.textMatn1,
+      );
+  static TextStyle get textMatn18Bold => TextStyle(
+        fontFamily: "IranSans",
+        fontSize: 18.sp,
+        fontWeight: FontWeight.bold,
+        color: MyColors.textMatn1,
+      );
+  static TextStyle get textMatn17W700 => TextStyle(
+        fontFamily: "IranSans",
+        fontSize: 17.sp,
+        fontWeight: FontWeight.w700,
+        color: MyColors.textMatn1,
+      );
+  static TextStyle get textMatn12W700 => TextStyle(
+        fontFamily: "IranSans",
+        fontSize: 12.sp,
+        fontWeight: FontWeight.bold,
+        color: MyColors.textMatn1,
+      );
+  static TextStyle get textMatn12Bold => TextStyle(
+        fontFamily: "IranSans",
+        fontSize: 12.sp,
+        fontWeight: FontWeight.bold,
+        color: MyColors.textMatn1,
+      );
+  static TextStyle get textMatn12W500 => TextStyle(
+        fontFamily: "IranSans",
+        fontSize: 12.sp,
+        fontWeight: FontWeight.w500,
+        color: MyColors.textMatn1,
+      );
+  static TextStyle get textMatn12W300 => TextStyle(
+        fontFamily: "IranSans",
+        fontSize: 12.sp,
+        fontWeight: FontWeight.normal,
+        color: MyColors.textMatn1,
+      );
+  static TextStyle get textMatn10W300 => TextStyle(
+        fontFamily: "IranSans",
+        fontSize: 10.sp,
+        fontWeight: FontWeight.normal,
+        color: MyColors.textMatn1,
+      );
+  static TextStyle get textMatn15 => TextStyle(
+        fontFamily: "IranSans",
+        fontSize: 15.sp,
+        fontWeight: FontWeight.bold,
+        color: MyColors.textMatn1,
+      );
 
-  static const TextStyle textMatn13 = TextStyle(
-    fontFamily: "IranSans",
-    fontSize: 13,
-    fontWeight: FontWeight.w300,
-    color: MyColors.textMatn1,
-  );
-  static const TextStyle textMatn9 = TextStyle(
-    fontFamily: "IranSans",
-    fontSize: 9,
-    fontWeight: FontWeight.w300,
-    color: MyColors.textMatn1,
-  );
-  static const TextStyle textMatnBtn = TextStyle(
-    color: MyColors.textLight,
-    fontSize: 16,
-    fontFamily: "IranSans",
-    fontWeight: FontWeight.bold,
-  );
-  static const TextStyle textMatn13PrimaryShade1 = TextStyle(
+  static TextStyle get textMatn13 => TextStyle(
+        fontFamily: "IranSans",
+        fontSize: 13.sp,
+        fontWeight: FontWeight.w300,
+        color: MyColors.textMatn1,
+      );
+  static TextStyle get textMatn9 => TextStyle(
+        fontFamily: "IranSans",
+        fontSize: 9.sp,
+        fontWeight: FontWeight.w300,
+        color: MyColors.textMatn1,
+      );
+  static TextStyle get textMatnBtn => TextStyle(
+        color: MyColors.textLight,
+        fontSize: 16.sp,
+        fontFamily: "IranSans",
+        fontWeight: FontWeight.bold,
+      );
+  static TextStyle get textMatn13PrimaryShade1 => TextStyle(
       fontFamily: "IranSans",
-      fontSize: 13,
+      fontSize: 13.sp,
       fontWeight: FontWeight.w500,
       color: MyColors.primaryShade1);
 
-  static const TextStyle textCenter16 = TextStyle(
-    fontFamily: "IranSans",
-    fontSize: 16,
-    fontWeight: FontWeight.w500,
-    color: MyColors.textMatn1,
-  );
+  static TextStyle get textCenter16 => TextStyle(
+        fontFamily: "IranSans",
+        fontSize: 16.sp,
+        fontWeight: FontWeight.w500,
+        color: MyColors.textMatn1,
+      );
 
-  static const TextStyle textMatn11 = TextStyle(
-    fontFamily: "IranSans",
-    fontSize: 11,
-    fontWeight: FontWeight.w300,
-    color: MyColors.textMatn1,
-  );
+  static TextStyle get textMatn11 => TextStyle(
+        fontFamily: "IranSans",
+        fontSize: 11.sp,
+        fontWeight: FontWeight.w300,
+        color: MyColors.textMatn1,
+      );
 
-  static const TextStyle textProgressBar = TextStyle(
-    color: MyColors.progressBarColor,
-    fontWeight: FontWeight.w700,
-    fontSize: 12,
-  );
+  static TextStyle get textProgressBar => TextStyle(
+        color: MyColors.progressBarColor,
+        fontWeight: FontWeight.w700,
+        fontSize: 12.sp,
+      );
 
-  static const TextStyle tabLabel16 = TextStyle(
-    fontFamily: "IranSans",
-    fontSize: 16,
-    fontWeight: FontWeight.w500,
-    color: MyColors.textMatn1,
-  );
+  static TextStyle get tabLabel16 => TextStyle(
+        fontFamily: "IranSans",
+        fontSize: 16.sp,
+        fontWeight: FontWeight.w500,
+        color: MyColors.textMatn1,
+      );
 
   // static const TextStyle bottomNavDisabledTextStyle = TextStyle(
   //   fontFamily: "IranSans",
@@ -152,15 +153,16 @@ class MyTextStyle {
   //   fontWeight: FontWeight.w400,
   //   color: MyColors.primary,
   // );
-  static const TextStyle textHint = TextStyle(
-    fontFamily: "IranSans",
-    color: MyColors.textHint,
-  );
+  static TextStyle get textHint => TextStyle(
+        fontFamily: "IranSans",
+        fontSize: 14.sp, // Added default size for hint
+        color: MyColors.textHint,
+      );
 
-  static const TextStyle textCancelButton = TextStyle(
-    fontFamily: "IranSans",
-    fontSize: 14,
-    fontWeight: FontWeight.bold,
-    color: MyColors.textCancelButton,
-  );
+  static TextStyle get textCancelButton => TextStyle(
+        fontFamily: "IranSans",
+        fontSize: 14.sp,
+        fontWeight: FontWeight.bold,
+        color: MyColors.textCancelButton,
+      );
 }

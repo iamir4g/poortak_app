@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/config/myColors.dart';
+import 'package:poortak/config/myTextStyle.dart';
 import 'custom_video_player.dart';
 
 class VideoContainerWidget extends StatelessWidget {
@@ -31,17 +33,17 @@ class VideoContainerWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 360,
-      padding: const EdgeInsets.all(5),
+      width: 360.w,
+      padding: EdgeInsets.all(5.r),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(40),
+        borderRadius: BorderRadius.circular(40.r),
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(37),
+        borderRadius: BorderRadius.circular(37.r),
         child: SizedBox(
-          width: 350,
-          height: 240,
+          width: 350.w,
+          height: 240.h,
           child: _buildContent(context),
         ),
       ),
@@ -61,9 +63,9 @@ class VideoContainerWidget extends StatelessWidget {
       key: videoPlayerKey,
       videoPath: videoPath ?? videoUrl!,
       isNetworkVideo: videoPath == null && videoUrl != null,
-      width: 350,
-      height: 240,
-      borderRadius: 37,
+      width: 350.w,
+      height: 240.h,
+      borderRadius: 37.r,
       autoPlay: false,
       showControls: true,
       thumbnailUrl: thumbnailUrl,
@@ -84,16 +86,16 @@ class VideoContainerWidget extends StatelessWidget {
         Container(
           decoration: BoxDecoration(
             color: MyColors.brandSecondary,
-            borderRadius: BorderRadius.circular(37),
+            borderRadius: BorderRadius.circular(37.r),
           ),
         ),
         if (thumbnailUrl != null)
           ClipRRect(
-            borderRadius: BorderRadius.circular(37),
+            borderRadius: BorderRadius.circular(37.r),
             child: Image.network(
               thumbnailUrl!,
-              width: 350,
-              height: 240,
+              width: 350.w,
+              height: 240.h,
               fit: BoxFit.cover,
             ),
           ),
@@ -105,7 +107,7 @@ class VideoContainerWidget extends StatelessWidget {
                 CircularProgressIndicator(
                   color: Theme.of(context).textTheme.titleMedium?.color,
                 ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16.h),
               Text(
                 isDecrypting
                     ? 'در حال رمزگشایی ویدیو...'
@@ -114,7 +116,7 @@ class VideoContainerWidget extends StatelessWidget {
                         : 'در حال پردازش ویدیو...',
                 style: TextStyle(
                   color: Theme.of(context).textTheme.titleMedium?.color,
-                  fontSize: 16,
+                  fontSize: 16.sp,
                   fontFamily: 'IranSans',
                 ),
               ),
@@ -129,7 +131,7 @@ class VideoContainerWidget extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: MyColors.brandSecondary,
-        borderRadius: BorderRadius.circular(37),
+        borderRadius: BorderRadius.circular(37.r),
       ),
       child: Center(
         child: Column(
@@ -138,14 +140,14 @@ class VideoContainerWidget extends StatelessWidget {
             Icon(
               Icons.error_outline,
               color: Theme.of(context).textTheme.titleMedium?.color,
-              size: 48,
+              size: 48.r,
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16.h),
             Text(
               'خطا در بارگذاری ویدیو',
               style: TextStyle(
                 color: Theme.of(context).textTheme.titleMedium?.color,
-                fontSize: 16,
+                fontSize: 16.sp,
               ),
             ),
           ],

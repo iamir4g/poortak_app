@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
 
 import 'package:persian_tools/persian_tools.dart';
@@ -62,7 +63,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                 stops: [0.1, 0.54, 1.0],
               ),
             ),
-            child: const Center(child: DotLoadingWidget(size: 100)),
+            child: Center(child: DotLoadingWidget(size: 100.r)),
           );
         }
 
@@ -549,7 +550,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                               content:
                                   Text('برای ادامه پرداخت باید لاگین کنید'),
                               backgroundColor: Colors.orange,
-                              duration: Duration(seconds: 3),
+                              duration: Duration(seconds: 2),
                             ),
                           );
                         } else {
@@ -557,6 +558,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                             SnackBar(
                               content: Text('خطا در پردازش پرداخت: $e'),
                               backgroundColor: Colors.red,
+                              duration: const Duration(seconds: 2),
                             ),
                           );
                         }
@@ -772,7 +774,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                               content:
                                   Text('برای ادامه پرداخت باید لاگین کنید'),
                               backgroundColor: Colors.orange,
-                              duration: Duration(seconds: 3),
+                              duration: Duration(seconds: 2),
                             ),
                           );
                         } else {
@@ -780,6 +782,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                             SnackBar(
                               content: Text('خطا در پردازش پرداخت: $e'),
                               backgroundColor: Colors.red,
+                              duration: const Duration(seconds: 2),
                             ),
                           );
                         }

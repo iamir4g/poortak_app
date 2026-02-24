@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/config/dimens.dart';
 import 'package:poortak/l10n/app_localizations.dart';
 // import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:poortak/common/services/tts_service.dart';
@@ -67,160 +69,162 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
         centerTitle: true,
         title: Text(l10n!.litner_review, style: MyTextStyle.textHeader16Bold),
       ),
-      body: BlocConsumer<LitnerReviewCubit, LitnerReviewState>(
-        listener: (context, state) {
-          print('State changed to: $state');
-          if (state is LitnerReviewCompleted) {
-            print('Showing completion modal');
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              ReusableModal.show(
-                context: context,
-                title: 'تبریک!',
-                message: 'تمام لغات امروز مرور شدند.',
-                type: ModalType.success,
-                buttonText: 'متوجه شدم',
-                onButtonPressed: () {
-                  Navigator.of(context).pop(); // Close modal
-                  Navigator.of(context).pop(); // Go back to Litner home
-                },
-              );
-            });
-          }
-        },
-        builder: (context, state) {
-          if (state is LitnerReviewLoading) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (state is LitnerReviewError) {
-            return Center(child: Text(state.message));
-          } else if (state is LitnerReviewCompleted) {
-            return const Center(
-                child: Text('تبریک! تمام لغات مرور شدند.',
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)));
-          } else if (state is LitnerReviewLoaded) {
-            // Check if words list is empty
-            if (state.words.isEmpty) {
-              return Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(32.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.book_outlined,
-                        size: 80,
-                        color: Colors.grey[400],
-                      ),
-                      const SizedBox(height: 24),
-                      Text(
-                        'شما ابتدا باید لغاتی را به لاینتر اضافه کنید',
-                        style: MyTextStyle.textHeader16Bold.copyWith(
-                          color: Colors.grey[600],
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 32),
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.pushNamed(
-                              context, '/litner-words-inprogress');
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF4285F4),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 32, vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: const Text(
-                          'اضافه کردن لغت',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
+      body: SafeArea(
+        child: BlocConsumer<LitnerReviewCubit, LitnerReviewState>(
+          listener: (context, state) {
+            print('State changed to: $state');
+            if (state is LitnerReviewCompleted) {
+              print('Showing completion modal');
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                ReusableModal.show(
+                  context: context,
+                  title: 'تبریک!',
+                  message: 'تمام لغات امروز مرور شدند.',
+                  type: ModalType.success,
+                  buttonText: 'متوجه شدم',
+                  onButtonPressed: () {
+                    Navigator.of(context).pop(); // Close modal
+                    Navigator.of(context).pop(); // Go back to Litner home
+                  },
+                );
+              });
             }
-
-            final word = state.words[state.currentIndex];
-            final totalSteps = state.words.length;
-            final currentStep = state.currentIndex;
-            return Column(
-              children: [
-                const SizedBox(height: 16),
-                StepProgress(
-                  currentIndex: currentStep,
-                  totalSteps: totalSteps,
-                ),
-                const SizedBox(height: 64),
-                // Expanded(
-                //   child:
-                Center(
-                  child: FlipCard(
-                    controller: _flipController,
-                    rotateSide: RotateSide.right,
-                    axis: FlipAxis.vertical,
-                    frontWidget: _buildFront(context, word.word, _flipToBack),
-                    backWidget: _buildBack(
-                        context, word.word, word.translation, _flipToFront),
-                  ),
-                ),
-                // ),
-                const SizedBox(height: 16),
-                if (isBack)
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          },
+          builder: (context, state) {
+            if (state is LitnerReviewLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is LitnerReviewError) {
+              return Center(child: Text(state.message));
+            } else if (state is LitnerReviewCompleted) {
+              return Center(
+                  child: Text('تبریک! تمام لغات مرور شدند.',
+                      style: TextStyle(
+                          fontSize: 18.sp, fontWeight: FontWeight.bold)));
+            } else if (state is LitnerReviewLoaded) {
+              // Check if words list is empty
+              if (state.words.isEmpty) {
+                return Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(Dimens.large.r),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        litnerChoiceButton(
-                          circleColor: Color(0xFFEAF9F1), // light green
-                          icon: Icons.check, // or use a custom SVG if needed
-                          iconColor: Color(0xFF4DC591), // green
-                          label: 'می دانستم',
-                          onTap: () {
-                            setState(() {
-                              isBack = false;
-                              if (_flipController.state?.isFront == false) {
-                                _flipController.flipcard();
-                              }
-                            });
-                            context
-                                .read<LitnerReviewCubit>()
-                                .submitReviewAndNext(word.id, true);
-                          },
+                        Icon(
+                          Icons.book_outlined,
+                          size: 80.r,
+                          color: Colors.grey[400],
                         ),
-                        litnerChoiceButton(
-                          circleColor: Color(0xFFFDEAEA), // light red
-                          icon: Icons.close, // or use a custom SVG if needed
-                          iconColor: Color(0xFFF16063), // red
-                          label: 'نمی دانستم',
-                          onTap: () {
-                            setState(() {
-                              isBack = false;
-                              if (_flipController.state?.isFront == false) {
-                                _flipController.flipcard();
-                              }
-                            });
-                            context
-                                .read<LitnerReviewCubit>()
-                                .submitReviewAndNext(word.id, false);
+                        SizedBox(height: Dimens.medium.h),
+                        Text(
+                          'شما ابتدا باید لغاتی را به لاینتر اضافه کنید',
+                          style: MyTextStyle.textHeader16Bold.copyWith(
+                            color: Colors.grey[600],
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(height: Dimens.large.h),
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.pushNamed(
+                                context, '/litner-words-inprogress');
                           },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF4285F4),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 32.w, vertical: 16.h),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.r),
+                            ),
+                          ),
+                          child: Text(
+                            'اضافه کردن لغت',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
                       ],
                     ),
                   ),
-              ],
-            );
-          }
-          return Container();
-        },
+                );
+              }
+
+              final word = state.words[state.currentIndex];
+              final totalSteps = state.words.length;
+              final currentStep = state.currentIndex;
+              return Column(
+                children: [
+                  SizedBox(height: Dimens.medium.h),
+                  StepProgress(
+                    currentIndex: currentStep,
+                    totalSteps: totalSteps,
+                  ),
+                  SizedBox(height: 64.h),
+                  // Expanded(
+                  //   child:
+                  Center(
+                    child: FlipCard(
+                      controller: _flipController,
+                      rotateSide: RotateSide.right,
+                      axis: FlipAxis.vertical,
+                      frontWidget: _buildFront(context, word.word, _flipToBack),
+                      backWidget: _buildBack(
+                          context, word.word, word.translation, _flipToFront),
+                    ),
+                  ),
+                  // ),
+                  SizedBox(height: Dimens.medium.h),
+                  if (isBack)
+                    Padding(
+                      padding: EdgeInsets.all(Dimens.medium.r),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          litnerChoiceButton(
+                            circleColor: Color(0xFFEAF9F1), // light green
+                            icon: Icons.check, // or use a custom SVG if needed
+                            iconColor: Color(0xFF4DC591), // green
+                            label: 'می دانستم',
+                            onTap: () {
+                              setState(() {
+                                isBack = false;
+                                if (_flipController.state?.isFront == false) {
+                                  _flipController.flipcard();
+                                }
+                              });
+                              context
+                                  .read<LitnerReviewCubit>()
+                                  .submitReviewAndNext(word.id, true);
+                            },
+                          ),
+                          litnerChoiceButton(
+                            circleColor: Color(0xFFFDEAEA), // light red
+                            icon: Icons.close, // or use a custom SVG if needed
+                            iconColor: Color(0xFFF16063), // red
+                            label: 'نمی دانستم',
+                            onTap: () {
+                              setState(() {
+                                isBack = false;
+                                if (_flipController.state?.isFront == false) {
+                                  _flipController.flipcard();
+                                }
+                              });
+                              context
+                                  .read<LitnerReviewCubit>()
+                                  .submitReviewAndNext(word.id, false);
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              );
+            }
+            return Container();
+          },
+        ),
       ),
     );
   }
@@ -228,11 +232,11 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
   Widget _buildFront(
       BuildContext context, String englishWord, VoidCallback onFlip) {
     return Container(
-      width: 260,
-      height: 320,
+      width: 260.w,
+      height: 320.h,
       decoration: BoxDecoration(
         color: const Color(0xFFE8F0FE),
-        borderRadius: BorderRadius.circular(32),
+        borderRadius: BorderRadius.circular(32.r),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -244,18 +248,18 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
             children: [
               Text(
                 englishWord,
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 28,
-                  color: Color(0xFF3A465A),
+                  fontSize: 28.sp,
+                  color: const Color(0xFF3A465A),
                 ),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: Dimens.small.w),
               GestureDetector(
                 onTap: () => ttsService.speak(englishWord),
                 child: IconifyIcon(
                   icon: "cuida:volume-2-outline",
-                  size: 28,
+                  size: 28.r,
                   color: const Color(0xFF3A465A),
                 ),
               ),
@@ -264,13 +268,13 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
           const Spacer(),
           GestureDetector(
             onTap: onFlip,
-            child: const IconifyIcon(
+            child: IconifyIcon(
               icon: "solar:smartphone-rotate-angle-outline",
-              size: 32,
-              color: Color(0xFF3A465A),
+              size: 32.r,
+              color: const Color(0xFF3A465A),
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: Dimens.medium.h),
         ],
       ),
     );
@@ -279,11 +283,11 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
   Widget _buildBack(BuildContext context, String englishWord,
       String persianWord, VoidCallback onFlip) {
     return Container(
-      width: 260,
-      height: 320,
+      width: 260.w,
+      height: 320.h,
       decoration: BoxDecoration(
         color: const Color(0xFF4285F4),
-        borderRadius: BorderRadius.circular(32),
+        borderRadius: BorderRadius.circular(32.r),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -295,18 +299,18 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
               children: [
                 Text(
                   englishWord,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 28,
+                    fontSize: 28.sp,
                     color: Colors.white,
                   ),
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: Dimens.small.w),
                 GestureDetector(
                   onTap: () => ttsService.speak(englishWord),
                   child: IconifyIcon(
                     icon: "cuida:volume-2-outline",
-                    size: 28,
+                    size: 28.r,
                     color: Colors.white,
                   ),
                 ),
@@ -315,22 +319,22 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
           ),
           Text(
             persianWord,
-            style: const TextStyle(
+            style: TextStyle(
               fontWeight: FontWeight.bold,
-              fontSize: 28,
+              fontSize: 28.sp,
               color: Colors.white,
             ),
           ),
           const Spacer(),
           GestureDetector(
             onTap: onFlip,
-            child: const IconifyIcon(
+            child: IconifyIcon(
               icon: "solar:smartphone-rotate-angle-outline",
-              size: 32,
+              size: 32.r,
               color: Colors.white,
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: Dimens.medium.h),
         ],
       ),
     );
@@ -349,21 +353,21 @@ Widget litnerChoiceButton({
     child: Column(
       children: [
         Container(
-          width: 56,
-          height: 56,
+          width: 56.w,
+          height: 56.h,
           decoration: BoxDecoration(
             color: circleColor,
             shape: BoxShape.circle,
           ),
-          child: Icon(icon, color: iconColor, size: 32),
+          child: Icon(icon, color: iconColor, size: 32.r),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: Dimens.small.h),
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontWeight: FontWeight.bold,
-            color: Color(0xFF3A465A), // dark color
-            fontSize: 16,
+            color: const Color(0xFF3A465A), // dark color
+            fontSize: 16.sp,
           ),
         ),
       ],

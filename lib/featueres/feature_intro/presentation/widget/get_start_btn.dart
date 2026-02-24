@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class GetStartBtn extends StatefulWidget {
   final String text;
@@ -41,13 +42,13 @@ class _GetStartBtnState extends State<GetStartBtn>
     return FadeTransition(
       opacity: fadeAnimation,
       child: SizedBox(
-        height: 45,
-        width: 120,
+        height: 45.h,
+        width: 120.w,
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.amber,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20), // <-- Radius
+              borderRadius: BorderRadius.circular(20.r), // <-- Radius
             ),
           ),
           onPressed: () {
@@ -55,8 +56,8 @@ class _GetStartBtnState extends State<GetStartBtn>
           },
           child: Text(
             widget.text,
-            style: const TextStyle(
-                fontSize: 17,
+            style: TextStyle(
+                fontSize: 17.sp,
                 color: Colors.black,
                 fontWeight: FontWeight.w500,
                 fontFamily: 'Vazir'),

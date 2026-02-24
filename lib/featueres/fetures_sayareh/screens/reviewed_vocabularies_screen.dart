@@ -8,6 +8,8 @@ import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/practice_voc
 import 'package:poortak/locator.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/lesson_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/practice_vocabulary_screen.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/config/dimens.dart';
 
 class ReviewedVocabulariesScreen extends StatefulWidget {
   static const routeName = "/reviewed_vocabularies_screen";
@@ -41,7 +43,7 @@ class _ReviewedVocabulariesScreenState
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('به زودی این قابلیت اضافه خواهد شد'),
-        duration: Duration(seconds: 1),
+        duration: Duration(seconds: 2),
       ),
     );
   }
@@ -53,9 +55,9 @@ class _ReviewedVocabulariesScreenState
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        shape: const RoundedRectangleBorder(
+        shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(30),
+            bottomLeft: Radius.circular(30.r),
           ),
         ),
         automaticallyImplyLeading: false,
@@ -76,276 +78,271 @@ class _ReviewedVocabulariesScreenState
           ),
         ],
         centerTitle: true,
-        title: const Text(
+        title: Text(
           'واژگان مرور شده',
           style: MyTextStyle.textHeader16Bold,
         ),
-        // leading: IconButton(
-        //   icon: const Icon(Icons.arrow_back),
-        //   onPressed: () {
-        //     Navigator.pushReplacementNamed(
-        //       context,
-        //       LessonScreen.routeName,
-        //       arguments: {
-        //         'index': 0,
-        //         'title': 'درس',
-        //         'lessonId': widget.courseId,
-        //       },
-        //     );
-        //   },
-        // ),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: widget.reviewedVocabularies.isEmpty
-                ? const Center(
-                    child: Text(
-                      'هیچ واژه‌ای مرور نشده است',
-                      style: MyTextStyle.textMatn14Bold,
-                    ),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: widget.reviewedVocabularies.length,
-                    itemBuilder: (context, index) {
-                      final reviewedVocab = widget.reviewedVocabularies[index];
-                      final word = reviewedVocab.word;
-                      final isCorrect = reviewedVocab.isCorrect;
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: widget.reviewedVocabularies.isEmpty
+                  ? Center(
+                      child: Text(
+                        'هیچ واژه‌ای مرور نشده است',
+                        style: MyTextStyle.textMatn14Bold,
+                      ),
+                    )
+                  : ListView.builder(
+                      padding: EdgeInsets.all(16.r),
+                      itemCount: widget.reviewedVocabularies.length,
+                      itemBuilder: (context, index) {
+                        final reviewedVocab =
+                            widget.reviewedVocabularies[index];
+                        final word = reviewedVocab.word;
+                        final isCorrect = reviewedVocab.isCorrect;
 
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 16),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: isCorrect
-                                ? const Color(0xFFADFF99)
-                                : const Color(0xFFFFB199),
-                            width: 2,
+                        return Container(
+                          margin: EdgeInsets.only(bottom: 16.h),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20.r),
+                            border: Border.all(
+                              color: isCorrect
+                                  ? const Color(0xFFADFF99)
+                                  : const Color(0xFFFFB199),
+                              width: 2.w,
+                            ),
                           ),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  // Word Image
-                                  FutureBuilder<String>(
-                                    future:
-                                        storageService.callGetDownloadPublicUrl(
-                                            word.thumbnail),
-                                    builder: (context, snapshot) {
-                                      if (snapshot.connectionState ==
-                                          ConnectionState.waiting) {
-                                        return Container(
-                                          width: 80,
-                                          height: 80,
-                                          decoration: BoxDecoration(
-                                            color: Colors.grey[200],
-                                            borderRadius:
-                                                BorderRadius.circular(16),
-                                          ),
-                                          child: const Center(
-                                            child: CircularProgressIndicator(),
+                          child: Padding(
+                            padding: EdgeInsets.all(16.r),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    // Word Image
+                                    FutureBuilder<String>(
+                                      future: storageService
+                                          .callGetDownloadPublicUrl(
+                                              word.thumbnail),
+                                      builder: (context, snapshot) {
+                                        if (snapshot.connectionState ==
+                                            ConnectionState.waiting) {
+                                          return Container(
+                                            width: 80.w,
+                                            height: 80.h,
+                                            decoration: BoxDecoration(
+                                              color: Colors.grey[200],
+                                              borderRadius:
+                                                  BorderRadius.circular(16.r),
+                                            ),
+                                            child: const Center(
+                                              child:
+                                                  CircularProgressIndicator(),
+                                            ),
+                                          );
+                                        }
+                                        if (snapshot.hasError ||
+                                            !snapshot.hasData) {
+                                          return Container(
+                                            width: 80.w,
+                                            height: 80.h,
+                                            decoration: BoxDecoration(
+                                              color: Colors.grey[200],
+                                              borderRadius:
+                                                  BorderRadius.circular(16.r),
+                                            ),
+                                            child: const Icon(Icons.error),
+                                          );
+                                        }
+                                        return ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(16.r),
+                                          child: Image.network(
+                                            snapshot.data!,
+                                            width: 80.w,
+                                            height: 80.h,
+                                            fit: BoxFit.cover,
                                           ),
                                         );
-                                      }
-                                      if (snapshot.hasError ||
-                                          !snapshot.hasData) {
-                                        return Container(
-                                          width: 80,
-                                          height: 80,
-                                          decoration: BoxDecoration(
-                                            color: Colors.grey[200],
-                                            borderRadius:
-                                                BorderRadius.circular(16),
-                                          ),
-                                          child: const Icon(Icons.error),
-                                        );
-                                      }
-                                      return ClipRRect(
-                                        borderRadius: BorderRadius.circular(16),
-                                        child: Image.network(
-                                          snapshot.data!,
-                                          width: 80,
-                                          height: 80,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                  const SizedBox(width: 16),
-                                  // Word Details
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: Text(
-                                                word.word,
-                                                style: MyTextStyle
-                                                    .textHeader16Bold
-                                                    .copyWith(
-                                                  color:
-                                                      const Color(0xFF3D495C),
-                                                  fontSize: 18,
+                                      },
+                                    ),
+                                    SizedBox(width: 16.w),
+                                    // Word Details
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: Text(
+                                                  word.word,
+                                                  style: MyTextStyle
+                                                      .textHeader16Bold
+                                                      .copyWith(
+                                                    color:
+                                                        const Color(0xFF3D495C),
+                                                    fontSize: 18.sp,
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                            Icon(
-                                              isCorrect
-                                                  ? Icons.check_circle
-                                                  : Icons.cancel,
-                                              color: isCorrect
-                                                  ? const Color(0xFF4CAF50)
-                                                  : const Color(0xFFFF5252),
-                                              size: 24,
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          word.translation,
-                                          style: MyTextStyle.textMatn14Bold
-                                              .copyWith(
-                                            color: const Color(0xFF52617A),
-                                            fontSize: 14,
+                                              Icon(
+                                                isCorrect
+                                                    ? Icons.check_circle
+                                                    : Icons.cancel,
+                                                color: isCorrect
+                                                    ? const Color(0xFF4CAF50)
+                                                    : const Color(0xFFFF5252),
+                                                size: 24.r,
+                                              ),
+                                            ],
                                           ),
+                                          SizedBox(height: 4.h),
+                                          Text(
+                                            word.translation,
+                                            style: MyTextStyle.textMatn14Bold
+                                                .copyWith(
+                                              color: const Color(0xFF52617A),
+                                              fontSize: 14.sp,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 16.h),
+                                // Action Buttons
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    // Add to Listener Button
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        color: MyColors.secondaryTint4,
+                                        borderRadius:
+                                            BorderRadius.circular(12.r),
+                                      ),
+                                      child: IconButton(
+                                        onPressed: () =>
+                                            _addToListener(word.id),
+                                        icon: const Icon(
+                                          Icons.add_circle_outline,
+                                          color: Color(0xFF3D495C),
                                         ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 16),
-                              // Action Buttons
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  // Add to Listener Button
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      color: MyColors.secondaryTint4,
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: IconButton(
-                                      onPressed: () => _addToListener(word.id),
-                                      icon: const Icon(
-                                        Icons.add_circle_outline,
-                                        color: Color(0xFF3D495C),
+                                        iconSize: 28.r,
                                       ),
-                                      iconSize: 28,
                                     ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  // Speak Button
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      color: MyColors.primary.withOpacity(0.1),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: IconButton(
-                                      onPressed: () => _readWord(word.word),
-                                      icon: const IconifyIcon(
-                                        icon: "cuida:volume-2-outline",
-                                        color: Color(0xFF3D495C),
+                                    SizedBox(width: 12.w),
+                                    // Speak Button
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        color:
+                                            MyColors.primary.withOpacity(0.1),
+                                        borderRadius:
+                                            BorderRadius.circular(12.r),
                                       ),
-                                      iconSize: 28,
+                                      child: IconButton(
+                                        onPressed: () => _readWord(word.word),
+                                        icon: const IconifyIcon(
+                                          icon: "cuida:volume-2-outline",
+                                          color: Color(0xFF3D495C),
+                                        ),
+                                        iconSize: 28.r,
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      );
-                    },
-                  ),
-          ),
-          // Sticky Bottom Buttons
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 10,
-                  offset: const Offset(0, -2),
-                ),
-              ],
+                        );
+                      },
+                    ),
             ),
-            padding: const EdgeInsets.all(16),
-            child: SafeArea(
-              child: Row(
-                children: [
-                  // تمرین ها Button
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pushReplacementNamed(
-                          context,
-                          PracticeVocabularyScreen.routeName,
-                          arguments: {'courseId': widget.courseId},
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: MyColors.primary,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                      ),
-                      child: const Text(
-                        'تمرین ها',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontFamily: "IranSans",
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  // مرور دوباره Button
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pushReplacementNamed(
-                          context,
-                          PracticeVocabularyScreen.routeName,
-                          arguments: {'courseId': widget.courseId},
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: MyColors.secondaryTint4,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                      ),
-                      child: const Text(
-                        'مرور دوباره',
-                        style: TextStyle(
-                          color: Color(0xFF3D495C),
-                          fontSize: 16,
-                          fontFamily: "IranSans",
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
+            // Sticky Bottom Buttons
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 10.r,
+                    offset: Offset(0, -2.h),
                   ),
                 ],
               ),
+              padding: EdgeInsets.all(16.r),
+              child: SafeArea(
+                child: Row(
+                  children: [
+                    // تمرین ها Button
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pushReplacementNamed(
+                            context,
+                            PracticeVocabularyScreen.routeName,
+                            arguments: {'courseId': widget.courseId},
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: MyColors.primary,
+                          padding: EdgeInsets.symmetric(vertical: 16.h),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16.r),
+                          ),
+                        ),
+                        child: Text(
+                          'تمرین ها',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16.sp,
+                            fontFamily: "IranSans",
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 12.w),
+                    // مرور دوباره Button
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pushReplacementNamed(
+                            context,
+                            PracticeVocabularyScreen.routeName,
+                            arguments: {'courseId': widget.courseId},
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: MyColors.secondaryTint4,
+                          padding: EdgeInsets.symmetric(vertical: 16.h),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16.r),
+                          ),
+                        ),
+                        child: Text(
+                          'مرور دوباره',
+                          style: TextStyle(
+                            color: Color(0xFF3D495C),
+                            fontSize: 16.sp,
+                            fontFamily: "IranSans",
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

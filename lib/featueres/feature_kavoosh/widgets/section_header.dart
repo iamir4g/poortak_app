@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/config/myColors.dart';
+import 'package:poortak/config/myTextStyle.dart';
 
 class SectionHeader extends StatelessWidget {
   final String title;
@@ -13,28 +16,22 @@ class SectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+      padding: EdgeInsets.symmetric(horizontal: 24.0.w, vertical: 8.0.h),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             title,
-            style: const TextStyle(
-              fontFamily: 'IRANSans',
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF29303D),
+            style: MyTextStyle.textMatn16Bold.copyWith(
+              color: MyColors.textMatn2,
             ),
           ),
           TextButton(
             onPressed: onSeeAllTap,
-            child: const Text(
+            child: Text(
               'همه',
-              style: TextStyle(
-                fontFamily: 'IRANSans',
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF52617A),
+              style: MyTextStyle.textMatn12Bold.copyWith(
+                color: MyColors.text3,
               ),
             ),
           ),

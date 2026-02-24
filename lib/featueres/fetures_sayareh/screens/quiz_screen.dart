@@ -186,6 +186,7 @@ class _QuizScreenState extends State<QuizScreen> {
                           correctAnswers: state.correctAnswers,
                           score: state.score,
                           courseId: widget.courseId,
+                          quizId: widget.quizId,
                         ),
                       );
                     }

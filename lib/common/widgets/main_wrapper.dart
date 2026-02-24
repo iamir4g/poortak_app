@@ -5,6 +5,7 @@ import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/common/widgets/bottom_nav.dart';
 import 'package:poortak/common/widgets/custom_drawer.dart';
@@ -262,6 +263,7 @@ class _MainWrapperState extends State<MainWrapper> {
               SnackBar(
                 content: Text('خطا در دسترسی به حافظه: ${state.message}'),
                 backgroundColor: Colors.red,
+                duration: const Duration(seconds: 2),
               ),
             );
           } else if (state is PermissionDenied) {
@@ -270,6 +272,7 @@ class _MainWrapperState extends State<MainWrapper> {
                 content: Text(
                     'برای استفاده از برنامه نیاز به دسترسی به حافظه دارید'),
                 backgroundColor: Colors.red,
+                duration: Duration(seconds: 2),
               ),
             );
           }
@@ -311,48 +314,6 @@ class _MainWrapperState extends State<MainWrapper> {
                         : Colors.white,
                     extendBodyBehindAppBar: false,
                     drawerScrimColor: Colors.black54,
-                    // onDrawerChanged: (isOpened) async {
-                    //   // تنظیم status bar وقتی drawer باز یا بسته می‌شود
-                    //   final backgroundColor = themeState.isDark
-                    //       ? MyColors.darkBackground
-                    //       : Colors.white;
-                    //   final statusBarIconBrightness = themeState.isDark
-                    //       ? Brightness.light
-                    //       : Brightness.dark;
-
-                    //   if (isOpened) {
-                    //     // وقتی drawer باز است، status bar را کاملاً شفاف می‌کنیم
-                    //     await SystemChrome.setEnabledSystemUIMode(
-                    //       SystemUiMode.edgeToEdge,
-                    //     );
-                    //     SystemChrome.setSystemUIOverlayStyle(
-                    //       SystemUiOverlayStyle(
-                    //         statusBarColor: MyColors.primary,
-                    //         statusBarIconBrightness: statusBarIconBrightness,
-                    //         statusBarBrightness: themeState.isDark
-                    //             ? Brightness.dark
-                    //             : Brightness.light,
-                    //         systemNavigationBarColor: MyColors.primary,
-                    //         systemNavigationBarIconBrightness:
-                    //             statusBarIconBrightness,
-                    //       ),
-                    //     );
-                    //   } else {
-                    //     // وقتی drawer بسته است، status bar را به MyColors.statusBarColor برمی‌گردانیم
-                    //     SystemChrome.setSystemUIOverlayStyle(
-                    //       SystemUiOverlayStyle(
-                    //         statusBarColor: MyColors.primary,
-                    //         statusBarIconBrightness: statusBarIconBrightness,
-                    //         statusBarBrightness: themeState.isDark
-                    //             ? Brightness.dark
-                    //             : Brightness.light,
-                    //         systemNavigationBarColor: backgroundColor,
-                    //         systemNavigationBarIconBrightness:
-                    //             statusBarIconBrightness,
-                    //       ),
-                    //     );
-                    //   }
-                    // },
                     appBar: AppBar(
                       backgroundColor: themeState.isDark
                           ? MyColors.darkBackground
@@ -394,24 +355,24 @@ class _MainWrapperState extends State<MainWrapper> {
                           color: themeState.isDark
                               ? MyColors.darkBackground
                               : Colors.white,
-                          borderRadius: const BorderRadius.only(
-                            bottomLeft: Radius.circular(33.5),
+                          borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(33.5.r),
                           ),
                           boxShadow: [
                             BoxShadow(
                               color: themeState.isDark
                                   ? Colors.black.withOpacity(0.3)
                                   : const Color.fromRGBO(0, 0, 0, 0.05),
-                              offset: const Offset(0, 1),
-                              blurRadius: 1,
+                              offset: Offset(0, 1.h),
+                              blurRadius: 1.r,
                               spreadRadius: 0,
                             ),
                           ],
                         ),
                       ),
-                      shape: const RoundedRectangleBorder(
+                      shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(33.5),
+                          bottomLeft: Radius.circular(33.5.r),
                         ),
                       ),
                     ),

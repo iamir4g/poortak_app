@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 
 class GlobalProgressBar extends StatelessWidget {
   final double percentage;
-  final double height;
-  final double width;
+  final double? height;
+  final double? width;
   final Color progressColor;
   final Color backgroundColor;
   final TextStyle? textStyle;
@@ -13,8 +15,8 @@ class GlobalProgressBar extends StatelessWidget {
   const GlobalProgressBar({
     super.key,
     required this.percentage,
-    this.height = 10,
-    this.width = 100,
+    this.height,
+    this.width,
     this.progressColor = MyColors.progressBarColor,
     this.backgroundColor = MyColors.progressBarBackground,
     this.textStyle,
@@ -22,6 +24,9 @@ class GlobalProgressBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final barHeight = height ?? 10.h;
+    final barWidth = width ?? 100.w;
+
     return Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -31,10 +36,10 @@ class GlobalProgressBar extends StatelessWidget {
           style: textStyle ??
               MyTextStyle.textProgressBar.copyWith(color: progressColor),
         ),
-        const SizedBox(width: 4),
+        SizedBox(width: Dimens.tiny),
         SizedBox(
-          width: width,
-          height: height,
+          width: barWidth,
+          height: barHeight,
           child: Directionality(
             textDirection: TextDirection.ltr,
             child: Stack(
@@ -43,7 +48,7 @@ class GlobalProgressBar extends StatelessWidget {
                 Container(
                   decoration: BoxDecoration(
                     color: backgroundColor,
-                    borderRadius: BorderRadius.circular(height / 2),
+                    borderRadius: BorderRadius.circular(barHeight / 2),
                   ),
                 ),
                 FractionallySizedBox(
@@ -51,7 +56,7 @@ class GlobalProgressBar extends StatelessWidget {
                   child: Container(
                     decoration: BoxDecoration(
                       color: progressColor,
-                      borderRadius: BorderRadius.circular(height / 2),
+                      borderRadius: BorderRadius.circular(barHeight / 2),
                     ),
                   ),
                 ),

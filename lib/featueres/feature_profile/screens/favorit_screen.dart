@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 
@@ -41,24 +42,24 @@ class _FavoritScreenState extends State<FavoritScreen> {
 
   Widget _buildHeader(bool isDarkMode) {
     return Container(
-      height: 57,
-      margin: const EdgeInsets.only(top: 22),
+      height: 57.h,
+      margin: EdgeInsets.only(top: 22.h),
       child: Stack(
         children: [
           // Header Background
           Container(
-            height: 57,
+            height: 57.h,
             decoration: BoxDecoration(
               color:
                   isDarkMode ? MyColors.darkBackgroundSecondary : Colors.white,
-              borderRadius: const BorderRadius.only(
-                bottomLeft: Radius.circular(33.5),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(33.5.r),
               ),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.05),
-                  offset: const Offset(0, 1),
-                  blurRadius: 1,
+                  offset: Offset(0, 1.h),
+                  blurRadius: 1.r,
                 ),
               ],
             ),
@@ -66,8 +67,8 @@ class _FavoritScreenState extends State<FavoritScreen> {
 
           // Title
           Positioned(
-            right: 32,
-            top: 16,
+            right: 32.w,
+            top: 16.h,
             child: Text(
               'علاقه مندی ها',
               style: MyTextStyle.textHeader16Bold.copyWith(
@@ -78,20 +79,20 @@ class _FavoritScreenState extends State<FavoritScreen> {
 
           // Back Button
           Positioned(
-            left: 16,
-            top: 11,
+            left: 16.w,
+            top: 11.h,
             child: GestureDetector(
               onTap: () => Navigator.pop(context),
               child: Container(
-                width: 35,
-                height: 35,
-                decoration: BoxDecoration(
+                width: 35.r,
+                height: 35.r,
+                decoration: const BoxDecoration(
                   color: Colors.transparent,
                 ),
                 child: Icon(
                   Icons.arrow_forward_ios,
                   color: isDarkMode ? Colors.white : MyColors.textMatn1,
-                  size: 20,
+                  size: 20.r,
                 ),
               ),
             ),
@@ -110,8 +111,8 @@ class _FavoritScreenState extends State<FavoritScreen> {
           Transform.rotate(
             angle: 0.025, // تقریباً 1.435 درجه
             child: SizedBox(
-              width: 110.7,
-              height: 212.8,
+              width: 110.7.w,
+              height: 212.8.h,
               child: Image.asset(
                 'assets/images/favorit/Delivery_Final.png',
                 fit: BoxFit.contain,
@@ -119,7 +120,7 @@ class _FavoritScreenState extends State<FavoritScreen> {
             ),
           ),
 
-          const SizedBox(height: 58),
+          SizedBox(height: 58.h),
 
           // Empty State Text
           Text(
@@ -136,7 +137,7 @@ class _FavoritScreenState extends State<FavoritScreen> {
 
   Widget _buildFavoritesList(bool isDarkMode) {
     return ListView.builder(
-      padding: const EdgeInsets.all(17),
+      padding: EdgeInsets.all(17.r),
       itemCount: 5, // تعداد آیتم‌های نمونه
       itemBuilder: (context, index) {
         return _buildFavoriteItem(isDarkMode, index);
@@ -146,83 +147,92 @@ class _FavoritScreenState extends State<FavoritScreen> {
 
   Widget _buildFavoriteItem(bool isDarkMode, int index) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      height: 144,
-      decoration: BoxDecoration(
-        color: isDarkMode ? MyColors.darkBackgroundSecondary : Colors.white,
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            offset: const Offset(0, 0),
-            blurRadius: 4,
-          ),
-        ],
-      ),
-      child: Row(
+      margin: EdgeInsets.only(bottom: 16.h),
+      height: 144.h,
+      child: Stack(
         children: [
-          // Content Section
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  // Title
-                  Text(
-                    'درس اول آموزش زبان انگلیسی (سیاره آی نو)',
-                    style: MyTextStyle.textMatn13.copyWith(
-                      color: isDarkMode ? Colors.white : MyColors.textMatn1,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    textAlign: TextAlign.right,
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-
-                  const Spacer(),
-
-                  // Play Button
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: MyColors.primary,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: const Icon(
-                      Icons.play_arrow,
-                      color: Colors.white,
-                      size: 24,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          // Image Section
+          // Main Container
           Container(
-            width: 110,
-            height: 110,
-            margin: const EdgeInsets.all(17),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              color: Colors.grey[300],
+              color:
+                  isDarkMode ? MyColors.darkBackgroundSecondary : Colors.white,
+              borderRadius: BorderRadius.circular(15.r),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.04),
+                  offset: const Offset(0, 0),
+                  blurRadius: 4.r,
+                ),
+              ],
             ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: Image.asset(
-                'assets/images/favorit/Delivery_Final.png',
-                fit: BoxFit.cover,
-              ),
+            child: Row(
+              children: [
+                // Content Section
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.all(16.r),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        // Title
+                        Text(
+                          'درس اول آموزش زبان انگلیسی (سیاره آی نو)',
+                          style: MyTextStyle.textMatn13.copyWith(
+                            color:
+                                isDarkMode ? Colors.white : MyColors.textMatn1,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          textAlign: TextAlign.right,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+
+                        const Spacer(),
+
+                        // Play Button
+                        Container(
+                          width: 40.r,
+                          height: 40.r,
+                          decoration: BoxDecoration(
+                            color: MyColors.primary,
+                            borderRadius: BorderRadius.circular(20.r),
+                          ),
+                          child: Icon(
+                            Icons.play_arrow,
+                            color: Colors.white,
+                            size: 24.r,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                // Image Section
+                Container(
+                  width: 110.r,
+                  height: 110.r,
+                  margin: EdgeInsets.all(17.r),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10.r),
+                    color: Colors.grey[300],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10.r),
+                    child: Image.asset(
+                      'assets/images/favorit/Delivery_Final.png',
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
 
           // Favorite Button
           Positioned(
-            top: 8,
-            right: 8,
+            top: 8.h,
+            right: 8.w,
             child: GestureDetector(
               onTap: () {
                 // حذف از علاقه‌مندی‌ها
@@ -231,16 +241,16 @@ class _FavoritScreenState extends State<FavoritScreen> {
                 });
               },
               child: Container(
-                width: 17,
-                height: 17,
+                width: 17.r,
+                height: 17.r,
                 decoration: BoxDecoration(
                   color: MyColors.error,
-                  borderRadius: BorderRadius.circular(8.5),
+                  borderRadius: BorderRadius.circular(8.5.r),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.favorite,
                   color: Colors.white,
-                  size: 10,
+                  size: 10.r,
                 ),
               ),
             ),

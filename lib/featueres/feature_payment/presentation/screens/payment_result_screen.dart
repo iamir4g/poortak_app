@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/common/widgets/main_wrapper.dart';
+import 'package:poortak/config/myColors.dart';
+import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/iknow_access_bloc/iknow_access_bloc.dart';
 import 'package:poortak/locator.dart';
 
@@ -28,209 +31,217 @@ class _PaymentResultScreenState extends State<PaymentResultScreen> {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         final accessBloc = locator<IknowAccessBloc>();
         accessBloc.add(FetchIknowAccessEvent(forceRefresh: true));
-        debugPrint("🔄 PaymentResultScreen: Refreshing IknowAccessBloc after successful payment");
+        debugPrint(
+            "🔄 PaymentResultScreen: Refreshing IknowAccessBloc after successful payment");
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    debugPrint("PaymentResultScreen: Building with status='${widget.ok}', ref='${widget.ref}'");
-    final isSuccess = widget.ok == 1 ? true : false;
+    debugPrint(
+        "PaymentResultScreen: Building with status='${widget.ok}', ref='${widget.ref}'");
+    final isSuccess = widget.ok == 1;
 
     debugPrint("PaymentResultScreen: isSuccess=$isSuccess");
 
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: MyColors.background1,
       appBar: AppBar(
         title: Text(
           "رسید نهایی",
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
+          style: MyTextStyle.textHeader16Bold.copyWith(
+            color: MyColors.textLight,
           ),
         ),
-        backgroundColor: isSuccess ? Colors.green : Colors.red,
+        backgroundColor: isSuccess ? MyColors.success : MyColors.error,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: MyColors.textLight, size: 24.sp),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          children: [
-            const SizedBox(height: 40),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.all(20.0.r),
+          child: Column(
+            children: [
+              SizedBox(height: 40.h),
 
-            // Status Icon
-            Container(
-              width: 120,
-              height: 120,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: isSuccess ? Colors.green[50] : Colors.red[50],
-                border: Border.all(
-                  color: isSuccess ? Colors.green : Colors.red,
-                  width: 3,
+              // Status Icon
+              Container(
+                width: 120.w,
+                height: 120.h,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: (isSuccess ? MyColors.success : MyColors.error)
+                      .withValues(alpha: 0.1),
+                  border: Border.all(
+                    color: isSuccess ? MyColors.success : MyColors.error,
+                    width: 3.w,
+                  ),
+                ),
+                child: Icon(
+                  isSuccess ? Icons.check_circle : Icons.cancel,
+                  size: 80.sp,
+                  color: isSuccess ? MyColors.success : MyColors.error,
                 ),
               ),
-              child: Icon(
-                isSuccess ? Icons.check_circle : Icons.cancel,
-                size: 80,
-                color: isSuccess ? Colors.green : Colors.red,
+
+              SizedBox(height: 30.h),
+
+              // Status Text
+              Text(
+                isSuccess
+                    ? 'پرداخت با موفقیت انجام شد'
+                    : 'پرداخت با خطا مواجه شد',
+                style: MyTextStyle.textMatn18Bold.copyWith(
+                  fontSize: 22.sp,
+                  color: isSuccess ? MyColors.success : MyColors.error,
+                ),
+                textAlign: TextAlign.center,
               ),
-            ),
 
-            const SizedBox(height: 30),
+              SizedBox(height: 10.h),
 
-            // Status Text
-            Text(
-              isSuccess
-                  ? 'پرداخت با موفقیت انجام شد'
-                  : 'پرداخت با خطا مواجه شد',
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: isSuccess ? Colors.green[700] : Colors.red[700],
-              ),
-              textAlign: TextAlign.center,
-            ),
-
-            const SizedBox(height: 10),
-
-            const SizedBox(height: 40),
-
-            // Payment Details Card
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.1),
-                    spreadRadius: 1,
-                    blurRadius: 10,
-                    offset: const Offset(0, 2),
+              if (isSuccess && widget.ref != null)
+                Text(
+                  'کد پیگیری: ${widget.ref}',
+                  style: MyTextStyle.textMatn14Bold.copyWith(
+                    fontWeight: FontWeight.normal,
+                    color: MyColors.textSecondary,
                   ),
-                ],
+                ),
+
+              SizedBox(height: 40.h),
+
+              // Payment Details Card
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.all(20.r),
+                decoration: BoxDecoration(
+                  color: MyColors.background,
+                  borderRadius: BorderRadius.circular(12.r),
+                  boxShadow: [
+                    BoxShadow(
+                      color: MyColors.shadow,
+                      spreadRadius: 1,
+                      blurRadius: 10.r,
+                      offset: Offset(0, 2.h),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Text(
+                        'جزئیات پرداخت',
+                        style: MyTextStyle.textMatn16Bold.copyWith(
+                          color: MyColors.textMatn2,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 20.h),
+                    _buildDetailRow('کد پیگیری', _getTransactionId()),
+                    _buildDetailRow('مبلغ', _getAmount()),
+                    _buildDetailRow('روش پرداخت', _getPaymentMethod()),
+                    _buildDetailRow('تاریخ و زمان', _getDateTime()),
+                    if (widget.ref != null)
+                      _buildDetailRow('کد پیگیری', widget.ref!),
+                  ],
+                ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(
+
+              SizedBox(height: 30.h),
+
+              // Action Buttons
+              if (isSuccess) ...[
+                SizedBox(
+                  width: double.infinity,
+                  height: 50.h,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // Navigate to main app or specific screen
+                      Navigator.of(context).pushNamedAndRemoveUntil(
+                        MainWrapper.routeName,
+                        (route) => false,
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: MyColors.success,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.r),
+                      ),
+                    ),
                     child: Text(
-                      'جزئیات پرداخت',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey[800],
+                      'بازگشت به صفحه اصلی',
+                      style: MyTextStyle.textMatnBtn,
+                    ),
+                  ),
+                ),
+              ] else ...[
+                SizedBox(height: 15.h),
+                SizedBox(
+                  width: double.infinity,
+                  height: 50.h,
+                  child: OutlinedButton(
+                    onPressed: () {
+                      Navigator.of(context).pushNamedAndRemoveUntil(
+                        MainWrapper.routeName,
+                        (route) => false,
+                      );
+                    },
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: MyColors.divider),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.r),
+                      ),
+                    ),
+                    child: Text(
+                      'بازگشت به صفحه اصلی',
+                      style: MyTextStyle.textMatn16Bold.copyWith(
+                        color: MyColors.textSecondary,
+                        fontSize: 16.sp,
                       ),
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  _buildDetailRow('کد پیگیری', _getTransactionId()),
-                  _buildDetailRow('مبلغ', _getAmount()),
-                  _buildDetailRow('روش پرداخت', _getPaymentMethod()),
-                  _buildDetailRow('تاریخ و زمان', _getDateTime()),
-                  if (widget.ref != null) _buildDetailRow('کد پیگیری', widget.ref!),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 30),
-
-            // Action Buttons
-            if (isSuccess) ...[
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  onPressed: () {
-                    // Navigate to main app or specific screen
-                    Navigator.of(context).pushNamedAndRemoveUntil(
-                      MainWrapper.routeName,
-                      (route) => false,
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: const Text(
-                    'بازگشت به صفحه اصلی',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
                 ),
-              ),
-            ] else ...[
-              const SizedBox(height: 15),
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: OutlinedButton(
-                  onPressed: () {
-                    Navigator.of(context).pushNamedAndRemoveUntil(
-                      MainWrapper.routeName,
-                      (route) => false,
-                    );
-                  },
-                  style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: Colors.grey[400]!),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+              ],
+
+              SizedBox(height: 20.h),
+
+              // Additional Info
+              Container(
+                padding: EdgeInsets.all(15.r),
+                decoration: BoxDecoration(
+                  color: MyColors.secondaryTint4,
+                  borderRadius: BorderRadius.circular(8.r),
+                  border: Border.all(color: MyColors.secondaryTint2),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.info_outline,
+                        color: MyColors.secondary, size: 20.sp),
+                    SizedBox(width: 10.w),
+                    Expanded(
+                      child: Text(
+                        isSuccess
+                            ? 'شما به زودی یک ایمیل تایید خواهید گرفت'
+                            : 'لطفا با پشتیبانی تماس بگیرید اگر مشکلات خود را ادامه دهید',
+                        style: MyTextStyle.textMatn14Bold.copyWith(
+                          fontWeight: FontWeight.normal,
+                          color: MyColors.secondaryShade2,
+                          fontSize: 14.sp,
+                        ),
+                      ),
                     ),
-                  ),
-                  child: Text(
-                    'بازگشت به صفحه اصلی',
-                    style: TextStyle(
-                      color: Colors.grey[700],
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  ],
                 ),
               ),
             ],
-
-            const SizedBox(height: 20),
-
-            // Additional Info
-            Container(
-              padding: const EdgeInsets.all(15),
-              decoration: BoxDecoration(
-                color: Colors.blue[50],
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.blue[200]!),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.info_outline, color: Colors.blue[600], size: 20),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      isSuccess
-                          ? 'شما به زودی یک ایمیل تایید خواهید گرفت'
-                          : 'لطفا با پشتیبانی تماس بگیرید اگر مشکلات خود را ادامه دهید',
-                      style: TextStyle(
-                        color: Colors.blue[700],
-                        fontSize: 14,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -238,28 +249,28 @@ class _PaymentResultScreenState extends State<PaymentResultScreen> {
 
   Widget _buildDetailRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: EdgeInsets.only(bottom: 12.h),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 120,
+            width: 120.w,
             child: Text(
               label,
-              style: TextStyle(
-                color: Colors.grey[600],
-                fontSize: 14,
+              style: MyTextStyle.textMatn14Bold.copyWith(
+                color: MyColors.textSecondary,
                 fontWeight: FontWeight.w500,
+                fontSize: 14.sp,
               ),
             ),
           ),
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(
-                color: Colors.black87,
-                fontSize: 14,
+              style: MyTextStyle.textMatn14Bold.copyWith(
+                color: MyColors.textMatn2,
                 fontWeight: FontWeight.w600,
+                fontSize: 14.sp,
               ),
             ),
           ),
@@ -274,7 +285,7 @@ class _PaymentResultScreenState extends State<PaymentResultScreen> {
   }
 
   String _getAmount() {
-    return '\$29.99'; // Replace with actual amount
+    return '۲۹,۹۰۰ تومان'; // Replace with actual amount
   }
 
   String _getPaymentMethod() {

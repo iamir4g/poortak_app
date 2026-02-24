@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconify_design/iconify_design.dart';
 import 'package:poortak/common/bloc/theme_cubit/theme_cubit.dart';
 import 'package:poortak/common/services/reminder_notification_service.dart';
@@ -52,7 +53,7 @@ class _ReminderScreenState extends State<ReminderScreen> {
       builder: (context, themeState) {
         final backgroundColor = themeState.isDark
             ? MyColors.darkBackground
-            : const Color(0xFFF6F9FE);
+            : MyColors.background3;
         final cardBackground =
             themeState.isDark ? MyColors.darkCardBackground : Colors.white;
 
@@ -63,17 +64,17 @@ class _ReminderScreenState extends State<ReminderScreen> {
               children: [
                 // Header
                 Container(
-                  height: 57,
+                  height: 57.h,
                   decoration: BoxDecoration(
                     color: cardBackground,
-                    borderRadius: const BorderRadius.only(
-                      bottomLeft: Radius.circular(33.5),
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(33.5.r),
                     ),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.05),
-                        offset: const Offset(0, 1),
-                        blurRadius: 1,
+                        offset: Offset(0, 1.h),
+                        blurRadius: 1.r,
                       ),
                     ],
                   ),
@@ -81,7 +82,7 @@ class _ReminderScreenState extends State<ReminderScreen> {
                     children: [
                       // Back button
                       Positioned(
-                        left: 16,
+                        left: 16.w,
                         top: 0,
                         bottom: 0,
                         child: Center(
@@ -92,7 +93,7 @@ class _ReminderScreenState extends State<ReminderScreen> {
                               color: themeState.isDark
                                   ? MyColors.darkTextPrimary
                                   : MyColors.textMatn1,
-                              size: 24,
+                              size: 24.r,
                             ),
                           ),
                         ),
@@ -109,7 +110,7 @@ class _ReminderScreenState extends State<ReminderScreen> {
                             style: MyTextStyle.textHeader16Bold.copyWith(
                               color: themeState.isDark
                                   ? MyColors.darkTextPrimary
-                                  : const Color(0xFF3D495C),
+                                  : MyColors.textCancelButton,
                             ),
                             textAlign: TextAlign.center,
                           ),
@@ -127,12 +128,12 @@ class _ReminderScreenState extends State<ReminderScreen> {
                             children: [
                               IconifyIcon(
                                 icon: "ic:baseline-more-time",
-                                size: 64,
+                                size: 64.r,
                                 color: themeState.isDark
                                     ? MyColors.darkTextSecondary
                                     : MyColors.text4,
                               ),
-                              const SizedBox(height: 16),
+                              SizedBox(height: 16.h),
                               Text(
                                 'یادآوری تنظیم نشده است',
                                 style: MyTextStyle.textMatn14Bold.copyWith(
@@ -145,7 +146,7 @@ class _ReminderScreenState extends State<ReminderScreen> {
                           ),
                         )
                       : ListView.builder(
-                          padding: const EdgeInsets.all(16),
+                          padding: EdgeInsets.all(16.r),
                           itemCount: _reminders.length,
                           itemBuilder: (context, index) {
                             final reminder = _reminders[index];
@@ -212,16 +213,16 @@ class ReminderCard extends StatelessWidget {
         final isActive = reminder['isActive'] ?? true;
 
         return Container(
-          margin: const EdgeInsets.only(bottom: 12),
-          padding: const EdgeInsets.all(16),
+          margin: EdgeInsets.only(bottom: 12.h),
+          padding: EdgeInsets.all(16.r),
           decoration: BoxDecoration(
             color: cardBackground,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(12.r),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.05),
-                offset: const Offset(0, 2),
-                blurRadius: 4,
+                offset: Offset(0, 2.h),
+                blurRadius: 4.r,
               ),
             ],
           ),
@@ -235,10 +236,10 @@ class ReminderCard extends StatelessWidget {
                     '${time.hour.toString().padLeft(2, '0').toPersianDigit()} : ${time.minute.toString().padLeft(2, '0').toPersianDigit()}',
                     style: MyTextStyle.textMatn14Bold.copyWith(
                       color: textColor,
-                      fontSize: 16,
+                      fontSize: 16.sp,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8.h),
                   // Toggle Switch
                   Switch(
                     value: isActive,
@@ -247,7 +248,7 @@ class ReminderCard extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(width: 16),
+              SizedBox(width: 16.w),
               // Content
               Expanded(
                 child: Column(
@@ -259,7 +260,7 @@ class ReminderCard extends StatelessWidget {
                         color: textColor,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    SizedBox(height: 4.h),
                     Text(
                       'هر روز',
                       style: MyTextStyle.textMatn12W300.copyWith(

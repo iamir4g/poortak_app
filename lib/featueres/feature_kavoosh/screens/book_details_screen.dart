@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/config/myColors.dart';
+import 'package:poortak/config/myTextStyle.dart';
 
 class BookDetailsScreen extends StatefulWidget {
   static const String routeName = '/book-detail';
@@ -32,49 +35,46 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F9FE),
+      backgroundColor: MyColors.background1,
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(57),
+        preferredSize: Size.fromHeight(57.h),
         child: SafeArea(
           child: Container(
-            padding: const EdgeInsets.fromLTRB(16, 0, 32, 0),
-            height: 57,
+            padding: EdgeInsets.fromLTRB(16.w, 0, 32.w, 0),
+            height: 57.h,
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: const BorderRadius.only(
-                bottomLeft: Radius.circular(33.5),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(33.5.r),
               ),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.05),
-                  offset: const Offset(0, 1),
-                  blurRadius: 1,
+                  offset: Offset(0, 1.h),
+                  blurRadius: 1.r,
                 ),
               ],
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   'کتاب آموزشی دبستان',
-                  style: TextStyle(
-                    fontFamily: 'IRANSans',
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF29303D),
+                  style: MyTextStyle.textHeader16Bold.copyWith(
+                    color: MyColors.textMatn2,
                   ),
                 ),
                 SizedBox(
-                  width: 40,
-                  height: 40,
+                  width: 40.w,
+                  height: 40.h,
                   child: IconButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  icon: const Icon(
-                    Icons.arrow_forward,
-                    color: Color(0xFF29303D),
-                    size: 28,
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: Icon(
+                      Icons.arrow_forward,
+                      color: MyColors.textMatn2,
+                      size: 28.r,
+                    ),
                   ),
-                ),
                 ),
               ],
             ),
@@ -84,76 +84,68 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const SizedBox(height: 24),
+            SizedBox(height: 24.h),
             // Book Image and Info
             Center(
               child: Column(
                 children: [
                   Container(
-                    width: 200,
-                    height: 280,
+                    width: 200.w,
+                    height: 280.h,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(16.r),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withValues(alpha: 0.1),
-                          blurRadius: 20,
-                          offset: const Offset(0, 10),
+                          blurRadius: 20.r,
+                          offset: Offset(0, 10.h),
                         ),
                       ],
                     ),
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(16.r),
                       child: Image.asset(
                         'assets/images/placeholder_book.png', // Needs a valid asset or network image
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) => Container(
                           color: Colors.grey[200],
-                          child: const Icon(Icons.book, size: 80, color: Colors.grey),
+                          child:
+                              Icon(Icons.book, size: 80.r, color: Colors.grey),
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24.h),
                   Text(
                     widget.title,
-                    style: const TextStyle(
-                      fontFamily: 'IRANSans',
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF29303D),
+                    style: MyTextStyle.textMatn18Bold.copyWith(
+                      fontSize: 20.sp,
+                      color: MyColors.textMatn2,
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  const Text(
+                  SizedBox(height: 8.h),
+                  Text(
                     'نسخه الکترونیکی',
-                    style: TextStyle(
-                      fontFamily: 'IRANSans',
-                      fontSize: 14,
-                      color: Color(0xFF9BA7C6),
+                    style: MyTextStyle.textMatn14Bold.copyWith(
+                      color: MyColors.text4,
+                      fontWeight: FontWeight.normal,
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24.h),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
+                    children: [
                       Text(
                         'قیمت:',
-                        style: TextStyle(
-                          fontFamily: 'IRANSans',
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF29303D),
+                        style: MyTextStyle.textHeader16Bold.copyWith(
+                          color: MyColors.textMatn2,
                         ),
                       ),
-                      SizedBox(width: 8),
+                      SizedBox(width: 8.w),
                       Text(
                         '۷۵,۰۰۰ تومان',
-                        style: TextStyle(
-                          fontFamily: 'IRANSans',
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF29303D),
+                        style: MyTextStyle.textHeader16Bold.copyWith(
+                          color: MyColors.textMatn2,
                         ),
                       ),
                     ],
@@ -161,37 +153,33 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
                 ],
               ),
             ),
-            const SizedBox(height: 24),
-            
+            SizedBox(height: 24.h),
+
             // Tabs
             Container(
-              margin: const EdgeInsets.symmetric(horizontal: 16),
-              decoration: const BoxDecoration(
+              margin: EdgeInsets.symmetric(horizontal: 16.w),
+              decoration: BoxDecoration(
                 border: Border(
-                  bottom: BorderSide(color: Color(0xFFEEEEEE), width: 1),
+                  bottom: BorderSide(color: MyColors.divider, width: 1.h),
                 ),
               ),
               child: TabBar(
                 controller: _tabController,
-                labelColor: const Color(0xFFFF9F29),
-                unselectedLabelColor: const Color(0xFF9BA7C6),
-                indicatorColor: const Color(0xFFFF9F29),
-                indicatorWeight: 3,
-                labelStyle: const TextStyle(
-                  fontFamily: 'IRANSans',
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                ),
+                labelColor: MyColors.primary,
+                unselectedLabelColor: MyColors.text4,
+                indicatorColor: MyColors.primary,
+                indicatorWeight: 3.h,
+                labelStyle: MyTextStyle.textMatn14Bold,
                 tabs: const [
                   Tab(text: 'درباره کالا'),
                   Tab(text: 'ویژگی های کالا'),
                 ],
               ),
             ),
-            
+
             // Tab Content
             Container(
-              padding: const EdgeInsets.all(24),
+              padding: EdgeInsets.all(24.r),
               child: Column(
                 children: [
                   _buildDetailRow('ناشر:', 'انتشارات تاجیک'),
@@ -203,54 +191,48 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
                 ],
               ),
             ),
-            
-            const SizedBox(height: 20),
-            
+
+            SizedBox(height: 20.h),
+
             // Buttons
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
+              padding: EdgeInsets.symmetric(horizontal: 24.w),
               child: Column(
                 children: [
                   SizedBox(
                     width: double.infinity,
-                    height: 50,
+                    height: 50.h,
                     child: OutlinedButton(
                       onPressed: () {},
                       style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Color(0xFF9BA7C6)),
+                        side: BorderSide(color: MyColors.text4),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(12.r),
                         ),
                       ),
-                      child: const Text(
+                      child: Text(
                         'خواندن نمونه',
-                        style: TextStyle(
-                          fontFamily: 'IRANSans',
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF9BA7C6),
+                        style: MyTextStyle.textHeader16Bold.copyWith(
+                          color: MyColors.text4,
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12.h),
                   SizedBox(
                     width: double.infinity,
-                    height: 50,
+                    height: 50.h,
                     child: ElevatedButton(
                       onPressed: () {},
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF4A80F0),
+                        backgroundColor: MyColors.secondary,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(12.r),
                         ),
                       ),
-                      child: const Text(
+                      child: Text(
                         'افزودن به سبد خرید',
-                        style: TextStyle(
-                          fontFamily: 'IRANSans',
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                        style: MyTextStyle.textHeader16Bold.copyWith(
                           color: Colors.white,
                         ),
                       ),
@@ -259,7 +241,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
                 ],
               ),
             ),
-            const SizedBox(height: 40),
+            SizedBox(height: 40.h),
           ],
         ),
       ),
@@ -268,25 +250,21 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
 
   Widget _buildDetailRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
+      padding: EdgeInsets.only(bottom: 16.h),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             label,
-            style: const TextStyle(
-              fontFamily: 'IRANSans',
-              fontSize: 14,
-              color: Color(0xFF9BA7C6),
+            style: MyTextStyle.textMatn14Bold.copyWith(
+              color: MyColors.text4,
+              fontWeight: FontWeight.normal,
             ),
           ),
           Text(
             value,
-            style: const TextStyle(
-              fontFamily: 'IRANSans',
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF52617A),
+            style: MyTextStyle.textMatn14Bold.copyWith(
+              color: MyColors.text3,
             ),
           ),
         ],
