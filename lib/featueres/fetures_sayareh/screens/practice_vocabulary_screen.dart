@@ -243,154 +243,173 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
                       return Column(
                         children: [
                           Expanded(
-                            child: Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  SizedBox(
-                                    height: 18.h,
-                                  ),
-                                  Container(
-                                    width: 268.w,
-                                    height: 45.h,
-                                    decoration: BoxDecoration(
-                                      color: MyColors.infoBg,
-                                      borderRadius: BorderRadius.circular(20.r),
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          "گزینه ی درست را انتخاب کنید.",
-                                          style: MyTextStyle.textMatn14Bold,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 24.h,
-                                  ),
-                                  FutureBuilder<String>(
-                                    future:
-                                        storageService.callGetDownloadPublicUrl(
-                                            correctWord.thumbnail),
-                                    builder: (context, snapshot) {
-                                      if (snapshot.connectionState ==
-                                          ConnectionState.waiting) {
-                                        return CircularProgressIndicator(
-                                            strokeWidth: 4.w);
-                                      }
-                                      if (snapshot.hasError) {
-                                        return Icon(Icons.error, size: 24.r);
-                                      }
-                                      if (snapshot.hasData) {
-                                        return ClipRRect(
+                            child: SingleChildScrollView(
+                              padding: EdgeInsets.only(bottom: 20.h),
+                              child: Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    if (!showAnswer) ...[
+                                      SizedBox(
+                                        height: 18.h,
+                                      ),
+                                      Container(
+                                        width: 268.w,
+                                        height: 45.h,
+                                        decoration: BoxDecoration(
+                                          color: MyColors.infoBg,
                                           borderRadius:
-                                              BorderRadius.circular(24.r),
-                                          child: Image.network(
-                                            snapshot.data!,
-                                            height: 264.h,
-                                            width: 264.w,
-                                            fit: BoxFit.cover,
-                                          ),
-                                        );
-                                      }
-                                      return const SizedBox.shrink();
-                                    },
-                                  ),
-                                  SizedBox(height: 60.h),
-                                  if (!showAnswer)
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      children: [
-                                        _buildWordButton(correctWord.word),
-                                        _buildWordButton(wrongWord.word),
-                                      ],
+                                              BorderRadius.circular(20.r),
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              "گزینه ی درست را انتخاب کنید.",
+                                              style: MyTextStyle.textMatn14Bold,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 24.h,
+                                      ),
+                                    ] else
+                                      SizedBox(height: 10.h),
+                                    FutureBuilder<String>(
+                                      future: storageService
+                                          .callGetDownloadPublicUrl(
+                                              correctWord.thumbnail),
+                                      builder: (context, snapshot) {
+                                        if (snapshot.connectionState ==
+                                            ConnectionState.waiting) {
+                                          return CircularProgressIndicator(
+                                              strokeWidth: 4.w);
+                                        }
+                                        if (snapshot.hasError) {
+                                          return Icon(Icons.error, size: 24.r);
+                                        }
+                                        if (snapshot.hasData) {
+                                          // Responsive height for image
+                                          double imageHeight = 264.h;
+                                          final screenHeight =
+                                              MediaQuery.of(context)
+                                                  .size
+                                                  .height;
+                                          if (screenHeight < 600) {
+                                            imageHeight = 180.h;
+                                          }
+
+                                          return ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(24.r),
+                                            child: Image.network(
+                                              snapshot.data!,
+                                              height: imageHeight,
+                                              width: imageHeight,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          );
+                                        }
+                                        return const SizedBox.shrink();
+                                      },
                                     ),
-                                  SizedBox(height: 60.h),
-                                  if (showAnswer) ...[
-                                    if (!isCorrect) ...[
+                                    SizedBox(height: showAnswer ? 20.h : 30.h),
+                                    if (!showAnswer)
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceEvenly,
+                                        children: [
+                                          _buildWordButton(correctWord.word),
+                                          _buildWordButton(wrongWord.word),
+                                        ],
+                                      ),
+                                    SizedBox(height: showAnswer ? 10.h : 30.h),
+                                    if (showAnswer) ...[
+                                      if (!isCorrect) ...[
+                                        Text(
+                                          selectedWord!,
+                                          style: MyTextStyle.text14Wrong,
+                                        ),
+                                        SizedBox(height: 5.h),
+                                      ],
                                       Text(
-                                        selectedWord!,
-                                        style: MyTextStyle.text14Wrong,
+                                        correctWord.word,
+                                        style: MyTextStyle.text24Correct,
+                                      ),
+                                      SizedBox(height: 2.h),
+                                      Text(
+                                        correctWord.translation,
+                                        style: TextStyle(
+                                          fontSize: 18.sp,
+                                          color: Colors.grey,
+                                        ),
                                       ),
                                       SizedBox(height: 10.h),
-                                    ],
-                                    Text(
-                                      correctWord.word,
-                                      style: MyTextStyle.text24Correct,
-                                    ),
-                                    SizedBox(height: 5.h),
-                                    Text(
-                                      correctWord.translation,
-                                      style: TextStyle(
-                                        fontSize: 18.sp,
-                                        color: Colors.grey,
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          IconButton(
+                                            onPressed: () =>
+                                                _readWord(correctWord.word),
+                                            icon: IconifyIcon(
+                                              icon: "cuida:volume-2-outline",
+                                              size: 32.r,
+                                            ),
+                                          ),
+                                          SizedBox(width: 20.w),
+                                          BlocBuilder<LitnerBloc, LitnerState>(
+                                            builder: (context, litnerState) {
+                                              return IconButton(
+                                                onPressed:
+                                                    litnerState is LitnerLoading
+                                                        ? null
+                                                        : () => _addToLitner(
+                                                              correctWord.word,
+                                                              correctWord
+                                                                  .translation,
+                                                            ),
+                                                icon: litnerState
+                                                        is LitnerLoading
+                                                    ? SizedBox(
+                                                        width: 20.w,
+                                                        height: 20.h,
+                                                        child:
+                                                            CircularProgressIndicator(
+                                                          strokeWidth: 2.w,
+                                                        ),
+                                                      )
+                                                    : const Icon(Icons
+                                                        .add_circle_outline),
+                                                iconSize: 32.r,
+                                              );
+                                            },
+                                          ),
+                                        ],
                                       ),
-                                    ),
-                                    SizedBox(height: 20.h),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        IconButton(
-                                          onPressed: () =>
-                                              _readWord(correctWord.word),
-                                          icon: IconifyIcon(
-                                            icon: "cuida:volume-2-outline",
-                                            size: 32.r,
+                                      SizedBox(height: 15.h),
+                                      ElevatedButton(
+                                        onPressed: _nextQuestion,
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: MyColors.primary,
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 32.w, vertical: 16.h),
+                                        ),
+                                        child: Text(
+                                          'سوال بعدی',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 16.sp,
+                                            fontFamily: "IranSans",
+                                            fontWeight: FontWeight.bold,
                                           ),
                                         ),
-                                        SizedBox(width: 20.w),
-                                        BlocBuilder<LitnerBloc, LitnerState>(
-                                          builder: (context, litnerState) {
-                                            return IconButton(
-                                              onPressed: litnerState
-                                                      is LitnerLoading
-                                                  ? null
-                                                  : () => _addToLitner(
-                                                        correctWord.word,
-                                                        correctWord.translation,
-                                                      ),
-                                              icon: litnerState is LitnerLoading
-                                                  ? SizedBox(
-                                                      width: 20.w,
-                                                      height: 20.h,
-                                                      child:
-                                                          CircularProgressIndicator(
-                                                        strokeWidth: 2.w,
-                                                      ),
-                                                    )
-                                                  : const Icon(
-                                                      Icons.add_circle_outline),
-                                              iconSize: 32.r,
-                                            );
-                                          },
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: 20.h),
-                                    ElevatedButton(
-                                      onPressed: _nextQuestion,
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: MyColors.primary,
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 32.w, vertical: 16.h),
                                       ),
-                                      child: Text(
-                                        'سوال بعدی',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 16.sp,
-                                          fontFamily: "IranSans",
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
+                                    ],
                                   ],
-                                ],
+                                ),
                               ),
                             ),
                           ),

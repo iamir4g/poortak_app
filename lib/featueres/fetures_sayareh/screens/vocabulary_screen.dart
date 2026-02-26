@@ -247,6 +247,14 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                                         return const Icon(Icons.error);
                                       }
                                       if (snapshot.hasData) {
+                                        // Responsive height for image
+                                        double imageHeight = 200.h;
+                                        final screenHeight =
+                                            MediaQuery.of(context).size.height;
+                                        if (screenHeight < 600) {
+                                          imageHeight = 150.h;
+                                        }
+
                                         return Container(
                                           decoration: BoxDecoration(
                                             borderRadius:
@@ -257,8 +265,8 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                                                 BorderRadius.circular(16.r),
                                             child: Image.network(
                                               snapshot.data!,
-                                              height: 200.h,
-                                              width: 200.w,
+                                              height: imageHeight,
+                                              width: imageHeight,
                                               fit: BoxFit.cover,
                                             ),
                                           ),
