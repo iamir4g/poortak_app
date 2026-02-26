@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/common/utils/video_downloader_util.dart';
 import 'package:poortak/common/bloc/video_download_cubit/video_download_cubit.dart';
@@ -60,6 +61,18 @@ class VideoDownloadService {
     });
   }
 
+  void _updateWakelock() {
+    // Check if there are any active downloads
+    final hasActiveDownloads = _activeDownloads.values.any((active) => active);
+    if (hasActiveDownloads) {
+      WakelockPlus.enable();
+      print("🔌 Wakelock enabled due to active download(s)");
+    } else {
+      WakelockPlus.disable();
+      print("🔌 Wakelock disabled - no active downloads");
+    }
+  }
+
   void _pauseActiveDownloads() {
     // Find all downloads that are currently downloading and pause them
     final currentState = _downloadCubit.state;
@@ -77,6 +90,7 @@ class VideoDownloadService {
             isDownloading: false,
           );
           _activeDownloads[videoName] = false;
+          _updateWakelock();
           print("⏸️ Paused download due to connectivity loss: $videoName");
         }
       }
@@ -157,6 +171,7 @@ class VideoDownloadService {
     }
 
     _activeDownloads[videoName] = true;
+    _updateWakelock();
 
     try {
       // Update state: checking files
@@ -199,6 +214,7 @@ class VideoDownloadService {
           isDecrypting: false,
         );
         _activeDownloads[videoName] = false;
+        _updateWakelock();
         return;
       }
 
@@ -265,6 +281,7 @@ class VideoDownloadService {
             decryptionProgress: 1.0,
           );
           _activeDownloads[videoName] = false;
+          _updateWakelock();
         },
         onError: (error) {
           // Check if error is due to connectivity issue
@@ -291,6 +308,8 @@ class VideoDownloadService {
               isDownloading: false,
               isDecrypting: false,
             );
+            _activeDownloads[videoName] = false;
+            _updateWakelock();
             print("⏸️ Download paused due to connectivity error: $videoName");
           } else {
             // Real error - show error state
@@ -301,8 +320,9 @@ class VideoDownloadService {
               isDownloading: false,
               isDecrypting: false,
             );
+            _activeDownloads[videoName] = false;
+            _updateWakelock();
           }
-          _activeDownloads[videoName] = false;
         },
       );
     } catch (e) {
@@ -330,6 +350,8 @@ class VideoDownloadService {
           isDownloading: false,
           isDecrypting: false,
         );
+        _activeDownloads[videoName] = false;
+        _updateWakelock();
         print("⏸️ Download paused due to connectivity error: $videoName");
       } else {
         // Real error - show error state
@@ -341,8 +363,9 @@ class VideoDownloadService {
           isDownloading: false,
           isDecrypting: false,
         );
+        _activeDownloads[videoName] = false;
+        _updateWakelock();
       }
-      _activeDownloads[videoName] = false;
     }
   }
 
@@ -368,6 +391,7 @@ class VideoDownloadService {
   /// Cancel a download (if possible)
   void cancelDownload(String videoName) {
     _activeDownloads[videoName] = false;
+    _updateWakelock();
     _downloadCubit.updateDownloadState(
       videoName: videoName,
       status: DownloadStatus.idle,

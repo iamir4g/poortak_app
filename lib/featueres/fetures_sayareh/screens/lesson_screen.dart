@@ -1,3 +1,4 @@
+import 'package:poortak/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poortak/common/services/video_download_service.dart';
@@ -42,7 +43,7 @@ class LessonScreen extends StatefulWidget {
   State<LessonScreen> createState() => _LessonScreenState();
 }
 
-class _LessonScreenState extends State<LessonScreen> {
+class _LessonScreenState extends State<LessonScreen> with RouteAware {
   String? videoUrl;
   String? localVideoPath;
   bool isDownloading = false;
@@ -176,10 +177,28 @@ class _LessonScreenState extends State<LessonScreen> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Register this screen for route observer
+    routeObserver.subscribe(this, ModalRoute.of(context)!);
+  }
+
+  @override
   void dispose() {
     _isDisposed = true;
+    // Unregister from route observer
+    routeObserver.unsubscribe(this);
     _videoPlayerKey.currentState?.stopVideo();
     super.dispose();
+  }
+
+  @override
+  void didPushNext() {
+    // Called when a new route has been pushed, and the current route is no longer visible.
+    // Pause video playback
+    print("Pausing video because a new screen was pushed");
+    _videoPlayerKey.currentState?.stopVideo();
+    super.didPushNext();
   }
 
   @override
