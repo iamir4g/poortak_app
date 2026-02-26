@@ -34,18 +34,26 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
   bool showAnswer = false;
   bool isCorrect = false;
   String? selectedWord;
+  List<String> randomizedOptions = [];
 
   @override
   void initState() {
     super.initState();
     _initializeTTS();
-    context.read<PracticeVocabularyBloc>().add(
-          PracticeVocabularyFetchEvent(courseId: widget.courseId),
-        );
   }
 
   void _initializeTTS() async {
     await ttsService.setMaleVoice();
+  }
+
+  void _generateRandomOptions(String correct, String wrong) {
+    if (randomizedOptions.isEmpty ||
+        (!randomizedOptions.contains(correct) ||
+            !randomizedOptions.contains(wrong))) {
+      final options = [correct, wrong];
+      options.shuffle();
+      randomizedOptions = options;
+    }
   }
 
   void _checkAnswer(String word) {
@@ -95,6 +103,7 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
     setState(() {
       showAnswer = false;
       selectedWord = null;
+      randomizedOptions = []; // Clear for next randomization
     });
     if (context.read<PracticeVocabularyBloc>().state
         is PracticeVocabularySuccess) {
@@ -178,6 +187,11 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
       },
       child: BlocBuilder<PracticeVocabularyBloc, PracticeVocabularyState>(
         builder: (context, state) {
+          if (state is PracticeVocabularyInitial) {
+            context.read<PracticeVocabularyBloc>().add(
+                  PracticeVocabularyFetchEvent(courseId: widget.courseId),
+                );
+          }
           final bool canPopScreen = state is! PracticeVocabularyCompleted;
 
           return PopScope(
@@ -239,6 +253,8 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
                       final correctWord =
                           state.practiceVocabulary.data.correctWord;
                       final wrongWord = state.practiceVocabulary.data.wrongWord;
+
+                      _generateRandomOptions(correctWord.word, wrongWord.word);
 
                       return Column(
                         children: [
@@ -320,10 +336,10 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
                                       Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceEvenly,
-                                        children: [
-                                          _buildWordButton(correctWord.word),
-                                          _buildWordButton(wrongWord.word),
-                                        ],
+                                        children: randomizedOptions
+                                            .map((word) =>
+                                                _buildWordButton(word))
+                                            .toList(),
                                       ),
                                     SizedBox(height: showAnswer ? 10.h : 30.h),
                                     if (showAnswer) ...[
