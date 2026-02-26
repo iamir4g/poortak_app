@@ -38,6 +38,11 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
   @override
   void initState() {
     super.initState();
+    _initializeTTS();
+  }
+
+  void _initializeTTS() async {
+    await ttsService.setMaleVoice();
   }
 
   void _addToLitner(String word, String translation) async {
@@ -65,7 +70,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
   }
 
   void _readWord(String word) async {
-    await ttsService.speak(word);
+    await ttsService.speak(word, voice: 'male');
   }
 
   void _showExitModal() {
@@ -213,71 +218,74 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                               }
                             }
                           },
-                          child: Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  height: 20.h,
-                                ),
-                                //step progress bar
-                                StepProgress(
-                                    currentIndex: currentIndex,
-                                    totalSteps: totalWords),
+                          child: SingleChildScrollView(
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    height: 20.h,
+                                  ),
+                                  //step progress bar
+                                  StepProgress(
+                                      currentIndex: currentIndex,
+                                      totalSteps: totalWords),
 
-                                SizedBox(
-                                  height: 85.h,
-                                ),
-                                FutureBuilder<String>(
-                                  future:
-                                      storageService.callGetDownloadPublicUrl(
-                                          currentWord.thumbnail),
-                                  builder: (context, snapshot) {
-                                    if (snapshot.connectionState ==
-                                        ConnectionState.waiting) {
-                                      return const CircularProgressIndicator();
-                                    }
-                                    if (snapshot.hasError) {
-                                      return const Icon(Icons.error);
-                                    }
-                                    if (snapshot.hasData) {
-                                      return Container(
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(16.r),
-                                        ),
-                                        child: ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(16.r),
-                                          child: Image.network(
-                                            snapshot.data!,
-                                            height: 264.h,
-                                            width: 264.w,
-                                            fit: BoxFit.cover,
+                                  SizedBox(
+                                    height: 30.h,
+                                  ),
+                                  FutureBuilder<String>(
+                                    future:
+                                        storageService.callGetDownloadPublicUrl(
+                                            currentWord.thumbnail),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.waiting) {
+                                        return const CircularProgressIndicator();
+                                      }
+                                      if (snapshot.hasError) {
+                                        return const Icon(Icons.error);
+                                      }
+                                      if (snapshot.hasData) {
+                                        return Container(
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(16.r),
                                           ),
-                                        ),
-                                      );
-                                    }
-                                    return const SizedBox.shrink();
-                                  },
-                                ),
-                                SizedBox(height: 20.h),
-                                Text(
-                                  currentWord.word,
-                                  style: TextStyle(
-                                    fontSize: 24.sp,
-                                    fontWeight: FontWeight.bold,
+                                          child: ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(16.r),
+                                            child: Image.network(
+                                              snapshot.data!,
+                                              height: 200.h,
+                                              width: 200.w,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                        );
+                                      }
+                                      return const SizedBox.shrink();
+                                    },
                                   ),
-                                ),
-                                SizedBox(height: 10.h),
-                                Text(
-                                  currentWord.translation,
-                                  style: TextStyle(
-                                    fontSize: 18.sp,
-                                    color: Colors.grey,
+                                  SizedBox(height: 20.h),
+                                  Text(
+                                    currentWord.word,
+                                    style: TextStyle(
+                                      fontSize: 24.sp,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                  SizedBox(height: 10.h),
+                                  Text(
+                                    currentWord.translation,
+                                    style: TextStyle(
+                                      fontSize: 18.sp,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                  SizedBox(height: 20.h),
+                                ],
+                              ),
                             ),
                           ),
                         ),

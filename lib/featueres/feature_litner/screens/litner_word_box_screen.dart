@@ -40,6 +40,16 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
   final TTSService ttsService = locator<TTSService>();
   bool isBack = false; // Track if the card is showing its back
 
+  @override
+  void initState() {
+    super.initState();
+    _initializeTTS();
+  }
+
+  void _initializeTTS() async {
+    await ttsService.setMaleVoice();
+  }
+
   void _flipToBack() {
     _flipController.flipcard();
     setState(() {
@@ -256,7 +266,7 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
               ),
               SizedBox(width: Dimens.small.w),
               GestureDetector(
-                onTap: () => ttsService.speak(englishWord),
+                onTap: () => ttsService.speak(englishWord, voice: 'male'),
                 child: IconifyIcon(
                   icon: "cuida:volume-2-outline",
                   size: 28.r,
@@ -307,7 +317,7 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
                 ),
                 SizedBox(width: Dimens.small.w),
                 GestureDetector(
-                  onTap: () => ttsService.speak(englishWord),
+                  onTap: () => ttsService.speak(englishWord, voice: 'male'),
                   child: IconifyIcon(
                     icon: "cuida:volume-2-outline",
                     size: 28.r,

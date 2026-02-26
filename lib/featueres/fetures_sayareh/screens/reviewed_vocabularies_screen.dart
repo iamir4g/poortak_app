@@ -33,8 +33,18 @@ class _ReviewedVocabulariesScreenState
   final TTSService ttsService = locator<TTSService>();
   final StorageService storageService = locator<StorageService>();
 
+  @override
+  void initState() {
+    super.initState();
+    _initializeTTS();
+  }
+
+  void _initializeTTS() async {
+    await ttsService.setMaleVoice();
+  }
+
   void _readWord(String word) async {
-    await ttsService.speak(word);
+    await ttsService.speak(word, voice: 'male');
   }
 
   void _addToListener(String wordId) {

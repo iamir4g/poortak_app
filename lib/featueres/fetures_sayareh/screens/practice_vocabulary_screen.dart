@@ -38,9 +38,14 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
   @override
   void initState() {
     super.initState();
+    _initializeTTS();
     context.read<PracticeVocabularyBloc>().add(
           PracticeVocabularyFetchEvent(courseId: widget.courseId),
         );
+  }
+
+  void _initializeTTS() async {
+    await ttsService.setMaleVoice();
   }
 
   void _checkAnswer(String word) {
@@ -112,7 +117,7 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
   }
 
   void _readWord(String word) async {
-    await ttsService.speak(word);
+    await ttsService.speak(word, voice: 'male');
   }
 
   void _addToLitner(String word, String translation) async {
