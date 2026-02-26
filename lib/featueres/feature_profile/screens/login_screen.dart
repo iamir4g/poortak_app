@@ -245,7 +245,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           textAlign: TextAlign.center,
                         ),
 
-                      SizedBox(height: 100.h),
+                      SizedBox(height: 60.h),
 
                       // Terms and conditions link
                       if (!showOtpForm) _buildTermsLink(),
@@ -260,7 +260,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       // Footer buttons removed - resend button is now in OTP section
 
                       // Bottom spacing
-                      SizedBox(height: 120.h),
+                      SizedBox(height: 40.h),
                       // const Expanded(child: SizedBox()),
                     ],
                   ),
@@ -275,8 +275,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget _buildMobileInput() {
     return Container(
-      width: 331.w,
-      height: 63.h,
+      constraints: BoxConstraints(maxWidth: 360.w),
+      padding: EdgeInsets.symmetric(horizontal: 4.w),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(19.r),
@@ -334,23 +334,24 @@ class _LoginScreenState extends State<LoginScreen> {
           Container(
             width: 1.w,
             height: 20.h,
-            margin: EdgeInsets.symmetric(horizontal: 12.w),
+            margin: EdgeInsets.symmetric(horizontal: 8.w),
             color: MyColors.divider,
           ),
           // Prefix "۰۹"
           Text(
             "۰۹",
             style: MyTextStyle.textMatn12Bold.copyWith(
-              fontSize: 24.sp,
+              fontSize: 22.sp,
               color: MyColors.textMatn1,
               fontWeight: FontWeight.w500,
             ),
           ),
+          SizedBox(width: 8.w),
           // Phone icon
           Container(
-            width: 60.w,
-            height: 60.h,
-            margin: EdgeInsets.only(right: 12.w),
+            width: 56.r,
+            height: 56.r,
+            margin: EdgeInsets.symmetric(vertical: 4.h, horizontal: 4.w),
             decoration: BoxDecoration(
               color: const Color(0xFFF6F6F6),
               borderRadius: BorderRadius.circular(19.r),
@@ -523,8 +524,11 @@ class _LoginScreenState extends State<LoginScreen> {
         }
 
         return Container(
-          width: 156.w,
-          height: 64.h,
+          constraints: BoxConstraints(
+            minWidth: 156.w,
+            minHeight: 56.h,
+          ),
+          padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
           decoration: BoxDecoration(
             color: MyColors.primary,
             borderRadius: BorderRadius.circular(20.r),

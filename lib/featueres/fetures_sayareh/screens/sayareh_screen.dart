@@ -142,7 +142,7 @@ class _SayarehScreenState extends State<SayarehScreen> {
                       child: Column(
                         children: [
                           SizedBox(
-                            height: 28,
+                            height: 28.h,
                           ),
                           Text(
                             l10n?.sayareh ?? "",
@@ -154,16 +154,17 @@ class _SayarehScreenState extends State<SayarehScreen> {
                             ),
                           ),
                           SizedBox(
-                            height: 12,
+                            height: 12.h,
                           ),
                           // Sayareh List Section
 
                           ListView.separated(
                             shrinkWrap: true,
+                            padding: EdgeInsets.zero,
                             physics: const NeverScrollableScrollPhysics(),
                             itemCount: sayarehDataCompleted.data.data.length,
                             separatorBuilder: (context, index) {
-                              return const SizedBox(height: 12);
+                              return SizedBox(height: 4.h);
                             },
                             itemBuilder: (context, index) {
                               final item =
@@ -219,7 +220,7 @@ class _SayarehScreenState extends State<SayarehScreen> {
                     child: Column(
                       children: [
                         SizedBox(
-                          height: 30,
+                          height: 30.h,
                         ),
                         Text(
                           "کتاب های سیاره آی نو",
@@ -229,17 +230,18 @@ class _SayarehScreenState extends State<SayarehScreen> {
                           ),
                         ),
                         SizedBox(
-                          height: 12,
+                          height: 12.h,
                         ),
                         if (sayarehDataCompleted.bookListData.data != null &&
                             sayarehDataCompleted.bookListData.data!.isNotEmpty)
                           ListView.separated(
                             shrinkWrap: true,
+                            padding: EdgeInsets.zero,
                             physics: const NeverScrollableScrollPhysics(),
                             itemCount:
                                 sayarehDataCompleted.bookListData.data!.length,
                             separatorBuilder: (context, index) {
-                              return SizedBox(height: 12);
+                              return SizedBox(height: 4.h);
                             },
                             itemBuilder: (context, index) {
                               return ItemBook(

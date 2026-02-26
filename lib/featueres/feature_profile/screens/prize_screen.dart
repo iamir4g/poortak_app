@@ -120,63 +120,71 @@ class _PrizeScreenState extends State<PrizeScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           // 1000 Toman container
-          Container(
-            width: 125.w,
-            height: 75.h,
-            decoration: BoxDecoration(
-              color: const Color(0xFFEFF7F1),
-              borderRadius: BorderRadius.circular(30.r),
-            ),
-            child: Center(
-              child: Text(
-                '۱۰۰۰ تومان',
-                style: MyTextStyle.textMatn15.copyWith(
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black,
+          Expanded(
+            child: Container(
+              height: 75.h,
+              decoration: BoxDecoration(
+                color: const Color(0xFFEFF7F1),
+                borderRadius: BorderRadius.circular(30.r),
+              ),
+              child: Center(
+                child: Text(
+                  '۱۰۰۰ تومان',
+                  style: MyTextStyle.textMatn15.copyWith(
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black,
+                  ),
                 ),
               ),
             ),
           ),
 
           // Arrow
-          SizedBox(
-            width: 52.r,
-            height: 52.r,
-            child: Icon(
-              Icons.arrow_forward,
-              size: 32.r,
-              color: const Color(0xFFFFA73F),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 8.w),
+            child: SizedBox(
+              width: 40.r,
+              height: 40.r,
+              child: Icon(
+                Icons.arrow_forward,
+                size: 28.r,
+                color: const Color(0xFFFFA73F),
+              ),
             ),
           ),
 
           // 1 Coin container
-          Container(
-            width: 135.w,
-            height: 75.h,
-            decoration: BoxDecoration(
-              color: const Color(0xFFFFF5DB),
-              borderRadius: BorderRadius.circular(30.r),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  width: 28.r,
-                  height: 26.r,
-                  child: Image.asset(
-                    'assets/images/points/star_icon.png',
-                    fit: BoxFit.contain,
+          Expanded(
+            child: Container(
+              height: 75.h,
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFF5DB),
+                borderRadius: BorderRadius.circular(30.r),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: 28.r,
+                    height: 26.r,
+                    child: Image.asset(
+                      'assets/images/points/star_icon.png',
+                      fit: BoxFit.contain,
+                    ),
                   ),
-                ),
-                SizedBox(width: 8.w),
-                Text(
-                  'هر ۱ سکه',
-                  style: MyTextStyle.textMatn15.copyWith(
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black,
+                  SizedBox(width: 8.w),
+                  Flexible(
+                    child: Text(
+                      'هر ۱ سکه',
+                      style: MyTextStyle.textMatn15.copyWith(
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ],
@@ -220,7 +228,7 @@ class _PrizeScreenState extends State<PrizeScreen> {
     required String number,
   }) {
     return Container(
-      width: 315.w,
+      width: double.infinity,
       decoration: BoxDecoration(
         color:
             isDarkMode ? MyColors.darkCardBackground : const Color(0xFFF4F5F5),
@@ -230,16 +238,15 @@ class _PrizeScreenState extends State<PrizeScreen> {
         children: [
           // Header with number
           Container(
-            width: 293.w,
-            height: 44.h,
-            margin: EdgeInsets.only(top: 18.h),
+            width: double.infinity,
+            margin: EdgeInsets.fromLTRB(16.w, 18.h, 16.w, 0),
+            padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 8.w),
             decoration: BoxDecoration(
               color: isDarkMode ? const Color(0xFF323548) : Colors.white,
               borderRadius: BorderRadius.circular(10.r),
             ),
             child: Row(
               children: [
-                SizedBox(width: 8.w),
                 Container(
                   width: 31.r,
                   height: 31.r,
@@ -258,13 +265,17 @@ class _PrizeScreenState extends State<PrizeScreen> {
                   ),
                 ),
                 SizedBox(width: 8.w),
-                Text(
-                  title,
-                  style: MyTextStyle.textMatn16.copyWith(
-                    fontWeight: FontWeight.w500,
-                    color: isDarkMode
-                        ? MyColors.darkTextPrimary
-                        : const Color(0xFF29303D),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: MyTextStyle.textMatn16.copyWith(
+                      fontWeight: FontWeight.w500,
+                      color: isDarkMode
+                          ? MyColors.darkTextPrimary
+                          : const Color(0xFF29303D),
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
@@ -273,7 +284,7 @@ class _PrizeScreenState extends State<PrizeScreen> {
 
           // Description
           Container(
-            width: 293.w,
+            width: double.infinity,
             padding: EdgeInsets.all(16.r),
             child: Text(
               description,
@@ -293,7 +304,7 @@ class _PrizeScreenState extends State<PrizeScreen> {
 
   Widget _buildBottomButton() {
     return Container(
-      height: 111.h,
+      padding: EdgeInsets.only(bottom: 16.h),
       width: double.infinity,
       decoration: BoxDecoration(
         color: Colors.white,
@@ -306,6 +317,7 @@ class _PrizeScreenState extends State<PrizeScreen> {
         ],
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           SizedBox(height: 16.h),
           // Ways to earn points button
@@ -316,7 +328,7 @@ class _PrizeScreenState extends State<PrizeScreen> {
             },
             child: Container(
               width: 254.w,
-              height: 60.h,
+              height: 56.h,
               decoration: BoxDecoration(
                 color: const Color(0xFFFFDB80),
                 borderRadius: BorderRadius.circular(20.r),
@@ -345,16 +357,13 @@ class _PrizeScreenState extends State<PrizeScreen> {
                 ),
               );
             },
-            child: SizedBox(
-              width: 128.w,
-              height: 23.h,
-              child: Center(
-                child: Text(
-                  'ادامه و پرداخت',
-                  style: MyTextStyle.textMatn15.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 4.h),
+              child: Text(
+                'ادامه و پرداخت',
+                style: MyTextStyle.textMatn11.copyWith(
+                  fontWeight: FontWeight.w500,
+                  color: const Color(0xFF29303D),
                 ),
               ),
             ),

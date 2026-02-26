@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
+import 'package:poortak/config/dimens.dart';
 import 'custom_video_player.dart';
 
 class VideoContainerWidget extends StatelessWidget {
@@ -33,17 +34,17 @@ class VideoContainerWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 360.w,
-      padding: EdgeInsets.all(5.r),
+      width: Dimens.nw(320), // Reduced from 360
+      padding: EdgeInsets.all(Dimens.nr(5)),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(40.r),
+        borderRadius: BorderRadius.circular(Dimens.nr(30)), // Reduced from 40
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(37.r),
+        borderRadius: BorderRadius.circular(Dimens.nr(27)), // Reduced from 37
         child: SizedBox(
-          width: 350.w,
-          height: 240.h,
+          width: Dimens.nw(310), // Reduced from 350
+          height: Dimens.nh(200), // Reduced from 240
           child: _buildContent(context),
         ),
       ),
@@ -63,9 +64,9 @@ class VideoContainerWidget extends StatelessWidget {
       key: videoPlayerKey,
       videoPath: videoPath ?? videoUrl!,
       isNetworkVideo: videoPath == null && videoUrl != null,
-      width: 350.w,
-      height: 240.h,
-      borderRadius: 37.r,
+      width: Dimens.nw(310),
+      height: Dimens.nh(200),
+      borderRadius: Dimens.nr(27),
       autoPlay: false,
       showControls: true,
       thumbnailUrl: thumbnailUrl,
@@ -86,16 +87,16 @@ class VideoContainerWidget extends StatelessWidget {
         Container(
           decoration: BoxDecoration(
             color: MyColors.brandSecondary,
-            borderRadius: BorderRadius.circular(37.r),
+            borderRadius: BorderRadius.circular(Dimens.nr(27)),
           ),
         ),
         if (thumbnailUrl != null)
           ClipRRect(
-            borderRadius: BorderRadius.circular(37.r),
+            borderRadius: BorderRadius.circular(Dimens.nr(27)),
             child: Image.network(
               thumbnailUrl!,
-              width: 350.w,
-              height: 240.h,
+              width: Dimens.nw(310),
+              height: Dimens.nh(200),
               fit: BoxFit.cover,
             ),
           ),
@@ -107,7 +108,7 @@ class VideoContainerWidget extends StatelessWidget {
                 CircularProgressIndicator(
                   color: Theme.of(context).textTheme.titleMedium?.color,
                 ),
-              SizedBox(height: 16.h),
+              SizedBox(height: Dimens.nh(16)),
               Text(
                 isDecrypting
                     ? 'در حال رمزگشایی ویدیو...'
@@ -116,7 +117,7 @@ class VideoContainerWidget extends StatelessWidget {
                         : 'در حال پردازش ویدیو...',
                 style: TextStyle(
                   color: Theme.of(context).textTheme.titleMedium?.color,
-                  fontSize: 16.sp,
+                  fontSize: Dimens.nsp(14), // Reduced from 16
                   fontFamily: 'IranSans',
                 ),
               ),
@@ -131,7 +132,7 @@ class VideoContainerWidget extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: MyColors.brandSecondary,
-        borderRadius: BorderRadius.circular(37.r),
+        borderRadius: BorderRadius.circular(Dimens.nr(27)),
       ),
       child: Center(
         child: Column(
@@ -140,14 +141,14 @@ class VideoContainerWidget extends StatelessWidget {
             Icon(
               Icons.error_outline,
               color: Theme.of(context).textTheme.titleMedium?.color,
-              size: 48.r,
+              size: Dimens.nr(40), // Reduced from 48
             ),
-            SizedBox(height: 16.h),
+            SizedBox(height: Dimens.nh(16)),
             Text(
               'خطا در بارگذاری ویدیو',
               style: TextStyle(
                 color: Theme.of(context).textTheme.titleMedium?.color,
-                fontSize: 16.sp,
+                fontSize: Dimens.nsp(14), // Reduced from 16
               ),
             ),
           ],

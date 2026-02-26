@@ -138,9 +138,13 @@ class _LitnerWordsInprogressScreenState
       backgroundColor: const Color(0xFFFFFFFF),
       appBar: AppBar(
         backgroundColor: const Color(0xFFFFFFFF),
-        title: Text(
-          'لغات در حال یادگیری',
-          style: MyTextStyle.textHeader16Bold,
+        title: Flexible(
+          child: Text(
+            'لغات در حال یادگیری',
+            style: MyTextStyle.textHeader16Bold,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.miniStartFloat,
@@ -256,36 +260,44 @@ class _LitnerWordsInprogressScreenState
                           child: CircularProgressIndicator(),
                         )
                       : _words.isEmpty
-                          ? Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.search_off,
-                                    size: 64.r,
-                                    color: Color(0xFF9CA3AF),
+                          ? SingleChildScrollView(
+                              child: Center(
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: 32.h, horizontal: 16.w),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.search_off,
+                                        size: 64.r,
+                                        color: Color(0xFF9CA3AF),
+                                      ),
+                                      SizedBox(height: Dimens.small.h),
+                                      Text(
+                                        _searchWord.isNotEmpty
+                                            ? 'هیچ لغتی یافت نشد.'
+                                            : 'هیچ لغتی موجود نیست.',
+                                        style: TextStyle(
+                                          fontFamily: 'IRANSans',
+                                          fontSize: 14.sp,
+                                          color: Color(0xFF9CA3AF),
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ],
                                   ),
-                                  SizedBox(height: Dimens.small.h),
-                                  Text(
-                                    _searchWord.isNotEmpty
-                                        ? 'هیچ لغتی یافت نشد.'
-                                        : 'هیچ لغتی موجود نیست.',
-                                    style: TextStyle(
-                                      fontFamily: 'IRANSans',
-                                      fontSize: 14.sp,
-                                      color: Color(0xFF9CA3AF),
-                                    ),
-                                  ),
-                                ],
+                                ),
                               ),
                             )
                           : ListView.separated(
                               controller: _scrollController,
+                              padding: EdgeInsets.symmetric(horizontal: 16.w),
                               itemCount:
                                   _words.length + (_isLoadingMore ? 1 : 0),
                               separatorBuilder: (context, index) => Container(
                                 height: 1.5.h,
-                                width: 200.w,
+                                width: double.infinity,
                                 color: const Color(0xFFF2F2F2),
                               ),
                               itemBuilder: (context, index) {
@@ -298,72 +310,70 @@ class _LitnerWordsInprogressScreenState
                                   ));
                                 }
                                 final word = _words[index];
-                                return Center(
-                                  child: Container(
-                                    width: 340.w,
-                                    height: 40.h,
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(8.r),
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Padding(
+                                return Container(
+                                  width: double.infinity,
+                                  constraints: BoxConstraints(minHeight: 48.h),
+                                  padding: EdgeInsets.symmetric(vertical: 4.h),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(8.r),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Padding(
                                           padding: EdgeInsets.only(left: 8.w),
-                                          child: Row(
-                                            children: [
-                                              Text(
-                                                word.translation,
-                                                style: TextStyle(
-                                                  fontFamily: 'IRANSans',
-                                                  fontWeight: FontWeight.w700,
-                                                  fontSize: 16.sp,
-                                                  color: Color(0xFF29303D),
-                                                ),
-                                              ),
-                                            ],
+                                          child: Text(
+                                            word.translation,
+                                            style: TextStyle(
+                                              fontFamily: 'IRANSans',
+                                              fontWeight: FontWeight.w700,
+                                              fontSize: 16.sp,
+                                              color: Color(0xFF29303D),
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
                                           ),
                                         ),
-                                        Padding(
-                                            padding:
-                                                EdgeInsets.only(right: 16.w),
-                                            child: Row(
-                                              children: [
-                                                IconButton(
-                                                  icon: IconifyIcon(
-                                                    icon:
-                                                        "cuida:volume-2-outline",
-                                                    size: 18.r,
-                                                    color: Color(0xFFA3AFC2),
-                                                  ),
-                                                  splashRadius: 18.r,
-                                                  padding: EdgeInsets.zero,
-                                                  constraints:
-                                                      const BoxConstraints(),
-                                                  onPressed: () {
-                                                    locator<TTSService>()
-                                                        .speak(word.word);
-                                                  },
-                                                ),
-                                                SizedBox(width: 4.w),
-                                                Text(
-                                                  word.word,
-                                                  style: TextStyle(
-                                                    fontFamily: 'IRANSans',
-                                                    fontWeight: FontWeight.w400,
-                                                    fontSize: 14.sp,
-                                                    color: Color(0xFF29303D),
-                                                  ),
-                                                  textAlign: TextAlign.right,
-                                                ),
-                                              ],
-                                            )),
-                                      ],
-                                    ),
+                                      ),
+                                      SizedBox(width: 8.w),
+                                      Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          IconButton(
+                                            icon: IconifyIcon(
+                                              icon: "cuida:volume-2-outline",
+                                              size: 18.r,
+                                              color: Color(0xFFA3AFC2),
+                                            ),
+                                            splashRadius: 18.r,
+                                            padding: EdgeInsets.zero,
+                                            constraints: const BoxConstraints(),
+                                            onPressed: () {
+                                              locator<TTSService>()
+                                                  .speak(word.word);
+                                            },
+                                          ),
+                                          SizedBox(width: 4.w),
+                                          ConstrainedBox(
+                                            constraints:
+                                                BoxConstraints(maxWidth: 120.w),
+                                            child: Text(
+                                              word.word,
+                                              style: TextStyle(
+                                                fontFamily: 'IRANSans',
+                                                fontWeight: FontWeight.w400,
+                                                fontSize: 14.sp,
+                                                color: Color(0xFF29303D),
+                                              ),
+                                              textAlign: TextAlign.right,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
                                   ),
                                 );
                               },

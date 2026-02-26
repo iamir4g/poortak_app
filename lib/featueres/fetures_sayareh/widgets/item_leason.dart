@@ -64,8 +64,7 @@ class ItemLeason extends StatelessWidget {
         }
       },
       child: Container(
-        width: 360.w,
-        height: 88.h,
+        width: double.infinity,
         margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
         padding: EdgeInsets.all(16.r),
         decoration: BoxDecoration(
@@ -77,30 +76,35 @@ class ItemLeason extends StatelessWidget {
           children: [
             Expanded(
               child: Row(children: [
-                CircleAvatar(
-                  radius: 33.5.r,
-                  child: FutureBuilder<String>(
-                    future: GetImageUrlService().getImageUrl(item.thumbnail),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const CircularProgressIndicator();
-                      }
-                      if (snapshot.hasError ||
-                          !snapshot.hasData ||
-                          snapshot.data!.isEmpty) {
-                        return const Icon(Icons.error);
-                      }
-                      return Image.network(
-                        snapshot.data!,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
+                SizedBox(
+                  width: 67.r,
+                  height: 67.r,
+                  child: ClipOval(
+                    child: FutureBuilder<String>(
+                      future: GetImageUrlService().getImageUrl(item.thumbnail),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        }
+                        if (snapshot.hasError ||
+                            !snapshot.hasData ||
+                            snapshot.data!.isEmpty) {
                           return const Icon(Icons.error);
-                        },
-                      );
-                    },
+                        }
+                        return Image.network(
+                          snapshot.data!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return const Icon(Icons.error);
+                          },
+                        );
+                      },
+                    ),
                   ),
                 ),
-                SizedBox(width: 4.w),
+                SizedBox(width: 8.w),
                 Expanded(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -128,7 +132,7 @@ class ItemLeason extends StatelessWidget {
               children: [
                 if (progress != null)
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    padding: EdgeInsets.symmetric(horizontal: 8.w),
                     child: average >= 100
                         ? Row(
                             children: List.generate(
@@ -139,9 +143,13 @@ class ItemLeason extends StatelessWidget {
                             percentage: average, width: 60.w, height: 8.h),
                   ),
                 isLocked
-                    ? Image(image: AssetImage("assets/images/lock_image.png"))
+                    ? SizedBox(
+                        width: 24.r,
+                        height: 24.r,
+                        child: Image(
+                            image: AssetImage("assets/images/lock_image.png")),
+                      )
                     : SizedBox(),
-                // : SizedBox(),
                 SizedBox(
                   width: 4.w,
                 ),
@@ -150,10 +158,6 @@ class ItemLeason extends StatelessWidget {
                   icon: "iconamoon:arrow-left-2-bold",
                   color: Theme.of(context).textTheme.titleMedium?.color,
                 ),
-                // Icon(
-                //   Icons.arrow_forward_ios,
-                //   color: Theme.of(context).textTheme.titleMedium?.color,
-                // ),
               ],
             ),
           ],

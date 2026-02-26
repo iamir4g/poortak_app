@@ -43,16 +43,21 @@ class SelfAssessmentSubjectCard extends StatelessWidget {
               ),
               child: Image.asset(
                 iconPath,
-                width: 70.w,
-                height: 70.h,
+                width: 50.r,
+                height: 50.r,
                 fit: BoxFit.contain,
               ),
             ),
             SizedBox(height: 12.h),
-            Text(
-              title,
-              style: MyTextStyle.textMatn14Bold,
-              textAlign: TextAlign.center,
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8.w),
+              child: Text(
+                title,
+                style: MyTextStyle.textMatn14Bold,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           ],
         ),

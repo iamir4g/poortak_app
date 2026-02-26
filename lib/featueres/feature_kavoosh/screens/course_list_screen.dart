@@ -57,10 +57,14 @@ class _CourseListScreenState extends State<CourseListScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  widget.title,
-                  style: MyTextStyle.textHeader16Bold.copyWith(
-                    color: MyColors.textMatn2,
+                Flexible(
+                  child: Text(
+                    widget.title,
+                    style: MyTextStyle.textHeader16Bold.copyWith(
+                      color: MyColors.textMatn2,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 SizedBox(
@@ -120,6 +124,8 @@ class _CourseListScreenState extends State<CourseListScreen> {
                           fontWeight: FontWeight.bold,
                           color: isSelected ? Colors.white : MyColors.text4,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ),

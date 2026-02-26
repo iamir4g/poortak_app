@@ -54,9 +54,13 @@ class SelfAssessmentGradesScreen extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  'آزمون $subjectTitle',
-                  style: MyTextStyle.textHeader16Bold,
+                Flexible(
+                  child: Text(
+                    'آزمون $subjectTitle',
+                    style: MyTextStyle.textHeader16Bold,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
                 SizedBox(
                   width: 40.w,

@@ -296,21 +296,21 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
       child: Scaffold(
         backgroundColor: const Color(0xFFF6F9FE),
         appBar: PreferredSize(
-          preferredSize: Size.fromHeight(57.h),
+          preferredSize: Size.fromHeight(Dimens.nh(57)),
           child: SafeArea(
             child: Container(
-              padding: EdgeInsets.fromLTRB(16.w, 0, 32.w, 0),
-              height: 57.h,
+              padding: EdgeInsets.fromLTRB(Dimens.nw(16), 0, Dimens.nw(32), 0),
+              height: Dimens.nh(57),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(33.5.r),
+                  bottomLeft: Radius.circular(Dimens.nr(33.5)),
                 ),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.05),
                     offset: const Offset(0, 1),
-                    blurRadius: 1.r,
+                    blurRadius: Dimens.nr(1),
                   ),
                 ],
               ),
@@ -326,7 +326,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: 'IranSans',
-                          fontSize: 16.sp,
+                          fontSize: Dimens.nsp(16),
                           fontWeight: FontWeight.bold,
                           color: const Color(0xFF3D495C),
                         ),
@@ -334,14 +334,14 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
                     },
                   ),
                   SizedBox(
-                    width: 40.w,
-                    height: 40.h,
+                    width: Dimens.nw(40),
+                    height: Dimens.nh(40),
                     child: IconButton(
                       onPressed: () => Navigator.pop(context),
                       icon: Icon(
                         Icons.arrow_forward,
                         color: const Color(0xFF3D495C),
-                        size: 28.sp,
+                        size: Dimens.nsp(28),
                       ),
                     ),
                   ),
@@ -359,15 +359,15 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
     return SingleChildScrollView(
       child: Column(
         children: [
-          SizedBox(height: 28.h),
+          SizedBox(height: Dimens.nh(15)), // Reduced from 28
           _buildVideoSection(),
-          SizedBox(height: 18.h),
+          SizedBox(height: Dimens.nh(15)), // Reduced from 18
           _buildConversationCard(),
-          SizedBox(height: 12.h),
+          SizedBox(height: Dimens.nh(10)), // Reduced from 12
           _buildVocabularyCard(),
-          SizedBox(height: 12.h),
+          SizedBox(height: Dimens.nh(10)), // Reduced from 12
           _buildQuizCard(),
-          SizedBox(height: 88.h),
+          SizedBox(height: Dimens.nh(60)), // Reduced from 88
           _buildDictionaryButton(),
         ],
       ),
@@ -377,16 +377,16 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
   Widget _buildCompletionHeader() {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(Dimens.medium),
-      margin: EdgeInsets.symmetric(horizontal: Dimens.medium),
+      padding: EdgeInsets.all(Dimens.nw(16)),
+      margin: EdgeInsets.symmetric(horizontal: Dimens.nw(16)),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20.r),
+        borderRadius: BorderRadius.circular(Dimens.nr(20)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
-            blurRadius: 10.r,
-            offset: Offset(0, 4.h),
+            blurRadius: Dimens.nr(10),
+            offset: Offset(0, Dimens.nh(4)),
           ),
         ],
       ),
@@ -404,22 +404,22 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
                       'خوانده شده',
                       style: TextStyle(
                         fontFamily: 'IranSans',
-                        fontSize: 14.sp,
+                        fontSize: Dimens.nsp(14),
                         fontWeight: FontWeight.bold,
                         color: const Color(0xFF3D495C),
                       ),
                     ),
-                    SizedBox(width: 8.w),
+                    SizedBox(width: Dimens.nw(8)),
                     Icon(
                       Icons.check_circle,
                       color: const Color(0xFF4CAF50),
-                      size: 24.sp,
+                      size: Dimens.nsp(24),
                     ),
                   ],
                 ),
-                SizedBox(height: 16.h),
+                SizedBox(height: Dimens.nh(16)),
                 SizedBox(
-                  height: 48.h,
+                  height: Dimens.nh(48),
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () {
@@ -433,7 +433,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFFF9F29),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(25.r),
+                        borderRadius: BorderRadius.circular(Dimens.nr(25)),
                       ),
                       elevation: 0,
                     ),
@@ -441,7 +441,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
                       'مرور دوباره درس',
                       style: TextStyle(
                         fontFamily: 'IranSans',
-                        fontSize: 16.sp,
+                        fontSize: Dimens.nsp(16),
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),
@@ -451,11 +451,11 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
               ],
             ),
           ),
-          SizedBox(width: 16.w),
+          SizedBox(width: Dimens.nw(16)),
           Image.asset(
             'assets/images/iknow/medal.png',
-            width: 90.w,
-            height: 90.h,
+            width: Dimens.nw(90),
+            height: Dimens.nh(90),
             fit: BoxFit.contain,
           ),
         ],
@@ -562,18 +562,18 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
       persianLabel: "واژگان",
       progress: _progress?.vocabulary,
       badge: Container(
-        width: 40.w,
-        height: 15.h,
+        width: Dimens.nw(40),
+        height: Dimens.nh(15),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(8.r),
+          borderRadius: BorderRadius.circular(Dimens.nr(8)),
         ),
         child: Center(
           child: Text(
             "Word",
             style: TextStyle(
               fontFamily: 'IranSans',
-              fontSize: 10.sp,
+              fontSize: Dimens.nsp(10),
               fontWeight: FontWeight.w900,
               color: const Color(0xFF95D6A4),
             ),
@@ -628,18 +628,18 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
     return Align(
       alignment: Alignment.centerLeft,
       child: Padding(
-        padding: EdgeInsets.only(left: 20.w),
+        padding: EdgeInsets.only(left: Dimens.nw(20)),
         child: Container(
-          width: 63.w,
-          height: 63.h,
+          width: Dimens.nw(63),
+          height: Dimens.nh(63),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(50.r),
+            borderRadius: BorderRadius.circular(Dimens.nr(50)),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.04),
                 offset: const Offset(0, 0),
-                blurRadius: 4.r,
+                blurRadius: Dimens.nr(4),
               ),
             ],
           ),
@@ -654,8 +654,8 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
             },
             icon: Image.asset(
               "assets/images/iknow/dictionary_icon.png",
-              width: 36.w,
-              height: 36.h,
+              width: Dimens.nw(36),
+              height: Dimens.nh(36),
             ),
           ),
         ),

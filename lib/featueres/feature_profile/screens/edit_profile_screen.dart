@@ -395,8 +395,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           ),
           content: SizedBox(
             width: double.maxFinite,
-            height: 300.h,
-            child: _buildAvatarGrid(),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.5,
+              ),
+              child: _buildAvatarGrid(),
+            ),
           ),
           actions: [
             TextButton(

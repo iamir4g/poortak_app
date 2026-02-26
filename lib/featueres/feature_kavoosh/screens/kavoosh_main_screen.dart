@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/config/dimens.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/educational_videos_screen.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/ebooks_screen.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/self_assessment_screen.dart';
@@ -31,7 +31,8 @@ class _KavooshMainScreenState extends State<KavooshMainScreen> {
             // Content
             Expanded(
               child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 20.h),
+                padding: EdgeInsets.symmetric(
+                    horizontal: Dimens.medium, vertical: Dimens.nw(20.0)),
                 child: Column(
                   children: [
                     // Educational Videos Card
@@ -48,7 +49,7 @@ class _KavooshMainScreenState extends State<KavooshMainScreen> {
                       },
                     ),
 
-                    SizedBox(height: 13.h),
+                    SizedBox(height: Dimens.nh(13.0)),
 
                     // E-Books Card
                     _buildContentCard(
@@ -64,7 +65,7 @@ class _KavooshMainScreenState extends State<KavooshMainScreen> {
                       },
                     ),
 
-                    SizedBox(height: 13.h),
+                    SizedBox(height: Dimens.nh(13.0)),
 
                     // Self-Assessment Card
                     _buildContentCard(
@@ -102,17 +103,17 @@ class _KavooshMainScreenState extends State<KavooshMainScreen> {
       child: Stack(
         children: [
           Container(
-            height: 150.h,
+            constraints: BoxConstraints(minHeight: Dimens.nh(150.0)),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: gradientColors,
               ),
-              borderRadius: BorderRadius.circular(30.r),
+              borderRadius: BorderRadius.circular(Dimens.nr(30.0)),
               border: Border.all(
                 color: Colors.white,
-                width: 5.w,
+                width: Dimens.nw(5.0),
               ),
               boxShadow: const [
                 BoxShadow(
@@ -123,7 +124,7 @@ class _KavooshMainScreenState extends State<KavooshMainScreen> {
               ],
             ),
             child: Padding(
-              padding: EdgeInsets.all(20.r),
+              padding: EdgeInsets.all(Dimens.nr(20.0)),
               child: Row(
                 children: [
                   Expanded(
@@ -134,36 +135,40 @@ class _KavooshMainScreenState extends State<KavooshMainScreen> {
                         Text(
                           title,
                           style: MyTextStyle.textMatn17W700.copyWith(
-                            color: const Color(0xFF29303D),
+                            color: MyColors.darkText1,
                           ),
                           textAlign: TextAlign.right,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        SizedBox(height: 4.h),
+                        SizedBox(height: Dimens.tiny),
                         Text(
                           subtitle,
                           style: MyTextStyle.textMatn10W300.copyWith(
                             fontWeight: FontWeight.w500,
-                            color: const Color(0xFF52617A),
+                            color: MyColors.text3,
                           ),
                           textAlign: TextAlign.right,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
                   ),
-                  SizedBox(width: 20.w),
+                  SizedBox(width: Dimens.medium),
                   // Icon placeholder
                   Container(
-                    width: 100.w,
-                    height: 70.h,
+                    width: Dimens.nr(80.0),
+                    height: Dimens.nr(80.0),
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.3),
-                      borderRadius: BorderRadius.circular(15.r),
+                      borderRadius: BorderRadius.circular(Dimens.radiusLarge),
                     ),
                     child: Center(
                       child: Image.asset(
                         _getIconPathForTitle(title),
-                        width: 114.w,
-                        height: 70.h,
+                        width: Dimens.nr(60.0),
+                        height: Dimens.nr(60.0),
                         fit: BoxFit.contain,
                       ),
                     ),
@@ -175,13 +180,14 @@ class _KavooshMainScreenState extends State<KavooshMainScreen> {
           // Coming Soon Badge
           if (showComingSoonBadge)
             Positioned(
-              top: 10.h,
-              right: 10.w,
+              top: Dimens.small,
+              right: Dimens.small,
               child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                padding: EdgeInsets.symmetric(
+                    horizontal: Dimens.small, vertical: Dimens.tiny),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFF6B6B),
-                  borderRadius: BorderRadius.circular(12.r),
+                  color: MyColors.darkError,
+                  borderRadius: BorderRadius.circular(Dimens.radiusMedium),
                   boxShadow: const [
                     BoxShadow(
                       color: Color(0x1F000000),

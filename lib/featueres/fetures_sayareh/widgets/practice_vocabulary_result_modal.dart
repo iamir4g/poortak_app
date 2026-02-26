@@ -130,8 +130,10 @@ class PracticeVocabularyResultModal extends StatelessWidget {
               height: 50,
               child: ElevatedButton(
                 onPressed: () {
+                  // First pop the dialog
                   Navigator.of(context).pop();
-                  Navigator.of(context).pushNamed(
+                  // Then replace the current screen (PracticeVocabularyScreen) with ReviewedVocabulariesScreen
+                  Navigator.of(context).pushReplacementNamed(
                     ReviewedVocabulariesScreen.routeName,
                     arguments: {
                       "reviewedVocabularies": reviewedVocabularies,

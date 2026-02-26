@@ -20,7 +20,7 @@ class SelfAssessmentGradeCard extends StatelessWidget {
       child: Container(
         margin: EdgeInsets.only(bottom: 16.h),
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-        height: 80.h,
+        constraints: BoxConstraints(minHeight: 80.h),
         decoration: BoxDecoration(
           color: MyColors.background,
           borderRadius: BorderRadius.circular(50.r),
@@ -36,14 +36,18 @@ class SelfAssessmentGradeCard extends StatelessWidget {
           children: [
             Image.asset(
               'assets/images/quiz_icon.png',
-              width: 40.w,
-              height: 40.h,
+              width: 40.r,
+              height: 40.r,
             ),
-            Padding(
-              padding: EdgeInsets.only(right: 16.0.w),
-              child: Text(
-                title,
-                style: MyTextStyle.textMatn18Bold,
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.0.w),
+                child: Text(
+                  title,
+                  style: MyTextStyle.textMatn18Bold,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ),
           ],

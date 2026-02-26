@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:poortak/config/dimens.dart';
+import 'package:poortak/config/myColors.dart';
 import 'package:poortak/common/widgets/primaryButton.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/l10n/app_localizations.dart';
-// import 'package:poortak/l10n/app_localizations.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_bloc.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_event.dart';
@@ -15,7 +15,6 @@ import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
 import 'package:poortak/locator.dart';
 import '../widgets/litner_card.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter/widgets.dart'; // For RouteAware
 import 'package:poortak/main.dart'; // For routeObserver
 
 class LitnerMainScreen extends StatefulWidget {
@@ -67,23 +66,25 @@ class _LitnerMainScreenState extends State<LitnerMainScreen> with RouteAware {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: const Color(0xFFFFFFFF),
+      backgroundColor: MyColors.background,
       body: SafeArea(
         child: Stack(
           children: [
             if (!isLoggedIn)
               Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: EdgeInsets.all(Dimens.medium),
                 child: Center(
                     child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: EdgeInsets.all(Dimens.small),
                       child: Text(
                         l10n!.you_are_not_logged_in_litner,
                         style: MyTextStyle.textCenter16,
                         textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     PrimaryButton(
@@ -97,76 +98,86 @@ class _LitnerMainScreenState extends State<LitnerMainScreen> with RouteAware {
               )
             else
               // Main content
-              Column(
-                children: [
-                  const SizedBox(height: 24),
-                  // Cards
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child: BlocBuilder<LitnerBloc, LitnerState>(
-                      builder: (context, state) {
-                        int inProgress = 0;
-                        int completed = 0;
-                        int today = 0;
+              SingleChildScrollView(
+                child: Column(
+                  children: [
+                    SizedBox(height: Dimens.large),
+                    // Cards
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: Dimens.nw(20.0)),
+                      child: BlocBuilder<LitnerBloc, LitnerState>(
+                        builder: (context, state) {
+                          int inProgress = 0;
+                          int completed = 0;
+                          int today = 0;
 
-                        if (state is OverviewLitnerSuccess) {
-                          inProgress =
-                              state.overviewLitner.data.inProgressWordsCount;
-                          completed =
-                              state.overviewLitner.data.completedWordsCount;
-                          today = state.overviewLitner.data.todayWordsCount;
-                        }
+                          if (state is OverviewLitnerSuccess) {
+                            inProgress =
+                                state.overviewLitner.data.inProgressWordsCount;
+                            completed =
+                                state.overviewLitner.data.completedWordsCount;
+                            today = state.overviewLitner.data.todayWordsCount;
+                          }
 
-                        return Column(
-                          children: [
-                            LitnerCard(
-                              gradient: const LinearGradient(
-                                colors: [Color(0xFFEED0F6), Color(0xFFF2E5FF)],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
+                          return Column(
+                            children: [
+                              LitnerCard(
+                                gradient: const LinearGradient(
+                                  colors: [
+                                    Color(0xFFEED0F6),
+                                    Color(0xFFF2E5FF)
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                                icon:
+                                    'assets/images/litner/work-in-progress.png',
+                                number: state is OverviewLitnerLoading
+                                    ? '...'
+                                    : inProgress.toString(),
+                                label: 'کلمه',
+                                subLabel: 'در حال یادگیری',
+                                onTap: () {
+                                  Navigator.pushNamed(context,
+                                      LitnerWordsInprogressScreen.routeName);
+                                },
                               ),
-                              icon: 'assets/images/litner/work-in-progress.png',
-                              number: state is OverviewLitnerLoading
-                                  ? '...'
-                                  : inProgress.toString(),
-                              label: 'کلمه',
-                              subLabel: 'در حال یادگیری',
-                              onTap: () {
-                                Navigator.pushNamed(context,
-                                    LitnerWordsInprogressScreen.routeName);
-                              },
-                            ),
-                            const SizedBox(height: 16),
-                            LitnerCard(
-                              gradient: const LinearGradient(
-                                colors: [Color(0xFFECFDE2), Color(0xFFE1FCF2)],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
+                              SizedBox(height: Dimens.medium),
+                              LitnerCard(
+                                gradient: const LinearGradient(
+                                  colors: [
+                                    Color(0xFFECFDE2),
+                                    Color(0xFFE1FCF2)
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                                icon: 'assets/images/litner/mortarboard.png',
+                                number: completed.toString(),
+                                label: 'کلمه',
+                                subLabel: 'آموخته شده',
+                                onTap: () {
+                                  Navigator.pushNamed(context,
+                                      LitnerWordCompletedScreen.routeName);
+                                },
                               ),
-                              icon: 'assets/images/litner/mortarboard.png',
-                              number: completed.toString(),
-                              label: 'کلمه',
-                              subLabel: 'آموخته شده',
-                              onTap: () {
-                                Navigator.pushNamed(context,
-                                    LitnerWordCompletedScreen.routeName);
-                              },
-                            ),
-                            const SizedBox(height: 16),
-                            LitnerTodayCard(
-                              number: today.toString(),
-                              onTap: () {
-                                Navigator.pushNamed(
-                                    context, LitnerWordBoxScreen.routeName);
-                              },
-                            ),
-                          ],
-                        );
-                      },
+                              SizedBox(height: Dimens.medium),
+                              LitnerTodayCard(
+                                number: today.toString(),
+                                onTap: () {
+                                  Navigator.pushNamed(
+                                      context, LitnerWordBoxScreen.routeName);
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      ),
                     ),
-                  ),
-                  const Spacer(),
-                ],
+                    SizedBox(height: Dimens.large),
+                  ],
+                ),
               ),
           ],
         ),

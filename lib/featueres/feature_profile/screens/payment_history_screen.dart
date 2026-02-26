@@ -157,37 +157,45 @@ class _PaymentHistoryScreenState extends State<PaymentHistoryScreen> {
   }
 
   Widget _buildEmptyState([String? message]) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // Empty state illustration
-          SizedBox(
-            width: 150.w,
-            height: 230.h,
-            child: const Image(
-              image:
-                  AssetImage('assets/images/profile/emptyPaymentHistory.png'),
+    return SingleChildScrollView(
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Empty state illustration
+            ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: 150.w,
+                maxHeight: 230.h,
+              ),
+              child: const Image(
+                image:
+                    AssetImage('assets/images/profile/emptyPaymentHistory.png'),
+                fit: BoxFit.contain,
+              ),
             ),
-          ),
-          SizedBox(height: 32.h),
-          // Empty state text
-          Text(
-            message ?? 'هنوز خریدی انجام نشده!',
-            style: MyTextStyle.textMatn16.copyWith(
-              fontWeight: FontWeight.w300,
-              color: MyColors.textMatn1,
+            SizedBox(height: 32.h),
+            // Empty state text
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.w),
+              child: Text(
+                message ?? 'هنوز خریدی انجام نشده!',
+                style: MyTextStyle.textMatn16.copyWith(
+                  fontWeight: FontWeight.w300,
+                  color: MyColors.textMatn1,
+                ),
+                textAlign: TextAlign.center,
+              ),
             ),
-            textAlign: TextAlign.center,
-          ),
-          SizedBox(height: 16.h),
-          ElevatedButton(
-            onPressed: () {
-              _paymentHistoryBloc.add(RefreshPaymentHistoryEvent());
-            },
-            child: const Text('بروزرسانی'),
-          ),
-        ],
+            SizedBox(height: 16.h),
+            ElevatedButton(
+              onPressed: () {
+                _paymentHistoryBloc.add(RefreshPaymentHistoryEvent());
+              },
+              child: const Text('بروزرسانی'),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -46,10 +46,14 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  widget.title,
-                  style: MyTextStyle.textHeader16Bold.copyWith(
-                    color: MyColors.textMatn2,
+                Flexible(
+                  child: Text(
+                    widget.title,
+                    style: MyTextStyle.textHeader16Bold.copyWith(
+                      color: MyColors.textMatn2,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 SizedBox(
@@ -147,7 +151,7 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
                           width: 60.w,
                           height: 60.h,
                           color: Colors.grey[200],
-                          // child: Image.asset(...), 
+                          // child: Image.asset(...),
                         ),
                       ),
                       SizedBox(width: 16.w),
@@ -161,21 +165,32 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
                               style: MyTextStyle.textMatn16Bold.copyWith(
                                 color: MyColors.textMatn2,
                               ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                             SizedBox(height: 8.h),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(
-                                  'نام استاد:',
-                                  style: MyTextStyle.textMatn12W500.copyWith(
-                                    color: MyColors.text4,
+                                Flexible(
+                                  child: Text(
+                                    'نام استاد:',
+                                    style: MyTextStyle.textMatn12W500.copyWith(
+                                      color: MyColors.text4,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
-                                Text(
-                                  'فاطمه میرایی', // Mock data
-                                  style: MyTextStyle.textMatn12Bold.copyWith(
-                                    color: MyColors.textMatn2,
+                                SizedBox(width: 8.w),
+                                Flexible(
+                                  child: Text(
+                                    'فاطمه میرایی', // Mock data
+                                    style: MyTextStyle.textMatn12Bold.copyWith(
+                                      color: MyColors.textMatn2,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
                               ],
@@ -184,16 +199,25 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(
-                                  'قیمت دوره:',
-                                  style: MyTextStyle.textMatn12W500.copyWith(
-                                    color: MyColors.text4,
+                                Flexible(
+                                  child: Text(
+                                    'قیمت دوره:',
+                                    style: MyTextStyle.textMatn12W500.copyWith(
+                                      color: MyColors.text4,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
-                                Text(
-                                  '۷۵,۰۰۰ تومان', // Mock data
-                                  style: MyTextStyle.textMatn12Bold.copyWith(
-                                    color: MyColors.textMatn2,
+                                SizedBox(width: 8.w),
+                                Flexible(
+                                  child: Text(
+                                    '۷۵,۰۰۰ تومان', // Mock data
+                                    style: MyTextStyle.textMatn12Bold.copyWith(
+                                      color: MyColors.textMatn2,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
                               ],
@@ -203,7 +227,7 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
                       ),
                     ],
                   ),
-                  
+
                   // Expandable Description
                   if (_isDescriptionExpanded) ...[
                     SizedBox(height: 16.h),
@@ -261,7 +285,9 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          _isDescriptionExpanded ? 'بستن اطلاعات' : 'اطلاعات دوره',
+                          _isDescriptionExpanded
+                              ? 'بستن اطلاعات'
+                              : 'اطلاعات دوره',
                           style: MyTextStyle.textMatn12Bold.copyWith(
                             color: MyColors.primary,
                           ),
@@ -338,7 +364,7 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
                 ],
               ),
             ),
-            
+
             SizedBox(height: 80.h), // Space for bottom button
           ],
         ),

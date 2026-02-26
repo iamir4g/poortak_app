@@ -113,9 +113,11 @@ class _HowToGetPointsScreenState extends State<HowToGetPointsScreen> {
   }
 
   Widget _buildCoinAnimation() {
-    return SizedBox(
-      height: 145.h,
-      width: 267.w,
+    return ConstrainedBox(
+      constraints: BoxConstraints(
+        maxHeight: 145.h,
+        maxWidth: 267.w,
+      ),
       child: Lottie.asset(
         'assets/images/points/coin.json',
         fit: BoxFit.contain,
@@ -138,7 +140,6 @@ class _HowToGetPointsScreenState extends State<HowToGetPointsScreen> {
             backgroundColor: isDarkMode
                 ? MyColors.darkCardBackground
                 : const Color(0xFFFDF4F2),
-            height: 95.h,
           ),
 
           SizedBox(height: 13.h),
@@ -152,7 +153,6 @@ class _HowToGetPointsScreenState extends State<HowToGetPointsScreen> {
             backgroundColor: isDarkMode
                 ? MyColors.darkCardBackground
                 : const Color(0xFFE9EFFF),
-            height: 86.h,
           ),
 
           SizedBox(height: 13.h),
@@ -167,7 +167,6 @@ class _HowToGetPointsScreenState extends State<HowToGetPointsScreen> {
             backgroundColor: isDarkMode
                 ? MyColors.darkCardBackground
                 : const Color(0xFFFFF9EB),
-            height: 86.h,
           ),
 
           SizedBox(height: 13.h),
@@ -185,11 +184,9 @@ class _HowToGetPointsScreenState extends State<HowToGetPointsScreen> {
     required String points,
     required String description,
     required Color backgroundColor,
-    required double height,
   }) {
     return Container(
-      width: 360.w,
-      height: height,
+      width: double.infinity,
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(20.r),
@@ -198,6 +195,7 @@ class _HowToGetPointsScreenState extends State<HowToGetPointsScreen> {
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -213,6 +211,8 @@ class _HowToGetPointsScreenState extends State<HowToGetPointsScreen> {
                           : const Color(0xFF29303D),
                     ),
                     textAlign: TextAlign.right,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
 

@@ -44,10 +44,14 @@ class _EBooksScreenState extends State<EBooksScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  'کتاب الکترونیکی',
-                  style: MyTextStyle.textMatn16Bold.copyWith(
-                    color: const Color(0xFF29303D),
+                Flexible(
+                  child: Text(
+                    'کتاب الکترونیکی',
+                    style: MyTextStyle.textMatn16Bold.copyWith(
+                      color: const Color(0xFF29303D),
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 SizedBox(
@@ -187,7 +191,7 @@ class _EBooksScreenState extends State<EBooksScreen> {
           },
         ),
         SizedBox(
-          height: 180.h,
+          height: 190.h,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: EdgeInsets.symmetric(horizontal: 16.w),

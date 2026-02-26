@@ -77,7 +77,14 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
           ),
         ],
         centerTitle: true,
-        title: Text(l10n!.litner_review, style: MyTextStyle.textHeader16Bold),
+        title: Flexible(
+          child: Text(
+            l10n!.litner_review,
+            style: MyTextStyle.textHeader16Bold,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
       ),
       body: SafeArea(
         child: BlocConsumer<LitnerReviewCubit, LitnerReviewState>(
@@ -104,17 +111,38 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
             if (state is LitnerReviewLoading) {
               return const Center(child: CircularProgressIndicator());
             } else if (state is LitnerReviewError) {
-              return Center(child: Text(state.message));
+              return Center(
+                child: Padding(
+                  padding: EdgeInsets.all(16.r),
+                  child: Text(
+                    state.message,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              );
             } else if (state is LitnerReviewCompleted) {
               return Center(
-                  child: Text('تبریک! تمام لغات مرور شدند.',
-                      style: TextStyle(
-                          fontSize: 18.sp, fontWeight: FontWeight.bold)));
+                child: Padding(
+                  padding: EdgeInsets.all(16.r),
+                  child: Text(
+                    'تبریک! تمام لغات مرور شدند.',
+                    style: TextStyle(
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              );
             } else if (state is LitnerReviewLoaded) {
               // Check if words list is empty
               if (state.words.isEmpty) {
                 return Center(
-                  child: Padding(
+                  child: SingleChildScrollView(
                     padding: EdgeInsets.all(Dimens.large.r),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -131,6 +159,8 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
                             color: Colors.grey[600],
                           ),
                           textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
                         SizedBox(height: Dimens.large.h),
                         ElevatedButton(
@@ -153,6 +183,8 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
                               fontSize: 16.sp,
                               fontWeight: FontWeight.bold,
                             ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
@@ -164,72 +196,75 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
               final word = state.words[state.currentIndex];
               final totalSteps = state.words.length;
               final currentStep = state.currentIndex;
-              return Column(
-                children: [
-                  SizedBox(height: Dimens.medium.h),
-                  StepProgress(
-                    currentIndex: currentStep,
-                    totalSteps: totalSteps,
-                  ),
-                  SizedBox(height: 64.h),
-                  // Expanded(
-                  //   child:
-                  Center(
-                    child: FlipCard(
-                      controller: _flipController,
-                      rotateSide: RotateSide.right,
-                      axis: FlipAxis.vertical,
-                      frontWidget: _buildFront(context, word.word, _flipToBack),
-                      backWidget: _buildBack(
-                          context, word.word, word.translation, _flipToFront),
+              return SingleChildScrollView(
+                child: Column(
+                  children: [
+                    SizedBox(height: Dimens.medium.h),
+                    StepProgress(
+                      currentIndex: currentStep,
+                      totalSteps: totalSteps,
                     ),
-                  ),
-                  // ),
-                  SizedBox(height: Dimens.medium.h),
-                  if (isBack)
-                    Padding(
-                      padding: EdgeInsets.all(Dimens.medium.r),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          litnerChoiceButton(
-                            circleColor: Color(0xFFEAF9F1), // light green
-                            icon: Icons.check, // or use a custom SVG if needed
-                            iconColor: Color(0xFF4DC591), // green
-                            label: 'می دانستم',
-                            onTap: () {
-                              setState(() {
-                                isBack = false;
-                                if (_flipController.state?.isFront == false) {
-                                  _flipController.flipcard();
-                                }
-                              });
-                              context
-                                  .read<LitnerReviewCubit>()
-                                  .submitReviewAndNext(word.id, true);
-                            },
-                          ),
-                          litnerChoiceButton(
-                            circleColor: Color(0xFFFDEAEA), // light red
-                            icon: Icons.close, // or use a custom SVG if needed
-                            iconColor: Color(0xFFF16063), // red
-                            label: 'نمی دانستم',
-                            onTap: () {
-                              setState(() {
-                                isBack = false;
-                                if (_flipController.state?.isFront == false) {
-                                  _flipController.flipcard();
-                                }
-                              });
-                              context
-                                  .read<LitnerReviewCubit>()
-                                  .submitReviewAndNext(word.id, false);
-                            },
-                          ),
-                        ],
+                    SizedBox(height: 64.h),
+                    Center(
+                      child: FlipCard(
+                        controller: _flipController,
+                        rotateSide: RotateSide.right,
+                        axis: FlipAxis.vertical,
+                        frontWidget:
+                            _buildFront(context, word.word, _flipToBack),
+                        backWidget: _buildBack(
+                            context, word.word, word.translation, _flipToFront),
                       ),
                     ),
-                ],
+                    SizedBox(height: Dimens.medium.h),
+                    if (isBack)
+                      Padding(
+                        padding: EdgeInsets.all(Dimens.medium.r),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            litnerChoiceButton(
+                              circleColor:
+                                  const Color(0xFFEAF9F1), // light green
+                              icon:
+                                  Icons.check, // or use a custom SVG if needed
+                              iconColor: const Color(0xFF4DC591), // green
+                              label: 'می دانستم',
+                              onTap: () {
+                                setState(() {
+                                  isBack = false;
+                                  if (_flipController.state?.isFront == false) {
+                                    _flipController.flipcard();
+                                  }
+                                });
+                                context
+                                    .read<LitnerReviewCubit>()
+                                    .submitReviewAndNext(word.id, true);
+                              },
+                            ),
+                            litnerChoiceButton(
+                              circleColor: const Color(0xFFFDEAEA), // light red
+                              icon:
+                                  Icons.close, // or use a custom SVG if needed
+                              iconColor: const Color(0xFFF16063), // red
+                              label: 'نمی دانستم',
+                              onTap: () {
+                                setState(() {
+                                  isBack = false;
+                                  if (_flipController.state?.isFront == false) {
+                                    _flipController.flipcard();
+                                  }
+                                });
+                                context
+                                    .read<LitnerReviewCubit>()
+                                    .submitReviewAndNext(word.id, false);
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
               );
             }
             return Container();
@@ -252,29 +287,37 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Spacer(),
-          Center(
-              child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                englishWord,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 28.sp,
-                  color: const Color(0xFF3A465A),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.w),
+            child: Center(
+                child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Flexible(
+                  child: Text(
+                    englishWord,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 28.sp,
+                      color: const Color(0xFF3A465A),
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-              ),
-              SizedBox(width: Dimens.small.w),
-              GestureDetector(
-                onTap: () => ttsService.speak(englishWord, voice: 'male'),
-                child: IconifyIcon(
-                  icon: "cuida:volume-2-outline",
-                  size: 28.r,
-                  color: const Color(0xFF3A465A),
+                SizedBox(width: Dimens.small.w),
+                GestureDetector(
+                  onTap: () => ttsService.speak(englishWord, voice: 'male'),
+                  child: IconifyIcon(
+                    icon: "cuida:volume-2-outline",
+                    size: 28.r,
+                    color: const Color(0xFF3A465A),
+                  ),
                 ),
-              ),
-            ],
-          )),
+              ],
+            )),
+          ),
           const Spacer(),
           GestureDetector(
             onTap: onFlip,
@@ -303,36 +346,50 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Spacer(),
-          Center(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  englishWord,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 28.sp,
-                    color: Colors.white,
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.w),
+            child: Center(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Flexible(
+                    child: Text(
+                      englishWord,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 28.sp,
+                        color: Colors.white,
+                      ),
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
-                ),
-                SizedBox(width: Dimens.small.w),
-                GestureDetector(
-                  onTap: () => ttsService.speak(englishWord, voice: 'male'),
-                  child: IconifyIcon(
-                    icon: "cuida:volume-2-outline",
-                    size: 28.r,
-                    color: Colors.white,
+                  SizedBox(width: Dimens.small.w),
+                  GestureDetector(
+                    onTap: () => ttsService.speak(englishWord, voice: 'male'),
+                    child: IconifyIcon(
+                      icon: "cuida:volume-2-outline",
+                      size: 28.r,
+                      color: Colors.white,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
-          Text(
-            persianWord,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 28.sp,
-              color: Colors.white,
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.w),
+            child: Text(
+              persianWord,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 28.sp,
+                color: Colors.white,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
           const Spacer(),
@@ -363,8 +420,8 @@ Widget litnerChoiceButton({
     child: Column(
       children: [
         Container(
-          width: 56.w,
-          height: 56.h,
+          width: 56.r,
+          height: 56.r,
           decoration: BoxDecoration(
             color: circleColor,
             shape: BoxShape.circle,
@@ -379,6 +436,8 @@ Widget litnerChoiceButton({
             color: const Color(0xFF3A465A), // dark color
             fontSize: 16.sp,
           ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
       ],
     ),

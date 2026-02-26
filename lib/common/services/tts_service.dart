@@ -36,6 +36,7 @@ class TTSService {
   bool _isInitialized = false;
   Completer<void>? _speechCompleter;
   String _currentVoice = 'male';
+  bool _stopRequested = false;
 
   Future<void> initialize() async {
     if (_isInitialized) {
@@ -188,6 +189,9 @@ class TTSService {
       await initialize();
     }
 
+    // بازنشانی وضعیت توقف برای پخش جدید
+    _stopRequested = false;
+
     // اگر voice مشخص شده، آن را تنظیم کن
     if (voice != null && voice != _currentVoice) {
       // بررسی می‌کنیم که آیا این تغییر صدا واقعا لازم است و آیا امکان‌پذیر است
@@ -210,11 +214,14 @@ class TTSService {
     _speechCompleter = Completer<void>();
     try {
       var result = await _flutterTts.speak(text);
-      if (result != 1) {
+      // اگر نتیجه 1 نباشد و درخواست توقف نداده باشیم، تلاش مجدد می‌کنیم
+      if (result != 1 && !_stopRequested) {
         print('Speak method returned $result - might have failed');
         // اگر speak ناموفق بود، شاید موتور آماده نیست. یک بار دیگر زبان را ست می‌کنیم
         await _flutterTts.setLanguage('en-US');
-        await _flutterTts.speak(text);
+        if (!_stopRequested) {
+          await _flutterTts.speak(text);
+        }
       }
     } catch (e) {
       print('Error during speak: $e');
@@ -347,6 +354,7 @@ class TTSService {
   }
 
   Future<void> stop() async {
+    _stopRequested = true;
     if (_speechCompleter != null && !_speechCompleter!.isCompleted) {
       _speechCompleter?.complete();
     }

@@ -43,8 +43,8 @@ class _QuestionCountModalState extends State<QuestionCountModal> {
           ),
           // Icon Placeholder
           Container(
-            width: 80.w,
-            height: 80.h,
+            width: 80.r,
+            height: 80.r,
             decoration: const BoxDecoration(
               shape: BoxShape.circle,
               color: Color(0xFFFF4081), // Pinkish red background from design
@@ -52,17 +52,22 @@ class _QuestionCountModalState extends State<QuestionCountModal> {
             child: Center(
               child: Image.asset(
                 'assets/images/kavoosh/khodsanji/reiazi_logo.png', // Placeholder, should be dynamic
-                width: 50.w,
-                height: 50.h,
+                width: 50.r,
+                height: 50.r,
                 fit: BoxFit.contain,
               ),
             ),
           ),
           SizedBox(height: 16.h),
-          Text(
-            widget.title,
-            style: MyTextStyle.textHeader16Bold,
-            textAlign: TextAlign.center,
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.w),
+            child: Text(
+              widget.title,
+              style: MyTextStyle.textHeader16Bold,
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
           SizedBox(height: 32.h),
 

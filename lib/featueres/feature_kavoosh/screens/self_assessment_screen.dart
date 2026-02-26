@@ -69,10 +69,14 @@ class SelfAssessmentScreen extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  'خودسنجی',
-                  style: MyTextStyle.textMatn16Bold.copyWith(
-                    color: const Color(0xFF29303D),
+                Flexible(
+                  child: Text(
+                    'خودسنجی',
+                    style: MyTextStyle.textMatn16Bold.copyWith(
+                      color: const Color(0xFF29303D),
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 SizedBox(

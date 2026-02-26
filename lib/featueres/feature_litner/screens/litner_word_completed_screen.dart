@@ -125,9 +125,13 @@ class _LitnerWordCompletedScreenState extends State<LitnerWordCompletedScreen> {
       appBar: AppBar(
         backgroundColor: const Color(0xFFF6F9FE),
         elevation: 0,
-        title: Text(
-          'آموخته شده ها',
-          style: MyTextStyle.textHeader16Bold,
+        title: Flexible(
+          child: Text(
+            'آموخته شده ها',
+            style: MyTextStyle.textHeader16Bold,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
         centerTitle: true,
         leading: IconButton(
@@ -156,7 +160,11 @@ class _LitnerWordCompletedScreenState extends State<LitnerWordCompletedScreen> {
               });
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text(state.message),
+                  content: Text(
+                    state.message,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                   duration: const Duration(seconds: 2),
                 ),
               );
@@ -219,6 +227,7 @@ class _LitnerWordCompletedScreenState extends State<LitnerWordCompletedScreen> {
                         fontSize: 14.sp,
                         color: const Color(0xFF29303D),
                       ),
+                      maxLines: 1,
                     ),
                   ),
                 ),
@@ -231,55 +240,62 @@ class _LitnerWordCompletedScreenState extends State<LitnerWordCompletedScreen> {
                         )
                       : _words.isEmpty
                           ? Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Image.asset(
-                                    'assets/images/litner/litner_empty_state.png',
-                                    width: 246.w,
-                                    height: 246.h,
-                                    fit: BoxFit.contain,
-                                  ),
-                                  SizedBox(height: 32.h),
-                                  Text(
-                                    _searchWord.isNotEmpty
-                                        ? 'هیچ لغتی یافت نشد.'
-                                        : 'شما هنوز هیچ کلمه ای را به صورت کامل نیاموخته اید.',
-                                    style: TextStyle(
-                                      fontFamily: 'IRANSans',
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 14.sp,
-                                      color: const Color(0xFF29303D),
+                              child: SingleChildScrollView(
+                                padding: EdgeInsets.all(16.r),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Image.asset(
+                                      'assets/images/litner/litner_empty_state.png',
+                                      width: 200.w,
+                                      height: 200.h,
+                                      fit: BoxFit.contain,
                                     ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                  if (_searchWord.isEmpty) ...[
-                                    SizedBox(height: 12.h),
-                                    Padding(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 24.0.w),
-                                      child: Text(
-                                        'وقتی معنی کلمه ای را به طور کامل به خاطر بسپارید، کلمه به این قسمت هدایت می شود.',
-                                        style: TextStyle(
-                                          fontFamily: 'IRANSans',
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 11.sp,
-                                          color: const Color(0xFFA3AFC2),
-                                        ),
-                                        textAlign: TextAlign.center,
+                                    SizedBox(height: 32.h),
+                                    Text(
+                                      _searchWord.isNotEmpty
+                                          ? 'هیچ لغتی یافت نشد.'
+                                          : 'شما هنوز هیچ کلمه ای را به صورت کامل نیاموخته اید.',
+                                      style: TextStyle(
+                                        fontFamily: 'IRANSans',
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 14.sp,
+                                        color: const Color(0xFF29303D),
                                       ),
+                                      textAlign: TextAlign.center,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
+                                    if (_searchWord.isEmpty) ...[
+                                      SizedBox(height: 12.h),
+                                      Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 24.0.w),
+                                        child: Text(
+                                          'وقتی معنی کلمه ای را به طور کامل به خاطر بسپارید، کلمه به این قسمت هدایت می شود.',
+                                          style: TextStyle(
+                                            fontFamily: 'IRANSans',
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 11.sp,
+                                            color: const Color(0xFFA3AFC2),
+                                          ),
+                                          textAlign: TextAlign.center,
+                                          maxLines: 3,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
                                   ],
-                                ],
+                                ),
                               ),
                             )
                           : ListView.separated(
                               controller: _scrollController,
+                              padding: EdgeInsets.symmetric(horizontal: 16.w),
                               itemCount:
                                   _words.length + (_isLoadingMore ? 1 : 0),
                               separatorBuilder: (context, index) => Container(
                                 height: 1.5.h,
-                                width: 200.w,
                                 color: const Color(0xFFF2F2F2),
                               ),
                               itemBuilder: (context, index) {
@@ -292,63 +308,60 @@ class _LitnerWordCompletedScreenState extends State<LitnerWordCompletedScreen> {
                                   ));
                                 }
                                 final word = _words[index];
-                                return Center(
-                                  child: Container(
-                                    width: 340.w,
-                                    height: 40.h,
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(8.r),
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        // Left: English word + speaker
-                                        Padding(
-                                          padding: EdgeInsets.only(left: 8.w),
-                                          child: Row(
-                                            children: [
-                                              Text(
-                                                word.translation,
-                                                style: TextStyle(
-                                                  fontFamily: 'IRANSans',
-                                                  fontWeight: FontWeight.w700,
-                                                  fontSize: 16.sp,
-                                                  color:
-                                                      const Color(0xFF29303D),
-                                                ),
-                                              ),
-                                            ],
+                                return Container(
+                                  width: double.infinity,
+                                  constraints: BoxConstraints(minHeight: 56.h),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(8.r),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      // Left: English word + speaker
+                                      Expanded(
+                                        child: Padding(
+                                          padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
+                                          child: Text(
+                                            word.translation,
+                                            style: TextStyle(
+                                              fontFamily: 'IRANSans',
+                                              fontWeight: FontWeight.w700,
+                                              fontSize: 16.sp,
+                                              color:
+                                                  const Color(0xFF29303D),
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
                                           ),
                                         ),
-                                        // Right: Persian word
-                                        Padding(
-                                            padding:
-                                                EdgeInsets.only(right: 16.w),
-                                            child: Row(
-                                              children: [
-                                                IconButton(
-                                                  icon: IconifyIcon(
-                                                    icon:
-                                                        "cuida:volume-2-outline",
-                                                    size: 18.r,
-                                                    color:
-                                                        const Color(0xFFA3AFC2),
-                                                  ),
-                                                  splashRadius: 18.r,
-                                                  padding: EdgeInsets.zero,
-                                                  constraints:
-                                                      const BoxConstraints(),
-                                                  onPressed: () {
-                                                    locator<TTSService>()
-                                                        .speak(word.word);
-                                                  },
+                                      ),
+                                      // Right: Persian word
+                                      Expanded(
+                                        child: Padding(
+                                          padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.end,
+                                            children: [
+                                              IconButton(
+                                                icon: IconifyIcon(
+                                                  icon:
+                                                      "cuida:volume-2-outline",
+                                                  size: 18.r,
+                                                  color:
+                                                      const Color(0xFFA3AFC2),
                                                 ),
-                                                SizedBox(width: 4.w),
-                                                Text(
+                                                splashRadius: 18.r,
+                                                padding: EdgeInsets.zero,
+                                                constraints:
+                                                    const BoxConstraints(),
+                                                onPressed: () {
+                                                  locator<TTSService>()
+                                                      .speak(word.word);
+                                                },
+                                              ),
+                                              SizedBox(width: 8.w),
+                                              Flexible(
+                                                child: Text(
                                                   word.word,
                                                   style: TextStyle(
                                                     fontFamily: 'IRANSans',
@@ -358,11 +371,15 @@ class _LitnerWordCompletedScreenState extends State<LitnerWordCompletedScreen> {
                                                         const Color(0xFF29303D),
                                                   ),
                                                   textAlign: TextAlign.right,
+                                                  maxLines: 1,
+                                                  overflow: TextOverflow.ellipsis,
                                                 ),
-                                              ],
-                                            )),
-                                      ],
-                                    ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 );
                               },

@@ -238,6 +238,11 @@ class _ConversationScreenState extends State<ConversationScreen> {
   /// این متد زمانی که کاربر روی یک پیام کلیک می‌کند فراخوانی می‌شود
   Future<void> speakText(
       String text, String voice, String conversationId) async {
+    // اگر در حال پخش خودکار هستیم، آن را متوقف کن
+    if (isPlayingNotifier.value) {
+      isPlayingNotifier.value = false;
+    }
+
     // ذخیره وضعیت پخش به عنوان آخرین متن پخش شده
     _savePlayback(conversationId);
 

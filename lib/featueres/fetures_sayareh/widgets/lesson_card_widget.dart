@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
+import 'package:poortak/config/dimens.dart';
+
 class LessonCardWidget extends StatelessWidget {
   final String iconPath;
   final String englishLabel;
@@ -22,20 +24,21 @@ class LessonCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final width = Dimens.nw(320); // Reduced from 359 to be more responsive
     return InkWell(
       onTap: onTap,
       child: Container(
-        width: 359.w,
-        height: 104.h,
+        width: width,
+        height: Dimens.nh(90), // Reduced from 104
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(40.r),
+          borderRadius: BorderRadius.circular(Dimens.nr(30)), // Reduced from 40
           color: Colors.white,
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.04),
               offset: const Offset(0, 0),
-              blurRadius: 4.r,
+              blurRadius: Dimens.nr(4),
             ),
           ],
         ),
@@ -45,15 +48,17 @@ class LessonCardWidget extends StatelessWidget {
               Positioned(
                 top: 0,
                 bottom: 0,
-                left: 0,
+                left: 0, // In RTL, progress should start from right
                 child: Container(
-                  width: 359.w * (progress! / 100),
-                  color: const Color(
-                      0xFFE3F2FD), // Light blue color for progress background
+                  width: width * (progress! / 100),
+                  color: const Color(0xFFE3F2FD),
                 ),
               ),
             Padding(
-              padding: EdgeInsets.symmetric(vertical: 22.h, horizontal: 28.w),
+              padding: EdgeInsets.symmetric(
+                vertical: Dimens.nh(15), // Reduced from 22
+                horizontal: Dimens.nw(20), // Reduced from 28
+              ),
               child: Row(
                 children: [
                   badge != null
@@ -61,22 +66,22 @@ class LessonCardWidget extends StatelessWidget {
                           children: [
                             Image.asset(
                               iconPath,
-                              width: 48.0.r,
-                              height: 48.0.r,
+                              width: Dimens.nr(40), // Reduced from 48
+                              height: Dimens.nr(40),
                             ),
                             Positioned(
-                              top: 5.h,
-                              left: 14.w,
+                              top: Dimens.nh(4),
+                              left: Dimens.nw(10),
                               child: badge!,
                             ),
                           ],
                         )
                       : Image.asset(
                           iconPath,
-                          width: 48.0.r,
-                          height: 48.0.r,
+                          width: Dimens.nr(40), // Reduced from 48
+                          height: Dimens.nr(40),
                         ),
-                  SizedBox(width: 18.w),
+                  SizedBox(width: Dimens.nw(15)), // Reduced from 18
                   Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -85,12 +90,14 @@ class LessonCardWidget extends StatelessWidget {
                         englishLabel,
                         style: MyTextStyle.textMatn12W500.copyWith(
                           color: const Color(0xFFA3AFC2),
+                          fontSize: Dimens.nsp(10), // Explicitly responsive
                         ),
                       ),
                       Text(
                         persianLabel,
                         style: MyTextStyle.textMatn18Bold.copyWith(
                           color: const Color(0xFF29303D),
+                          fontSize: Dimens.nsp(16), // Explicitly responsive
                         ),
                       )
                     ],
@@ -99,16 +106,16 @@ class LessonCardWidget extends StatelessWidget {
                     const Spacer(),
                     if (progress == 100)
                       Container(
-                        width: 40.w,
-                        height: 40.h,
+                        width: Dimens.nw(32), // Reduced from 40
+                        height: Dimens.nh(32),
                         decoration: const BoxDecoration(
-                          color: Color(0xFF4CAF50), // Green color
+                          color: Color(0xFF4CAF50),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
                           Icons.check,
                           color: Colors.white,
-                          size: 24.r,
+                          size: Dimens.nr(20), // Reduced from 24
                         ),
                       )
                     else
@@ -116,9 +123,9 @@ class LessonCardWidget extends StatelessWidget {
                         "%$progress",
                         style: TextStyle(
                           fontFamily: 'IranSans',
-                          fontSize: 16.sp,
+                          fontSize: Dimens.nsp(14), // Reduced from 16
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF53668E),
+                          color: const Color(0xFF53668E),
                         ),
                       ),
                   ],

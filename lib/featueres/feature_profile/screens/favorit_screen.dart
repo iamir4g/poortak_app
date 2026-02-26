@@ -148,7 +148,6 @@ class _FavoritScreenState extends State<FavoritScreen> {
   Widget _buildFavoriteItem(bool isDarkMode, int index) {
     return Container(
       margin: EdgeInsets.only(bottom: 16.h),
-      height: 144.h,
       child: Stack(
         children: [
           // Main Container
@@ -187,7 +186,7 @@ class _FavoritScreenState extends State<FavoritScreen> {
                           overflow: TextOverflow.ellipsis,
                         ),
 
-                        const Spacer(),
+                        SizedBox(height: 12.h),
 
                         // Play Button
                         Container(

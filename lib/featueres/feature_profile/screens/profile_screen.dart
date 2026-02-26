@@ -104,168 +104,170 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                       // Content
-                      Column(
-                        children: [
-                          SizedBox(height: 24.h),
-                          // Avatar
-                          Center(
-                            child: Container(
-                              width: 94.r,
-                              height: 94.r,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                    color: const Color(0xFFE6EBF2), width: 5.r),
-                                color: Colors.white,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.04),
-                                    blurRadius: 4.r,
-                                  ),
-                                ],
-                              ),
-                              child: ClipOval(
-                                child: userAvatarUrl != null
-                                    ? Image.network(
-                                        userAvatarUrl!,
-                                        fit: BoxFit.cover,
-                                        errorBuilder:
-                                            (context, error, stackTrace) {
-                                          return Image.asset(
-                                            'assets/images/profile/finalProfile.png',
-                                            fit: BoxFit.cover,
-                                          );
-                                        },
-                                      )
-                                    : Image.asset(
-                                        'assets/images/profile/finalProfile.png',
-                                        fit: BoxFit.cover,
-                                      ),
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: 16.h),
-                          // Name
-                          Text(
-                            _getDisplayName(),
-                            style: MyTextStyle.textMatn16Bold.copyWith(
-                              color: MyColors.textCancelButton,
-                            ),
-                          ),
-                          SizedBox(height: 8.h),
-                          // Mobile
-                          Text(
-                            ' موبایل: ${userMobile ?? 'نامشخص'}',
-                            style: MyTextStyle.textMatn12Bold.copyWith(
-                              color: MyColors.text3,
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 16.w, vertical: 16.h),
-                            child: Center(
-                              child: SizedBox(
-                                width: 180.w,
-                                height: 42.h,
-                                child: OutlinedButton(
-                                  onPressed: () {
-                                    Navigator.pushNamed(
-                                      context,
-                                      EditProfileScreen.routeName,
-                                    ).then((_) {
-                                      // Refresh profile data when returning from edit screen
-                                      _checkLoginStatus();
-                                    });
-                                  },
-                                  style: OutlinedButton.styleFrom(
-                                    side: BorderSide(
-                                        color: const Color(0xFFE0E4EB),
-                                        width: 2.r),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(15.r),
+                      SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            SizedBox(height: 24.h),
+                            // Avatar
+                            Center(
+                              child: Container(
+                                width: 94.r,
+                                height: 94.r,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                      color: const Color(0xFFE6EBF2), width: 5.r),
+                                  color: Colors.white,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.04),
+                                      blurRadius: 4.r,
                                     ),
-                                    backgroundColor: Colors.transparent,
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 16.w),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      // Custom edit icon - using a simple icon for now
-                                      // You can replace this with the actual SVG from Figma
-                                      Container(
-                                        width: 16.r,
-                                        height: 16.r,
-                                        decoration: const BoxDecoration(
-                                          color: Color(0xFFA3AFC2),
-                                          shape: BoxShape.circle,
+                                  ],
+                                ),
+                                child: ClipOval(
+                                  child: userAvatarUrl != null
+                                      ? Image.network(
+                                          userAvatarUrl!,
+                                          fit: BoxFit.cover,
+                                          errorBuilder:
+                                              (context, error, stackTrace) {
+                                            return Image.asset(
+                                              'assets/images/profile/finalProfile.png',
+                                              fit: BoxFit.cover,
+                                            );
+                                          },
+                                        )
+                                      : Image.asset(
+                                          'assets/images/profile/finalProfile.png',
+                                          fit: BoxFit.cover,
                                         ),
-                                        child: Icon(
-                                          Icons.edit,
-                                          color: Colors.white,
-                                          size: 10.r,
-                                        ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 16.h),
+                            // Name
+                            Text(
+                              _getDisplayName(),
+                              style: MyTextStyle.textMatn16Bold.copyWith(
+                                color: MyColors.textCancelButton,
+                              ),
+                            ),
+                            SizedBox(height: 8.h),
+                            // Mobile
+                            Text(
+                              ' موبایل: ${userMobile ?? 'نامشخص'}',
+                              style: MyTextStyle.textMatn12Bold.copyWith(
+                                color: MyColors.text3,
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 16.w, vertical: 16.h),
+                              child: Center(
+                                child: SizedBox(
+                                  width: 180.w,
+                                  height: 42.h,
+                                  child: OutlinedButton(
+                                    onPressed: () {
+                                      Navigator.pushNamed(
+                                        context,
+                                        EditProfileScreen.routeName,
+                                      ).then((_) {
+                                        // Refresh profile data when returning from edit screen
+                                        _checkLoginStatus();
+                                      });
+                                    },
+                                    style: OutlinedButton.styleFrom(
+                                      side: BorderSide(
+                                          color: const Color(0xFFE0E4EB),
+                                          width: 2.r),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(15.r),
                                       ),
-                                      SizedBox(width: 8.w),
-                                      Text(
-                                        'ویرایش حساب',
-                                        style: MyTextStyle.textMatn11.copyWith(
-                                          fontWeight: FontWeight.w500,
-                                          color: MyColors.text3,
+                                      backgroundColor: Colors.transparent,
+                                      padding:
+                                          EdgeInsets.symmetric(horizontal: 16.w),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        // Custom edit icon - using a simple icon for now
+                                        // You can replace this with the actual SVG from Figma
+                                        Container(
+                                          width: 16.r,
+                                          height: 16.r,
+                                          decoration: const BoxDecoration(
+                                            color: Color(0xFFA3AFC2),
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: Icon(
+                                            Icons.edit,
+                                            color: Colors.white,
+                                            size: 10.r,
+                                          ),
                                         ),
-                                      ),
-                                    ],
+                                        SizedBox(width: 8.w),
+                                        Text(
+                                          'ویرایش حساب',
+                                          style: MyTextStyle.textMatn11.copyWith(
+                                            fontWeight: FontWeight.w500,
+                                            color: MyColors.text3,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
-                          // const Spacer(),
-                          SizedBox(height: 80.h),
-                          // Padding(
-                          // padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                          // child:
-                          Column(
-                            children: [
-                              _ProfileActionCard(
-                                icon: Icons.star,
-                                label: 'امتیازات',
-                                onTap: () {
-                                  Navigator.pushNamed(
-                                    context,
-                                    MainPointsScreen.routeName,
-                                  );
-                                },
-                              ),
-                              SizedBox(height: 16.h),
-                              _ProfileActionCard(
-                                icon: Icons.history,
-                                label: 'تاریخچه خرید',
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          const PaymentHistoryScreen(),
-                                    ),
-                                  );
-                                },
-                              ),
-                              SizedBox(height: 16.h),
-                              _ProfileActionCard(
-                                icon: Icons.bookmark,
-                                label: 'علاقه مندی ها',
-                                onTap: () {
-                                  Navigator.pushNamed(
-                                    context,
-                                    FavoritScreen.routeName,
-                                  );
-                                },
-                              ),
-                            ],
-                          ),
-                          // ),
-                        ],
+                            // const Spacer(),
+                            SizedBox(height: 80.h),
+                            // Padding(
+                            // padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                            // child:
+                            Column(
+                              children: [
+                                _ProfileActionCard(
+                                  icon: Icons.star,
+                                  label: 'امتیازات',
+                                  onTap: () {
+                                    Navigator.pushNamed(
+                                      context,
+                                      MainPointsScreen.routeName,
+                                    );
+                                  },
+                                ),
+                                SizedBox(height: 16.h),
+                                _ProfileActionCard(
+                                  icon: Icons.history,
+                                  label: 'تاریخچه خرید',
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const PaymentHistoryScreen(),
+                                      ),
+                                    );
+                                  },
+                                ),
+                                SizedBox(height: 16.h),
+                                _ProfileActionCard(
+                                  icon: Icons.bookmark,
+                                  label: 'علاقه مندی ها',
+                                  onTap: () {
+                                    Navigator.pushNamed(
+                                      context,
+                                      FavoritScreen.routeName,
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 24.h),
+                          ],
+                        ),
                       ),
                     ],
                   ),

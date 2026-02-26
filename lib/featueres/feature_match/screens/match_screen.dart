@@ -143,11 +143,15 @@ class _MatchScreenState extends State<MatchScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           // Title
-          Text(
-            'شرکت در مسابقه',
-            textAlign: TextAlign.center,
-            style: MyTextStyle.textHeader16Bold.copyWith(
-              color: MyColors.textMatn2,
+          Flexible(
+            child: Text(
+              'شرکت در مسابقه',
+              textAlign: TextAlign.center,
+              style: MyTextStyle.textHeader16Bold.copyWith(
+                color: MyColors.textMatn2,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
 
@@ -199,10 +203,10 @@ class _MatchScreenState extends State<MatchScreen> {
                 const Center(
                   child: CircularProgressIndicator(),
                 )
-              else if (state is MatchSuccess)
+              else if (currentMatch != null)
                 Center(
                     child: Text(
-                  state.match.data.match.question,
+                  currentMatch!.data.match.question,
                   textAlign: TextAlign.center,
                   style: MyTextStyle.textMatn14Bold.copyWith(
                     fontWeight: FontWeight.w300,

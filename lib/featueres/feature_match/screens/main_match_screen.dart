@@ -48,12 +48,16 @@ class MainMatchScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     // Title
-                    Text(
-                      'مسابقه پورتک',
-                      style: MyTextStyle.textHeader16Bold.copyWith(
-                        color: MyColors.textMatn2,
+                    Flexible(
+                      child: Text(
+                        'مسابقه پورتک',
+                        style: MyTextStyle.textHeader16Bold.copyWith(
+                          color: MyColors.textMatn2,
+                        ),
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      textAlign: TextAlign.center,
                     ),
 
                     // Back Button
@@ -124,8 +128,9 @@ class MainMatchScreen extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 350.w,
-        height: 162.h,
+        width: double.infinity,
+        constraints: BoxConstraints(minHeight: 162.h),
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20.r),
@@ -142,8 +147,8 @@ class MainMatchScreen extends StatelessWidget {
           children: [
             // Icon
             Container(
-              width: 80.w,
-              height: 80.h,
+              width: 80.r,
+              height: 80.r,
               decoration: BoxDecoration(
                 color: MyColors.primary.withOpacity(0.1),
                 shape: BoxShape.circle,
@@ -164,6 +169,8 @@ class MainMatchScreen extends StatelessWidget {
                 color: const Color(0xFF29303D),
               ),
               textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
@@ -180,20 +187,26 @@ class MainMatchScreen extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20.r),
           ),
-          title: Text(
-            'به زودی',
-            style: MyTextStyle.textMatn18Bold.copyWith(
-              color: MyColors.textMatn1,
+          title: Flexible(
+            child: Text(
+              'به زودی',
+              style: MyTextStyle.textMatn18Bold.copyWith(
+                color: MyColors.textMatn1,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
-            textAlign: TextAlign.center,
           ),
-          content: Text(
-            'این بخش به زودی راه‌اندازی خواهد شد.',
-            style: MyTextStyle.textMatn14Bold.copyWith(
-              fontWeight: FontWeight.normal,
-              color: MyColors.textMatn1,
+          content: SingleChildScrollView(
+            child: Text(
+              'این بخش به زودی راه‌اندازی خواهد شد.',
+              style: MyTextStyle.textMatn14Bold.copyWith(
+                fontWeight: FontWeight.normal,
+                color: MyColors.textMatn1,
+              ),
+              textAlign: TextAlign.center,
             ),
-            textAlign: TextAlign.center,
           ),
           actions: [
             Center(
@@ -207,10 +220,14 @@ class MainMatchScreen extends StatelessWidget {
                   padding:
                       EdgeInsets.symmetric(horizontal: 30.w, vertical: 12.h),
                 ),
-                child: Text(
-                  'متوجه شدم',
-                  style: MyTextStyle.textMatn14Bold.copyWith(
-                    color: Colors.white,
+                child: Flexible(
+                  child: Text(
+                    'متوجه شدم',
+                    style: MyTextStyle.textMatn14Bold.copyWith(
+                      color: Colors.white,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ),

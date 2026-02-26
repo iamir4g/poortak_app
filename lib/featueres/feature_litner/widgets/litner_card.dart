@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/config/dimens.dart';
+import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 
 class LitnerCard extends StatelessWidget {
@@ -24,20 +25,21 @@ class LitnerCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 359.w,
-        height: 143.h,
+        width: double.infinity,
+        height: Dimens.nh(143.0),
         decoration: BoxDecoration(
           gradient: gradient,
-          borderRadius: BorderRadius.circular(40.r),
+          borderRadius: BorderRadius.circular(Dimens.nr(40.0)),
         ),
         child: Row(
           children: [
             // Right: White circle with image
             Padding(
-              padding: EdgeInsets.only(right: 16.w, left: 8.w),
+              padding:
+                  EdgeInsets.only(right: Dimens.medium, left: Dimens.small),
               child: Container(
-                width: 79.w,
-                height: 79.h,
+                width: Dimens.nr(79.0),
+                height: Dimens.nr(79.0),
                 decoration: const BoxDecoration(
                   color: Colors.white,
                   shape: BoxShape.circle,
@@ -45,8 +47,8 @@ class LitnerCard extends StatelessWidget {
                 child: Center(
                   child: Image.asset(
                     icon,
-                    width: 44.w,
-                    height: 44.h,
+                    width: Dimens.nr(44.0),
+                    height: Dimens.nr(44.0),
                     fit: BoxFit.contain,
                   ),
                 ),
@@ -56,7 +58,11 @@ class LitnerCard extends StatelessWidget {
             Expanded(
               child: Padding(
                 padding: EdgeInsets.only(
-                    right: 16.w, left: 24.w, top: 32.h, bottom: 32.h),
+                  right: Dimens.medium,
+                  left: Dimens.large,
+                  top: Dimens.nw(20.0),
+                  bottom: Dimens.nw(20.0),
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -64,29 +70,39 @@ class LitnerCard extends StatelessWidget {
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Text(
-                          number,
-                          style: MyTextStyle.textMatn18Bold.copyWith(
-                            fontSize: 20.sp,
-                            color: const Color(0xFF29303D),
+                        Flexible(
+                          child: Text(
+                            number,
+                            style: MyTextStyle.textMatn18Bold.copyWith(
+                              fontSize: Dimens.nsp(20.0),
+                              color: MyColors.darkText1,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        SizedBox(width: 8.w),
-                        Text(
-                          label,
-                          style: MyTextStyle.textMatn17W700.copyWith(
-                            fontSize: 20.sp,
-                            color: const Color(0xFF29303D),
+                        SizedBox(width: Dimens.small),
+                        Flexible(
+                          child: Text(
+                            label,
+                            style: MyTextStyle.textMatn17W700.copyWith(
+                              fontSize: Dimens.nsp(20.0),
+                              color: MyColors.darkText1,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
                     ),
-                    SizedBox(height: 8.h),
+                    SizedBox(height: Dimens.small),
                     Text(
                       subLabel,
                       style: MyTextStyle.textMatn12W500.copyWith(
-                        color: const Color(0xFF52617A),
+                        color: MyColors.text3,
                       ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
@@ -119,24 +135,25 @@ class LitnerTodayCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 359.w,
-        height: 112.h,
+        width: double.infinity,
+        height: Dimens.nh(112.0),
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             colors: [Color(0xFFFFF5DB), Color(0xFFFEE8DB)],
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
           ),
-          borderRadius: BorderRadius.circular(40.r),
+          borderRadius: BorderRadius.circular(Dimens.nr(40.0)),
         ),
         child: Row(
           children: [
             // Right: White circle with image
             Padding(
-              padding: EdgeInsets.only(right: 16.w, left: 8.w),
+              padding:
+                  EdgeInsets.only(right: Dimens.medium, left: Dimens.small),
               child: Container(
-                width: 79.w,
-                height: 79.h,
+                width: Dimens.nr(79.0),
+                height: Dimens.nr(79.0),
                 decoration: const BoxDecoration(
                   color: Colors.white,
                   shape: BoxShape.circle,
@@ -144,8 +161,8 @@ class LitnerTodayCard extends StatelessWidget {
                 child: Center(
                   child: Image.asset(
                     imageAsset,
-                    width: 42.w,
-                    height: 41.h,
+                    width: Dimens.nr(42.0),
+                    height: Dimens.nr(41.0),
                     fit: BoxFit.contain,
                   ),
                 ),
@@ -160,36 +177,46 @@ class LitnerTodayCard extends StatelessWidget {
                   Text(
                     number,
                     style: MyTextStyle.textMatn18Bold.copyWith(
-                      fontSize: 20.sp,
-                      color: const Color(0xFF29303D),
+                      fontSize: Dimens.nsp(20.0),
+                      color: MyColors.darkText1,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  SizedBox(height: 2.h),
+                  SizedBox(height: Dimens.nh(2.0)),
                   Text(
                     label,
                     style: MyTextStyle.textMatn12W500.copyWith(
-                      color: const Color(0xFF52617A),
+                      color: MyColors.text3,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
             ),
             // Left: Button
             Padding(
-              padding: EdgeInsets.only(left: 18.w, right: 8.w),
+              padding:
+                  EdgeInsets.only(left: Dimens.nw(18.0), right: Dimens.small),
               child: Container(
-                width: 105.w,
-                height: 44.h,
+                width: Dimens.nw(105.0),
+                height: Dimens.nh(44.0),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFFA73F),
-                  borderRadius: BorderRadius.circular(30.r),
+                  color: MyColors.primary,
+                  borderRadius: BorderRadius.circular(Dimens.nr(30.0)),
                 ),
                 alignment: Alignment.center,
-                child: Text(
-                  buttonText,
-                  style: MyTextStyle.textMatnBtn.copyWith(
-                    fontSize: 14.sp,
-                    color: const Color(0xFFFFFFFF),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: Dimens.small),
+                  child: Text(
+                    buttonText,
+                    style: MyTextStyle.textMatnBtn.copyWith(
+                      fontSize: Dimens.nsp(14.0),
+                      color: MyColors.textLight,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ),

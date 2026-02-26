@@ -37,7 +37,7 @@ class DetailedCourseCard extends StatelessWidget {
           },
       child: Container(
         margin: EdgeInsets.only(bottom: 16.h, left: 16.w, right: 16.w),
-        height: 140.h,
+        constraints: BoxConstraints(minHeight: 140.h),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20.r),
@@ -56,6 +56,7 @@ class DetailedCourseCard extends StatelessWidget {
               padding: EdgeInsets.all(12.0.r),
               child: Container(
                 width: 100.w,
+                height: 116.h,
                 decoration: BoxDecoration(
                   color: backgroundColor ?? MyColors.background1,
                   borderRadius: BorderRadius.circular(16.r),
@@ -80,6 +81,7 @@ class DetailedCourseCard extends StatelessWidget {
                 padding: EdgeInsets.symmetric(vertical: 16.0.h, horizontal: 8.0.w),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     // Title
                     Text(
@@ -98,30 +100,39 @@ class DetailedCourseCard extends StatelessWidget {
                       style: MyTextStyle.textMatn12W500.copyWith(
                         color: MyColors.text3,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     
-                    const Spacer(),
+                    SizedBox(height: 12.h),
                     
                     // Bottom Row: Date and Purchased Badge
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         // Date
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.access_time,
-                              size: 14.r,
-                              color: MyColors.text4,
-                            ),
-                            SizedBox(width: 4.w),
-                            Text(
-                              date,
-                              style: MyTextStyle.textMatn10W300.copyWith(
+                        Flexible(
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.access_time,
+                                size: 14.r,
                                 color: MyColors.text4,
                               ),
-                            ),
-                          ],
+                              SizedBox(width: 4.w),
+                              Flexible(
+                                child: Text(
+                                  date,
+                                  style: MyTextStyle.textMatn10W300.copyWith(
+                                    color: MyColors.text4,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                         
                         if (isPurchased)
@@ -140,6 +151,8 @@ class DetailedCourseCard extends StatelessWidget {
                                     fontWeight: FontWeight.bold,
                                     color: MyColors.success,
                                   ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                                 SizedBox(width: 4.w),
                                 Icon(

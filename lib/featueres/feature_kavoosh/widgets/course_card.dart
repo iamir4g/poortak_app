@@ -32,6 +32,7 @@ class CourseCard extends StatelessWidget {
       child: Container(
         width: 140.w,
         margin: EdgeInsets.only(left: 16.w),
+        constraints: BoxConstraints(minHeight: 180.h),
         decoration: BoxDecoration(
           color: backgroundColor ?? Colors.white,
           borderRadius: BorderRadius.circular(20.r),
@@ -45,45 +46,39 @@ class CourseCard extends StatelessWidget {
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
           children: [
             // Image Placeholder
-            Expanded(
-              flex: 3,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius: BorderRadius.all(Radius.circular(20.r)),
-                ),
-                child: imagePath != null
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.all(Radius.circular(20.r)),
-                        child: Image.asset(
-                          imagePath!,
-                          fit: BoxFit.cover,
-                        ),
-                      )
-                    : Center(
-                        child:
-                            Icon(Icons.image, color: Colors.grey, size: 40.r),
-                      ),
+            Container(
+              height: 120.h,
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: BorderRadius.all(Radius.circular(20.r)),
               ),
+              child: imagePath != null
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.all(Radius.circular(20.r)),
+                      child: Image.asset(
+                        imagePath!,
+                        fit: BoxFit.cover,
+                      ),
+                    )
+                  : Center(
+                      child:
+                          Icon(Icons.image, color: Colors.grey, size: 40.r),
+                    ),
             ),
             // Title
-            Expanded(
-              flex: 1,
-              child: Padding(
-                padding: EdgeInsets.all(8.0.r),
-                child: Center(
-                  child: Text(
-                    title,
-                    style: MyTextStyle.textMatn12Bold.copyWith(
-                      color: MyColors.textMatn2,
-                    ),
-                    textAlign: TextAlign.center,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+            Padding(
+              padding: EdgeInsets.all(8.0.r),
+              child: Text(
+                title,
+                style: MyTextStyle.textMatn12Bold.copyWith(
+                  color: MyColors.textMatn2,
                 ),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],

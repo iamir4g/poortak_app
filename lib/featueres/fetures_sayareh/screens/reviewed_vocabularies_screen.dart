@@ -296,8 +296,12 @@ class _ReviewedVocabulariesScreenState
                         onPressed: () {
                           Navigator.pushReplacementNamed(
                             context,
-                            PracticeVocabularyScreen.routeName,
-                            arguments: {'courseId': widget.courseId},
+                            LessonScreen.routeName,
+                            arguments: {
+                              'index': 0,
+                              'title': 'درس',
+                              'lessonId': widget.courseId,
+                            },
                           );
                         },
                         style: ElevatedButton.styleFrom(

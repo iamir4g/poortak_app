@@ -38,8 +38,8 @@ class ItemBook extends StatelessWidget {
           }
         },
         child: Container(
-          width: 360.w,
-          height: 100.h,
+          width: double.infinity,
+          margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
           padding: EdgeInsets.all(16.r),
           decoration: BoxDecoration(
             color: Theme.of(context).cardColor,
@@ -49,9 +49,9 @@ class ItemBook extends StatelessWidget {
                 color: Theme.of(context).brightness == Brightness.dark
                     ? Colors.black.withOpacity(0.3)
                     : Colors.grey.withOpacity(0.1),
-                spreadRadius: 1,
-                blurRadius: 3,
-                offset: const Offset(0, 1),
+                spreadRadius: 1.r,
+                blurRadius: 3.r,
+                offset: Offset(0, 1.h),
               ),
             ],
           ),
@@ -88,11 +88,12 @@ class ItemBook extends StatelessWidget {
                   ],
                 ),
               ),
+              SizedBox(width: 8.w),
               ClipRRect(
                 borderRadius: BorderRadius.circular(12.r),
                 child: SizedBox(
-                  width: 81.w,
-                  height: 81.h,
+                  width: 70.r,
+                  height: 70.r,
                   child: FutureBuilder<String>(
                     future: GetImageUrlService().getImageUrl(thumbnail ?? ""),
                     builder: (context, snapshot) {
@@ -110,8 +111,6 @@ class ItemBook extends StatelessWidget {
                       }
                       return Image.network(
                         snapshot.data!,
-                        width: 81.w,
-                        height: 81.h,
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
                           return const Center(
@@ -123,11 +122,6 @@ class ItemBook extends StatelessWidget {
                   ),
                 ),
               ),
-              // const SizedBox(width: 8),
-              // Icon(
-              //   Icons.arrow_forward_ios,
-              //   color: Theme.of(context).textTheme.bodySmall?.color,
-              // ),
             ],
           ),
         ),

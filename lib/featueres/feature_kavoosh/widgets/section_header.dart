@@ -20,12 +20,17 @@ class SectionHeader extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            title,
-            style: MyTextStyle.textMatn16Bold.copyWith(
-              color: MyColors.textMatn2,
+          Flexible(
+            child: Text(
+              title,
+              style: MyTextStyle.textMatn16Bold.copyWith(
+                color: MyColors.textMatn2,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
+          SizedBox(width: 8.w),
           TextButton(
             onPressed: onSeeAllTap,
             child: Text(

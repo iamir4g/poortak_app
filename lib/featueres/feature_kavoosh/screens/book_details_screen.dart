@@ -58,10 +58,14 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  'کتاب آموزشی دبستان',
-                  style: MyTextStyle.textHeader16Bold.copyWith(
-                    color: MyColors.textMatn2,
+                Flexible(
+                  child: Text(
+                    'کتاب آموزشی دبستان',
+                    style: MyTextStyle.textHeader16Bold.copyWith(
+                      color: MyColors.textMatn2,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 SizedBox(
@@ -116,11 +120,17 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
                     ),
                   ),
                   SizedBox(height: 24.h),
-                  Text(
-                    widget.title,
-                    style: MyTextStyle.textMatn18Bold.copyWith(
-                      fontSize: 20.sp,
-                      color: MyColors.textMatn2,
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16.w),
+                    child: Text(
+                      widget.title,
+                      style: MyTextStyle.textMatn18Bold.copyWith(
+                        fontSize: 20.sp,
+                        color: MyColors.textMatn2,
+                      ),
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   SizedBox(height: 8.h),
@@ -130,25 +140,34 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
                       color: MyColors.text4,
                       fontWeight: FontWeight.normal,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: 24.h),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'قیمت:',
-                        style: MyTextStyle.textHeader16Bold.copyWith(
-                          color: MyColors.textMatn2,
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16.w),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'قیمت:',
+                          style: MyTextStyle.textHeader16Bold.copyWith(
+                            color: MyColors.textMatn2,
+                          ),
                         ),
-                      ),
-                      SizedBox(width: 8.w),
-                      Text(
-                        '۷۵,۰۰۰ تومان',
-                        style: MyTextStyle.textHeader16Bold.copyWith(
-                          color: MyColors.textMatn2,
+                        SizedBox(width: 8.w),
+                        Flexible(
+                          child: Text(
+                            '۷۵,۰۰۰ تومان',
+                            style: MyTextStyle.textHeader16Bold.copyWith(
+                              color: MyColors.textMatn2,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -254,17 +273,27 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            label,
-            style: MyTextStyle.textMatn14Bold.copyWith(
-              color: MyColors.text4,
-              fontWeight: FontWeight.normal,
+          Flexible(
+            child: Text(
+              label,
+              style: MyTextStyle.textMatn14Bold.copyWith(
+                color: MyColors.text4,
+                fontWeight: FontWeight.normal,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
-          Text(
-            value,
-            style: MyTextStyle.textMatn14Bold.copyWith(
-              color: MyColors.text3,
+          SizedBox(width: 8.w),
+          Flexible(
+            child: Text(
+              value,
+              style: MyTextStyle.textMatn14Bold.copyWith(
+                color: MyColors.text3,
+              ),
+              textAlign: TextAlign.left,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],
