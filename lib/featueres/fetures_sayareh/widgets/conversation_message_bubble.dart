@@ -73,7 +73,11 @@ class ConversationMessageBubble extends StatelessWidget {
                         style: FontSizeHelper.getContentTextStyle(
                           context,
                           baseFontSize: 16.0.sp,
-                          color: isFirstPerson ? Colors.white : Colors.black,
+                          color: isCurrentPlaying
+                              ? (isFirstPerson ? Colors.white : Colors.black)
+                              : (isFirstPerson
+                                  ? Colors.white.withOpacity(0.5)
+                                  : Colors.black.withOpacity(0.4)),
                         ),
                         softWrap: true,
                         textDirection: TextDirection.ltr,

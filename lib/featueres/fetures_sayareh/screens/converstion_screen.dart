@@ -67,6 +67,10 @@ class _ConversationScreenState extends State<ConversationScreen> {
     )..add(GetConversationEvent(id: widget.conversationId));
   }
 
+  final ScrollController _scrollController = ScrollController();
+  // مپ برای ذخیره GlobalKey هر آیتم جهت اسکرول دقیق
+  final Map<int, GlobalKey> _itemKeys = {};
+
   @override
   void dispose() {
     // توقف پخش در صورت خروج از صفحه
@@ -76,6 +80,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
     currentPlayingIndexNotifier.dispose();
     showTranslationsNotifier.dispose();
     _savePlaybackDebounceTimer?.cancel();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -383,19 +388,19 @@ class _ConversationScreenState extends State<ConversationScreen> {
   /// ساخت لیست مکالمه با استفاده از ListView.builder
   /// این متد پیام‌های مرتب شده را به صورت اسکرول‌پذیر نمایش می‌دهد
   Widget _buildConversationList(BuildContext context, ConversationModel data) {
-    final ScrollController scrollController = ScrollController();
-
     // اسکرول به آخرین پیام پخش شده پس از رندر شدن لیست
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (currentPlayingIndexNotifier.value > 0 &&
-          scrollController.hasClients) {
-        // تخمین حدودی برای اسکرول (چون ارتفاع حباب‌ها متغیر است)
-        final double targetOffset = currentPlayingIndexNotifier.value * 100.0.h;
-        scrollController.animateTo(
-          targetOffset.clamp(0, scrollController.position.maxScrollExtent),
-          duration: const Duration(milliseconds: 500),
-          curve: Curves.easeInOut,
-        );
+          _scrollController.hasClients) {
+        final key = _itemKeys[currentPlayingIndexNotifier.value];
+        if (key?.currentContext != null) {
+          Scrollable.ensureVisible(
+            key!.currentContext!,
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.easeInOut,
+            alignment: 0.5, // قرار دادن در وسط صفحه
+          );
+        }
       }
     });
 
@@ -405,12 +410,48 @@ class _ConversationScreenState extends State<ConversationScreen> {
         return ValueListenableBuilder<int>(
           valueListenable: currentPlayingIndexNotifier,
           builder: (context, currentPlayingIndex, _) {
+            // اضافه کردن اسکرول خودکار هنگام تغییر ایندکس
+            if (_scrollController.hasClients) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                final key = _itemKeys[currentPlayingIndex];
+                if (key?.currentContext != null) {
+                  Scrollable.ensureVisible(
+                    key!.currentContext!,
+                    duration: const Duration(milliseconds: 600),
+                    curve: Curves.easeInOut,
+                    alignment: 0.5, // قرار دادن در وسط صفحه
+                  );
+                } else {
+                  // Fallback: اگر آیتم هنوز رندر نشده بود، از تخمین قبلی استفاده می‌کنیم
+                  final double screenHeight =
+                      MediaQuery.of(context).size.height;
+                  final double estimatedItemHeight =
+                      showTranslations ? 150.0.h : 100.0.h;
+
+                  double targetOffset =
+                      (currentPlayingIndex * estimatedItemHeight) -
+                          (screenHeight / 2) +
+                          (estimatedItemHeight / 2);
+
+                  _scrollController.animateTo(
+                    targetOffset.clamp(
+                        0, _scrollController.position.maxScrollExtent),
+                    duration: const Duration(milliseconds: 600),
+                    curve: Curves.easeInOut,
+                  );
+                }
+              });
+            }
+
             return ListView.builder(
-              controller: scrollController,
+              controller: _scrollController,
               padding: EdgeInsets.all(16.r),
               itemCount: sortedMessages?.length ?? 0,
               itemBuilder: (context, index) {
                 final message = sortedMessages![index];
+
+                // ایجاد یا دریافت کلید برای این ایندکس
+                _itemKeys[index] ??= GlobalKey();
 
                 // بررسی اینکه آیا این پیام در حال پخش است
                 final isCurrentPlaying = sortedMessages != null &&
@@ -419,6 +460,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
                 // استفاده از widget جداگانه برای نمایش هر حباب پیام
                 return ConversationMessageBubble(
+                  key: _itemKeys[index],
                   message: message,
                   isCurrentPlaying: isCurrentPlaying,
                   showTranslations: showTranslations,

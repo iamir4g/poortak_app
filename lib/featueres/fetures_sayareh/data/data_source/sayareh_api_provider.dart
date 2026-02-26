@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:poortak/common/services/auth_service.dart';
 import 'package:poortak/config/constants.dart';
@@ -11,61 +12,65 @@ class SayarehApiProvider {
   SayarehApiProvider({required this.dio})
       : _authService = locator<AuthService>();
 
-  dynamic callGetAllCourses() async {
-    final response = await dio.get(
-      "${Constants.baseUrl}iknow/courses",
-    );
+  dynamic _retryRequest(Future<Response> Function() request) async {
+    int retryCount = 0;
+    const maxRetries = 3;
+    const retryDelay = Duration(seconds: 2);
 
-    log("Sayareh Home Response: ${response.data}");
-    return response;
+    while (true) {
+      try {
+        return await request();
+      } on DioException catch (e) {
+        retryCount++;
+        bool isTlsError = e.error is HandshakeException &&
+            e.error.toString().contains("WRONG_VERSION_NUMBER");
+        bool isNetworkError = e.type == DioExceptionType.connectionTimeout ||
+            e.type == DioExceptionType.sendTimeout ||
+            e.type == DioExceptionType.receiveTimeout ||
+            e.type == DioExceptionType.connectionError;
+
+        if ((isTlsError || isNetworkError) && retryCount < maxRetries) {
+          log("⚠️ API Error (Retry $retryCount/$maxRetries): ${e.message}. Retrying in ${retryDelay.inSeconds}s...");
+          await Future.delayed(retryDelay);
+          continue;
+        }
+        rethrow;
+      }
+    }
+  }
+
+  dynamic callGetAllCourses() async {
+    return _retryRequest(() => dio.get("${Constants.baseUrl}iknow/courses"));
   }
 
   dynamic callGetBookList() async {
-    final response = await dio.get(
-      "${Constants.baseUrl}iknow/books",
-    );
-    log("Sayareh Book List Response: ${response.data}");
-    return response;
+    return _retryRequest(() => dio.get("${Constants.baseUrl}iknow/books"));
   }
 
   dynamic callGetBookById(String bookId) async {
-    final response = await dio.get(
-      "${Constants.baseUrl}iknow/books/$bookId",
-    );
-    log("Sayareh Single Book Response: ${response.data}");
-    return response;
+    return _retryRequest(
+        () => dio.get("${Constants.baseUrl}iknow/books/$bookId"));
   }
 
   dynamic callGetCourseById(String id) async {
-    final response = await dio.get(
-      "${Constants.baseUrl}iknow/courses/$id",
-    );
-
-    log("Sayareh Course Response: ${response.data}");
-    return response;
+    return _retryRequest(
+        () => dio.get("${Constants.baseUrl}iknow/courses/$id"));
   }
 
   dynamic callGetVocabulary(String id) async {
-    final response = await dio.get(
-      "${Constants.baseUrl}iknow/courses/$id/vocabulary",
-    );
-
-    log("Sayareh Vocabulary Response: ${response.data}");
-    return response;
+    return _retryRequest(
+        () => dio.get("${Constants.baseUrl}iknow/courses/$id/vocabulary"));
   }
 
   dynamic callPostPracticeVocabulary(
       String id, List<String>? previousVocabularyIds) async {
     log("previousVocabularyIds: $previousVocabularyIds");
-    final response = await dio.post(
-      "${Constants.baseUrl}iknow/courses/$id/vocabulary/practice",
-      data: {
-        "previousVocabularyIds": previousVocabularyIds,
-      },
-    );
-
-    log("Sayareh Practice Vocabulary Response: ${response.data}");
-    return response;
+    return _retryRequest(() => dio.post(
+          "${Constants.baseUrl}iknow/courses/$id/vocabulary/practice",
+          data: {
+            "previousVocabularyIds": previousVocabularyIds,
+          },
+        ));
   }
 
   dynamic callPostSubmitVocabulary(
@@ -74,147 +79,103 @@ class SayarehApiProvider {
     String answer,
     List<String> previousVocabularyIds,
   ) async {
-    final response = await dio.post(
-      "${Constants.baseUrl}iknow/courses/$courseId/vocabulary/$vocabularyId/submit",
-      data: {
-        "answer": answer,
-        "previousVocabularyIds": previousVocabularyIds,
-        "vocabularyId": vocabularyId,
-      },
-    );
-
-    log("Sayareh Submit Vocabulary Response: ${response.data}");
-    return response;
+    return _retryRequest(() => dio.post(
+          "${Constants.baseUrl}iknow/courses/$courseId/vocabulary/$vocabularyId/submit",
+          data: {
+            "answer": answer,
+            "previousVocabularyIds": previousVocabularyIds,
+            "vocabularyId": vocabularyId,
+          },
+        ));
   }
 
   dynamic callGetQuizzes(String id) async {
-    return await _authService.get(
-      "${Constants.baseUrl}iknow/courses/$id/quiz",
-    );
+    return _retryRequest(() => _authService.get(
+          "${Constants.baseUrl}iknow/courses/$id/quiz",
+        ));
   }
 
   dynamic callGetStartQuizById(String courseId, String quizId) async {
-    return await _authService.get(
-      "${Constants.baseUrl}iknow/courses/$courseId/quiz/$quizId/start",
-    );
+    return _retryRequest(() => _authService.get(
+          "${Constants.baseUrl}iknow/courses/$courseId/quiz/$quizId/start",
+        ));
   }
 
   dynamic callPostAnswerQuestion(String courseId, String quizId,
       String questionId, String answerId) async {
-    return await _authService.post(
-      "${Constants.baseUrl}iknow/courses/$courseId/quiz/$quizId/answer",
-      data: {
-        "questionId": questionId,
-        "answerId": answerId,
-      },
-    );
+    return _retryRequest(() => _authService.post(
+          "${Constants.baseUrl}iknow/courses/$courseId/quiz/$quizId/answer",
+          data: {
+            "questionId": questionId,
+            "answerId": answerId,
+          },
+        ));
   }
 
   dynamic callGetResultQuestion(String courseId, String quizId) async {
-    return await _authService.get(
-      "${Constants.baseUrl}iknow/courses/$courseId/quiz/$quizId/result",
-    );
+    return _retryRequest(() => _authService.get(
+          "${Constants.baseUrl}iknow/courses/$courseId/quiz/$quizId/result",
+        ));
   }
 
   dynamic callDeleteQuizResult(String courseId, String quizId) async {
-    return await _authService.delete(
-      "${Constants.baseUrl}iknow/courses/$courseId/quiz/$quizId/result",
-    );
+    return _retryRequest(() => _authService.delete(
+          "${Constants.baseUrl}iknow/courses/$courseId/quiz/$quizId/result",
+        ));
   }
 
   dynamic callSayarehStorageApi() async {
-    final response = await dio.get(
-      "${Constants.baseUrl}storage",
-    );
-
-    log("Sayareh Storage Response: ${response.data}");
-    return response; //SayarehStorageTest.fromJson(response.data);
+    return _retryRequest(() => dio.get("${Constants.baseUrl}storage"));
   }
 
   dynamic callDownloadCourseVideo(String courseId) async {
-    final response = await dio.get(
-      "${Constants.baseUrl}iknow/courses/$courseId/download",
-    );
-
-    log("Course Video Download URL: ${response.data}");
-    return response;
+    return _retryRequest(
+        () => dio.get("${Constants.baseUrl}iknow/courses/$courseId/download"));
   }
 
   dynamic callDownloadBookFile(String bookId) async {
-    final response = await dio.get(
-      "${Constants.baseUrl}iknow/books/$bookId/download",
-    );
-
-    log("Book File Download URL: ${response.data}");
-    return response;
+    return _retryRequest(
+        () => dio.get("${Constants.baseUrl}iknow/books/$bookId/download"));
   }
 
   dynamic callGetConversation(String id) async {
-    final response = await dio.get(
-      "${Constants.baseUrl}iknow/courses/$id/conversation",
-    );
-
-    log("Sayareh Conversation Response: ${response.data}");
-    return response;
+    return _retryRequest(
+        () => dio.get("${Constants.baseUrl}iknow/courses/$id/conversation"));
   }
 
   dynamic callGetConversationPlayback(String courseId) async {
-    final response = await dio.get(
-      "${Constants.baseUrl}iknow/courses/$courseId/conversation/playback",
-    );
-
-    log("Sayareh Conversation Playback Response: ${response.data}");
-    return response;
+    return _retryRequest(() => dio.get(
+        "${Constants.baseUrl}iknow/courses/$courseId/conversation/playback"));
   }
 
   dynamic callPostConversationPlayback(
       String courseId, String conversationId) async {
     log("Sayareh save converstion courseId: $courseId, conversationId: $conversationId");
-    final response = await dio.post(
-      "${Constants.baseUrl}iknow/courses/$courseId/conversation/playback",
-      data: {
-        "courseId": courseId,
-        "conversationId": conversationId,
-      },
-    );
-
-    log("Sayareh Post Conversation Playback Response: ${response.data}");
-    return response;
+    return _retryRequest(() => dio.post(
+          "${Constants.baseUrl}iknow/courses/$courseId/conversation/playback",
+          data: {
+            "courseId": courseId,
+            "conversationId": conversationId,
+          },
+        ));
   }
 
   dynamic callGetCourseProgress(String courseId) async {
-    final response = await dio.get(
-      "${Constants.baseUrl}iknow/courses/$courseId/progress",
-    );
-
-    log("Sayareh Course Progress Response: ${response.data}");
-    return response;
+    return _retryRequest(
+        () => dio.get("${Constants.baseUrl}iknow/courses/$courseId/progress"));
   }
 
   dynamic callGetAllCoursesProgress() async {
-    final response = await dio.get(
-      "${Constants.baseUrl}iknow/courses/progress",
-    );
-
-    log("Sayareh All Courses Progress Response: ${response.data}");
-    return response;
+    return _retryRequest(
+        () => dio.get("${Constants.baseUrl}iknow/courses/progress"));
   }
 
   dynamic callDeleteCourseProgress(String courseId) async {
-    final response = await dio.delete(
-      "${Constants.baseUrl}iknow/courses/$courseId/progress",
-    );
-
-    log("Sayareh Delete Course Progress Response: ${response.data}");
-    return response;
+    return _retryRequest(() =>
+        dio.delete("${Constants.baseUrl}iknow/courses/$courseId/progress"));
   }
 
   dynamic callGetIknowAccess() async {
-    final response = await dio.get(
-      "${Constants.baseUrl}iknow/access",
-    );
-
-    log("Iknow Access Response: ${response.data}");
-    return response;
+    return _retryRequest(() => dio.get("${Constants.baseUrl}iknow/access"));
   }
 }

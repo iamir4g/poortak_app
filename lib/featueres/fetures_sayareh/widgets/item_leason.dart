@@ -75,7 +75,7 @@ class ItemLeason extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Container(
+            Expanded(
               child: Row(children: [
                 CircleAvatar(
                   radius: 33.5.r,
@@ -101,20 +101,26 @@ class ItemLeason extends StatelessWidget {
                   ),
                 ),
                 SizedBox(width: 4.w),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      item.name,
-                      style: Theme.of(context).textTheme.titleSmall,
-                    ),
-                    SizedBox(height: 6.h),
-                    Text(
-                      item.description,
-                      style: Theme.of(context).textTheme.labelMedium,
-                    ),
-                  ],
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        item.name,
+                        style: Theme.of(context).textTheme.titleSmall,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      SizedBox(height: 6.h),
+                      Text(
+                        item.description,
+                        style: Theme.of(context).textTheme.labelMedium,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
                 )
               ]),
             ),
