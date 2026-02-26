@@ -11,8 +11,11 @@ class ConversationMessageBubble extends StatelessWidget {
   /// داده پیام که باید نمایش داده شود
   final Datum message;
 
-  /// مشخص می‌کند که آیا این پیام در حال پخش است (برای نمایش border سبز)
+  /// مشخص می‌کند که آیا این پیام در حال پخش است
   final bool isCurrentPlaying;
+
+  /// ایندکس جمله فعلی که در حال پخش است (برای Shadowing)
+  final int currentSentenceIndex;
 
   /// مشخص می‌کند که آیا ترجمه باید نمایش داده شود
   final bool showTranslations;
@@ -24,9 +27,16 @@ class ConversationMessageBubble extends StatelessWidget {
     super.key,
     required this.message,
     required this.isCurrentPlaying,
+    this.currentSentenceIndex = 0,
     required this.showTranslations,
     required this.onTap,
   });
+
+  /// تجزیه متن به جملات
+  List<String> _splitIntoSentences(String text) {
+    final RegExp regExp = RegExp(r'[^.!?]+[.!?]*');
+    return regExp.allMatches(text).map((m) => m.group(0)!).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +45,9 @@ class ConversationMessageBubble extends StatelessWidget {
 
     // محاسبه عرض صفحه برای محدود کردن عرض حباب پیام
     final screenWidth = MediaQuery.of(context).size.width;
+
+    // تجزیه متن به جملات برای هایلایت کردن جمله فعال
+    final sentences = _splitIntoSentences(message.text);
 
     return Align(
       // تراز حباب به راست برای پیام‌های شخص اول و به چپ برای پیام‌های شخص دوم
@@ -68,31 +81,30 @@ class ConversationMessageBubble extends StatelessWidget {
                   children: [
                     // متن پیام که می‌تواند wrap شود
                     Expanded(
-                      child: Text(
-                        message.text,
-                        style: FontSizeHelper.getContentTextStyle(
-                          context,
-                          baseFontSize: 16.0.sp,
-                          color: isCurrentPlaying
-                              ? (isFirstPerson ? Colors.white : Colors.black)
-                              : (isFirstPerson
-                                  ? Colors.white.withOpacity(0.5)
-                                  : Colors.black.withOpacity(0.4)),
-                        ),
-                        softWrap: true,
+                      child: RichText(
                         textDirection: TextDirection.ltr,
+                        text: TextSpan(
+                          children: List.generate(sentences.length, (index) {
+                            final isSentenceActive = isCurrentPlaying &&
+                                index == currentSentenceIndex;
+                            return TextSpan(
+                              text: sentences[index],
+                              style: FontSizeHelper.getContentTextStyle(
+                                context,
+                                baseFontSize: 16.0.sp,
+                                color: isSentenceActive
+                                    ? (isFirstPerson
+                                        ? Colors.white
+                                        : Colors.black)
+                                    : (isFirstPerson
+                                        ? Colors.white.withOpacity(0.5)
+                                        : Colors.black.withOpacity(0.4)),
+                              ),
+                            );
+                          }),
+                        ),
                       ),
                     ),
-                    // const SizedBox(width: 8),
-                    // // آیکون صوتی برای نشان دادن قابلیت پخش
-                    // Padding(
-                    //   padding: const EdgeInsets.only(top: 2),
-                    //   child: Icon(
-                    //     Icons.volume_up,
-                    //     size: 16,
-                    //     color: isFirstPerson ? Colors.white70 : Colors.black54,
-                    //   ),
-                    // ),
                   ],
                 ),
                 // نمایش ترجمه در صورت فعال بودن
