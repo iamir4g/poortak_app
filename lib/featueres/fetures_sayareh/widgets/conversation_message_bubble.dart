@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/common/utils/font_size_helper.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/conversation_model.dart';
@@ -97,8 +96,8 @@ class ConversationMessageBubble extends StatelessWidget {
                                         ? Colors.white
                                         : Colors.black)
                                     : (isFirstPerson
-                                        ? Colors.white.withOpacity(0.5)
-                                        : Colors.black.withOpacity(0.4)),
+                                        ? Colors.white.withValues(alpha: 0.5)
+                                        : Colors.black.withValues(alpha: 0.5)),
                               ),
                             );
                           }),

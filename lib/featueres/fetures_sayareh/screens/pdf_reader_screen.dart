@@ -170,7 +170,7 @@ class PdfReaderScreen extends StatelessWidget {
 
     if (isLoggedIn) {
       // User is logged in
-      print(
+      debugPrint(
           "User is logged in. purchased: ${bookData.purchased}, file: ${bookData.file}, trialFile: ${bookData.trialFile}");
       if (bookData.purchased == true &&
           bookData.file != null &&
@@ -178,24 +178,25 @@ class PdfReaderScreen extends StatelessWidget {
         // User has purchased the book, use the full file
         fileToDownload = bookData.file;
         usePublicUrl = false;
-        print("Using purchased file: $fileToDownload with authenticated URL");
+        debugPrint(
+            "Using purchased file: $fileToDownload with authenticated URL");
       } else if (bookData.trialFile != null &&
           bookData.trialFile.toString().trim().isNotEmpty) {
         // User hasn't purchased or file is not available, use trial file with public URL
         fileToDownload = bookData.trialFile;
         usePublicUrl = true;
-        print("Using trial file: $fileToDownload with public URL");
+        debugPrint("Using trial file: $fileToDownload with public URL");
       }
     } else {
       // User is not logged in, always use trial file with public URL
-      print("User is not logged in. trialFile: ${bookData.trialFile}");
+      debugPrint("User is not logged in. trialFile: ${bookData.trialFile}");
       if (bookData.trialFile != null &&
           bookData.trialFile.toString().trim().isNotEmpty) {
         fileToDownload = bookData.trialFile;
         usePublicUrl = true;
-        print("Using trial file: $fileToDownload with public URL");
+        debugPrint("Using trial file: $fileToDownload with public URL");
       } else {
-        print("Trial file is not available for non-logged in user");
+        debugPrint("Trial file is not available for non-logged in user");
       }
     }
 
@@ -245,10 +246,10 @@ class PdfReaderScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.grey.withOpacity(0.1),
+                          color: Colors.grey.withValues(alpha: 0.1),
                           spreadRadius: 1,
-                          blurRadius: 3,
-                          offset: const Offset(0, 1),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
                         ),
                       ],
                     ),

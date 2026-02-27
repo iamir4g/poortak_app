@@ -249,7 +249,7 @@ class _MatchScreenState extends State<MatchScreen> {
                   textAlign: TextAlign.right,
                   style: MyTextStyle.textMatn16.copyWith(
                     color: _isAnswerSubmitted()
-                        ? MyColors.text4.withOpacity(0.5)
+                        ? MyColors.text4.withValues(alpha: 0.5)
                         : MyColors.text4,
                   ),
                   decoration: InputDecoration(
@@ -258,7 +258,7 @@ class _MatchScreenState extends State<MatchScreen> {
                         : 'جواب سوال:',
                     hintStyle: MyTextStyle.textMatn16.copyWith(
                       color: _isAnswerSubmitted()
-                          ? MyColors.text4.withOpacity(0.5)
+                          ? MyColors.text4.withValues(alpha: 0.5)
                           : MyColors.text4,
                     ),
                     border: InputBorder.none,

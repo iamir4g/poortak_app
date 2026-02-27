@@ -41,6 +41,7 @@ class _WordDetailView extends StatelessWidget {
     final prefsOperator = locator<PrefsOperator>();
     final isLoggedIn = await prefsOperator.getLoggedIn();
     if (!isLoggedIn) {
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("لطفا وارد شوید"),
@@ -50,6 +51,7 @@ class _WordDetailView extends StatelessWidget {
       );
       return;
     }
+    if (!context.mounted) return;
     context.read<LitnerBloc>().add(
           CreateWordEvent(word: word, translation: translation),
         );

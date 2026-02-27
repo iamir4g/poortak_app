@@ -15,6 +15,7 @@ class QuizAnswerBloc extends Bloc<QuizAnswerEvent, QuizAnswerState> {
 
   QuizAnswerBloc(this._sayarehRepository) : super(QuizAnswerInitial()) {
     on<SubmitAnswerEvent>(_onSubmitAnswer);
+    on<ResetQuizAnswerEvent>((event, emit) => emit(QuizAnswerInitial()));
   }
 
   Future<void> _onSubmitAnswer(

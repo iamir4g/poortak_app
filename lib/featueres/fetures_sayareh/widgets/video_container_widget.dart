@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/config/myColors.dart';
-import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/config/dimens.dart';
 import 'custom_video_player.dart';
 
@@ -71,7 +69,7 @@ class VideoContainerWidget extends StatelessWidget {
       showControls: true,
       thumbnailUrl: thumbnailUrl,
       onVideoEnded: () {
-        print('Video ended');
+        debugPrint('Video ended');
         // If user hasn't purchased and this was a trailer video, show purchase dialog
         if (!hasAccess && onShowPurchaseDialog != null) {
           onShowPurchaseDialog!();

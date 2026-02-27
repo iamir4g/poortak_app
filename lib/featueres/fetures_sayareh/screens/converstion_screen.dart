@@ -5,7 +5,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconify_design/iconify_design.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
-import 'package:poortak/config/dimens.dart';
 import 'package:poortak/locator.dart';
 import 'package:poortak/common/services/tts_service.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/conversation_model.dart';
@@ -147,8 +146,9 @@ class _ConversationScreenState extends State<ConversationScreen> {
           i < messages.length;
           i++) {
         if (!mounted) break;
-        if (!isPlayingNotifier.value || _playbackSessionId != mySessionId)
+        if (!isPlayingNotifier.value || _playbackSessionId != mySessionId) {
           break;
+        }
 
         final message = messages[i];
         currentPlayingIndexNotifier.value = i;
@@ -162,8 +162,9 @@ class _ConversationScreenState extends State<ConversationScreen> {
             j++) {
           if (!mounted) break;
           // بررسی حیاتی قبل از هر مرحله
-          if (!isPlayingNotifier.value || _playbackSessionId != mySessionId)
+          if (!isPlayingNotifier.value || _playbackSessionId != mySessionId) {
             break;
+          }
 
           currentSentenceIndexNotifier.value = j;
           final sentence = _currentMessageSentences[j];
@@ -181,36 +182,44 @@ class _ConversationScreenState extends State<ConversationScreen> {
               await ttsService.stop();
               await ttsService.setMaleVoice();
               await Future.delayed(const Duration(milliseconds: 100));
-              if (!isPlayingNotifier.value || _playbackSessionId != mySessionId)
+              if (!isPlayingNotifier.value ||
+                  _playbackSessionId != mySessionId) {
                 break;
+              }
               await ttsService.speak(sentence);
             } else if (message.voice == 'female') {
               await ttsService.stop();
               await ttsService.setFemaleVoice();
               await Future.delayed(const Duration(milliseconds: 100));
-              if (!isPlayingNotifier.value || _playbackSessionId != mySessionId)
+              if (!isPlayingNotifier.value ||
+                  _playbackSessionId != mySessionId) {
                 break;
+              }
               await ttsService.speak(sentence);
             } else {
-              if (!isPlayingNotifier.value || _playbackSessionId != mySessionId)
+              if (!isPlayingNotifier.value ||
+                  _playbackSessionId != mySessionId) {
                 break;
+              }
               await ttsService.speak(sentence, voice: message.voice);
             }
           } catch (e) {
-            print("Error during sentence playback: $e");
+            debugPrint("Error during sentence playback: $e");
           }
 
           // توقف بین جملات برای تکنیک Shadowing
-          if (!isPlayingNotifier.value || _playbackSessionId != mySessionId)
+          if (!isPlayingNotifier.value || _playbackSessionId != mySessionId) {
             break;
+          }
 
           // صبر کردن برای اتمام صحبت فعلی قبل از رفتن به تاخیر Shadowing
           // این بخش از پخش مجدد ناخواسته جلوگیری می‌کند
           await Future.delayed(const Duration(milliseconds: 800));
 
           // بررسی مجدد بعد از تاخیر
-          if (!isPlayingNotifier.value || _playbackSessionId != mySessionId)
+          if (!isPlayingNotifier.value || _playbackSessionId != mySessionId) {
             break;
+          }
         }
 
         // اگر پخش پیام تمام شد و کاربر متوقف نکرده بود، ایندکس جمله را صفر کن
@@ -350,7 +359,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
             color: MyColors.background,
           ),
           child: SafeArea(
-            child: Container(
+            child: SizedBox(
               height: 60.h,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:poortak/config/myColors.dart';
-import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/common/services/getImageUrl_service.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/book_detail_screen.dart';
 
@@ -47,8 +45,8 @@ class ItemBook extends StatelessWidget {
             boxShadow: [
               BoxShadow(
                 color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.black.withOpacity(0.3)
-                    : Colors.grey.withOpacity(0.1),
+                    ? Colors.black.withValues(alpha: 0.3)
+                    : Colors.grey.withValues(alpha: 0.1),
                 spreadRadius: 1.r,
                 blurRadius: 3.r,
                 offset: Offset(0, 1.h),

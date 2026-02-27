@@ -3,7 +3,6 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_start_bloc/quiz_start_bloc.dart';
@@ -73,9 +72,8 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
         // Call delete API
         await locator<SayarehRepository>()
             .deleteQuizResult(widget.courseId, widget.quizId);
-        if (context.mounted) {
-          Navigator.of(context).pop(); // Exit quiz screen
-        }
+        if (!mounted) return;
+        Navigator.of(context).pop(); // Exit quiz screen
       },
     );
   }
@@ -321,7 +319,7 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                                       borderRadius: BorderRadius.circular(16.r),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: Colors.black.withOpacity(0.03),
+                                          color: Colors.black.withValues(alpha: 0.03),
                                           blurRadius: 4,
                                           offset: Offset(0, 2),
                                         ),

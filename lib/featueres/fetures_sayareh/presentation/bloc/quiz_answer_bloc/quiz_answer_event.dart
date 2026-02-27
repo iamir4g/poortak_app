@@ -23,3 +23,7 @@ class SubmitAnswerEvent extends QuizAnswerEvent {
   @override
   List<Object> get props => [courseId, quizId, questionId, answerId];
 }
+
+class ResetQuizAnswerEvent extends QuizAnswerEvent {
+  const ResetQuizAnswerEvent();
+}

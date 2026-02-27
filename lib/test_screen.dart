@@ -6,7 +6,7 @@ class TestScreen extends StatelessWidget {
 
   TestScreen({super.key});
 
-  PageController pageController = PageController();
+  final PageController pageController = PageController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(

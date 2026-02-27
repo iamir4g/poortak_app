@@ -4,7 +4,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/common/resources/data_state.dart';
-import 'package:poortak/config/dimens.dart';
 import 'package:poortak/featueres/feature_profile/repositories/profile_repository.dart';
 import 'package:poortak/featueres/feature_profile/data/data_sorce/profile_api_provider.dart';
 import 'package:poortak/locator.dart';

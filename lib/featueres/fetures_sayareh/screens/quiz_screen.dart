@@ -5,7 +5,6 @@ import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/common/utils/font_size_helper.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_answer_bloc/quiz_answer_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_result_bloc/quiz_result_bloc.dart';
-import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/quiz_question_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/widgets/quiz_result_modal.dart';
 import 'package:poortak/featueres/fetures_sayareh/widgets/item_question.dart';
@@ -46,16 +45,6 @@ class _QuizScreenState extends State<QuizScreen> {
     currentQuestion = widget.initialQuestion;
   }
 
-  void _handleAuthError(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('لطفا ابتدا وارد حساب کاربری خود شوید'),
-        duration: Duration(seconds: 2),
-      ),
-    );
-    Navigator.pushReplacementNamed(context, LoginScreen.routeName);
-  }
-
   void _showExitModal() {
     ReusableModal.show(
       context: context,
@@ -74,9 +63,8 @@ class _QuizScreenState extends State<QuizScreen> {
         // Call delete API
         await locator<SayarehRepository>()
             .deleteQuizResult(widget.courseId, widget.quizId);
-        if (context.mounted) {
-          Navigator.of(context).pop(); // Exit quiz screen
-        }
+        if (!mounted) return;
+        Navigator.of(context).pop(); // Exit quiz screen
       },
     );
   }
@@ -289,7 +277,8 @@ class _QuizScreenState extends State<QuizScreen> {
                                     borderRadius: BorderRadius.circular(16),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withOpacity(0.03),
+                                        color: Colors.black
+                                            .withValues(alpha: 0.03),
                                         blurRadius: 4,
                                         offset: Offset(0, 2),
                                       ),
@@ -407,9 +396,8 @@ class _QuizScreenState extends State<QuizScreen> {
                                             isCorrectAnswer = false;
                                             isWrongSelected = false;
                                           });
-                                          context
-                                              .read<QuizAnswerBloc>()
-                                              .emit(QuizAnswerInitial());
+                                          context.read<QuizAnswerBloc>().add(
+                                              const ResetQuizAnswerEvent());
                                         } else {
                                           // Handle end of quiz if needed, though listener handles it
                                           context.read<QuizResultBloc>().add(

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 
 class ContestCard extends StatelessWidget {
@@ -77,13 +76,13 @@ class ContestCard extends StatelessWidget {
                       boxShadow: [
                         BoxShadow(
                           color: Theme.of(context).brightness == Brightness.dark
-                              ? Colors.black.withOpacity(0.3)
-                              : Colors.grey.withOpacity(0.1),
+                              ? Colors.black.withValues(alpha: 0.3)
+                              : Colors.grey.withValues(alpha: 0.1),
                         ),
                         BoxShadow(
                           color: Theme.of(context).brightness == Brightness.dark
-                              ? Colors.black.withOpacity(0.3)
-                              : Colors.grey.withOpacity(0.1),
+                              ? Colors.black.withValues(alpha: 0.3)
+                              : Colors.grey.withValues(alpha: 0.1),
                         ),
                       ],
                       color: Theme.of(context).brightness == Brightness.dark

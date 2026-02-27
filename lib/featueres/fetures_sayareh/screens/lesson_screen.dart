@@ -20,8 +20,6 @@ import 'package:poortak/locator.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/common/services/getImageUrl_service.dart';
 import 'package:poortak/common/widgets/reusable_modal.dart';
-import 'package:lottie/lottie.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/config/dimens.dart';
 
 class LessonScreen extends StatefulWidget {
@@ -84,11 +82,12 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
         _currentLesson!.video!.isNotEmpty) {
       videoToDownload = _currentLesson!.video;
       usePublicUrl = false;
-      print("Using purchased video: $videoToDownload with authenticated URL");
+      debugPrint(
+          "Using purchased video: $videoToDownload with authenticated URL");
     } else if (_currentLesson?.trailerVideo.isNotEmpty == true) {
       videoToDownload = _currentLesson!.trailerVideo;
       usePublicUrl = true;
-      print("Using trailer video: $videoToDownload with public URL");
+      debugPrint("Using trailer video: $videoToDownload with public URL");
     }
 
     if (videoToDownload == null || videoToDownload.isEmpty) return;
@@ -157,7 +156,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
 
   void _showPurchaseDialog() {
     if (_currentLesson == null) {
-      print('No lesson data available for purchase dialog');
+      debugPrint('No lesson data available for purchase dialog');
       return;
     }
     showDialog(
@@ -196,7 +195,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
   void didPushNext() {
     // Called when a new route has been pushed, and the current route is no longer visible.
     // Pause video playback
-    print("Pausing video because a new screen was pushed");
+    debugPrint("Pausing video because a new screen was pushed");
     _videoPlayerKey.currentState?.stopVideo();
     super.didPushNext();
   }
@@ -207,7 +206,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
       listeners: [
         BlocListener<LessonBloc, LessonState>(
           listener: (context, state) {
-            print("LessonBloc state changed: $state");
+            debugPrint("LessonBloc state changed: $state");
             if (state is LessonSuccess) {
               if (!_isDisposed && mounted) {
                 setState(() {
@@ -260,17 +259,17 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
                   state.lesson.video != null &&
                   state.lesson.video!.isNotEmpty) {
                 videoToCheck = state.lesson.video;
-                print("Checking for purchased video: $videoToCheck");
+                debugPrint("Checking for purchased video: $videoToCheck");
               } else {
                 videoToCheck = state.lesson.trailerVideo;
-                print("Checking for trailer video: $videoToCheck");
+                debugPrint("Checking for trailer video: $videoToCheck");
               }
 
               if (videoToCheck != null && videoToCheck.isNotEmpty) {
                 _checkAndDownloadVideo(videoToCheck);
               }
             } else if (state is LessonError) {
-              print("LessonError: ${state.message}");
+              debugPrint("LessonError: ${state.message}");
               if (mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
@@ -308,7 +307,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     offset: const Offset(0, 1),
                     blurRadius: Dimens.nr(1),
                   ),
@@ -384,7 +383,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
         borderRadius: BorderRadius.circular(Dimens.nr(20)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: Dimens.nr(10),
             offset: Offset(0, Dimens.nh(4)),
           ),
@@ -637,7 +636,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
             borderRadius: BorderRadius.circular(Dimens.nr(50)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.04),
+                color: Colors.black.withValues(alpha: 0.04),
                 offset: const Offset(0, 0),
                 blurRadius: Dimens.nr(4),
               ),

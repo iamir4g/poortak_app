@@ -107,7 +107,7 @@ Future<void> _requestStoragePermission() async {
       }
     }
   } catch (e) {
-    print('Error requesting storage permission: $e');
+    debugPrint('Error requesting storage permission: $e');
     // Continue app execution even if permission request fails
   }
 }
@@ -319,7 +319,7 @@ void main() async {
                         final w = raw['word'];
                         final t = raw['translation'];
                         if (w is String && t is String && w.isNotEmpty) {
-                          print(
+                          debugPrint(
                               '[Routes] Navigating to WordDetailScreen word="$w" translation="$t"');
                           return WordDetailScreen(
                             word: w,
@@ -327,7 +327,7 @@ void main() async {
                           );
                         }
                       }
-                      print(
+                      debugPrint(
                           '[Routes] Invalid arguments for WordDetailScreen: $raw');
                       return const Scaffold(
                         body: Center(
@@ -392,8 +392,6 @@ void main() async {
                     BookDetailScreen.routeName: (context) =>
                         const BookDetailScreen(),
                     PdfReaderScreen.routeName: (context) {
-                      final args = ModalRoute.of(context)?.settings.arguments
-                          as Map<String, dynamic>;
                       return MultiBlocProvider(
                         providers: [
                           BlocProvider(

@@ -17,7 +17,6 @@ import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/common/services/tts_service.dart';
 import 'package:poortak/common/widgets/reusable_modal.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:poortak/config/dimens.dart';
 
 class VocabularyScreen extends StatefulWidget {
   static const routeName = "/vocabulary_screen";
@@ -49,13 +48,14 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
     final isLoggedIn = await prefsOperator.getLoggedIn();
 
     if (!isLoggedIn) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text(
             "لطفا وارد شوید",
           ),
           backgroundColor: Colors.red,
-          duration: const Duration(seconds: 2),
+          duration: Duration(seconds: 2),
         ),
       );
       return;
@@ -63,6 +63,8 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
 
     log(word);
     log(translation);
+
+    if (!mounted) return;
     context.read<LitnerBloc>().add(CreateWordEvent(
           word: word,
           translation: translation,
@@ -199,8 +201,6 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                             final velocity = details.primaryVelocity;
                             if (velocity == null) return;
 
-                            final currentWordObj =
-                                state.vocabulary.data[currentIndex];
                             // Swipe right (to previous) - positive velocity
                             if (velocity > 0) {
                               if (currentIndex > 0) {

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/common/bloc/settings_cubit/settings_cubit.dart';
@@ -227,10 +226,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
             value: value,
             onChanged: onChanged,
             activeThumbColor: activeColor ?? MyColors.textSecondary,
-            activeTrackColor: activeColor?.withOpacity(0.3) ??
-                MyColors.textSecondary.withOpacity(0.3),
+            activeTrackColor: activeColor?.withValues(alpha: 0.3) ??
+                MyColors.textSecondary.withValues(alpha: 0.3),
             inactiveThumbColor: Colors.white,
-            inactiveTrackColor: MyColors.textSecondary.withOpacity(0.3),
+            inactiveTrackColor: MyColors.textSecondary.withValues(alpha: 0.3),
           ),
         ],
       ),
@@ -243,7 +242,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         SliderTheme(
           data: SliderTheme.of(context).copyWith(
             activeTrackColor: MyColors.primary,
-            inactiveTrackColor: MyColors.text4.withOpacity(0.3),
+            inactiveTrackColor: MyColors.text4.withValues(alpha: 0.3),
             thumbColor: MyColors.primary,
             trackHeight: 4.h,
             thumbShape: RoundSliderThumbShape(enabledThumbRadius: 8.r),

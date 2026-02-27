@@ -4,20 +4,15 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/common/services/getImageUrl_service.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/common/widgets/dot_loading_widget.dart';
-import 'package:poortak/common/widgets/primaryButton.dart';
 import 'package:poortak/common/widgets/reusable_modal.dart';
-import 'package:poortak/config/myColors.dart';
-import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/data_source/shopping_cart_api_provider.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/models/cart_enum.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
-import 'package:poortak/featueres/fetures_sayareh/data/models/single_book_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/single_book_bloc/single_book_cubit.dart';
 import 'package:poortak/locator.dart';
 import 'package:persian_tools/persian_tools.dart';
 import 'package:poortak/common/widgets/main_wrapper.dart';
-import 'dart:developer';
 import 'package:dio/dio.dart';
 
 class BookDetailScreen extends StatelessWidget {
@@ -136,7 +131,7 @@ class BookDetailScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
+                          color: Colors.black.withValues(alpha: 0.1),
                           blurRadius: 10,
                           offset: const Offset(0, 5),
                         ),
@@ -267,7 +262,7 @@ class BookDetailScreen extends StatelessWidget {
             color: Colors.white,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 10,
                 offset: const Offset(0, -5),
               ),

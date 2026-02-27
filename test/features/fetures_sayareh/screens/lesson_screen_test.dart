@@ -9,7 +9,6 @@ import 'package:get_it/get_it.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:poortak/common/bloc/connectivity_cubit/connectivity_cubit.dart';
 import 'package:poortak/common/bloc/video_download_cubit/video_download_cubit.dart';
-import 'package:poortak/common/resources/data_state.dart';
 import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/common/services/video_download_service.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';

@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconify_design/iconify_design.dart';
-import 'package:poortak/config/myColors.dart';
-import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/common/services/getImageUrl_service.dart';
 import 'package:poortak/common/widgets/global_progress_bar.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/all_courses_progress_model.dart';

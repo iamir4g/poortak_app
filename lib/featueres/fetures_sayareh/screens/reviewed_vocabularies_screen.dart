@@ -9,7 +9,6 @@ import 'package:poortak/locator.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/lesson_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/practice_vocabulary_screen.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:poortak/config/dimens.dart';
 
 class ReviewedVocabulariesScreen extends StatefulWidget {
   static const routeName = "/reviewed_vocabularies_screen";
@@ -251,8 +250,8 @@ class _ReviewedVocabulariesScreenState
                                     // Speak Button
                                     Container(
                                       decoration: BoxDecoration(
-                                        color:
-                                            MyColors.primary.withOpacity(0.1),
+                                        color: MyColors.primary
+                                            .withValues(alpha: 0.1),
                                         borderRadius:
                                             BorderRadius.circular(12.r),
                                       ),
@@ -280,7 +279,7 @@ class _ReviewedVocabulariesScreenState
                 color: Colors.white,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 10.r,
                     offset: Offset(0, -2.h),
                   ),

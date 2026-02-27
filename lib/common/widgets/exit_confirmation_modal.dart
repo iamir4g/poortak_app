@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 
 class ExitConfirmationModal extends StatelessWidget {
@@ -32,7 +31,7 @@ class ExitConfirmationModal extends StatelessWidget {
               width: 80.w,
               height: 80.h,
               decoration: BoxDecoration(
-                color: MyColors.error.withOpacity(0.1),
+                color: MyColors.error.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -119,8 +118,8 @@ class ExitConfirmationModal extends StatelessWidget {
                       onStay();
                     },
                     style: OutlinedButton.styleFrom(
-                      side: const BorderSide(
-                          color: Color(0xFF3D495C), width: 1),
+                      side:
+                          const BorderSide(color: Color(0xFF3D495C), width: 1),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20.r),
                       ),

@@ -1,8 +1,6 @@
-
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
@@ -15,9 +13,12 @@ import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shoppi
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_state.dart';
 import 'package:poortak/featueres/feature_shopping_cart/repositories/shopping_cart_repository.dart';
-import 'package:poortak/featueres/fetures_sayareh/data/models/all_courses_progress_model.dart' as progress_model;
-import 'package:poortak/featueres/fetures_sayareh/data/models/book_list_model.dart' as book_model;
-import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_home_model.dart' as home_model;
+import 'package:poortak/featueres/fetures_sayareh/data/models/all_courses_progress_model.dart'
+    as progress_model;
+import 'package:poortak/featueres/fetures_sayareh/data/models/book_list_model.dart'
+    as book_model;
+import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_home_model.dart'
+    as home_model;
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/iknow_access_bloc/iknow_access_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/repositories/sayareh_repository.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/sayareh_screen.dart';
@@ -39,8 +40,11 @@ class MockShoppingCartBloc extends Mock implements ShoppingCartBloc {}
 
 // Fake Classes
 class FakeIknowAccessEvent extends Fake implements IknowAccessEvent {}
+
 class FakeIknowAccessState extends Fake implements IknowAccessState {}
+
 class FakeShoppingCartEvent extends Fake implements ShoppingCartEvent {}
+
 class FakeShoppingCartState extends Fake implements ShoppingCartState {}
 
 void main() {
@@ -77,7 +81,8 @@ void main() {
 
     // Setup default behaviors for IknowAccessBloc
     when(() => mockIknowAccessBloc.state).thenReturn(IknowAccessInitial());
-    when(() => mockIknowAccessBloc.stream).thenAnswer((_) => const Stream.empty());
+    when(() => mockIknowAccessBloc.stream)
+        .thenAnswer((_) => const Stream.empty());
     when(() => mockIknowAccessBloc.add(any())).thenReturn(null);
     when(() => mockIknowAccessBloc.close()).thenAnswer((_) async {});
     when(() => mockIknowAccessBloc.hasCourseAccess(any())).thenReturn(false);
@@ -113,7 +118,7 @@ void main() {
   }
 
   // --- Helpers for Data Generation ---
-  home_model.SayarehHomeModel _getEmptySayarehHomeModel() {
+  home_model.SayarehHomeModel getEmptySayarehHomeModel() {
     return home_model.SayarehHomeModel(
       ok: true,
       meta: home_model.Meta(),
@@ -121,7 +126,7 @@ void main() {
     );
   }
 
-  book_model.GetBookListModel _getEmptyBookListModel() {
+  book_model.GetBookListModel getEmptyBookListModel() {
     return book_model.GetBookListModel(
       ok: true,
       meta: book_model.Meta(),
@@ -129,7 +134,7 @@ void main() {
     );
   }
 
-  progress_model.AllCoursesProgressModel _getEmptyProgressModel() {
+  progress_model.AllCoursesProgressModel getEmptyProgressModel() {
     return progress_model.AllCoursesProgressModel(
       ok: true,
       meta: home_model.Meta(),
@@ -140,18 +145,18 @@ void main() {
   testWidgets('نمایش لودینگ در ابتدای ورود به صفحه', (tester) async {
     // Arrange
     final completer = Completer<DataState<home_model.SayarehHomeModel>>();
-    
-    // Delay the future to simulate network request and keep it in loading state
-    when(() => mockSayarehRepository.fetchAllCourses()).thenAnswer(
-        (_) => completer.future);
-    when(() => mockSayarehRepository.fetchBookList()).thenAnswer(
-        (_) async => DataSuccess(_getEmptyBookListModel()));
-    when(() => mockSayarehRepository.fetchAllCoursesProgress()).thenAnswer(
-        (_) async => DataSuccess(_getEmptyProgressModel()));
-    
-    // Mock Shopping Cart getCart
-    when(() => mockShoppingCartRepository.getCart()).thenAnswer((_) async => ShoppingCart());
 
+    // Delay the future to simulate network request and keep it in loading state
+    when(() => mockSayarehRepository.fetchAllCourses())
+        .thenAnswer((_) => completer.future);
+    when(() => mockSayarehRepository.fetchBookList())
+        .thenAnswer((_) async => DataSuccess(getEmptyBookListModel()));
+    when(() => mockSayarehRepository.fetchAllCoursesProgress())
+        .thenAnswer((_) async => DataSuccess(getEmptyProgressModel()));
+
+    // Mock Shopping Cart getCart
+    when(() => mockShoppingCartRepository.getCart())
+        .thenAnswer((_) async => ShoppingCart());
 
     // Act
     await tester.pumpWidget(createWidgetUnderTest());
@@ -161,23 +166,24 @@ void main() {
     // Assert
     // We expect to verify we are in loading state.
     expect(find.text("کتاب های سیاره آی نو"), findsNothing);
-    
+
     // Cleanup
-    completer.complete(DataSuccess(_getEmptySayarehHomeModel()));
+    completer.complete(DataSuccess(getEmptySayarehHomeModel()));
     await tester.pumpAndSettle();
   });
-  
+
   testWidgets('نمایش خطا در صورت بروز مشکل در دریافت اطلاعات', (tester) async {
     // Arrange
     const errorMessage = "خطا در برقراری ارتباط";
-    when(() => mockSayarehRepository.fetchAllCourses()).thenAnswer(
-        (_) async => DataFailed(errorMessage));
-    when(() => mockSayarehRepository.fetchBookList()).thenAnswer(
-            (_) async => DataSuccess(_getEmptyBookListModel()));
-    when(() => mockSayarehRepository.fetchAllCoursesProgress()).thenAnswer(
-            (_) async => DataSuccess(_getEmptyProgressModel()));
+    when(() => mockSayarehRepository.fetchAllCourses())
+        .thenAnswer((_) async => DataFailed(errorMessage));
+    when(() => mockSayarehRepository.fetchBookList())
+        .thenAnswer((_) async => DataSuccess(getEmptyBookListModel()));
+    when(() => mockSayarehRepository.fetchAllCoursesProgress())
+        .thenAnswer((_) async => DataSuccess(getEmptyProgressModel()));
 
-    when(() => mockShoppingCartRepository.getCart()).thenAnswer((_) async => ShoppingCart());
+    when(() => mockShoppingCartRepository.getCart())
+        .thenAnswer((_) async => ShoppingCart());
 
     // Act
     await tester.pumpWidget(createWidgetUnderTest());
@@ -188,7 +194,8 @@ void main() {
     expect(find.text("تلاش دوباره"), findsOneWidget);
   });
 
-  testWidgets('نمایش لیست درس‌ها و کتاب‌ها پس از دریافت موفقیت‌آمیز', (tester) async {
+  testWidgets('نمایش لیست درس‌ها و کتاب‌ها پس از دریافت موفقیت‌آمیز',
+      (tester) async {
     // Arrange
     final lesson = home_model.Lesson(
       id: "1",
@@ -204,20 +211,19 @@ void main() {
       updatedAt: DateTime.now(),
       publishedAt: DateTime.now(),
     );
-    
+
     final book = book_model.BookList(
-        id: "101", 
-        title: "کتاب اول", 
-        order: 1, 
-        thumbnail: "book.jpg", 
-        price: "5000", 
-        pageCount: 100, 
-        publishDate: "2023", 
-        file: "book.pdf", 
-        createdAt: DateTime.now(), 
-        updatedAt: DateTime.now(), 
-        purchased: false
-    );
+        id: "101",
+        title: "کتاب اول",
+        order: 1,
+        thumbnail: "book.jpg",
+        price: "5000",
+        pageCount: 100,
+        publishDate: "2023",
+        file: "book.pdf",
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+        purchased: false);
 
     final homeModel = home_model.SayarehHomeModel(
       ok: true,
@@ -231,19 +237,21 @@ void main() {
       data: [book],
     );
 
-    when(() => mockSayarehRepository.fetchAllCourses()).thenAnswer(
-        (_) async => DataSuccess(homeModel));
-    when(() => mockSayarehRepository.fetchBookList()).thenAnswer(
-        (_) async => DataSuccess(bookModel));
-    when(() => mockSayarehRepository.fetchAllCoursesProgress()).thenAnswer(
-        (_) async => DataSuccess(_getEmptyProgressModel()));
-    
-    when(() => mockShoppingCartRepository.getCart()).thenAnswer((_) async => ShoppingCart());
+    when(() => mockSayarehRepository.fetchAllCourses())
+        .thenAnswer((_) async => DataSuccess(homeModel));
+    when(() => mockSayarehRepository.fetchBookList())
+        .thenAnswer((_) async => DataSuccess(bookModel));
+    when(() => mockSayarehRepository.fetchAllCoursesProgress())
+        .thenAnswer((_) async => DataSuccess(getEmptyProgressModel()));
+
+    when(() => mockShoppingCartRepository.getCart())
+        .thenAnswer((_) async => ShoppingCart());
 
     // Act
     await tester.pumpWidget(createWidgetUnderTest());
-    await tester.pump(); 
-    await tester.pump(const Duration(seconds: 2)); // Wait for futures to complete and UI to update
+    await tester.pump();
+    await tester.pump(const Duration(
+        seconds: 2)); // Wait for futures to complete and UI to update
 
     // Assert
     expect(find.text("درس اول"), findsOneWidget);

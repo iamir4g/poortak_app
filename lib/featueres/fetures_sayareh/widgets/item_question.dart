@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/config/myColors.dart';
-import 'package:poortak/config/myTextStyle.dart';
 
 class QuizAnswerItem extends StatefulWidget {
   final String title;

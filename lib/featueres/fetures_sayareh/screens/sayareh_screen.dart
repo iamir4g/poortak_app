@@ -19,7 +19,6 @@ import 'package:poortak/featueres/fetures_sayareh/data/models/all_courses_progre
 import 'package:poortak/locator.dart';
 // import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
-import 'dart:developer';
 
 class SayarehScreen extends StatefulWidget {
   static const routeName = "/sayareh_screen";
@@ -30,8 +29,6 @@ class SayarehScreen extends StatefulWidget {
 }
 
 class _SayarehScreenState extends State<SayarehScreen> {
-  final PrefsOperator _prefsOperator = locator<PrefsOperator>();
-
   @override
   void initState() {
     super.initState();
@@ -41,8 +38,6 @@ class _SayarehScreenState extends State<SayarehScreen> {
       accessBloc.add(FetchIknowAccessEvent(forceRefresh: true));
     });
   }
-
-  // Helper method to add item to cart based on login status
 
   @override
   Widget build(BuildContext context) {
@@ -265,18 +260,15 @@ class _SayarehScreenState extends State<SayarehScreen> {
                             },
                           )
                         else
-                          Container(
-                            // padding: const EdgeInsets.all(20),
-                            child: Center(
-                              child: Text(
-                                "هیچ کتابی یافت نشد",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Theme.of(context)
-                                      .textTheme
-                                      .bodySmall
-                                      ?.color,
-                                ),
+                          Center(
+                            child: Text(
+                              "هیچ کتابی یافت نشد",
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall
+                                    ?.color,
                               ),
                             ),
                           ),

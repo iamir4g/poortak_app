@@ -14,7 +14,6 @@ import 'package:poortak/featueres/fetures_sayareh/widgets/practice_vocabulary_re
 import 'package:poortak/locator.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/lesson_screen.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:poortak/config/dimens.dart';
 
 class PracticeVocabularyScreen extends StatefulWidget {
   static const routeName = "/practice_vocabulary_screen";
@@ -133,6 +132,7 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
     final isLoggedIn = await prefsOperator.getLoggedIn();
 
     if (!isLoggedIn) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("لطفا وارد شوید"),
@@ -143,6 +143,7 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
       return;
     }
 
+    if (!mounted) return;
     context.read<LitnerBloc>().add(CreateWordEvent(
           word: word,
           translation: translation,
@@ -196,7 +197,7 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
 
           return PopScope(
             canPop: canPopScreen,
-            onPopInvoked: (didPop) {
+            onPopInvokedWithResult: (didPop, result) {
               if (!didPop) {
                 _navigateToLessonScreen();
               }

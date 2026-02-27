@@ -150,7 +150,7 @@ class MainMatchScreen extends StatelessWidget {
               width: 80.r,
               height: 80.r,
               decoration: BoxDecoration(
-                color: MyColors.primary.withOpacity(0.1),
+                color: MyColors.primary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Lottie.asset(

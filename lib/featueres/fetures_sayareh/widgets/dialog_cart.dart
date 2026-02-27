@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -12,7 +10,6 @@ import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/models/cart_enum.dart';
-import 'package:poortak/featueres/feature_shopping_cart/data/models/shopping_cart_model.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/data_source/shopping_cart_api_provider.dart';
@@ -68,26 +65,28 @@ class _DialogCartState extends State<DialogCart> {
     return error.toString();
   }
 
-  void _addItemToCart(
-      BuildContext context, String type, String itemId, String itemName) async {
+  void _addItemToCart(String type, String itemId, String itemName) async {
     final isLoggedIn = _prefsOperator.isLoggedIn();
 
-    log("🛒 Adding item to cart: $itemName");
-    log("   Type: $type");
-    log("   ID: $itemId");
-    log("   User logged in: $isLoggedIn");
+    debugPrint("🛒 Adding item to cart: $itemName");
+    debugPrint("   Type: $type");
+    debugPrint("   ID: $itemId");
+    debugPrint("   User logged in: $isLoggedIn");
 
     // Get root navigator context before closing dialog
     final rootContext = Navigator.of(context, rootNavigator: true).context;
 
     if (isLoggedIn) {
       // User is logged in - add to server cart via API
-      log("📤 Adding item to server cart via API");
+      debugPrint("📤 Adding item to server cart via API");
       try {
         final apiProvider = locator<ShoppingCartApiProvider>();
         final cartType = CartType.values.firstWhere((e) => e.name == type);
         await apiProvider.addToCart(cartType, itemId);
-        log("✅ Item added to server cart successfully");
+        debugPrint("✅ Item added to server cart successfully");
+
+        if (!mounted) return;
+
         // Refresh cart after adding
         context.read<ShoppingCartBloc>().add(GetCartEvent());
 
@@ -96,16 +95,20 @@ class _DialogCartState extends State<DialogCart> {
 
         // Show success modal after dialog is closed
         Future.microtask(() {
-          _showSuccessModal(rootContext, itemName);
+          if (rootContext.mounted) {
+            _showSuccessModal(rootContext, itemName);
+          }
         });
       } catch (e) {
-        log("❌ Failed to add item to server cart: $e");
+        debugPrint("❌ Failed to add item to server cart: $e");
         final errorMessage = _extractErrorMessage(e);
-        log("📝 Extracted error message: $errorMessage");
+        debugPrint("📝 Extracted error message: $errorMessage");
+
+        if (!mounted) return;
 
         Navigator.of(context).pop(); // Close dialog even on error
-        if (mounted) {
-          Future.microtask(() {
+        Future.microtask(() {
+          if (rootContext.mounted) {
             ScaffoldMessenger.of(rootContext).showSnackBar(
               SnackBar(
                 content: Text(errorMessage),
@@ -113,20 +116,24 @@ class _DialogCartState extends State<DialogCart> {
                 duration: const Duration(seconds: 2),
               ),
             );
-          });
-        }
+          }
+        });
       }
     } else {
       // User is not logged in - add to local cart
-      log("📱 Adding item to local cart");
+      debugPrint("📱 Adding item to local cart");
       context.read<ShoppingCartBloc>().add(AddToLocalCartEvent(type, itemId));
+
+      if (!mounted) return;
 
       // Close current dialog
       Navigator.of(context).pop();
 
       // Show success modal after dialog is closed
       Future.microtask(() {
-        _showSuccessModal(rootContext, itemName);
+        if (rootContext.mounted) {
+          _showSuccessModal(rootContext, itemName);
+        }
       });
     }
   }
@@ -157,7 +164,7 @@ class _DialogCartState extends State<DialogCart> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     return Dialog(
         backgroundColor: MyColors.background,
         child: ConstrainedBox(
@@ -254,7 +261,7 @@ class _DialogCartState extends State<DialogCart> {
                                                   .textMatn13PrimaryShade1,
                                             ),
                                             Text(
-                                              l10n?.coin_with_buy ?? "",
+                                              l10n.coin_with_buy,
                                               style: MyTextStyle.textMatn9,
                                             )
                                           ],
@@ -302,7 +309,7 @@ class _DialogCartState extends State<DialogCart> {
                                           MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
-                                          l10n!.price,
+                                          l10n.price,
                                           style: MyTextStyle.textMatn15,
                                         ),
                                         Row(
@@ -328,11 +335,8 @@ class _DialogCartState extends State<DialogCart> {
                                   lable: l10n.add_to_cart,
                                   onPressed: () {
                                     // Add single course to cart using item ID and IKnowCourse type
-                                    _addItemToCart(
-                                        context,
-                                        CartType.IKnowCourse.name,
-                                        widget.item.id,
-                                        widget.item.name);
+                                    _addItemToCart(CartType.IKnowCourse.name,
+                                        widget.item.id, widget.item.name);
                                   })
                             ],
                           ),
@@ -413,7 +417,7 @@ class _DialogCartState extends State<DialogCart> {
                                                 .textMatn13PrimaryShade1,
                                           ),
                                           Text(
-                                            l10n.coin_with_buy ?? "",
+                                            l10n.coin_with_buy,
                                             style: MyTextStyle.textMatn9,
                                           )
                                         ],
@@ -638,7 +642,6 @@ class _DialogCartState extends State<DialogCart> {
                                 onPressed: () {
                                   // Add bundle to cart using specific item ID and IKnow type
                                   _addItemToCart(
-                                      context,
                                       CartType.IKnow.name,
                                       "4a61cc6b-8e3c-46e5-ad3c-5f52d0aff181",
                                       "مجموعه کامل سیاره آی نو");

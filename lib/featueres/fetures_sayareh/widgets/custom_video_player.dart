@@ -132,7 +132,7 @@ class CustomVideoPlayerState extends State<CustomVideoPlayer> {
         _setSecureFlag(true);
       }
     } catch (error) {
-      print('Error initializing video player: $error');
+      debugPrint('Error initializing video player: $error');
       if (mounted) {
         setState(() {
           _isVideoInitialized = false;
@@ -144,7 +144,6 @@ class CustomVideoPlayerState extends State<CustomVideoPlayer> {
   void _videoPlayerListener() {
     // Only update UI if buffering state changes
     if (mounted) {
-      final isBuffering = _videoPlayerController.value.isBuffering;
       // You can add a local state for buffering if needed for UI
       // For now we just ensure UI updates on state changes
       if (_videoPlayerController.value.isPlaying != _isPlaying) {
@@ -196,7 +195,7 @@ class CustomVideoPlayerState extends State<CustomVideoPlayer> {
       }
     } catch (e) {
       // Ignore errors - this is a security feature, not critical for functionality
-      print('Error setting secure flag: $e');
+      debugPrint('Error setting secure flag: $e');
     }
   }
 
@@ -253,9 +252,10 @@ class CustomVideoPlayerState extends State<CustomVideoPlayer> {
                           child: SliderTheme(
                             data: SliderTheme.of(context).copyWith(
                               activeTrackColor: Colors.white,
-                              inactiveTrackColor: Colors.white.withOpacity(0.3),
+                              inactiveTrackColor:
+                                  Colors.white.withValues(alpha: 0.3),
                               thumbColor: Colors.white,
-                              overlayColor: Colors.white.withOpacity(0.3),
+                              overlayColor: Colors.white.withValues(alpha: 0.3),
                               trackHeight: 4,
                               thumbShape: const RoundSliderThumbShape(
                                   enabledThumbRadius: 6),
@@ -397,7 +397,7 @@ class CustomVideoPlayerState extends State<CustomVideoPlayer> {
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.3),
+                              color: Colors.black.withValues(alpha: 0.3),
                               blurRadius: 10,
                               offset: const Offset(0, 4),
                             ),
@@ -553,7 +553,7 @@ class _FullscreenVideoPlayerState extends State<FullscreenVideoPlayer> {
       }
     } catch (e) {
       // Ignore errors - this is a security feature, not critical for functionality
-      print('Error setting secure flag: $e');
+      debugPrint('Error setting secure flag: $e');
     }
   }
 
@@ -598,10 +598,10 @@ class _FullscreenVideoPlayerState extends State<FullscreenVideoPlayer> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Colors.black.withOpacity(0.7),
+              Colors.black.withValues(alpha: 0.7),
               Colors.transparent,
               Colors.transparent,
-              Colors.black.withOpacity(0.7),
+              Colors.black.withValues(alpha: 0.7),
             ],
           ),
         ),
@@ -661,9 +661,9 @@ class _FullscreenVideoPlayerState extends State<FullscreenVideoPlayer> {
                     child: SliderTheme(
                       data: SliderTheme.of(context).copyWith(
                         activeTrackColor: Colors.white,
-                        inactiveTrackColor: Colors.white.withOpacity(0.3),
+                        inactiveTrackColor: Colors.white.withValues(alpha: 0.3),
                         thumbColor: Colors.white,
-                        overlayColor: Colors.white.withOpacity(0.3),
+                        overlayColor: Colors.white.withValues(alpha: 0.3),
                         trackHeight: 4,
                         thumbShape:
                             const RoundSliderThumbShape(enabledThumbRadius: 8),

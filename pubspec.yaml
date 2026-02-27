@@ -76,6 +76,8 @@ dependencies:
   openai_tts: ^0.0.3
   wakelock_plus: ^1.4.0
   flutter_screenutil: ^5.9.3
+  flutter_localizations:
+    sdk: flutter
   # برای رمزنگاری و رمزگشایی
   # cryptography: ^2.7.0
   # برای خواندن فایل .env
@@ -85,8 +87,6 @@ dependencies:
 
 dev_dependencies:
   flutter_test:
-    sdk: flutter
-  flutter_localizations: # Add this line
     sdk: flutter
   mocktail: ^1.0.0
   # The "flutter_lints" package below contains a set of recommended lints to

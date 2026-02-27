@@ -9,12 +9,10 @@ import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/dictionary_b
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/dictionary_bloc/dictionary_event.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/dictionary_bloc/dictionary_state.dart';
 import 'package:poortak/locator.dart';
-import 'package:poortak/featueres/fetures_sayareh/screens/word_detail_screen.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_bloc.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_event.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_state.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/dictionary_model.dart';
-import 'package:poortak/main.dart';
 
 class DictionaryBottomSheet extends StatelessWidget {
   const DictionaryBottomSheet({super.key});
@@ -62,29 +60,6 @@ class _DictionaryContentState extends State<_DictionaryContent> {
         context.read<DictionaryBloc>().add(SearchWord(query));
       }
     });
-  }
-
-  Future<void> _openFullPage(
-      BuildContext ctx, String word, String translation) async {
-    try {
-      print(
-          '[DictionaryBottomSheet] Full page navigate word="$word" translation="$translation"');
-      Navigator.of(ctx).pop();
-      await Future.delayed(const Duration(milliseconds: 50));
-      navigatorKey.currentState?.pushNamed(
-        WordDetailScreen.routeName,
-        arguments: {'word': word, 'translation': translation},
-      );
-    } catch (e, st) {
-      print('[DictionaryBottomSheet] Navigation error: $e');
-      print(st);
-      ScaffoldMessenger.of(ctx).showSnackBar(
-        const SnackBar(
-          content: Text('خطا در ناوبری'),
-          duration: Duration(seconds: 2),
-        ),
-      );
-    }
   }
 
   @override
