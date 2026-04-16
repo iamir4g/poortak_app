@@ -95,10 +95,14 @@ class StorageService {
     return GetDeceryptKey.fromJson(response.data);
   }
 
-  Future<String> callGetDownloadPublicUrl(String key) async {
+  String getDownloadPublicUrl(String key) {
     // For public downloads, the API returns the image binary data directly
     // We need to construct the URL manually since the response is binary
-    final publicUrl = "${Constants.baseUrl}storage/public/$key";
+    return "${Constants.baseUrl}storage/public/$key";
+  }
+
+  Future<String> callGetDownloadPublicUrl(String key) async {
+    final publicUrl = getDownloadPublicUrl(key);
     // log("Public Download URL: $publicUrl");
     return publicUrl;
   }

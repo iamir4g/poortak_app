@@ -200,30 +200,38 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                 ),
               ),
               SizedBox(width: 8.w),
-              Text(
-                'مجموع امتیاز های شما : ',
-                style: TextStyle(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.w500,
-                  color: const Color(0xFF29303D),
-                ),
-              ),
-              SizedBox(width: 8.w),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFFE8CC),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Center(
-                  child: Text(
-                    '۲۰۰ سکه',
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w500,
-                      color: const Color(0xFF29303D),
+              Expanded(
+                child: Wrap(
+                  alignment: WrapAlignment.start,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 8.w,
+                  runSpacing: 4.h,
+                  children: [
+                    Text(
+                      'مجموع امتیاز های شما : ',
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w500,
+                        color: const Color(0xFF29303D),
+                      ),
                     ),
-                  ),
+                    Container(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFE8CC),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        '۲۰۰ سکه',
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w500,
+                          color: const Color(0xFF29303D),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],

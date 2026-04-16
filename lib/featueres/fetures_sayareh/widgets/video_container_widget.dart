@@ -14,6 +14,7 @@ class VideoContainerWidget extends StatelessWidget {
   final bool hasAccess;
   final VoidCallback onVideoEnded;
   final Function()? onShowPurchaseDialog;
+  final VoidCallback? onDownload;
 
   const VideoContainerWidget({
     super.key,
@@ -27,6 +28,7 @@ class VideoContainerWidget extends StatelessWidget {
     required this.hasAccess,
     required this.onVideoEnded,
     this.onShowPurchaseDialog,
+    this.onDownload,
   });
 
   @override
@@ -54,6 +56,11 @@ class VideoContainerWidget extends StatelessWidget {
       return _buildLoadingState(context);
     }
 
+    // If local video doesn't exist and user hasn't started download, show download button
+    if (videoPath == null && onDownload != null) {
+      return _buildDownloadPrompt(context);
+    }
+
     if (videoPath == null && videoUrl == null) {
       return _buildErrorState(context);
     }
@@ -75,6 +82,70 @@ class VideoContainerWidget extends StatelessWidget {
           onShowPurchaseDialog!();
         }
       },
+    );
+  }
+
+  Widget _buildDownloadPrompt(BuildContext context) {
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        if (thumbnailUrl != null)
+          ClipRRect(
+            borderRadius: BorderRadius.circular(Dimens.nr(27)),
+            child: Image.network(
+              thumbnailUrl!,
+              width: Dimens.nw(310),
+              height: Dimens.nh(200),
+              fit: BoxFit.cover,
+            ),
+          )
+        else
+          Container(
+            decoration: BoxDecoration(
+              color: MyColors.brandSecondary,
+              borderRadius: BorderRadius.circular(Dimens.nr(27)),
+            ),
+          ),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.black.withValues(alpha: 0.3),
+            borderRadius: BorderRadius.circular(Dimens.nr(27)),
+          ),
+        ),
+        Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              GestureDetector(
+                onTap: onDownload,
+                child: Container(
+                  width: Dimens.nw(64),
+                  height: Dimens.nw(64),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.download_rounded,
+                    color: MyColors.brandPrimary,
+                    size: Dimens.nw(32),
+                  ),
+                ),
+              ),
+              SizedBox(height: Dimens.nh(12)),
+              Text(
+                'برای مشاهده، ویدیو را دانلود کنید',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: Dimens.nsp(14),
+                  fontFamily: 'IranSans',
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 

@@ -15,6 +15,7 @@ import 'package:poortak/featueres/fetures_sayareh/data/models/result_question_mo
 import 'package:poortak/featueres/fetures_sayareh/data/models/course_progress_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/all_courses_progress_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/iknow_access_model.dart';
+import 'package:poortak/featueres/fetures_sayareh/data/models/iknow_summary_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_home_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_storage_test_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/vocabulary_model.dart';
@@ -51,6 +52,20 @@ class SayarehRepository {
       }
     } on AppException catch (e) {
       return CheckExceptions.getError<GetBookListModel>(e);
+    }
+  }
+
+  Future<DataState<IKnowSummaryModel>> fetchIknowSummary() async {
+    try {
+      Response response = await sayarehApiProvider.callGetIknowSummary();
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = IKnowSummaryModel.fromJson(response.data);
+        return DataSuccess(data);
+      } else {
+        return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
+      }
+    } on AppException catch (e) {
+      return CheckExceptions.getError<IKnowSummaryModel>(e);
     }
   }
 

@@ -47,6 +47,10 @@ class SayarehApiProvider {
     return _retryRequest(() => dio.get("${Constants.baseUrl}iknow/books"));
   }
 
+  dynamic callGetIknowSummary() async {
+    return _retryRequest(() => dio.get("${Constants.baseUrl}iknow/summary"));
+  }
+
   dynamic callGetBookById(String bookId) async {
     return _retryRequest(
         () => dio.get("${Constants.baseUrl}iknow/books/$bookId"));

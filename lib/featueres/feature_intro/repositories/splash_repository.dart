@@ -1,10 +1,12 @@
+import 'dart:developer';
 import 'dart:io';
 
 class SplashRepository {
   Future<bool> checkConnectivity() async {
     try {
       final result = await InternetAddress.lookup('google.com');
-      // log(result.toString());
+      log("aaaa");
+      log(result.toString());
       print(result);
       print(result[0].rawAddress.isNotEmpty);
       return result.isNotEmpty && result[0].rawAddress.isNotEmpty;

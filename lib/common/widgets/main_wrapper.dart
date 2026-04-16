@@ -384,6 +384,7 @@ class _MainWrapperState extends State<MainWrapper> {
                           : PageView(
                               controller: controller,
                               onPageChanged: (index) {
+                                context.read<BottomNavCubit>().changeSelectedIndex(index);
                                 setState(() {
                                   currentPageIndex = index;
                                 });

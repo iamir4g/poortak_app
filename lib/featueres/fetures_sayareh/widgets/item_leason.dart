@@ -5,6 +5,7 @@ import 'package:iconify_design/iconify_design.dart';
 import 'package:poortak/common/services/getImageUrl_service.dart';
 import 'package:poortak/common/widgets/global_progress_bar.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/all_courses_progress_model.dart';
+import 'package:poortak/featueres/fetures_sayareh/data/models/iknow_summary_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_home_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/iknow_access_bloc/iknow_access_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/lesson_screen.dart';
@@ -16,6 +17,7 @@ class ItemLeason extends StatelessWidget {
   final bool purchased;
   final Function() onTap;
   final CourseProgressItem? progress;
+  final IKnowSummaryModel? summaryData;
 
   const ItemLeason({
     super.key,
@@ -24,6 +26,7 @@ class ItemLeason extends StatelessWidget {
     required this.purchased,
     required this.index,
     this.progress,
+    this.summaryData,
   });
 
   @override
@@ -57,7 +60,8 @@ class ItemLeason extends StatelessWidget {
           // If isDemo is false AND user doesn't have access, show add to cart modal
           showDialog(
             context: context,
-            builder: (BuildContext context) => DialogCart(item: item),
+            builder: (BuildContext context) =>
+                DialogCart(item: item, summaryData: summaryData),
           );
         }
       },

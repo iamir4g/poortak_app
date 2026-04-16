@@ -65,7 +65,8 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
     return accessBloc.hasCourseAccess(widget.lessonId);
   }
 
-  Future<void> _checkAndDownloadVideo(String videoToCheck) async {
+  Future<void> _checkAndDownloadVideo(String videoToCheck,
+      {bool autoStart = true}) async {
     if (videoToCheck.isEmpty) return;
 
     _currentVideoName = videoToCheck;
@@ -100,6 +101,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
       isEncrypted: !usePublicUrl,
       usePublicUrl: usePublicUrl,
       videoKey: videoToDownload,
+      autoStart: autoStart,
     );
   }
 
@@ -266,7 +268,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
               }
 
               if (videoToCheck != null && videoToCheck.isNotEmpty) {
-                _checkAndDownloadVideo(videoToCheck);
+                _checkAndDownloadVideo(videoToCheck, autoStart: false);
               }
             } else if (state is LessonError) {
               debugPrint("LessonError: ${state.message}");
@@ -507,6 +509,11 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
                 hasAccess: hasAccess,
                 onVideoEnded: () {},
                 onShowPurchaseDialog: _showPurchaseDialog,
+                onDownload: () {
+                  if (_currentVideoName != null) {
+                    _checkAndDownloadVideo(_currentVideoName!, autoStart: true);
+                  }
+                },
               ),
               VideoProgressBarWidget(
                 isVisible: currentIsDownloading,

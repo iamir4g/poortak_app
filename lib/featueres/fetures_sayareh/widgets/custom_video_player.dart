@@ -187,6 +187,22 @@ class CustomVideoPlayerState extends State<CustomVideoPlayer> {
     _startHideTimer();
   }
 
+  void _toggleControlsVisibility() {
+    if (!_isVideoInitialized || !widget.showControls) {
+      return;
+    }
+
+    setState(() {
+      _showControls = !_showControls;
+    });
+
+    if (_showControls) {
+      _startHideTimer();
+    } else {
+      _hideTimer?.cancel();
+    }
+  }
+
   Future<void> _setSecureFlag(bool enable) async {
     try {
       if (Platform.isAndroid) {
@@ -223,8 +239,10 @@ class CustomVideoPlayerState extends State<CustomVideoPlayer> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Colors.black,
+              Colors.black.withValues(alpha: 0.55),
               Colors.transparent,
+              Colors.transparent,
+              Colors.black.withValues(alpha: 0.75),
             ],
           ),
         ),
@@ -238,14 +256,6 @@ class CustomVideoPlayerState extends State<CustomVideoPlayer> {
                 builder: (context, value, child) {
                   return Row(
                     children: [
-                      IconButton(
-                        icon: Icon(
-                          value.isPlaying ? Icons.pause : Icons.play_arrow,
-                          color: Colors.white,
-                          size: 30,
-                        ),
-                        onPressed: _togglePlayPause,
-                      ),
                       Expanded(
                         child: Directionality(
                           textDirection: TextDirection.ltr,
@@ -343,10 +353,7 @@ class CustomVideoPlayerState extends State<CustomVideoPlayer> {
         borderRadius: BorderRadius.all(Radius.circular(widget.borderRadius)),
         child: GestureDetector(
           onTap: () {
-            // Toggle play/pause when tapping on video
-            if (_isVideoInitialized) {
-              _togglePlayPause();
-            }
+            _toggleControlsVisibility();
           },
           child: Stack(
             alignment: Alignment.center,
@@ -383,31 +390,29 @@ class CustomVideoPlayerState extends State<CustomVideoPlayer> {
               if (_isVideoInitialized && widget.showControls)
                 _buildVideoControls(),
 
-              // Large play button overlay - only show when video is paused/stopped
-              if (_isVideoInitialized && !_isPlaying)
-                Positioned.fill(
-                  child: Container(
-                    color: Colors.transparent,
-                    child: Center(
-                      child: Container(
-                        width: 80,
-                        height: 80,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.3),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.play_arrow,
-                          color: Colors.black,
-                          size: 50,
-                        ),
+              // Keep play/pause interaction centered while the controls are visible.
+              if (_isVideoInitialized && widget.showControls && _showControls)
+                Center(
+                  child: GestureDetector(
+                    onTap: _togglePlayPause,
+                    child: Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.92),
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.35),
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Icon(
+                        _isPlaying ? Icons.pause : Icons.play_arrow,
+                        color: Colors.black,
+                        size: 50,
                       ),
                     ),
                   ),

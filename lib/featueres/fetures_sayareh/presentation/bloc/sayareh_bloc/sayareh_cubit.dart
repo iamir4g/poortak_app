@@ -3,6 +3,7 @@ import 'package:meta/meta.dart';
 import 'package:poortak/common/resources/data_state.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_home_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/book_list_model.dart';
+import 'package:poortak/featueres/fetures_sayareh/data/models/iknow_summary_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_storage_test_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/repositories/sayareh_repository.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/all_courses_progress_model.dart';
@@ -22,9 +23,15 @@ class SayarehCubit extends Cubit<SayarehState> {
 
     DataState dataState = await sayarehRepository.fetchAllCourses();
     DataState bookListState = await sayarehRepository.fetchBookList();
+    DataState summaryState = await sayarehRepository.fetchIknowSummary();
 
     AllCoursesProgressModel? progressData;
+    IKnowSummaryModel? summaryData;
     final prefsOperator = locator<PrefsOperator>();
+
+    if (summaryState is DataSuccess) {
+      summaryData = summaryState.data;
+    }
 
     if (prefsOperator.isLoggedIn()) {
       DataState progressState =
@@ -36,17 +43,26 @@ class SayarehCubit extends Cubit<SayarehState> {
 
     if (isClosed) return;
 
-    if (dataState is DataSuccess && bookListState is DataSuccess) {
+    if (dataState is DataSuccess &&
+        bookListState is DataSuccess &&
+        summaryData != null) {
       emit(state.copyWith(
           sayarehDataStatus: SayarehDataCompleted(
-              dataState.data, bookListState.data,
-              progressData: progressData)));
+          dataState.data,
+          bookListState.data,
+          summaryData,
+          progressData: progressData,
+        ),
+      ));
     } else if (dataState is DataFailed) {
       emit(state.copyWith(
           sayarehDataStatus: SayarehDataError(dataState.error ?? "")));
     } else if (bookListState is DataFailed) {
       emit(state.copyWith(
           sayarehDataStatus: SayarehDataError(bookListState.error ?? "")));
+    } else if (summaryState is DataFailed) {
+      emit(state.copyWith(
+          sayarehDataStatus: SayarehDataError(summaryState.error ?? "")));
     }
   }
 }

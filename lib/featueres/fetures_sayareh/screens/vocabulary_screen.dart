@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconify_design/iconify_design.dart';
@@ -15,7 +16,6 @@ import 'package:poortak/featueres/fetures_sayareh/screens/practice_vocabulary_sc
 import 'package:poortak/locator.dart';
 import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/common/services/tts_service.dart';
-import 'package:poortak/common/widgets/reusable_modal.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class VocabularyScreen extends StatefulWidget {
@@ -28,9 +28,14 @@ class VocabularyScreen extends StatefulWidget {
 }
 
 class _VocabularyScreenState extends State<VocabularyScreen> {
+  static const double _vocabularySpeechRate = 0.3;
   int currentIndex = 0;
   int totalWords = 0;
   String? lastPlayedWord;
+  String? currentImageWordKey;
+  String? currentImageUrl;
+  bool isCurrentImageReady = false;
+  final Map<String, String> imageUrlCache = {};
   final TTSService ttsService = locator<TTSService>();
   final StorageService storageService = locator<StorageService>();
   final PrefsOperator prefsOperator = locator<PrefsOperator>();
@@ -71,27 +76,11 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
         ));
   }
 
-  void _readWord(String word) async {
-    await ttsService.speak(word, voice: 'male');
-  }
-
-  void _showExitModal() {
-    ReusableModal.show(
-      context: context,
-      title: 'ترک تمرین ها',
-      message:
-          'با ترک تمرین های این بخش، پاسخ های فعلی شما حذف می شود و باید دفعه ی بعد دوباره به آنها پاسخ دهید',
-      type: ModalType.info,
-      buttonText: 'ماندن',
-      secondButtonText: 'ترک تمرین ها',
-      showSecondButton: true,
-      onButtonPressed: () {
-        Navigator.of(context).pop(); // Close modal
-      },
-      onSecondButtonPressed: () {
-        Navigator.of(context).pop(); // Close modal
-        Navigator.of(context).pop(); // Exit vocabulary screen
-      },
+  Future<void> _readWord(String word) async {
+    await ttsService.speak(
+      word,
+      voice: 'male',
+      speechRate: _vocabularySpeechRate,
     );
   }
 
@@ -99,7 +88,9 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
     setState(() {
       if (currentIndex < totalWords - 1) {
         currentIndex++;
-        lastPlayedWord = null; // Reset to trigger auto-play in build
+        lastPlayedWord = null;
+        currentImageUrl = null;
+        isCurrentImageReady = false;
       }
     });
   }
@@ -108,9 +99,107 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
     setState(() {
       if (currentIndex > 0) {
         currentIndex--;
-        lastPlayedWord = null; // Reset to trigger auto-play in build
+        lastPlayedWord = null;
+        currentImageUrl = null;
+        isCurrentImageReady = false;
       }
     });
+  }
+
+  void _goToNextWord(List<dynamic> words) {
+    if (currentIndex >= words.length - 1) return;
+    final nextWord = words[currentIndex + 1].word;
+    _nextWord(words.length, nextWord);
+  }
+
+  void _goToPreviousWord(List<dynamic> words) {
+    if (currentIndex <= 0) return;
+    final previousWord = words[currentIndex - 1].word;
+    _previousWord(words.length, previousWord);
+  }
+
+  void _handleVocabularyAreaTap(
+    TapUpDetails details,
+    BuildContext context,
+    List<dynamic> words,
+  ) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final tappedOnLeftHalf = details.localPosition.dx < screenWidth / 2;
+
+    if (tappedOnLeftHalf) {
+      _goToNextWord(words);
+      return;
+    }
+
+    _goToPreviousWord(words);
+  }
+
+  Widget _buildImageLoader() {
+    return Center(
+      child: SizedBox(
+        width: 22.w,
+        height: 22.h,
+        child: CircularProgressIndicator(
+          strokeWidth: 2.w,
+          color: MyColors.primary,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _prepareCurrentWordImage(
+    List<dynamic> words,
+    int index,
+  ) async {
+    final currentWord = words[index];
+    final imageUrl = imageUrlCache.putIfAbsent(
+      currentWord.thumbnail,
+      () => storageService.getDownloadPublicUrl(currentWord.thumbnail),
+    );
+
+    if (!mounted) return;
+
+    setState(() {
+      currentImageUrl = imageUrl;
+      isCurrentImageReady = false;
+    });
+
+    try {
+      await precacheImage(CachedNetworkImageProvider(imageUrl), context);
+    } catch (e) {
+      log('Vocabulary image precache failed: $e');
+      return;
+    }
+
+    if (!mounted || currentImageWordKey != currentWord.thumbnail) return;
+
+    setState(() {
+      isCurrentImageReady = true;
+    });
+
+    if (lastPlayedWord != currentWord.word) {
+      await _readWord(currentWord.word);
+      if (!mounted || currentImageWordKey != currentWord.thumbnail) return;
+      setState(() {
+        lastPlayedWord = currentWord.word;
+      });
+    }
+
+    _prefetchNearbyImages(words, index);
+  }
+
+  void _prefetchNearbyImages(List<dynamic> words, int index) {
+    for (final nearbyIndex in [index + 1, index - 1]) {
+      if (nearbyIndex < 0 || nearbyIndex >= words.length) continue;
+
+      final nearbyWord = words[nearbyIndex];
+      final imageUrl = imageUrlCache.putIfAbsent(
+        nearbyWord.thumbnail,
+        () => storageService.getDownloadPublicUrl(nearbyWord.thumbnail),
+      );
+
+      precacheImage(CachedNetworkImageProvider(imageUrl), context);
+    }
   }
 
   @override
@@ -153,7 +242,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
             automaticallyImplyLeading: false,
             actions: [
               IconButton(
-                onPressed: _showExitModal,
+                onPressed: () => Navigator.of(context).pop(), //_showExitModal,
                 icon: const Icon(Icons.arrow_forward),
               ),
             ],
@@ -181,15 +270,13 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                   final currentWord = state.vocabulary.data[currentIndex];
                   totalWords = state.vocabulary.data.length;
 
-                  // Auto-play word when it changes
-                  if (lastPlayedWord != currentWord.word) {
+                  if (currentImageWordKey != currentWord.thumbnail) {
+                    currentImageWordKey = currentWord.thumbnail;
                     WidgetsBinding.instance.addPostFrameCallback((_) {
-                      _readWord(currentWord.word);
-                      if (mounted) {
-                        setState(() {
-                          lastPlayedWord = currentWord.word;
-                        });
-                      }
+                      _prepareCurrentWordImage(
+                        state.vocabulary.data,
+                        currentIndex,
+                      );
                     });
                   }
 
@@ -197,25 +284,23 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                     children: [
                       Expanded(
                         child: GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTapUp: (details) => _handleVocabularyAreaTap(
+                            details,
+                            context,
+                            state.vocabulary.data,
+                          ),
                           onHorizontalDragEnd: (details) {
                             final velocity = details.primaryVelocity;
                             if (velocity == null) return;
 
                             // Swipe right (to previous) - positive velocity
                             if (velocity > 0) {
-                              if (currentIndex > 0) {
-                                final previousWord = state
-                                    .vocabulary.data[currentIndex - 1].word;
-                                _previousWord(totalWords, previousWord);
-                              }
+                              _goToPreviousWord(state.vocabulary.data);
                             }
                             // Swipe left (to next) - negative velocity
                             else if (velocity < 0) {
-                              if (currentIndex < totalWords - 1) {
-                                final nextWord = state
-                                    .vocabulary.data[currentIndex + 1].word;
-                                _nextWord(totalWords, nextWord);
-                              }
+                              _goToNextWord(state.vocabulary.data);
                             }
                           },
                           child: SingleChildScrollView(
@@ -234,45 +319,46 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                                   SizedBox(
                                     height: 30.h,
                                   ),
-                                  FutureBuilder<String>(
-                                    future:
-                                        storageService.callGetDownloadPublicUrl(
-                                            currentWord.thumbnail),
-                                    builder: (context, snapshot) {
-                                      if (snapshot.connectionState ==
-                                          ConnectionState.waiting) {
-                                        return const CircularProgressIndicator();
+                                  Builder(
+                                    builder: (context) {
+                                      double imageHeight = 200.h;
+                                      final screenHeight =
+                                          MediaQuery.of(context).size.height;
+                                      if (screenHeight < 600) {
+                                        imageHeight = 150.h;
                                       }
-                                      if (snapshot.hasError) {
-                                        return const Icon(Icons.error);
-                                      }
-                                      if (snapshot.hasData) {
-                                        // Responsive height for image
-                                        double imageHeight = 200.h;
-                                        final screenHeight =
-                                            MediaQuery.of(context).size.height;
-                                        if (screenHeight < 600) {
-                                          imageHeight = 150.h;
-                                        }
 
-                                        return Container(
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(16.r),
+                                      return Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(16.r),
+                                        ),
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(16.r),
+                                          child: SizedBox(
+                                            width: imageHeight,
+                                            height: imageHeight,
+                                            child: currentImageUrl == null
+                                                ? _buildImageLoader()
+                                                : CachedNetworkImage(
+                                                    imageUrl: currentImageUrl!,
+                                                    fit: BoxFit.cover,
+                                                    fadeInDuration:
+                                                        const Duration(
+                                                            milliseconds: 150),
+                                                    placeholder:
+                                                        (context, url) =>
+                                                            _buildImageLoader(),
+                                                    errorWidget:
+                                                        (context, url, error) =>
+                                                            const Icon(
+                                                      Icons.error,
+                                                    ),
+                                                  ),
                                           ),
-                                          child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(16.r),
-                                            child: Image.network(
-                                              snapshot.data!,
-                                              height: imageHeight,
-                                              width: imageHeight,
-                                              fit: BoxFit.cover,
-                                            ),
-                                          ),
-                                        );
-                                      }
-                                      return const SizedBox.shrink();
+                                        ),
+                                      );
                                     },
                                   ),
                                   SizedBox(height: 20.h),
@@ -305,15 +391,8 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                           children: [
                             IconButton(
                               key: const Key('vocabulary_forward_button'),
-                              onPressed: () {
-                                if (currentIndex <
-                                    state.vocabulary.data.length - 1) {
-                                  final nextWord = state
-                                      .vocabulary.data[currentIndex + 1].word;
-                                  _nextWord(
-                                      state.vocabulary.data.length, nextWord);
-                                }
-                              },
+                              onPressed: () =>
+                                  _goToNextWord(state.vocabulary.data),
                               icon: const Icon(Icons.arrow_back),
                               iconSize: 32.r,
                             ),
@@ -347,14 +426,8 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                               ),
                             ),
                             IconButton(
-                              onPressed: () {
-                                if (currentIndex > 0) {
-                                  final previousWord = state
-                                      .vocabulary.data[currentIndex - 1].word;
-                                  _previousWord(state.vocabulary.data.length,
-                                      previousWord);
-                                }
-                              },
+                              onPressed: () =>
+                                  _goToPreviousWord(state.vocabulary.data),
                               icon: const Icon(Icons.arrow_forward),
                               iconSize: 32.r,
                             ),

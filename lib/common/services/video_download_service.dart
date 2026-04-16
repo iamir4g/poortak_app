@@ -135,10 +135,16 @@ class VideoDownloadService {
     required bool isEncrypted,
     required bool usePublicUrl,
     String? videoKey,
+    bool autoStart = true,
   }) async {
+    // If not auto-starting and no existing download info, we should still check if file exists
+    // to update the UI state (e.g., show local path if already downloaded)
+
     // Check if internet is connected before starting/resuming download
     final connectivityCubit = _connectivityCubit;
-    if (connectivityCubit != null && !connectivityCubit.state.isConnected) {
+    if (autoStart &&
+        connectivityCubit != null &&
+        !connectivityCubit.state.isConnected) {
       print("⚠️ No internet connection, cannot start download: $videoName");
       // Store download info for later resume
       _pausedDownloads[videoName] = PausedDownloadInfo(
@@ -218,7 +224,22 @@ class VideoDownloadService {
         return;
       }
 
-      // No existing file found, start download
+      // No existing file found. If autoStart is false, just stop here.
+      if (!autoStart) {
+        print("ℹ️ Auto-download disabled, stopping after check: $videoName");
+        _downloadCubit.updateDownloadState(
+          videoName: videoName,
+          status: DownloadStatus.idle,
+          isCheckingFiles: false,
+          isDownloading: false,
+          isDecrypting: false,
+        );
+        _activeDownloads[videoName] = false;
+        _updateWakelock();
+        return;
+      }
+
+      // Start download
       _downloadCubit.updateDownloadState(
         videoName: videoName,
         status: DownloadStatus.downloading,

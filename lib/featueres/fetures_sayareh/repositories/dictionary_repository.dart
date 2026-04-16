@@ -15,31 +15,59 @@ class DictionaryRepository {
         queryParameters: {'translations': true},
         options: Options(
           headers: {'User-Agent': 'PostmanRuntime/7.32.3'},
-          sendTimeout: const Duration(seconds: 20),
-          receiveTimeout: const Duration(seconds: 20),
+          sendTimeout: const Duration(seconds: 10),
+          receiveTimeout: const Duration(seconds: 10),
         ),
       );
 
-      print('[DictionaryRepository] Status: ${response.statusCode}');
       if (response.statusCode == 200) {
-        print(
-            '[DictionaryRepository] Payload type: ${response.data.runtimeType}');
-        return DictionaryEntry.fromJson(response.data);
+        final entry = DictionaryEntry.fromJson(response.data);
+        if (entry.persianTranslations.isNotEmpty) {
+          return entry;
+        }
       }
-      print('[DictionaryRepository] Non-200 response');
+      
+      // If no Persian translation found in first API, try fallback
+      return await _searchFallback(word);
+    } catch (e) {
+      print('[DictionaryRepository] Primary API failed, trying fallback: $e');
+      return await _searchFallback(word);
+    }
+  }
+
+  Future<DictionaryEntry?> _searchFallback(String word) async {
+    try {
+      print('[DictionaryRepository] Fallback search for: $word');
+      // Using unofficial Google Translate API as fallback
+      final url =
+          'https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=fa&dt=t&q=$word';
+      
+      final response = await _dio.get(
+        url,
+        options: Options(
+          sendTimeout: const Duration(seconds: 10),
+          receiveTimeout: const Duration(seconds: 10),
+        ),
+      );
+
+      if (response.statusCode == 200 && response.data != null) {
+        final data = response.data as List<dynamic>;
+        if (data.isNotEmpty && data[0] is List && (data[0] as List).isNotEmpty) {
+          final translation = data[0][0][0] as String;
+          if (translation.isNotEmpty && translation.toLowerCase() != word.toLowerCase()) {
+            return DictionaryEntry(
+              word: word,
+              persianTranslations: [translation],
+              examples: [],
+              relatedWords: [],
+            );
+          }
+        }
+      }
       return null;
     } catch (e) {
-      if (e is DioException) {
-        print(
-            '[DictionaryRepository] DioException: code=${e.response?.statusCode} message=${e.message}');
-        print('[DictionaryRepository] Dio data: ${e.response?.data}');
-        if (e.response?.statusCode == 404) {
-          return null;
-        }
-      } else {
-        print('[DictionaryRepository] Error: $e');
-      }
-      rethrow;
+      print('[DictionaryRepository] Fallback failed: $e');
+      return null;
     }
   }
 }

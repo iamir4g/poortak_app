@@ -33,9 +33,11 @@ import 'dart:async';
 
 class TTSService {
   final FlutterTts _flutterTts = FlutterTts();
+  static const double _defaultSpeechRate = 0.5;
   bool _isInitialized = false;
   Completer<void>? _speechCompleter;
   String _currentVoice = 'male';
+  double _currentSpeechRate = _defaultSpeechRate;
   bool _stopRequested = false;
 
   Future<void> initialize() async {
@@ -61,7 +63,7 @@ class TTSService {
             'Failed to check language availability - TTS engine might not be ready');
       }
 
-      await _flutterTts.setSpeechRate(0.5);
+      await _flutterTts.setSpeechRate(_defaultSpeechRate);
       await _flutterTts.setVolume(1.0);
       await _flutterTts.setPitch(1.0);
 
@@ -141,6 +143,7 @@ class TTSService {
         await _flutterTts.setPitch(0.9);
         await _flutterTts.setSpeechRate(0.5);
         await _flutterTts.setVolume(0.9);
+        _currentSpeechRate = 0.5;
         print(
             'Setting male voice: en-us-x-iom-local, pitch=0.9, rate=0.4, volume=0.9');
       } catch (e) {
@@ -149,6 +152,7 @@ class TTSService {
         await _flutterTts.setPitch(0.9);
         await _flutterTts.setSpeechRate(0.4);
         await _flutterTts.setVolume(0.9);
+        _currentSpeechRate = 0.4;
       }
     } else if (voice == 'female') {
       // صدای زن: استفاده از تنظیمات pitch و rate
@@ -156,6 +160,7 @@ class TTSService {
       await _flutterTts.setPitch(1.5);
       await _flutterTts.setSpeechRate(0.5);
       await _flutterTts.setVolume(1.0);
+      _currentSpeechRate = 0.5;
       print('Setting female voice: pitch=1.5, rate=0.5, volume=1.0');
     }
   }
@@ -175,6 +180,7 @@ class TTSService {
   /// Parameters:
   /// - [text]: The text to be spoken
   /// - [voice]: Optional voice selection ("male" or "female")
+  /// - [speechRate]: Optional temporary speech speed for this utterance only
   ///
   /// Usage:
   /// ```dart
@@ -183,8 +189,11 @@ class TTSService {
   ///
   /// // With voice selection
   /// await ttsService.speak("Hello", voice: "male");
+  ///
+  /// // With slower speech rate
+  /// await ttsService.speak("Hello", speechRate: 0.4);
   /// ```
-  Future<void> speak(String text, {String? voice}) async {
+  Future<void> speak(String text, {String? voice, double? speechRate}) async {
     if (!_isInitialized) {
       await initialize();
     }
@@ -209,6 +218,14 @@ class TTSService {
       } catch (e) {
         print('Error attempting to set voice in speak: $e');
       }
+    }
+
+    final previousSpeechRate = _currentSpeechRate;
+    final shouldTemporarilyOverrideRate =
+        speechRate != null && speechRate != previousSpeechRate;
+
+    if (shouldTemporarilyOverrideRate) {
+      await _flutterTts.setSpeechRate(speechRate);
     }
 
     _speechCompleter = Completer<void>();
@@ -245,6 +262,10 @@ class TTSService {
 
       _speechCompleter?.completeError(e);
       return;
+    } finally {
+      if (shouldTemporarilyOverrideRate) {
+        await _flutterTts.setSpeechRate(previousSpeechRate);
+      }
     }
 
     // در برخی موارد completion handler صدا زده نمی‌شود اگر متن کوتاه باشد یا خطا رخ دهد
@@ -304,6 +325,7 @@ class TTSService {
       await _flutterTts.setSpeechRate(0.5);
       await _flutterTts.setVolume(0.9);
       _currentVoice = 'male';
+      _currentSpeechRate = 0.5;
     } catch (e) {
       print('Failed to set male voice: $e');
     }
@@ -348,6 +370,7 @@ class TTSService {
       await _flutterTts.setSpeechRate(0.45);
       await _flutterTts.setVolume(1.0);
       _currentVoice = 'female';
+      _currentSpeechRate = 0.45;
     } catch (e) {
       print('Failed to set female voice: $e');
     }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconify_design/iconify_design.dart';
 import 'package:persian_tools/persian_tools.dart';
+import 'package:poortak/common/services/getImageUrl_service.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/common/widgets/primaryButton.dart';
 import 'package:poortak/common/widgets/reusable_modal.dart';
@@ -13,6 +14,7 @@ import 'package:poortak/featueres/feature_shopping_cart/data/models/cart_enum.da
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/data_source/shopping_cart_api_provider.dart';
+import 'package:poortak/featueres/fetures_sayareh/data/models/iknow_summary_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_home_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/widgets/item_multi_card.dart';
 import 'package:poortak/l10n/app_localizations.dart';
@@ -21,7 +23,8 @@ import 'package:poortak/common/widgets/main_wrapper.dart';
 
 class DialogCart extends StatefulWidget {
   final Lesson item;
-  const DialogCart({super.key, required this.item});
+  final IKnowSummaryModel? summaryData;
+  const DialogCart({super.key, required this.item, this.summaryData});
 
   @override
   State<DialogCart> createState() => _DialogCartState();
@@ -29,6 +32,58 @@ class DialogCart extends StatefulWidget {
 
 class _DialogCartState extends State<DialogCart> {
   final PrefsOperator _prefsOperator = locator<PrefsOperator>();
+  static const String _bundleName = "مجموعه کامل سیاره آی نو";
+
+  int _parsePrice(String? value) {
+    return int.tryParse(value ?? "") ?? 0;
+  }
+
+  int _calculateBundleSubtotal(IKnowSummaryModel summary) {
+    final settingsPrice = _parsePrice(summary.data.settings.price);
+    if (settingsPrice > 0) {
+      return settingsPrice;
+    }
+
+    final coursesTotal = summary.data.courses.fold<int>(
+      0,
+      (total, course) => total + _parsePrice(course.price),
+    );
+    final booksTotal = summary.data.books.fold<int>(
+      0,
+      (total, book) => total + _parsePrice(book.price),
+    );
+    return coursesTotal + booksTotal;
+  }
+
+  int _calculateDiscountAmount(IKnowSummaryModel summary) {
+    final subtotal = _calculateBundleSubtotal(summary);
+    final settings = summary.data.settings;
+    final discountValue = _parsePrice(settings.discountAmount);
+
+    if (settings.discountType.toLowerCase() == "percent") {
+      return subtotal * discountValue ~/ 100;
+    }
+
+    return discountValue;
+  }
+
+  int _calculatePayableAmount(IKnowSummaryModel summary) {
+    final payable =
+        _calculateBundleSubtotal(summary) - _calculateDiscountAmount(summary);
+    return payable < 0 ? 0 : payable;
+  }
+
+  List<IKnowSummaryCourse> _sortedCourses(IKnowSummaryModel summary) {
+    final courses = List<IKnowSummaryCourse>.from(summary.data.courses);
+    courses.sort((a, b) => a.order.compareTo(b.order));
+    return courses;
+  }
+
+  List<IKnowSummaryBook> _sortedBooks(IKnowSummaryModel summary) {
+    final books = List<IKnowSummaryBook>.from(summary.data.books);
+    books.sort((a, b) => a.order.compareTo(b.order));
+    return books;
+  }
 
   /// Extracts error message from DioException or other exceptions
   String _extractErrorMessage(dynamic error) {
@@ -165,6 +220,7 @@ class _DialogCartState extends State<DialogCart> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final summaryData = widget.summaryData;
     return Dialog(
         backgroundColor: MyColors.background,
         child: ConstrainedBox(
@@ -231,8 +287,43 @@ class _DialogCartState extends State<DialogCart> {
                                           Radius.circular(27.r)),
                                       color: MyColors.background,
                                     ),
-                                    child: Image.asset(
-                                        "assets/images/cart/single_lesson.png"),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(27.r),
+                                      ),
+                                      child: FutureBuilder<String>(
+                                        future: GetImageUrlService()
+                                            .getImageUrl(widget.item.thumbnail),
+                                        builder: (context, snapshot) {
+                                          if (snapshot.connectionState ==
+                                              ConnectionState.waiting) {
+                                            return const Center(
+                                              child:
+                                                  CircularProgressIndicator(),
+                                            );
+                                          }
+                                          if (snapshot.hasError ||
+                                              !snapshot.hasData ||
+                                              snapshot.data!.isEmpty) {
+                                            return Image.asset(
+                                              "assets/images/cart/single_lesson.png",
+                                              fit: BoxFit.cover,
+                                            );
+                                          }
+                                          return Image.network(
+                                            snapshot.data!,
+                                            fit: BoxFit.cover,
+                                            errorBuilder:
+                                                (context, error, stackTrace) {
+                                              return Image.asset(
+                                                "assets/images/cart/single_lesson.png",
+                                                fit: BoxFit.cover,
+                                              );
+                                            },
+                                          );
+                                        },
+                                      ),
+                                    ),
                                   ),
                                   Positioned(
                                     bottom: 5.h,
@@ -285,9 +376,29 @@ class _DialogCartState extends State<DialogCart> {
                                       width: 8.w,
                                     ),
                                     Text(
-                                      "درس اول انیمیشن سیاره آی نو",
+                                      widget.item.name,
                                       style: MyTextStyle.textMatn12W500,
-                                    )
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    SizedBox(
+                                      width: 14,
+                                    ),
+                                    if (widget.item.description.isNotEmpty) ...[
+                                      // SizedBox(
+                                      //   height: 12.h,
+                                      // ),
+                                      Text(
+                                        widget.item.description,
+                                        style:
+                                            MyTextStyle.textMatn14Bold.copyWith(
+                                                // color: MyColors.textSecondary,
+                                                ),
+                                        textAlign: TextAlign.center,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ],
                                   ],
                                 ),
                               ),
@@ -343,314 +454,390 @@ class _DialogCartState extends State<DialogCart> {
                         ),
                       ),
                       SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            SizedBox(
-                              height: 16.h,
-                            ),
-                            Stack(
-                              children: [
-                                Container(
-                                  width: 286.w,
-                                  height: 177.h,
-                                  decoration: BoxDecoration(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(27.r)),
-                                    color: MyColors.background,
-                                  ),
-                                  child: Image.asset(
-                                      "assets/images/cart/bundle_lesson.png"),
-                                ),
-                                Positioned(
-                                    bottom: 35.h,
-                                    right: 8.w,
-                                    child: SizedBox(
-                                      width: 30.w,
-                                      height: 30.h,
-                                      // decoration: BoxDecoration(
-                                      //   color: Colors.white,
-                                      //   borderRadius: BorderRadius.circular(15),
-                                      // ),
-                                      child: IconifyIcon(
-                                          color: MyColors.textLight,
-                                          icon: "arcticons:pdf-viewer"),
-                                    )),
-                                Positioned(
-                                  bottom: 5.h,
-                                  right: 8.w,
-                                  child: SizedBox(
-                                    width: 30.w,
-                                    height: 30.h,
-                                    // decoration: BoxDecoration(
-                                    //   color: Colors.white,
-                                    //   borderRadius: BorderRadius.circular(15),
-                                    // ),
-                                    child: IconifyIcon(
-                                        color: MyColors.textLight,
-                                        icon: "carbon:play-outline"),
-                                  ),
-                                ),
-                                Positioned(
-                                  bottom: 5.h,
-                                  left: 8.w,
-                                  child: Container(
-                                    width: 104.w,
-                                    height: 30.h,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(20.r)),
-                                        color: MyColors.background),
-                                    child: Padding(
-                                      padding:
-                                          EdgeInsets.fromLTRB(4.w, 0, 2.w, 0),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceAround,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          Image.asset(
-                                              "assets/images/star_icon.png"),
-                                          Text(
-                                            convertEnToFa("+50"),
-                                            style: MyTextStyle
-                                                .textMatn13PrimaryShade1,
-                                          ),
-                                          Text(
-                                            l10n.coin_with_buy,
-                                            style: MyTextStyle.textMatn9,
-                                          )
-                                        ],
-                                      ),
+                        child: summaryData == null
+                            ? Padding(
+                                padding: EdgeInsets.all(24.w),
+                                child: Column(
+                                  children: [
+                                    SizedBox(height: 40.h),
+                                    const CircularProgressIndicator(),
+                                    SizedBox(height: 16.h),
+                                    Text(
+                                      "اطلاعات خرید مجموعه در حال بارگذاری است",
+                                      style: MyTextStyle.textMatn12W500,
+                                      textAlign: TextAlign.center,
                                     ),
-                                  ),
+                                    SizedBox(height: 24.h),
+                                  ],
                                 ),
-                              ],
-                            ),
-                            SizedBox(
-                              height: 26.h,
-                            ),
-                            Container(
-                              decoration: const BoxDecoration(
-                                  color: MyColors.background1),
-                              child: Column(
-                                children: [
-                                  SizedBox(
-                                    height: 16.h,
-                                  ),
-                                  Center(
-                                      child: Text(
-                                    "انیمیشن سیاره آی نو",
-                                    style: MyTextStyle.textMatn14Bold,
-                                  )),
-                                  SizedBox(
-                                    height: 18.h,
-                                  ),
-                                  //items in shopping cart
-                                  SizedBox(
-                                    width: 248.w,
-                                    child: ListView.separated(
-                                        shrinkWrap: true,
-                                        physics:
-                                            const NeverScrollableScrollPhysics(),
-                                        itemCount: 8,
-                                        separatorBuilder: (context, index) {
-                                          return SizedBox(height: 6.h);
-                                        },
-                                        itemBuilder: (context, index) {
-                                          return ItemMultiCard(
-                                            title:
-                                                "درس ${index + 1} سیاره آی نو",
-                                            price: "75000",
-                                          );
-                                        }),
-                                  ),
+                              )
+                            : Builder(
+                                builder: (context) {
+                                  final sortedCourses =
+                                      _sortedCourses(summaryData);
+                                  final sortedBooks = _sortedBooks(summaryData);
+                                  final subtotal =
+                                      _calculateBundleSubtotal(summaryData);
+                                  final discountAmount =
+                                      _calculateDiscountAmount(summaryData);
+                                  final payableAmount =
+                                      _calculatePayableAmount(summaryData);
+                                  final settings = summaryData.data.settings;
+                                  final isPercentDiscount =
+                                      settings.discountType.toLowerCase() ==
+                                          "percent";
 
-                                  SizedBox(
-                                    height: 20.h,
-                                  ),
-                                  Center(
-                                      child: Text(
-                                    "کتاب های الکترونیکی",
-                                    style: MyTextStyle.textMatn14Bold,
-                                  )),
-                                  SizedBox(
-                                    height: 16.h,
-                                  ),
-                                  ItemMultiCard(
-                                    title: "فرهنگ لغت پورتک ",
-                                    price: "75000",
-                                  ),
-                                  SizedBox(
-                                    height: 4.h,
-                                  ),
-                                  ItemMultiCard(
-                                    title: "گرامر پورتک",
-                                    price: "75000",
-                                  ),
-                                  SizedBox(
-                                    height: 14.h,
-                                  )
-                                ],
-                              ),
-                            ),
-                            SizedBox(
-                              height: 16.h,
-                            ),
-                            Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 16.w),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
+                                  return Column(
                                     children: [
-                                      Text(
-                                        "جمع دروس و کتاب ها",
-                                        style: MyTextStyle.textMatn12W300,
+                                      SizedBox(
+                                        height: 16.h,
                                       ),
-                                      Row(
+                                      Stack(
                                         children: [
-                                          Text(
-                                            "${widget.item.price.toString().addComma} ",
-                                            style: MyTextStyle.textMatn14Bold,
+                                          Container(
+                                            width: 286.w,
+                                            height: 177.h,
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(27.r)),
+                                              color: MyColors.background,
+                                            ),
+                                            child: Image.asset(
+                                              "assets/images/cart/bundle_lesson.png",
+                                              fit: BoxFit.cover,
+                                            ),
                                           ),
-                                          Text(
-                                            l10n.toman,
-                                            style: MyTextStyle.textMatn10W300,
-                                          )
+                                          Positioned(
+                                              bottom: 35.h,
+                                              right: 8.w,
+                                              child: SizedBox(
+                                                width: 30.w,
+                                                height: 30.h,
+                                                child: IconifyIcon(
+                                                    color: MyColors.textLight,
+                                                    icon:
+                                                        "arcticons:pdf-viewer"),
+                                              )),
+                                          Positioned(
+                                            bottom: 5.h,
+                                            right: 8.w,
+                                            child: SizedBox(
+                                              width: 30.w,
+                                              height: 30.h,
+                                              child: IconifyIcon(
+                                                  color: MyColors.textLight,
+                                                  icon: "carbon:play-outline"),
+                                            ),
+                                          ),
+                                          Positioned(
+                                            bottom: 5.h,
+                                            left: 8.w,
+                                            child: Container(
+                                              width: 104.w,
+                                              height: 30.h,
+                                              decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                          Radius.circular(
+                                                              20.r)),
+                                                  color: MyColors.background),
+                                              child: Padding(
+                                                padding: EdgeInsets.fromLTRB(
+                                                    4.w, 0, 2.w, 0),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceAround,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  children: [
+                                                    Image.asset(
+                                                        "assets/images/star_icon.png"),
+                                                    Text(
+                                                      convertEnToFa("+50"),
+                                                      style: MyTextStyle
+                                                          .textMatn13PrimaryShade1,
+                                                    ),
+                                                    Text(
+                                                      l10n.coin_with_buy,
+                                                      style:
+                                                          MyTextStyle.textMatn9,
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
                                         ],
-                                      )
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    height: 16.h,
-                                  ),
-                                  Container(
-                                    width: 286.w,
-                                    height: 42.h,
-                                    decoration: ShapeDecoration(
-                                      color: MyColors.discountBackground,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(10.r),
                                       ),
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceAround,
-                                      children: [
-                                        Text(
-                                          "تخفیف",
-                                          style: MyTextStyle.textMatn12W300,
-                                        ),
-                                        Row(
-                                          // mainAxisAlignment:
-                                          //     MainAxisAlignment.spaceAround,
+                                      SizedBox(
+                                        height: 26.h,
+                                      ),
+                                      Container(
+                                        decoration: const BoxDecoration(
+                                            color: MyColors.background1),
+                                        child: Column(
                                           children: [
+                                            SizedBox(
+                                              height: 16.h,
+                                            ),
+                                            Center(
+                                              child: Text(
+                                                _bundleName,
+                                                style:
+                                                    MyTextStyle.textMatn14Bold,
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              height: 18.h,
+                                            ),
+                                            SizedBox(
+                                              width: 248.w,
+                                              child: ListView.separated(
+                                                shrinkWrap: true,
+                                                physics:
+                                                    const NeverScrollableScrollPhysics(),
+                                                itemCount: sortedCourses.length,
+                                                separatorBuilder:
+                                                    (context, index) {
+                                                  return SizedBox(height: 6.h);
+                                                },
+                                                itemBuilder: (context, index) {
+                                                  final course =
+                                                      sortedCourses[index];
+                                                  return ItemMultiCard(
+                                                    title: course.name,
+                                                    price: course.price,
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              height: 20.h,
+                                            ),
+                                            Center(
+                                              child: Text(
+                                                "کتاب های الکترونیکی",
+                                                style:
+                                                    MyTextStyle.textMatn14Bold,
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              height: 16.h,
+                                            ),
+                                            SizedBox(
+                                              width: 248.w,
+                                              child: ListView.separated(
+                                                shrinkWrap: true,
+                                                physics:
+                                                    const NeverScrollableScrollPhysics(),
+                                                itemCount: sortedBooks.length,
+                                                separatorBuilder:
+                                                    (context, index) {
+                                                  return SizedBox(height: 6.h);
+                                                },
+                                                itemBuilder: (context, index) {
+                                                  final book =
+                                                      sortedBooks[index];
+                                                  return ItemMultiCard(
+                                                    title: book.title,
+                                                    price: book.price,
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              height: 14.h,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 16.h,
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 16.w),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceAround,
+                                              children: [
+                                                Text(
+                                                  "جمع دروس و کتاب ها",
+                                                  style: MyTextStyle
+                                                      .textMatn12W300,
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    Text(
+                                                      "${subtotal.toString().addComma} ",
+                                                      style: MyTextStyle
+                                                          .textMatn14Bold,
+                                                    ),
+                                                    Text(
+                                                      l10n.toman,
+                                                      style: MyTextStyle
+                                                          .textMatn10W300,
+                                                    )
+                                                  ],
+                                                )
+                                              ],
+                                            ),
+                                            SizedBox(
+                                              height: 16.h,
+                                            ),
                                             Container(
-                                              width: 33.w,
-                                              height: 17.84.h,
-                                              alignment: Alignment.center,
+                                              width: 286.w,
+                                              height: 42.h,
                                               decoration: ShapeDecoration(
-                                                color: MyColors.darkErrorLight,
+                                                color:
+                                                    MyColors.discountBackground,
                                                 shape: RoundedRectangleBorder(
                                                   borderRadius:
                                                       BorderRadius.circular(
-                                                          11.50.r),
+                                                          10.r),
                                                 ),
                                               ),
-                                              child: Text(
-                                                "10%",
-                                                style:
-                                                    MyTextStyle.textMatn10W300,
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceAround,
+                                                children: [
+                                                  Text(
+                                                    "تخفیف",
+                                                    style: MyTextStyle
+                                                        .textMatn12W300,
+                                                  ),
+                                                  Row(
+                                                    children: [
+                                                      if (isPercentDiscount)
+                                                        Container(
+                                                          width: 40.w,
+                                                          height: 17.84.h,
+                                                          alignment:
+                                                              Alignment.center,
+                                                          decoration:
+                                                              ShapeDecoration(
+                                                            color: MyColors
+                                                                .darkErrorLight,
+                                                            shape:
+                                                                RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          11.50
+                                                                              .r),
+                                                            ),
+                                                          ),
+                                                          child: Text(
+                                                            "${settings.discountAmount}%",
+                                                            style: MyTextStyle
+                                                                .textMatn10W300,
+                                                          ),
+                                                        ),
+                                                      if (isPercentDiscount)
+                                                        SizedBox(width: 4.w),
+                                                      Text(
+                                                        discountAmount
+                                                            .toString()
+                                                            .addComma,
+                                                        style: MyTextStyle
+                                                            .textMatn12W300,
+                                                      ),
+                                                      SizedBox(
+                                                        width: 4.w,
+                                                      ),
+                                                      Text(
+                                                        l10n.toman,
+                                                        style: MyTextStyle
+                                                            .textMatn10W300,
+                                                      ),
+                                                    ],
+                                                  )
+                                                ],
                                               ),
                                             ),
                                             SizedBox(
-                                              width: 4.w,
+                                              height: 16.h,
                                             ),
-                                            Text(
-                                              "150000",
-                                              style: MyTextStyle.textMatn12W300,
+                                            Container(
+                                              width: 286.w,
+                                              height: 54.h,
+                                              decoration: ShapeDecoration(
+                                                color: MyColors.background2,
+                                                shape: RoundedRectangleBorder(
+                                                  side: BorderSide(
+                                                    width: 2.w,
+                                                    color: MyColors.primary,
+                                                  ),
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          10.r),
+                                                ),
+                                              ),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceAround,
+                                                children: [
+                                                  Text(
+                                                    "مبلغ قابل پرداخت",
+                                                    style: MyTextStyle
+                                                        .textMatn12W300,
+                                                  ),
+                                                  Row(
+                                                    children: [
+                                                      Text(
+                                                        payableAmount
+                                                            .toString()
+                                                            .addComma,
+                                                        style: MyTextStyle
+                                                            .textMatn14Bold,
+                                                      ),
+                                                      SizedBox(
+                                                        width: 4.w,
+                                                      ),
+                                                      Text(
+                                                        l10n.toman,
+                                                        style: MyTextStyle
+                                                            .textMatn10W300,
+                                                      )
+                                                    ],
+                                                  )
+                                                ],
+                                              ),
                                             ),
                                             SizedBox(
-                                              width: 4.w,
-                                            ),
-                                            Text(
-                                              l10n.toman,
-                                              style: MyTextStyle.textMatn10W300,
+                                              height: 16.h,
                                             ),
                                           ],
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 16.h,
-                                  ),
-                                  Container(
-                                    width: 286.w,
-                                    height: 54.h,
-                                    decoration: ShapeDecoration(
-                                      color: MyColors.background2,
-                                      shape: RoundedRectangleBorder(
-                                        side: BorderSide(
-                                          width: 2.w,
-                                          color: MyColors.primary,
                                         ),
-                                        borderRadius:
-                                            BorderRadius.circular(10.r),
                                       ),
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceAround,
-                                      children: [
-                                        Text(
-                                          "مبلغ قابل پرداخت",
-                                          style: MyTextStyle.textMatn12W300,
-                                        ),
-                                        Row(
-                                          children: [
-                                            Text(
-                                              "60000",
-                                              style: MyTextStyle.textMatn14Bold,
-                                            ),
-                                            SizedBox(
-                                              width: 4.w,
-                                            ),
-                                            Text(
-                                              l10n.toman,
-                                              style: MyTextStyle.textMatn10W300,
-                                            )
-                                          ],
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 16.h,
-                                  ),
-                                ],
+                                      PrimaryButton(
+                                          width: 286.w,
+                                          height: 65.h,
+                                          lable: l10n.add_to_cart,
+                                          onPressed: () {
+                                            if (settings.id.isEmpty) {
+                                              return;
+                                            }
+                                            _addItemToCart(
+                                              CartType.IKnow.name,
+                                              settings.id,
+                                              _bundleName,
+                                            );
+                                          }),
+                                      SizedBox(
+                                        height: 20.h,
+                                      )
+                                    ],
+                                  );
+                                },
                               ),
-                            ),
-                            PrimaryButton(
-                                width: 286.w,
-                                height: 65.h,
-                                lable: l10n.add_to_cart,
-                                onPressed: () {
-                                  // Add bundle to cart using specific item ID and IKnow type
-                                  _addItemToCart(
-                                      CartType.IKnow.name,
-                                      "4a61cc6b-8e3c-46e5-ad3c-5f52d0aff181",
-                                      "مجموعه کامل سیاره آی نو");
-                                }),
-                            SizedBox(
-                              height: 20.h,
-                            )
-                          ],
-                        ),
                       ),
                     ],
                   ),

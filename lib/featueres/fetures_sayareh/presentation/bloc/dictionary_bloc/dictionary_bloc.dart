@@ -17,7 +17,8 @@ class DictionaryBloc extends Bloc<DictionaryEvent, DictionaryState> {
     SearchWord event,
     Emitter<DictionaryState> emit,
   ) async {
-    if (event.word.isEmpty) {
+    final word = event.word.trim();
+    if (word.isEmpty) {
       emit(DictionaryInitial());
       return;
     }
@@ -25,11 +26,11 @@ class DictionaryBloc extends Bloc<DictionaryEvent, DictionaryState> {
     emit(DictionaryLoading());
 
     try {
-      print('[DictionaryBloc] Searching word: ${event.word}');
-      final entry = await _repository.searchWord(event.word);
+      print('[DictionaryBloc] Searching word: $word');
+      final entry = await _repository.searchWord(word);
       if (entry != null) {
         if (entry.persianTranslations.isEmpty) {
-          print('[DictionaryBloc] No translations found for ${event.word}');
+          print('[DictionaryBloc] No translations found for $word');
           emit(DictionaryEmpty());
         } else {
           print(
@@ -37,7 +38,7 @@ class DictionaryBloc extends Bloc<DictionaryEvent, DictionaryState> {
           emit(DictionaryLoaded(entry));
         }
       } else {
-        print('[DictionaryBloc] Entry is null for ${event.word}');
+        print('[DictionaryBloc] Entry is null for $word');
         emit(DictionaryEmpty());
       }
     } catch (e) {

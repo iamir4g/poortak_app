@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
+import 'package:poortak/config/myTextStyle.dart';
 
 enum ModalType {
   error,
@@ -88,16 +89,13 @@ class ReusableModal extends StatelessWidget {
                   // Title
                   Center(
                     child: Container(
-                      width: 250.w,
+                      width: double.infinity,
+                      constraints: BoxConstraints(maxWidth: 260.w),
+                      padding: EdgeInsets.symmetric(horizontal: Dimens.medium),
                       margin: EdgeInsets.only(bottom: 10.h),
                       child: Text(
                         title,
-                        style: TextStyle(
-                          fontFamily: 'IRANSans',
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16.sp,
-                          color: MyColors.textMatn1,
-                        ),
+                        style: MyTextStyle.textHeader16Bold,
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -106,16 +104,16 @@ class ReusableModal extends StatelessWidget {
                   // Message
                   Center(
                     child: Container(
-                      width: 250.w,
+                      width: double.infinity,
+                      constraints: BoxConstraints(maxWidth: 270.w),
+                      padding: EdgeInsets.symmetric(horizontal: Dimens.medium),
                       margin: EdgeInsets.only(bottom: 30.h),
                       child: Text(
                         message,
-                        style: TextStyle(
-                          fontFamily: 'IRANSans',
-                          fontWeight: FontWeight.w500,
-                          fontSize: 14.sp,
+                        style: MyTextStyle.textMatn14Bold.copyWith(
                           color: const Color(0xFF3D495C),
                           height: 1.4,
+                          fontWeight: FontWeight.w500,
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -133,24 +131,28 @@ class ReusableModal extends StatelessWidget {
                           // First button (primary)
                           Expanded(
                             child: SizedBox(
-                              height: 50.h,
+                              height: Dimens.buttonHeight,
                               child: ElevatedButton(
                                 onPressed: onButtonPressed ??
                                     () => Navigator.of(context).pop(),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: MyColors.primary,
+                                  padding:
+                                      EdgeInsets.symmetric(horizontal: 8.w),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(20.r),
                                   ),
                                   elevation: 0,
                                 ),
-                                child: Text(
-                                  buttonText,
-                                  style: TextStyle(
-                                    fontFamily: 'IRANSans',
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 16.sp,
-                                    color: Colors.white,
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(
+                                    buttonText,
+                                    maxLines: 1,
+                                    style: MyTextStyle.textMatn14Bold.copyWith(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w500,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -162,12 +164,14 @@ class ReusableModal extends StatelessWidget {
                           // Second button (secondary)
                           Expanded(
                             child: SizedBox(
-                              height: 50.h,
+                              height: Dimens.buttonHeight,
                               child: ElevatedButton(
                                 onPressed: onSecondButtonPressed ??
                                     () => Navigator.of(context).pop(),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.transparent,
+                                  padding:
+                                      EdgeInsets.symmetric(horizontal: 8.w),
                                   side: const BorderSide(
                                       color: MyColors.primary, width: 1),
                                   shape: RoundedRectangleBorder(
@@ -175,13 +179,15 @@ class ReusableModal extends StatelessWidget {
                                   ),
                                   elevation: 0,
                                 ),
-                                child: Text(
-                                  secondButtonText!,
-                                  style: TextStyle(
-                                    fontFamily: 'IRANSans',
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 16.sp,
-                                    color: MyColors.primary,
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(
+                                    secondButtonText!,
+                                    maxLines: 1,
+                                    style: MyTextStyle.textMatn14Bold.copyWith(
+                                      color: MyColors.primary,
+                                      fontWeight: FontWeight.w500,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -195,24 +201,26 @@ class ReusableModal extends StatelessWidget {
                     Center(
                       child: SizedBox(
                         width: 172.w,
-                        height: 64.h,
+                        height: 56.h,
                         child: ElevatedButton(
                           onPressed: onButtonPressed ??
                               () => Navigator.of(context).pop(),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: MyColors.primary,
+                            padding: EdgeInsets.symmetric(horizontal: 12.w),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20.r),
                             ),
                             elevation: 0,
                           ),
-                          child: Text(
-                            buttonText,
-                            style: TextStyle(
-                              fontFamily: 'IRANSans',
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18.sp,
-                              color: Colors.white,
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              buttonText,
+                              maxLines: 1,
+                              style: MyTextStyle.textMatn16Bold.copyWith(
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ),
@@ -385,7 +393,7 @@ class ReusableModal extends StatelessWidget {
           width: 80.w,
           height: 80.h,
           decoration: BoxDecoration(
-            color: MyColors.error.withOpacity(0.1),
+            color: MyColors.error.withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
           child: Icon(
@@ -399,7 +407,7 @@ class ReusableModal extends StatelessWidget {
           width: 80.w,
           height: 80.h,
           decoration: BoxDecoration(
-            color: MyColors.info.withOpacity(0.1),
+            color: MyColors.info.withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
           child: Icon(
@@ -413,7 +421,7 @@ class ReusableModal extends StatelessWidget {
           width: 80.w,
           height: 80.h,
           decoration: BoxDecoration(
-            color: MyColors.success.withOpacity(0.1),
+            color: MyColors.success.withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
           child: Icon(

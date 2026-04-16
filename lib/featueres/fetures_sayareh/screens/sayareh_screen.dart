@@ -180,7 +180,9 @@ class _SayarehScreenState extends State<SayarehScreen> {
                                   onTap: () {},
                                   index: index,
                                   purchased: item.purchased,
-                                  progress: progress);
+                                  progress: progress,
+                                  summaryData:
+                                      sayarehDataCompleted.summaryData);
                             },
                           ),
                         ],

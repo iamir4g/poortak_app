@@ -1,9 +1,14 @@
+import 'dart:async';
+
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconify_design/iconify_design.dart';
+import 'package:poortak/common/services/haptic_service.dart';
 import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/common/services/tts_service.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
+import 'package:poortak/common/widgets/reusable_modal.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_bloc.dart';
@@ -27,6 +32,7 @@ class PracticeVocabularyScreen extends StatefulWidget {
 }
 
 class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
+  final AudioPlayer _feedbackPlayer = AudioPlayer();
   final TTSService ttsService = locator<TTSService>();
   final StorageService storageService = locator<StorageService>();
   final PrefsOperator prefsOperator = locator<PrefsOperator>();
@@ -34,6 +40,7 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
   bool isCorrect = false;
   String? selectedWord;
   List<String> randomizedOptions = [];
+  bool _isExitDialogOpen = false;
 
   @override
   void initState() {
@@ -43,6 +50,12 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
 
   void _initializeTTS() async {
     await ttsService.setMaleVoice();
+  }
+
+  @override
+  void dispose() {
+    unawaited(_feedbackPlayer.dispose());
+    super.dispose();
   }
 
   void _generateRandomOptions(String correct, String wrong) {
@@ -66,6 +79,11 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
       showAnswer = true;
       isCorrect = word == correctWord.word;
     });
+
+    unawaited(_playAnswerFeedbackSound(isCorrect));
+    if (!isCorrect) {
+      unawaited(HapticService.wrongAnswerFeedback());
+    }
 
     // Save the answer (correct or wrong)
     context.read<PracticeVocabularyBloc>().add(
@@ -95,6 +113,19 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
               wordId: correctWord.id,
             ),
           );
+    }
+  }
+
+  Future<void> _playAnswerFeedbackSound(bool isAnswerCorrect) async {
+    final assetPath = isAnswerCorrect
+        ? 'sounds/dragon-studio-correct.mp3'
+        : 'sounds/freesound_community-wrong.mp3';
+
+    try {
+      await _feedbackPlayer.stop();
+      await _feedbackPlayer.play(AssetSource(assetPath));
+    } catch (e) {
+      debugPrint('Failed to play answer feedback sound: $e');
     }
   }
 
@@ -162,6 +193,41 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
     );
   }
 
+  void _showExitModal() {
+    if (_isExitDialogOpen) return;
+    _isExitDialogOpen = true;
+
+    ReusableModal.show(
+      context: context,
+      title: 'ترک تمرین ها',
+      message:
+          'با ترک تمرین های این بخش، پاسخ های فعلی شما حذف می شود و باید دفعه ی بعد دوباره به آنها پاسخ دهید',
+      type: ModalType.info,
+      buttonText: 'ماندن',
+      secondButtonText: 'ترک تمرین ها',
+      showSecondButton: true,
+      barrierDismissible: false,
+      onButtonPressed: () {
+        _isExitDialogOpen = false;
+        Navigator.of(context).pop();
+      },
+      onSecondButtonPressed: () {
+        _isExitDialogOpen = false;
+        Navigator.of(context).pop();
+        _navigateToLessonScreen();
+      },
+    );
+  }
+
+  void _handleExitAttempt(PracticeVocabularyState state) {
+    if (state is PracticeVocabularyCompleted) {
+      _navigateToLessonScreen();
+      return;
+    }
+
+    _showExitModal();
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocListener<LitnerBloc, LitnerState>(
@@ -193,13 +259,11 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
                   PracticeVocabularyFetchEvent(courseId: widget.courseId),
                 );
           }
-          final bool canPopScreen = state is! PracticeVocabularyCompleted;
-
           return PopScope(
-            canPop: canPopScreen,
+            canPop: false,
             onPopInvokedWithResult: (didPop, result) {
               if (!didPop) {
-                _navigateToLessonScreen();
+                _handleExitAttempt(state);
               }
             },
             child: Scaffold(
@@ -215,9 +279,7 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
                   IconButton(
                     iconSize: 24.r,
                     icon: const Icon(Icons.arrow_forward),
-                    onPressed: () {
-                      _navigateToLessonScreen();
-                    },
+                    onPressed: () => _handleExitAttempt(state),
                   ),
                 ],
                 centerTitle: true,
