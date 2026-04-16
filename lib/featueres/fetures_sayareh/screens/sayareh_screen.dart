@@ -137,7 +137,7 @@ class _SayarehScreenState extends State<SayarehScreen> {
                       child: Column(
                         children: [
                           SizedBox(
-                            height: 28.h,
+                            height: 18.h,
                           ),
                           Text(
                             l10n?.sayareh ?? "",
@@ -149,7 +149,7 @@ class _SayarehScreenState extends State<SayarehScreen> {
                             ),
                           ),
                           SizedBox(
-                            height: 12.h,
+                            height: 8.h,
                           ),
                           // Sayareh List Section
 
@@ -159,7 +159,7 @@ class _SayarehScreenState extends State<SayarehScreen> {
                             physics: const NeverScrollableScrollPhysics(),
                             itemCount: sayarehDataCompleted.data.data.length,
                             separatorBuilder: (context, index) {
-                              return SizedBox(height: 4.h);
+                              return SizedBox(height: 1.h);
                             },
                             itemBuilder: (context, index) {
                               final item =
@@ -217,7 +217,7 @@ class _SayarehScreenState extends State<SayarehScreen> {
                     child: Column(
                       children: [
                         SizedBox(
-                          height: 30.h,
+                          height: 20.h,
                         ),
                         Text(
                           "کتاب های سیاره آی نو",

@@ -7,12 +7,17 @@ import 'package:persian_tools/persian_tools.dart';
 import 'package:poortak/common/widgets/dot_loading_widget.dart';
 import 'package:poortak/common/widgets/primaryButton.dart';
 
+import 'package:poortak/common/resources/data_state.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/models/shopping_cart_model.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_state.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/data_source/shopping_cart_api_provider.dart';
+import 'package:poortak/featueres/fetures_sayareh/data/models/iknow_summary_model.dart';
+import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_home_model.dart';
+import 'package:poortak/featueres/fetures_sayareh/data/models/single_book_model.dart';
+import 'package:poortak/featueres/fetures_sayareh/repositories/sayareh_repository.dart';
 import 'package:poortak/common/services/getImageUrl_service.dart';
 import 'package:poortak/l10n/app_localizations.dart';
 import 'package:poortak/locator.dart';
@@ -23,6 +28,22 @@ import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/common/error_handling/app_exception.dart';
 import 'dart:developer';
 
+class _LocalCartDisplayItem {
+  final String title;
+  final String description;
+  final int price;
+  final String? thumbnailId;
+  final String type;
+
+  const _LocalCartDisplayItem({
+    required this.title,
+    required this.description,
+    required this.price,
+    required this.type,
+    this.thumbnailId,
+  });
+}
+
 class ShoppingCartScreen extends StatefulWidget {
   static const routeName = "/shopping_cart_screen";
   const ShoppingCartScreen({super.key});
@@ -32,6 +53,10 @@ class ShoppingCartScreen extends StatefulWidget {
 }
 
 class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
+  final SayarehRepository _sayarehRepository = locator<SayarehRepository>();
+  final Map<String, Future<_LocalCartDisplayItem>> _localCartItemCache = {};
+  Future<IKnowSummaryModel>? _summaryFuture;
+
   @override
   void initState() {
     super.initState();
@@ -170,6 +195,104 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
       log("📱 Loading local cart...");
       bloc.add(GetLocalCartEvent());
     }
+  }
+
+  Future<IKnowSummaryModel?> _getSummaryData() async {
+    _summaryFuture ??= () async {
+      final DataState<IKnowSummaryModel> summaryState =
+          await _sayarehRepository.fetchIknowSummary();
+      if (summaryState is DataSuccess<IKnowSummaryModel> &&
+          summaryState.data != null) {
+        return summaryState.data!;
+      }
+      throw Exception(summaryState.error ?? 'خطا در دریافت اطلاعات مجموعه');
+    }();
+
+    return _summaryFuture;
+  }
+
+  int _parsePrice(String? price) {
+    return int.tryParse(price ?? '') ?? 0;
+  }
+
+  int _calculateBundlePayableAmount(IKnowSummaryModel summary) {
+    final subtotal = _parsePrice(summary.data.settings.price);
+    final discountValue = _parsePrice(summary.data.settings.discountAmount);
+    final isPercent =
+        summary.data.settings.discountType.toLowerCase() == 'percent';
+
+    final discountAmount =
+        isPercent ? subtotal * discountValue ~/ 100 : discountValue;
+    final payable = subtotal - discountAmount;
+    return payable < 0 ? 0 : payable;
+  }
+
+  Future<_LocalCartDisplayItem> _loadLocalCartItemData(
+      String itemType, String itemId) async {
+    if (itemType == 'IKnowCourse') {
+      final DataState<Lesson> courseState =
+          await _sayarehRepository.fetchCourseById(itemId);
+      if (courseState is DataSuccess<Lesson> && courseState.data != null) {
+        final course = courseState.data!;
+        return _LocalCartDisplayItem(
+          title: course.name,
+          description: course.description,
+          price: _parsePrice(course.price),
+          thumbnailId: course.thumbnail,
+          type: itemType,
+        );
+      }
+    } else if (itemType == 'IKnowBook') {
+      final DataState<SingleBookModel> bookState =
+          await _sayarehRepository.fetchBookById(itemId);
+      if (bookState is DataSuccess<SingleBookModel> && bookState.data != null) {
+        final book = bookState.data!.data;
+        return _LocalCartDisplayItem(
+          title: book.title,
+          description: book.description ?? '',
+          price: _parsePrice(book.price),
+          thumbnailId: book.thumbnail,
+          type: itemType,
+        );
+      }
+    } else if (itemType == 'IKnow') {
+      final summary = await _getSummaryData();
+      if (summary != null) {
+        return _LocalCartDisplayItem(
+          title: 'مجموعه کامل سیاره آی نو',
+          description:
+              'شامل ${summary.data.courses.length} درس و ${summary.data.books.length} کتاب',
+          price: _calculateBundlePayableAmount(summary),
+          type: itemType,
+        );
+      }
+    }
+
+    return _LocalCartDisplayItem(
+      title: 'محصول',
+      description: 'اطلاعات این آیتم در دسترس نیست',
+      price: 0,
+      type: itemType,
+    );
+  }
+
+  Future<_LocalCartDisplayItem> _resolveLocalCartItem(
+      Map<String, dynamic> item) {
+    final itemType = item['type'] as String;
+    final itemId = item['itemId'] as String;
+    final cacheKey = '$itemType::$itemId';
+
+    return _localCartItemCache.putIfAbsent(
+      cacheKey,
+      () => _loadLocalCartItemData(itemType, itemId),
+    );
+  }
+
+  Future<int> _calculateTotalPrice(
+      List<Map<String, dynamic>> localCartItems) async {
+    final resolvedItems =
+        await Future.wait(localCartItems.map(_resolveLocalCartItem));
+    return resolvedItems.fold<int>(0, (sum, item) => sum + item.price);
   }
 
   // Build header section with points
@@ -612,132 +735,125 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                 final item = localCartItems[index];
                 final itemType = item['type'] as String;
                 final itemId = item['itemId'] as String;
+                return FutureBuilder<_LocalCartDisplayItem>(
+                  future: _resolveLocalCartItem(item),
+                  builder: (context, snapshot) {
+                    final resolvedItem = snapshot.data;
+                    final isLoading =
+                        snapshot.connectionState == ConnectionState.waiting &&
+                            resolvedItem == null;
 
-                // Create display title based on type
-                String displayTitle = '';
-                String displayDescription = '';
-                int displayPrice = 0;
-
-                if (itemType == 'IKnowCourse') {
-                  displayTitle = 'دوره آموزشی';
-                  displayDescription = 'دوره تک درس';
-                  displayPrice = 75000; // Default price for single course
-                } else if (itemType == 'IKnow') {
-                  displayTitle = 'مجموعه کامل سیاره آی نو';
-                  displayDescription = 'شامل تمام دوره ها و کتاب ها';
-                  displayPrice = 750000; // Default price for bundle
-                } else {
-                  displayTitle = 'محصول';
-                  displayDescription = 'محصول انتخابی';
-                  displayPrice = 50000;
-                }
-
-                return Container(
-                  margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-                  padding: EdgeInsets.all(16.w),
-                  decoration: BoxDecoration(
-                    color: MyColors.background,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        top: -10.h,
-                        left: -10.w,
-                        child: IconButton(
-                          iconSize: 18.r,
-                          icon: const Icon(Icons.close),
-                          onPressed: () {
-                            context.read<ShoppingCartBloc>().add(
-                                RemoveFromLocalCartEvent(itemType, itemId));
-                          },
-                        ),
+                    return Container(
+                      margin:
+                          EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                      padding: EdgeInsets.all(16.w),
+                      decoration: BoxDecoration(
+                        color: MyColors.background,
+                        borderRadius: BorderRadius.circular(16),
                       ),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      child: Stack(
                         children: [
-                          Container(
-                            width: 100.w,
-                            height: 100.h,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: Colors.red,
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: Container(
-                                color: Colors.grey[300],
-                                child: Icon(
-                                  itemType == 'IKnowCourse'
-                                      ? Icons.school
-                                      : Icons.library_books,
-                                  size: 40.r,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
+                          Positioned(
+                            top: -10.h,
+                            left: -10.w,
+                            child: IconButton(
+                              iconSize: 18.r,
+                              icon: const Icon(Icons.close),
+                              onPressed: () {
+                                context.read<ShoppingCartBloc>().add(
+                                    RemoveFromLocalCartEvent(itemType, itemId));
+                              },
                             ),
                           ),
-                          SizedBox(width: 8.w),
-                          Expanded(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                width: 100.w,
+                                height: 100.h,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: Colors.grey[300],
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: _buildLocalCartItemImage(
+                                    resolvedItem,
+                                    itemType,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 8.w),
+                              Expanded(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      resolvedItem?.title ??
+                                          (isLoading
+                                              ? 'در حال بارگذاری...'
+                                              : 'محصول'),
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16.sp,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    SizedBox(height: 4.h),
+                                    Text(
+                                      resolvedItem?.description ??
+                                          (isLoading
+                                              ? 'در حال دریافت اطلاعات'
+                                              : 'اطلاعات این آیتم در دسترس نیست'),
+                                      style: TextStyle(
+                                        color: Colors.grey[600],
+                                        fontSize: 14.sp,
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    SizedBox(height: 8.h),
+                                    Text(
+                                      'نوع: ${_getItemTypeLabel(itemType)}',
+                                      style: TextStyle(
+                                        color: Colors.grey[500],
+                                        fontSize: 12.sp,
+                                      ),
+                                    ),
+                                    SizedBox(height: 24.h),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          Positioned(
+                            bottom: 0,
+                            left: 0,
+                            child: Row(
                               children: [
                                 Text(
-                                  displayTitle,
+                                  (resolvedItem?.price ?? 0)
+                                      .toString()
+                                      .addComma,
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16.sp,
                                   ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
                                 ),
-                                SizedBox(height: 4.h),
+                                SizedBox(width: 4.w),
                                 Text(
-                                  displayDescription,
-                                  style: TextStyle(
-                                    color: Colors.grey[600],
-                                    fontSize: 14.sp,
-                                  ),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
+                                  "تومان",
+                                  style: TextStyle(fontSize: 12.sp),
                                 ),
-                                SizedBox(height: 8.h),
-                                Text(
-                                  'نوع: ${itemType == 'IKnowCourse' ? 'دوره تکی' : 'مجموعه کامل'}',
-                                  style: TextStyle(
-                                    color: Colors.grey[500],
-                                    fontSize: 12.sp,
-                                  ),
-                                ),
-                                SizedBox(height: 24.h), // Space for price
                               ],
                             ),
                           ),
                         ],
                       ),
-                      Positioned(
-                        bottom: 0,
-                        left: 0,
-                        child: Row(
-                          children: [
-                            Text(
-                              displayPrice.toString().addComma,
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16.sp,
-                              ),
-                            ),
-                            SizedBox(width: 4.w),
-                            Text(
-                              "تومان",
-                              style: TextStyle(fontSize: 12.sp),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+                    );
+                  },
                 );
               },
             ),
@@ -754,18 +870,24 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '${l10n?.total_price} ${_calculateTotalPrice(localCartItems).addComma}',
-                        style: TextStyle(
-                          fontSize: 18.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
+                  child: FutureBuilder<int>(
+                    future: _calculateTotalPrice(localCartItems),
+                    builder: (context, snapshot) {
+                      final totalPrice = snapshot.data ?? 0;
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '${l10n?.total_price} ${totalPrice.addComma}',
+                            style: TextStyle(
+                              fontSize: 18.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      );
+                    },
                   ),
                 ),
                 PrimaryButton(
@@ -824,20 +946,74 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
     );
   }
 
-  // Helper method to calculate total price from local cart items
-  int _calculateTotalPrice(List<Map<String, dynamic>> localCartItems) {
-    int total = 0;
-    for (final item in localCartItems) {
-      final itemType = item['type'] as String;
-      if (itemType == 'IKnowCourse') {
-        total += 75000; // Price for single course
-      } else if (itemType == 'IKnow') {
-        total += 750000; // Price for bundle
-      } else {
-        total += 50000; // Default price
-      }
+  String _getItemTypeLabel(String itemType) {
+    if (itemType == 'IKnowCourse') {
+      return 'دوره تکی';
     }
-    return total;
+    if (itemType == 'IKnowBook') {
+      return 'کتاب';
+    }
+    if (itemType == 'IKnow') {
+      return 'مجموعه کامل';
+    }
+    return 'محصول';
+  }
+
+  Widget _buildLocalCartItemImage(
+      _LocalCartDisplayItem? item, String itemType) {
+    if (item?.thumbnailId != null && item!.thumbnailId!.isNotEmpty) {
+      return FutureBuilder<String>(
+        future: GetImageUrlService().getImageUrl(item.thumbnailId!),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError ||
+              !snapshot.hasData ||
+              snapshot.data!.isEmpty) {
+            return _buildLocalCartFallbackImage(itemType);
+          }
+          return Image.network(
+            snapshot.data!,
+            fit: BoxFit.cover,
+            width: 100,
+            height: 100,
+            errorBuilder: (context, error, stackTrace) {
+              return _buildLocalCartFallbackImage(itemType);
+            },
+          );
+        },
+      );
+    }
+
+    if (itemType == 'IKnow') {
+      return Image.asset(
+        'assets/images/cart/bundle_lesson.png',
+        fit: BoxFit.cover,
+      );
+    }
+
+    return _buildLocalCartFallbackImage(itemType);
+  }
+
+  Widget _buildLocalCartFallbackImage(String itemType) {
+    final IconData icon;
+    if (itemType == 'IKnowCourse') {
+      icon = Icons.school;
+    } else if (itemType == 'IKnowBook') {
+      icon = Icons.menu_book;
+    } else {
+      icon = Icons.library_books;
+    }
+
+    return Container(
+      color: Colors.grey[300],
+      child: Icon(
+        icon,
+        size: 40.r,
+        color: Colors.grey[600],
+      ),
+    );
   }
 
   // Helper method to build cart item image

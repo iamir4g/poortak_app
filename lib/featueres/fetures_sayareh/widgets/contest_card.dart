@@ -13,8 +13,8 @@ class ContestCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 360.w,
-      height: 105.h,
+      width: 300.w,
+      height: 90.h,
       // margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Material(
         color: Colors.transparent,
@@ -70,8 +70,8 @@ class ContestCard extends StatelessWidget {
                   SizedBox(width: 16.w),
                   // Gift box icon container - positioned exactly like Figma
                   Container(
-                    width: 77.5.w,
-                    height: 79.h,
+                    width: 70.w,
+                    height: 70.h,
                     decoration: BoxDecoration(
                       boxShadow: [
                         BoxShadow(
@@ -92,8 +92,8 @@ class ContestCard extends StatelessWidget {
                     ),
                     child: Center(
                       child: Container(
-                        width: 48.w,
-                        height: 49.h,
+                        width: 40.w,
+                        height: 40.h,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(4.r),
                         ),
