@@ -32,11 +32,19 @@ class MyColors {
   static const Color background = Color(0xFFFFFFFF); // White
   static const Color lightDarkBackground = Color(0xFF121212); // Dark background
   // Text Colors
+  static const Color textBase = Color(0xFF14181F);
+  static const Color text1 = Color(0xFF29303D);
+  static const Color text2 = Color(0xFF3D495C);
+  static const Color text3 = Color(0xFF52617A);
+  static const Color text4 = Color(0xFF667999);
+  static const Color text5 = Color(0xFF8594AD);
+  static const Color text6 = Color(0xFFA3AFC2);
+  static const Color text7 = Color(0xFFC2C9D6);
+  static const Color gray = Color(0xFFE0E4EB);
+
   static const Color textPrimary = Color(0xFF000000); // Black
   static const Color textSecondary = Color(0xFF757575); // Grey
   static const Color textLight = Color(0xFFFFFFFF); // White
-  static const Color text3 = Color.fromRGBO(82, 97, 122, 1);
-  static const Color text4 = Color.fromRGBO(163, 175, 194, 1);
   static const Color textMatn1 = Color.fromRGBO(54, 58, 83, 1);
   static const Color textMatn2 = Color.fromRGBO(33, 41, 55, 1);
   // Status Colors
@@ -84,7 +92,7 @@ class MyColors {
 
   // Dark Mode Specific Colors
   static const Color darkMatn1 = Color(0xFF363A53); // Dark text color
-  static const Color darkText1 = Color(0xFF29303D); // Dark text variant
+  static const Color darkText1 = text1; // Dark text variant
 
   // Progress Bar Colors
   static const Color progressBarColor = Color(0xFF5E85F2);
@@ -97,5 +105,8 @@ class MyColors {
   // New colors for AddWordBottomSheet
   static const Color inputBackground = Color(0xFFF7F7FB);
   static const Color textHint = Color(0xFFBDBDBD);
-  static const Color textCancelButton = Color(0xFF3D495C);
+  static const Color textCancelButton = text2;
+  static const Color activeTabBackground = Color(0xFF363A53);
+  static const Color inactiveTabBackground = Color(0xFF9498AC);
+  static const Color dividerGray = gray;
 }

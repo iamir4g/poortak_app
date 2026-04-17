@@ -165,4 +165,18 @@ class MyTextStyle {
         fontWeight: FontWeight.bold,
         color: MyColors.textCancelButton,
       );
+
+  static TextStyle get tabActiveTextStyle => TextStyle(
+        fontFamily: "IranSans",
+        fontSize: 14.sp,
+        fontWeight: FontWeight.w300,
+        color: MyColors.activeTabBackground,
+      );
+
+  static TextStyle get tabInactiveTextStyle => TextStyle(
+        fontFamily: "IranSans",
+        fontSize: 14.sp,
+        fontWeight: FontWeight.w300,
+        color: MyColors.inactiveTabBackground,
+      );
 }

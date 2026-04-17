@@ -185,13 +185,16 @@ class _SayarehScreenState extends State<SayarehScreen> {
                                       sayarehDataCompleted.summaryData);
                             },
                           ),
+                          SizedBox(
+                            height: 10.h,
+                          ),
                         ],
                       ),
                     ),
                   ),
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: EdgeInsets.symmetric(horizontal: 8.w),
                     decoration: BoxDecoration(
                       gradient: Theme.of(context).brightness == Brightness.dark
                           ? LinearGradient(
@@ -217,7 +220,7 @@ class _SayarehScreenState extends State<SayarehScreen> {
                     child: Column(
                       children: [
                         SizedBox(
-                          height: 20.h,
+                          height: 18.h,
                         ),
                         Text(
                           "کتاب های سیاره آی نو",
@@ -276,14 +279,14 @@ class _SayarehScreenState extends State<SayarehScreen> {
                           ),
                         // Example Box 1
                         SizedBox(
-                          height: 12,
+                          height: 12.h,
                         ),
                       ],
                     ),
                   ),
 
                   // Contest Card Section
-                  const SizedBox(height: 20),
+                  SizedBox(height: 10.h),
                   ContestCard(
                     onTap: () {
                       if (locator<PrefsOperator>().isLoggedIn()) {
@@ -298,7 +301,7 @@ class _SayarehScreenState extends State<SayarehScreen> {
                       }
                     },
                   ),
-                  const SizedBox(height: 100),
+                  SizedBox(height: 50.h),
                 ],
               ),
             );

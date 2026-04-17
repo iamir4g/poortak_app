@@ -91,8 +91,8 @@ class ItemBook extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(12.r),
                 child: SizedBox(
-                  width: 70.r,
-                  height: 70.r,
+                  width: 80.r,
+                  height: 80.r,
                   child: FutureBuilder<String>(
                     future: GetImageUrlService().getImageUrl(thumbnail ?? ""),
                     builder: (context, snapshot) {

@@ -9,6 +9,7 @@ import 'package:poortak/featueres/feature_profile/screens/main_points_screen.dar
 import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/payment_history_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/edit_profile_screen.dart';
+import 'package:poortak/common/widgets/custom_concave_clipper.dart';
 import 'package:poortak/locator.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -97,9 +98,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     children: [
                       // Curved white background
                       ClipPath(
-                        clipper: MyClipper(),
+                        clipper: CustomConcaveClipper(
+                            curveDepth: 10, bottomOffset: 20),
                         child: Container(
-                          height: 300.h, //double.infinity - 500,
+                          height: 250.h, //double.infinity - 500,
                           color: Colors.white,
                         ),
                       ),
@@ -116,7 +118,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
                                   border: Border.all(
-                                      color: const Color(0xFFE6EBF2), width: 5.r),
+                                      color: const Color(0xFFE6EBF2),
+                                      width: 5.r),
                                   color: Colors.white,
                                   boxShadow: [
                                     BoxShadow(
@@ -166,8 +169,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   horizontal: 16.w, vertical: 16.h),
                               child: Center(
                                 child: SizedBox(
-                                  width: 180.w,
-                                  height: 42.h,
+                                  width: 160.w,
+                                  height: 32.h,
                                   child: OutlinedButton(
                                     onPressed: () {
                                       Navigator.pushNamed(
@@ -183,11 +186,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           color: const Color(0xFFE0E4EB),
                                           width: 2.r),
                                       shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(15.r),
+                                        borderRadius:
+                                            BorderRadius.circular(15.r),
                                       ),
                                       backgroundColor: Colors.transparent,
-                                      padding:
-                                          EdgeInsets.symmetric(horizontal: 16.w),
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 16.w),
                                     ),
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
@@ -210,7 +214,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         SizedBox(width: 8.w),
                                         Text(
                                           'ویرایش حساب',
-                                          style: MyTextStyle.textMatn11.copyWith(
+                                          style:
+                                              MyTextStyle.textMatn11.copyWith(
                                             fontWeight: FontWeight.w500,
                                             color: MyColors.text3,
                                           ),
@@ -222,7 +227,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ),
                             ),
                             // const Spacer(),
-                            SizedBox(height: 80.h),
+                            SizedBox(height: 40.h),
                             // Padding(
                             // padding: const EdgeInsets.symmetric(horizontal: 16.0),
                             // child:
@@ -300,7 +305,7 @@ class _ProfileActionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 84.h,
+      height: 60.h,
       width: 357.838.w,
       margin: EdgeInsets.symmetric(horizontal: 17.w),
       decoration: BoxDecoration(
@@ -344,48 +349,5 @@ class _ProfileActionCard extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-class MyClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    var path = Path();
-
-    // Start from top-left
-    path.moveTo(0, 0);
-
-    // Go to top-right
-    path.lineTo(size.width, 0);
-
-    // Go to bottom-right
-    path.lineTo(size.width, size.height - 50.h);
-
-    // Create the concave curve at the bottom
-    path.quadraticBezierTo(
-      size.width * 0.5, // Control point x (center)
-      size.height +
-          30.h, // Control point y (below the bottom for concave effect)
-      size.width * 0.2, // End point x (20% from left)
-      size.height - 20.h, // End point y
-    );
-
-    // Continue the curve to the left
-    path.quadraticBezierTo(
-      size.width * 0.05, // Control point x (5% from left)
-      size.height - 45.h, // Control point y
-      0, // End point x (left edge)
-      size.height - 50.h, // End point y
-    );
-
-    // Close the path
-    path.close();
-
-    return path;
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) {
-    return false;
   }
 }

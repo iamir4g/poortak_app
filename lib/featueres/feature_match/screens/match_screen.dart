@@ -334,13 +334,13 @@ class _MatchScreenState extends State<MatchScreen> {
           top: -40.h,
           left: 0,
           child: Container(
-            width: 60.w,
+            width: 70.w,
             height: 60.h,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(30.r),
+              borderRadius: BorderRadius.circular(10.r),
               image: const DecorationImage(
                 image: AssetImage('assets/images/match/match_avatar.png'),
-                fit: BoxFit.cover,
+                fit: BoxFit.contain,
               ),
             ),
           ),
@@ -404,9 +404,10 @@ class _MatchScreenState extends State<MatchScreen> {
   Widget _buildCountdownSection() {
     return Container(
       width: double.infinity,
+      height: 100.h,
       padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 16.w),
       decoration: BoxDecoration(
-        color: const Color(0xFFF2F5FA),
+        color: MyColors.background,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(20.r),
           topRight: Radius.circular(20.r),
@@ -421,7 +422,7 @@ class _MatchScreenState extends State<MatchScreen> {
             'زمان باقی مانده ارسال پاسخ برای سوال این ماه :',
             style: MyTextStyle.textMatn10W300.copyWith(
               fontWeight: FontWeight.w500,
-              color: MyColors.textMatn2,
+              color: MyColors.text3,
             ),
           ),
           Column(
@@ -433,8 +434,8 @@ class _MatchScreenState extends State<MatchScreen> {
                 children: [
                   // Days box
                   Container(
-                    width: 54.w,
-                    height: 54.h,
+                    width: 50.w,
+                    height: 50.h,
                     decoration: BoxDecoration(
                       color: const Color(0xFFF2F5FA),
                       borderRadius: BorderRadius.circular(5.r),
@@ -449,7 +450,7 @@ class _MatchScreenState extends State<MatchScreen> {
                         Text(
                           '$hoursRemaining',
                           style: MyTextStyle.text24Correct.copyWith(
-                            color: MyColors.textMatn2,
+                            color: MyColors.text2,
                           ),
                         ),
                       ],
@@ -462,7 +463,7 @@ class _MatchScreenState extends State<MatchScreen> {
                   Text(
                     ':',
                     style: MyTextStyle.text24Correct.copyWith(
-                      color: MyColors.text4,
+                      color: MyColors.text2,
                     ),
                   ),
 
@@ -470,8 +471,8 @@ class _MatchScreenState extends State<MatchScreen> {
 
                   // Hours box
                   Container(
-                    width: 54.w,
-                    height: 54.h,
+                    width: 50.w,
+                    height: 50.h,
                     decoration: BoxDecoration(
                       color: const Color(0xFFF2F5FA),
                       borderRadius: BorderRadius.circular(5.r),
@@ -486,7 +487,8 @@ class _MatchScreenState extends State<MatchScreen> {
                         Text(
                           '$daysRemaining',
                           style: MyTextStyle.text24Correct.copyWith(
-                            color: MyColors.textMatn2,
+                            // fontWeight: FontWeight.bold,
+                            color: MyColors.text2,
                           ),
                         ),
                       ],

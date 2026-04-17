@@ -5,6 +5,7 @@ import 'package:poortak/common/services/getImageUrl_service.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/common/widgets/dot_loading_widget.dart';
 import 'package:poortak/common/widgets/reusable_modal.dart';
+import 'package:poortak/config/myColors.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/data_source/shopping_cart_api_provider.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/models/cart_enum.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
@@ -13,12 +14,33 @@ import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/single_book_
 import 'package:poortak/locator.dart';
 import 'package:persian_tools/persian_tools.dart';
 import 'package:poortak/common/widgets/main_wrapper.dart';
+import 'package:poortak/config/myTextStyle.dart';
 import 'package:dio/dio.dart';
 
-class BookDetailScreen extends StatelessWidget {
+class BookDetailScreen extends StatefulWidget {
   static const routeName = "/book_detail_screen";
 
   const BookDetailScreen({super.key});
+
+  @override
+  State<BookDetailScreen> createState() => _BookDetailScreenState();
+}
+
+class _BookDetailScreenState extends State<BookDetailScreen>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -177,9 +199,13 @@ class BookDetailScreen extends StatelessWidget {
                     color: Color(0xFF94A3B8),
                   ),
                 ),
-                const SizedBox(height: 24),
+                // const SizedBox(height: 2),
                 // Price
                 if (!isPurchased) ...[
+                  const Divider(
+                    height: 32,
+                    color: MyColors.dividerGray,
+                  ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -201,55 +227,60 @@ class BookDetailScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const Divider(height: 32),
                 ],
 
-                // Attributes Tab/Section
-                const Align(
-                  alignment: Alignment.centerRight,
-                  child: Text(
-                    "ویژگی های کالا",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors
-                          .orange, // Matches screenshot underline color roughly
-                    ),
+                const SizedBox(height: 32),
+                SizedBox(
+                  height: 40, // ارتفاع برای TabBar
+                  // child: Align(
+                  // alignment: Alignment.centerRight,
+                  child: TabBar(
+                    dividerColor: MyColors.dividerGray,
+                    controller: _tabController,
+                    isScrollable: true,
+                    labelStyle: MyTextStyle.tabActiveTextStyle,
+                    unselectedLabelStyle: MyTextStyle.tabInactiveTextStyle,
+                    indicatorColor: Colors.orange,
+                    indicatorSize: TabBarIndicatorSize.label,
+                    indicatorWeight: 2,
+                    tabs: const [
+                      Tab(text: "درباره کالا"),
+                      Tab(text: "ویژگی های کالا"),
+                    ],
+                  ),
+                  // ),
+                ),
+                const SizedBox(height: 16),
+                SizedBox(
+                  height: 200, // ارتفاع ثابت برای TabBarView
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: [
+                      // درباره کالا
+                      SingleChildScrollView(
+                        child: Text(
+                          bookData.description ?? "توضیحاتی موجود نیست.",
+                          style: const TextStyle(fontSize: 14, height: 1.5),
+                          textAlign: TextAlign.justify,
+                        ),
+                      ),
+                      // ویژگی های کالا
+                      Column(
+                        children: [
+                          _buildAttributeRow(
+                              "ناشر:", bookData.publisher ?? "-"),
+                          _buildAttributeRow(
+                              "نویسنده:", bookData.author ?? "-"),
+                          _buildAttributeRow("فرمت:", "PDF"), // Assumed
+                          _buildAttributeRow("تعداد صفحه:",
+                              bookData.pageCount?.toString() ?? "-"),
+                          _buildAttributeRow("تاریخ نشر:",
+                              bookData.publishDate?.toString() ?? "-"),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
-                Container(
-                  height: 2,
-                  width: 100,
-                  color: Colors.orange,
-                  margin: const EdgeInsets.only(top: 8, bottom: 16),
-                ),
-
-                _buildAttributeRow("ناشر:", bookData.publisher ?? "-"),
-                _buildAttributeRow("نویسنده:", bookData.author ?? "-"),
-                _buildAttributeRow(
-                    "قیمت ارزی:", "دلار"), // Placeholder based on screenshot
-                _buildAttributeRow("فرمت:", "PDF"), // Assumed
-                // _buildAttributeRow("حجم:", "۲۴ مگابایت"), // Placeholder
-                _buildAttributeRow(
-                    "تعداد صفحه:", bookData.pageCount?.toString() ?? "-"),
-                _buildAttributeRow(
-                    "تاریخ نشر:", bookData.publishDate?.toString() ?? "-"),
-
-                const SizedBox(height: 20),
-                // Description if needed, though screenshot focuses on attributes
-                if (bookData.description != null) ...[
-                  const Align(
-                    alignment: Alignment.centerRight,
-                    child: Text("درباره کالا",
-                        style: TextStyle(fontSize: 14, color: Colors.grey)),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    bookData.description!,
-                    style: const TextStyle(fontSize: 14, height: 1.5),
-                    textAlign: TextAlign.justify,
-                  ),
-                ],
                 const SizedBox(height: 100), // Space for bottom buttons
               ],
             ),

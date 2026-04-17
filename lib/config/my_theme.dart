@@ -141,13 +141,13 @@ class MyThemes {
             fontWeight: FontWeight.w700,
           ),
           displaySmall: TextStyle(
-            color: Color(0xFF28303D),
+            color: MyColors.text1,
             fontSize: 13.sp,
             fontFamily: 'IRANSans',
             fontWeight: FontWeight.w500,
           ),
           headlineSmall: TextStyle(
-            color: Color(0xFF3D485B),
+            color: MyColors.text2,
             fontSize: 10.sp,
             fontFamily: 'IRANSans',
             fontWeight: FontWeight.w300,
