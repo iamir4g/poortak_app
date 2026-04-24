@@ -122,6 +122,7 @@ flutter:
     - assets/images/profile/
     - assets/images/login/
     - assets/images/main/
+    - assets/images/mony/
     - assets/images/match/
     - assets/images/splash/
     - assets/images/cart/

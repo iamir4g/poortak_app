@@ -179,4 +179,20 @@ class MyTextStyle {
         fontWeight: FontWeight.w300,
         color: MyColors.inactiveTabBackground,
       );
+
+  static TextStyle get text16MediumText1 => TextStyle(
+        fontFamily: "IranSans",
+        fontSize: 16.sp,
+        fontWeight: FontWeight.w500,
+        color: MyColors.text1,
+        height: 1.0,
+      );
+
+  static TextStyle get text14LightText3 => TextStyle(
+        fontFamily: "IranSans",
+        fontSize: 14.sp,
+        fontWeight: FontWeight.w300,
+        color: MyColors.text3,
+        height: 1.0,
+      );
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:iconify_design/iconify_design.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/config/dimens.dart';
@@ -34,6 +34,46 @@ class _CustomDrawerState extends State<CustomDrawer> {
   String? userAvatar;
   String? userAvatarUrl;
 
+  static const Map<String, String> _drawerIconAssets = {
+    'tdesign:edit': 'assets/images/icons/tdesign--edit.svg',
+    'famicons:sun': 'assets/images/icons/famicons--sunny-outline.svg',
+    'famicons:moon': 'assets/images/icons/famicons--moon.svg',
+    'ic:baseline-more-time': 'assets/images/icons/ic--baseline-more-time.svg',
+    'famicons:settings-outline':
+        'assets/images/icons/famicons--settings-outline.svg',
+    'ph:chat-dots-light': 'assets/images/icons/ph--chat-dots-light.svg',
+    'lsicon:circle-more-outline':
+        'assets/images/icons/lsicon--circle-more-outline.svg',
+    'ion:call-outline': 'assets/images/icons/ion--call-outline.svg',
+    'material-symbols-light:info-outline-rounded':
+        'assets/images/icons/material-symbols--info-outline-rounded.svg',
+    'mynaui:share': 'assets/images/icons/mynaui--share.svg',
+    'fluent:heart-28-regular':
+        'assets/images/icons/fluent--heart-28-regular.svg',
+  };
+
+  Widget _buildDrawerIcon({
+    required String icon,
+    required double size,
+    required Color color,
+  }) {
+    final assetPath = _drawerIconAssets[icon];
+    if (assetPath == null) {
+      return Icon(
+        Icons.help_outline_rounded,
+        size: size,
+        color: color,
+      );
+    }
+
+    return SvgPicture.asset(
+      assetPath,
+      width: size,
+      height: size,
+      colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+    );
+  }
+
   Widget _buildListTile({
     required String icon,
     required String title,
@@ -53,7 +93,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
               borderRadius: BorderRadius.circular(Dimens.radiusCircle),
             ),
             child: Center(
-              child: IconifyIcon(
+              child: _buildDrawerIcon(
                 size: Dimens.iconSmall,
                 icon: icon,
                 color: themeState.isDark
@@ -282,7 +322,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                                               ),
                                             ),
                                             child: Center(
-                                              child: IconifyIcon(
+                                              child: _buildDrawerIcon(
                                                 icon: "tdesign:edit",
                                                 color: Colors.white,
                                                 size: 12.w,
@@ -311,7 +351,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                                         Dimens.radiusCircle),
                                   ),
                                   child: Center(
-                                    child: IconifyIcon(
+                                    child: _buildDrawerIcon(
                                       size: Dimens.iconSmall,
                                       icon: themeState.isDark
                                           ? "famicons:sun"

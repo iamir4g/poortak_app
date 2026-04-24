@@ -4,6 +4,7 @@ import 'package:lottie/lottie.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_match/screens/match_screen.dart';
+import 'package:poortak/featueres/feature_match/screens/prize_screen.dart';
 
 class MainMatchScreen extends StatelessWidget {
   static const routeName = '/main_match_screen';
@@ -104,7 +105,8 @@ class MainMatchScreen extends StatelessWidget {
                         title: 'جوایز مسابقه',
                         onTap: () {
                           // Navigate to prizes screen
-                          _showComingSoonDialog(context);
+                          Navigator.pushNamed(
+                              context, MatchPrizeScreen.routeName);
                         },
                       ),
 

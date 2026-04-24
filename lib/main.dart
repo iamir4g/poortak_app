@@ -13,6 +13,8 @@ import 'package:poortak/featueres/featureMenu/screens/main_reminder.dart';
 import 'package:poortak/featueres/feature_intro/presentation/screens/splash_screen.dart';
 import 'package:poortak/featueres/feature_match/screens/main_match_screen.dart';
 import 'package:poortak/featueres/feature_match/screens/match_screen.dart';
+import 'package:poortak/featueres/feature_match/screens/prize_screen.dart'
+    as match_prize;
 import 'package:poortak/featueres/feature_payment/presentation/screens/payment_result_screen.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/kavoosh_main_screen.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/educational_videos_screen.dart';
@@ -382,6 +384,8 @@ void main() async {
                           create: (context) => locator<MatchBloc>(),
                           child: const MatchScreen(),
                         ),
+                    match_prize.MatchPrizeScreen.routeName: (context) =>
+                        const match_prize.MatchPrizeScreen(),
                     MainPointsScreen.routeName: (context) => MainPointsScreen(),
                     HistoryPrizeScreen.routeName: (context) =>
                         HistoryPrizeScreen(),
