@@ -338,24 +338,32 @@ class _DialogCartState extends State<DialogCart> {
                                       child: Padding(
                                         padding:
                                             EdgeInsets.fromLTRB(4.w, 0, 4.w, 0),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceAround,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: [
-                                            Image.asset(
-                                                "assets/images/star_icon.png"),
-                                            Text(
-                                              convertEnToFa("+5"),
-                                              style: MyTextStyle
-                                                  .textMatn13PrimaryShade1,
-                                            ),
-                                            Text(
-                                              l10n.coin_with_buy,
-                                              style: MyTextStyle.textMatn9,
-                                            )
-                                          ],
+                                        child: FittedBox(
+                                          fit: BoxFit.scaleDown,
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              Image.asset(
+                                                "assets/images/star_icon.png",
+                                                width: 18.w,
+                                                height: 18.h,
+                                                fit: BoxFit.contain,
+                                              ),
+                                              SizedBox(width: 2.w),
+                                              Text(
+                                                convertEnToFa("+5"),
+                                                style: MyTextStyle
+                                                    .textMatn13PrimaryShade1,
+                                              ),
+                                              SizedBox(width: 2.w),
+                                              Text(
+                                                l10n.coin_with_buy,
+                                                style: MyTextStyle.textMatn9,
+                                              )
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -544,26 +552,35 @@ class _DialogCartState extends State<DialogCart> {
                                               child: Padding(
                                                 padding: EdgeInsets.fromLTRB(
                                                     4.w, 0, 2.w, 0),
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceAround,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.center,
-                                                  children: [
-                                                    Image.asset(
-                                                        "assets/images/star_icon.png"),
-                                                    Text(
-                                                      convertEnToFa("+50"),
-                                                      style: MyTextStyle
-                                                          .textMatn13PrimaryShade1,
-                                                    ),
-                                                    Text(
-                                                      l10n.coin_with_buy,
-                                                      style:
-                                                          MyTextStyle.textMatn9,
-                                                    )
-                                                  ],
+                                                child: FittedBox(
+                                                  fit: BoxFit.scaleDown,
+                                                  child: Row(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Image.asset(
+                                                        "assets/images/star_icon.png",
+                                                        width: 18.w,
+                                                        height: 18.h,
+                                                        fit: BoxFit.contain,
+                                                      ),
+                                                      SizedBox(width: 2.w),
+                                                      Text(
+                                                        convertEnToFa("+50"),
+                                                        style: MyTextStyle
+                                                            .textMatn13PrimaryShade1,
+                                                      ),
+                                                      SizedBox(width: 2.w),
+                                                      Text(
+                                                        l10n.coin_with_buy,
+                                                        style: MyTextStyle
+                                                            .textMatn9,
+                                                      )
+                                                    ],
+                                                  ),
                                                 ),
                                               ),
                                             ),
