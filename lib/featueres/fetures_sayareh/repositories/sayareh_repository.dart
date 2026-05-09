@@ -25,6 +25,25 @@ class SayarehRepository {
 
   SayarehRepository(this.sayarehApiProvider);
 
+  String _extractErrorMessage(
+    dynamic responseData, {
+    required String fallbackMessage,
+  }) {
+    if (responseData is Map<String, dynamic>) {
+      final message = responseData['message'];
+      if (message is String && message.trim().isNotEmpty) {
+        return message;
+      }
+
+      final error = responseData['error'];
+      if (error is String && error.trim().isNotEmpty) {
+        return error;
+      }
+    }
+
+    return fallbackMessage;
+  }
+
   Future<DataState<SayarehHomeModel>> fetchAllCourses() async {
     // Response response = await sayarehApiProvider.callSayarehApi();
     try {
@@ -268,6 +287,19 @@ class SayarehRepository {
         return DataFailed<QuizesQuestion>(
             response.data['message'] ?? "خطا در دریافت اطلاعات");
       }
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 422) {
+        return const DataFailed<QuizesQuestion>(
+          "شما قبلا این آزمون را گذرانده اید.",
+        );
+      }
+
+      return DataFailed<QuizesQuestion>(
+        _extractErrorMessage(
+          e.response?.data,
+          fallbackMessage: "خطا در دریافت اطلاعات",
+        ),
+      );
     } on AppException catch (e) {
       return DataFailed<QuizesQuestion>(e.message);
     } catch (e) {

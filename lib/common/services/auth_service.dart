@@ -17,7 +17,7 @@ class AuthService {
   /// This method:
   /// - Gets the user token from preferences
   /// - Sets the Authorization header
-  /// - Handles 401/404 responses by clearing the token and throwing UnauthorisedException
+  /// - Handles only 401 responses by clearing the token and throwing UnauthorisedException
   /// - Re-throws other DioExceptions
   ///
   /// Usage:
@@ -53,7 +53,7 @@ class AuthService {
       log("   Response data: ${e.response?.data}");
       log("   Error message: ${e.message}");
 
-      if (e.response?.statusCode == 401 || e.response?.statusCode == 404) {
+      if (e.response?.statusCode == 401) {
         log("🔐 Authentication failed - clearing token and throwing UnauthorisedException");
         // Clear token and throw unauthorized exception
         await _prefsOperator.logout();

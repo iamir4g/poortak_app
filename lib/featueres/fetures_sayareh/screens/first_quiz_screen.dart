@@ -487,6 +487,19 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                         );
                       },
                     );
+                  } else if (state is QuizStartError) {
+                    return Center(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 24.w),
+                        child: Text(
+                          state.message,
+                          textAlign: TextAlign.center,
+                          style: MyTextStyle.textMatn15.copyWith(
+                            color: const Color(0xFF3D495C),
+                          ),
+                        ),
+                      ),
+                    );
                   }
                   return const SizedBox();
                 },
