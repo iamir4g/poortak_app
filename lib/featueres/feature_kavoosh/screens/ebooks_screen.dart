@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_kavoosh/widgets/course_card.dart';
 import 'package:poortak/featueres/feature_kavoosh/widgets/section_header.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/course_list_screen.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/book_details_screen.dart';
+import 'package:poortak/featueres/feature_kavoosh/data/models/category_nodes_summary_model.dart';
+import 'package:poortak/featueres/feature_kavoosh/data/models/kavoosh_tree_type.dart';
+import 'package:poortak/featueres/feature_kavoosh/presentation/bloc/categories_bloc/categories_bloc.dart';
+import 'package:poortak/featueres/feature_kavoosh/presentation/bloc/categories_bloc/categories_event.dart';
+import 'package:poortak/featueres/feature_kavoosh/presentation/bloc/categories_bloc/categories_state.dart';
+import 'package:poortak/locator.dart';
 
 class EBooksScreen extends StatefulWidget {
   static const String routeName = '/ebooks';
@@ -20,129 +27,173 @@ class _EBooksScreenState extends State<EBooksScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(57.h),
-        child: SafeArea(
-          child: Container(
-            padding: EdgeInsets.fromLTRB(16.w, 0, 32.w, 0),
-            height: 57.h,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(33.5.r),
+    return BlocProvider(
+      create: (context) => locator<CategoriesBloc>()
+        ..add(
+          FetchCategoryNodesSummaryEvent(
+            treeType: KavooshTreeType.book,
+          ),
+        ),
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(57.h),
+          child: SafeArea(
+            child: Container(
+              padding: EdgeInsets.fromLTRB(16.w, 0, 32.w, 0),
+              height: 57.h,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(33.5.r),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    offset: Offset(0, 1.h),
+                    blurRadius: 1.r,
+                  ),
+                ],
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  offset: Offset(0, 1.h),
-                  blurRadius: 1.r,
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Flexible(
-                  child: Text(
-                    'کتاب الکترونیکی',
-                    style: MyTextStyle.textMatn16Bold.copyWith(
-                      color: const Color(0xFF29303D),
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                SizedBox(
-                  width: 40.w,
-                  height: 40.h,
-                  child: IconButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    icon: Icon(
-                      Icons.arrow_forward,
-                      color: const Color(0xFF29303D),
-                      size: 28.sp,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Flexible(
+                    child: Text(
+                      'کتاب الکترونیکی',
+                      style: MyTextStyle.textMatn16Bold.copyWith(
+                        color: const Color(0xFF29303D),
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                ),
-              ],
+                  SizedBox(
+                    width: 40.w,
+                    height: 40.h,
+                    child: IconButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      icon: Icon(
+                        Icons.arrow_forward,
+                        color: const Color(0xFF29303D),
+                        size: 28.sp,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
-      ),
-      body: SafeArea(
-        top: false,
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              // Slider Placeholder
-              Container(
-                height: 200.h,
-                width: double.infinity,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFF9F6C6), // Light yellow placeholder
-                  borderRadius: BorderRadius.only(
-                    bottomLeft:
-                        Radius.circular(0), // Figma might show different
-                    bottomRight: Radius.circular(0),
+        body: SafeArea(
+          top: false,
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Container(
+                  height: 200.h,
+                  width: double.infinity,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFF9F6C6),
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(0),
+                      bottomRight: Radius.circular(0),
+                    ),
+                  ),
+                  child: const Center(),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 16.0.h),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _buildTabItem(0, 'کتاب ها', Icons.book_outlined),
+                      SizedBox(width: 24.w),
+                      _buildTabItem(1, 'نمونه سوالات', Icons.quiz_outlined),
+                    ],
                   ),
                 ),
-                child: const Center(
-                    // child: Text('Slider Placeholder'),
-                    ),
-              ),
-
-              // Custom Tabs
-              Padding(
-                padding: EdgeInsets.symmetric(vertical: 16.0.h),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _buildTabItem(0, 'کتاب ها', Icons.book_outlined),
-                    SizedBox(width: 24.w),
-                    _buildTabItem(1, 'نمونه سوالات', Icons.quiz_outlined),
-                  ],
-                ),
-              ),
-              // Divider line for tabs
-              Container(
-                height: 2.h,
-                width: double.infinity,
-                color: Colors.grey.withValues(alpha: 0.1),
-                child: Row(
-                  children: [
-                    Expanded(
+                Container(
+                  height: 2.h,
+                  width: double.infinity,
+                  color: Colors.grey.withValues(alpha: 0.1),
+                  child: Row(
+                    children: [
+                      Expanded(
                         child: Container(
-                            color: _selectedTabIndex == 0
-                                ? Colors.orange
-                                : Colors.transparent)),
-                    Expanded(
+                          color: _selectedTabIndex == 0
+                              ? Colors.orange
+                              : Colors.transparent,
+                        ),
+                      ),
+                      Expanded(
                         child: Container(
-                            color: _selectedTabIndex == 1
-                                ? Colors.orange
-                                : Colors.transparent)),
-                  ],
+                          color: _selectedTabIndex == 1
+                              ? Colors.orange
+                              : Colors.transparent,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-
-              SizedBox(height: 16.h),
-
-              // Content Sections
-              if (_selectedTabIndex == 0) ...[
-                _buildSection('پایه اول دبستان'),
-                _buildSection('پایه دوم دبستان'),
-                _buildSection('پایه سوم دبستان'),
-                _buildSection('پایه چهارم دبستان'),
-              ] else ...[
-                SizedBox(
-                  height: 200.h,
-                  child: const Center(child: Text('نمونه سوالات')),
-                ),
+                SizedBox(height: 16.h),
+                if (_selectedTabIndex == 0) ...[
+                  BlocBuilder<CategoriesBloc, CategoriesState>(
+                    builder: (context, state) {
+                      if (state is CategoriesLoading) {
+                        return Padding(
+                          padding: EdgeInsets.symmetric(vertical: 24.h),
+                          child: const Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                        );
+                      }
+                      if (state is CategoriesError) {
+                        return Padding(
+                          padding: EdgeInsets.symmetric(vertical: 24.h),
+                          child: Center(
+                            child: Text(
+                              state.message,
+                              style: MyTextStyle.textMatn14Bold.copyWith(
+                                color: Colors.red,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        );
+                      }
+                      if (state is CategoriesLoaded) {
+                        if (state.categories.isEmpty) {
+                          return Padding(
+                            padding: EdgeInsets.symmetric(vertical: 24.h),
+                            child: Center(
+                              child: Text(
+                                'دسته‌بندی‌ای یافت نشد',
+                                style: MyTextStyle.textMatn14Bold.copyWith(
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ),
+                          );
+                        }
+                        return Column(
+                          children: state.categories
+                              .map((category) => _buildSection(category))
+                              .toList(),
+                        );
+                      }
+                      return const SizedBox.shrink();
+                    },
+                  ),
+                ] else ...[
+                  SizedBox(
+                    height: 200.h,
+                    child: const Center(child: Text('نمونه سوالات')),
+                  ),
+                ],
+                SizedBox(height: 20.h),
               ],
-
-              SizedBox(height: 20.h),
-            ],
+            ),
           ),
         ),
       ),
@@ -177,16 +228,21 @@ class _EBooksScreenState extends State<EBooksScreen> {
     );
   }
 
-  Widget _buildSection(String title) {
+  Widget _buildSection(CategoryNodeSummary category) {
     return Column(
       children: [
         SectionHeader(
-          title: title,
+          title: category.title,
           onSeeAllTap: () {
             Navigator.pushNamed(
               context,
               CourseListScreen.routeName,
-              arguments: {'title': 'کتاب های $title', 'type': 'book'},
+              arguments: {
+                'title': 'کتاب های ${category.title}',
+                'type': 'book',
+                'categoryId': category.id,
+                'treeType': KavooshTreeType.book,
+              },
             );
           },
         ),
