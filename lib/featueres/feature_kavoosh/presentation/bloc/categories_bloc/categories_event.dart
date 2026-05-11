@@ -11,3 +11,11 @@ class FetchCategoryNodesSummaryEvent extends CategoriesEvent {
     this.parentCategoryId,
   });
 }
+
+class FetchCategoryNodeContentEvent extends CategoriesEvent {
+  final String categoryId;
+
+  FetchCategoryNodeContentEvent({
+    required this.categoryId,
+  });
+}

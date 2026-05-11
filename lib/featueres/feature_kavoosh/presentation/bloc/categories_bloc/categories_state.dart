@@ -12,6 +12,12 @@ class CategoriesLoaded extends CategoriesState {
   CategoriesLoaded(this.categories);
 }
  
+class CategoryNodeContentLoaded extends CategoriesState {
+  final CategoryNodeSummary category;
+
+  CategoryNodeContentLoaded(this.category);
+}
+
 class CategoriesError extends CategoriesState {
   final String message;
  

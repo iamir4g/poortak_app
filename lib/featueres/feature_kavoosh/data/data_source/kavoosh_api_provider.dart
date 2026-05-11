@@ -21,4 +21,12 @@ class KavooshApiProvider {
       queryParameters: queryParameters,
     );
   }
+
+  Future<Response> callGetCategoryNodeContent({
+    required String categoryId,
+  }) {
+    return dio.get(
+      "${Constants.baseUrl}categories/nodes/$categoryId/content",
+    );
+  }
 }

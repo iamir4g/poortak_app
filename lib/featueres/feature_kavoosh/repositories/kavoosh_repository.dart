@@ -45,4 +45,43 @@ class KavooshRepository {
       return DataFailed(e.toString());
     }
   }
+
+  Future<DataState<CategoryNodeSummary>> fetchCategoryNodeContent({
+    required String categoryId,
+  }) async {
+    try {
+      final response = await apiProvider.callGetCategoryNodeContent(
+        categoryId: categoryId,
+      );
+
+      final data = response.data;
+      if ((response.statusCode == 200 || response.statusCode == 201) &&
+          data is Map<String, dynamic> &&
+          data['ok'] == true) {
+        final nodeJson = data['data'];
+        if (nodeJson is Map<String, dynamic>) {
+          return DataSuccess(CategoryNodeSummary.fromJson(nodeJson));
+        }
+        return const DataFailed("فرمت پاسخ سرور نامعتبر است");
+      }
+
+      if (data is Map<String, dynamic>) {
+        return DataFailed(
+            data['message']?.toString() ?? "خطا در دریافت محتوای دسته‌بندی");
+      }
+
+      return const DataFailed("خطا در دریافت محتوای دسته‌بندی");
+    } on DioException catch (e) {
+      final responseData = e.response?.data;
+      if (responseData is Map<String, dynamic>) {
+        final message = responseData['message']?.toString();
+        if (message != null && message.isNotEmpty) {
+          return DataFailed(message);
+        }
+      }
+      return DataFailed(e.message ?? "خطا در اتصال به سرور");
+    } catch (e) {
+      return DataFailed(e.toString());
+    }
+  }
 }

@@ -20,6 +20,7 @@ import 'package:poortak/featueres/feature_kavoosh/screens/kavoosh_main_screen.da
 import 'package:poortak/featueres/feature_kavoosh/screens/educational_videos_screen.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/ebooks_screen.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/course_list_screen.dart';
+import 'package:poortak/featueres/feature_kavoosh/data/models/kavoosh_tree_type.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/video_detail_screen.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/book_details_screen.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/self_assessment_screen.dart';
@@ -346,8 +347,12 @@ void main() async {
                       final args = ModalRoute.of(context)?.settings.arguments
                           as Map<String, dynamic>;
                       return CourseListScreen(
-                        title: args['title'],
-                        type: args['type'],
+                        title: args['title']?.toString() ?? '',
+                        type: args['type']?.toString(),
+                        categoryId: args['categoryId']?.toString() ?? '',
+                        treeType: args['treeType'] is KavooshTreeType
+                            ? args['treeType'] as KavooshTreeType
+                            : null,
                       );
                     },
                     VideoDetailScreen.routeName: (context) {
