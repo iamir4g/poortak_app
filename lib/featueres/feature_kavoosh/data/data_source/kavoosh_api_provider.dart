@@ -29,4 +29,40 @@ class KavooshApiProvider {
       "${Constants.baseUrl}categories/nodes/$categoryId/content",
     );
   }
+
+  Future<Response> callGetVideoCoursesByCategory({
+    required String categoryId,
+    int size = 10,
+    int page = 1,
+    String order = 'asc',
+    String query = '',
+  }) {
+    return dio.get(
+      "${Constants.baseUrl}video-courses/category/$categoryId",
+      queryParameters: {
+        'size': size,
+        'page': page,
+        'order': order,
+        'query': query,
+      },
+    );
+  }
+
+  Future<Response> callGetBooksByCategory({
+    required String categoryId,
+    int size = 10,
+    int page = 1,
+    String order = 'asc',
+    String query = '',
+  }) {
+    return dio.get(
+      "${Constants.baseUrl}books/category/$categoryId",
+      queryParameters: {
+        'size': size,
+        'page': page,
+        'order': order,
+        'query': query,
+      },
+    );
+  }
 }
