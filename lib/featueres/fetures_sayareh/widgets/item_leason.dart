@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:iconify_design/iconify_design.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poortak/common/services/getImageUrl_service.dart';
 import 'package:poortak/common/widgets/global_progress_bar.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/all_courses_progress_model.dart';
@@ -155,10 +155,16 @@ class ItemLeason extends StatelessWidget {
                 SizedBox(
                   width: 4.w,
                 ),
-                IconifyIcon(
-                  size: 32.r,
-                  icon: "iconamoon:arrow-left-2-bold",
-                  color: Theme.of(context).textTheme.titleMedium?.color,
+                SvgPicture.asset(
+                  'assets/images/icons/iconamoon--arrow-left-2-duotone.svg',
+                  width: 32.r,
+                  height: 32.r,
+                  colorFilter: ColorFilter.mode(
+                    Theme.of(context).textTheme.titleMedium?.color ??
+                        Theme.of(context).iconTheme.color ??
+                        Colors.black,
+                    BlendMode.srcIn,
+                  ),
                 ),
               ],
             ),

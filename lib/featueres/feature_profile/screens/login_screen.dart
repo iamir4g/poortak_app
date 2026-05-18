@@ -4,7 +4,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:iconify_design/iconify_design.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poortak/common/widgets/main_wrapper.dart';
 import 'package:poortak/featueres/feature_profile/widgets/terms_conditions_modal.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
@@ -359,10 +359,14 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Transform.rotate(
               angle: 4.71238,
               child: Center(
-                child: IconifyIcon(
-                  icon: "ion:call",
-                  color: MyColors.text4,
-                  size: 18.r,
+                child: SvgPicture.asset(
+                  'assets/images/icons/ion--call.svg',
+                  width: 18.r,
+                  height: 18.r,
+                  colorFilter: const ColorFilter.mode(
+                    MyColors.text4,
+                    BlendMode.srcIn,
+                  ),
                 ),
               ),
             ),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:iconify_design/iconify_design.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poortak/common/bloc/theme_cubit/theme_cubit.dart';
 import 'package:poortak/common/services/reminder_notification_service.dart';
 import 'package:poortak/config/myColors.dart';
@@ -126,12 +126,16 @@ class _ReminderScreenState extends State<ReminderScreen> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              IconifyIcon(
-                                icon: "ic:baseline-more-time",
-                                size: 64.r,
-                                color: themeState.isDark
-                                    ? MyColors.darkTextSecondary
-                                    : MyColors.text4,
+                              SvgPicture.asset(
+                                'assets/images/icons/ic--baseline-more-time.svg',
+                                width: 64.r,
+                                height: 64.r,
+                                colorFilter: ColorFilter.mode(
+                                  themeState.isDark
+                                      ? MyColors.darkTextSecondary
+                                      : MyColors.text4,
+                                  BlendMode.srcIn,
+                                ),
                               ),
                               SizedBox(height: 16.h),
                               Text(

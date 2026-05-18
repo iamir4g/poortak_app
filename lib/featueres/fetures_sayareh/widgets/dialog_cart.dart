@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:iconify_design/iconify_design.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:persian_tools/persian_tools.dart';
 import 'package:poortak/common/services/getImageUrl_service.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
@@ -521,10 +521,16 @@ class _DialogCartState extends State<DialogCart> {
                                               child: SizedBox(
                                                 width: 30.w,
                                                 height: 30.h,
-                                                child: IconifyIcon(
-                                                    color: MyColors.textLight,
-                                                    icon:
-                                                        "arcticons:pdf-viewer"),
+                                                child: SvgPicture.asset(
+                                                  'assets/images/icons/arcticons--pdf-viewer.svg',
+                                                  width: 30.w,
+                                                  height: 30.h,
+                                                  colorFilter:
+                                                      const ColorFilter.mode(
+                                                    MyColors.textLight,
+                                                    BlendMode.srcIn,
+                                                  ),
+                                                ),
                                               )),
                                           Positioned(
                                             bottom: 5.h,
@@ -532,9 +538,16 @@ class _DialogCartState extends State<DialogCart> {
                                             child: SizedBox(
                                               width: 30.w,
                                               height: 30.h,
-                                              child: IconifyIcon(
-                                                  color: MyColors.textLight,
-                                                  icon: "carbon:play-outline"),
+                                              child: SvgPicture.asset(
+                                                'assets/images/icons/carbon--play-outline.svg',
+                                                width: 30.w,
+                                                height: 30.h,
+                                                colorFilter:
+                                                    const ColorFilter.mode(
+                                                  MyColors.textLight,
+                                                  BlendMode.srcIn,
+                                                ),
+                                              ),
                                             ),
                                           ),
                                           Positioned(

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/l10n/app_localizations.dart';
 // import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:poortak/common/services/tts_service.dart';
 import 'package:poortak/common/widgets/step_progress.dart';
-import 'package:iconify_design/iconify_design.dart';
 import 'package:flutter_flip_card/flutter_flip_card.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poortak/config/myTextStyle.dart';
@@ -309,10 +309,14 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
                 SizedBox(width: Dimens.small.w),
                 GestureDetector(
                   onTap: () => ttsService.speak(englishWord, voice: 'male'),
-                  child: IconifyIcon(
-                    icon: "cuida:volume-2-outline",
-                    size: 28.r,
-                    color: const Color(0xFF3A465A),
+                  child: SvgPicture.asset(
+                    'assets/images/icons/cuida--volume-2-outline.svg',
+                    width: 28.r,
+                    height: 28.r,
+                    colorFilter: const ColorFilter.mode(
+                      Color(0xFF3A465A),
+                      BlendMode.srcIn,
+                    ),
                   ),
                 ),
               ],
@@ -321,10 +325,14 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
           const Spacer(),
           GestureDetector(
             onTap: onFlip,
-            child: IconifyIcon(
-              icon: "solar:smartphone-rotate-angle-outline",
-              size: 32.r,
-              color: const Color(0xFF3A465A),
+            child: SvgPicture.asset(
+              'assets/images/icons/solar--smartphone-rotate-angle-outline.svg',
+              width: 32.r,
+              height: 32.r,
+              colorFilter: const ColorFilter.mode(
+                Color(0xFF3A465A),
+                BlendMode.srcIn,
+              ),
             ),
           ),
           SizedBox(height: Dimens.medium.h),
@@ -368,10 +376,14 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
                   SizedBox(width: Dimens.small.w),
                   GestureDetector(
                     onTap: () => ttsService.speak(englishWord, voice: 'male'),
-                    child: IconifyIcon(
-                      icon: "cuida:volume-2-outline",
-                      size: 28.r,
-                      color: Colors.white,
+                    child: SvgPicture.asset(
+                      'assets/images/icons/cuida--volume-2-outline.svg',
+                      width: 28.r,
+                      height: 28.r,
+                      colorFilter: const ColorFilter.mode(
+                        Colors.white,
+                        BlendMode.srcIn,
+                      ),
                     ),
                   ),
                 ],
@@ -395,10 +407,14 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
           const Spacer(),
           GestureDetector(
             onTap: onFlip,
-            child: IconifyIcon(
-              icon: "solar:smartphone-rotate-angle-outline",
-              size: 32.r,
-              color: Colors.white,
+            child: SvgPicture.asset(
+              'assets/images/icons/solar--smartphone-rotate-angle-outline.svg',
+              width: 32.r,
+              height: 32.r,
+              colorFilter: const ColorFilter.mode(
+                Colors.white,
+                BlendMode.srcIn,
+              ),
             ),
           ),
           SizedBox(height: Dimens.medium.h),

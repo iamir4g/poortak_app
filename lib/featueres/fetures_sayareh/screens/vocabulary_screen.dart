@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:iconify_design/iconify_design.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poortak/common/widgets/step_progress.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/config/myColors.dart';
@@ -420,9 +420,15 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                             ),
                             IconButton(
                               onPressed: () => _readWord(currentWord.word),
-                              icon: IconifyIcon(
-                                icon: "cuida:volume-2-outline",
-                                size: 32.r,
+                              icon: SvgPicture.asset(
+                                'assets/images/icons/cuida--volume-2-outline.svg',
+                                width: 32.r,
+                                height: 32.r,
+                                colorFilter: ColorFilter.mode(
+                                  Theme.of(context).iconTheme.color ??
+                                      Colors.black,
+                                  BlendMode.srcIn,
+                                ),
                               ),
                             ),
                             IconButton(

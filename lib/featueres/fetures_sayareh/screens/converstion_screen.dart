@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:iconify_design/iconify_design.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/locator.dart';
@@ -386,10 +386,14 @@ class _ConversationScreenState extends State<ConversationScreen> {
                       onPressed: () {
                         _playNext();
                       },
-                      icon: IconifyIcon(
-                        icon: "ri:skip-right-fill",
-                        size: 30.r,
-                        color: MyColors.textPrimary,
+                      icon: SvgPicture.asset(
+                        'assets/images/icons/ri--skip-right-fill.svg',
+                        width: 30.r,
+                        height: 30.r,
+                        colorFilter: const ColorFilter.mode(
+                          MyColors.textPrimary,
+                          BlendMode.srcIn,
+                        ),
                       )),
                   // دکمه پخش/توقف تمام مکالمه
                   ValueListenableBuilder<bool>(
@@ -413,10 +417,14 @@ class _ConversationScreenState extends State<ConversationScreen> {
                       onPressed: () {
                         _playPrevious();
                       },
-                      icon: IconifyIcon(
-                        icon: "ri:skip-left-fill",
-                        size: 30.r,
-                        color: MyColors.textPrimary,
+                      icon: SvgPicture.asset(
+                        'assets/images/icons/ri--skip-left-fill.svg',
+                        width: 30.r,
+                        height: 30.r,
+                        colorFilter: const ColorFilter.mode(
+                          MyColors.textPrimary,
+                          BlendMode.srcIn,
+                        ),
                       )),
                 ],
               ),

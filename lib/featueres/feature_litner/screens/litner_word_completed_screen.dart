@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_bloc.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_event.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_state.dart';
 import 'package:poortak/featueres/feature_litner/data/models/list_words_model.dart';
-import 'package:iconify_design/iconify_design.dart';
 import 'package:poortak/locator.dart';
 import 'package:poortak/common/services/tts_service.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -343,12 +343,15 @@ class _LitnerWordCompletedScreenState extends State<LitnerWordCompletedScreen> {
                                             mainAxisAlignment: MainAxisAlignment.end,
                                             children: [
                                               IconButton(
-                                                icon: IconifyIcon(
-                                                  icon:
-                                                      "cuida:volume-2-outline",
-                                                  size: 18.r,
-                                                  color:
-                                                      const Color(0xFFA3AFC2),
+                                                icon: SvgPicture.asset(
+                                                  'assets/images/icons/cuida--volume-2-outline.svg',
+                                                  width: 18.r,
+                                                  height: 18.r,
+                                                  colorFilter:
+                                                      const ColorFilter.mode(
+                                                    Color(0xFFA3AFC2),
+                                                    BlendMode.srcIn,
+                                                  ),
                                                 ),
                                                 splashRadius: 18.r,
                                                 padding: EdgeInsets.zero,
