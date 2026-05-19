@@ -11,8 +11,8 @@ import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_state.
 import 'package:poortak/featueres/feature_litner/screens/litner_word_completed_screen.dart';
 import 'package:poortak/featueres/feature_litner/screens/litner_word_box_screen.dart';
 import 'package:poortak/featueres/feature_litner/screens/litner_words_inprogress_screen.dart';
-import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
 import 'package:poortak/common/blocs/bottom_nav_cubit/bottom_nav_cubit.dart';
+import 'package:poortak/common/services/auth_navigation_manager.dart';
 import 'package:poortak/locator.dart';
 import '../widgets/litner_card.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -20,9 +20,8 @@ import 'package:poortak/main.dart'; // For routeObserver
 
 class LitnerMainScreen extends StatefulWidget {
   static const routeName = '/litner_main';
-  final VoidCallback? onLoginRequested;
 
-  const LitnerMainScreen({super.key, this.onLoginRequested});
+  const LitnerMainScreen({super.key});
 
   @override
   State<LitnerMainScreen> createState() => _LitnerMainScreenState();
@@ -59,6 +58,7 @@ class _LitnerMainScreenState extends State<LitnerMainScreen> with RouteAware {
 
   Future<void> _checkLoginStatus() async {
     final loggedIn = await prefsOperator.getLoggedIn();
+    if (!mounted) return;
     setState(() {
       isLoggedIn = loggedIn;
     });
@@ -70,10 +70,11 @@ class _LitnerMainScreenState extends State<LitnerMainScreen> with RouteAware {
     return BlocListener<BottomNavCubit, int>(
       listener: (context, selectedIndex) async {
         if (selectedIndex == 3) {
+          final litnerBloc = context.read<LitnerBloc>();
           await _checkLoginStatus();
           if (!mounted) return;
           if (isLoggedIn) {
-            context.read<LitnerBloc>().add(FetchOverviewLitnerEvent());
+            litnerBloc.add(FetchOverviewLitnerEvent());
           }
         }
       },
@@ -102,12 +103,7 @@ class _LitnerMainScreenState extends State<LitnerMainScreen> with RouteAware {
                       PrimaryButton(
                         lable: l10n.login,
                         onPressed: () {
-                          final onLoginRequested = widget.onLoginRequested;
-                          if (onLoginRequested != null) {
-                            onLoginRequested();
-                            return;
-                          }
-                          Navigator.pushNamed(context, LoginScreen.routeName);
+                          goToLoginAndReturn(returnTabIndex: 3);
                         },
                       ),
                     ],

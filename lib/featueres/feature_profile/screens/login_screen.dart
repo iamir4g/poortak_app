@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poortak/common/widgets/main_wrapper.dart';
+import 'package:poortak/common/services/auth_navigation_manager.dart';
 import 'package:poortak/featueres/feature_profile/widgets/terms_conditions_modal.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/config/myColors.dart';
@@ -507,10 +508,13 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           );
           // Navigate to MainWrapper instead of profile screen
+          final initialIndex =
+              AuthNavigationManager().pendingReturnTabIndex ?? 4;
           Navigator.pushNamedAndRemoveUntil(
             context,
             MainWrapper.routeName,
             (route) => false,
+            arguments: {"initialIndex": initialIndex},
           );
         }
       },
