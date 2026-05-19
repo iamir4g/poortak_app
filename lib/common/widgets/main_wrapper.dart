@@ -16,6 +16,7 @@ import 'package:poortak/featueres/feature_kavoosh/screens/kavoosh_main_screen.da
 import 'package:poortak/featueres/feature_litner/screens/litner_main_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/profile_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/bloc_storage_bloc.dart';
+import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/iknow_access_bloc/iknow_access_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/repositories/sayareh_repository.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/sayareh_screen.dart';
 import 'package:poortak/featueres/feature_shopping_cart/screens/shopping_cart_screen.dart';
@@ -53,7 +54,7 @@ class _MainWrapperState extends State<MainWrapper> {
         const SayarehScreen(),
         const KavooshMainScreen(),
         const ShoppingCartScreen(),
-        LitnerMainScreen(),
+        LitnerMainScreen(onLoginRequested: () => _animateToTab(4)),
         const ProfileScreen(),
       ];
 
@@ -158,9 +159,23 @@ class _MainWrapperState extends State<MainWrapper> {
     return '';
   }
 
+  void _animateToTab(int index) {
+    if (!mounted) return;
+    context.read<BottomNavCubit>().changeSelectedIndex(index);
+    controller.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+    setState(() {
+      currentPageIndex = index;
+    });
+  }
+
   void _logout() async {
     // Clear user data from preferences
     await prefsOperator.logout();
+    locator<IknowAccessBloc>().add(ClearIknowAccessEvent());
 
     // Clear shopping cart (both local and remote)
     try {
@@ -170,16 +185,7 @@ class _MainWrapperState extends State<MainWrapper> {
     }
 
     // Navigate to Sayareh screen (index 0) instead of login screen
-    controller.animateToPage(
-      0,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-    );
-
-    // Update the current page index
-    setState(() {
-      currentPageIndex = 0;
-    });
+    _animateToTab(0);
   }
 
   void _showLogoutConfirmation() {

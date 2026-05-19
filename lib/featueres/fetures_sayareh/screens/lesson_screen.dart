@@ -61,46 +61,65 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
   bool _isCompletionPopupShown = false;
 
   bool get hasAccess {
+    final prefsOperator = locator<PrefsOperator>();
+    if (!prefsOperator.isLoggedIn()) return false;
+    if (widget.purchased == true) return true;
     final accessBloc = locator<IknowAccessBloc>();
     return accessBloc.hasCourseAccess(widget.lessonId);
   }
 
-  Future<void> _checkAndDownloadVideo(String videoToCheck,
-      {bool autoStart = true}) async {
-    if (videoToCheck.isEmpty) return;
+  Future<void> _checkAndDownloadVideo(String _, {bool autoStart = true}) async {
+    final lesson = _currentLesson;
+    if (lesson == null) return;
 
-    _currentVideoName = videoToCheck;
-
-    // Determine which video to download based on login and purchase status
-    final prefsOperator = locator<PrefsOperator>();
-    final isLoggedIn = prefsOperator.isLoggedIn();
-    String? videoToDownload;
+    final hasPaidAccess = hasAccess;
+    String? videoId;
     bool usePublicUrl = false;
+    bool isEncrypted = true;
 
-    if (isLoggedIn &&
-        hasAccess &&
-        _currentLesson?.video != null &&
-        _currentLesson!.video!.isNotEmpty) {
-      videoToDownload = _currentLesson!.video;
+    if (hasPaidAccess && lesson.video != null && lesson.video!.isNotEmpty) {
+      videoId = lesson.video;
       usePublicUrl = false;
-      debugPrint(
-          "Using purchased video: $videoToDownload with authenticated URL");
-    } else if (_currentLesson?.trailerVideo.isNotEmpty == true) {
-      videoToDownload = _currentLesson!.trailerVideo;
+      isEncrypted = true;
+    } else if (lesson.isDemo && lesson.trailerVideo.isNotEmpty) {
+      videoId = lesson.trailerVideo;
       usePublicUrl = true;
-      debugPrint("Using trailer video: $videoToDownload with public URL");
+      isEncrypted = false;
+    } else if (lesson.trailerVideo.isNotEmpty) {
+      videoId = lesson.trailerVideo;
+      usePublicUrl = true;
+      isEncrypted = false;
+    } else if (lesson.video != null && lesson.video!.isNotEmpty) {
+      videoId = lesson.video;
+      usePublicUrl = false;
+      isEncrypted = true;
     }
 
-    if (videoToDownload == null || videoToDownload.isEmpty) return;
+    if (videoId == null || videoId.isEmpty) return;
 
-    // Use global download service - download continues even if screen is disposed
+    if (_currentVideoName != videoId) {
+      _videoPlayerKey.currentState?.stopVideo();
+      if (!_isDisposed && mounted) {
+        setState(() {
+          localVideoPath = null;
+          videoUrl = null;
+          isCheckingFiles = true;
+          isDownloading = false;
+          isDecrypting = false;
+          downloadProgress = 0.0;
+          decryptionProgress = 0.0;
+        });
+      }
+      _currentVideoName = videoId;
+    }
+
     await _downloadService.checkAndDownloadVideo(
-      videoName: videoToCheck,
+      videoName: videoId,
       lessonId: widget.lessonId,
-      hasAccess: hasAccess,
-      isEncrypted: !usePublicUrl,
+      hasAccess: hasPaidAccess,
+      isEncrypted: isEncrypted,
       usePublicUrl: usePublicUrl,
-      videoKey: videoToDownload,
+      videoKey: videoId,
       autoStart: autoStart,
     );
   }
@@ -167,11 +186,35 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
     );
   }
 
+  void _handleVideoEnded() {
+    if (_isDisposed || !mounted) return;
+    if (hasAccess) return;
+    final lesson = _currentLesson;
+    final currentVideoName = _currentVideoName;
+    if (lesson == null || currentVideoName == null) return;
+    if (!lesson.isDemo) return;
+    final isTrailer = lesson.trailerVideo.isNotEmpty &&
+        currentVideoName == lesson.trailerVideo;
+    if (!isTrailer) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _showPurchaseDialog();
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     isCheckingFiles = true;
     context.read<LessonBloc>().add(GetLessonEvenet(id: widget.lessonId));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final prefsOperator = locator<PrefsOperator>();
+      if (prefsOperator.isLoggedIn()) {
+        locator<IknowAccessBloc>()
+            .add(FetchIknowAccessEvent(forceRefresh: true));
+      }
+    });
 
     // Check if there's an existing download for this lesson
     // This will be updated when we know the video name
@@ -206,6 +249,16 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
   Widget build(BuildContext context) {
     return MultiBlocListener(
       listeners: [
+        BlocListener<IknowAccessBloc, IknowAccessState>(
+          bloc: locator<IknowAccessBloc>(),
+          listener: (context, state) {
+            if (!mounted || _isDisposed) return;
+            if (state is IknowAccessCompleted) {
+              setState(() {});
+              _checkAndDownloadVideo('', autoStart: false);
+            }
+          },
+        ),
         BlocListener<LessonBloc, LessonState>(
           listener: (context, state) {
             debugPrint("LessonBloc state changed: $state");
@@ -251,25 +304,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
                 }
               }();
 
-              // Determine which video to use
-              final prefsOperator = locator<PrefsOperator>();
-              final isLoggedIn = prefsOperator.isLoggedIn();
-              String? videoToCheck;
-
-              if (isLoggedIn &&
-                  hasAccess &&
-                  state.lesson.video != null &&
-                  state.lesson.video!.isNotEmpty) {
-                videoToCheck = state.lesson.video;
-                debugPrint("Checking for purchased video: $videoToCheck");
-              } else {
-                videoToCheck = state.lesson.trailerVideo;
-                debugPrint("Checking for trailer video: $videoToCheck");
-              }
-
-              if (videoToCheck != null && videoToCheck.isNotEmpty) {
-                _checkAndDownloadVideo(videoToCheck, autoStart: false);
-              }
+              _checkAndDownloadVideo('', autoStart: false);
             } else if (state is LessonError) {
               debugPrint("LessonError: ${state.message}");
               if (mounted) {
@@ -507,12 +542,10 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
                 isDecrypting: currentIsDecrypting,
                 videoPlayerKey: _videoPlayerKey,
                 hasAccess: hasAccess,
-                onVideoEnded: () {},
+                onVideoEnded: _handleVideoEnded,
                 onShowPurchaseDialog: _showPurchaseDialog,
                 onDownload: () {
-                  if (_currentVideoName != null) {
-                    _checkAndDownloadVideo(_currentVideoName!, autoStart: true);
-                  }
+                  _checkAndDownloadVideo('', autoStart: true);
                 },
               ),
               VideoProgressBarWidget(

@@ -77,10 +77,7 @@ class VideoContainerWidget extends StatelessWidget {
       thumbnailUrl: thumbnailUrl,
       onVideoEnded: () {
         debugPrint('Video ended');
-        // If user hasn't purchased and this was a trailer video, show purchase dialog
-        if (!hasAccess && onShowPurchaseDialog != null) {
-          onShowPurchaseDialog!();
-        }
+        onVideoEnded();
       },
     );
   }

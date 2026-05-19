@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poortak/common/services/getImageUrl_service.dart';
@@ -7,7 +6,6 @@ import 'package:poortak/common/widgets/global_progress_bar.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/all_courses_progress_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/iknow_summary_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_home_model.dart';
-import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/iknow_access_bloc/iknow_access_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/lesson_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/widgets/dialog_cart.dart';
 
@@ -31,14 +29,7 @@ class ItemLeason extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Get IknowAccessBloc from context
-    final accessBloc = context.watch<IknowAccessBloc>();
-
-    // Check if user has access to this course
-    final hasAccess = accessBloc.hasCourseAccess(item.id);
-
-    // Use hasAccess instead of purchased
-    final isLocked = !hasAccess;
+    final isLocked = !purchased && !item.isDemo;
 
     double average = 0;
     if (progress != null) {
@@ -49,12 +40,12 @@ class ItemLeason extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         // If isDemo is true OR user has access, go directly to lesson screen
-        if (item.isDemo || hasAccess) {
+        if (item.isDemo || purchased) {
           Navigator.pushNamed(context, LessonScreen.routeName, arguments: {
             'index': index,
             'title': item.name,
             'lessonId': item.id,
-            'purchased': hasAccess, // Use hasAccess instead of purchased
+            'purchased': purchased,
           });
         } else {
           // If isDemo is false AND user doesn't have access, show add to cart modal

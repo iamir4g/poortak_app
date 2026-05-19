@@ -15,6 +15,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/featueres/feature_profile/presentation/bloc/profile_bloc.dart';
 import 'package:poortak/featueres/feature_profile/presentation/bloc/profile_event.dart';
 import 'package:poortak/featueres/feature_profile/presentation/bloc/profile_state.dart';
+import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/iknow_access_bloc/iknow_access_bloc.dart';
 import 'package:poortak/locator.dart';
 import 'package:smart_auth/smart_auth.dart';
 
@@ -494,6 +495,9 @@ class _LoginScreenState extends State<LoginScreen> {
             // referrerCode: state.data.data.result.user.referrerCode,
             // rate: state.data.data.result.user.rate,
           );
+          final accessBloc = locator<IknowAccessBloc>();
+          accessBloc.add(ClearIknowAccessEvent());
+          accessBloc.add(FetchIknowAccessEvent(forceRefresh: true));
 
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
