@@ -161,14 +161,14 @@ class _KavooshMainScreenState extends State<KavooshMainScreen> {
                     width: Dimens.nr(80.0),
                     height: Dimens.nr(80.0),
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.3),
+                      color: Colors.transparent,
                       borderRadius: BorderRadius.circular(Dimens.radiusLarge),
                     ),
                     child: Center(
                       child: Image.asset(
                         _getIconPathForTitle(title),
-                        width: Dimens.nr(60.0),
-                        height: Dimens.nr(60.0),
+                        width: Dimens.nr(100.0),
+                        height: Dimens.nr(120.0),
                         fit: BoxFit.contain,
                       ),
                     ),

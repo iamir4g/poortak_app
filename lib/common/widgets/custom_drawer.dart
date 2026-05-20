@@ -153,7 +153,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
         final statusBarHeight = MediaQuery.of(context).padding.top;
 
         return Drawer(
-          backgroundColor: Colors.transparent,
+          backgroundColor: backgroundColor,
           elevation: 0,
           child: Container(
             decoration: BoxDecoration(
@@ -259,7 +259,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                                                             borderRadius: BorderRadius
                                                                 .circular(Dimens
                                                                     .radiusCircle),
-                                                            color: Colors.red,
+                                                            // color: Colors.red,
                                                             image:
                                                                 const DecorationImage(
                                                               image: AssetImage(
@@ -282,7 +282,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                                                           : userFirstName ??
                                                               userLastName ??
                                                               "کاربر")
-                                                      : "وارد شوید",
+                                                      : "کاربر مهمان",
                                                   style: MyTextStyle
                                                       .textMatn14Bold
                                                       .copyWith(
@@ -375,6 +375,8 @@ class _CustomDrawerState extends State<CustomDrawer> {
                                   onChanged: (value) {
                                     context.read<ThemeCubit>().toggleTheme();
                                   },
+                                  activeTrackColor: MyColors.gray,
+                                  inactiveTrackColor: MyColors.gray,
                                   inactiveThumbColor: Colors.white,
                                   activeThumbColor: MyColors.primary,
                                   trackOutlineColor: WidgetStateProperty.all(

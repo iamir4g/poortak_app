@@ -68,8 +68,13 @@ class _DictionaryContentState extends State<_DictionaryContent> {
       listener: (context, state) {
         if (state is CreateWordSuccess) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('لغت به لایتنر اضافه شد'),
+            SnackBar(
+              content: Text(
+                'لغت به لایتنر اضافه شد',
+                style: MyTextStyle.textMatn12Bold.copyWith(
+                  color: MyColors.textLight,
+                ),
+              ),
               backgroundColor: MyColors.success,
               duration: Duration(seconds: 2),
             ),
@@ -78,7 +83,12 @@ class _DictionaryContentState extends State<_DictionaryContent> {
           final isWordExistsError = state.message == "این کلمه قبلا اضافه شده";
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(state.message),
+              content: Text(
+                state.message,
+                style: MyTextStyle.textMatn12Bold.copyWith(
+                  color: MyColors.textLight,
+                ),
+              ),
               backgroundColor:
                   isWordExistsError ? MyColors.warning : MyColors.error,
               duration: const Duration(seconds: 2),
@@ -112,7 +122,9 @@ class _DictionaryContentState extends State<_DictionaryContent> {
                 const SizedBox(height: 16),
                 Text(
                   'دیکشنری',
-                  style: MyTextStyle.textHeader16Bold.copyWith(fontSize: 18),
+                  style: MyTextStyle.textHeader16Bold.copyWith(
+                    fontSize: 18,
+                  ),
                 ),
                 const SizedBox(height: 20),
                 Padding(
@@ -128,6 +140,13 @@ class _DictionaryContentState extends State<_DictionaryContent> {
                       onChanged: _onSearchChanged,
                       textAlign: TextAlign.right,
                       textDirection: TextDirection.ltr,
+                      style: MyTextStyle.textMatn14Bold.copyWith(
+                        fontWeight: FontWeight.normal,
+                        color: MyColors.textMatn1,
+                        height: 1.0,
+                        letterSpacing: 0.0,
+                      ),
+                      cursorColor: MyColors.primary,
                       decoration: InputDecoration(
                         hintText: 'جستجوی معنی کلمه',
                         hintStyle: MyTextStyle.textMatn14Bold.copyWith(
@@ -188,7 +207,11 @@ class _DictionaryContentState extends State<_DictionaryContent> {
                                         alignment: WrapAlignment.end,
                                         children: entry.relatedWords
                                             .map((w) => ActionChip(
-                                                label: Text(w),
+                                                label: Text(
+                                                  w,
+                                                  style: MyTextStyle
+                                                      .textMatn12W300,
+                                                ),
                                                 onPressed: () {
                                                   _controller.text = w;
                                                   _onSearchChanged(w);
@@ -365,7 +388,13 @@ class _DictionaryContentState extends State<_DictionaryContent> {
               return Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('• '),
+                  Text(
+                    '• ',
+                    style: MyTextStyle.textMatn16.copyWith(
+                      height: 1.0,
+                      letterSpacing: 0.0,
+                    ),
+                  ),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

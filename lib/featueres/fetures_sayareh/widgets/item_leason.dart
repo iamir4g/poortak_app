@@ -3,6 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poortak/common/services/getImageUrl_service.dart';
 import 'package:poortak/common/widgets/global_progress_bar.dart';
+import 'package:poortak/config/myColors.dart';
+import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/all_courses_progress_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/iknow_summary_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_home_model.dart';
@@ -105,14 +107,18 @@ class ItemLeason extends StatelessWidget {
                     children: [
                       Text(
                         item.name,
-                        style: Theme.of(context).textTheme.titleSmall,
+                        style: MyTextStyle.textMatn17W700.copyWith(
+                          color: MyColors.text2,
+                          height: 1.0,
+                          letterSpacing: 0.0,
+                        ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                       SizedBox(height: 6.h),
                       Text(
                         item.description,
-                        style: Theme.of(context).textTheme.labelMedium,
+                        style: MyTextStyle.text10MediumText6,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),

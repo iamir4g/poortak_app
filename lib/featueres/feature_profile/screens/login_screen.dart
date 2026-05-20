@@ -155,8 +155,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
                       // Logo section
                       Center(
-                        child: Image.asset(
-                          'assets/images/poortakLogo.png',
+                        child: SvgPicture.asset(
+                          'assets/images/poortak_logo.svg',
                           height: 102.h,
                           width: 153.w,
                           fit: BoxFit.contain,

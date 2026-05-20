@@ -89,6 +89,14 @@ class MyTextStyle {
         fontWeight: FontWeight.normal,
         color: MyColors.textMatn1,
       );
+  static TextStyle get text10MediumText6 => TextStyle(
+        fontFamily: "IranSans",
+        fontSize: 10.sp,
+        fontWeight: FontWeight.w500,
+        color: MyColors.text6,
+        height: 1.5,
+        letterSpacing: 1.0,
+      );
   static TextStyle get textMatn15 => TextStyle(
         fontFamily: "IranSans",
         fontSize: 15.sp,

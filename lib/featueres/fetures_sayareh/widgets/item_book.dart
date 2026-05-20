@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/common/services/getImageUrl_service.dart';
 import 'package:poortak/config/myColors.dart';
+import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/book_detail_screen.dart';
 
 class ItemBook extends StatelessWidget {
@@ -64,10 +65,10 @@ class ItemBook extends StatelessWidget {
                   children: [
                     Text(
                       title ?? 'بدون عنوان',
-                      style: TextStyle(
-                        color: Theme.of(context).textTheme.titleMedium?.color,
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w600,
+                      style: MyTextStyle.textMatn17W700.copyWith(
+                        color: MyColors.text2,
+                        height: 1.0,
+                        letterSpacing: 0.0,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -76,10 +77,7 @@ class ItemBook extends StatelessWidget {
                       SizedBox(height: 4.h),
                       Text(
                         description!,
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontSize: 12.sp,
-                        ),
+                        style: MyTextStyle.text10MediumText6,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
