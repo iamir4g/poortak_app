@@ -31,6 +31,7 @@ class MyColors {
   // Background Colors
   static const Color background = Color(0xFFFFFFFF); // White
   static const Color lightDarkBackground = Color(0xFF121212); // Dark background
+  static const Color modalHeaderBackground = Color(0xFFF3F4F7);
   // Text Colors
   static const Color textBase = Color(0xFF14181F);
   static const Color text1 = Color(0xFF29303D);

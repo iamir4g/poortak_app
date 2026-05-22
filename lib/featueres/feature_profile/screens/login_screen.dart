@@ -4,9 +4,11 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:poortak/common/utils/svg_embedded_png.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poortak/common/widgets/main_wrapper.dart';
 import 'package:poortak/common/services/auth_navigation_manager.dart';
+import 'package:poortak/common/utils/digit_utils.dart';
 import 'package:poortak/featueres/feature_profile/widgets/terms_conditions_modal.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/config/myColors.dart';
@@ -35,6 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
   String? mobileNumber;
   final FocusNode _mobileFocusNode = FocusNode();
   final FocusNode _otpFocusNode = FocusNode();
+  late final Future<Uint8List?> _logoBytesFuture;
 
   // Timer variables
   Timer? _timer;
@@ -44,6 +47,8 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
+    _logoBytesFuture =
+        loadEmbeddedPngBytesFromSvgAsset('assets/images/poortak_logo.svg');
     _getAppSignature();
   }
 
@@ -51,6 +56,7 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       final res = await SmartAuth.instance.getAppSignature();
       log("📱 App Signature for SMS Retriever: ${res.data}");
+    } catch (e) {
     } catch (e) {
       log("Error getting app signature: $e");
     }
@@ -64,14 +70,14 @@ class _LoginScreenState extends State<LoginScreen> {
         final code = res.data?.code;
         if (code != null) {
           setState(() {
-            _otpController.text = code;
+            _otpController.text = toPersianDigits(code);
           });
           // Optional: Auto submit
           if (mobileNumber != null) {
             context.read<ProfileBloc>().add(
                   LoginWithOtpEvent(
                     mobile: mobileNumber!,
-                    otp: code,
+                    otp: normalizeOtpForServer(code),
                   ),
                 );
           }
@@ -155,11 +161,24 @@ class _LoginScreenState extends State<LoginScreen> {
 
                       // Logo section
                       Center(
-                        child: SvgPicture.asset(
-                          'assets/images/poortak_logo.svg',
-                          height: 102.h,
-                          width: 153.w,
-                          fit: BoxFit.contain,
+                        child: FutureBuilder<Uint8List?>(
+                          future: _logoBytesFuture,
+                          builder: (context, snapshot) {
+                            final bytes = snapshot.data;
+                            if (bytes == null) {
+                              return SizedBox(
+                                height: 102.h,
+                                width: 153.w,
+                              );
+                            }
+                            return Image.memory(
+                              bytes,
+                              height: 102.h,
+                              width: 153.w,
+                              fit: BoxFit.contain,
+                              filterQuality: FilterQuality.high,
+                            );
+                          },
                         ),
                       ),
 
@@ -409,8 +428,7 @@ class _LoginScreenState extends State<LoginScreen> {
               keyboardType: TextInputType.number,
               textAlign: TextAlign.center,
               inputFormatters: [
-                FilteringTextInputFormatter.digitsOnly,
-                LengthLimitingTextInputFormatter(4),
+                PersianOtpTextInputFormatter(maxLength: 4),
               ],
               onChanged: (value) {
                 // Close keyboard when OTP is complete (4 digits)
@@ -452,7 +470,13 @@ class _LoginScreenState extends State<LoginScreen> {
           log(state.message);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(state.message),
+              content: Text(
+                state.message,
+                style: MyTextStyle.textMatn13.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
               backgroundColor: MyColors.error,
               duration: const Duration(seconds: 2),
             ),
@@ -462,7 +486,13 @@ class _LoginScreenState extends State<LoginScreen> {
           log(state.message);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(state.message),
+              content: Text(
+                state.message,
+                style: MyTextStyle.textMatn13.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
               backgroundColor: MyColors.error,
               duration: const Duration(seconds: 2),
             ),
@@ -502,7 +532,13 @@ class _LoginScreenState extends State<LoginScreen> {
 
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('ورود با موفقیت انجام شد'),
+              content: Text(
+                'ورود با موفقیت انجام شد',
+                style: MyTextStyle.textMatn13.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
               backgroundColor: MyColors.success,
               duration: const Duration(seconds: 2),
             ),
@@ -555,7 +591,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     context.read<ProfileBloc>().add(
                           LoginWithOtpEvent(
                             mobile: mobileNumber!,
-                            otp: _otpController.text,
+                            otp: normalizeOtpForServer(_otpController.text),
                           ),
                         );
                   }
@@ -570,8 +606,13 @@ class _LoginScreenState extends State<LoginScreen> {
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content:
-                            const Text('لطفا شماره موبایل معتبر وارد کنید'),
+                        content: Text(
+                          'لطفا شماره موبایل معتبر وارد کنید',
+                          style: MyTextStyle.textMatn13.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
                         backgroundColor: MyColors.warning,
                         duration: const Duration(seconds: 2),
                       ),

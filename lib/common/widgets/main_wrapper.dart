@@ -13,6 +13,7 @@ import 'package:poortak/common/widgets/logout_confirmation_modal.dart';
 import 'package:poortak/common/widgets/exit_confirmation_modal.dart';
 import 'package:poortak/common/services/auth_navigation_manager.dart';
 import 'package:poortak/config/myColors.dart';
+import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/kavoosh_main_screen.dart';
 import 'package:poortak/featueres/feature_litner/screens/litner_main_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/profile_screen.dart';
@@ -380,10 +381,11 @@ class _MainWrapperState extends State<MainWrapper> {
                                     value: 'logout',
                                     child: Text(
                                       'خروج از ناحیه کاربری',
-                                      style: TextStyle(
+                                      style: MyTextStyle.textMatn13.copyWith(
                                         color: themeState.isDark
                                             ? MyColors.darkTextPrimary
                                             : MyColors.textMatn1,
+                                        fontWeight: FontWeight.w500,
                                       ),
                                     ),
                                   ),

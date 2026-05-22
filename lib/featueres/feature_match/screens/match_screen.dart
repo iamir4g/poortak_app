@@ -1,11 +1,13 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/common/utils/svg_embedded_png.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
-import 'package:poortak/common/widgets/reusable_modal.dart';
 import 'package:poortak/featueres/feature_match/presentation/bloc/match_bloc/match_bloc.dart';
 import 'package:poortak/featueres/feature_match/data/models/match_model.dart';
+import 'package:poortak/featueres/feature_match/screens/prize_screen.dart';
 import 'dart:async';
 
 class MatchScreen extends StatefulWidget {
@@ -19,6 +21,7 @@ class MatchScreen extends StatefulWidget {
 class _MatchScreenState extends State<MatchScreen> {
   final TextEditingController _answerController = TextEditingController();
   Timer? _countdownTimer;
+  late final Future<Uint8List?> _avatarBytesFuture;
 
   // Countdown values
   int daysRemaining = 0;
@@ -28,6 +31,8 @@ class _MatchScreenState extends State<MatchScreen> {
   @override
   void initState() {
     super.initState();
+    _avatarBytesFuture = loadEmbeddedPngBytesFromSvgAsset(
+        'assets/images/match/match_avatar.svg');
     // Fetch match data when screen loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
@@ -338,10 +343,18 @@ class _MatchScreenState extends State<MatchScreen> {
             height: 60.h,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10.r),
-              image: const DecorationImage(
-                image: AssetImage('assets/images/match/match_avatar.png'),
-                fit: BoxFit.contain,
-              ),
+            ),
+            child: FutureBuilder<Uint8List?>(
+              future: _avatarBytesFuture,
+              builder: (context, snapshot) {
+                final bytes = snapshot.data;
+                if (bytes == null) return const SizedBox.shrink();
+                return Image.memory(
+                  bytes,
+                  fit: BoxFit.contain,
+                  filterQuality: FilterQuality.high,
+                );
+              },
             ),
           ),
         ),
@@ -582,20 +595,133 @@ class _MatchScreenState extends State<MatchScreen> {
   }
 
   void _showSuccessModal(bool isCorrect) {
-    ReusableModal.showSuccess(
+    showDialog<void>(
       context: context,
-      title: 'پاسخ شما با موفقیت ارسال شد.',
-      message: '',
-      buttonText: 'مشاهده جوایز مسابقه',
-      secondButtonText: 'بستن',
-      showSecondButton: true,
-      onButtonPressed: () {
-        Navigator.of(context).pop(); // Close modal
-        // Navigate to prizes screen
-        // Navigator.pushNamed(context, '/prize_screen');
-      },
-      onSecondButtonPressed: () {
-        Navigator.of(context).pop(); // Close modal
+      barrierDismissible: true,
+      builder: (dialogContext) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: EdgeInsets.symmetric(horizontal: 24.w),
+          child: Container(
+            width: double.infinity,
+            constraints: BoxConstraints(maxWidth: 360.w),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20.r),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: double.infinity,
+                  color: MyColors.modalHeaderBackground,
+                  child: Stack(
+                    children: [
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: IconButton(
+                          onPressed: () => Navigator.of(dialogContext).pop(),
+                          icon: Icon(
+                            Icons.close,
+                            size: 22.r,
+                            color: MyColors.text2,
+                          ),
+                        ),
+                      ),
+                      Center(
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 16.w,
+                            vertical: 24.h,
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                width: 64.r,
+                                height: 64.r,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: MyColors.success,
+                                    width: 3.r,
+                                  ),
+                                ),
+                                child: Center(
+                                  child: Icon(
+                                    Icons.check,
+                                    size: 34.r,
+                                    color: MyColors.success,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 16.h),
+                              Text(
+                                'پاسخ شما با موفقیت ارسال شد.',
+                                textAlign: TextAlign.center,
+                                style: MyTextStyle.textCenter16.copyWith(
+                                  fontFamily: 'IRANSans',
+                                  fontWeight: FontWeight.w500,
+                                  color: MyColors.text2,
+                                  height: 1.0,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.of(dialogContext).pop();
+                      Navigator.pushNamed(
+                        context,
+                        MatchPrizeScreen.routeName,
+                      );
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.symmetric(vertical: 18.h),
+                      alignment: Alignment.center,
+                      child: Text(
+                        'مشاهده جوایز مسابقه',
+                        textAlign: TextAlign.center,
+                        style: MyTextStyle.modalAction16MediumBlue,
+                      ),
+                    ),
+                  ),
+                ),
+                Divider(height: 1.h, thickness: 1.h, color: MyColors.gray),
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () => Navigator.of(dialogContext).pop(),
+                    child: Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.symmetric(vertical: 18.h),
+                      alignment: Alignment.center,
+                      child: Text(
+                        'بستن',
+                        textAlign: TextAlign.center,
+                        style: MyTextStyle.modalAction16MediumOnDark.copyWith(
+                          color: MyColors.activeTabBackground,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
       },
     );
   }

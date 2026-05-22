@@ -141,12 +141,7 @@ class _SayarehScreenState extends State<SayarehScreen> {
                           ),
                           Text(
                             l10n?.sayareh ?? "",
-                            style: MyTextStyle.textMatn12W700.copyWith(
-                              color: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium
-                                  ?.color,
-                            ),
+                            style: MyTextStyle.sayarehHeader12Bold,
                           ),
                           SizedBox(
                             height: 8.h,
@@ -224,13 +219,10 @@ class _SayarehScreenState extends State<SayarehScreen> {
                         ),
                         Text(
                           "کتاب های سیاره آی نو",
-                          style: MyTextStyle.textMatn12W700.copyWith(
-                            color:
-                                Theme.of(context).textTheme.titleMedium?.color,
-                          ),
+                          style: MyTextStyle.sayarehHeader12Bold,
                         ),
                         SizedBox(
-                          height: 12.h,
+                          height: 8.h,
                         ),
                         if (sayarehDataCompleted.bookListData.data != null &&
                             sayarehDataCompleted.bookListData.data!.isNotEmpty)

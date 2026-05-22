@@ -39,7 +39,7 @@ class ItemBook extends StatelessWidget {
         },
         child: Container(
           width: double.infinity,
-          margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+          margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
           padding: EdgeInsets.all(16.r),
           decoration: BoxDecoration(
             color: MyColors.background, //Theme.of(context).cardColor,
