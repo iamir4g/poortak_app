@@ -28,6 +28,7 @@ class ItemBook extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -42,7 +43,7 @@ class ItemBook extends StatelessWidget {
           margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
           padding: EdgeInsets.all(16.r),
           decoration: BoxDecoration(
-            color: MyColors.background, //Theme.of(context).cardColor,
+            color: Theme.of(context).cardColor,
             borderRadius: BorderRadius.circular(20.r),
             boxShadow: [
               BoxShadow(
@@ -66,7 +67,8 @@ class ItemBook extends StatelessWidget {
                     Text(
                       title ?? 'بدون عنوان',
                       style: MyTextStyle.textMatn17W700.copyWith(
-                        color: MyColors.text2,
+                        color:
+                            isDark ? const Color(0xFFFFFFFF) : MyColors.text2,
                         height: 1.0,
                         letterSpacing: 0.0,
                       ),
@@ -77,7 +79,11 @@ class ItemBook extends StatelessWidget {
                       SizedBox(height: 4.h),
                       Text(
                         description!,
-                        style: MyTextStyle.text10MediumText6,
+                        style: MyTextStyle.text10MediumText6.copyWith(
+                          color: isDark
+                              ? const Color(0xFF838697)
+                              : MyTextStyle.text10MediumText6.color,
+                        ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),

@@ -31,6 +31,7 @@ class ItemLeason extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final isLocked = !purchased && !item.isDemo;
 
     double average = 0;
@@ -108,7 +109,8 @@ class ItemLeason extends StatelessWidget {
                       Text(
                         item.name,
                         style: MyTextStyle.textMatn17W700.copyWith(
-                          color: MyColors.text2,
+                          color:
+                              isDark ? const Color(0xFFFFFFFF) : MyColors.text2,
                           height: 1.0,
                           letterSpacing: 0.0,
                         ),
@@ -118,7 +120,11 @@ class ItemLeason extends StatelessWidget {
                       SizedBox(height: 6.h),
                       Text(
                         item.description,
-                        style: MyTextStyle.text10MediumText6,
+                        style: MyTextStyle.text10MediumText6.copyWith(
+                          color: isDark
+                              ? const Color(0xFF838697)
+                              : MyTextStyle.text10MediumText6.color,
+                        ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -157,9 +163,11 @@ class ItemLeason extends StatelessWidget {
                   width: 32.r,
                   height: 32.r,
                   colorFilter: ColorFilter.mode(
-                    Theme.of(context).textTheme.titleMedium?.color ??
-                        Theme.of(context).iconTheme.color ??
-                        Colors.black,
+                    isDark
+                        ? const Color(0xFFFFFFFF)
+                        : Theme.of(context).textTheme.titleMedium?.color ??
+                            Theme.of(context).iconTheme.color ??
+                            Colors.black,
                     BlendMode.srcIn,
                   ),
                 ),

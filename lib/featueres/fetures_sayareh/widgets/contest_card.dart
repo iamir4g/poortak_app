@@ -1,10 +1,9 @@
-import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:poortak/common/utils/svg_embedded_png.dart';
 import 'package:poortak/config/myColors.dart';
 
 class ContestCard extends StatelessWidget {
@@ -17,6 +16,7 @@ class ContestCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -27,7 +27,7 @@ class ContestCard extends StatelessWidget {
           margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
           padding: EdgeInsets.all(16.r),
           decoration: BoxDecoration(
-            gradient: MyColors.contestCardGradient,
+            color: Theme.of(context).cardColor,
             borderRadius: BorderRadius.circular(20.r),
             boxShadow: [
               BoxShadow(
@@ -51,7 +51,9 @@ class ContestCard extends StatelessWidget {
                     Text(
                       'مسابقه پورتک',
                       style: TextStyle(
-                        color: Theme.of(context).textTheme.titleMedium?.color,
+                        color: isDark
+                            ? const Color(0xFFFFFFFF)
+                            : Theme.of(context).textTheme.titleMedium?.color,
                         fontSize: 16.sp,
                         fontWeight: FontWeight.w600,
                       ),
@@ -62,7 +64,9 @@ class ContestCard extends StatelessWidget {
                     Text(
                       'در مسابقه ماهانه پورتک شرکت کنید و جایزه ببرید.',
                       style: TextStyle(
-                        color: Theme.of(context).textTheme.bodySmall?.color,
+                        color: isDark
+                            ? const Color(0xFF838697)
+                            : Theme.of(context).textTheme.bodySmall?.color,
                         fontSize: 12.sp,
                       ),
                       maxLines: 2,
@@ -76,7 +80,7 @@ class ContestCard extends StatelessWidget {
                 width: 70.r,
                 height: 70.r,
                 decoration: BoxDecoration(
-                  color: MyColors.background,
+                  color: isDark ? const Color(0xFF11131C) : MyColors.background,
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
@@ -114,7 +118,7 @@ class _GiftBoxAsset extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<Uint8List?>(
-      future: _tryExtractEmbeddedPngFromSvg(),
+      future: loadEmbeddedPngBytesFromSvgAsset(_assetPath),
       builder: (context, snapshot) {
         final bytes = snapshot.data;
         if (bytes != null && bytes.isNotEmpty) {
@@ -135,13 +139,5 @@ class _GiftBoxAsset extends StatelessWidget {
         );
       },
     );
-  }
-
-  Future<Uint8List?> _tryExtractEmbeddedPngFromSvg() async {
-    final svg = await rootBundle.loadString(_assetPath);
-    final match = RegExp(r'data:image\/png;base64,([^"]+)').firstMatch(svg);
-    final base64Data = match?.group(1);
-    if (base64Data == null || base64Data.isEmpty) return null;
-    return base64Decode(base64Data);
   }
 }

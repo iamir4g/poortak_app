@@ -41,6 +41,7 @@ class _SayarehScreenState extends State<SayarehScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context);
     return MultiBlocProvider(
       providers: [
@@ -116,9 +117,9 @@ class _SayarehScreenState extends State<SayarehScreen> {
                               begin: Alignment.topCenter,
                               end: Alignment.bottomCenter,
                               colors: [
-                                Color(0xFF1A1D2E),
-                                Color(0xFF2C2E3F),
-                                Color(0xFF3B3D54),
+                                Color(0xFF171926),
+                                Color(0xFF212332),
+                                Color(0xFF171926),
                               ],
                               stops: [0.1, 0.54, 1.0],
                             )
@@ -141,7 +142,11 @@ class _SayarehScreenState extends State<SayarehScreen> {
                           ),
                           Text(
                             l10n?.sayareh ?? "",
-                            style: MyTextStyle.sayarehHeader12Bold,
+                            style: MyTextStyle.sayarehHeader12Bold.copyWith(
+                              color: isDark
+                                  ? const Color(0xFFFFFFFF)
+                                  : MyTextStyle.sayarehHeader12Bold.color,
+                            ),
                           ),
                           SizedBox(
                             height: 8.h,
@@ -191,16 +196,9 @@ class _SayarehScreenState extends State<SayarehScreen> {
                     width: double.infinity,
                     padding: EdgeInsets.symmetric(horizontal: 8.w),
                     decoration: BoxDecoration(
-                      gradient: Theme.of(context).brightness == Brightness.dark
-                          ? LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                Color(0xFF2C2E3F), // Dark card background
-                                Color(0xFF3B3D54), // Darker card background
-                              ],
-                              stops: [0.0, 1.0],
-                            )
+                      color: isDark ? const Color(0xFF11131C) : null,
+                      gradient: isDark
+                          ? null
                           : LinearGradient(
                               begin: Alignment.topCenter,
                               end: Alignment.bottomCenter,
@@ -219,7 +217,11 @@ class _SayarehScreenState extends State<SayarehScreen> {
                         ),
                         Text(
                           "کتاب های سیاره آی نو",
-                          style: MyTextStyle.sayarehHeader12Bold,
+                          style: MyTextStyle.sayarehHeader12Bold.copyWith(
+                            color: isDark
+                                ? const Color(0xFFFFFFFF)
+                                : MyTextStyle.sayarehHeader12Bold.color,
+                          ),
                         ),
                         SizedBox(
                           height: 8.h,
@@ -311,9 +313,9 @@ class _SayarehScreenState extends State<SayarehScreen> {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          Color(0xFF1A1D2E),
-                          Color(0xFF2C2E3F),
-                          Color(0xFF3B3D54),
+                          Color(0xFF171926),
+                          Color(0xFF212332),
+                          Color(0xFF171926),
                         ],
                         stops: [0.1, 0.54, 1.0],
                       )
