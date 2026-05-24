@@ -6,6 +6,7 @@ import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/iknow_access
 import 'package:poortak/featueres/fetures_sayareh/widgets/item_leason.dart';
 import 'package:poortak/l10n/app_localizations.dart';
 import 'package:poortak/common/widgets/dot_loading_widget.dart';
+import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/sayareh_bloc/sayareh_cubit.dart';
 import 'package:poortak/featueres/feature_match/screens/main_match_screen.dart';
@@ -159,7 +160,7 @@ class _SayarehScreenState extends State<SayarehScreen> {
                             physics: const NeverScrollableScrollPhysics(),
                             itemCount: sayarehDataCompleted.data.data.length,
                             separatorBuilder: (context, index) {
-                              return SizedBox(height: 1.h);
+                              return SizedBox(height: Dimens.nh(13.0));
                             },
                             itemBuilder: (context, index) {
                               final item =
@@ -194,7 +195,7 @@ class _SayarehScreenState extends State<SayarehScreen> {
                   ),
                   Container(
                     width: double.infinity,
-                    padding: EdgeInsets.symmetric(horizontal: 8.w),
+                    padding: EdgeInsets.zero,
                     decoration: BoxDecoration(
                       color: isDark ? const Color(0xFF11131C) : null,
                       gradient: isDark
@@ -235,7 +236,7 @@ class _SayarehScreenState extends State<SayarehScreen> {
                             itemCount:
                                 sayarehDataCompleted.bookListData.data!.length,
                             separatorBuilder: (context, index) {
-                              return SizedBox(height: 4.h);
+                              return SizedBox(height: Dimens.nh(13.0));
                             },
                             itemBuilder: (context, index) {
                               return ItemBook(

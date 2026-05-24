@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/common/services/getImageUrl_service.dart';
+import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/book_detail_screen.dart';
@@ -40,7 +41,9 @@ class ItemBook extends StatelessWidget {
         },
         child: Container(
           width: double.infinity,
-          margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
+          margin: EdgeInsets.symmetric(
+            horizontal: Dimens.medium,
+          ),
           padding: EdgeInsets.all(16.r),
           decoration: BoxDecoration(
             color: Theme.of(context).cardColor,

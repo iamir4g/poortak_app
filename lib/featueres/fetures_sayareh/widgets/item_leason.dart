@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poortak/common/services/getImageUrl_service.dart';
 import 'package:poortak/common/widgets/global_progress_bar.dart';
+import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/all_courses_progress_model.dart';
@@ -61,7 +62,7 @@ class ItemLeason extends StatelessWidget {
       },
       child: Container(
         width: double.infinity,
-        margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 2.h),
+        margin: EdgeInsets.symmetric(horizontal: Dimens.medium),
         padding: EdgeInsets.all(16.r),
         decoration: BoxDecoration(
           color: Theme.of(context).cardColor,

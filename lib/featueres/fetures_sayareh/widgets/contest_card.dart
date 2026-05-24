@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poortak/common/utils/svg_embedded_png.dart';
+import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 
 class ContestCard extends StatelessWidget {
@@ -24,7 +25,10 @@ class ContestCard extends StatelessWidget {
         onTap: onTap,
         child: Container(
           width: double.infinity,
-          margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+          margin: EdgeInsets.symmetric(
+            horizontal: Dimens.medium,
+            vertical: Dimens.nh(8),
+          ),
           padding: EdgeInsets.all(16.r),
           decoration: BoxDecoration(
             color: Theme.of(context).cardColor,
