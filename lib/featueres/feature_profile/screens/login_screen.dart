@@ -230,14 +230,30 @@ class _LoginScreenState extends State<LoginScreen> {
                         SizedBox(height: 8.h),
                         // Timer display or resend button
                         if (!_canResend)
-                          Text(
-                            "ارسال مجدد کد:${_formatTime(_remainingSeconds)}",
-                            style: MyTextStyle.textMatn13.copyWith(
-                              color: loginTheme.actionTextColor,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14.sp,
-                            ),
+                          RichText(
                             textAlign: TextAlign.center,
+                            text: TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: "ارسال مجدد کد:",
+                                  style: MyTextStyle.textMatn13.copyWith(
+                                    color: loginTheme.actionTextColor,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14.sp,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: _formatTime(_remainingSeconds),
+                                  style: MyTextStyle.textMatn13.copyWith(
+                                    color: theme.brightness == Brightness.dark
+                                        ? MyColors.primary
+                                        : loginTheme.actionTextColor,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14.sp,
+                                  ),
+                                ),
+                              ],
+                            ),
                           )
                         else
                           Builder(
@@ -451,14 +467,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 fontSize: 18.sp,
                 color: loginTheme.inputTextColor,
                 letterSpacing: 2.w,
-                fontFamily: 'monospace',
               ),
               decoration: InputDecoration(
                 hintText: "----",
                 hintStyle: MyTextStyle.textMatn13.copyWith(
                   color: MyColors.text4,
                   letterSpacing: 4.w,
-                  fontFamily: 'monospace',
                 ),
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.symmetric(

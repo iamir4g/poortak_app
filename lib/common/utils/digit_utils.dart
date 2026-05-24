@@ -44,6 +44,16 @@ String normalizeOtpForServer(String input, {int maxLength = 4}) {
   return digits.length <= maxLength ? digits : digits.substring(0, maxLength);
 }
 
+String formatTomanAmount(String amount) {
+  try {
+    final numAmount = double.parse(toEnglishDigits(amount));
+    final formattedAmount = numAmount.toStringAsFixed(0);
+    return '${toPersianDigits(formattedAmount)} تومان';
+  } catch (_) {
+    return '${toPersianDigits(amount)} تومان';
+  }
+}
+
 class PersianOtpTextInputFormatter extends TextInputFormatter {
   final int maxLength;
 

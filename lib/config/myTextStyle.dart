@@ -233,4 +233,24 @@ class MyTextStyle {
         color: MyColors.text3,
         height: 1.0,
       );
+
+  static TextStyle get paymentHistoryLabel14Light => TextStyle(
+        fontFamily: "IRANSans",
+        fontSize: 14.sp,
+        fontWeight: FontWeight.w300,
+        fontStyle: FontStyle.normal,
+        height: 1.0,
+        letterSpacing: 0.0,
+        color: MyColors.textMatn1,
+      );
+
+  static TextStyle get paymentHistoryValue14Medium => TextStyle(
+        fontFamily: "IRANSans",
+        fontSize: 14.sp,
+        fontWeight: FontWeight.w500,
+        fontStyle: FontStyle.normal,
+        height: 1.0,
+        letterSpacing: 0.0,
+        color: MyColors.textMatn1,
+      );
 }

@@ -112,7 +112,7 @@ class _FavoritScreenState extends State<FavoritScreen> {
             angle: 0.025, // تقریباً 1.435 درجه
             child: SizedBox(
               width: 110.7.w,
-              height: 212.8.h,
+              height: 200.8.h,
               child: Image.asset(
                 'assets/images/favorit/Delivery_Final.png',
                 fit: BoxFit.contain,
@@ -120,7 +120,7 @@ class _FavoritScreenState extends State<FavoritScreen> {
             ),
           ),
 
-          SizedBox(height: 58.h),
+          SizedBox(height: 8.h),
 
           // Empty State Text
           Text(

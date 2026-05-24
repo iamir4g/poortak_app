@@ -115,6 +115,22 @@ class MyColors {
   static const Color loginButtonText = Color(0xFF171926);
   static const Color termsBackgroundDark = Color(0xFF282A39);
 
+  // Profile (Dark Mode)
+  static const Color profileBackgroundDark = Color(0xFF171926);
+  static const Color profileHeaderDark = Color(0xFF212332);
+  static const Color profileTextPrimaryDark = loginTextPrimaryDark;
+  static const Color profileAvatarBorderDark = Color(0xFF3A3C45);
+
+  // Payment History
+  static const Color paymentHistoryScreenHeaderDark =
+      darkBackgroundSecondary; // #2C2E3F
+  static const Color paymentHistoryCardDark = termsBackgroundDark; // #282A39
+  static const Color paymentHistoryCardHeaderDark = Color(0xFF323548);
+  static const Color paymentHistoryCardHeaderLight = Color(0xFFF9F9F9);
+  static const Color paymentHistoryHeaderTitleLight = Color(0xFF29303D);
+  static const Color paymentHistoryDetailValueLight = Color(0xFF494E6A);
+  static const Color paymentHistoryDetailLabelLight = Color(0xFF717483);
+
   // Progress Bar Colors
   static const Color progressBarColor = Color(0xFF5E85F2);
   static const Color progressBarBackground = Color(0xFFE0E0E0);

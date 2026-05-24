@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/common/utils/date_util.dart';
+import 'package:poortak/common/utils/digit_utils.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_profile/presentation/bloc/payment_history_bloc/payment_history_bloc.dart';
@@ -39,8 +41,10 @@ class _PaymentHistoryScreenState extends State<PaymentHistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: MyColors.background3,
+      backgroundColor:
+          isDark ? MyColors.profileBackgroundDark : MyColors.background3,
       body: SafeArea(
         child: Column(
           children: [
@@ -50,7 +54,9 @@ class _PaymentHistoryScreenState extends State<PaymentHistoryScreen> {
               width: double.infinity,
               padding: EdgeInsets.symmetric(horizontal: 16.w),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: isDark
+                    ? MyColors.paymentHistoryScreenHeaderDark
+                    : Colors.white,
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(33.5.r),
                 ),
@@ -69,7 +75,9 @@ class _PaymentHistoryScreenState extends State<PaymentHistoryScreen> {
                   Text(
                     'تاریخچه خرید',
                     style: MyTextStyle.textHeader16Bold.copyWith(
-                      color: MyColors.textMatn1,
+                      color: isDark
+                          ? MyColors.profileTextPrimaryDark
+                          : MyColors.textMatn1,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -83,7 +91,9 @@ class _PaymentHistoryScreenState extends State<PaymentHistoryScreen> {
                       onPressed: () => Navigator.of(context).pop(),
                       icon: Icon(
                         Icons.arrow_forward,
-                        color: MyColors.textMatn1,
+                        color: isDark
+                            ? MyColors.profileTextPrimaryDark
+                            : MyColors.textMatn1,
                         size: 20.r,
                       ),
                     ),
@@ -140,7 +150,9 @@ class _PaymentHistoryScreenState extends State<PaymentHistoryScreen> {
           Text(
             message,
             style: MyTextStyle.textMatn16.copyWith(
-              color: MyColors.textMatn1,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? MyColors.profileTextPrimaryDark
+                  : MyColors.textMatn1,
             ),
             textAlign: TextAlign.center,
           ),
@@ -174,7 +186,7 @@ class _PaymentHistoryScreenState extends State<PaymentHistoryScreen> {
                 fit: BoxFit.contain,
               ),
             ),
-            SizedBox(height: 32.h),
+            SizedBox(height: 10.h),
             // Empty state text
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 20.w),
@@ -182,7 +194,9 @@ class _PaymentHistoryScreenState extends State<PaymentHistoryScreen> {
                 message ?? 'هنوز خریدی انجام نشده!',
                 style: MyTextStyle.textMatn16.copyWith(
                   fontWeight: FontWeight.w300,
-                  color: MyColors.textMatn1,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? MyColors.profileTextPrimaryDark
+                      : MyColors.textMatn1,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -253,16 +267,18 @@ class _PaymentHistoryScreenState extends State<PaymentHistoryScreen> {
             Text(
               'جزئیات تراکنش',
               style: MyTextStyle.textMatn18Bold.copyWith(
-                color: MyColors.textMatn1,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? MyColors.profileTextPrimaryDark
+                    : MyColors.textMatn1,
               ),
             ),
             SizedBox(height: 16.h),
             Text('کد پیگیری: ${payment.trackingCode ?? 'نامشخص'}'),
             Text('وضعیت: ${_getStatusText(payment.status)}'),
             Text(
-                'مبلغ: ${payment.grandTotal != null ? _formatAmount(payment.grandTotal!) : 'نامشخص'}'),
+                'مبلغ: ${payment.grandTotal != null ? formatTomanAmount(payment.grandTotal!) : 'نامشخص'}'),
             Text(
-                'تاریخ: ${payment.createdAt != null ? _formatDate(payment.createdAt!) : 'نامشخص'}'),
+                'تاریخ: ${payment.createdAt != null ? DateUtil.formatPersianDateWithDigits(payment.createdAt!, separator: '/') : 'نامشخص'}'),
           ],
         ),
       ),
@@ -286,32 +302,5 @@ class _PaymentHistoryScreenState extends State<PaymentHistoryScreen> {
       default:
         return 'نامشخص';
     }
-  }
-
-  String _formatAmount(String amount) {
-    try {
-      final numAmount = double.parse(amount);
-      final formattedAmount = numAmount.toStringAsFixed(0);
-      return '${_toPersianNumbers(formattedAmount)} تومان';
-    } catch (e) {
-      return '${_toPersianNumbers(amount)} تومان';
-    }
-  }
-
-  String _formatDate(DateTime date) {
-    final year = date.year;
-    final month = date.month.toString().padLeft(2, '0');
-    final day = date.day.toString().padLeft(2, '0');
-    return '$year/$month/$day';
-  }
-
-  String _toPersianNumbers(String text) {
-    const english = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
-    const persian = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
-
-    for (int i = 0; i < english.length; i++) {
-      text = text.replaceAll(english[i], persian[i]);
-    }
-    return text;
   }
 }
