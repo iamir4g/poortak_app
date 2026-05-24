@@ -15,7 +15,9 @@ import 'package:poortak/featueres/featureMenu/screens/main_reminder.dart';
 import 'package:poortak/featueres/feature_profile/screens/profile_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
 import 'package:poortak/locator.dart';
+import 'package:poortak/common/blocs/bottom_nav_cubit/bottom_nav_cubit.dart';
 import 'package:poortak/common/bloc/theme_cubit/theme_cubit.dart';
+import 'package:poortak/common/services/auth_navigation_manager.dart';
 
 class CustomDrawer extends StatefulWidget {
   const CustomDrawer({super.key});
@@ -196,13 +198,20 @@ class _CustomDrawerState extends State<CustomDrawer> {
                                       top: 20.h,
                                       child: GestureDetector(
                                         onTap: () {
+                                          Navigator.of(context).pop();
                                           if (isLoggedIn) {
-                                            Navigator.pushNamed(context,
-                                                ProfileScreen.routeName);
-                                          } else {
-                                            Navigator.pushNamed(
-                                                context, LoginScreen.routeName);
+                                            AuthNavigationManager()
+                                                .requestLoginAndReturn(
+                                              returnTabIndex: 4,
+                                            );
+                                            return;
                                           }
+                                          final currentIndex = context
+                                              .read<BottomNavCubit>()
+                                              .state;
+                                          goToLoginAndReturn(
+                                            returnTabIndex: currentIndex,
+                                          );
                                         },
                                         child: SizedBox(
                                           height: 80.h,
