@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/common/utils/svg_embedded_png.dart';
+import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_match/presentation/bloc/match_bloc/match_bloc.dart';
@@ -50,17 +50,29 @@ class _MatchScreenState extends State<MatchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xFFFFF5F0), // #fff5f0
-              Color(0xFFFBFDF2), // #fbfdf2
-            ],
-          ),
+        decoration: BoxDecoration(
+          gradient: isDark
+              ? const LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color(0xFF171926),
+                    MyColors.darkBackground,
+                    Color(0xFF171926),
+                  ],
+                  stops: [0.1, 0.54, 1.0],
+                )
+              : const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Color(0xFFFFF5F0),
+                    Color(0xFFFBFDF2),
+                  ],
+                ),
         ),
         child: SafeArea(
           child: BlocListener<MatchBloc, MatchState>(
@@ -96,20 +108,21 @@ class _MatchScreenState extends State<MatchScreen> {
                     // Main content
                     Expanded(
                       child: SingleChildScrollView(
-                        padding: EdgeInsets.symmetric(horizontal: 16.w),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: Dimens.medium),
                         child: Column(
                           children: [
-                            SizedBox(height: 75.h),
+                            SizedBox(height: Dimens.nh(75)),
 
                             // Question section
                             _buildQuestionSection(state),
 
-                            SizedBox(height: 20.h),
+                            SizedBox(height: Dimens.nh(20)),
 
                             // Description text
                             _buildDescriptionText(),
 
-                            SizedBox(height: 40.h),
+                            SizedBox(height: Dimens.nh(40)),
                           ],
                         ),
                       ),
@@ -128,21 +141,29 @@ class _MatchScreenState extends State<MatchScreen> {
   }
 
   Widget _buildHeader() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
-      padding: EdgeInsets.fromLTRB(16.w, 0, 32.w, 0),
-      height: 57.h,
+      padding: EdgeInsets.fromLTRB(
+        Dimens.medium,
+        0,
+        Dimens.nw(32),
+        0,
+      ),
+      height: Dimens.nh(57),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? MyColors.darkBackgroundSecondary : Colors.white,
         borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(33.5.r),
+          bottomLeft: Radius.circular(Dimens.nr(33.5)),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            offset: Offset(0, 1.h),
-            blurRadius: 1.r,
-          ),
-        ],
+        boxShadow: isDark
+            ? null
+            : [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  offset: Offset(0, Dimens.nh(1)),
+                  blurRadius: Dimens.nr(1),
+                ),
+              ],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -153,7 +174,7 @@ class _MatchScreenState extends State<MatchScreen> {
               'شرکت در مسابقه',
               textAlign: TextAlign.center,
               style: MyTextStyle.textHeader16Bold.copyWith(
-                color: MyColors.textMatn2,
+                color: isDark ? MyColors.darkTextPrimary : MyColors.textMatn2,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -162,14 +183,14 @@ class _MatchScreenState extends State<MatchScreen> {
 
           // Back button
           SizedBox(
-            width: 40.w,
-            height: 40.h,
+            width: Dimens.nw(40),
+            height: Dimens.nh(40),
             child: IconButton(
               onPressed: () => Navigator.pop(context),
               icon: Icon(
                 Icons.arrow_forward,
-                color: MyColors.textMatn1,
-                size: 28.r,
+                color: isDark ? MyColors.darkTextPrimary : MyColors.textMatn1,
+                size: Dimens.nr(28),
               ),
             ),
           ),
@@ -179,29 +200,32 @@ class _MatchScreenState extends State<MatchScreen> {
   }
 
   Widget _buildQuestionSection(MatchState state) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Stack(
       clipBehavior: Clip.none,
       children: [
         // Main content area
         Container(
           width: double.infinity,
-          margin: EdgeInsets.only(top: 20.h),
-          padding: EdgeInsets.all(20.r),
+          margin: EdgeInsets.only(top: Dimens.nh(20)),
+          padding: EdgeInsets.all(Dimens.nr(20)),
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(22.r),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.1),
-                offset: Offset(0, 2.h),
-                blurRadius: 8.r,
-              ),
-            ],
+            color: isDark ? MyColors.termsBackgroundDark : Colors.white,
+            borderRadius: BorderRadius.circular(Dimens.nr(22)),
+            boxShadow: isDark
+                ? null
+                : [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      offset: Offset(0, Dimens.nh(2)),
+                      blurRadius: Dimens.nr(8),
+                    ),
+                  ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: 20.h),
+              SizedBox(height: Dimens.nh(20)),
 
               // Question text
               if (state is MatchLoading)
@@ -215,7 +239,8 @@ class _MatchScreenState extends State<MatchScreen> {
                   textAlign: TextAlign.center,
                   style: MyTextStyle.textMatn14Bold.copyWith(
                     fontWeight: FontWeight.w300,
-                    color: MyColors.textMatn1,
+                    color:
+                        isDark ? MyColors.darkTextPrimary : MyColors.textMatn1,
                   ),
                 ))
               else if (state is MatchError)
@@ -233,20 +258,25 @@ class _MatchScreenState extends State<MatchScreen> {
                   textAlign: TextAlign.center,
                   style: MyTextStyle.textMatn14Bold.copyWith(
                     fontWeight: FontWeight.w300,
-                    color: MyColors.textMatn1,
+                    color:
+                        isDark ? MyColors.darkTextPrimary : MyColors.textMatn1,
                   ),
                 ),
 
-              SizedBox(height: 20.h),
+              SizedBox(height: Dimens.nh(20)),
 
               // Answer input field
               Container(
-                height: 50.h,
+                height: Dimens.nh(50),
                 decoration: BoxDecoration(
                   color: _isAnswerSubmitted()
-                      ? const Color(0xFFE0E0E0)
-                      : const Color(0xFFF8F8F8),
-                  borderRadius: BorderRadius.circular(30.r),
+                      ? (isDark
+                          ? MyColors.loginIconContainerDark
+                          : const Color(0xFFE0E0E0))
+                      : (isDark
+                          ? MyColors.loginInputBackgroundDark
+                          : const Color(0xFFF8F8F8)),
+                  borderRadius: BorderRadius.circular(Dimens.nr(30)),
                 ),
                 child: TextField(
                   controller: _answerController,
@@ -254,8 +284,10 @@ class _MatchScreenState extends State<MatchScreen> {
                   textAlign: TextAlign.right,
                   style: MyTextStyle.textMatn16.copyWith(
                     color: _isAnswerSubmitted()
-                        ? MyColors.text4.withValues(alpha: 0.5)
-                        : MyColors.text4,
+                        ? (isDark
+                            ? MyColors.darkTextSecondary.withValues(alpha: 0.7)
+                            : MyColors.text4.withValues(alpha: 0.5))
+                        : (isDark ? MyColors.darkTextPrimary : MyColors.text4),
                   ),
                   decoration: InputDecoration(
                     hintText: _isAnswerSubmitted()
@@ -263,33 +295,40 @@ class _MatchScreenState extends State<MatchScreen> {
                         : 'جواب سوال:',
                     hintStyle: MyTextStyle.textMatn16.copyWith(
                       color: _isAnswerSubmitted()
-                          ? MyColors.text4.withValues(alpha: 0.5)
-                          : MyColors.text4,
+                          ? (isDark
+                              ? MyColors.darkTextSecondary
+                                  .withValues(alpha: 0.7)
+                              : MyColors.text4.withValues(alpha: 0.5))
+                          : (isDark
+                              ? MyColors.darkTextSecondary
+                              : MyColors.text4),
                     ),
                     border: InputBorder.none,
-                    contentPadding:
-                        EdgeInsets.symmetric(horizontal: 20.w, vertical: 15.h),
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: Dimens.nw(20),
+                      vertical: Dimens.nh(15),
+                    ),
                   ),
                 ),
               ),
 
-              SizedBox(height: 20.h),
+              SizedBox(height: Dimens.nh(20)),
 
               // Submit button
               Center(
                 child: Container(
-                  width: 164.w,
-                  height: 50.h,
+                  width: Dimens.nw(164),
+                  height: Dimens.nh(50),
                   decoration: BoxDecoration(
                     color: _isAnswerSubmitted()
                         ? const Color(0xFFBDBDBD)
-                        : MyColors.textMatn2,
-                    borderRadius: BorderRadius.circular(56.5.r),
+                        : MyColors.primary,
+                    borderRadius: BorderRadius.circular(Dimens.nr(56.5)),
                   ),
                   child: Material(
                     color: Colors.transparent,
                     child: InkWell(
-                      borderRadius: BorderRadius.circular(56.5.r),
+                      borderRadius: BorderRadius.circular(Dimens.nr(56.5)),
                       onTap: _isAnswerSubmitted()
                           ? null
                           : () {
@@ -336,13 +375,13 @@ class _MatchScreenState extends State<MatchScreen> {
 
         // Avatar positioned on the left side above the main container
         Positioned(
-          top: -40.h,
+          top: -Dimens.nh(40),
           left: 0,
           child: Container(
-            width: 70.w,
-            height: 60.h,
+            width: Dimens.nw(70),
+            height: Dimens.nh(60),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10.r),
+              borderRadius: BorderRadius.circular(Dimens.nr(10)),
             ),
             child: FutureBuilder<Uint8List?>(
               future: _avatarBytesFuture,
@@ -366,19 +405,25 @@ class _MatchScreenState extends State<MatchScreen> {
           right: 0,
           child: Center(
             child: Container(
-              width: 112.w,
-              height: 33.h,
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+              width: Dimens.nw(112),
+              height: Dimens.nh(33),
+              padding: EdgeInsets.symmetric(
+                horizontal: Dimens.medium,
+                vertical: Dimens.nh(8),
+              ),
               decoration: BoxDecoration(
-                color: const Color(0xFFF2F2FE),
-                borderRadius: BorderRadius.circular(15.r),
+                color: isDark
+                    ? MyColors.darkCardBackground
+                    : const Color(0xFFF2F2FE),
+                borderRadius: BorderRadius.circular(Dimens.nr(15)),
               ),
               child: Center(
                 child: Text(
                   'سوال این ماه',
                   style: MyTextStyle.textMatn14Bold.copyWith(
                     fontWeight: FontWeight.w300,
-                    color: MyColors.textMatn1,
+                    color:
+                        isDark ? MyColors.darkTextPrimary : MyColors.textMatn1,
                   ),
                 ),
               ),
@@ -390,6 +435,7 @@ class _MatchScreenState extends State<MatchScreen> {
   }
 
   Widget _buildDescriptionText() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
@@ -397,16 +443,16 @@ class _MatchScreenState extends State<MatchScreen> {
           'پس از ارسال پاسخ مسابقه، به نفراتی که پاسخ صحیح داده باشند به قید قرعه جوایز ویژه داده خواهد شد.',
           textAlign: TextAlign.right,
           style: MyTextStyle.textMatn11.copyWith(
-            color: MyColors.text3,
+            color: isDark ? MyColors.darkTextSecondary : MyColors.text3,
             height: 1.5,
           ),
         ),
-        SizedBox(height: 8.h),
+        SizedBox(height: Dimens.nh(8)),
         Text(
           'قرعه کشی در اوایل هر ماه انجام می شود و لیست برندگان در بخش (برندگان مسابقه) نمایش داده خواهد شد.',
           textAlign: TextAlign.right,
           style: MyTextStyle.textMatn11.copyWith(
-            color: MyColors.text3,
+            color: isDark ? MyColors.darkTextSecondary : MyColors.text3,
             height: 1.5,
           ),
         ),
@@ -415,15 +461,19 @@ class _MatchScreenState extends State<MatchScreen> {
   }
 
   Widget _buildCountdownSection() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       width: double.infinity,
-      height: 100.h,
-      padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 16.w),
+      height: Dimens.nh(100),
+      padding: EdgeInsets.symmetric(
+        vertical: Dimens.nh(12),
+        horizontal: Dimens.medium,
+      ),
       decoration: BoxDecoration(
-        color: MyColors.background,
+        color: isDark ? MyColors.darkBackgroundSecondary : MyColors.background,
         borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20.r),
-          topRight: Radius.circular(20.r),
+          topLeft: Radius.circular(Dimens.nr(20)),
+          topRight: Radius.circular(Dimens.nr(20)),
         ),
       ),
       child: Row(
@@ -435,7 +485,7 @@ class _MatchScreenState extends State<MatchScreen> {
             'زمان باقی مانده ارسال پاسخ برای سوال این ماه :',
             style: MyTextStyle.textMatn10W300.copyWith(
               fontWeight: FontWeight.w500,
-              color: MyColors.text3,
+              color: isDark ? MyColors.darkTextSecondary : MyColors.text3,
             ),
           ),
           Column(
@@ -447,14 +497,18 @@ class _MatchScreenState extends State<MatchScreen> {
                 children: [
                   // Days box
                   Container(
-                    width: 50.w,
-                    height: 50.h,
+                    width: Dimens.nw(50),
+                    height: Dimens.nh(50),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF2F5FA),
-                      borderRadius: BorderRadius.circular(5.r),
+                      color: isDark
+                          ? MyColors.termsBackgroundDark
+                          : const Color(0xFFF2F5FA),
+                      borderRadius: BorderRadius.circular(Dimens.nr(5)),
                       border: Border.all(
-                        color: MyColors.text4.withOpacity(0.3),
-                        width: 1.w,
+                        color: isDark
+                            ? MyColors.darkBorder
+                            : MyColors.text4.withOpacity(0.3),
+                        width: Dimens.nw(1),
                       ),
                     ),
                     child: Column(
@@ -463,35 +517,41 @@ class _MatchScreenState extends State<MatchScreen> {
                         Text(
                           '$hoursRemaining',
                           style: MyTextStyle.text24Correct.copyWith(
-                            color: MyColors.text2,
+                            color: isDark
+                                ? MyColors.darkTextPrimary
+                                : MyColors.text2,
                           ),
                         ),
                       ],
                     ),
                   ),
 
-                  SizedBox(width: 8.w),
+                  SizedBox(width: Dimens.small),
 
                   // Colon
                   Text(
                     ':',
                     style: MyTextStyle.text24Correct.copyWith(
-                      color: MyColors.text2,
+                      color: isDark ? MyColors.darkTextPrimary : MyColors.text2,
                     ),
                   ),
 
-                  SizedBox(width: 8.w),
+                  SizedBox(width: Dimens.small),
 
                   // Hours box
                   Container(
-                    width: 50.w,
-                    height: 50.h,
+                    width: Dimens.nw(50),
+                    height: Dimens.nh(50),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF2F5FA),
-                      borderRadius: BorderRadius.circular(5.r),
+                      color: isDark
+                          ? MyColors.termsBackgroundDark
+                          : const Color(0xFFF2F5FA),
+                      borderRadius: BorderRadius.circular(Dimens.nr(5)),
                       border: Border.all(
-                        color: MyColors.text4.withOpacity(0.3),
-                        width: 1.w,
+                        color: isDark
+                            ? MyColors.darkBorder
+                            : MyColors.text4.withOpacity(0.3),
+                        width: Dimens.nw(1),
                       ),
                     ),
                     child: Column(
@@ -501,7 +561,9 @@ class _MatchScreenState extends State<MatchScreen> {
                           '$daysRemaining',
                           style: MyTextStyle.text24Correct.copyWith(
                             // fontWeight: FontWeight.bold,
-                            color: MyColors.text2,
+                            color: isDark
+                                ? MyColors.darkTextPrimary
+                                : MyColors.text2,
                           ),
                         ),
                       ],
@@ -510,7 +572,7 @@ class _MatchScreenState extends State<MatchScreen> {
                 ],
               ),
 
-              SizedBox(height: 6.h),
+              SizedBox(height: Dimens.nh(6)),
 
               // Labels
               Row(
@@ -520,21 +582,23 @@ class _MatchScreenState extends State<MatchScreen> {
                     'ساعت',
                     style: MyTextStyle.textMatn10W300.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: MyColors.text4,
+                      color:
+                          isDark ? MyColors.darkTextSecondary : MyColors.text4,
                     ),
                   ),
-                  SizedBox(width: 54.w),
+                  SizedBox(width: Dimens.nw(54)),
                   Text(
                     'روز',
                     style: MyTextStyle.textMatn10W300.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: MyColors.text4,
+                      color:
+                          isDark ? MyColors.darkTextSecondary : MyColors.text4,
                     ),
                   ),
                 ],
               ),
 
-              SizedBox(height: 6.h),
+              SizedBox(height: Dimens.nh(6)),
             ],
           ),
         ],
@@ -595,19 +659,20 @@ class _MatchScreenState extends State<MatchScreen> {
   }
 
   void _showSuccessModal(bool isCorrect) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     showDialog<void>(
       context: context,
       barrierDismissible: true,
       builder: (dialogContext) {
         return Dialog(
           backgroundColor: Colors.transparent,
-          insetPadding: EdgeInsets.symmetric(horizontal: 24.w),
+          insetPadding: EdgeInsets.symmetric(horizontal: Dimens.nw(24)),
           child: Container(
             width: double.infinity,
-            constraints: BoxConstraints(maxWidth: 360.w),
+            constraints: BoxConstraints(maxWidth: Dimens.nw(360)),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20.r),
+              color: isDark ? MyColors.termsBackgroundDark : Colors.white,
+              borderRadius: BorderRadius.circular(Dimens.nr(20)),
             ),
             clipBehavior: Clip.antiAlias,
             child: Column(
@@ -617,7 +682,9 @@ class _MatchScreenState extends State<MatchScreen> {
               children: [
                 Container(
                   width: double.infinity,
-                  color: MyColors.modalHeaderBackground,
+                  color: isDark
+                      ? MyColors.darkBackgroundSecondary
+                      : MyColors.modalHeaderBackground,
                   child: Stack(
                     children: [
                       Align(
@@ -626,47 +693,51 @@ class _MatchScreenState extends State<MatchScreen> {
                           onPressed: () => Navigator.of(dialogContext).pop(),
                           icon: Icon(
                             Icons.close,
-                            size: 22.r,
-                            color: MyColors.text2,
+                            size: Dimens.nr(22),
+                            color: isDark
+                                ? MyColors.darkTextPrimary
+                                : MyColors.text2,
                           ),
                         ),
                       ),
                       Center(
                         child: Padding(
                           padding: EdgeInsets.symmetric(
-                            horizontal: 16.w,
-                            vertical: 24.h,
+                            horizontal: Dimens.medium,
+                            vertical: Dimens.nh(24),
                           ),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Container(
-                                width: 64.r,
-                                height: 64.r,
+                                width: Dimens.nr(64),
+                                height: Dimens.nr(64),
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
                                   border: Border.all(
                                     color: MyColors.success,
-                                    width: 3.r,
+                                    width: Dimens.nr(3),
                                   ),
                                 ),
                                 child: Center(
                                   child: Icon(
                                     Icons.check,
-                                    size: 34.r,
+                                    size: Dimens.nr(34),
                                     color: MyColors.success,
                                   ),
                                 ),
                               ),
-                              SizedBox(height: 16.h),
+                              SizedBox(height: Dimens.nh(16)),
                               Text(
                                 'پاسخ شما با موفقیت ارسال شد.',
                                 textAlign: TextAlign.center,
                                 style: MyTextStyle.textCenter16.copyWith(
                                   fontFamily: 'IRANSans',
                                   fontWeight: FontWeight.w500,
-                                  color: MyColors.text2,
+                                  color: isDark
+                                      ? MyColors.darkTextPrimary
+                                      : MyColors.text2,
                                   height: 1.0,
                                 ),
                               ),
@@ -689,30 +760,43 @@ class _MatchScreenState extends State<MatchScreen> {
                     },
                     child: Container(
                       width: double.infinity,
-                      padding: EdgeInsets.symmetric(vertical: 18.h),
+                      padding: EdgeInsets.symmetric(vertical: Dimens.nh(18)),
                       alignment: Alignment.center,
                       child: Text(
                         'مشاهده جوایز مسابقه',
                         textAlign: TextAlign.center,
-                        style: MyTextStyle.modalAction16MediumBlue,
+                        style: (isDark
+                                ? MyTextStyle.modalAction16MediumOnDark
+                                : MyTextStyle.modalAction16MediumBlue)
+                            .copyWith(
+                          color: isDark
+                              ? MyColors.darkTextAccent
+                              : MyTextStyle.modalAction16MediumBlue.color,
+                        ),
                       ),
                     ),
                   ),
                 ),
-                Divider(height: 1.h, thickness: 1.h, color: MyColors.gray),
+                Divider(
+                  height: Dimens.nh(1),
+                  thickness: Dimens.nh(1),
+                  color: isDark ? MyColors.darkBorder : MyColors.gray,
+                ),
                 Material(
                   color: Colors.transparent,
                   child: InkWell(
                     onTap: () => Navigator.of(dialogContext).pop(),
                     child: Container(
                       width: double.infinity,
-                      padding: EdgeInsets.symmetric(vertical: 18.h),
+                      padding: EdgeInsets.symmetric(vertical: Dimens.nh(18)),
                       alignment: Alignment.center,
                       child: Text(
                         'بستن',
                         textAlign: TextAlign.center,
                         style: MyTextStyle.modalAction16MediumOnDark.copyWith(
-                          color: MyColors.activeTabBackground,
+                          color: isDark
+                              ? MyColors.darkTextPrimary
+                              : MyColors.activeTabBackground,
                         ),
                       ),
                     ),

@@ -131,6 +131,26 @@ class MyColors {
   static const Color paymentHistoryDetailValueLight = Color(0xFF494E6A);
   static const Color paymentHistoryDetailLabelLight = Color(0xFF717483);
 
+  // Conversation (Dark Mode)
+  static const Color conversationFirstPersonBubbleDark = Color(0xFF262556);
+  static const Color conversationSecondPersonBubbleDark = Color(0xFF27221C);
+
+    // Quiz
+  static const Color quizAnswerDefaultLightBackground = background3;
+  static const Color quizAnswerDefaultDarkBackground =
+      darkBackgroundSecondary; // #2C2E3F
+  static const Color quizAnswerSelectedBorder = primary;
+  static const Color quizAnswerCorrectBackgroundLight = Color(0xFFEDFAEB);
+  static const Color quizAnswerCorrectBorderLight = Color(0xFF6FC845);
+  static const Color quizAnswerWrongBackgroundLight = Color(0xFFFDEFE8);
+  static const Color quizAnswerWrongBorderLight = Color(0xFFE96217);
+  static const Color quizAnswerCorrectBackgroundDark = Color(0xFF10160F);
+  static const Color quizAnswerCorrectBorderDark = Color(0xFF68D451);
+  static const Color quizAnswerCorrectTextDark = Color(0xFF6EC644);
+  static const Color quizAnswerWrongBackgroundDark = Color(0xFF351705);
+  static const Color quizAnswerWrongBorderDark = Color(0xFFE96217);
+  static const Color quizAnswerWrongTextDark = Color(0xFFE96216);
+
   // Progress Bar Colors
   static const Color progressBarColor = Color(0xFF5E85F2);
   static const Color progressBarBackground = Color(0xFFE0E0E0);

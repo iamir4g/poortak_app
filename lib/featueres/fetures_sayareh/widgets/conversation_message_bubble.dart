@@ -39,6 +39,7 @@ class ConversationMessageBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     // تعیین اینکه آیا پیام از طرف شخص اول (male voice) است یا نه
     final isFirstPerson = message.voice == 'male';
 
@@ -47,6 +48,17 @@ class ConversationMessageBubble extends StatelessWidget {
 
     // تجزیه متن به جملات برای هایلایت کردن جمله فعال
     final sentences = _splitIntoSentences(message.text);
+
+    final bubbleColor = isDark
+        ? (isFirstPerson
+            ? MyColors.conversationFirstPersonBubbleDark
+            : MyColors.conversationSecondPersonBubbleDark)
+        : (isFirstPerson ? MyColors.primary : Colors.grey[300]);
+    final baseTextColor =
+        isDark ? MyColors.profileTextPrimaryDark : (isFirstPerson ? Colors.white : Colors.black);
+    final translationColor = isDark
+        ? MyColors.loginTextSecondaryDark
+        : (isFirstPerson ? Colors.white70 : Colors.black54);
 
     return Align(
       // تراز حباب به راست برای پیام‌های شخص اول و به چپ برای پیام‌های شخص دوم
@@ -63,7 +75,7 @@ class ConversationMessageBubble extends StatelessWidget {
             padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 16.w),
             decoration: BoxDecoration(
               // رنگ نارنجی برای پیام‌های شخص اول و خاکستری برای شخص دوم
-              color: isFirstPerson ? MyColors.primary : Colors.grey[300],
+              color: bubbleColor,
               borderRadius: BorderRadius.circular(20.r),
               // نمایش border سبز اگر پیام در حال پخش است
               border: isCurrentPlaying
@@ -86,18 +98,15 @@ class ConversationMessageBubble extends StatelessWidget {
                           children: List.generate(sentences.length, (index) {
                             final isSentenceActive = isCurrentPlaying &&
                                 index == currentSentenceIndex;
+                            final sentenceColor = isSentenceActive
+                                ? baseTextColor
+                                : baseTextColor.withValues(alpha: 0.6);
                             return TextSpan(
                               text: sentences[index],
                               style: FontSizeHelper.getContentTextStyle(
                                 context,
                                 baseFontSize: 16.0.sp,
-                                color: isSentenceActive
-                                    ? (isFirstPerson
-                                        ? Colors.white
-                                        : Colors.black)
-                                    : (isFirstPerson
-                                        ? Colors.white.withValues(alpha: 0.5)
-                                        : Colors.black.withValues(alpha: 0.5)),
+                                color: sentenceColor,
                               ),
                             );
                           }),
@@ -114,7 +123,7 @@ class ConversationMessageBubble extends StatelessWidget {
                     style: FontSizeHelper.getContentTextStyle(
                       context,
                       baseFontSize: 12.0.sp,
-                      color: isFirstPerson ? Colors.white70 : Colors.black54,
+                      color: translationColor,
                     ),
                     softWrap: true,
                     textDirection: TextDirection.ltr,

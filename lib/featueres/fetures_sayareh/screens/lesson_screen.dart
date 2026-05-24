@@ -21,6 +21,8 @@ import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/common/services/getImageUrl_service.dart';
 import 'package:poortak/common/widgets/reusable_modal.dart';
 import 'package:poortak/config/dimens.dart';
+import 'package:poortak/config/myColors.dart';
+import 'package:poortak/config/myTextStyle.dart';
 
 class LessonScreen extends StatefulWidget {
   static const routeName = "/lesson_screen";
@@ -330,7 +332,9 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
         ),
       ],
       child: Scaffold(
-        backgroundColor: const Color(0xFFF6F9FE),
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? MyColors.profileBackgroundDark
+            : MyColors.background3,
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(Dimens.nh(57)),
           child: SafeArea(
@@ -338,7 +342,9 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
               padding: EdgeInsets.fromLTRB(Dimens.nw(16), 0, Dimens.nw(32), 0),
               height: Dimens.nh(57),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? MyColors.darkBackgroundSecondary
+                    : Colors.white,
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(Dimens.nr(33.5)),
                 ),
@@ -355,16 +361,18 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
                 children: [
                   BlocBuilder<LessonBloc, LessonState>(
                     builder: (context, state) {
+                      final isDark =
+                          Theme.of(context).brightness == Brightness.dark;
                       return Text(
                         state is LessonSuccess
                             ? state.lesson.name
                             : widget.title,
                         textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontFamily: 'IranSans',
+                        style: MyTextStyle.textHeader16Bold.copyWith(
                           fontSize: Dimens.nsp(16),
-                          fontWeight: FontWeight.bold,
-                          color: const Color(0xFF3D495C),
+                          color: isDark
+                              ? MyColors.profileTextPrimaryDark
+                              : MyColors.text2,
                         ),
                       );
                     },
@@ -376,7 +384,9 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
                       onPressed: () => Navigator.pop(context),
                       icon: Icon(
                         Icons.arrow_forward,
-                        color: const Color(0xFF3D495C),
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? MyColors.profileTextPrimaryDark
+                            : MyColors.text2,
                         size: Dimens.nsp(28),
                       ),
                     ),
@@ -411,12 +421,13 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
   }
 
   Widget _buildCompletionHeader() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(Dimens.nw(16)),
       margin: EdgeInsets.symmetric(horizontal: Dimens.nw(16)),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? MyColors.termsBackgroundDark : Colors.white,
         borderRadius: BorderRadius.circular(Dimens.nr(20)),
         boxShadow: [
           BoxShadow(
@@ -438,11 +449,11 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
                   children: [
                     Text(
                       'خوانده شده',
-                      style: TextStyle(
-                        fontFamily: 'IranSans',
+                      style: MyTextStyle.textMatn14Bold.copyWith(
                         fontSize: Dimens.nsp(14),
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFF3D495C),
+                        color: isDark
+                            ? MyColors.profileTextPrimaryDark
+                            : MyColors.text2,
                       ),
                     ),
                     SizedBox(width: Dimens.nw(8)),
@@ -475,10 +486,8 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
                     ),
                     child: Text(
                       'مرور دوباره درس',
-                      style: TextStyle(
-                        fontFamily: 'IranSans',
+                      style: MyTextStyle.textMatn16Bold.copyWith(
                         fontSize: Dimens.nsp(16),
-                        fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),
                     ),
@@ -595,6 +604,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
   }
 
   Widget _buildVocabularyCard() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return LessonCardWidget(
       iconPath: "assets/images/words_icon.png",
       englishLabel: "vocabulary",
@@ -604,7 +614,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
         width: Dimens.nw(40),
         height: Dimens.nh(15),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDark ? MyColors.profileHeaderDark : Colors.white,
           borderRadius: BorderRadius.circular(Dimens.nr(8)),
         ),
         child: Center(
@@ -664,6 +674,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
   }
 
   Widget _buildDictionaryButton() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Align(
       alignment: Alignment.centerLeft,
       child: Padding(
@@ -672,7 +683,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
           width: Dimens.nw(63),
           height: Dimens.nh(63),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: isDark ? MyColors.profileHeaderDark : Colors.white,
             borderRadius: BorderRadius.circular(Dimens.nr(50)),
             boxShadow: [
               BoxShadow(

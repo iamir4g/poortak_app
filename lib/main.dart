@@ -166,7 +166,7 @@ void main() async {
       child: BlocBuilder<ThemeCubit, ThemeState>(
         builder: (context, themeState) {
           return ScreenUtilInit(
-            designSize: const Size(360, 640),
+            designSize: const Size(393, 852),
             minTextAdapt: true,
             splitScreenMode: true,
             builder: (context, child) {

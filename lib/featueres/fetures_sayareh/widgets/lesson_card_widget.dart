@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/config/dimens.dart';
 
@@ -22,6 +23,7 @@ class LessonCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final width = Dimens.nw(320); // Reduced from 359 to be more responsive
     return InkWell(
       onTap: onTap,
@@ -31,7 +33,7 @@ class LessonCardWidget extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(Dimens.nr(30)), // Reduced from 40
-          color: Colors.white,
+          color: isDark ? MyColors.termsBackgroundDark : Colors.white,
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.04),
@@ -49,7 +51,9 @@ class LessonCardWidget extends StatelessWidget {
                 left: 0, // In RTL, progress should start from right
                 child: Container(
                   width: width * (progress! / 100),
-                  color: const Color(0xFFE3F2FD),
+                  color: isDark
+                      ? MyColors.paymentHistoryCardHeaderDark
+                      : const Color(0xFFE3F2FD),
                 ),
               ),
             Padding(
@@ -87,14 +91,18 @@ class LessonCardWidget extends StatelessWidget {
                       Text(
                         englishLabel,
                         style: MyTextStyle.textMatn12W500.copyWith(
-                          color: const Color(0xFFA3AFC2),
+                          color: isDark
+                              ? MyColors.loginTextSecondaryDark
+                              : const Color(0xFFA3AFC2),
                           fontSize: Dimens.nsp(10), // Explicitly responsive
                         ),
                       ),
                       Text(
                         persianLabel,
                         style: MyTextStyle.textMatn18Bold.copyWith(
-                          color: const Color(0xFF29303D),
+                          color: isDark
+                              ? MyColors.profileTextPrimaryDark
+                              : const Color(0xFF29303D),
                           fontSize: Dimens.nsp(16), // Explicitly responsive
                         ),
                       )
@@ -123,7 +131,9 @@ class LessonCardWidget extends StatelessWidget {
                           fontFamily: 'IranSans',
                           fontSize: Dimens.nsp(14), // Reduced from 16
                           fontWeight: FontWeight.bold,
-                          color: const Color(0xFF53668E),
+                          color: isDark
+                              ? MyColors.profileTextPrimaryDark
+                              : const Color(0xFF53668E),
                         ),
                       ),
                   ],

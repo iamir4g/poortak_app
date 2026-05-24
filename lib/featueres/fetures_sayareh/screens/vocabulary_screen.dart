@@ -56,10 +56,8 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text(
-            "لطفا وارد شوید",
-          ),
-          backgroundColor: Colors.red,
+          content: Text("لطفا وارد شوید"),
+          backgroundColor: MyColors.error,
           duration: Duration(seconds: 2),
         ),
       );
@@ -204,6 +202,17 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final pageBackgroundColor =
+        isDark ? MyColors.profileBackgroundDark : MyColors.secondaryTint4;
+    final headerBackgroundColor =
+        isDark ? MyColors.darkBackgroundSecondary : Colors.white;
+    final primaryTextColor =
+        isDark ? MyColors.profileTextPrimaryDark : MyColors.textMatn1;
+    final secondaryTextColor =
+        isDark ? MyColors.loginTextSecondaryDark : MyColors.textSecondary;
+    final iconColor =
+        isDark ? MyColors.profileTextPrimaryDark : (Theme.of(context).iconTheme.color ?? Colors.black);
     return BlocProvider(
       create: (context) => VocabularyBloc(sayarehRepository: locator())
         ..add(VocabularyFetchEvent(id: widget.id)),
@@ -232,24 +241,28 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
           }
         },
         child: Scaffold(
-          backgroundColor: MyColors.secondaryTint4,
+          backgroundColor: pageBackgroundColor,
           appBar: AppBar(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(30.r),
               ),
             ),
+            backgroundColor: headerBackgroundColor,
+            foregroundColor: primaryTextColor,
             automaticallyImplyLeading: false,
             actions: [
               IconButton(
                 onPressed: () => Navigator.of(context).pop(), //_showExitModal,
-                icon: const Icon(Icons.arrow_forward),
+                icon: Icon(Icons.arrow_forward, color: primaryTextColor),
               ),
             ],
             centerTitle: true,
             title: Text(
               'واژگان',
-              style: MyTextStyle.textHeader16Bold,
+              style: MyTextStyle.textHeader16Bold.copyWith(
+                color: primaryTextColor,
+              ),
             ),
             // leading: IconButton(
             //   icon: const Icon(Icons.arrow_back),
@@ -260,11 +273,22 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
             child: BlocBuilder<VocabularyBloc, VocabularyState>(
               builder: (context, state) {
                 if (state is VocabularyLoading) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(MyColors.primary),
+                    ),
+                  );
                 }
                 if (state is VocabularySuccess) {
                   if (state.vocabulary.data.isEmpty) {
-                    return const Center(child: Text('واژگانی یافت نشد'));
+                    return Center(
+                      child: Text(
+                        'واژگانی یافت نشد',
+                        style: MyTextStyle.textMatn16.copyWith(
+                          color: primaryTextColor,
+                        ),
+                      ),
+                    );
                   }
 
                   final currentWord = state.vocabulary.data[currentIndex];
@@ -364,17 +388,17 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                                   SizedBox(height: 20.h),
                                   Text(
                                     currentWord.word,
-                                    style: TextStyle(
+                                    style: MyTextStyle.textMatn18Bold.copyWith(
                                       fontSize: 24.sp,
-                                      fontWeight: FontWeight.bold,
+                                      color: primaryTextColor,
                                     ),
                                   ),
                                   SizedBox(height: 10.h),
                                   Text(
                                     currentWord.translation,
-                                    style: TextStyle(
+                                    style: MyTextStyle.textMatn16.copyWith(
                                       fontSize: 18.sp,
-                                      color: Colors.grey,
+                                      color: secondaryTextColor,
                                     ),
                                   ),
                                   SizedBox(height: 20.h),
@@ -393,7 +417,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                               key: const Key('vocabulary_forward_button'),
                               onPressed: () =>
                                   _goToNextWord(state.vocabulary.data),
-                              icon: const Icon(Icons.arrow_back),
+                              icon: Icon(Icons.arrow_back, color: iconColor),
                               iconSize: 32.r,
                             ),
                             BlocBuilder<LitnerBloc, LitnerState>(
@@ -411,9 +435,13 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                                           height: 20.h,
                                           child: CircularProgressIndicator(
                                             strokeWidth: 2.w,
+                                            valueColor:
+                                                const AlwaysStoppedAnimation<Color>(
+                                                    MyColors.primary),
                                           ),
                                         )
-                                      : const Icon(Icons.add_circle_outline),
+                                      : Icon(Icons.add_circle_outline,
+                                          color: iconColor),
                                   iconSize: 32.r,
                                 );
                               },
@@ -425,8 +453,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                                 width: 32.r,
                                 height: 32.r,
                                 colorFilter: ColorFilter.mode(
-                                  Theme.of(context).iconTheme.color ??
-                                      Colors.black,
+                                  iconColor,
                                   BlendMode.srcIn,
                                 ),
                               ),
@@ -434,7 +461,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                             IconButton(
                               onPressed: () =>
                                   _goToPreviousWord(state.vocabulary.data),
-                              icon: const Icon(Icons.arrow_forward),
+                              icon: Icon(Icons.arrow_forward, color: iconColor),
                               iconSize: 32.r,
                             ),
                           ],
@@ -468,7 +495,15 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                   );
                 }
                 if (state is VocabularyError) {
-                  return Center(child: Text(state.message));
+                  return Center(
+                    child: Text(
+                      state.message,
+                      style: MyTextStyle.textMatn16.copyWith(
+                        color: primaryTextColor,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  );
                 }
                 return const SizedBox.shrink();
               },

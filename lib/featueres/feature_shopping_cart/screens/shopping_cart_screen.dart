@@ -8,6 +8,7 @@ import 'package:poortak/common/widgets/dot_loading_widget.dart';
 import 'package:poortak/common/widgets/primaryButton.dart';
 
 import 'package:poortak/common/resources/data_state.dart';
+import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/models/shopping_cart_model.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
@@ -70,25 +71,37 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return BlocBuilder<ShoppingCartBloc, ShoppingCartState>(
       builder: (context, state) {
         log("🔄 Builder called with state: ${state.runtimeType}");
 
         if (state is ShoppingCartLoading) {
           return Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Color(0xFFE8F0FC),
-                  Color(0xFFFCEBF1),
-                  Color(0xFFEFE8FC),
-                ],
-                stops: [0.1, 0.54, 1.0],
-              ),
+            decoration: BoxDecoration(
+              gradient: isDark
+                  ? const LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Color(0xFF171926),
+                        MyColors.darkBackground,
+                        Color(0xFF171926),
+                      ],
+                      stops: [0.1, 0.54, 1.0],
+                    )
+                  : const LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Color(0xFFE8F0FC),
+                        Color(0xFFFCEBF1),
+                        Color(0xFFEFE8FC),
+                      ],
+                      stops: [0.1, 0.54, 1.0],
+                    ),
             ),
-            child: Center(child: DotLoadingWidget(size: 100.r)),
+            child: Center(child: DotLoadingWidget(size: Dimens.nr(100))),
           );
         }
 
@@ -138,17 +151,28 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
 
         if (state is ShoppingCartError) {
           return Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Color(0xFFE8F0FC),
-                  Color(0xFFFCEBF1),
-                  Color(0xFFEFE8FC),
-                ],
-                stops: [0.1, 0.54, 1.0],
-              ),
+            decoration: BoxDecoration(
+              gradient: isDark
+                  ? const LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Color(0xFF171926),
+                        MyColors.darkBackground,
+                        Color(0xFF171926),
+                      ],
+                      stops: [0.1, 0.54, 1.0],
+                    )
+                  : const LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Color(0xFFE8F0FC),
+                        Color(0xFFFCEBF1),
+                        Color(0xFFEFE8FC),
+                      ],
+                      stops: [0.1, 0.54, 1.0],
+                    ),
             ),
             child: Center(
               child: Column(
@@ -156,7 +180,9 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                 children: [
                   Text(
                     state.message,
-                    style: const TextStyle(color: Colors.white),
+                    style: TextStyle(
+                      color: isDark ? MyColors.darkTextPrimary : Colors.white,
+                    ),
                   ),
                   const SizedBox(height: 10),
                   ElevatedButton(
@@ -297,13 +323,17 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
 
   // Build header section with points
   Widget _buildPointsHeader() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 32.w, vertical: 12.h),
-      decoration: const BoxDecoration(
-        color: Colors.white,
+      padding: EdgeInsets.symmetric(
+        horizontal: Dimens.nw(32),
+        vertical: Dimens.nh(12),
+      ),
+      decoration: BoxDecoration(
+        color: isDark ? MyColors.darkBackgroundSecondary : Colors.white,
         borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(15),
-          bottomRight: Radius.circular(15),
+          bottomLeft: Radius.circular(Dimens.nr(15)),
+          bottomRight: Radius.circular(Dimens.nr(15)),
         ),
       ),
       child: Column(
@@ -315,42 +345,48 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
             children: [
               // Star animation
               SizedBox(
-                width: 50.w,
-                height: 50.h,
+                width: Dimens.nw(50),
+                height: Dimens.nh(50),
                 child: Lottie.asset(
                   'assets/images/cart/star.json',
                   fit: BoxFit.cover,
                 ),
               ),
-              SizedBox(width: 8.w),
+              SizedBox(width: Dimens.small),
               Expanded(
                 child: Wrap(
                   alignment: WrapAlignment.start,
                   crossAxisAlignment: WrapCrossAlignment.center,
-                  spacing: 8.w,
-                  runSpacing: 4.h,
+                  spacing: Dimens.small,
+                  runSpacing: Dimens.nh(4),
                   children: [
                     Text(
                       'مجموع امتیاز های شما : ',
                       style: TextStyle(
-                        fontSize: 16.sp,
+                        fontSize: Dimens.nsp(16),
                         fontWeight: FontWeight.w500,
-                        color: const Color(0xFF29303D),
+                        color: isDark
+                            ? MyColors.darkTextPrimary
+                            : const Color(0xFF29303D),
                       ),
                     ),
                     Container(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: Dimens.nw(12), vertical: Dimens.nh(6)),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFFE8CC),
-                        borderRadius: BorderRadius.circular(10),
+                        color: isDark
+                            ? MyColors.primary.withValues(alpha: 0.18)
+                            : const Color(0xFFFFE8CC),
+                        borderRadius: BorderRadius.circular(Dimens.nr(10)),
                       ),
                       child: Text(
                         '۲۰۰ سکه',
                         style: TextStyle(
-                          fontSize: 16.sp,
+                          fontSize: Dimens.nsp(16),
                           fontWeight: FontWeight.w500,
-                          color: const Color(0xFF29303D),
+                          color: isDark
+                              ? MyColors.darkTextPrimary
+                              : const Color(0xFF29303D),
                         ),
                       ),
                     ),
@@ -359,42 +395,51 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
               ),
             ],
           ),
-          SizedBox(height: 12.h),
+          SizedBox(height: Dimens.nh(12)),
           // Progress bar section
           Row(
             children: [
               Container(
-                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+                padding: EdgeInsets.symmetric(
+                  horizontal: Dimens.nw(12),
+                  vertical: Dimens.nh(8),
+                ),
                 decoration: BoxDecoration(
                   border: Border.all(color: const Color(0xFFFFA73F)),
-                  borderRadius: BorderRadius.circular(22),
+                  borderRadius: BorderRadius.circular(Dimens.nr(22)),
                 ),
                 child: Center(
                   child: Text(
                     'راهنما ؟',
                     style: TextStyle(
-                      fontSize: 14.sp,
+                      fontSize: Dimens.nsp(14),
                       fontWeight: FontWeight.bold,
                       color: const Color(0xFFFFA73F),
                     ),
                   ),
                 ),
               ),
-              SizedBox(width: 8.w),
+              SizedBox(width: Dimens.small),
               Expanded(
                 child: Container(
-                  padding: EdgeInsets.symmetric(vertical: 8.h),
+                  padding: EdgeInsets.symmetric(vertical: Dimens.nh(8)),
                   decoration: BoxDecoration(
-                    border: Border.all(color: const Color(0xFFC2C9D6)),
-                    borderRadius: BorderRadius.circular(22),
+                    border: Border.all(
+                      color: isDark
+                          ? MyColors.darkBorder
+                          : const Color(0xFFC2C9D6),
+                    ),
+                    borderRadius: BorderRadius.circular(Dimens.nr(22)),
                   ),
                   child: Center(
                     child: Text(
                       'محاسبه امتیاز بر روی سبد خرید',
                       style: TextStyle(
-                        fontSize: 14.sp,
+                        fontSize: Dimens.nsp(14),
                         fontWeight: FontWeight.bold,
-                        color: const Color(0xFFC2C9D6),
+                        color: isDark
+                            ? MyColors.darkTextSecondary
+                            : const Color(0xFFC2C9D6),
                       ),
                     ),
                   ),
@@ -409,9 +454,10 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
 
   // Build empty cart UI
   Widget buildEmptyCartUI() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
-      decoration: const BoxDecoration(
-        color: Color(0xFFF6F9FE), // Background color from Figma
+      decoration: BoxDecoration(
+        color: isDark ? MyColors.darkBackground : const Color(0xFFF6F9FE),
       ),
       child: Column(
         children: [
@@ -423,50 +469,55 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  SizedBox(height: 24.h),
+                  SizedBox(height: Dimens.nh(24)),
                   // White card container
                   Container(
-                    margin: EdgeInsets.symmetric(horizontal: 16.w),
-                    padding: EdgeInsets.all(24.w),
+                    margin: EdgeInsets.symmetric(horizontal: Dimens.medium),
+                    padding: EdgeInsets.all(Dimens.nw(24)),
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(22),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.1),
-                          blurRadius: 10,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
+                      color:
+                          isDark ? MyColors.termsBackgroundDark : Colors.white,
+                      borderRadius: BorderRadius.circular(Dimens.nr(22)),
+                      boxShadow: isDark
+                          ? null
+                          : [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.1),
+                                blurRadius: 10,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         // Shopping cart image
                         SizedBox(
-                          width: 138.w,
-                          height: 117.h,
+                          width: Dimens.nw(138),
+                          height: Dimens.nh(117),
                           child: Image.asset(
                             'assets/images/cart/shopping_cart.png',
                             fit: BoxFit.contain,
                           ),
                         ),
-                        SizedBox(height: 20.h),
+                        SizedBox(height: Dimens.nh(20)),
                         // Empty cart text
                         Text(
                           'سبد خرید شما خالی است!',
                           style: TextStyle(
-                            fontSize: 16.sp,
+                            fontSize: Dimens.nsp(16),
                             fontWeight: FontWeight.w500,
-                            color: const Color(0xFF3D495C),
+                            color: isDark
+                                ? MyColors.darkTextPrimary
+                                : const Color(0xFF3D495C),
                           ),
                           textAlign: TextAlign.center,
                         ),
                       ],
                     ),
                   ),
-                  SizedBox(height: 24.h),
+                  SizedBox(height: Dimens.nh(24)),
                 ],
               ),
             ),
@@ -478,18 +529,30 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
 
   // Build server cart items UI
   Widget _buildCartItemsUI(ShoppingCart cart, AppLocalizations? l10n) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Color(0xFFE8F0FC),
-            Color(0xFFFCEBF1),
-            Color(0xFFEFE8FC),
-          ],
-          stops: [0.1, 0.54, 1.0],
-        ),
+      decoration: BoxDecoration(
+        gradient: isDark
+            ? const LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color(0xFF171926),
+                  MyColors.darkBackground,
+                  Color(0xFF171926),
+                ],
+                stops: [0.1, 0.54, 1.0],
+              )
+            : const LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color(0xFFE8F0FC),
+                  Color(0xFFFCEBF1),
+                  Color(0xFFEFE8FC),
+                ],
+                stops: [0.1, 0.54, 1.0],
+              ),
       ),
       child: Column(
         children: [
@@ -501,20 +564,30 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
               itemBuilder: (context, index) {
                 final item = cart.items[index];
                 return Container(
-                  margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-                  padding: EdgeInsets.all(16.w),
+                  margin: EdgeInsets.symmetric(
+                    horizontal: Dimens.medium,
+                    vertical: Dimens.small,
+                  ),
+                  padding: EdgeInsets.all(Dimens.medium),
                   decoration: BoxDecoration(
-                    color: MyColors.background,
-                    borderRadius: BorderRadius.circular(16),
+                    color: isDark
+                        ? MyColors.termsBackgroundDark
+                        : MyColors.background,
+                    borderRadius: BorderRadius.circular(Dimens.nr(16)),
                   ),
                   child: Stack(
                     children: [
                       Positioned(
-                        top: -10.h,
-                        left: -10.w,
+                        top: -Dimens.nh(10),
+                        left: -Dimens.nw(10),
                         child: IconButton(
-                          iconSize: 18.r,
-                          icon: const Icon(Icons.close),
+                          iconSize: Dimens.nr(18),
+                          icon: Icon(
+                            Icons.close,
+                            color: isDark
+                                ? MyColors.darkTextSecondary
+                                : MyColors.text3,
+                          ),
                           onPressed: () {
                             if (item.itemId != null) {
                               context
@@ -528,18 +601,22 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Container(
-                            width: 100.w,
-                            height: 100.h,
+                            width: Dimens.nw(100),
+                            height: Dimens.nh(100),
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: Colors.grey[300],
+                              borderRadius:
+                                  BorderRadius.circular(Dimens.nr(10)),
+                              color: isDark
+                                  ? MyColors.darkCardBackground
+                                  : Colors.grey[300],
                             ),
                             child: ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius:
+                                  BorderRadius.circular(Dimens.nr(10)),
                               child: _buildCartItemImage(item),
                             ),
                           ),
-                          SizedBox(width: 8.w),
+                          SizedBox(width: Dimens.small),
                           Expanded(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.start,
@@ -549,28 +626,32 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                                   item.title,
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 16.sp,
+                                    fontSize: Dimens.nsp(16),
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
-                                SizedBox(height: 4.h),
+                                SizedBox(height: Dimens.nh(4)),
                                 Text(
                                   item.description,
                                   style: TextStyle(
-                                    color: Colors.grey[600],
-                                    fontSize: 14.sp,
+                                    color: isDark
+                                        ? MyColors.darkTextSecondary
+                                        : Colors.grey[600],
+                                    fontSize: Dimens.nsp(14),
                                   ),
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
                                 ),
-                                SizedBox(height: 8.h),
+                                SizedBox(height: Dimens.nh(8)),
                                 if (item.quantity != null && item.quantity! > 1)
                                   Text(
                                     'تعداد: ${item.quantity}',
                                     style: TextStyle(
-                                      color: Colors.grey[500],
-                                      fontSize: 12.sp,
+                                      color: isDark
+                                          ? MyColors.darkTextSecondary
+                                          : Colors.grey[500],
+                                      fontSize: Dimens.nsp(12),
                                     ),
                                   ),
                                 if (item.source != null &&
@@ -579,11 +660,10 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                                     'تخفیف: ${item.source!['discountAmount']}%',
                                     style: TextStyle(
                                       color: Colors.green[600],
-                                      fontSize: 12.sp,
+                                      fontSize: Dimens.nsp(12),
                                     ),
                                   ),
-                                SizedBox(
-                                    height: 24.h), // Space for price at bottom
+                                SizedBox(height: Dimens.nh(24)),
                               ],
                             ),
                           ),
@@ -598,13 +678,13 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                               item.price.toString().addComma,
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                fontSize: 16.sp,
+                                fontSize: Dimens.nsp(16),
                               ),
                             ),
-                            SizedBox(width: 4.w),
+                            SizedBox(width: Dimens.nw(4)),
                             Text(
                               "تومان",
-                              style: TextStyle(fontSize: 12.sp),
+                              style: TextStyle(fontSize: Dimens.nsp(12)),
                             ),
                           ],
                         ),
@@ -616,11 +696,13 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
             ),
           ),
           Container(
-            padding: EdgeInsets.all(16.w),
+            padding: EdgeInsets.all(Dimens.medium),
             decoration: BoxDecoration(
-              color: MyColors.background,
+              color: isDark
+                  ? MyColors.darkBackgroundSecondary
+                  : MyColors.background,
               borderRadius: BorderRadius.vertical(
-                top: Radius.circular(20.r),
+                top: Radius.circular(Dimens.nr(20)),
               ),
             ),
             child: Row(
@@ -634,7 +716,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                       Text(
                         '${l10n?.total_price} ${cart.grandTotal?.addComma ?? cart.items.fold(0, (sum, item) => sum + item.price).addComma}',
                         style: TextStyle(
-                          fontSize: 18.sp,
+                          fontSize: Dimens.nsp(18),
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -644,8 +726,10 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                         Text(
                           'قیمت اصلی: ${cart.subTotal!.addComma} تومان',
                           style: TextStyle(
-                            color: Colors.grey[600],
-                            fontSize: 12.sp,
+                            color: isDark
+                                ? MyColors.darkTextSecondary
+                                : Colors.grey[600],
+                            fontSize: Dimens.nsp(12),
                             decoration: TextDecoration.lineThrough,
                           ),
                         ),
@@ -653,8 +737,8 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                   ),
                 ),
                 PrimaryButton(
-                  width: 160.w,
-                  height: 50.h,
+                  width: Dimens.nw(160),
+                  height: Dimens.nh(50),
                   lable: l10n?.pay_now ?? "Pay Now",
                   onPressed: () async {
                     try {
@@ -711,18 +795,30 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
   // Build local cart items UI
   Widget _buildLocalCartItemsUI(
       List<Map<String, dynamic>> localCartItems, AppLocalizations? l10n) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Color(0xFFE8F0FC),
-            Color(0xFFFCEBF1),
-            Color(0xFFEFE8FC),
-          ],
-          stops: [0.1, 0.54, 1.0],
-        ),
+      decoration: BoxDecoration(
+        gradient: isDark
+            ? const LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color(0xFF171926),
+                  MyColors.darkBackground,
+                  Color(0xFF171926),
+                ],
+                stops: [0.1, 0.54, 1.0],
+              )
+            : const LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color(0xFFE8F0FC),
+                  Color(0xFFFCEBF1),
+                  Color(0xFFEFE8FC),
+                ],
+                stops: [0.1, 0.54, 1.0],
+              ),
       ),
       child: Column(
         children: [
@@ -744,21 +840,30 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                             resolvedItem == null;
 
                     return Container(
-                      margin:
-                          EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-                      padding: EdgeInsets.all(16.w),
+                      margin: EdgeInsets.symmetric(
+                        horizontal: Dimens.medium,
+                        vertical: Dimens.small,
+                      ),
+                      padding: EdgeInsets.all(Dimens.medium),
                       decoration: BoxDecoration(
-                        color: MyColors.background,
-                        borderRadius: BorderRadius.circular(16),
+                        color: isDark
+                            ? MyColors.termsBackgroundDark
+                            : MyColors.background,
+                        borderRadius: BorderRadius.circular(Dimens.nr(16)),
                       ),
                       child: Stack(
                         children: [
                           Positioned(
-                            top: -10.h,
-                            left: -10.w,
+                            top: -Dimens.nh(10),
+                            left: -Dimens.nw(10),
                             child: IconButton(
-                              iconSize: 18.r,
-                              icon: const Icon(Icons.close),
+                              iconSize: Dimens.nr(18),
+                              icon: Icon(
+                                Icons.close,
+                                color: isDark
+                                    ? MyColors.darkTextSecondary
+                                    : MyColors.text3,
+                              ),
                               onPressed: () {
                                 context.read<ShoppingCartBloc>().add(
                                     RemoveFromLocalCartEvent(itemType, itemId));
@@ -769,21 +874,25 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Container(
-                                width: 100.w,
-                                height: 100.h,
+                                width: Dimens.nw(100),
+                                height: Dimens.nh(100),
                                 decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: Colors.grey[300],
+                                  borderRadius:
+                                      BorderRadius.circular(Dimens.nr(10)),
+                                  color: isDark
+                                      ? MyColors.darkCardBackground
+                                      : Colors.grey[300],
                                 ),
                                 child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
+                                  borderRadius:
+                                      BorderRadius.circular(Dimens.nr(10)),
                                   child: _buildLocalCartItemImage(
                                     resolvedItem,
                                     itemType,
                                   ),
                                 ),
                               ),
-                              SizedBox(width: 8.w),
+                              SizedBox(width: Dimens.small),
                               Expanded(
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.start,
@@ -796,33 +905,37 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                                               : 'محصول'),
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 16.sp,
+                                        fontSize: Dimens.nsp(16),
                                       ),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                     ),
-                                    SizedBox(height: 4.h),
+                                    SizedBox(height: Dimens.nh(4)),
                                     Text(
                                       resolvedItem?.description ??
                                           (isLoading
                                               ? 'در حال دریافت اطلاعات'
                                               : 'اطلاعات این آیتم در دسترس نیست'),
                                       style: TextStyle(
-                                        color: Colors.grey[600],
-                                        fontSize: 14.sp,
+                                        color: isDark
+                                            ? MyColors.darkTextSecondary
+                                            : Colors.grey[600],
+                                        fontSize: Dimens.nsp(14),
                                       ),
                                       maxLines: 2,
                                       overflow: TextOverflow.ellipsis,
                                     ),
-                                    SizedBox(height: 8.h),
+                                    SizedBox(height: Dimens.nh(8)),
                                     Text(
                                       'نوع: ${_getItemTypeLabel(itemType)}',
                                       style: TextStyle(
-                                        color: Colors.grey[500],
-                                        fontSize: 12.sp,
+                                        color: isDark
+                                            ? MyColors.darkTextSecondary
+                                            : Colors.grey[500],
+                                        fontSize: Dimens.nsp(12),
                                       ),
                                     ),
-                                    SizedBox(height: 24.h),
+                                    SizedBox(height: Dimens.nh(24)),
                                   ],
                                 ),
                               ),
@@ -839,13 +952,13 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                                       .addComma,
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 16.sp,
+                                    fontSize: Dimens.nsp(16),
                                   ),
                                 ),
-                                SizedBox(width: 4.w),
+                                SizedBox(width: Dimens.nw(4)),
                                 Text(
                                   "تومان",
-                                  style: TextStyle(fontSize: 12.sp),
+                                  style: TextStyle(fontSize: Dimens.nsp(12)),
                                 ),
                               ],
                             ),
@@ -859,11 +972,13 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
             ),
           ),
           Container(
-            padding: EdgeInsets.all(16.w),
+            padding: EdgeInsets.all(Dimens.medium),
             decoration: BoxDecoration(
-              color: MyColors.background,
+              color: isDark
+                  ? MyColors.darkBackgroundSecondary
+                  : MyColors.background,
               borderRadius: BorderRadius.vertical(
-                top: Radius.circular(20.r),
+                top: Radius.circular(Dimens.nr(20)),
               ),
             ),
             child: Row(
@@ -881,7 +996,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                           Text(
                             '${l10n?.total_price} ${totalPrice.addComma}',
                             style: TextStyle(
-                              fontSize: 18.sp,
+                              fontSize: Dimens.nsp(18),
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -891,8 +1006,8 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                   ),
                 ),
                 PrimaryButton(
-                  width: 160.w,
-                  height: 50.h,
+                  width: Dimens.nw(160),
+                  height: Dimens.nh(50),
                   lable: l10n?.pay_now ?? "Pay Now",
                   onPressed: () async {
                     try {
@@ -997,6 +1112,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
   }
 
   Widget _buildLocalCartFallbackImage(String itemType) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final IconData icon;
     if (itemType == 'IKnowCourse') {
       icon = Icons.school;
@@ -1007,17 +1123,18 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
     }
 
     return Container(
-      color: Colors.grey[300],
+      color: isDark ? MyColors.darkCardBackground : Colors.grey[300],
       child: Icon(
         icon,
-        size: 40.r,
-        color: Colors.grey[600],
+        size: Dimens.nr(40),
+        color: isDark ? MyColors.darkTextSecondary : Colors.grey[600],
       ),
     );
   }
 
   // Helper method to build cart item image
   Widget _buildCartItemImage(ShoppingCartItem item) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     // Check if source has thumbnail
     String? thumbnailId;
     if (item.source != null && item.source!['thumbnail'] != null) {
@@ -1036,11 +1153,11 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
               !snapshot.hasData ||
               snapshot.data!.isEmpty) {
             return Container(
-              color: Colors.grey[300],
-              child: const Icon(
+              color: isDark ? MyColors.darkCardBackground : Colors.grey[300],
+              child: Icon(
                 Icons.image_not_supported,
-                size: 40,
-                color: Colors.grey,
+                size: Dimens.nr(40),
+                color: isDark ? MyColors.darkTextSecondary : Colors.grey,
               ),
             );
           }
@@ -1051,11 +1168,11 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
             height: 100,
             errorBuilder: (context, error, stackTrace) {
               return Container(
-                color: Colors.grey[300],
-                child: const Icon(
+                color: isDark ? MyColors.darkCardBackground : Colors.grey[300],
+                child: Icon(
                   Icons.image_not_supported,
-                  size: 40,
-                  color: Colors.grey,
+                  size: Dimens.nr(40),
+                  color: isDark ? MyColors.darkTextSecondary : Colors.grey,
                 ),
               );
             },
@@ -1073,11 +1190,11 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
         height: 100,
         errorBuilder: (context, error, stackTrace) {
           return Container(
-            color: Colors.grey[300],
-            child: const Icon(
+            color: isDark ? MyColors.darkCardBackground : Colors.grey[300],
+            child: Icon(
               Icons.image_not_supported,
-              size: 40,
-              color: Colors.grey,
+              size: Dimens.nr(40),
+              color: isDark ? MyColors.darkTextSecondary : Colors.grey,
             ),
           );
         },
@@ -1086,11 +1203,11 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
 
     // Default placeholder
     return Container(
-      color: Colors.grey[300],
-      child: const Icon(
+      color: isDark ? MyColors.darkCardBackground : Colors.grey[300],
+      child: Icon(
         Icons.shopping_cart,
-        size: 40,
-        color: Colors.grey,
+        size: Dimens.nr(40),
+        color: isDark ? MyColors.darkTextSecondary : Colors.grey,
       ),
     );
   }

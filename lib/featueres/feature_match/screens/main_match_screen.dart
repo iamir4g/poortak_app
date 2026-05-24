@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
+import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_match/screens/match_screen.dart';
@@ -12,38 +12,53 @@ class MainMatchScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xFFFFF5F0), // Light orange
-              Color(0xFFFBFDF2), // Light green
-            ],
-          ),
+        decoration: BoxDecoration(
+          gradient: isDark
+              ? const LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color(0xFF171926),
+                    MyColors.darkBackground,
+                    Color(0xFF171926),
+                  ],
+                  stops: [0.1, 0.54, 1.0],
+                )
+              : const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Color(0xFFFFF5F0),
+                    Color(0xFFFBFDF2),
+                  ],
+                ),
         ),
         child: SafeArea(
           child: Column(
             children: [
               // Header
               Container(
-                height: 57.h,
+                height: Dimens.nh(57),
                 width: double.infinity,
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                padding: EdgeInsets.symmetric(horizontal: Dimens.medium),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color:
+                      isDark ? MyColors.darkBackgroundSecondary : Colors.white,
                   borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(33.5.r),
+                    bottomLeft: Radius.circular(Dimens.nr(33.5)),
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0x0D000000),
-                      offset: Offset(0, 1.h),
-                      blurRadius: 1.r,
-                    ),
-                  ],
+                  boxShadow: isDark
+                      ? null
+                      : [
+                          BoxShadow(
+                            color: const Color(0x0D000000),
+                            offset: Offset(0, Dimens.nh(1)),
+                            blurRadius: Dimens.nr(1),
+                          ),
+                        ],
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -53,7 +68,9 @@ class MainMatchScreen extends StatelessWidget {
                       child: Text(
                         'مسابقه پورتک',
                         style: MyTextStyle.textHeader16Bold.copyWith(
-                          color: MyColors.textMatn2,
+                          color: isDark
+                              ? MyColors.darkTextPrimary
+                              : MyColors.textMatn2,
                         ),
                         textAlign: TextAlign.center,
                         maxLines: 1,
@@ -63,15 +80,17 @@ class MainMatchScreen extends StatelessWidget {
 
                     // Back Button
                     Container(
-                      width: 50.w,
-                      height: 50.h,
-                      margin: EdgeInsets.only(left: 16.w),
+                      width: Dimens.nw(50),
+                      height: Dimens.nh(50),
+                      margin: EdgeInsets.only(left: Dimens.medium),
                       child: IconButton(
                         onPressed: () => Navigator.of(context).pop(),
                         icon: Icon(
                           Icons.arrow_forward,
-                          color: MyColors.textMatn1,
-                          size: 20.r,
+                          color: isDark
+                              ? MyColors.darkTextPrimary
+                              : MyColors.textMatn1,
+                          size: Dimens.nr(20),
                         ),
                       ),
                     ),
@@ -82,27 +101,31 @@ class MainMatchScreen extends StatelessWidget {
               // Content
               Expanded(
                 child: SingleChildScrollView(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: Dimens.nw(20),
+                    vertical: Dimens.nh(20),
+                  ),
                   child: Column(
                     children: [
-                      SizedBox(height: 20.h),
+                      SizedBox(height: Dimens.nh(20)),
 
                       // Match Option Cards
                       _buildMatchCard(
                         iconLottiePath: 'assets/images/match/questions.json',
                         title: 'شرکت در مسابقه',
+                        isDark: isDark,
                         onTap: () {
                           // Navigate to join match screen
                           Navigator.pushNamed(context, MatchScreen.routeName);
                         },
                       ),
 
-                      SizedBox(height: 20.h),
+                      SizedBox(height: Dimens.nh(20)),
 
                       _buildMatchCard(
                         iconLottiePath: 'assets/images/match/prize.json',
                         title: 'جوایز مسابقه',
+                        isDark: isDark,
                         onTap: () {
                           // Navigate to prizes screen
                           Navigator.pushNamed(
@@ -110,7 +133,7 @@ class MainMatchScreen extends StatelessWidget {
                         },
                       ),
 
-                      SizedBox(height: 40.h),
+                      SizedBox(height: Dimens.nh(40)),
                     ],
                   ),
                 ),
@@ -125,34 +148,40 @@ class MainMatchScreen extends StatelessWidget {
   Widget _buildMatchCard({
     required String iconLottiePath,
     required String title,
+    required bool isDark,
     required VoidCallback onTap,
   }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: double.infinity,
-        constraints: BoxConstraints(minHeight: 162.h),
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+        constraints: BoxConstraints(minHeight: Dimens.nh(162)),
+        padding: EdgeInsets.symmetric(
+          horizontal: Dimens.medium,
+          vertical: Dimens.medium,
+        ),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20.r),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0x0A000000),
-              offset: const Offset(0, 0),
-              blurRadius: 4.r,
-            ),
-          ],
+          color: isDark ? MyColors.termsBackgroundDark : Colors.white,
+          borderRadius: BorderRadius.circular(Dimens.nr(20)),
+          boxShadow: isDark
+              ? null
+              : [
+                  BoxShadow(
+                    color: const Color(0x0A000000),
+                    offset: const Offset(0, 0),
+                    blurRadius: Dimens.nr(4),
+                  ),
+                ],
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // Icon
             Container(
-              width: 80.r,
-              height: 80.r,
+              width: Dimens.nr(80),
+              height: Dimens.nr(80),
               decoration: BoxDecoration(
-                color: MyColors.primary.withValues(alpha: 0.1),
+                color: MyColors.primary.withValues(alpha: isDark ? 0.15 : 0.1),
                 shape: BoxShape.circle,
               ),
               child: Lottie.asset(
@@ -161,14 +190,14 @@ class MainMatchScreen extends StatelessWidget {
               ),
             ),
 
-            SizedBox(height: 16.h),
+            SizedBox(height: Dimens.nh(16)),
 
             // Title
             Text(
               title,
               style: MyTextStyle.textMatn16.copyWith(
                 fontWeight: FontWeight.w500,
-                color: const Color(0xFF29303D),
+                color: isDark ? MyColors.darkTextPrimary : MyColors.text1,
               ),
               textAlign: TextAlign.center,
               maxLines: 2,
@@ -181,19 +210,20 @@ class MainMatchScreen extends StatelessWidget {
   }
 
   void _showComingSoonDialog(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: Colors.white,
+          backgroundColor: isDark ? MyColors.termsBackgroundDark : Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20.r),
+            borderRadius: BorderRadius.circular(Dimens.nr(20)),
           ),
           title: Flexible(
             child: Text(
               'به زودی',
               style: MyTextStyle.textMatn18Bold.copyWith(
-                color: MyColors.textMatn1,
+                color: isDark ? MyColors.darkTextPrimary : MyColors.textMatn1,
               ),
               textAlign: TextAlign.center,
               maxLines: 1,
@@ -205,7 +235,7 @@ class MainMatchScreen extends StatelessWidget {
               'این بخش به زودی راه‌اندازی خواهد شد.',
               style: MyTextStyle.textMatn14Bold.copyWith(
                 fontWeight: FontWeight.normal,
-                color: MyColors.textMatn1,
+                color: isDark ? MyColors.darkTextPrimary : MyColors.textMatn1,
               ),
               textAlign: TextAlign.center,
             ),
@@ -217,10 +247,12 @@ class MainMatchScreen extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: MyColors.primary,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20.r),
+                    borderRadius: BorderRadius.circular(Dimens.nr(20)),
                   ),
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 30.w, vertical: 12.h),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: Dimens.nw(30),
+                    vertical: Dimens.nh(12),
+                  ),
                 ),
                 child: Flexible(
                   child: Text(

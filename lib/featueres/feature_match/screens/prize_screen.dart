@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 
@@ -36,17 +36,29 @@ class _MatchPrizeScreenState extends State<MatchPrizeScreen>
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFFFFF9F0), // Light beige
-              Color(0xFFFBFDF2), // Light green
-            ],
-          ),
+        decoration: BoxDecoration(
+          gradient: isDark
+              ? const LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color(0xFF171926),
+                    MyColors.darkBackground,
+                    Color(0xFF171926),
+                  ],
+                  stops: [0.1, 0.54, 1.0],
+                )
+              : const LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color(0xFFFFF9F0),
+                    Color(0xFFFBFDF2),
+                  ],
+                ),
         ),
         child: SafeArea(
           child: Column(
@@ -60,25 +72,31 @@ class _MatchPrizeScreenState extends State<MatchPrizeScreen>
                   children: [
                     // Abstract background shapes
                     Positioned(
-                      top: 150.h,
-                      left: -70.w,
+                      top: Dimens.nh(150),
+                      left: -Dimens.nw(70),
                       child: Container(
-                        width: 250.r,
-                        height: 250.r,
+                        width: Dimens.nr(250),
+                        height: Dimens.nr(250),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFFE8D0).withOpacity(0.3),
+                          color: (isDark
+                                  ? MyColors.primary
+                                  : const Color(0xFFFFE8D0))
+                              .withValues(alpha: 0.18),
                           shape: BoxShape.circle,
                         ),
                       ),
                     ),
                     Positioned(
-                      bottom: 50.h,
-                      right: -80.w,
+                      bottom: Dimens.nh(50),
+                      right: -Dimens.nw(80),
                       child: Container(
-                        width: 300.r,
-                        height: 300.r,
+                        width: Dimens.nr(300),
+                        height: Dimens.nr(300),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFE8F5D0).withOpacity(0.3),
+                          color: (isDark
+                                  ? MyColors.secondary
+                                  : const Color(0xFFE8F5D0))
+                              .withValues(alpha: 0.14),
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -87,21 +105,28 @@ class _MatchPrizeScreenState extends State<MatchPrizeScreen>
                     // Main content card
                     SingleChildScrollView(
                       padding: EdgeInsets.symmetric(
-                          horizontal: 12.w, vertical: 20.h),
+                        horizontal: Dimens.nw(12),
+                        vertical: Dimens.nh(20),
+                      ),
                       child: Container(
                         width: double.infinity,
                         padding: EdgeInsets.symmetric(
-                            horizontal: 24.w, vertical: 50.h),
+                          horizontal: Dimens.nw(24),
+                          vertical: Dimens.nh(50),
+                        ),
                         decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(30.r),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.04),
-                              offset: const Offset(0, 10),
-                              blurRadius: 20,
-                            ),
-                          ],
+                          color:
+                              isDark ? MyColors.termsBackgroundDark : Colors.white,
+                          borderRadius: BorderRadius.circular(Dimens.nr(30)),
+                          boxShadow: isDark
+                              ? null
+                              : [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.04),
+                                    offset: const Offset(0, 10),
+                                    blurRadius: 20,
+                                  ),
+                                ],
                         ),
                         child: Column(
                           children: [
@@ -111,13 +136,19 @@ class _MatchPrizeScreenState extends State<MatchPrizeScreen>
                               children: [
                                 // Shadow under money
                                 Container(
-                                  width: 140.w,
-                                  height: 20.h,
-                                  margin: EdgeInsets.only(bottom: 20.h),
+                                  width: Dimens.nw(140),
+                                  height: Dimens.nh(20),
+                                  margin: EdgeInsets.only(
+                                    bottom: Dimens.nh(20),
+                                  ),
                                   decoration: BoxDecoration(
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withOpacity(0.08),
+                                        color: (isDark
+                                                ? Colors.black
+                                                : Colors.black)
+                                            .withValues(
+                                                alpha: isDark ? 0.25 : 0.08),
                                         blurRadius: 25,
                                         spreadRadius: 2,
                                       ),
@@ -135,8 +166,8 @@ class _MatchPrizeScreenState extends State<MatchPrizeScreen>
                                             i--)
                                           Image.asset(
                                             'assets/images/mony/images-$i.png',
-                                            width: 100.w,
-                                            height: 100.h,
+                                            width: Dimens.nw(100),
+                                            height: Dimens.nh(100),
                                             fit: BoxFit.contain,
                                           ),
                                       ],
@@ -146,29 +177,34 @@ class _MatchPrizeScreenState extends State<MatchPrizeScreen>
                               ],
                             ),
 
-                            SizedBox(height: 30.h),
+                            SizedBox(height: Dimens.nh(30)),
 
                             // Title
                             Text(
                               'جوایز نقدی به برندگان',
                               textAlign: TextAlign.center,
                               style: MyTextStyle.text16MediumText1.copyWith(
-                                fontSize: 18.sp,
-                                color: MyColors.text1,
+                                fontSize: Dimens.nsp(18),
+                                color:
+                                    isDark ? MyColors.darkTextPrimary : MyColors.text1,
                               ),
                             ),
 
-                            SizedBox(height: 15.h),
+                            SizedBox(height: Dimens.nh(15)),
 
                             // Description
                             Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 10.w),
+                              padding: EdgeInsets.symmetric(
+                                horizontal: Dimens.nw(10),
+                              ),
                               child: Text(
                                 'پس از ارسال پاسخ صحیح در بخش (شرکت در مسابقه پورتک) به قید قرعه به ۱۰ نفر از عزیزانی که جواب درست را نوشته باشند مبلغ ۱ میلیون ریال تعلق می گیرد.',
                                 textAlign: TextAlign.center,
                                 style: MyTextStyle.text14LightText3.copyWith(
                                   height: 1.4,
-                                  color: MyColors.text3,
+                                  color: isDark
+                                      ? MyColors.darkTextSecondary
+                                      : MyColors.text3,
                                 ),
                               ),
                             ),
@@ -187,21 +223,29 @@ class _MatchPrizeScreenState extends State<MatchPrizeScreen>
   }
 
   Widget _buildHeader() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
-      padding: EdgeInsets.fromLTRB(16.w, 0, 32.w, 0),
-      height: 57.h,
+      padding: EdgeInsets.fromLTRB(
+        Dimens.medium,
+        0,
+        Dimens.nw(32),
+        0,
+      ),
+      height: Dimens.nh(57),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? MyColors.darkBackgroundSecondary : Colors.white,
         borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(33.5.r),
+          bottomLeft: Radius.circular(Dimens.nr(33.5)),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            offset: Offset(0, 1.h),
-            blurRadius: 1.r,
-          ),
-        ],
+        boxShadow: isDark
+            ? null
+            : [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  offset: Offset(0, Dimens.nh(1)),
+                  blurRadius: Dimens.nr(1),
+                ),
+              ],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -212,7 +256,8 @@ class _MatchPrizeScreenState extends State<MatchPrizeScreen>
               'جوایز مسابقه',
               textAlign: TextAlign.center,
               style: MyTextStyle.textHeader16Bold.copyWith(
-                color: MyColors.textMatn2,
+                color:
+                    isDark ? MyColors.darkTextPrimary : MyColors.textMatn2,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -221,14 +266,15 @@ class _MatchPrizeScreenState extends State<MatchPrizeScreen>
 
           // Back button
           SizedBox(
-            width: 40.w,
-            height: 40.h,
+            width: Dimens.nw(40),
+            height: Dimens.nh(40),
             child: IconButton(
               onPressed: () => Navigator.pop(context),
               icon: Icon(
                 Icons.arrow_forward,
-                color: MyColors.textMatn1,
-                size: 28.r,
+                color:
+                    isDark ? MyColors.darkTextPrimary : MyColors.textMatn1,
+                size: Dimens.nr(28),
               ),
             ),
           ),

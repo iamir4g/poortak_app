@@ -26,6 +26,12 @@ class QuizResultModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final surfaceColor = isDark ? MyColors.termsBackgroundDark : Colors.white;
+    final primaryTextColor =
+        isDark ? MyColors.profileTextPrimaryDark : const Color(0xFF3D495C);
+    final secondaryTextColor =
+        isDark ? MyColors.loginTextSecondaryDark : const Color(0xFF52617A);
     // Calculate percentages
     final double correctPercent =
         totalQuestions > 0 ? (correctAnswers / totalQuestions) * 100 : 0;
@@ -44,7 +50,11 @@ class QuizResultModal extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(25.r),
       ),
-      child: Padding(
+      child: Container(
+        decoration: BoxDecoration(
+          color: surfaceColor,
+          borderRadius: BorderRadius.circular(25.r),
+        ),
         padding: EdgeInsets.all(20.r),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -61,7 +71,7 @@ class QuizResultModal extends StatelessWidget {
             Text(
               'نمره شما : ${getResultText(correctPercent)}',
               style: MyTextStyle.textHeader16Bold.copyWith(
-                color: const Color(0xFF3D495C),
+                color: primaryTextColor,
                 fontWeight: FontWeight.w700,
                 fontSize: 16.sp,
               ),
@@ -75,7 +85,7 @@ class QuizResultModal extends StatelessWidget {
                 Text(
                   'درصد جواب های درست:',
                   style: MyTextStyle.textHeader16Bold.copyWith(
-                    color: const Color(0xFF52617A),
+                    color: secondaryTextColor,
                     fontWeight: FontWeight.w500,
                     fontSize: 12.sp,
                   ),
@@ -83,7 +93,7 @@ class QuizResultModal extends StatelessWidget {
                 Text(
                   '${correctPercent.toStringAsFixed(0)}%',
                   style: MyTextStyle.textHeader16Bold.copyWith(
-                    color: const Color(0xFF52617A),
+                    color: secondaryTextColor,
                     fontWeight: FontWeight.w500,
                     fontSize: 12.sp,
                   ),
@@ -96,8 +106,14 @@ class QuizResultModal extends StatelessWidget {
               child: LinearProgressIndicator(
                 value: correctPercent / 100,
                 minHeight: 14.h,
-                backgroundColor: const Color(0xFFEFEFEF),
-                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFADFF99)),
+                backgroundColor: isDark
+                    ? MyColors.profileHeaderDark
+                    : const Color(0xFFEFEFEF),
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  isDark
+                      ? MyColors.quizAnswerCorrectBorderDark
+                      : const Color(0xFFADFF99),
+                ),
               ),
             ),
             SizedBox(height: Dimens.medium.h),
@@ -108,7 +124,7 @@ class QuizResultModal extends StatelessWidget {
                 Text(
                   'درصد جواب های غلط:',
                   style: MyTextStyle.textHeader16Bold.copyWith(
-                    color: const Color(0xFF52617A),
+                    color: secondaryTextColor,
                     fontWeight: FontWeight.w500,
                     fontSize: 12.sp,
                   ),
@@ -116,7 +132,7 @@ class QuizResultModal extends StatelessWidget {
                 Text(
                   '${wrongPercent.toStringAsFixed(0)}%',
                   style: MyTextStyle.textHeader16Bold.copyWith(
-                    color: const Color(0xFF52617A),
+                    color: secondaryTextColor,
                     fontWeight: FontWeight.w500,
                     fontSize: 12.sp,
                   ),
@@ -129,8 +145,12 @@ class QuizResultModal extends StatelessWidget {
               child: LinearProgressIndicator(
                 value: wrongPercent / 100,
                 minHeight: 14.h,
-                backgroundColor: const Color(0xFFEFEFEF),
-                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFFB199)),
+                backgroundColor: isDark
+                    ? MyColors.profileHeaderDark
+                    : const Color(0xFFEFEFEF),
+                valueColor: AlwaysStoppedAnimation<Color>(isDark
+                    ? MyColors.quizAnswerWrongBorderDark
+                    : const Color(0xFFFFB199)),
               ),
             ),
             SizedBox(height: 24.h),
