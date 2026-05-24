@@ -2,12 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
+import 'package:poortak/config/my_theme.dart';
 
 class TermsConditionsModal extends StatelessWidget {
   const TermsConditionsModal({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final termsTheme = theme.extension<TermsConditionsTheme>() ??
+        (theme.brightness == Brightness.dark
+            ? TermsConditionsTheme.dark
+            : TermsConditionsTheme.light);
     return Dialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20.r),
@@ -16,7 +22,7 @@ class TermsConditionsModal extends StatelessWidget {
         width: 333.w,
         height: 600.h, // Adjusted height to be more reasonable
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: termsTheme.backgroundColor,
           borderRadius: BorderRadius.circular(20.r),
         ),
         child: Column(
@@ -39,7 +45,7 @@ class TermsConditionsModal extends StatelessWidget {
                               text: "قوانین و مقررات ",
                               style: MyTextStyle.textMatn12Bold.copyWith(
                                 fontSize: 15.sp,
-                                color: const Color(0xFFF88F48), // Orange color
+                                color: MyColors.primary,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -47,7 +53,7 @@ class TermsConditionsModal extends StatelessWidget {
                               text: "خرید از پورتک",
                               style: MyTextStyle.textMatn12Bold.copyWith(
                                 fontSize: 15.sp,
-                                color: MyColors.textMatn1,
+                                color: termsTheme.textColor,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -65,7 +71,7 @@ class TermsConditionsModal extends StatelessWidget {
                           height: 24.h,
                           child: Icon(
                             Icons.close,
-                            color: Colors.black,
+                            color: termsTheme.iconColor,
                             size: 24.sp,
                           ),
                         ),
@@ -75,7 +81,7 @@ class TermsConditionsModal extends StatelessWidget {
                   SizedBox(height: 16.h),
                   Container(
                     height: 1.h,
-                    color: MyColors.divider,
+                    color: termsTheme.dividerColor,
                   ),
                 ],
               ),
@@ -92,7 +98,7 @@ class TermsConditionsModal extends StatelessWidget {
                       'اطلاعات شخصی کاربران همانند ایمیل، شماره همراه و… با حفظ حریم شخصی در اپلیکیشن ثبت می‌شود. علاوه‌ بر آن به منظور اطلاع رسانی بهتر تخفیفات ویژه و سایر تخفیفات مناسبتی سایت، ایمیل یا پیامک به آدرس الکترونیک و یا شماره‌ همراه ثبت شده‌ کاربر ارسال خواهد شد.',
                       style: MyTextStyle.textMatn13.copyWith(
                         fontSize: 14.sp,
-                        color: MyColors.textMatn1,
+                        color: termsTheme.textColor,
                         height: 1.5,
                       ),
                       textAlign: TextAlign.right,
@@ -102,7 +108,7 @@ class TermsConditionsModal extends StatelessWidget {
                       'کلیه حقوق و امتیازات مجموعه آموزشی سیاره آی نو متعلق به انتشارات تاجیک می باشد و هر گونه کپی برداری و تکثیر از آن غیر مجاز بوده و پیگرد قانونی به همراه خواهد داشت.',
                       style: MyTextStyle.textMatn13.copyWith(
                         fontSize: 14.sp,
-                        color: MyColors.textMatn1,
+                        color: termsTheme.textColor,
                         height: 1.5,
                       ),
                       textAlign: TextAlign.right,
@@ -112,7 +118,7 @@ class TermsConditionsModal extends StatelessWidget {
                       'ثبت، پردازش و ارسال سفارش سفارش های فبزیکی ثبت شده در طول روزهای کاری و اولین روز پس از تعطیلات پردازش می شوند، و ارسال از طریق پست به تهران و شهرستان ها میسر می باشد.',
                       style: MyTextStyle.textMatn13.copyWith(
                         fontSize: 14.sp,
-                        color: MyColors.textMatn1,
+                        color: termsTheme.textColor,
                         height: 1.5,
                       ),
                       textAlign: TextAlign.right,
@@ -122,7 +128,7 @@ class TermsConditionsModal extends StatelessWidget {
                       'کاربران باید هنگام سفارش کالای مورد نظر خود، فرم سفارش را با اطلاعات صحیح و به طور کامل تکمیل کنند. بدیهی است درصورت ورود اطلاعات ناقص یا نادرست، سفارش کاربر قابل پیگیری و تحویل نخواهد بود. بنابراین درج آدرس، ایمیل و شماره تماس همراه مشتری، به منزله مورد تایید بودن صحت آنها است و در صورتی که این موارد به صورت صحیح یا کامل درج نشده باشد،همچنین، مشتریان می‌توانند نام، آدرس و تلفن شخص دیگری را برای تحویل گرفتن سفارش وارد کنند و تحویل گیرنده سفارش هنگام دریافت کالا باید کارت شناسایی همراه داشته باشد.',
                       style: MyTextStyle.textMatn13.copyWith(
                         fontSize: 14.sp,
-                        color: MyColors.textMatn1,
+                        color: termsTheme.textColor,
                         height: 1.5,
                       ),
                       textAlign: TextAlign.right,
@@ -132,7 +138,7 @@ class TermsConditionsModal extends StatelessWidget {
                       'برای سفارش یک کالا به تعداد بالا، لازم است پیش از ارسال، سفارش مشتریان ابتدا توسط پشتیبان بررسی و در صورت تایید، پردازش گردد. در صورت عدم تایید سفارشات با هماهنگی مشتری کنسل شده و در صورت واریز وجه، مبلغ پرداخت شده طی 5 الی 7 روز کاری به حساب مشتری عودت داده خواهد شد.',
                       style: MyTextStyle.textMatn13.copyWith(
                         fontSize: 14.sp,
-                        color: MyColors.textMatn1,
+                        color: termsTheme.textColor,
                         height: 1.5,
                       ),
                       textAlign: TextAlign.right,

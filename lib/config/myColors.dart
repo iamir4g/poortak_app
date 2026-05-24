@@ -105,6 +105,16 @@ class MyColors {
   static const Color darkMatn1 = Color(0xFF363A53); // Dark text color
   static const Color darkText1 = text1; // Dark text variant
 
+  // Login (Dark Mode)
+  static const Color loginBackgroundOverlayDark = Color(0x99000000);
+  static const Color loginInputBackgroundDark = Color(0xFF282A39);
+  static const Color loginIconColorDark = Color(0xFFD3D4DA);
+  static const Color loginIconContainerDark = Color(0xFF545878);
+  static const Color loginTextPrimaryDark = Color(0xFFFFFFFF);
+  static const Color loginTextSecondaryDark = Color(0xFF838697);
+  static const Color loginButtonText = Color(0xFF171926);
+  static const Color termsBackgroundDark = Color(0xFF282A39);
+
   // Progress Bar Colors
   static const Color progressBarColor = Color(0xFF5E85F2);
   static const Color progressBarBackground = Color(0xFFE0E0E0);

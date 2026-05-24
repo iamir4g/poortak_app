@@ -14,6 +14,7 @@ import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/config/dimens.dart';
+import 'package:poortak/config/my_theme.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/featueres/feature_profile/presentation/bloc/profile_bloc.dart';
 import 'package:poortak/featueres/feature_profile/presentation/bloc/profile_event.dart';
@@ -136,10 +137,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final loginTheme = theme.extension<LoginTheme>() ??
+        (theme.brightness == Brightness.dark
+            ? LoginTheme.dark
+            : LoginTheme.light);
     return BlocProvider(
       create: (context) => ProfileBloc(repository: locator()),
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
         body: Stack(
           children: [
             // Background
@@ -147,6 +153,11 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Image.asset(
                 'assets/images/login/login_background.png',
                 fit: BoxFit.cover,
+              ),
+            ),
+            Positioned.fill(
+              child: ColoredBox(
+                color: loginTheme.backgroundOverlayColor,
               ),
             ),
             // Content
@@ -191,7 +202,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             : "شماره موبایل خود را وارد کنید:",
                         style: MyTextStyle.textMatn12Bold.copyWith(
                           fontSize: 16.sp,
-                          color: MyColors.textMatn1,
+                          color: loginTheme.titleTextColor,
                           fontWeight: FontWeight.w500,
                         ),
                         textAlign: TextAlign.center,
@@ -200,8 +211,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       SizedBox(height: Dimens.medium.h),
 
                       // Form section
-                      if (!showOtpForm) _buildMobileInput(),
-                      if (showOtpForm) _buildOtpInput(),
+                      if (!showOtpForm) _buildMobileInput(loginTheme),
+                      if (showOtpForm) _buildOtpInput(loginTheme),
 
                       SizedBox(height: Dimens.small.h),
 
@@ -210,7 +221,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         Text(
                           "کد ارسال شده به شماره 09${mobileNumber ?? ''} را وارد کنید",
                           style: MyTextStyle.textMatn13.copyWith(
-                            color: MyColors.text3,
+                            color: loginTheme.secondaryTextColor,
                             height: 1.4,
                             fontSize: 13.sp,
                           ),
@@ -222,7 +233,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           Text(
                             "ارسال مجدد کد:${_formatTime(_remainingSeconds)}",
                             style: MyTextStyle.textMatn13.copyWith(
-                              color: MyColors.primary,
+                              color: loginTheme.actionTextColor,
                               fontWeight: FontWeight.w600,
                               fontSize: 14.sp,
                             ),
@@ -245,7 +256,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 child: Text(
                                   "ارسال مجدد کد",
                                   style: MyTextStyle.textMatn13.copyWith(
-                                    color: MyColors.primary,
+                                    color: loginTheme.actionTextColor,
                                     fontWeight: FontWeight.w600,
                                     fontSize: 14.sp,
                                   ),
@@ -259,7 +270,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         Text(
                           "یک کد تایید برای شما ارسال می شود.",
                           style: MyTextStyle.textMatn13.copyWith(
-                            color: MyColors.text3,
+                            color: loginTheme.secondaryTextColor,
                             height: 1.4,
                             fontSize: 13.sp,
                           ),
@@ -294,12 +305,12 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildMobileInput() {
+  Widget _buildMobileInput(LoginTheme loginTheme) {
     return Container(
       constraints: BoxConstraints(maxWidth: 360.w),
       padding: EdgeInsets.symmetric(horizontal: 4.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: loginTheme.inputBackgroundColor,
         borderRadius: BorderRadius.circular(19.r),
         boxShadow: [
           BoxShadow(
@@ -332,7 +343,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 },
                 style: MyTextStyle.textMatn16.copyWith(
                   fontSize: 16.sp,
-                  color: MyColors.textMatn1,
+                  color: loginTheme.inputTextColor,
                   // fontFamily: 'monospace', // برای نمایش بهتر اعداد
                 ),
                 decoration: InputDecoration(
@@ -363,7 +374,7 @@ class _LoginScreenState extends State<LoginScreen> {
             "۰۹",
             style: MyTextStyle.textMatn12Bold.copyWith(
               fontSize: 22.sp,
-              color: MyColors.textMatn1,
+              color: loginTheme.inputTextColor,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -374,7 +385,7 @@ class _LoginScreenState extends State<LoginScreen> {
             height: 56.r,
             margin: EdgeInsets.symmetric(vertical: 4.h, horizontal: 4.w),
             decoration: BoxDecoration(
-              color: const Color(0xFFF6F6F6),
+              color: loginTheme.iconContainerColor,
               borderRadius: BorderRadius.circular(19.r),
             ),
             child: Transform.rotate(
@@ -384,8 +395,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   'assets/images/icons/ion--call.svg',
                   width: 18.r,
                   height: 18.r,
-                  colorFilter: const ColorFilter.mode(
-                    MyColors.text4,
+                  colorFilter: ColorFilter.mode(
+                    loginTheme.iconColor,
                     BlendMode.srcIn,
                   ),
                 ),
@@ -397,14 +408,14 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildOtpInput() {
+  Widget _buildOtpInput(LoginTheme loginTheme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(height: 12.h),
         Container(
           decoration: BoxDecoration(
-            color: MyColors.background,
+            color: loginTheme.inputBackgroundColor,
             borderRadius: BorderRadius.circular(16.r),
             border: Border.all(
               color:
@@ -438,7 +449,7 @@ class _LoginScreenState extends State<LoginScreen> {
               },
               style: MyTextStyle.textMatn16.copyWith(
                 fontSize: 18.sp,
-                color: MyColors.textMatn1,
+                color: loginTheme.inputTextColor,
                 letterSpacing: 2.w,
                 fontFamily: 'monospace',
               ),
@@ -555,34 +566,37 @@ class _LoginScreenState extends State<LoginScreen> {
         }
       },
       builder: (context, state) {
+        final buttonWidth = Dimens.loginButtonWidth;
+        final theme = Theme.of(context);
+        final loginTheme = theme.extension<LoginTheme>() ??
+            (theme.brightness == Brightness.dark
+                ? LoginTheme.dark
+                : LoginTheme.light);
         if (state is ProfileLoading) {
-          return Container(
+          return SizedBox(
+            width: buttonWidth,
             height: 56.h,
-            decoration: BoxDecoration(
-              color: MyColors.primary,
-              borderRadius: BorderRadius.circular(16.r),
-            ),
-            child: Center(
-              child: CircularProgressIndicator(
-                color: Colors.white,
-                strokeWidth: 2.w,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: MyColors.primary,
+                borderRadius: BorderRadius.circular(16.r),
+              ),
+              child: Center(
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 2.w,
+                ),
               ),
             ),
           );
         }
 
-        return Container(
-          constraints: BoxConstraints(
-            minWidth: 156.w,
-            minHeight: 56.h,
-          ),
-          padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
-          decoration: BoxDecoration(
+        return SizedBox(
+          width: buttonWidth,
+          height: 56.h,
+          child: Material(
             color: MyColors.primary,
             borderRadius: BorderRadius.circular(20.r),
-          ),
-          child: Material(
-            color: Colors.transparent,
             child: InkWell(
               borderRadius: BorderRadius.circular(20.r),
               onTap: () {
@@ -625,7 +639,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   showOtpForm ? "تایید و ورود" : "تأیید",
                   style: MyTextStyle.textMatn12Bold.copyWith(
                     fontSize: 18.sp,
-                    color: Colors.white,
+                    color: loginTheme.buttonTextColor,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -658,7 +672,11 @@ class _LoginScreenState extends State<LoginScreen> {
               text: "خرید از پورتک",
               style: MyTextStyle.textMatn13.copyWith(
                 fontSize: 14.sp,
-                color: MyColors.textMatn1,
+                color: (Theme.of(context).extension<LoginTheme>() ??
+                        (Theme.of(context).brightness == Brightness.dark
+                            ? LoginTheme.dark
+                            : LoginTheme.light))
+                    .secondaryTextColor,
                 fontWeight: FontWeight.w500,
               ),
             ),
