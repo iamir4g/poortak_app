@@ -1,6 +1,7 @@
 import 'package:poortak/featueres/feature_shopping_cart/data/models/shopping_cart_model.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/models/cart_enum.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/models/get_cart_model.dart';
+import 'package:poortak/common/utils/money_utils.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/locator.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/data_source/shopping_cart_api_provider.dart';
@@ -37,8 +38,8 @@ class ShoppingCartRepository {
           createdAt: getCartModel.data.cart.createdAt,
           updatedAt: getCartModel.data.cart.updatedAt,
           items: [],
-          subTotal: getCartModel.data.subTotal,
-          grandTotal: getCartModel.data.grandTotal,
+          subTotal: MoneyUtils.rialToTomanInt(getCartModel.data.subTotal),
+          grandTotal: MoneyUtils.rialToTomanInt(getCartModel.data.grandTotal),
         );
         return _cart;
       }
@@ -75,7 +76,7 @@ class ShoppingCartRepository {
           description: displayDescription,
           image: imageUrl,
           isLock: false, // Assuming items in cart are unlocked
-          price: int.parse(cartItem.price),
+          price: MoneyUtils.parseRialToTomanInt(cartItem.price),
           itemId: cartItem.itemId,
           type: cartItem.type,
           quantity: cartItem.quantity,
@@ -105,8 +106,8 @@ class ShoppingCartRepository {
         createdAt: getCartModel.data.cart.createdAt,
         updatedAt: getCartModel.data.cart.updatedAt,
         items: shoppingCartItems,
-        subTotal: getCartModel.data.subTotal,
-        grandTotal: getCartModel.data.grandTotal,
+        subTotal: MoneyUtils.rialToTomanInt(getCartModel.data.subTotal),
+        grandTotal: MoneyUtils.rialToTomanInt(getCartModel.data.grandTotal),
       );
 
       log("🎉 Successfully converted server cart to ShoppingCart format with ${shoppingCartItems.length} items");

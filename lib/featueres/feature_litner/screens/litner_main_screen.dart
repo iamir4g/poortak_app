@@ -147,7 +147,7 @@ class _LitnerMainScreenState extends State<LitnerMainScreen> with RouteAware {
                                     end: Alignment.bottomRight,
                                   ),
                                   icon:
-                                      'assets/images/litner/work-in-progress.png',
+                                      'assets/images/litner/work-in-progress.svg',
                                   number: state is OverviewLitnerLoading
                                       ? '...'
                                       : inProgress.toString(),
@@ -168,7 +168,7 @@ class _LitnerMainScreenState extends State<LitnerMainScreen> with RouteAware {
                                     begin: Alignment.topLeft,
                                     end: Alignment.bottomRight,
                                   ),
-                                  icon: 'assets/images/litner/mortarboard.png',
+                                  icon: 'assets/images/litner/mortarboard.svg',
                                   number: completed.toString(),
                                   label: 'کلمه',
                                   subLabel: 'آموخته شده',

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/config/dimens.dart';
+import 'package:poortak/common/utils/svg_embedded_png.dart';
 
 class LessonCardWidget extends StatelessWidget {
   final String iconPath;
@@ -66,9 +67,9 @@ class LessonCardWidget extends StatelessWidget {
                   badge != null
                       ? Stack(
                           children: [
-                            Image.asset(
+                            buildImageFromAssetOrEmbeddedSvg(
                               iconPath,
-                              width: Dimens.nr(40), // Reduced from 48
+                              width: Dimens.nr(40),
                               height: Dimens.nr(40),
                             ),
                             Positioned(
@@ -78,9 +79,9 @@ class LessonCardWidget extends StatelessWidget {
                             ),
                           ],
                         )
-                      : Image.asset(
+                      : buildImageFromAssetOrEmbeddedSvg(
                           iconPath,
-                          width: Dimens.nr(40), // Reduced from 48
+                          width: Dimens.nr(40),
                           height: Dimens.nr(40),
                         ),
                   SizedBox(width: Dimens.nw(15)), // Reduced from 18

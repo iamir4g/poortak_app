@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/common/utils/svg_embedded_png.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 
@@ -38,8 +39,8 @@ class SelfAssessmentGradeCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Image.asset(
-              'assets/images/quiz_icon.png',
+            buildImageFromAssetOrEmbeddedSvg(
+              'assets/images/points/quiz_icon.svg',
               width: 40.r,
               height: 40.r,
             ),

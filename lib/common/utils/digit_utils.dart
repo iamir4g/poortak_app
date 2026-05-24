@@ -46,8 +46,9 @@ String normalizeOtpForServer(String input, {int maxLength = 4}) {
 
 String formatTomanAmount(String amount) {
   try {
-    final numAmount = double.parse(toEnglishDigits(amount));
-    final formattedAmount = numAmount.toStringAsFixed(0);
+    final rialAmount = double.parse(toEnglishDigits(amount));
+    final tomanAmount = (rialAmount / 10).floor();
+    final formattedAmount = tomanAmount.toStringAsFixed(0);
     return '${toPersianDigits(formattedAmount)} تومان';
   } catch (_) {
     return '${toPersianDigits(amount)} تومان';

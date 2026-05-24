@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/common/services/getImageUrl_service.dart';
+import 'package:poortak/common/utils/money_utils.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/common/widgets/dot_loading_widget.dart';
 import 'package:poortak/common/widgets/primaryButton.dart';
@@ -164,8 +165,8 @@ class _BookDetailScreenState extends State<BookDetailScreen>
                 // Book Cover
                 Center(
                   child: Container(
-                    width: Dimens.nw(200),
-                    height: Dimens.nh(300),
+                    width: Dimens.nw(261.0),
+                    height: Dimens.nh(216.0),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(Dimens.nr(12)),
                       boxShadow: [
@@ -240,7 +241,7 @@ class _BookDetailScreenState extends State<BookDetailScreen>
                         children: [
                           Text(
                             bookData.price != null
-                                ? bookData.price.toString().addComma
+                                ? MoneyUtils.formatTomanFromRial(bookData.price)
                                 : "0",
                             style: TextStyle(
                               fontSize: Dimens.nsp(16),
@@ -272,7 +273,8 @@ class _BookDetailScreenState extends State<BookDetailScreen>
                   // child: Align(
                   // alignment: Alignment.centerRight,
                   child: TabBar(
-                    dividerColor: isDark ? MyColors.darkBorder : MyColors.dividerGray,
+                    dividerColor:
+                        isDark ? MyColors.darkBorder : MyColors.dividerGray,
                     controller: _tabController,
                     isScrollable: true,
                     labelStyle: MyTextStyle.tabLabel16.copyWith(
@@ -378,7 +380,8 @@ class _BookDetailScreenState extends State<BookDetailScreen>
                     child: Text(
                       "خواندن نمونه",
                       style: TextStyle(
-                        color: isDark ? MyColors.darkTextSecondary : Colors.grey,
+                        color:
+                            isDark ? MyColors.darkTextSecondary : Colors.grey,
                       ),
                     ),
                   ),

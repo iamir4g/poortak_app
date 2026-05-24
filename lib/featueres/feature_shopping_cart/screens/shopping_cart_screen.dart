@@ -25,6 +25,7 @@ import 'package:poortak/locator.dart';
 // import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'package:url_launcher/url_launcher.dart';
+import 'package:poortak/common/utils/money_utils.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/common/error_handling/app_exception.dart';
 import 'dart:developer';
@@ -237,18 +238,15 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
     return _summaryFuture;
   }
 
-  int _parsePrice(String? price) {
-    return int.tryParse(price ?? '') ?? 0;
-  }
-
   int _calculateBundlePayableAmount(IKnowSummaryModel summary) {
-    final subtotal = _parsePrice(summary.data.settings.price);
-    final discountValue = _parsePrice(summary.data.settings.discountAmount);
+    final subtotal = MoneyUtils.parseRialToTomanInt(summary.data.settings.price);
     final isPercent =
         summary.data.settings.discountType.toLowerCase() == 'percent';
 
-    final discountAmount =
-        isPercent ? subtotal * discountValue ~/ 100 : discountValue;
+    final discountAmount = isPercent
+        ? subtotal * MoneyUtils.parseRial(summary.data.settings.discountAmount) ~/
+            100
+        : MoneyUtils.parseRialToTomanInt(summary.data.settings.discountAmount);
     final payable = subtotal - discountAmount;
     return payable < 0 ? 0 : payable;
   }
@@ -263,7 +261,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
         return _LocalCartDisplayItem(
           title: course.name,
           description: course.description,
-          price: _parsePrice(course.price),
+          price: MoneyUtils.parseRialToTomanInt(course.price),
           thumbnailId: course.thumbnail,
           type: itemType,
         );
@@ -276,7 +274,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
         return _LocalCartDisplayItem(
           title: book.title,
           description: book.description ?? '',
-          price: _parsePrice(book.price),
+          price: MoneyUtils.parseRialToTomanInt(book.price),
           thumbnailId: book.thumbnail,
           type: itemType,
         );
