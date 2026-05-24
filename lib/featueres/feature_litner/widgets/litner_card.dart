@@ -22,13 +22,15 @@ class LitnerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: double.infinity,
         height: Dimens.nh(143.0),
         decoration: BoxDecoration(
-          gradient: gradient,
+          color: isDark ? MyColors.termsBackgroundDark : null,
+          gradient: isDark ? null : gradient,
           borderRadius: BorderRadius.circular(Dimens.nr(40.0)),
         ),
         child: Row(
@@ -40,8 +42,8 @@ class LitnerCard extends StatelessWidget {
               child: Container(
                 width: Dimens.nr(79.0),
                 height: Dimens.nr(79.0),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
+                decoration: BoxDecoration(
+                  color: isDark ? MyColors.textPrimary : Colors.white,
                   shape: BoxShape.circle,
                 ),
                 child: Center(
@@ -75,7 +77,9 @@ class LitnerCard extends StatelessWidget {
                             number,
                             style: MyTextStyle.textMatn18Bold.copyWith(
                               fontSize: Dimens.nsp(20.0),
-                              color: MyColors.darkText1,
+                              color: isDark
+                                  ? MyColors.profileTextPrimaryDark
+                                  : MyColors.darkText1,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -87,7 +91,9 @@ class LitnerCard extends StatelessWidget {
                             label,
                             style: MyTextStyle.textMatn17W700.copyWith(
                               fontSize: Dimens.nsp(20.0),
-                              color: MyColors.darkText1,
+                              color: isDark
+                                  ? MyColors.profileTextPrimaryDark
+                                  : MyColors.darkText1,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -99,7 +105,9 @@ class LitnerCard extends StatelessWidget {
                     Text(
                       subLabel,
                       style: MyTextStyle.textMatn12W500.copyWith(
-                        color: MyColors.text3,
+                        color: isDark
+                            ? MyColors.profileTextPrimaryDark
+                            : MyColors.text3,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -132,17 +140,21 @@ class LitnerTodayCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: double.infinity,
         height: Dimens.nh(112.0),
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [Color(0xFFFFF5DB), Color(0xFFFEE8DB)],
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight,
-          ),
+          color: isDark ? MyColors.termsBackgroundDark : null,
+          gradient: isDark
+              ? null
+              : const LinearGradient(
+                  colors: [Color(0xFFFFF5DB), Color(0xFFFEE8DB)],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                ),
           borderRadius: BorderRadius.circular(Dimens.nr(40.0)),
         ),
         child: Row(
@@ -154,8 +166,8 @@ class LitnerTodayCard extends StatelessWidget {
               child: Container(
                 width: Dimens.nr(79.0),
                 height: Dimens.nr(79.0),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
+                decoration: BoxDecoration(
+                  color: isDark ? MyColors.textPrimary : Colors.white,
                   shape: BoxShape.circle,
                 ),
                 child: Center(
@@ -178,7 +190,9 @@ class LitnerTodayCard extends StatelessWidget {
                     number,
                     style: MyTextStyle.textMatn18Bold.copyWith(
                       fontSize: Dimens.nsp(20.0),
-                      color: MyColors.darkText1,
+                      color: isDark
+                          ? MyColors.profileTextPrimaryDark
+                          : MyColors.darkText1,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -187,7 +201,9 @@ class LitnerTodayCard extends StatelessWidget {
                   Text(
                     label,
                     style: MyTextStyle.textMatn12W500.copyWith(
-                      color: MyColors.text3,
+                      color: isDark
+                          ? MyColors.profileTextPrimaryDark
+                          : MyColors.text3,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,

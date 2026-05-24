@@ -305,7 +305,7 @@ class _PrizeScreenState extends State<PrizeScreen> {
   }
 
   Widget _buildBottomButton() {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: EdgeInsets.only(bottom: 16.h),
       width: double.infinity,

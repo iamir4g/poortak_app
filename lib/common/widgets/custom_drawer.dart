@@ -325,7 +325,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                                               child: _buildDrawerIcon(
                                                 icon: "tdesign:edit",
                                                 color: Colors.white,
-                                                size: 12.w,
+                                                size: 8.w,
                                               ),
                                             ),
                                           ),

@@ -79,7 +79,9 @@ class _LitnerMainScreenState extends State<LitnerMainScreen> with RouteAware {
         }
       },
       child: Scaffold(
-        backgroundColor: MyColors.background,
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? MyColors.profileBackgroundDark
+            : MyColors.background,
         body: SafeArea(
           child: Stack(
             children: [
