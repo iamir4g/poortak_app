@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 
 class SelfAssessmentSubjectCard extends StatelessWidget {
@@ -18,19 +19,23 @@ class SelfAssessmentSubjectCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: backgroundColor,
+          color: isDark ? MyColors.termsBackgroundDark : backgroundColor,
           borderRadius: BorderRadius.circular(20.r),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 10.r,
-              offset: Offset(0, 4.h),
-            ),
-          ],
+          border: isDark ? Border.all(color: MyColors.darkBorder) : null,
+          boxShadow: isDark
+              ? null
+              : [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 10.r,
+                    offset: Offset(0, 4.h),
+                  ),
+                ],
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -38,7 +43,9 @@ class SelfAssessmentSubjectCard extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(12.r),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.5),
+                color: isDark
+                    ? MyColors.darkBackgroundSecondary.withValues(alpha: 0.7)
+                    : Colors.white.withValues(alpha: 0.5),
                 shape: BoxShape.circle,
               ),
               child: Image.asset(
@@ -53,7 +60,9 @@ class SelfAssessmentSubjectCard extends StatelessWidget {
               padding: EdgeInsets.symmetric(horizontal: 8.w),
               child: Text(
                 title,
-                style: MyTextStyle.textMatn14Bold,
+                style: MyTextStyle.textMatn14Bold.copyWith(
+                  color: isDark ? MyColors.darkTextPrimary : null,
+                ),
                 textAlign: TextAlign.center,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:poortak/common/widgets/primaryButton.dart';
 import 'package:poortak/config/dimens.dart';
+import 'package:poortak/config/myColors.dart';
 import 'package:poortak/l10n/app_localizations.dart';
 // import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:poortak/common/services/tts_service.dart';
@@ -67,20 +69,30 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
+      backgroundColor:
+          isDark ? MyColors.profileBackgroundDark : MyColors.background,
       appBar: AppBar(
         automaticallyImplyLeading: false,
+        backgroundColor:
+            isDark ? MyColors.profileHeaderDark : Theme.of(context).appBarTheme.backgroundColor,
         actions: [
           IconButton(
             onPressed: () => Navigator.of(context).pop(),
-            icon: const Icon(Icons.arrow_forward),
+            icon: Icon(
+              Icons.arrow_forward,
+              color: isDark ? MyColors.darkTextPrimary : null,
+            ),
           ),
         ],
         centerTitle: true,
         title: Flexible(
           child: Text(
             l10n!.litner_review,
-            style: MyTextStyle.textHeader16Bold,
+            style: MyTextStyle.textHeader16Bold.copyWith(
+              color: isDark ? MyColors.darkTextPrimary : MyColors.textMatn1,
+            ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -150,42 +162,31 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
                         Icon(
                           Icons.book_outlined,
                           size: 80.r,
-                          color: Colors.grey[400],
+                          color: isDark
+                              ? MyColors.darkTextSecondary
+                              : Colors.grey[400],
                         ),
                         SizedBox(height: Dimens.medium.h),
                         Text(
                           'شما ابتدا باید لغاتی را به لاینتر اضافه کنید',
                           style: MyTextStyle.textHeader16Bold.copyWith(
-                            color: Colors.grey[600],
+                            color: isDark
+                                ? MyColors.darkTextPrimary
+                                : Colors.grey[600],
                           ),
                           textAlign: TextAlign.center,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
                         SizedBox(height: Dimens.large.h),
-                        ElevatedButton(
+                        PrimaryButton(
+                          width: double.infinity,
+                          height: Dimens.buttonHeight,
+                          lable: 'اضافه کردن لغت',
                           onPressed: () {
                             Navigator.pushNamed(
                                 context, '/litner-words-inprogress');
                           },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF4285F4),
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 32.w, vertical: 16.h),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12.r),
-                            ),
-                          ),
-                          child: Text(
-                            'اضافه کردن لغت',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
                         ),
                       ],
                     ),
@@ -230,6 +231,9 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
                                   Icons.check, // or use a custom SVG if needed
                               iconColor: const Color(0xFF4DC591), // green
                               label: 'می دانستم',
+                              textColor: isDark
+                                  ? MyColors.darkTextPrimary
+                                  : const Color(0xFF3A465A),
                               onTap: () {
                                 setState(() {
                                   isBack = false;
@@ -248,6 +252,9 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
                                   Icons.close, // or use a custom SVG if needed
                               iconColor: const Color(0xFFF16063), // red
                               label: 'نمی دانستم',
+                              textColor: isDark
+                                  ? MyColors.darkTextPrimary
+                                  : const Color(0xFF3A465A),
                               onTap: () {
                                 setState(() {
                                   isBack = false;
@@ -276,11 +283,12 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
 
   Widget _buildFront(
       BuildContext context, String englishWord, VoidCallback onFlip) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       width: 260.w,
       height: 320.h,
       decoration: BoxDecoration(
-        color: const Color(0xFFE8F0FE),
+        color: isDark ? MyColors.termsBackgroundDark : const Color(0xFFE8F0FE),
         borderRadius: BorderRadius.circular(32.r),
       ),
       child: Column(
@@ -299,7 +307,9 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 28.sp,
-                      color: const Color(0xFF3A465A),
+                      color: isDark
+                          ? MyColors.darkTextPrimary
+                          : const Color(0xFF3A465A),
                     ),
                     textAlign: TextAlign.center,
                     maxLines: 2,
@@ -313,8 +323,10 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
                     'assets/images/icons/cuida--volume-2-outline.svg',
                     width: 28.r,
                     height: 28.r,
-                    colorFilter: const ColorFilter.mode(
-                      Color(0xFF3A465A),
+                    colorFilter: ColorFilter.mode(
+                      isDark
+                          ? MyColors.darkTextPrimary
+                          : const Color(0xFF3A465A),
                       BlendMode.srcIn,
                     ),
                   ),
@@ -329,8 +341,10 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
               'assets/images/icons/solar--smartphone-rotate-angle-outline.svg',
               width: 32.r,
               height: 32.r,
-              colorFilter: const ColorFilter.mode(
-                Color(0xFF3A465A),
+              colorFilter: ColorFilter.mode(
+                isDark
+                    ? MyColors.darkTextSecondary
+                    : const Color(0xFF3A465A),
                 BlendMode.srcIn,
               ),
             ),
@@ -343,11 +357,12 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
 
   Widget _buildBack(BuildContext context, String englishWord,
       String persianWord, VoidCallback onFlip) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       width: 260.w,
       height: 320.h,
       decoration: BoxDecoration(
-        color: const Color(0xFF4285F4),
+        color: isDark ? MyColors.primary : const Color(0xFF4285F4),
         borderRadius: BorderRadius.circular(32.r),
       ),
       child: Column(
@@ -429,6 +444,7 @@ Widget litnerChoiceButton({
   required IconData icon,
   required Color iconColor,
   required String label,
+  required Color textColor,
   required VoidCallback? onTap,
 }) {
   return GestureDetector(
@@ -449,7 +465,7 @@ Widget litnerChoiceButton({
           label,
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            color: const Color(0xFF3A465A), // dark color
+            color: textColor,
             fontSize: 16.sp,
           ),
           maxLines: 1,

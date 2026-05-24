@@ -43,7 +43,8 @@ class LitnerCard extends StatelessWidget {
                 width: Dimens.nr(79.0),
                 height: Dimens.nr(79.0),
                 decoration: BoxDecoration(
-                  color: isDark ? MyColors.textPrimary : Colors.white,
+                  color:
+                      isDark ? MyColors.darkBackgroundSecondary : Colors.white,
                   shape: BoxShape.circle,
                 ),
                 child: Center(
@@ -78,7 +79,7 @@ class LitnerCard extends StatelessWidget {
                             style: MyTextStyle.textMatn18Bold.copyWith(
                               fontSize: Dimens.nsp(20.0),
                               color: isDark
-                                  ? MyColors.profileTextPrimaryDark
+                                  ? MyColors.darkTextPrimary
                                   : MyColors.darkText1,
                             ),
                             maxLines: 1,
@@ -92,7 +93,7 @@ class LitnerCard extends StatelessWidget {
                             style: MyTextStyle.textMatn17W700.copyWith(
                               fontSize: Dimens.nsp(20.0),
                               color: isDark
-                                  ? MyColors.profileTextPrimaryDark
+                                  ? MyColors.darkTextPrimary
                                   : MyColors.darkText1,
                             ),
                             maxLines: 1,
@@ -106,7 +107,7 @@ class LitnerCard extends StatelessWidget {
                       subLabel,
                       style: MyTextStyle.textMatn12W500.copyWith(
                         color: isDark
-                            ? MyColors.profileTextPrimaryDark
+                            ? MyColors.darkTextSecondary
                             : MyColors.text3,
                       ),
                       maxLines: 2,
@@ -167,7 +168,8 @@ class LitnerTodayCard extends StatelessWidget {
                 width: Dimens.nr(79.0),
                 height: Dimens.nr(79.0),
                 decoration: BoxDecoration(
-                  color: isDark ? MyColors.textPrimary : Colors.white,
+                  color:
+                      isDark ? MyColors.darkBackgroundSecondary : Colors.white,
                   shape: BoxShape.circle,
                 ),
                 child: Center(
@@ -191,7 +193,7 @@ class LitnerTodayCard extends StatelessWidget {
                     style: MyTextStyle.textMatn18Bold.copyWith(
                       fontSize: Dimens.nsp(20.0),
                       color: isDark
-                          ? MyColors.profileTextPrimaryDark
+                          ? MyColors.darkTextPrimary
                           : MyColors.darkText1,
                     ),
                     maxLines: 1,
@@ -202,7 +204,7 @@ class LitnerTodayCard extends StatelessWidget {
                     label,
                     style: MyTextStyle.textMatn12W500.copyWith(
                       color: isDark
-                          ? MyColors.profileTextPrimaryDark
+                          ? MyColors.darkTextSecondary
                           : MyColors.text3,
                     ),
                     maxLines: 1,

@@ -91,6 +91,7 @@ class _CourseListScreenState extends State<CourseListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return BlocProvider.value(
       value: _bloc,
       child: BlocListener<CategoriesBloc, CategoriesState>(
@@ -120,7 +121,8 @@ class _CourseListScreenState extends State<CourseListScreen> {
           }
         },
         child: Scaffold(
-          backgroundColor: MyColors.background1, // Light background color
+          backgroundColor:
+              isDark ? MyColors.darkBackground : MyColors.background1,
           appBar: PreferredSize(
             preferredSize: Size.fromHeight(57.h),
             child: SafeArea(
@@ -128,17 +130,19 @@ class _CourseListScreenState extends State<CourseListScreen> {
                 padding: EdgeInsets.fromLTRB(16.w, 0, 32.w, 0),
                 height: 57.h,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: isDark ? MyColors.darkBackgroundSecondary : Colors.white,
                   borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(33.5.r),
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      offset: Offset(0, 1.h),
-                      blurRadius: 1.r,
-                    ),
-                  ],
+                  boxShadow: isDark
+                      ? null
+                      : [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.05),
+                            offset: Offset(0, 1.h),
+                            blurRadius: 1.r,
+                          ),
+                        ],
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -147,7 +151,9 @@ class _CourseListScreenState extends State<CourseListScreen> {
                       child: Text(
                         widget.title,
                         style: MyTextStyle.textHeader16Bold.copyWith(
-                          color: MyColors.textMatn2,
+                          color: isDark
+                              ? MyColors.darkTextPrimary
+                              : MyColors.textMatn2,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -160,7 +166,9 @@ class _CourseListScreenState extends State<CourseListScreen> {
                         onPressed: () => Navigator.of(context).pop(),
                         icon: Icon(
                           Icons.arrow_forward,
-                          color: MyColors.textMatn2,
+                          color: isDark
+                              ? MyColors.darkTextPrimary
+                              : MyColors.textMatn2,
                           size: 28.r,
                         ),
                       ),

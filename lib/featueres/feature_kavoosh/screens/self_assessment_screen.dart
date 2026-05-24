@@ -12,6 +12,7 @@ class SelfAssessmentScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final List<Map<String, dynamic>> subjects = [
       {
         'title': 'ریاضی',
@@ -46,7 +47,7 @@ class SelfAssessmentScreen extends StatelessWidget {
     ];
 
     return Scaffold(
-      backgroundColor: MyColors.background3,
+      backgroundColor: isDark ? MyColors.darkBackground : MyColors.background3,
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(57.h),
         child: SafeArea(
@@ -54,17 +55,19 @@ class SelfAssessmentScreen extends StatelessWidget {
             padding: EdgeInsets.fromLTRB(16.w, 0, 32.w, 0),
             height: 57.h,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: isDark ? MyColors.darkBackgroundSecondary : Colors.white,
               borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(33.5.r),
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  offset: Offset(0, 1.h),
-                  blurRadius: 1.r,
-                ),
-              ],
+              boxShadow: isDark
+                  ? null
+                  : [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.05),
+                        offset: Offset(0, 1.h),
+                        blurRadius: 1.r,
+                      ),
+                    ],
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -73,7 +76,9 @@ class SelfAssessmentScreen extends StatelessWidget {
                   child: Text(
                     'خودسنجی',
                     style: MyTextStyle.textMatn16Bold.copyWith(
-                      color: const Color(0xFF29303D),
+                      color: isDark
+                          ? MyColors.darkTextPrimary
+                          : const Color(0xFF29303D),
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -86,7 +91,9 @@ class SelfAssessmentScreen extends StatelessWidget {
                     onPressed: () => Navigator.of(context).pop(),
                     icon: Icon(
                       Icons.arrow_forward,
-                      color: const Color(0xFF29303D),
+                      color: isDark
+                          ? MyColors.darkTextPrimary
+                          : const Color(0xFF29303D),
                       size: 28.sp,
                     ),
                   ),

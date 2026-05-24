@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_bloc.dart';
@@ -28,6 +29,7 @@ class _AddWordBottomSheetState extends State<AddWordBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return BlocListener<LitnerBloc, LitnerState>(
       listener: (context, state) {
         if (state is CreateWordSuccess) {
@@ -54,11 +56,11 @@ class _AddWordBottomSheetState extends State<AddWordBottomSheet> {
         }
       },
       child: Container(
-        decoration: const BoxDecoration(
-          color: MyColors.background,
+        decoration: BoxDecoration(
+          color: isDark ? MyColors.termsBackgroundDark : MyColors.background,
           borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
+            topLeft: Radius.circular(Dimens.nr(20)),
+            topRight: Radius.circular(Dimens.nr(20)),
           ),
         ),
         padding: EdgeInsets.only(
@@ -77,8 +79,10 @@ class _AddWordBottomSheetState extends State<AddWordBottomSheet> {
                 // Title
                 Text(
                   'افزودن واژه جدید',
-                  style: MyTextStyle.textHeader16Bold
-                      .copyWith(fontWeight: FontWeight.bold),
+                  style: MyTextStyle.textHeader16Bold.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? MyColors.darkTextPrimary : null,
+                  ),
                   textAlign: TextAlign.right,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -87,23 +91,31 @@ class _AddWordBottomSheetState extends State<AddWordBottomSheet> {
                 // English Word Label
                 Text(
                   'واژه انگلیسی',
-                  style: MyTextStyle.textMatn12W500,
+                  style: MyTextStyle.textMatn12W500.copyWith(
+                    color: isDark ? MyColors.darkTextPrimary : null,
+                  ),
                   textAlign: TextAlign.right,
                 ),
                 SizedBox(height: 8.h),
                 // English Word Input
                 Container(
                   decoration: BoxDecoration(
-                    color: MyColors.inputBackground,
+                    color: isDark
+                        ? MyColors.loginInputBackgroundDark
+                        : MyColors.inputBackground,
                     borderRadius: BorderRadius.circular(16.r),
                   ),
                   child: TextFormField(
                     controller: _wordController,
                     textAlign: TextAlign.center,
-                    style: MyTextStyle.textMatn15,
+                    style: MyTextStyle.textMatn15.copyWith(
+                      color: isDark ? MyColors.darkTextPrimary : null,
+                    ),
                     decoration: InputDecoration(
                       hintText: 'واژه را وارد کنید',
-                      hintStyle: MyTextStyle.textHint,
+                      hintStyle: MyTextStyle.textHint.copyWith(
+                        color: isDark ? MyColors.darkTextSecondary : null,
+                      ),
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.symmetric(vertical: 18.h),
                     ),
@@ -119,23 +131,31 @@ class _AddWordBottomSheetState extends State<AddWordBottomSheet> {
                 // Persian Translation Label
                 Text(
                   'معنی فارسی',
-                  style: MyTextStyle.textMatn12W500,
+                  style: MyTextStyle.textMatn12W500.copyWith(
+                    color: isDark ? MyColors.darkTextPrimary : null,
+                  ),
                   textAlign: TextAlign.right,
                 ),
                 SizedBox(height: 8.h),
                 // Persian Translation Input
                 Container(
                   decoration: BoxDecoration(
-                    color: MyColors.inputBackground,
+                    color: isDark
+                        ? MyColors.loginInputBackgroundDark
+                        : MyColors.inputBackground,
                     borderRadius: BorderRadius.circular(16.r),
                   ),
                   child: TextFormField(
                     controller: _translationController,
                     textAlign: TextAlign.center,
-                    style: MyTextStyle.textMatn15,
+                    style: MyTextStyle.textMatn15.copyWith(
+                      color: isDark ? MyColors.darkTextPrimary : null,
+                    ),
                     decoration: InputDecoration(
                       hintText: 'معنی واژه را وارد کنید',
-                      hintStyle: MyTextStyle.textHint,
+                      hintStyle: MyTextStyle.textHint.copyWith(
+                        color: isDark ? MyColors.darkTextSecondary : null,
+                      ),
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.symmetric(vertical: 18.h),
                     ),
@@ -214,7 +234,10 @@ class _AddWordBottomSheetState extends State<AddWordBottomSheet> {
                       child: OutlinedButton(
                         onPressed: () => Navigator.pop(context),
                         style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: MyColors.divider),
+                          side: BorderSide(
+                            color:
+                                isDark ? MyColors.darkBorder : MyColors.divider,
+                          ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16.r),
                           ),
@@ -222,7 +245,11 @@ class _AddWordBottomSheetState extends State<AddWordBottomSheet> {
                         ),
                         child: Text(
                           'لغو',
-                          style: MyTextStyle.textCancelButton,
+                          style: MyTextStyle.textCancelButton.copyWith(
+                            color: isDark
+                                ? MyColors.darkTextSecondary
+                                : MyTextStyle.textCancelButton.color,
+                          ),
                         ),
                       ),
                     ),

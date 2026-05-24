@@ -15,6 +15,7 @@ class SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 24.0.w, vertical: 8.0.h),
       child: Row(
@@ -24,7 +25,7 @@ class SectionHeader extends StatelessWidget {
             child: Text(
               title,
               style: MyTextStyle.textMatn16Bold.copyWith(
-                color: MyColors.textMatn2,
+                color: isDark ? MyColors.darkTextPrimary : MyColors.textMatn2,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -36,7 +37,7 @@ class SectionHeader extends StatelessWidget {
             child: Text(
               'همه',
               style: MyTextStyle.textMatn12Bold.copyWith(
-                color: MyColors.text3,
+                color: isDark ? MyColors.darkTextSecondary : MyColors.text3,
               ),
             ),
           ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_bloc.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_event.dart';
@@ -120,22 +121,30 @@ class _LitnerWordCompletedScreenState extends State<LitnerWordCompletedScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F9FE),
+      backgroundColor:
+          isDark ? MyColors.profileBackgroundDark : const Color(0xFFF6F9FE),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF6F9FE),
+        backgroundColor:
+            isDark ? MyColors.profileHeaderDark : const Color(0xFFF6F9FE),
         elevation: 0,
         title: Flexible(
           child: Text(
             'آموخته شده ها',
-            style: MyTextStyle.textHeader16Bold,
+            style: MyTextStyle.textHeader16Bold.copyWith(
+              color: isDark ? MyColors.darkTextPrimary : MyColors.textMatn1,
+            ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
         ),
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Color(0xFF3D495C)),
+          icon: Icon(
+            Icons.arrow_back_ios_new,
+            color: isDark ? MyColors.darkTextPrimary : const Color(0xFF3D495C),
+          ),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -179,10 +188,12 @@ class _LitnerWordCompletedScreenState extends State<LitnerWordCompletedScreen> {
                   child: Container(
                     height: 48.h,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFFFFFF),
+                      color: isDark
+                          ? MyColors.loginInputBackgroundDark
+                          : const Color(0xFFFFFFFF),
                       borderRadius: BorderRadius.circular(Dimens.small.r),
                       border: Border.all(
-                        color: const Color(0xFFE5E7EB),
+                        color: isDark ? MyColors.darkBorder : const Color(0xFFE5E7EB),
                         width: 1.w,
                       ),
                     ),
@@ -195,7 +206,9 @@ class _LitnerWordCompletedScreenState extends State<LitnerWordCompletedScreen> {
                         hintStyle: TextStyle(
                           fontFamily: 'IRANSans',
                           fontSize: 14.sp,
-                          color: const Color(0xFF9CA3AF),
+                          color: isDark
+                              ? MyColors.darkTextSecondary
+                              : const Color(0xFF9CA3AF),
                         ),
                         prefixIcon: _isSearching
                             ? SizedBox(
@@ -213,7 +226,9 @@ class _LitnerWordCompletedScreenState extends State<LitnerWordCompletedScreen> {
                               )
                             : Icon(
                                 Icons.search,
-                                color: const Color(0xFF9CA3AF),
+                                color: isDark
+                                    ? MyColors.darkTextSecondary
+                                    : const Color(0xFF9CA3AF),
                                 size: 20.r,
                               ),
                         border: InputBorder.none,
@@ -225,7 +240,7 @@ class _LitnerWordCompletedScreenState extends State<LitnerWordCompletedScreen> {
                       style: TextStyle(
                         fontFamily: 'IRANSans',
                         fontSize: 14.sp,
-                        color: const Color(0xFF29303D),
+                        color: isDark ? MyColors.darkTextPrimary : const Color(0xFF29303D),
                       ),
                       maxLines: 1,
                     ),
@@ -260,7 +275,9 @@ class _LitnerWordCompletedScreenState extends State<LitnerWordCompletedScreen> {
                                         fontFamily: 'IRANSans',
                                         fontWeight: FontWeight.w500,
                                         fontSize: 14.sp,
-                                        color: const Color(0xFF29303D),
+                                        color: isDark
+                                            ? MyColors.darkTextPrimary
+                                            : const Color(0xFF29303D),
                                       ),
                                       textAlign: TextAlign.center,
                                       maxLines: 2,
@@ -277,7 +294,9 @@ class _LitnerWordCompletedScreenState extends State<LitnerWordCompletedScreen> {
                                             fontFamily: 'IRANSans',
                                             fontWeight: FontWeight.w500,
                                             fontSize: 11.sp,
-                                            color: const Color(0xFFA3AFC2),
+                                            color: isDark
+                                                ? MyColors.darkTextSecondary
+                                                : const Color(0xFFA3AFC2),
                                           ),
                                           textAlign: TextAlign.center,
                                           maxLines: 3,
@@ -291,12 +310,15 @@ class _LitnerWordCompletedScreenState extends State<LitnerWordCompletedScreen> {
                             )
                           : ListView.separated(
                               controller: _scrollController,
-                              padding: EdgeInsets.symmetric(horizontal: 16.w),
+                              padding:
+                                  EdgeInsets.symmetric(horizontal: Dimens.medium),
                               itemCount:
                                   _words.length + (_isLoadingMore ? 1 : 0),
                               separatorBuilder: (context, index) => Container(
                                 height: 1.5.h,
-                                color: const Color(0xFFF2F2F2),
+                                color: isDark
+                                    ? MyColors.darkBorder.withValues(alpha: 0.35)
+                                    : const Color(0xFFF2F2F2),
                               ),
                               itemBuilder: (context, index) {
                                 if (index == _words.length) {
@@ -312,7 +334,9 @@ class _LitnerWordCompletedScreenState extends State<LitnerWordCompletedScreen> {
                                   width: double.infinity,
                                   constraints: BoxConstraints(minHeight: 56.h),
                                   decoration: BoxDecoration(
-                                    color: Colors.white,
+                                    color: isDark
+                                        ? MyColors.termsBackgroundDark
+                                        : Colors.white,
                                     borderRadius: BorderRadius.circular(8.r),
                                   ),
                                   child: Row(
@@ -327,8 +351,9 @@ class _LitnerWordCompletedScreenState extends State<LitnerWordCompletedScreen> {
                                               fontFamily: 'IRANSans',
                                               fontWeight: FontWeight.w700,
                                               fontSize: 16.sp,
-                                              color:
-                                                  const Color(0xFF29303D),
+                                              color: isDark
+                                                  ? MyColors.darkTextPrimary
+                                                  : const Color(0xFF29303D),
                                             ),
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
@@ -348,8 +373,10 @@ class _LitnerWordCompletedScreenState extends State<LitnerWordCompletedScreen> {
                                                   width: 18.r,
                                                   height: 18.r,
                                                   colorFilter:
-                                                      const ColorFilter.mode(
-                                                    Color(0xFFA3AFC2),
+                                                      ColorFilter.mode(
+                                                    isDark
+                                                        ? MyColors.darkTextSecondary
+                                                        : const Color(0xFFA3AFC2),
                                                     BlendMode.srcIn,
                                                   ),
                                                 ),
@@ -370,8 +397,9 @@ class _LitnerWordCompletedScreenState extends State<LitnerWordCompletedScreen> {
                                                     fontFamily: 'IRANSans',
                                                     fontWeight: FontWeight.w400,
                                                     fontSize: 14.sp,
-                                                    color:
-                                                        const Color(0xFF29303D),
+                                                    color: isDark
+                                                        ? MyColors.darkTextPrimary
+                                                        : const Color(0xFF29303D),
                                                   ),
                                                   textAlign: TextAlign.right,
                                                   maxLines: 1,

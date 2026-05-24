@@ -15,6 +15,7 @@ class SelfAssessmentGradeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -22,15 +23,18 @@ class SelfAssessmentGradeCard extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
         constraints: BoxConstraints(minHeight: 80.h),
         decoration: BoxDecoration(
-          color: MyColors.background,
+          color: isDark ? MyColors.termsBackgroundDark : MyColors.background,
           borderRadius: BorderRadius.circular(50.r),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 10.r,
-              offset: Offset(0, 4.h),
-            ),
-          ],
+          border: isDark ? Border.all(color: MyColors.darkBorder) : null,
+          boxShadow: isDark
+              ? null
+              : [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 10.r,
+                    offset: Offset(0, 4.h),
+                  ),
+                ],
         ),
         child: Row(
           children: [
@@ -44,7 +48,9 @@ class SelfAssessmentGradeCard extends StatelessWidget {
                 padding: EdgeInsets.symmetric(horizontal: 16.0.w),
                 child: Text(
                   title,
-                  style: MyTextStyle.textMatn18Bold,
+                  style: MyTextStyle.textMatn18Bold.copyWith(
+                    color: isDark ? MyColors.darkTextPrimary : null,
+                  ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),

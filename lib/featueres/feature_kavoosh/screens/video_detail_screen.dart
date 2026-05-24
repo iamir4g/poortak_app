@@ -22,8 +22,9 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: MyColors.background1,
+      backgroundColor: isDark ? MyColors.darkBackground : MyColors.background1,
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(57.h),
         child: SafeArea(
@@ -31,17 +32,19 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
             padding: EdgeInsets.fromLTRB(16.w, 0, 32.w, 0),
             height: 57.h,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: isDark ? MyColors.darkBackgroundSecondary : Colors.white,
               borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(33.5.r),
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  offset: Offset(0, 1.h),
-                  blurRadius: 1.r,
-                ),
-              ],
+              boxShadow: isDark
+                  ? null
+                  : [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.05),
+                        offset: Offset(0, 1.h),
+                        blurRadius: 1.r,
+                      ),
+                    ],
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -50,7 +53,9 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
                   child: Text(
                     widget.title,
                     style: MyTextStyle.textHeader16Bold.copyWith(
-                      color: MyColors.textMatn2,
+                      color: isDark
+                          ? MyColors.darkTextPrimary
+                          : MyColors.textMatn2,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -63,7 +68,9 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
                     onPressed: () => Navigator.of(context).pop(),
                     icon: Icon(
                       Icons.arrow_forward,
-                      color: MyColors.textMatn2,
+                      color: isDark
+                          ? MyColors.darkTextPrimary
+                          : MyColors.textMatn2,
                       size: 28.r,
                     ),
                   ),
@@ -82,15 +89,18 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
               height: 200.h,
               width: double.infinity,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: isDark ? MyColors.termsBackgroundDark : Colors.white,
                 borderRadius: BorderRadius.circular(20.r),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
-                    blurRadius: 10.r,
-                    offset: Offset(0, 4.h),
-                  ),
-                ],
+                border: isDark ? Border.all(color: MyColors.darkBorder) : null,
+                boxShadow: isDark
+                    ? null
+                    : [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.05),
+                          blurRadius: 10.r,
+                          offset: Offset(0, 4.h),
+                        ),
+                      ],
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -100,12 +110,15 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
                     width: 60.w,
                     height: 60.h,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFE3F2FD),
+                      color: isDark
+                          ? MyColors.darkBackgroundSecondary
+                          : const Color(0xFFE3F2FD),
                       borderRadius: BorderRadius.circular(30.r),
                     ),
                     child: Icon(
                       Icons.movie_creation_outlined,
-                      color: const Color(0xFF2196F3),
+                      color:
+                          isDark ? MyColors.secondary : const Color(0xFF2196F3),
                       size: 30.r,
                     ),
                   ),
@@ -114,7 +127,8 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
                     'برای تماشای ویدئو روی بخش مورد نظر\nکلیک کنید.',
                     textAlign: TextAlign.center,
                     style: MyTextStyle.textMatn14Bold.copyWith(
-                      color: MyColors.text3,
+                      color:
+                          isDark ? MyColors.darkTextSecondary : MyColors.text3,
                       fontWeight: FontWeight.normal,
                       height: 1.5,
                     ),
@@ -129,15 +143,18 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
             Container(
               padding: EdgeInsets.all(16.r),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: isDark ? MyColors.termsBackgroundDark : Colors.white,
                 borderRadius: BorderRadius.circular(20.r),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
-                    blurRadius: 10.r,
-                    offset: Offset(0, 4.h),
-                  ),
-                ],
+                border: isDark ? Border.all(color: MyColors.darkBorder) : null,
+                boxShadow: isDark
+                    ? null
+                    : [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.05),
+                          blurRadius: 10.r,
+                          offset: Offset(0, 4.h),
+                        ),
+                      ],
               ),
               child: Column(
                 children: [
@@ -150,7 +167,9 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
                         child: Container(
                           width: 60.w,
                           height: 60.h,
-                          color: Colors.grey[200],
+                          color: isDark
+                              ? MyColors.darkBackgroundSecondary
+                              : Colors.grey[200],
                           // child: Image.asset(...),
                         ),
                       ),
@@ -163,7 +182,9 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
                             Text(
                               widget.title,
                               style: MyTextStyle.textMatn16Bold.copyWith(
-                                color: MyColors.textMatn2,
+                                color: isDark
+                                    ? MyColors.darkTextPrimary
+                                    : MyColors.textMatn2,
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -176,7 +197,9 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
                                   child: Text(
                                     'نام استاد:',
                                     style: MyTextStyle.textMatn12W500.copyWith(
-                                      color: MyColors.text4,
+                                      color: isDark
+                                          ? MyColors.darkTextSecondary
+                                          : MyColors.text4,
                                     ),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
@@ -312,15 +335,18 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
             Container(
               padding: EdgeInsets.all(16.r),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: isDark ? MyColors.termsBackgroundDark : Colors.white,
                 borderRadius: BorderRadius.circular(20.r),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
-                    blurRadius: 10.r,
-                    offset: Offset(0, 4.h),
-                  ),
-                ],
+                border: isDark ? Border.all(color: MyColors.darkBorder) : null,
+                boxShadow: isDark
+                    ? null
+                    : [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.05),
+                          blurRadius: 10.r,
+                          offset: Offset(0, 4.h),
+                        ),
+                      ],
               ),
               child: Column(
                 children: [
@@ -380,11 +406,11 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
               // Add to cart action
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: MyColors.secondary, // Blue button
+              backgroundColor: isDark ? MyColors.primary : MyColors.secondary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16.r),
               ),
-              elevation: 4,
+              elevation: isDark ? 0 : 4,
             ),
             child: Text(
               'اضافه به سبد خرید',
