@@ -20,6 +20,7 @@ import 'package:poortak/locator.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/common/services/getImageUrl_service.dart';
 import 'package:poortak/common/widgets/reusable_modal.dart';
+import 'package:poortak/common/utils/svg_embedded_png.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
@@ -702,8 +703,8 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
                 builder: (context) => const DictionaryBottomSheet(),
               );
             },
-            icon: Image.asset(
-              "assets/images/iknow/dictionary_icon.png",
+            icon: buildImageFromAssetOrEmbeddedSvg(
+              "assets/images/iknow/dictionary_icon.svg",
               width: Dimens.nw(36),
               height: Dimens.nh(36),
             ),

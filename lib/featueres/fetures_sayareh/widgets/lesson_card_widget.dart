@@ -69,8 +69,8 @@ class LessonCardWidget extends StatelessWidget {
                           children: [
                             buildImageFromAssetOrEmbeddedSvg(
                               iconPath,
-                              width: Dimens.nr(40),
-                              height: Dimens.nr(40),
+                              width: Dimens.nr(42),
+                              height: Dimens.nr(42),
                             ),
                             Positioned(
                               top: Dimens.nh(4),
@@ -81,8 +81,8 @@ class LessonCardWidget extends StatelessWidget {
                         )
                       : buildImageFromAssetOrEmbeddedSvg(
                           iconPath,
-                          width: Dimens.nr(40),
-                          height: Dimens.nr(40),
+                          width: Dimens.nr(42),
+                          height: Dimens.nr(42),
                         ),
                   SizedBox(width: Dimens.nw(15)), // Reduced from 18
                   Column(

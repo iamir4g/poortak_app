@@ -43,7 +43,7 @@ class MyColors {
   static const Color text7 = Color(0xFFC2C9D6);
   static const Color gray = Color(0xFFE0E4EB);
 
-  static const Color textPrimary = Color(0xFF000000); // Black
+  static const Color textPrimary = Color(0xFF14181F);
   static const Color textSecondary = Color(0xFF757575); // Grey
   static const Color textLight = Color(0xFFFFFFFF); // White
   static const Color textMatn1 = Color.fromRGBO(54, 58, 83, 1);
@@ -135,7 +135,7 @@ class MyColors {
   static const Color conversationFirstPersonBubbleDark = Color(0xFF262556);
   static const Color conversationSecondPersonBubbleDark = Color(0xFF27221C);
 
-    // Quiz
+  // Quiz
   static const Color quizAnswerDefaultLightBackground = background3;
   static const Color quizAnswerDefaultDarkBackground =
       darkBackgroundSecondary; // #2C2E3F

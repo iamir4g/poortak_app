@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:poortak/common/utils/svg_embedded_png.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
@@ -13,27 +14,6 @@ class MatchPrizeScreen extends StatefulWidget {
 
 class _MatchPrizeScreenState extends State<MatchPrizeScreen>
     with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<int> _animation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 40000),
-    )..repeat(); // Repeat the animation
-
-    // Animation from image 9 to 0
-    _animation = IntTween(begin: 9, end: 0).animate(_controller);
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -115,8 +95,9 @@ class _MatchPrizeScreenState extends State<MatchPrizeScreen>
                           vertical: Dimens.nh(50),
                         ),
                         decoration: BoxDecoration(
-                          color:
-                              isDark ? MyColors.termsBackgroundDark : Colors.white,
+                          color: isDark
+                              ? MyColors.termsBackgroundDark
+                              : Colors.white,
                           borderRadius: BorderRadius.circular(Dimens.nr(30)),
                           boxShadow: isDark
                               ? null
@@ -136,7 +117,7 @@ class _MatchPrizeScreenState extends State<MatchPrizeScreen>
                               children: [
                                 // Shadow under money
                                 Container(
-                                  width: Dimens.nw(140),
+                                  width: Dimens.nw(176),
                                   height: Dimens.nh(20),
                                   margin: EdgeInsets.only(
                                     bottom: Dimens.nh(20),
@@ -155,24 +136,11 @@ class _MatchPrizeScreenState extends State<MatchPrizeScreen>
                                     ],
                                   ),
                                 ),
-                                AnimatedBuilder(
-                                  animation: _animation,
-                                  builder: (context, child) {
-                                    return Stack(
-                                      alignment: Alignment.center,
-                                      children: [
-                                        for (int i = 9;
-                                            i >= _animation.value;
-                                            i--)
-                                          Image.asset(
-                                            'assets/images/mony/images-$i.png',
-                                            width: Dimens.nw(100),
-                                            height: Dimens.nh(100),
-                                            fit: BoxFit.contain,
-                                          ),
-                                      ],
-                                    );
-                                  },
+                                buildImageFromAssetOrEmbeddedSvg(
+                                  'assets/images/mony/allmony.svg',
+                                  width: Dimens.nw(176),
+                                  height: Dimens.nh(187),
+                                  fit: BoxFit.contain,
                                 ),
                               ],
                             ),
@@ -185,8 +153,9 @@ class _MatchPrizeScreenState extends State<MatchPrizeScreen>
                               textAlign: TextAlign.center,
                               style: MyTextStyle.text16MediumText1.copyWith(
                                 fontSize: Dimens.nsp(18),
-                                color:
-                                    isDark ? MyColors.darkTextPrimary : MyColors.text1,
+                                color: isDark
+                                    ? MyColors.darkTextPrimary
+                                    : MyColors.text1,
                               ),
                             ),
 
@@ -256,8 +225,7 @@ class _MatchPrizeScreenState extends State<MatchPrizeScreen>
               'جوایز مسابقه',
               textAlign: TextAlign.center,
               style: MyTextStyle.textHeader16Bold.copyWith(
-                color:
-                    isDark ? MyColors.darkTextPrimary : MyColors.textMatn2,
+                color: isDark ? MyColors.darkTextPrimary : MyColors.textMatn2,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -272,8 +240,7 @@ class _MatchPrizeScreenState extends State<MatchPrizeScreen>
               onPressed: () => Navigator.pop(context),
               icon: Icon(
                 Icons.arrow_forward,
-                color:
-                    isDark ? MyColors.darkTextPrimary : MyColors.textMatn1,
+                color: isDark ? MyColors.darkTextPrimary : MyColors.textMatn1,
                 size: Dimens.nr(28),
               ),
             ),

@@ -122,7 +122,7 @@ class TermsConditionsTheme extends ThemeExtension<TermsConditionsTheme> {
   static const light = TermsConditionsTheme(
     backgroundColor: Colors.white,
     textColor: MyColors.textMatn1,
-    iconColor: Colors.black,
+    iconColor: MyColors.textPrimary,
     dividerColor: MyColors.divider,
   );
 
