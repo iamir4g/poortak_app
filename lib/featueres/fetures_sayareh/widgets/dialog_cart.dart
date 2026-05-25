@@ -34,6 +34,34 @@ class _DialogCartState extends State<DialogCart> {
   final PrefsOperator _prefsOperator = locator<PrefsOperator>();
   static const String _bundleName = "مجموعه کامل سیاره آی نو";
 
+  Widget _buildCartFooter() {
+    return Container(
+      width: Dimens.nw(360.0),
+      height: Dimens.nh(112.0),
+      decoration: ShapeDecoration(
+        color: MyColors.cartFooterBackground,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(Dimens.nr(25.0)),
+            bottomRight: Radius.circular(Dimens.nr(25.0)),
+          ),
+        ),
+      ),
+      child: Row(
+        children: [
+          Image.asset("assets/images/cart/subtract.png"),
+          Expanded(
+            child: Text(
+              "جهت کسب اطلاعات بیشتر به وبسایت پورتک به نشانی www.poortak.ir مراجه کنید.",
+              style: MyTextStyle.textMatn11,
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   int _calculateBundleSubtotal(IKnowSummaryModel summary) {
     final settingsPrice =
         MoneyUtils.parseRialToTomanInt(summary.data.settings.price);
@@ -276,705 +304,718 @@ class _DialogCartState extends State<DialogCart> {
                 Expanded(
                   child: TabBarView(
                     children: [
-                      SingleChildScrollView(
-                        child: Padding(
-                          padding: EdgeInsets.fromLTRB(
-                              Dimens.medium, Dimens.medium, Dimens.medium, 0),
-                          child: Column(
-                            children: [
-                              Stack(
+                      CustomScrollView(
+                        slivers: [
+                          SliverToBoxAdapter(
+                            child: Padding(
+                              padding: EdgeInsets.fromLTRB(
+                                Dimens.medium,
+                                Dimens.medium,
+                                Dimens.medium,
+                                0,
+                              ),
+                              child: Column(
                                 children: [
-                                  Container(
-                                    width: Dimens.nw(286.0),
-                                    height: Dimens.nh(177.0),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(Dimens.nr(27.0))),
-                                      color: MyColors.background,
-                                    ),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(Dimens.nr(27.0)),
-                                      ),
-                                      child: FutureBuilder<String>(
-                                        future: GetImageUrlService()
-                                            .getImageUrl(widget.item.thumbnail),
-                                        builder: (context, snapshot) {
-                                          if (snapshot.connectionState ==
-                                              ConnectionState.waiting) {
-                                            return const Center(
-                                              child:
-                                                  CircularProgressIndicator(),
-                                            );
-                                          }
-                                          if (snapshot.hasError ||
-                                              !snapshot.hasData ||
-                                              snapshot.data!.isEmpty) {
-                                            return Image.asset(
-                                              "assets/images/cart/single_lesson.png",
-                                              fit: BoxFit.cover,
-                                            );
-                                          }
-                                          return Image.network(
-                                            snapshot.data!,
-                                            fit: BoxFit.cover,
-                                            errorBuilder:
-                                                (context, error, stackTrace) {
-                                              return Image.asset(
-                                                "assets/images/cart/single_lesson.png",
+                                  Stack(
+                                    children: [
+                                      Container(
+                                        width: Dimens.nw(286.0),
+                                        height: Dimens.nh(177.0),
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(Dimens.nr(27.0))),
+                                          color: MyColors.background,
+                                        ),
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(Dimens.nr(27.0)),
+                                          ),
+                                          child: FutureBuilder<String>(
+                                            future: GetImageUrlService()
+                                                .getImageUrl(
+                                                    widget.item.thumbnail),
+                                            builder: (context, snapshot) {
+                                              if (snapshot.connectionState ==
+                                                  ConnectionState.waiting) {
+                                                return const Center(
+                                                  child:
+                                                      CircularProgressIndicator(),
+                                                );
+                                              }
+                                              if (snapshot.hasError ||
+                                                  !snapshot.hasData ||
+                                                  snapshot.data!.isEmpty) {
+                                                return Image.asset(
+                                                  "assets/images/cart/single_lesson.png",
+                                                  fit: BoxFit.cover,
+                                                );
+                                              }
+                                              return Image.network(
+                                                snapshot.data!,
                                                 fit: BoxFit.cover,
+                                                errorBuilder: (context, error,
+                                                    stackTrace) {
+                                                  return Image.asset(
+                                                    "assets/images/cart/single_lesson.png",
+                                                    fit: BoxFit.cover,
+                                                  );
+                                                },
                                               );
                                             },
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                  ),
-                                  Positioned(
-                                    bottom: Dimens.nh(5.0),
-                                    left: Dimens.small,
-                                    child: Container(
-                                      width: Dimens.nw(104.0),
-                                      height: Dimens.nh(30.0),
-                                      decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(Dimens.nr(20.0))),
-                                          color: MyColors.background),
-                                      child: Padding(
-                                        padding: EdgeInsets.fromLTRB(
-                                            Dimens.tiny, 0, Dimens.tiny, 0),
-                                        child: FittedBox(
-                                          fit: BoxFit.scaleDown,
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            children: [
-                                              Image.asset(
-                                                "assets/images/star_icon.png",
-                                                width: Dimens.nw(18.0),
-                                                height: Dimens.nh(18.0),
-                                                fit: BoxFit.contain,
-                                              ),
-                                              SizedBox(width: Dimens.nw(2.0)),
-                                              Text(
-                                                convertEnToFa("+5"),
-                                                style: MyTextStyle
-                                                    .textMatn13PrimaryShade1,
-                                              ),
-                                              SizedBox(width: Dimens.nw(2.0)),
-                                              Text(
-                                                l10n.coin_with_buy,
-                                                style: MyTextStyle.textMatn9,
-                                              )
-                                            ],
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(
-                                height: Dimens.nh(26.0),
-                              ),
-                              Center(
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    // Image(
-                                    //     image: AssetImage(
-                                    //         "assets/images/lock_image.png")),
-                                    // SizedBox(
-                                    //   width: Dimens.small,
-                                    // ),
-                                    Text(
-                                      widget.item.name,
-                                      style: MyTextStyle.textMatn12W500,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    SizedBox(
-                                      width: Dimens.nw(14.0),
-                                    ),
-                                    if (widget.item.description.isNotEmpty) ...[
-                                      // SizedBox(
-                                      //   height: 12.h,
-                                      // ),
-                                      // Text(
-                                      //   widget.item.description,
-                                      //   style:
-                                      //       MyTextStyle.textMatn14Bold.copyWith(
-                                      //           // color: MyColors.textSecondary,
-                                      //           ),
-                                      //   textAlign: TextAlign.center,
-                                      //   maxLines: 2,
-                                      //   overflow: TextOverflow.ellipsis,
-                                      // ),
+                                      Positioned(
+                                        bottom: Dimens.nh(5.0),
+                                        left: Dimens.small,
+                                        child: Container(
+                                          width: Dimens.nw(104.0),
+                                          height: Dimens.nh(30.0),
+                                          decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(
+                                                      Dimens.nr(20.0))),
+                                              color: MyColors.background),
+                                          child: Padding(
+                                            padding: EdgeInsets.fromLTRB(
+                                                Dimens.tiny, 0, Dimens.tiny, 0),
+                                            child: FittedBox(
+                                              fit: BoxFit.scaleDown,
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                children: [
+                                                  Image.asset(
+                                                    "assets/images/star_icon.png",
+                                                    width: Dimens.nw(18.0),
+                                                    height: Dimens.nh(18.0),
+                                                    fit: BoxFit.contain,
+                                                  ),
+                                                  SizedBox(
+                                                      width: Dimens.nw(2.0)),
+                                                  Text(
+                                                    convertEnToFa("+5"),
+                                                    style: MyTextStyle
+                                                        .textMatn13PrimaryShade1,
+                                                  ),
+                                                  SizedBox(
+                                                      width: Dimens.nw(2.0)),
+                                                  Text(
+                                                    l10n.coin_with_buy,
+                                                    style:
+                                                        MyTextStyle.textMatn9,
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
                                     ],
-                                  ],
-                                ),
-                              ),
-                              SizedBox(
-                                height: Dimens.nh(18.0),
-                              ),
-                              Container(
-                                  height: Dimens.nh(54.0),
-                                  decoration: BoxDecoration(
-                                    color: MyColors.cardBackground1,
-                                    borderRadius: BorderRadius.all(
-                                        Radius.circular(Dimens.nr(10.0))),
                                   ),
-                                  child: Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: Dimens.medium),
+                                  SizedBox(
+                                    height: Dimens.nh(26.0),
+                                  ),
+                                  Center(
                                     child: Row(
                                       mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                          MainAxisAlignment.center,
                                       children: [
                                         Text(
-                                          l10n.price,
-                                          style: TextStyle(
-                                            fontFamily: "IRANSans",
-                                            fontSize: Dimens.nsp(15.0),
-                                            fontWeight: FontWeight.w300,
-                                            fontStyle: FontStyle.normal,
-                                            height: 1.0,
-                                            letterSpacing: 0.0,
-                                            color: MyColors.text1,
-                                          ),
+                                          widget.item.name,
+                                          style: MyTextStyle.textMatn12W500,
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
                                         ),
-                                        Row(
+                                        SizedBox(
+                                          width: Dimens.nw(14.0),
+                                        ),
+                                        if (widget.item.description.isNotEmpty)
+                                          ...[],
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: Dimens.nh(18.0),
+                                  ),
+                                  Container(
+                                      height: Dimens.nh(54.0),
+                                      decoration: BoxDecoration(
+                                        color: MyColors.cardBackground1,
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(Dimens.nr(10.0))),
+                                      ),
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: Dimens.medium),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
-                                              "${MoneyUtils.formatTomanFromRial(widget.item.price)} ",
+                                              l10n.price,
                                               style: TextStyle(
                                                 fontFamily: "IRANSans",
-                                                fontSize: Dimens.nsp(16.0),
+                                                fontSize: Dimens.nsp(15.0),
                                                 fontWeight: FontWeight.w300,
                                                 fontStyle: FontStyle.normal,
                                                 height: 1.0,
                                                 letterSpacing: 0.0,
-                                                color: MyColors.textMatn1,
-                                              ),
-                                              textAlign: TextAlign.center,
-                                            ),
-                                            Text(
-                                              l10n.toman,
-                                              style: MyTextStyle.textMatn13,
-                                            )
-                                          ],
-                                        )
-                                      ],
-                                    ),
-                                  )),
-                              SizedBox(
-                                height: Dimens.nh(20.0),
-                              ),
-                              SizedBox(
-                                width: Dimens.nw(286.0),
-                                height: Dimens.nh(65.0),
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    _addItemToCart(
-                                      CartType.IKnowCourse.name,
-                                      widget.item.id,
-                                      widget.item.name,
-                                    );
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: isDark
-                                        ? MyColors.primary
-                                        : MyColors.secondary,
-                                    foregroundColor: MyColors.textLight,
-                                    elevation: 0,
-                                    shadowColor: Colors.transparent,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(
-                                        Dimens.radiusLarge,
-                                      ),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    l10n.add_to_cart,
-                                    style: MyTextStyle.textMatnBtn,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      SingleChildScrollView(
-                        child: summaryData == null
-                            ? Padding(
-                                padding: EdgeInsets.all(Dimens.large),
-                                child: Column(
-                                  children: [
-                                    SizedBox(height: Dimens.nh(40.0)),
-                                    const CircularProgressIndicator(),
-                                    SizedBox(height: Dimens.nh(16.0)),
-                                    Text(
-                                      "اطلاعات خرید مجموعه در حال بارگذاری است",
-                                      style: MyTextStyle.textMatn12W500,
-                                      textAlign: TextAlign.center,
-                                    ),
-                                    SizedBox(height: Dimens.nh(24.0)),
-                                  ],
-                                ),
-                              )
-                            : Builder(
-                                builder: (context) {
-                                  final sortedCourses =
-                                      _sortedCourses(summaryData);
-                                  final sortedBooks = _sortedBooks(summaryData);
-                                  final subtotal =
-                                      _calculateBundleSubtotal(summaryData);
-                                  final discountAmount =
-                                      _calculateDiscountAmount(summaryData);
-                                  final payableAmount =
-                                      _calculatePayableAmount(summaryData);
-                                  final settings = summaryData.data.settings;
-                                  final isPercentDiscount =
-                                      settings.discountType.toLowerCase() ==
-                                          "percent";
-
-                                  return Column(
-                                    children: [
-                                      SizedBox(
-                                        height: Dimens.nh(16.0),
-                                      ),
-                                      Stack(
-                                        children: [
-                                          Container(
-                                            width: Dimens.nw(286.0),
-                                            height: Dimens.nh(177.0),
-                                            decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(
-                                                      Dimens.nr(27.0))),
-                                              color: MyColors.background,
-                                            ),
-                                            child: Image.asset(
-                                              "assets/images/cart/bundle_lesson.png",
-                                              fit: BoxFit.cover,
-                                            ),
-                                          ),
-                                          Positioned(
-                                              bottom: Dimens.nh(35.0),
-                                              right: Dimens.small,
-                                              child: SizedBox(
-                                                width: Dimens.nw(30.0),
-                                                height: Dimens.nh(30.0),
-                                                child: SvgPicture.asset(
-                                                  'assets/images/icons/arcticons--pdf-viewer.svg',
-                                                  width: Dimens.nw(30.0),
-                                                  height: Dimens.nh(30.0),
-                                                  colorFilter:
-                                                      const ColorFilter.mode(
-                                                    MyColors.textLight,
-                                                    BlendMode.srcIn,
-                                                  ),
-                                                ),
-                                              )),
-                                          Positioned(
-                                            bottom: Dimens.nh(5.0),
-                                            right: Dimens.small,
-                                            child: SizedBox(
-                                              width: Dimens.nw(30.0),
-                                              height: Dimens.nh(30.0),
-                                              child: SvgPicture.asset(
-                                                'assets/images/icons/carbon--play-outline.svg',
-                                                width: Dimens.nw(30.0),
-                                                height: Dimens.nh(30.0),
-                                                colorFilter:
-                                                    const ColorFilter.mode(
-                                                  MyColors.textLight,
-                                                  BlendMode.srcIn,
-                                                ),
+                                                color: MyColors.text1,
                                               ),
                                             ),
-                                          ),
-                                          Positioned(
-                                            bottom: Dimens.nh(5.0),
-                                            left: Dimens.small,
-                                            child: Container(
-                                              width: Dimens.nw(104.0),
-                                              height: Dimens.nh(30.0),
-                                              decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.all(
-                                                          Radius.circular(
-                                                              Dimens.nr(20.0))),
-                                                  color: MyColors.background),
-                                              child: Padding(
-                                                padding: EdgeInsets.fromLTRB(
-                                                    Dimens.tiny,
-                                                    0,
-                                                    Dimens.nw(2.0),
-                                                    0),
-                                                child: FittedBox(
-                                                  fit: BoxFit.scaleDown,
-                                                  child: Row(
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      Image.asset(
-                                                        "assets/images/star_icon.png",
-                                                        width: Dimens.nw(18.0),
-                                                        height: Dimens.nh(18.0),
-                                                        fit: BoxFit.contain,
-                                                      ),
-                                                      SizedBox(
-                                                          width:
-                                                              Dimens.nw(2.0)),
-                                                      Text(
-                                                        convertEnToFa("+50"),
-                                                        style: MyTextStyle
-                                                            .textMatn13PrimaryShade1,
-                                                      ),
-                                                      SizedBox(
-                                                          width:
-                                                              Dimens.nw(2.0)),
-                                                      Text(
-                                                        l10n.coin_with_buy,
-                                                        style: MyTextStyle
-                                                            .textMatn9,
-                                                      )
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(
-                                        height: Dimens.nh(26.0),
-                                      ),
-                                      Container(
-                                        decoration: const BoxDecoration(
-                                            color: MyColors.background1),
-                                        child: Column(
-                                          children: [
-                                            SizedBox(
-                                              height: Dimens.nh(16.0),
-                                            ),
-                                            Center(
-                                              child: Text(
-                                                _bundleName,
-                                                style:
-                                                    MyTextStyle.textMatn14Bold,
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              height: Dimens.nh(18.0),
-                                            ),
-                                            SizedBox(
-                                              width: Dimens.nw(248.0),
-                                              child: ListView.separated(
-                                                shrinkWrap: true,
-                                                physics:
-                                                    const NeverScrollableScrollPhysics(),
-                                                itemCount: sortedCourses.length,
-                                                separatorBuilder:
-                                                    (context, index) {
-                                                  return SizedBox(
-                                                      height: Dimens.nh(6.0));
-                                                },
-                                                itemBuilder: (context, index) {
-                                                  final course =
-                                                      sortedCourses[index];
-                                                  return ItemMultiCard(
-                                                    title: course.name,
-                                                    price: course.price,
-                                                  );
-                                                },
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              height: Dimens.nh(20.0),
-                                            ),
-                                            Center(
-                                              child: Text(
-                                                "کتاب های الکترونیکی",
-                                                style:
-                                                    MyTextStyle.textMatn14Bold,
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              height: Dimens.nh(16.0),
-                                            ),
-                                            SizedBox(
-                                              width: Dimens.nw(248.0),
-                                              child: ListView.separated(
-                                                shrinkWrap: true,
-                                                physics:
-                                                    const NeverScrollableScrollPhysics(),
-                                                itemCount: sortedBooks.length,
-                                                separatorBuilder:
-                                                    (context, index) {
-                                                  return SizedBox(
-                                                      height: Dimens.nh(6.0));
-                                                },
-                                                itemBuilder: (context, index) {
-                                                  final book =
-                                                      sortedBooks[index];
-                                                  return ItemMultiCard(
-                                                    title: book.title,
-                                                    price: book.price,
-                                                  );
-                                                },
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              height: Dimens.nh(14.0),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: Dimens.nh(16.0),
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: Dimens.medium),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: [
                                             Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.spaceAround,
                                               children: [
                                                 Text(
-                                                  "جمع دروس و کتاب ها",
-                                                  style: MyTextStyle
-                                                      .textMatn12W300,
+                                                  "${MoneyUtils.formatTomanFromRial(widget.item.price)} ",
+                                                  style: TextStyle(
+                                                    fontFamily: "IRANSans",
+                                                    fontSize: Dimens.nsp(16.0),
+                                                    fontWeight: FontWeight.w300,
+                                                    fontStyle: FontStyle.normal,
+                                                    height: 1.0,
+                                                    letterSpacing: 0.0,
+                                                    color: MyColors.textMatn1,
+                                                  ),
+                                                  textAlign: TextAlign.center,
                                                 ),
-                                                Row(
-                                                  children: [
-                                                    Text(
-                                                      "${subtotal.toString().addComma} ",
-                                                      style: MyTextStyle
-                                                          .textMatn14Bold,
-                                                    ),
-                                                    Text(
-                                                      l10n.toman,
-                                                      style: MyTextStyle
-                                                          .textMatn10W300,
-                                                    )
-                                                  ],
+                                                Text(
+                                                  l10n.toman,
+                                                  style: MyTextStyle.textMatn13,
                                                 )
                                               ],
-                                            ),
-                                            SizedBox(
-                                              height: Dimens.nh(16.0),
-                                            ),
-                                            Container(
-                                              width: Dimens.nw(286.0),
-                                              height: Dimens.nh(42.0),
-                                              decoration: ShapeDecoration(
-                                                color:
-                                                    MyColors.discountBackground,
-                                                shape: RoundedRectangleBorder(
+                                            )
+                                          ],
+                                        ),
+                                      )),
+                                  SizedBox(
+                                    height: Dimens.nh(20.0),
+                                  ),
+                                  SizedBox(
+                                    width: Dimens.nw(286.0),
+                                    height: Dimens.nh(65.0),
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        _addItemToCart(
+                                          CartType.IKnowCourse.name,
+                                          widget.item.id,
+                                          widget.item.name,
+                                        );
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: isDark
+                                            ? MyColors.primary
+                                            : MyColors.secondary,
+                                        foregroundColor: MyColors.textLight,
+                                        elevation: 0,
+                                        shadowColor: Colors.transparent,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            Dimens.radiusLarge,
+                                          ),
+                                        ),
+                                      ),
+                                      child: Text(
+                                        l10n.add_to_cart,
+                                        style: MyTextStyle.textMatnBtn,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: Dimens.nh(20.0),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          SliverFillRemaining(
+                            hasScrollBody: false,
+                            child: Align(
+                              alignment: Alignment.bottomCenter,
+                              child: _buildCartFooter(),
+                            ),
+                          ),
+                        ],
+                      ),
+                      CustomScrollView(
+                        slivers: [
+                          SliverToBoxAdapter(
+                            child: summaryData == null
+                                ? Padding(
+                                    padding: EdgeInsets.all(Dimens.large),
+                                    child: Column(
+                                      children: [
+                                        SizedBox(height: Dimens.nh(40.0)),
+                                        const CircularProgressIndicator(),
+                                        SizedBox(height: Dimens.nh(16.0)),
+                                        Text(
+                                          "اطلاعات خرید مجموعه در حال بارگذاری است",
+                                          style: MyTextStyle.textMatn12W500,
+                                          textAlign: TextAlign.center,
+                                        ),
+                                        SizedBox(height: Dimens.nh(24.0)),
+                                      ],
+                                    ),
+                                  )
+                                : Builder(
+                                    builder: (context) {
+                                      final sortedCourses =
+                                          _sortedCourses(summaryData);
+                                      final sortedBooks =
+                                          _sortedBooks(summaryData);
+                                      final subtotal =
+                                          _calculateBundleSubtotal(summaryData);
+                                      final discountAmount =
+                                          _calculateDiscountAmount(summaryData);
+                                      final payableAmount =
+                                          _calculatePayableAmount(summaryData);
+                                      final settings =
+                                          summaryData.data.settings;
+                                      final isPercentDiscount =
+                                          settings.discountType.toLowerCase() ==
+                                              "percent";
+
+                                      return Column(
+                                        children: [
+                                          SizedBox(
+                                            height: Dimens.nh(16.0),
+                                          ),
+                                          Stack(
+                                            children: [
+                                              Container(
+                                                width: Dimens.nw(286.0),
+                                                height: Dimens.nh(177.0),
+                                                decoration: BoxDecoration(
                                                   borderRadius:
-                                                      BorderRadius.circular(
-                                                          Dimens.nr(10.0)),
+                                                      BorderRadius.all(
+                                                    Radius.circular(
+                                                        Dimens.nr(27.0)),
+                                                  ),
+                                                  color: MyColors.background,
+                                                ),
+                                                child: Image.asset(
+                                                  "assets/images/cart/bundle_lesson.png",
+                                                  fit: BoxFit.cover,
                                                 ),
                                               ),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceAround,
-                                                children: [
-                                                  Text(
-                                                    "تخفیف",
-                                                    style: MyTextStyle
-                                                        .textMatn12W300,
+                                              Positioned(
+                                                  bottom: Dimens.nh(35.0),
+                                                  right: Dimens.small,
+                                                  child: SizedBox(
+                                                    width: Dimens.nw(30.0),
+                                                    height: Dimens.nh(30.0),
+                                                    child: SvgPicture.asset(
+                                                      'assets/images/icons/arcticons--pdf-viewer.svg',
+                                                      width: Dimens.nw(30.0),
+                                                      height: Dimens.nh(30.0),
+                                                      colorFilter:
+                                                          const ColorFilter
+                                                              .mode(
+                                                        MyColors.textLight,
+                                                        BlendMode.srcIn,
+                                                      ),
+                                                    ),
+                                                  )),
+                                              Positioned(
+                                                bottom: Dimens.nh(5.0),
+                                                right: Dimens.small,
+                                                child: SizedBox(
+                                                  width: Dimens.nw(30.0),
+                                                  height: Dimens.nh(30.0),
+                                                  child: SvgPicture.asset(
+                                                    'assets/images/icons/carbon--play-outline.svg',
+                                                    width: Dimens.nw(30.0),
+                                                    height: Dimens.nh(30.0),
+                                                    colorFilter:
+                                                        const ColorFilter.mode(
+                                                      MyColors.textLight,
+                                                      BlendMode.srcIn,
+                                                    ),
                                                   ),
-                                                  Row(
-                                                    children: [
-                                                      if (isPercentDiscount)
-                                                        Container(
-                                                          width:
-                                                              Dimens.nw(40.0),
-                                                          height:
-                                                              Dimens.nh(17.84),
-                                                          alignment:
-                                                              Alignment.center,
-                                                          decoration:
-                                                              ShapeDecoration(
-                                                            color: MyColors
-                                                                .darkErrorLight,
-                                                            shape:
-                                                                RoundedRectangleBorder(
-                                                              borderRadius:
-                                                                  BorderRadius.circular(
-                                                                      Dimens.nr(
-                                                                          11.50)),
-                                                            ),
-                                                          ),
-                                                          child: Text(
-                                                            "${settings.discountAmount}%",
-                                                            style: MyTextStyle
-                                                                .textMatn10W300,
-                                                          ),
-                                                        ),
-                                                      if (isPercentDiscount)
-                                                        SizedBox(
+                                                ),
+                                              ),
+                                              Positioned(
+                                                bottom: Dimens.nh(5.0),
+                                                left: Dimens.small,
+                                                child: Container(
+                                                  width: Dimens.nw(104.0),
+                                                  height: Dimens.nh(30.0),
+                                                  decoration: BoxDecoration(
+                                                      borderRadius: BorderRadius
+                                                          .all(Radius.circular(
+                                                              Dimens.nr(20.0))),
+                                                      color:
+                                                          MyColors.background),
+                                                  child: Padding(
+                                                    padding:
+                                                        EdgeInsets.fromLTRB(
+                                                            Dimens.tiny,
+                                                            0,
+                                                            Dimens.nw(2.0),
+                                                            0),
+                                                    child: FittedBox(
+                                                      fit: BoxFit.scaleDown,
+                                                      child: Row(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          Image.asset(
+                                                            "assets/images/star_icon.png",
                                                             width:
-                                                                Dimens.nw(4.0)),
+                                                                Dimens.nw(18.0),
+                                                            height:
+                                                                Dimens.nh(18.0),
+                                                            fit: BoxFit.contain,
+                                                          ),
+                                                          SizedBox(
+                                                              width: Dimens.nw(
+                                                                  2.0)),
+                                                          Text(
+                                                            convertEnToFa(
+                                                                "+50"),
+                                                            style: MyTextStyle
+                                                                .textMatn13PrimaryShade1,
+                                                          ),
+                                                          SizedBox(
+                                                              width: Dimens.nw(
+                                                                  2.0)),
+                                                          Text(
+                                                            l10n.coin_with_buy,
+                                                            style: MyTextStyle
+                                                                .textMatn9,
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(
+                                            height: Dimens.nh(26.0),
+                                          ),
+                                          Container(
+                                            decoration: const BoxDecoration(
+                                                color: MyColors.background1),
+                                            child: Column(
+                                              children: [
+                                                SizedBox(
+                                                  height: Dimens.nh(16.0),
+                                                ),
+                                                Center(
+                                                  child: Text(
+                                                    _bundleName,
+                                                    style: MyTextStyle
+                                                        .textMatn14Bold,
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  height: Dimens.nh(18.0),
+                                                ),
+                                                SizedBox(
+                                                  width: Dimens.nw(248.0),
+                                                  child: ListView.separated(
+                                                    shrinkWrap: true,
+                                                    physics:
+                                                        const NeverScrollableScrollPhysics(),
+                                                    itemCount:
+                                                        sortedCourses.length,
+                                                    separatorBuilder:
+                                                        (context, index) {
+                                                      return SizedBox(
+                                                          height:
+                                                              Dimens.nh(6.0));
+                                                    },
+                                                    itemBuilder:
+                                                        (context, index) {
+                                                      final course =
+                                                          sortedCourses[index];
+                                                      return ItemMultiCard(
+                                                        title: course.name,
+                                                        price: course.price,
+                                                      );
+                                                    },
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  height: Dimens.nh(20.0),
+                                                ),
+                                                Center(
+                                                  child: Text(
+                                                    "کتاب های الکترونیکی",
+                                                    style: MyTextStyle
+                                                        .textMatn14Bold,
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  height: Dimens.nh(16.0),
+                                                ),
+                                                SizedBox(
+                                                  width: Dimens.nw(248.0),
+                                                  child: ListView.separated(
+                                                    shrinkWrap: true,
+                                                    physics:
+                                                        const NeverScrollableScrollPhysics(),
+                                                    itemCount:
+                                                        sortedBooks.length,
+                                                    separatorBuilder:
+                                                        (context, index) {
+                                                      return SizedBox(
+                                                          height:
+                                                              Dimens.nh(6.0));
+                                                    },
+                                                    itemBuilder:
+                                                        (context, index) {
+                                                      final book =
+                                                          sortedBooks[index];
+                                                      return ItemMultiCard(
+                                                        title: book.title,
+                                                        price: book.price,
+                                                      );
+                                                    },
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  height: Dimens.nh(14.0),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            height: Dimens.nh(16.0),
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: Dimens.medium),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceAround,
+                                                  children: [
+                                                    Text(
+                                                      "جمع دروس و کتاب ها",
+                                                      style: MyTextStyle
+                                                          .textMatn12W300,
+                                                    ),
+                                                    Row(
+                                                      children: [
+                                                        Text(
+                                                          "${subtotal.toString().addComma} ",
+                                                          style: MyTextStyle
+                                                              .textMatn14Bold,
+                                                        ),
+                                                        Text(
+                                                          l10n.toman,
+                                                          style: MyTextStyle
+                                                              .textMatn10W300,
+                                                        )
+                                                      ],
+                                                    )
+                                                  ],
+                                                ),
+                                                SizedBox(
+                                                  height: Dimens.nh(16.0),
+                                                ),
+                                                Container(
+                                                  width: Dimens.nw(286.0),
+                                                  height: Dimens.nh(42.0),
+                                                  decoration: ShapeDecoration(
+                                                    color: MyColors
+                                                        .discountBackground,
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              Dimens.nr(10.0)),
+                                                    ),
+                                                  ),
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceAround,
+                                                    children: [
                                                       Text(
-                                                        discountAmount
-                                                            .toString()
-                                                            .addComma,
+                                                        "تخفیف",
                                                         style: MyTextStyle
                                                             .textMatn12W300,
                                                       ),
-                                                      SizedBox(
-                                                        width: Dimens.nw(4.0),
-                                                      ),
-                                                      Text(
-                                                        l10n.toman,
-                                                        style: MyTextStyle
-                                                            .textMatn10W300,
-                                                      ),
-                                                    ],
-                                                  )
-                                                ],
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              height: Dimens.nh(16.0),
-                                            ),
-                                            Container(
-                                              width: Dimens.nw(286.0),
-                                              height: Dimens.nh(54.0),
-                                              decoration: ShapeDecoration(
-                                                color: MyColors.background2,
-                                                shape: RoundedRectangleBorder(
-                                                  side: BorderSide(
-                                                    width: Dimens.nw(2.0),
-                                                    color: MyColors.primary,
-                                                  ),
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          Dimens.nr(10.0)),
-                                                ),
-                                              ),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceAround,
-                                                children: [
-                                                  Text(
-                                                    "مبلغ قابل پرداخت",
-                                                    style: MyTextStyle
-                                                        .textMatn12W300,
-                                                  ),
-                                                  Row(
-                                                    children: [
-                                                      Text(
-                                                        payableAmount
-                                                            .toString()
-                                                            .addComma,
-                                                        style: MyTextStyle
-                                                            .textMatn14Bold,
-                                                      ),
-                                                      SizedBox(
-                                                        width: Dimens.nw(4.0),
-                                                      ),
-                                                      Text(
-                                                        l10n.toman,
-                                                        style: MyTextStyle
-                                                            .textMatn10W300,
+                                                      Row(
+                                                        children: [
+                                                          if (isPercentDiscount)
+                                                            Container(
+                                                              width: Dimens.nw(
+                                                                  40.0),
+                                                              height: Dimens.nh(
+                                                                  17.84),
+                                                              alignment:
+                                                                  Alignment
+                                                                      .center,
+                                                              decoration:
+                                                                  ShapeDecoration(
+                                                                color: MyColors
+                                                                    .darkErrorLight,
+                                                                shape:
+                                                                    RoundedRectangleBorder(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              Dimens.nr(11.50)),
+                                                                ),
+                                                              ),
+                                                              child: Text(
+                                                                "${settings.discountAmount}%",
+                                                                style: MyTextStyle
+                                                                    .textMatn10W300,
+                                                              ),
+                                                            ),
+                                                          if (isPercentDiscount)
+                                                            SizedBox(
+                                                                width:
+                                                                    Dimens.nw(
+                                                                        4.0)),
+                                                          Text(
+                                                            discountAmount
+                                                                .toString()
+                                                                .addComma,
+                                                            style: MyTextStyle
+                                                                .textMatn12W300,
+                                                          ),
+                                                          SizedBox(
+                                                            width:
+                                                                Dimens.nw(4.0),
+                                                          ),
+                                                          Text(
+                                                            l10n.toman,
+                                                            style: MyTextStyle
+                                                                .textMatn10W300,
+                                                          ),
+                                                        ],
                                                       )
                                                     ],
-                                                  )
-                                                ],
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  height: Dimens.nh(16.0),
+                                                ),
+                                                Container(
+                                                  width: Dimens.nw(286.0),
+                                                  height: Dimens.nh(54.0),
+                                                  decoration: ShapeDecoration(
+                                                    color: MyColors.background2,
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                      side: BorderSide(
+                                                        width: Dimens.nw(2.0),
+                                                        color: MyColors.primary,
+                                                      ),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              Dimens.nr(10.0)),
+                                                    ),
+                                                  ),
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceAround,
+                                                    children: [
+                                                      Text(
+                                                        "مبلغ قابل پرداخت",
+                                                        style: MyTextStyle
+                                                            .textMatn12W300,
+                                                      ),
+                                                      Row(
+                                                        children: [
+                                                          Text(
+                                                            payableAmount
+                                                                .toString()
+                                                                .addComma,
+                                                            style: MyTextStyle
+                                                                .textMatn14Bold,
+                                                          ),
+                                                          SizedBox(
+                                                            width:
+                                                                Dimens.nw(4.0),
+                                                          ),
+                                                          Text(
+                                                            l10n.toman,
+                                                            style: MyTextStyle
+                                                                .textMatn10W300,
+                                                          )
+                                                        ],
+                                                      )
+                                                    ],
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  height: Dimens.nh(16.0),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            width: Dimens.nw(286.0),
+                                            height: Dimens.nh(65.0),
+                                            child: ElevatedButton(
+                                              onPressed: () {
+                                                if (settings.id.isEmpty) {
+                                                  return;
+                                                }
+                                                _addItemToCart(
+                                                  CartType.IKnow.name,
+                                                  settings.id,
+                                                  _bundleName,
+                                                );
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: isDark
+                                                    ? MyColors.primary
+                                                    : MyColors.secondary,
+                                                foregroundColor:
+                                                    MyColors.textLight,
+                                                elevation: 0,
+                                                shadowColor: Colors.transparent,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                    Dimens.radiusLarge,
+                                                  ),
+                                                ),
                                               ),
-                                            ),
-                                            SizedBox(
-                                              height: Dimens.nh(16.0),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        width: Dimens.nw(286.0),
-                                        height: Dimens.nh(65.0),
-                                        child: ElevatedButton(
-                                          onPressed: () {
-                                            if (settings.id.isEmpty) {
-                                              return;
-                                            }
-                                            _addItemToCart(
-                                              CartType.IKnow.name,
-                                              settings.id,
-                                              _bundleName,
-                                            );
-                                          },
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: isDark
-                                                ? MyColors.primary
-                                                : MyColors.secondary,
-                                            foregroundColor: MyColors.textLight,
-                                            elevation: 0,
-                                            shadowColor: Colors.transparent,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(
-                                                Dimens.radiusLarge,
+                                              child: Text(
+                                                l10n.add_to_cart,
+                                                style: MyTextStyle.textMatnBtn,
                                               ),
                                             ),
                                           ),
-                                          child: Text(
-                                            l10n.add_to_cart,
-                                            style: MyTextStyle.textMatnBtn,
+                                          SizedBox(
+                                            height: Dimens.nh(20.0),
                                           ),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: Dimens.nh(20.0),
-                                      )
-                                    ],
-                                  );
-                                },
-                              ),
+                                        ],
+                                      );
+                                    },
+                                  ),
+                          ),
+                          SliverFillRemaining(
+                            hasScrollBody: false,
+                            child: Align(
+                              alignment: Alignment.bottomCenter,
+                              child: _buildCartFooter(),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
                 ),
-                Container(
-                  width: Dimens.nw(360.0),
-                  height: Dimens.nh(112.0),
-                  decoration: ShapeDecoration(
-                    color: MyColors.cartFooterBackground,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(Dimens.nr(25.0)),
-                        bottomRight: Radius.circular(Dimens.nr(25.0)),
-                      ),
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Image.asset("assets/images/cart/subtract.png"),
-                      // SizedBox(width: Dimens.small),
-                      Expanded(
-                        child: Text(
-                          "جهت کسب اطلاعات بیشتر به وبسایت پورتک به نشانی www.poortak.ir مراجه کنید.",
-                          style: MyTextStyle.textMatn11,
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ],
-                  ),
-                )
               ],
             ),
           ),
