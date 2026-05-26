@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:iconify_design/iconify_design.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poortak/common/services/haptic_service.dart';
 import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/common/services/tts_service.dart';
@@ -433,9 +433,17 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
                                           IconButton(
                                             onPressed: () =>
                                                 _readWord(correctWord.word),
-                                            icon: IconifyIcon(
-                                              icon: "cuida:volume-2-outline",
-                                              size: 32.r,
+                                            icon: SvgPicture.asset(
+                                              'assets/images/icons/cuida--volume-2-outline.svg',
+                                              width: 32.r,
+                                              height: 32.r,
+                                              colorFilter: ColorFilter.mode(
+                                                Theme.of(context)
+                                                        .iconTheme
+                                                        .color ??
+                                                    Colors.black,
+                                                BlendMode.srcIn,
+                                              ),
                                             ),
                                           ),
                                           SizedBox(width: 20.w),

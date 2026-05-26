@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:iconify_design/iconify_design.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/common/services/tts_service.dart';
 import 'package:poortak/config/myColors.dart';
@@ -257,9 +257,14 @@ class _ReviewedVocabulariesScreenState
                                       ),
                                       child: IconButton(
                                         onPressed: () => _readWord(word.word),
-                                        icon: const IconifyIcon(
-                                          icon: "cuida:volume-2-outline",
-                                          color: Color(0xFF3D495C),
+                                        icon: SvgPicture.asset(
+                                          'assets/images/icons/cuida--volume-2-outline.svg',
+                                          width: 28.r,
+                                          height: 28.r,
+                                          colorFilter: const ColorFilter.mode(
+                                            Color(0xFF3D495C),
+                                            BlendMode.srcIn,
+                                          ),
                                         ),
                                         iconSize: 28.r,
                                       ),

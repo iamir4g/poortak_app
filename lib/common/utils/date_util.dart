@@ -117,6 +117,11 @@ class DateUtil {
     return '$year$separator$month$separator$day';
   }
 
+  static String formatPersianDateWithDigits(DateTime dateTime,
+      {String separator = '/'}) {
+    return convertEnglishToPersianDigits(formatPersianDate(dateTime, separator));
+  }
+
   /// Get Persian day name
   static String getPersianDayName(DateTime dateTime) {
     final shamsiDate = Jalali.fromDateTime(dateTime);
@@ -145,5 +150,29 @@ class DateUtil {
       throw ArgumentError('Month index must be between 1 and 12');
     }
     return persianMonths[monthIndex - 1];
+  }
+
+  static String toRelativeTime(DateTime dateTime) {
+    final now = DateTime.now().toUtc();
+    final dt = dateTime.toUtc();
+    final diff = now.difference(dt);
+    if (diff.isNegative) return 'لحظاتی پیش';
+
+    if (diff.inMinutes < 1) return 'لحظاتی پیش';
+    if (diff.inHours < 1) {
+      return '${convertEnglishToPersianDigits(diff.inMinutes.toString())} دقیقه پیش';
+    }
+    if (diff.inDays < 1) {
+      return '${convertEnglishToPersianDigits(diff.inHours.toString())} ساعت پیش';
+    }
+    if (diff.inDays < 30) {
+      return '${convertEnglishToPersianDigits(diff.inDays.toString())} روز پیش';
+    }
+    final months = diff.inDays ~/ 30;
+    if (months < 12) {
+      return '${convertEnglishToPersianDigits(months.toString())} ماه پیش';
+    }
+    final years = months ~/ 12;
+    return '${convertEnglishToPersianDigits(years.toString())} سال پیش';
   }
 }

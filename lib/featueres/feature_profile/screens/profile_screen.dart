@@ -81,12 +81,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor =
+        isDark ? MyColors.profileBackgroundDark : MyColors.background3;
     if (!isLoggedIn) {
       return const LoginScreen();
     }
 
     return Scaffold(
-      backgroundColor: MyColors.background3,
+      backgroundColor: backgroundColor,
       body: SafeArea(
         child: Stack(
           children: [
@@ -102,7 +105,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             curveDepth: 10, bottomOffset: 20),
                         child: Container(
                           height: 250.h, //double.infinity - 500,
-                          color: Colors.white,
+                          color: isDark
+                              ? MyColors.profileHeaderDark
+                              : Colors.white,
                         ),
                       ),
                       // Content
@@ -118,12 +123,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
                                   border: Border.all(
-                                      color: const Color(0xFFE6EBF2),
-                                      width: 5.r),
-                                  color: Colors.white,
+                                    color: isDark
+                                        ? MyColors.profileAvatarBorderDark
+                                        : const Color(0xFFE6EBF2),
+                                    width: 5.r,
+                                  ),
+                                  color: Colors.transparent,
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black.withOpacity(0.04),
+                                      color:
+                                          Colors.black.withValues(alpha: 0.04),
                                       blurRadius: 4.r,
                                     ),
                                   ],
@@ -153,7 +162,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             Text(
                               _getDisplayName(),
                               style: MyTextStyle.textMatn16Bold.copyWith(
-                                color: MyColors.textCancelButton,
+                                color: isDark
+                                    ? MyColors.profileTextPrimaryDark
+                                    : MyColors.textCancelButton,
                               ),
                             ),
                             SizedBox(height: 8.h),
@@ -161,7 +172,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             Text(
                               ' موبایل: ${userMobile ?? 'نامشخص'}',
                               style: MyTextStyle.textMatn12Bold.copyWith(
-                                color: MyColors.text3,
+                                color: isDark
+                                    ? MyColors.profileTextPrimaryDark
+                                    : MyColors.text3,
                               ),
                             ),
                             Padding(
@@ -201,13 +214,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         Container(
                                           width: 16.r,
                                           height: 16.r,
-                                          decoration: const BoxDecoration(
-                                            color: Color(0xFFA3AFC2),
-                                            shape: BoxShape.circle,
+                                          decoration: BoxDecoration(
+                                            color: MyColors.text4,
+                                            shape: BoxShape.rectangle,
+                                            borderRadius:
+                                                BorderRadius.circular(2.r),
                                           ),
                                           child: Icon(
                                             Icons.edit,
-                                            color: Colors.white,
+                                            color: Colors.black,
                                             size: 10.r,
                                           ),
                                         ),
@@ -217,7 +232,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           style:
                                               MyTextStyle.textMatn11.copyWith(
                                             fontWeight: FontWeight.w500,
-                                            color: MyColors.text3,
+                                            color: isDark
+                                                ? MyColors
+                                                    .profileTextPrimaryDark
+                                                : MyColors.text3,
                                           ),
                                         ),
                                       ],
@@ -304,16 +322,17 @@ class _ProfileActionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       height: 60.h,
       width: 357.838.w,
       margin: EdgeInsets.symmetric(horizontal: 17.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? MyColors.termsBackgroundDark : Colors.white,
         borderRadius: BorderRadius.circular(22.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 4.r,
             offset: Offset(0, 2.h),
           ),
@@ -337,7 +356,9 @@ class _ProfileActionCard extends StatelessWidget {
                     label,
                     style: MyTextStyle.textMatn16.copyWith(
                       fontWeight: FontWeight.w500,
-                      color: MyColors.textCancelButton,
+                      color: isDark
+                          ? MyColors.profileTextPrimaryDark
+                          : MyColors.textCancelButton,
                       height: 1.375, // 22px line height for 16px font
                     ),
                     textAlign: TextAlign.right,

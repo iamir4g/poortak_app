@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:iconify_design/iconify_design.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/dictionary_bloc/dictionary_bloc.dart';
@@ -120,10 +120,15 @@ class _WordDetailView extends StatelessWidget {
                                 color: const Color(0xFF29303D))),
                         IconButton(
                           onPressed: () => locator<TTSService>().speak(word),
-                          icon: IconifyIcon(
-                              icon: "cuida:volume-2-outline",
-                              size: 22.r,
-                              color: const Color(0xFFA3AFC2)),
+                          icon: SvgPicture.asset(
+                            'assets/images/icons/cuida--volume-2-outline.svg',
+                            width: 22.r,
+                            height: 22.r,
+                            colorFilter: const ColorFilter.mode(
+                              Color(0xFFA3AFC2),
+                              BlendMode.srcIn,
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -199,12 +204,16 @@ class _WordDetailView extends StatelessWidget {
                                                 onPressed: () =>
                                                     locator<TTSService>()
                                                         .speak(ex.text),
-                                                icon: IconifyIcon(
-                                                    icon:
-                                                        "cuida:volume-2-outline",
-                                                    size: 18.r,
-                                                    color: const Color(
-                                                        0xFFA3AFC2)),
+                                                icon: SvgPicture.asset(
+                                                  'assets/images/icons/cuida--volume-2-outline.svg',
+                                                  width: 18.r,
+                                                  height: 18.r,
+                                                  colorFilter:
+                                                      const ColorFilter.mode(
+                                                    Color(0xFFA3AFC2),
+                                                    BlendMode.srcIn,
+                                                  ),
+                                                ),
                                               ),
                                             ],
                                           ),

@@ -71,8 +71,15 @@ class _QuizScreenState extends State<QuizScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final pageBackgroundColor =
+        isDark ? MyColors.profileBackgroundDark : Colors.white;
+    final headerBackgroundColor =
+        isDark ? MyColors.darkBackgroundSecondary : Colors.white;
+    final primaryTextColor =
+        isDark ? MyColors.profileTextPrimaryDark : MyColors.text2;
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: pageBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
@@ -82,13 +89,13 @@ class _QuizScreenState extends State<QuizScreen> {
                 Container(
                   width: double.infinity,
                   height: 80,
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
+                  decoration: BoxDecoration(
+                    color: headerBackgroundColor,
                     borderRadius: BorderRadius.only(
                       bottomLeft: Radius.circular(33.5),
                       bottomRight: Radius.circular(33.5),
                     ),
-                    boxShadow: [
+                    boxShadow: const [
                       BoxShadow(
                         color: Color(0x0D000000),
                         blurRadius: 1,
@@ -113,11 +120,13 @@ class _QuizScreenState extends State<QuizScreen> {
                             width: 34,
                             height: 34,
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: headerBackgroundColor,
                               borderRadius: BorderRadius.circular(17),
                             ),
-                            child: const Icon(Icons.arrow_forward,
-                                color: Color(0xFF3D495C)),
+                            child: Icon(
+                              Icons.arrow_forward,
+                              color: primaryTextColor,
+                            ),
                           ),
                         ),
                       ],
@@ -160,7 +169,7 @@ class _QuizScreenState extends State<QuizScreen> {
                         SnackBar(
                           content: Text(state.message),
                           duration: const Duration(seconds: 2),
-                          backgroundColor: Colors.red,
+                          backgroundColor: MyColors.error,
                         ),
                       );
                       // Navigate back to quiz list on error
@@ -183,7 +192,12 @@ class _QuizScreenState extends State<QuizScreen> {
                     builder: (context, answerState) {
                       if (answerState is QuizAnswerComplete) {
                         // Optionally show a loading indicator or a message
-                        return const Center(child: CircularProgressIndicator());
+                        return const Center(
+                          child: CircularProgressIndicator(
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(MyColors.primary),
+                          ),
+                        );
                       }
                       // Use currentQuestion for rendering
                       final questionData = currentQuestion.data;
@@ -202,6 +216,9 @@ class _QuizScreenState extends State<QuizScreen> {
                                 context,
                                 baseFontSize: 16.0,
                                 fontWeight: FontWeight.bold,
+                                color: isDark
+                                    ? MyColors.profileTextPrimaryDark
+                                    : null,
                               ),
                             ),
                             const SizedBox(height: 32),
@@ -273,7 +290,9 @@ class _QuizScreenState extends State<QuizScreen> {
                                   margin:
                                       const EdgeInsets.symmetric(horizontal: 0),
                                   decoration: BoxDecoration(
-                                    color: MyColors.cardBackground1,
+                                    color: isDark
+                                        ? MyColors.termsBackgroundDark
+                                        : MyColors.cardBackground1,
                                     borderRadius: BorderRadius.circular(16),
                                     boxShadow: [
                                       BoxShadow(
@@ -287,7 +306,9 @@ class _QuizScreenState extends State<QuizScreen> {
                                   child: Text(
                                     answerState.explanation!,
                                     style: MyTextStyle.textMatn12W500.copyWith(
-                                      color: MyColors.textMatn1,
+                                      color: isDark
+                                          ? MyColors.profileTextPrimaryDark
+                                          : MyColors.textMatn1,
                                       fontSize: 13,
                                     ),
                                     textAlign: TextAlign.center,
@@ -302,11 +323,21 @@ class _QuizScreenState extends State<QuizScreen> {
                                     width: 54,
                                     height: 54,
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFFEDFAEB),
+                                      color: isDark
+                                          ? MyColors
+                                              .quizAnswerCorrectBackgroundDark
+                                          : MyColors
+                                              .quizAnswerCorrectBackgroundLight,
                                       borderRadius: BorderRadius.circular(50),
                                     ),
-                                    child: const Icon(Icons.check_circle,
-                                        color: Color(0xFF6FC845), size: 40),
+                                    child: Icon(
+                                      Icons.check_circle,
+                                      color: isDark
+                                          ? MyColors.quizAnswerCorrectTextDark
+                                          : MyColors
+                                              .quizAnswerCorrectBorderLight,
+                                      size: 40,
+                                    ),
                                   ),
                                   const SizedBox(height: 12),
                                   Text(
@@ -315,7 +346,9 @@ class _QuizScreenState extends State<QuizScreen> {
                                       fontFamily: 'IRANSans',
                                       fontWeight: FontWeight.w300,
                                       fontSize: 12,
-                                      color: Color(0xFF3D495C),
+                                      color: isDark
+                                          ? MyColors.quizAnswerCorrectTextDark
+                                          : MyColors.text2,
                                     ),
                                     textAlign: TextAlign.center,
                                   ),

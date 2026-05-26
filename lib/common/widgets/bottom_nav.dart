@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:iconify_design/iconify_design.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
@@ -20,6 +20,38 @@ class BottomNav extends StatelessWidget {
 
   const BottomNav({super.key, required this.controller});
 
+  static const Map<String, String> _navIconAssets = {
+    'mage:video-player': 'assets/images/icons/mage--video-player.svg',
+    'mage:search': 'assets/images/icons/mage--search.svg',
+    'hugeicons:shopping-cart-02':
+        'assets/images/icons/hugeicons--shopping-cart-02.svg',
+    'hugeicons:book-open-02': 'assets/images/icons/hugeicons--book-open-02.svg',
+    'mynaui:user-square': 'assets/images/icons/mage--user-square.svg',
+    'mage:user-square': 'assets/images/icons/mage--user-square.svg',
+  };
+
+  Widget _buildNavSvgIcon({
+    required String icon,
+    required double size,
+    required Color color,
+  }) {
+    final assetPath = _navIconAssets[icon];
+    if (assetPath == null) {
+      return Icon(
+        Icons.help_outline_rounded,
+        size: size,
+        color: color,
+      );
+    }
+
+    return SvgPicture.asset(
+      assetPath,
+      width: size,
+      height: size,
+      colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ThemeCubit, ThemeState>(
@@ -34,8 +66,8 @@ class BottomNav extends StatelessWidget {
             boxShadow: [
               BoxShadow(
                 color: themeState.isDark
-                    ? Colors.black.withOpacity(0.3)
-                    : const Color(0xFF92A2BE).withOpacity(0.12),
+                    ? Colors.black.withValues(alpha: 0.3)
+                    : const Color(0xFF92A2BE).withValues(alpha: 0.12),
                 offset: Offset(0, -7.h),
                 blurRadius: 13.r,
                 spreadRadius: 0,
@@ -138,7 +170,6 @@ class BottomNav extends StatelessWidget {
       );
     }
 
-    // برای بقیه از IconifyIcon استفاده می‌کنیم
     Color iconColor = isSelected
         ? MyColors.primary
         : (themeState.isDark ? MyColors.darkTextSecondary : Colors.grey);
@@ -153,13 +184,19 @@ class BottomNav extends StatelessWidget {
         },
         builder: (context, cartState) {
           if (cartState is ShoppingCartInitial) {
-            return IconifyIcon(
-                icon: icon, color: iconColor, size: Dimens.iconMedium);
+            return _buildNavSvgIcon(
+              icon: icon,
+              color: iconColor,
+              size: Dimens.iconMedium,
+            );
           }
 
           if (cartState is ShoppingCartLoading) {
-            return IconifyIcon(
-                icon: icon, color: iconColor, size: Dimens.iconMedium);
+            return _buildNavSvgIcon(
+              icon: icon,
+              color: iconColor,
+              size: Dimens.iconMedium,
+            );
           }
 
           // Handle server cart (logged-in users)
@@ -171,12 +208,18 @@ class BottomNav extends StatelessWidget {
                     badges.BadgeStyle(badgeColor: MyColors.primaryShade2),
                 badgeContent: Text(cart.items.length.toString(),
                     style: MyTextStyle.textMatn12W700),
-                child: IconifyIcon(
-                    icon: icon, color: iconColor, size: Dimens.iconMedium),
+                child: _buildNavSvgIcon(
+                  icon: icon,
+                  color: iconColor,
+                  size: Dimens.iconMedium,
+                ),
               );
             }
-            return IconifyIcon(
-                icon: icon, color: iconColor, size: Dimens.iconMedium);
+            return _buildNavSvgIcon(
+              icon: icon,
+              color: iconColor,
+              size: Dimens.iconMedium,
+            );
           }
 
           // Handle local cart (non-logged-in users)
@@ -184,12 +227,18 @@ class BottomNav extends StatelessWidget {
             if (cartState.items.isNotEmpty) {
               return badges.Badge(
                 badgeContent: Text(cartState.items.length.toString()),
-                child: IconifyIcon(
-                    icon: icon, color: iconColor, size: Dimens.iconMedium),
+                child: _buildNavSvgIcon(
+                  icon: icon,
+                  color: iconColor,
+                  size: Dimens.iconMedium,
+                ),
               );
             }
-            return IconifyIcon(
-                icon: icon, color: iconColor, size: Dimens.iconMedium);
+            return _buildNavSvgIcon(
+              icon: icon,
+              color: iconColor,
+              size: Dimens.iconMedium,
+            );
           }
 
           // Handle local cart item added/removed states
@@ -197,33 +246,52 @@ class BottomNav extends StatelessWidget {
             if (cartState.items.isNotEmpty) {
               return badges.Badge(
                 badgeContent: Text(cartState.items.length.toString()),
-                child: IconifyIcon(
-                    icon: icon, color: iconColor, size: Dimens.iconMedium),
+                child: _buildNavSvgIcon(
+                  icon: icon,
+                  color: iconColor,
+                  size: Dimens.iconMedium,
+                ),
               );
             }
-            return IconifyIcon(
-                icon: icon, color: iconColor, size: Dimens.iconMedium);
+            return _buildNavSvgIcon(
+              icon: icon,
+              color: iconColor,
+              size: Dimens.iconMedium,
+            );
           }
 
           if (cartState is LocalCartItemRemoved) {
             if (cartState.items.isNotEmpty) {
               return badges.Badge(
                 badgeContent: Text(cartState.items.length.toString()),
-                child: IconifyIcon(
-                    icon: icon, color: iconColor, size: Dimens.iconMedium),
+                child: _buildNavSvgIcon(
+                  icon: icon,
+                  color: iconColor,
+                  size: Dimens.iconMedium,
+                ),
               );
             }
-            return IconifyIcon(
-                icon: icon, color: iconColor, size: Dimens.iconMedium);
+            return _buildNavSvgIcon(
+              icon: icon,
+              color: iconColor,
+              size: Dimens.iconMedium,
+            );
           }
 
-          return IconifyIcon(
-              icon: icon, color: iconColor, size: Dimens.iconMedium);
+          return _buildNavSvgIcon(
+            icon: icon,
+            color: iconColor,
+            size: Dimens.iconMedium,
+          );
         },
       );
     }
 
-    return IconifyIcon(icon: icon, color: iconColor, size: Dimens.iconMedium);
+    return _buildNavSvgIcon(
+      icon: icon,
+      color: iconColor,
+      size: Dimens.iconMedium,
+    );
   }
 
   Widget _buildNavItem({

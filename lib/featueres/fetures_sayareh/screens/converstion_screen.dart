@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:iconify_design/iconify_design.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/locator.dart';
@@ -329,10 +329,20 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final pageBackgroundColor =
+        isDark ? MyColors.profileBackgroundDark : MyColors.secondaryTint4;
+    final headerBackgroundColor =
+        isDark ? MyColors.darkBackgroundSecondary : Colors.white;
+    final primaryTextColor =
+        isDark ? MyColors.profileTextPrimaryDark : MyColors.textMatn1;
+    final iconColor =
+        isDark ? MyColors.profileTextPrimaryDark : MyColors.textPrimary;
+    final bottomBarColor = isDark ? MyColors.profileHeaderDark : MyColors.background;
     return BlocProvider.value(
       value: _converstionBloc,
       child: Scaffold(
-        backgroundColor: MyColors.secondaryTint4,
+        backgroundColor: pageBackgroundColor,
         // نوار بالای صفحه با عنوان "مکالمه"
         appBar: AppBar(
           shape: RoundedRectangleBorder(
@@ -340,23 +350,27 @@ class _ConversationScreenState extends State<ConversationScreen> {
               bottomLeft: Radius.circular(30.r),
             ),
           ),
+          backgroundColor: headerBackgroundColor,
+          foregroundColor: primaryTextColor,
           automaticallyImplyLeading: false,
           actions: [
             IconButton(
               onPressed: () => Navigator.of(context).pop(),
-              icon: const Icon(Icons.arrow_forward),
+              icon: Icon(Icons.arrow_forward, color: primaryTextColor),
             ),
           ],
           centerTitle: true,
           title: Text(
             'مکالمه',
-            style: MyTextStyle.textHeader16Bold,
+            style: MyTextStyle.textHeader16Bold.copyWith(
+              color: primaryTextColor,
+            ),
           ),
         ),
         // نوار پایین صفحه شامل دکمه‌های پخش و نمایش ترجمه
         bottomNavigationBar: Container(
           decoration: BoxDecoration(
-            color: MyColors.background,
+            color: bottomBarColor,
           ),
           child: SafeArea(
             child: SizedBox(
@@ -377,7 +391,9 @@ class _ConversationScreenState extends State<ConversationScreen> {
                           Icons.translate,
                           color: showTranslations
                               ? MyColors.secondary
-                              : MyColors.textSecondary,
+                              : (isDark
+                                  ? MyColors.loginTextSecondaryDark
+                                  : MyColors.textSecondary),
                         ),
                       );
                     },
@@ -386,10 +402,14 @@ class _ConversationScreenState extends State<ConversationScreen> {
                       onPressed: () {
                         _playNext();
                       },
-                      icon: IconifyIcon(
-                        icon: "ri:skip-right-fill",
-                        size: 30.r,
-                        color: MyColors.textPrimary,
+                      icon: SvgPicture.asset(
+                        'assets/images/icons/ri--skip-right-fill.svg',
+                        width: 30.r,
+                        height: 30.r,
+                        colorFilter: ColorFilter.mode(
+                          iconColor,
+                          BlendMode.srcIn,
+                        ),
                       )),
                   // دکمه پخش/توقف تمام مکالمه
                   ValueListenableBuilder<bool>(
@@ -413,10 +433,14 @@ class _ConversationScreenState extends State<ConversationScreen> {
                       onPressed: () {
                         _playPrevious();
                       },
-                      icon: IconifyIcon(
-                        icon: "ri:skip-left-fill",
-                        size: 30.r,
-                        color: MyColors.textPrimary,
+                      icon: SvgPicture.asset(
+                        'assets/images/icons/ri--skip-left-fill.svg',
+                        width: 30.r,
+                        height: 30.r,
+                        colorFilter: ColorFilter.mode(
+                          iconColor,
+                          BlendMode.srcIn,
+                        ),
                       )),
                 ],
               ),
@@ -446,12 +470,25 @@ class _ConversationScreenState extends State<ConversationScreen> {
               builder: (context, state) {
                 // نمایش Loading در هنگام بارگذاری داده‌ها
                 if (state is ConverstionLoading) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(
+                    child: CircularProgressIndicator(
+                      valueColor:
+                          AlwaysStoppedAnimation<Color>(MyColors.primary),
+                    ),
+                  );
                 }
 
                 // نمایش پیام خطا در صورت بروز مشکل
                 if (state is ConverstionError) {
-                  return Center(child: Text(state.message));
+                  return Center(
+                    child: Text(
+                      state.message,
+                      style: MyTextStyle.textMatn16.copyWith(
+                        color: primaryTextColor,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  );
                 }
 
                 // نمایش لیست مکالمه در صورت موفقیت‌آمیز بودن درخواست

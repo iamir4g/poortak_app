@@ -6,6 +6,7 @@ import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/iknow_access
 import 'package:poortak/featueres/fetures_sayareh/widgets/item_leason.dart';
 import 'package:poortak/l10n/app_localizations.dart';
 import 'package:poortak/common/widgets/dot_loading_widget.dart';
+import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/sayareh_bloc/sayareh_cubit.dart';
 import 'package:poortak/featueres/feature_match/screens/main_match_screen.dart';
@@ -41,6 +42,7 @@ class _SayarehScreenState extends State<SayarehScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context);
     return MultiBlocProvider(
       providers: [
@@ -116,9 +118,9 @@ class _SayarehScreenState extends State<SayarehScreen> {
                               begin: Alignment.topCenter,
                               end: Alignment.bottomCenter,
                               colors: [
-                                Color(0xFF1A1D2E),
-                                Color(0xFF2C2E3F),
-                                Color(0xFF3B3D54),
+                                Color(0xFF171926),
+                                Color(0xFF212332),
+                                Color(0xFF171926),
                               ],
                               stops: [0.1, 0.54, 1.0],
                             )
@@ -141,11 +143,10 @@ class _SayarehScreenState extends State<SayarehScreen> {
                           ),
                           Text(
                             l10n?.sayareh ?? "",
-                            style: MyTextStyle.textMatn12W700.copyWith(
-                              color: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium
-                                  ?.color,
+                            style: MyTextStyle.sayarehHeader12Bold.copyWith(
+                              color: isDark
+                                  ? const Color(0xFFFFFFFF)
+                                  : MyTextStyle.sayarehHeader12Bold.color,
                             ),
                           ),
                           SizedBox(
@@ -159,7 +160,7 @@ class _SayarehScreenState extends State<SayarehScreen> {
                             physics: const NeverScrollableScrollPhysics(),
                             itemCount: sayarehDataCompleted.data.data.length,
                             separatorBuilder: (context, index) {
-                              return SizedBox(height: 1.h);
+                              return SizedBox(height: Dimens.nh(13.0));
                             },
                             itemBuilder: (context, index) {
                               final item =
@@ -194,18 +195,11 @@ class _SayarehScreenState extends State<SayarehScreen> {
                   ),
                   Container(
                     width: double.infinity,
-                    padding: EdgeInsets.symmetric(horizontal: 8.w),
+                    padding: EdgeInsets.zero,
                     decoration: BoxDecoration(
-                      gradient: Theme.of(context).brightness == Brightness.dark
-                          ? LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                Color(0xFF2C2E3F), // Dark card background
-                                Color(0xFF3B3D54), // Darker card background
-                              ],
-                              stops: [0.0, 1.0],
-                            )
+                      color: isDark ? const Color(0xFF11131C) : null,
+                      gradient: isDark
+                          ? null
                           : LinearGradient(
                               begin: Alignment.topCenter,
                               end: Alignment.bottomCenter,
@@ -224,13 +218,14 @@ class _SayarehScreenState extends State<SayarehScreen> {
                         ),
                         Text(
                           "کتاب های سیاره آی نو",
-                          style: MyTextStyle.textMatn12W700.copyWith(
-                            color:
-                                Theme.of(context).textTheme.titleMedium?.color,
+                          style: MyTextStyle.sayarehHeader12Bold.copyWith(
+                            color: isDark
+                                ? const Color(0xFFFFFFFF)
+                                : MyTextStyle.sayarehHeader12Bold.color,
                           ),
                         ),
                         SizedBox(
-                          height: 12.h,
+                          height: 8.h,
                         ),
                         if (sayarehDataCompleted.bookListData.data != null &&
                             sayarehDataCompleted.bookListData.data!.isNotEmpty)
@@ -241,7 +236,7 @@ class _SayarehScreenState extends State<SayarehScreen> {
                             itemCount:
                                 sayarehDataCompleted.bookListData.data!.length,
                             separatorBuilder: (context, index) {
-                              return SizedBox(height: 4.h);
+                              return SizedBox(height: Dimens.nh(13.0));
                             },
                             itemBuilder: (context, index) {
                               return ItemBook(
@@ -319,9 +314,9 @@ class _SayarehScreenState extends State<SayarehScreen> {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          Color(0xFF1A1D2E),
-                          Color(0xFF2C2E3F),
-                          Color(0xFF3B3D54),
+                          Color(0xFF171926),
+                          Color(0xFF212332),
+                          Color(0xFF171926),
                         ],
                         stops: [0.1, 0.54, 1.0],
                       )

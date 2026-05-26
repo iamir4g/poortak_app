@@ -43,7 +43,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     // Initialize background animation
     _backgroundAnimationController = AnimationController(
-      duration: const Duration(milliseconds: 4500), // 4.5 seconds
+      duration: const Duration(milliseconds: 2500),
       vsync: this,
     );
     _backgroundAnimation = Tween<double>(
@@ -51,14 +51,13 @@ class _SplashScreenState extends State<SplashScreen>
       end: 1.0,
     ).animate(CurvedAnimation(
       parent: _backgroundAnimationController,
-      curve: Curves.easeInOut,
+      curve: Curves.easeOutCubic,
     ));
 
     // Start background animation after a short delay
-    Future.delayed(const Duration(milliseconds: 500), () {
-      if (mounted) {
-        _backgroundAnimationController.forward();
-      }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _backgroundAnimationController.forward();
     });
 
     BlocProvider.of<SplashCubit>(context).checkConnectionEvent();
@@ -91,35 +90,17 @@ class _SplashScreenState extends State<SplashScreen>
             width: width,
             child: Stack(
               children: [
-                // Second background image (splash2.png) - slides down from top
-                Positioned(
-                  top: -MediaQuery.of(context).size.height +
-                      (_backgroundAnimation.value *
-                          MediaQuery.of(context).size.height),
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
+                Positioned.fill(
                   child: Container(
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       image: DecorationImage(
-                        image: AssetImage('assets/images/splash/splash2.png'),
+                        image: const AssetImage(
+                            'assets/images/splash/splash_full.png'),
                         fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                ),
-                // First background image (splash1.png) - moves down
-                Positioned(
-                  top: _backgroundAnimation.value *
-                      MediaQuery.of(context).size.height,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  child: Container(
-                    decoration: const BoxDecoration(
-                      image: DecorationImage(
-                        image: AssetImage('assets/images/splash/splash1.png'),
-                        fit: BoxFit.cover,
+                        alignment: Alignment(
+                          0,
+                          -1 + (_backgroundAnimation.value * 2),
+                        ),
                       ),
                     ),
                   ),

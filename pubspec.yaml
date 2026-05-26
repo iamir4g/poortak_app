@@ -165,5 +165,8 @@ flutter:
     - family: IranSans
       fonts:
         - asset: assets/fonts/iransans.ttf
+    - family: IRANSans
+      fonts:
+        - asset: assets/fonts/iransans.ttf
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package

@@ -50,22 +50,36 @@ class _QuizAnswerItemState extends State<QuizAnswerItem> {
   @override
   Widget build(BuildContext context) {
     Color borderColor = Colors.transparent;
-    Color bgColor = const Color(0xFFF6F9FE);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    Color bgColor = isDark
+        ? MyColors.quizAnswerDefaultDarkBackground
+        : MyColors.quizAnswerDefaultLightBackground;
+    Color textColor = isDark ? MyColors.profileTextPrimaryDark : MyColors.paymentHistoryDetailValueLight;
     // log("widget.id: ${widget.id}");
     // log("widget.showFeedback: ${widget.showFeedback}");
     // log("widget.isCorrect: ${widget.isCorrect}");
     // log("widget.isSelected: ${widget.isSelected}");
     if (widget.showFeedback) {
       if (widget.isCorrect) {
-        borderColor = const Color(0xFF6FC845); // green
-        bgColor = const Color(0xFFEDFAEB); // light green
+        borderColor = isDark
+            ? MyColors.quizAnswerCorrectBorderDark
+            : MyColors.quizAnswerCorrectBorderLight;
+        bgColor = isDark
+            ? MyColors.quizAnswerCorrectBackgroundDark
+            : MyColors.quizAnswerCorrectBackgroundLight;
+        textColor = isDark ? MyColors.quizAnswerCorrectTextDark : textColor;
       } else if (widget.id == widget.selectedAnswerId &&
           widget.isWrongSelected) {
-        borderColor = const Color(0xFFE96217); // red
-        bgColor = const Color(0xFFFDEFE8); // light red
+        borderColor = isDark
+            ? MyColors.quizAnswerWrongBorderDark
+            : MyColors.quizAnswerWrongBorderLight;
+        bgColor = isDark
+            ? MyColors.quizAnswerWrongBackgroundDark
+            : MyColors.quizAnswerWrongBackgroundLight;
+        textColor = isDark ? MyColors.quizAnswerWrongTextDark : textColor;
       }
     } else if (widget.isSelected) {
-      borderColor = MyColors.primary;
+      borderColor = MyColors.quizAnswerSelectedBorder;
     }
     return Container(
       width: double.infinity,
@@ -85,7 +99,7 @@ class _QuizAnswerItemState extends State<QuizAnswerItem> {
             fontFamily: 'IRANSans',
             fontWeight: FontWeight.w500,
             fontSize: 14.sp,
-            color: Color(0xFF494E6A),
+            color: textColor,
           ),
           textAlign: TextAlign.center,
         ),

@@ -34,6 +34,9 @@ import 'package:poortak/common/bloc/settings_cubit/settings_cubit.dart';
 import 'package:poortak/featueres/feature_match/presentation/bloc/match_bloc/match_bloc.dart';
 import 'package:poortak/featueres/feature_match/data/data_source/match_api_provider.dart';
 import 'package:poortak/featueres/feature_match/repositories/match_repository.dart';
+import 'package:poortak/featueres/feature_kavoosh/data/data_source/kavoosh_api_provider.dart';
+import 'package:poortak/featueres/feature_kavoosh/repositories/kavoosh_repository.dart';
+import 'package:poortak/featueres/feature_kavoosh/presentation/bloc/categories_bloc/categories_bloc.dart';
 import 'package:poortak/common/bloc/connectivity_cubit/connectivity_cubit.dart';
 import 'package:poortak/common/bloc/video_download_cubit/video_download_cubit.dart';
 import 'package:poortak/common/services/video_download_service.dart';
@@ -99,6 +102,8 @@ Future<void> initLocator() async {
   locator.registerSingleton<ShoppingCartApiProvider>(
       ShoppingCartApiProvider(dio: locator()));
   locator.registerSingleton<MatchApiProvider>(MatchApiProvider(locator()));
+  locator.registerSingleton<KavooshApiProvider>(
+      KavooshApiProvider(dio: locator()));
 
   //repository
   locator.registerSingleton<SayarehRepository>(SayarehRepository(locator()));
@@ -108,6 +113,7 @@ Future<void> initLocator() async {
   locator.registerSingleton<ProfileBloc>(ProfileBloc(repository: locator()));
   locator.registerSingleton<LitnerRepository>(LitnerRepository(locator()));
   locator.registerSingleton<MatchRepository>(MatchRepository(locator()));
+  locator.registerSingleton<KavooshRepository>(KavooshRepository(locator()));
   locator.registerSingleton<DictionaryRepository>(
       DictionaryRepository(dio: locator()));
   locator.registerSingleton<BlocStorageBloc>(
@@ -126,6 +132,8 @@ Future<void> initLocator() async {
       .registerFactory<MatchBloc>(() => MatchBloc(matchRepository: locator()));
   locator.registerFactory<DictionaryBloc>(
       () => DictionaryBloc(repository: locator()));
+  locator.registerFactory<CategoriesBloc>(
+      () => CategoriesBloc(repository: locator()));
 
   // Register ShoppingCartBloc
   locator.registerSingleton<ShoppingCartBloc>(

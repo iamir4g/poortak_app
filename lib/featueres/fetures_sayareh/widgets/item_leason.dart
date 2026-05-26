@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:iconify_design/iconify_design.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poortak/common/services/getImageUrl_service.dart';
 import 'package:poortak/common/widgets/global_progress_bar.dart';
+import 'package:poortak/config/dimens.dart';
+import 'package:poortak/config/myColors.dart';
+import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/all_courses_progress_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/iknow_summary_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_home_model.dart';
-import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/iknow_access_bloc/iknow_access_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/lesson_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/widgets/dialog_cart.dart';
 
@@ -31,14 +32,8 @@ class ItemLeason extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Get IknowAccessBloc from context
-    final accessBloc = context.watch<IknowAccessBloc>();
-
-    // Check if user has access to this course
-    final hasAccess = accessBloc.hasCourseAccess(item.id);
-
-    // Use hasAccess instead of purchased
-    final isLocked = !hasAccess;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isLocked = !purchased && !item.isDemo;
 
     double average = 0;
     if (progress != null) {
@@ -49,12 +44,12 @@ class ItemLeason extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         // If isDemo is true OR user has access, go directly to lesson screen
-        if (item.isDemo || hasAccess) {
+        if (item.isDemo || purchased) {
           Navigator.pushNamed(context, LessonScreen.routeName, arguments: {
             'index': index,
             'title': item.name,
             'lessonId': item.id,
-            'purchased': hasAccess, // Use hasAccess instead of purchased
+            'purchased': purchased,
           });
         } else {
           // If isDemo is false AND user doesn't have access, show add to cart modal
@@ -67,7 +62,7 @@ class ItemLeason extends StatelessWidget {
       },
       child: Container(
         width: double.infinity,
-        margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 2.h),
+        margin: EdgeInsets.symmetric(horizontal: Dimens.medium),
         padding: EdgeInsets.all(16.r),
         decoration: BoxDecoration(
           color: Theme.of(context).cardColor,
@@ -114,14 +109,23 @@ class ItemLeason extends StatelessWidget {
                     children: [
                       Text(
                         item.name,
-                        style: Theme.of(context).textTheme.titleSmall,
+                        style: MyTextStyle.textMatn17W700.copyWith(
+                          color:
+                              isDark ? const Color(0xFFFFFFFF) : MyColors.text2,
+                          height: 1.0,
+                          letterSpacing: 0.0,
+                        ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                       SizedBox(height: 6.h),
                       Text(
                         item.description,
-                        style: Theme.of(context).textTheme.labelMedium,
+                        style: MyTextStyle.text10MediumText6.copyWith(
+                          color: isDark
+                              ? const Color(0xFF838697)
+                              : MyTextStyle.text10MediumText6.color,
+                        ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -155,10 +159,18 @@ class ItemLeason extends StatelessWidget {
                 SizedBox(
                   width: 4.w,
                 ),
-                IconifyIcon(
-                  size: 32.r,
-                  icon: "iconamoon:arrow-left-2-bold",
-                  color: Theme.of(context).textTheme.titleMedium?.color,
+                SvgPicture.asset(
+                  'assets/images/icons/iconamoon--arrow-left-2-duotone.svg',
+                  width: 32.r,
+                  height: 32.r,
+                  colorFilter: ColorFilter.mode(
+                    isDark
+                        ? const Color(0xFFFFFFFF)
+                        : Theme.of(context).textTheme.titleMedium?.color ??
+                            Theme.of(context).iconTheme.color ??
+                            Colors.black,
+                    BlendMode.srcIn,
+                  ),
                 ),
               ],
             ),

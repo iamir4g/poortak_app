@@ -34,8 +34,9 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: MyColors.background1,
+      backgroundColor: isDark ? MyColors.darkBackground : MyColors.background1,
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(57.h),
         child: SafeArea(
@@ -43,17 +44,19 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
             padding: EdgeInsets.fromLTRB(16.w, 0, 32.w, 0),
             height: 57.h,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: isDark ? MyColors.darkBackgroundSecondary : Colors.white,
               borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(33.5.r),
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  offset: Offset(0, 1.h),
-                  blurRadius: 1.r,
-                ),
-              ],
+              boxShadow: isDark
+                  ? null
+                  : [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.05),
+                        offset: Offset(0, 1.h),
+                        blurRadius: 1.r,
+                      ),
+                    ],
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -62,7 +65,9 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
                   child: Text(
                     'کتاب آموزشی دبستان',
                     style: MyTextStyle.textHeader16Bold.copyWith(
-                      color: MyColors.textMatn2,
+                      color: isDark
+                          ? MyColors.darkTextPrimary
+                          : MyColors.textMatn2,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -75,7 +80,9 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
                     onPressed: () => Navigator.of(context).pop(),
                     icon: Icon(
                       Icons.arrow_forward,
-                      color: MyColors.textMatn2,
+                      color: isDark
+                          ? MyColors.darkTextPrimary
+                          : MyColors.textMatn2,
                       size: 28.r,
                     ),
                   ),
@@ -112,7 +119,9 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
                         'assets/images/placeholder_book.png', // Needs a valid asset or network image
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) => Container(
-                          color: Colors.grey[200],
+                          color: isDark
+                              ? MyColors.darkBackgroundSecondary
+                              : Colors.grey[200],
                           child:
                               Icon(Icons.book, size: 80.r, color: Colors.grey),
                         ),
@@ -126,7 +135,9 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
                       widget.title,
                       style: MyTextStyle.textMatn18Bold.copyWith(
                         fontSize: 20.sp,
-                        color: MyColors.textMatn2,
+                        color: isDark
+                            ? MyColors.darkTextPrimary
+                            : MyColors.textMatn2,
                       ),
                       textAlign: TextAlign.center,
                       maxLines: 2,
@@ -137,7 +148,8 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
                   Text(
                     'نسخه الکترونیکی',
                     style: MyTextStyle.textMatn14Bold.copyWith(
-                      color: MyColors.text4,
+                      color:
+                          isDark ? MyColors.darkTextSecondary : MyColors.text4,
                       fontWeight: FontWeight.normal,
                     ),
                     maxLines: 1,
@@ -152,7 +164,9 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
                         Text(
                           'قیمت:',
                           style: MyTextStyle.textHeader16Bold.copyWith(
-                            color: MyColors.textMatn2,
+                            color: isDark
+                                ? MyColors.darkTextPrimary
+                                : MyColors.textMatn2,
                           ),
                         ),
                         SizedBox(width: 8.w),
@@ -160,7 +174,9 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
                           child: Text(
                             '۷۵,۰۰۰ تومان',
                             style: MyTextStyle.textHeader16Bold.copyWith(
-                              color: MyColors.textMatn2,
+                              color: isDark
+                                  ? MyColors.darkTextPrimary
+                                  : MyColors.textMatn2,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -179,13 +195,17 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
               margin: EdgeInsets.symmetric(horizontal: 16.w),
               decoration: BoxDecoration(
                 border: Border(
-                  bottom: BorderSide(color: MyColors.divider, width: 1.h),
+                  bottom: BorderSide(
+                    color: isDark ? MyColors.darkBorder : MyColors.divider,
+                    width: 1.h,
+                  ),
                 ),
               ),
               child: TabBar(
                 controller: _tabController,
                 labelColor: MyColors.primary,
-                unselectedLabelColor: MyColors.text4,
+                unselectedLabelColor:
+                    isDark ? MyColors.darkTextSecondary : MyColors.text4,
                 indicatorColor: MyColors.primary,
                 indicatorWeight: 3.h,
                 labelStyle: MyTextStyle.textMatn14Bold,
@@ -224,7 +244,9 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
                     child: OutlinedButton(
                       onPressed: () {},
                       style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: MyColors.text4),
+                        side: BorderSide(
+                          color: isDark ? MyColors.darkBorder : MyColors.text4,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12.r),
                         ),
@@ -232,7 +254,9 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
                       child: Text(
                         'خواندن نمونه',
                         style: MyTextStyle.textHeader16Bold.copyWith(
-                          color: MyColors.text4,
+                          color: isDark
+                              ? MyColors.darkTextSecondary
+                              : MyColors.text4,
                         ),
                       ),
                     ),
@@ -244,7 +268,8 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
                     child: ElevatedButton(
                       onPressed: () {},
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: MyColors.secondary,
+                        backgroundColor:
+                            isDark ? MyColors.primary : MyColors.secondary,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12.r),
                         ),
@@ -268,6 +293,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
   }
 
   Widget _buildDetailRow(String label, String value) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
       padding: EdgeInsets.only(bottom: 16.h),
       child: Row(
@@ -277,7 +303,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
             child: Text(
               label,
               style: MyTextStyle.textMatn14Bold.copyWith(
-                color: MyColors.text4,
+                color: isDark ? MyColors.darkTextSecondary : MyColors.text4,
                 fontWeight: FontWeight.normal,
               ),
               maxLines: 1,
@@ -289,7 +315,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
             child: Text(
               value,
               style: MyTextStyle.textMatn14Bold.copyWith(
-                color: MyColors.text3,
+                color: isDark ? MyColors.darkTextPrimary : MyColors.text3,
               ),
               textAlign: TextAlign.left,
               maxLines: 1,

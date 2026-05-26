@@ -39,7 +39,7 @@ class _PrizeScreenState extends State<PrizeScreen> {
                     SizedBox(height: 20.h),
 
                     // Prize conversion section
-                    _buildPrizeConversionSection(),
+                    _buildPrizeConversionSection(isDarkMode),
 
                     SizedBox(height: 20.h),
 
@@ -113,7 +113,7 @@ class _PrizeScreenState extends State<PrizeScreen> {
     );
   }
 
-  Widget _buildPrizeConversionSection() {
+  Widget _buildPrizeConversionSection(bool isDarkMode) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 20.w),
       child: Row(
@@ -124,7 +124,7 @@ class _PrizeScreenState extends State<PrizeScreen> {
             child: Container(
               height: 75.h,
               decoration: BoxDecoration(
-                color: const Color(0xFFEFF7F1),
+                color: isDarkMode ? MyColors.text1 : const Color(0xFFEFF7F1),
                 borderRadius: BorderRadius.circular(30.r),
               ),
               child: Center(
@@ -132,7 +132,7 @@ class _PrizeScreenState extends State<PrizeScreen> {
                   '۱۰۰۰ تومان',
                   style: MyTextStyle.textMatn15.copyWith(
                     fontWeight: FontWeight.w500,
-                    color: Colors.black,
+                    color: isDarkMode ? MyColors.darkTextPrimary : Colors.black,
                   ),
                 ),
               ),
@@ -158,7 +158,7 @@ class _PrizeScreenState extends State<PrizeScreen> {
             child: Container(
               height: 75.h,
               decoration: BoxDecoration(
-                color: const Color(0xFFFFF5DB),
+                color: isDarkMode ? MyColors.text1 : const Color(0xFFFFF5DB),
                 borderRadius: BorderRadius.circular(30.r),
               ),
               child: Row(
@@ -178,7 +178,9 @@ class _PrizeScreenState extends State<PrizeScreen> {
                       'هر ۱ سکه',
                       style: MyTextStyle.textMatn15.copyWith(
                         fontWeight: FontWeight.w500,
-                        color: Colors.black,
+                        color: isDarkMode
+                            ? MyColors.darkTextPrimary
+                            : Colors.black,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -303,14 +305,15 @@ class _PrizeScreenState extends State<PrizeScreen> {
   }
 
   Widget _buildBottomButton() {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: EdgeInsets.only(bottom: 16.h),
       width: double.infinity,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDarkMode ? MyColors.profileHeaderDark : Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             offset: Offset(0, -2.h),
             blurRadius: 4.r,
           ),
@@ -346,28 +349,28 @@ class _PrizeScreenState extends State<PrizeScreen> {
           ),
           SizedBox(height: 8.h),
           // Continue and pay button
-          GestureDetector(
-            onTap: () {
-              // This could navigate to a payment screen or show a dialog
-              // For now, just show a snackbar
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('این قابلیت به زودی اضافه خواهد شد'),
-                  duration: Duration(seconds: 2),
-                ),
-              );
-            },
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 4.h),
-              child: Text(
-                'ادامه و پرداخت',
-                style: MyTextStyle.textMatn11.copyWith(
-                  fontWeight: FontWeight.w500,
-                  color: const Color(0xFF29303D),
-                ),
-              ),
-            ),
-          ),
+          // GestureDetector(
+          //   onTap: () {
+          //     // This could navigate to a payment screen or show a dialog
+          //     // For now, just show a snackbar
+          //     ScaffoldMessenger.of(context).showSnackBar(
+          //       const SnackBar(
+          //         content: Text('این قابلیت به زودی اضافه خواهد شد'),
+          //         duration: Duration(seconds: 2),
+          //       ),
+          //     );
+          //   },
+          //   child: Padding(
+          //     padding: EdgeInsets.symmetric(vertical: 4.h),
+          //     child: Text(
+          //       'ادامه و پرداخت',
+          //       style: MyTextStyle.textMatn11.copyWith(
+          //         fontWeight: FontWeight.w500,
+          //         color: const Color(0xFF29303D),
+          //       ),
+          //     ),
+          //   ),
+          // ),
         ],
       ),
     );

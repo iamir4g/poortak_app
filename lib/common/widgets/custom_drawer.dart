@@ -13,9 +13,10 @@ import 'package:poortak/featueres/featureMenu/screens/contactUs_screen.dart';
 import 'package:poortak/featueres/featureMenu/screens/settings_screen.dart';
 import 'package:poortak/featueres/featureMenu/screens/main_reminder.dart';
 import 'package:poortak/featueres/feature_profile/screens/profile_screen.dart';
-import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
 import 'package:poortak/locator.dart';
+import 'package:poortak/common/blocs/bottom_nav_cubit/bottom_nav_cubit.dart';
 import 'package:poortak/common/bloc/theme_cubit/theme_cubit.dart';
+import 'package:poortak/common/services/auth_navigation_manager.dart';
 
 class CustomDrawer extends StatefulWidget {
   const CustomDrawer({super.key});
@@ -153,7 +154,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
         final statusBarHeight = MediaQuery.of(context).padding.top;
 
         return Drawer(
-          backgroundColor: Colors.transparent,
+          backgroundColor: backgroundColor,
           elevation: 0,
           child: Container(
             decoration: BoxDecoration(
@@ -196,13 +197,20 @@ class _CustomDrawerState extends State<CustomDrawer> {
                                       top: 20.h,
                                       child: GestureDetector(
                                         onTap: () {
+                                          Navigator.of(context).pop();
                                           if (isLoggedIn) {
-                                            Navigator.pushNamed(context,
-                                                ProfileScreen.routeName);
-                                          } else {
-                                            Navigator.pushNamed(
-                                                context, LoginScreen.routeName);
+                                            AuthNavigationManager()
+                                                .requestLoginAndReturn(
+                                              returnTabIndex: 4,
+                                            );
+                                            return;
                                           }
+                                          final currentIndex = context
+                                              .read<BottomNavCubit>()
+                                              .state;
+                                          goToLoginAndReturn(
+                                            returnTabIndex: currentIndex,
+                                          );
                                         },
                                         child: SizedBox(
                                           height: 80.h,
@@ -259,7 +267,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                                                             borderRadius: BorderRadius
                                                                 .circular(Dimens
                                                                     .radiusCircle),
-                                                            color: Colors.red,
+                                                            // color: Colors.red,
                                                             image:
                                                                 const DecorationImage(
                                                               image: AssetImage(
@@ -282,7 +290,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                                                           : userFirstName ??
                                                               userLastName ??
                                                               "کاربر")
-                                                      : "وارد شوید",
+                                                      : "کاربر مهمان",
                                                   style: MyTextStyle
                                                       .textMatn14Bold
                                                       .copyWith(
@@ -325,7 +333,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                                               child: _buildDrawerIcon(
                                                 icon: "tdesign:edit",
                                                 color: Colors.white,
-                                                size: 12.w,
+                                                size: 8.w,
                                               ),
                                             ),
                                           ),
@@ -375,6 +383,8 @@ class _CustomDrawerState extends State<CustomDrawer> {
                                   onChanged: (value) {
                                     context.read<ThemeCubit>().toggleTheme();
                                   },
+                                  activeTrackColor: MyColors.gray,
+                                  inactiveTrackColor: MyColors.gray,
                                   inactiveThumbColor: Colors.white,
                                   activeThumbColor: MyColors.primary,
                                   trackOutlineColor: WidgetStateProperty.all(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/video_detail_screen.dart';
@@ -20,6 +21,7 @@ class CourseCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
       onTap: onTap ??
           () {
@@ -31,18 +33,24 @@ class CourseCard extends StatelessWidget {
           },
       child: Container(
         width: 140.w,
-        margin: EdgeInsets.only(left: 16.w),
+        margin: EdgeInsets.only(left: Dimens.medium),
         constraints: BoxConstraints(minHeight: 180.h),
         decoration: BoxDecoration(
-          color: backgroundColor ?? Colors.white,
+          color: isDark
+              ? MyColors.termsBackgroundDark
+              : (backgroundColor ?? Colors.white),
           borderRadius: BorderRadius.circular(20.r),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 10.r,
-              offset: Offset(0, 4.h),
-            ),
-          ],
+          border:
+              isDark ? Border.all(color: MyColors.darkBorder) : null,
+          boxShadow: isDark
+              ? null
+              : [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 10.r,
+                    offset: Offset(0, 4.h),
+                  ),
+                ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -52,7 +60,9 @@ class CourseCard extends StatelessWidget {
             Container(
               height: 120.h,
               decoration: BoxDecoration(
-                color: Colors.grey[200],
+                color: isDark
+                    ? MyColors.darkBackgroundSecondary
+                    : Colors.grey[200],
                 borderRadius: BorderRadius.all(Radius.circular(20.r)),
               ),
               child: imagePath != null
@@ -65,7 +75,11 @@ class CourseCard extends StatelessWidget {
                     )
                   : Center(
                       child:
-                          Icon(Icons.image, color: Colors.grey, size: 40.r),
+                          Icon(Icons.image,
+                              color: isDark
+                                  ? MyColors.darkTextSecondary
+                                  : Colors.grey,
+                              size: 40.r),
                     ),
             ),
             // Title
@@ -74,7 +88,8 @@ class CourseCard extends StatelessWidget {
               child: Text(
                 title,
                 style: MyTextStyle.textMatn12Bold.copyWith(
-                  color: MyColors.textMatn2,
+                  color:
+                      isDark ? MyColors.darkTextPrimary : MyColors.textMatn2,
                 ),
                 textAlign: TextAlign.center,
                 maxLines: 2,

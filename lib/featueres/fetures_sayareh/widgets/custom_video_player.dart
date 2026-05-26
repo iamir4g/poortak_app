@@ -48,6 +48,7 @@ class CustomVideoPlayerState extends State<CustomVideoPlayer> {
   Timer? _hideTimer;
   bool _isDragging = false;
   double _dragValue = 0.0;
+  bool _hasNotifiedEnded = false;
 
   @override
   void initState() {
@@ -158,18 +159,20 @@ class CustomVideoPlayerState extends State<CustomVideoPlayer> {
       }
     }
 
-    if (_videoPlayerController.value.position >=
-        _videoPlayerController.value.duration) {
-      // Video has ended
-      if (mounted) {
-        setState(() {
-          _isPlaying = false;
-        });
-        WakelockPlus.disable();
-        // Call the callback if provided
-        widget.onVideoEnded?.call();
-      }
+    final value = _videoPlayerController.value;
+    final duration = value.duration;
+    if (duration != Duration.zero && value.position < duration) {
+      _hasNotifiedEnded = false;
+      return;
     }
+    if (duration == Duration.zero || _hasNotifiedEnded) return;
+    _hasNotifiedEnded = true;
+    if (!mounted) return;
+    setState(() {
+      _isPlaying = false;
+    });
+    WakelockPlus.disable();
+    widget.onVideoEnded?.call();
   }
 
   void _togglePlayPause() {

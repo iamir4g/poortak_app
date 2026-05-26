@@ -11,11 +11,14 @@ import 'package:poortak/common/widgets/bottom_nav.dart';
 import 'package:poortak/common/widgets/custom_drawer.dart';
 import 'package:poortak/common/widgets/logout_confirmation_modal.dart';
 import 'package:poortak/common/widgets/exit_confirmation_modal.dart';
+import 'package:poortak/common/services/auth_navigation_manager.dart';
 import 'package:poortak/config/myColors.dart';
+import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/kavoosh_main_screen.dart';
 import 'package:poortak/featueres/feature_litner/screens/litner_main_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/profile_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/bloc_storage_bloc.dart';
+import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/iknow_access_bloc/iknow_access_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/repositories/sayareh_repository.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/sayareh_screen.dart';
 import 'package:poortak/featueres/feature_shopping_cart/screens/shopping_cart_screen.dart';
@@ -41,6 +44,8 @@ class _MainWrapperState extends State<MainWrapper> {
   late final PageController controller;
   final PrefsOperator prefsOperator = locator<PrefsOperator>();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final AuthNavigationManager _authNavigationManager = AuthNavigationManager();
+  late final VoidCallback _authNavigationListener;
 
   late int currentPageIndex;
 
@@ -53,7 +58,7 @@ class _MainWrapperState extends State<MainWrapper> {
         const SayarehScreen(),
         const KavooshMainScreen(),
         const ShoppingCartScreen(),
-        LitnerMainScreen(),
+        const LitnerMainScreen(),
         const ProfileScreen(),
       ];
 
@@ -64,6 +69,8 @@ class _MainWrapperState extends State<MainWrapper> {
     currentPageIndex = widget.initialIndex ?? 0;
     // Initialize PageController with initial page
     controller = PageController(initialPage: currentPageIndex);
+    _authNavigationListener = _handleAuthNavigation;
+    _authNavigationManager.addListener(_authNavigationListener);
 
     // تنظیم status bar برای MainWrapper
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -85,6 +92,7 @@ class _MainWrapperState extends State<MainWrapper> {
           // BottomNavCubit might not be available yet, ignore
         }
       }
+      _handleAuthNavigation();
     });
 
     // Initialize deep link handling for when app is already running
@@ -137,8 +145,37 @@ class _MainWrapperState extends State<MainWrapper> {
   @override
   void dispose() {
     _linkSubscription?.cancel();
+    _authNavigationManager.removeListener(_authNavigationListener);
     controller.dispose();
     super.dispose();
+  }
+
+  void _handleAuthNavigation() {
+    final pending = _authNavigationManager.pendingRequest;
+    if (pending == null) return;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      if (!prefsOperator.isLoggedIn()) {
+        _animateToTab(4);
+        return;
+      }
+
+      _animateToTab(pending.returnTabIndex);
+      final returnRouteName = pending.returnRouteName;
+      if (returnRouteName != null && returnRouteName.isNotEmpty) {
+        Future.delayed(const Duration(milliseconds: 320), () {
+          if (!mounted) return;
+          Navigator.pushNamed(
+            context,
+            returnRouteName,
+            arguments: pending.returnRouteArguments,
+          );
+        });
+      }
+      _authNavigationManager.clearPendingRequest();
+    });
   }
 
   String getTitle(int index) {
@@ -158,9 +195,23 @@ class _MainWrapperState extends State<MainWrapper> {
     return '';
   }
 
+  void _animateToTab(int index) {
+    if (!mounted) return;
+    context.read<BottomNavCubit>().changeSelectedIndex(index);
+    controller.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+    setState(() {
+      currentPageIndex = index;
+    });
+  }
+
   void _logout() async {
     // Clear user data from preferences
     await prefsOperator.logout();
+    locator<IknowAccessBloc>().add(ClearIknowAccessEvent());
 
     // Clear shopping cart (both local and remote)
     try {
@@ -170,16 +221,7 @@ class _MainWrapperState extends State<MainWrapper> {
     }
 
     // Navigate to Sayareh screen (index 0) instead of login screen
-    controller.animateToPage(
-      0,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-    );
-
-    // Update the current page index
-    setState(() {
-      currentPageIndex = 0;
-    });
+    _animateToTab(0);
   }
 
   void _showLogoutConfirmation() {
@@ -339,10 +381,11 @@ class _MainWrapperState extends State<MainWrapper> {
                                     value: 'logout',
                                     child: Text(
                                       'خروج از ناحیه کاربری',
-                                      style: TextStyle(
+                                      style: MyTextStyle.textMatn13.copyWith(
                                         color: themeState.isDark
                                             ? MyColors.darkTextPrimary
                                             : MyColors.textMatn1,
+                                        fontWeight: FontWeight.w500,
                                       ),
                                     ),
                                   ),
@@ -361,7 +404,7 @@ class _MainWrapperState extends State<MainWrapper> {
                           boxShadow: [
                             BoxShadow(
                               color: themeState.isDark
-                                  ? Colors.black.withOpacity(0.3)
+                                  ? Colors.black.withValues(alpha: 0.3)
                                   : const Color.fromRGBO(0, 0, 0, 0.05),
                               offset: Offset(0, 1.h),
                               blurRadius: 1.r,
@@ -384,7 +427,9 @@ class _MainWrapperState extends State<MainWrapper> {
                           : PageView(
                               controller: controller,
                               onPageChanged: (index) {
-                                context.read<BottomNavCubit>().changeSelectedIndex(index);
+                                context
+                                    .read<BottomNavCubit>()
+                                    .changeSelectedIndex(index);
                                 setState(() {
                                   currentPageIndex = index;
                                 });

@@ -22,11 +22,13 @@ class _QuestionCountModalState extends State<QuestionCountModal> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: EdgeInsets.all(24.r),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? MyColors.termsBackgroundDark : Colors.white,
         borderRadius: BorderRadius.circular(30.r),
+        border: isDark ? Border.all(color: MyColors.darkBorder) : null,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -36,7 +38,11 @@ class _QuestionCountModalState extends State<QuestionCountModal> {
             children: [
               IconButton(
                 onPressed: () => Navigator.pop(context),
-                icon: Icon(Icons.close, color: MyColors.text3, size: 24.r),
+                icon: Icon(
+                  Icons.close,
+                  color: isDark ? MyColors.darkTextSecondary : MyColors.text3,
+                  size: 24.r,
+                ),
               ),
               SizedBox(width: 40.w), // Spacer for centering if needed
             ],
@@ -63,7 +69,9 @@ class _QuestionCountModalState extends State<QuestionCountModal> {
             padding: EdgeInsets.symmetric(horizontal: 16.w),
             child: Text(
               widget.title,
-              style: MyTextStyle.textHeader16Bold,
+              style: MyTextStyle.textHeader16Bold.copyWith(
+                color: isDark ? MyColors.darkTextPrimary : null,
+              ),
               textAlign: TextAlign.center,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
@@ -79,7 +87,9 @@ class _QuestionCountModalState extends State<QuestionCountModal> {
                 SliderTheme(
                   data: SliderTheme.of(context).copyWith(
                     activeTrackColor: MyColors.primary,
-                    inactiveTrackColor: const Color(0xFFE0E0E0),
+                    inactiveTrackColor: isDark
+                        ? MyColors.darkBorder.withValues(alpha: 0.6)
+                        : const Color(0xFFE0E0E0),
                     thumbColor: MyColors.primary,
                     overlayColor: MyColors.primary.withValues(alpha: 0.2),
                     trackHeight: 4.0.h,
@@ -108,13 +118,22 @@ class _QuestionCountModalState extends State<QuestionCountModal> {
                     children: [
                       Text('۰',
                           style: MyTextStyle.textMatn12Bold
-                              .copyWith(color: MyColors.textSecondary)),
+                              .copyWith(
+                                  color: isDark
+                                      ? MyColors.darkTextSecondary
+                                      : MyColors.textSecondary)),
                       Text('۲۰',
                           style: MyTextStyle.textMatn12Bold
-                              .copyWith(color: MyColors.textSecondary)),
+                              .copyWith(
+                                  color: isDark
+                                      ? MyColors.darkTextSecondary
+                                      : MyColors.textSecondary)),
                       Text('۴۰',
                           style: MyTextStyle.textMatn12Bold
-                              .copyWith(color: MyColors.textSecondary)),
+                              .copyWith(
+                                  color: isDark
+                                      ? MyColors.darkTextSecondary
+                                      : MyColors.textSecondary)),
                     ],
                   ),
                 ),
@@ -130,7 +149,8 @@ class _QuestionCountModalState extends State<QuestionCountModal> {
             child: ElevatedButton(
               onPressed: widget.onStart,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF3F445A), // Dark button color
+                backgroundColor:
+                    isDark ? MyColors.primary : const Color(0xFF3F445A),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20.r),
                 ),
@@ -138,7 +158,8 @@ class _QuestionCountModalState extends State<QuestionCountModal> {
               ),
               child: Text(
                 'بزن بریم!',
-                style: MyTextStyle.textHeader16Bold.copyWith(color: Colors.white),
+                style:
+                    MyTextStyle.textHeader16Bold.copyWith(color: Colors.white),
               ),
             ),
           ),

@@ -393,18 +393,13 @@ class VideoDownloadService {
   /// Check if an error is related to connectivity
   bool _isConnectivityError(String error) {
     final errorLower = error.toLowerCase();
-    return errorLower.contains('socket') ||
-        errorLower.contains('network') ||
-        errorLower.contains('connection') ||
-        errorLower.contains('timeout') ||
+    return errorLower.contains('connection error:') ||
+        errorLower.contains('socket') ||
         errorLower.contains('failed host lookup') ||
+        errorLower.contains('timeout') ||
         errorLower.contains('no internet') ||
-        errorLower.contains('internet') ||
         errorLower.contains('connection closed') ||
         errorLower.contains('closed while receiving') ||
-        errorLower.contains('httpexception') ||
-        errorLower.contains('dioexception') ||
-        errorLower.contains('receive data') ||
         errorLower.contains('connection reset') ||
         errorLower.contains('connection refused');
   }

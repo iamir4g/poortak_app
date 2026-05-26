@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/common/utils/date_util.dart';
+import 'package:poortak/common/utils/digit_utils.dart';
+import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_profile/data/models/payment_history_model.dart';
 
@@ -15,10 +18,11 @@ class PaymentHistoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 17.w, vertical: 8.h),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? MyColors.paymentHistoryCardDark : Colors.white,
         borderRadius: BorderRadius.circular(10.r),
         boxShadow: [
           BoxShadow(
@@ -45,7 +49,9 @@ class PaymentHistoryCard extends StatelessWidget {
                   padding:
                       EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF9F9F9),
+                    color: isDark
+                        ? MyColors.paymentHistoryCardHeaderDark
+                        : MyColors.paymentHistoryCardHeaderLight,
                     borderRadius: BorderRadius.circular(7.r),
                   ),
                   child: Row(
@@ -55,7 +61,9 @@ class PaymentHistoryCard extends StatelessWidget {
                         child: Text(
                           _getProductTitle(),
                           style: MyTextStyle.textMatn14Bold.copyWith(
-                            color: const Color(0xFF29303D),
+                            color: isDark
+                                ? MyColors.profileTextPrimaryDark
+                                : MyColors.paymentHistoryHeaderTitleLight,
                             height: 1.2,
                           ),
                           textAlign: TextAlign.right,
@@ -70,6 +78,7 @@ class PaymentHistoryCard extends StatelessWidget {
                 SizedBox(height: 16.h),
                 // Details section
                 _buildDetailRow(
+                  context: context,
                   label: 'تاریخ خرید',
                   value: payment.createdAt != null
                       ? _formatDate(payment.createdAt!)
@@ -77,11 +86,13 @@ class PaymentHistoryCard extends StatelessWidget {
                 ),
                 SizedBox(height: 8.h),
                 _buildDetailRow(
+                  context: context,
                   label: 'وضعیت خرید',
                   value: _getStatusText(),
                 ),
                 SizedBox(height: 8.h),
                 _buildDetailRow(
+                  context: context,
                   label: 'مبلغ پرداخت شده',
                   value: payment.grandTotal != null
                       ? _formatAmount(payment.grandTotal!)
@@ -89,6 +100,7 @@ class PaymentHistoryCard extends StatelessWidget {
                 ),
                 SizedBox(height: 8.h),
                 _buildDetailRow(
+                  context: context,
                   label: 'مبلغ کل خرید',
                   value: payment.grandTotal != null
                       ? _formatAmount(payment.grandTotal!)
@@ -119,28 +131,30 @@ class PaymentHistoryCard extends StatelessWidget {
   }
 
   Widget _buildDetailRow({
+    required BuildContext context,
     required String label,
     required String value,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        // Value (right side in RTL)
-        Text(
-          value,
-          style: MyTextStyle.textMatn14Bold.copyWith(
-            fontWeight: FontWeight.w500,
-            color: const Color(0xFF494E6A),
-            height: 1.2,
-          ),
-        ),
         // Label (left side in RTL)
         Text(
           label,
-          style: MyTextStyle.textMatn14Bold.copyWith(
-            fontWeight: FontWeight.w300,
-            color: const Color(0xFF717483),
-            height: 1.2,
+          style: MyTextStyle.paymentHistoryLabel14Light.copyWith(
+            color: isDark
+                ? MyColors.profileTextPrimaryDark
+                : MyColors.paymentHistoryDetailLabelLight,
+          ),
+        ),
+        // Value (right side in RTL)
+        Text(
+          value,
+          style: MyTextStyle.paymentHistoryValue14Medium.copyWith(
+            color: isDark
+                ? MyColors.profileTextPrimaryDark
+                : MyColors.paymentHistoryDetailValueLight,
           ),
         ),
       ],
@@ -218,31 +232,10 @@ class PaymentHistoryCard extends StatelessWidget {
   }
 
   String _formatDate(DateTime date) {
-    // Format date as Persian date (you might want to use a Persian date package)
-    final year = date.year;
-    final month = date.month.toString().padLeft(2, '0');
-    final day = date.day.toString().padLeft(2, '0');
-    return '$year/$month/$day';
+    return DateUtil.formatPersianDateWithDigits(date, separator: '/');
   }
 
   String _formatAmount(String amount) {
-    // Format amount with proper Persian number formatting
-    try {
-      final numAmount = double.parse(amount);
-      final formattedAmount = numAmount.toStringAsFixed(0);
-      return '${_toPersianNumbers(formattedAmount)} تومان';
-    } catch (e) {
-      return '${_toPersianNumbers(amount)} تومان';
-    }
-  }
-
-  String _toPersianNumbers(String text) {
-    const english = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
-    const persian = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
-
-    for (int i = 0; i < english.length; i++) {
-      text = text.replaceAll(english[i], persian[i]);
-    }
-    return text;
+    return formatTomanAmount(amount);
   }
 }

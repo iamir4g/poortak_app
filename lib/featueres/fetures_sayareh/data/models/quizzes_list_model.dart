@@ -41,6 +41,7 @@ class Datum {
   DateTime createdAt;
   DateTime updatedAt;
   String iKnowCourseId;
+  List<IKnowUserQuizProgress> iKnowUserQuizProgresses;
 
   Datum({
     required this.id,
@@ -50,16 +51,21 @@ class Datum {
     required this.createdAt,
     required this.updatedAt,
     required this.iKnowCourseId,
+    required this.iKnowUserQuizProgresses,
   });
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
-        id: json["id"],
-        title: json["title"],
-        difficulty: json["difficulty"],
-        thumbnail: json["thumbnail"],
+        id: json["id"] ?? "",
+        title: json["title"] ?? "",
+        difficulty: json["difficulty"] ?? "",
+        thumbnail: json["thumbnail"] ?? "",
         createdAt: DateTime.parse(json["createdAt"]),
         updatedAt: DateTime.parse(json["updatedAt"]),
-        iKnowCourseId: json["iKnowCourseId"],
+        iKnowCourseId: json["iKnowCourseId"] ?? "",
+        iKnowUserQuizProgresses: (json["iKnowUserQuizProgresses"] as List?)
+                ?.map((x) => IKnowUserQuizProgress.fromJson(x))
+                .toList() ??
+            [],
       );
 
   Map<String, dynamic> toJson() => {
@@ -70,6 +76,41 @@ class Datum {
         "createdAt": createdAt.toIso8601String(),
         "updatedAt": updatedAt.toIso8601String(),
         "iKnowCourseId": iKnowCourseId,
+        "iKnowUserQuizProgresses":
+            List<dynamic>.from(iKnowUserQuizProgresses.map((x) => x.toJson())),
+      };
+}
+
+class IKnowUserQuizProgress {
+  String id;
+  int score;
+  bool completed;
+  String quizId;
+  String userId;
+
+  IKnowUserQuizProgress({
+    required this.id,
+    required this.score,
+    required this.completed,
+    required this.quizId,
+    required this.userId,
+  });
+
+  factory IKnowUserQuizProgress.fromJson(Map<String, dynamic> json) =>
+      IKnowUserQuizProgress(
+        id: json["id"] ?? "",
+        score: json["score"] ?? 0,
+        completed: json["completed"] ?? false,
+        quizId: json["quizId"] ?? "",
+        userId: json["userId"] ?? "",
+      );
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "score": score,
+        "completed": completed,
+        "quizId": quizId,
+        "userId": userId,
       };
 }
 

@@ -20,7 +20,10 @@ import 'package:poortak/locator.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/common/services/getImageUrl_service.dart';
 import 'package:poortak/common/widgets/reusable_modal.dart';
+import 'package:poortak/common/utils/svg_embedded_png.dart';
 import 'package:poortak/config/dimens.dart';
+import 'package:poortak/config/myColors.dart';
+import 'package:poortak/config/myTextStyle.dart';
 
 class LessonScreen extends StatefulWidget {
   static const routeName = "/lesson_screen";
@@ -61,46 +64,65 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
   bool _isCompletionPopupShown = false;
 
   bool get hasAccess {
+    final prefsOperator = locator<PrefsOperator>();
+    if (!prefsOperator.isLoggedIn()) return false;
+    if (widget.purchased == true) return true;
     final accessBloc = locator<IknowAccessBloc>();
     return accessBloc.hasCourseAccess(widget.lessonId);
   }
 
-  Future<void> _checkAndDownloadVideo(String videoToCheck,
-      {bool autoStart = true}) async {
-    if (videoToCheck.isEmpty) return;
+  Future<void> _checkAndDownloadVideo(String _, {bool autoStart = true}) async {
+    final lesson = _currentLesson;
+    if (lesson == null) return;
 
-    _currentVideoName = videoToCheck;
-
-    // Determine which video to download based on login and purchase status
-    final prefsOperator = locator<PrefsOperator>();
-    final isLoggedIn = prefsOperator.isLoggedIn();
-    String? videoToDownload;
+    final hasPaidAccess = hasAccess;
+    String? videoId;
     bool usePublicUrl = false;
+    bool isEncrypted = true;
 
-    if (isLoggedIn &&
-        hasAccess &&
-        _currentLesson?.video != null &&
-        _currentLesson!.video!.isNotEmpty) {
-      videoToDownload = _currentLesson!.video;
+    if (hasPaidAccess && lesson.video != null && lesson.video!.isNotEmpty) {
+      videoId = lesson.video;
       usePublicUrl = false;
-      debugPrint(
-          "Using purchased video: $videoToDownload with authenticated URL");
-    } else if (_currentLesson?.trailerVideo.isNotEmpty == true) {
-      videoToDownload = _currentLesson!.trailerVideo;
+      isEncrypted = true;
+    } else if (lesson.isDemo && lesson.trailerVideo.isNotEmpty) {
+      videoId = lesson.trailerVideo;
       usePublicUrl = true;
-      debugPrint("Using trailer video: $videoToDownload with public URL");
+      isEncrypted = false;
+    } else if (lesson.trailerVideo.isNotEmpty) {
+      videoId = lesson.trailerVideo;
+      usePublicUrl = true;
+      isEncrypted = false;
+    } else if (lesson.video != null && lesson.video!.isNotEmpty) {
+      videoId = lesson.video;
+      usePublicUrl = false;
+      isEncrypted = true;
     }
 
-    if (videoToDownload == null || videoToDownload.isEmpty) return;
+    if (videoId == null || videoId.isEmpty) return;
 
-    // Use global download service - download continues even if screen is disposed
+    if (_currentVideoName != videoId) {
+      _videoPlayerKey.currentState?.stopVideo();
+      if (!_isDisposed && mounted) {
+        setState(() {
+          localVideoPath = null;
+          videoUrl = null;
+          isCheckingFiles = true;
+          isDownloading = false;
+          isDecrypting = false;
+          downloadProgress = 0.0;
+          decryptionProgress = 0.0;
+        });
+      }
+      _currentVideoName = videoId;
+    }
+
     await _downloadService.checkAndDownloadVideo(
-      videoName: videoToCheck,
+      videoName: videoId,
       lessonId: widget.lessonId,
-      hasAccess: hasAccess,
-      isEncrypted: !usePublicUrl,
+      hasAccess: hasPaidAccess,
+      isEncrypted: isEncrypted,
       usePublicUrl: usePublicUrl,
-      videoKey: videoToDownload,
+      videoKey: videoId,
       autoStart: autoStart,
     );
   }
@@ -167,11 +189,35 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
     );
   }
 
+  void _handleVideoEnded() {
+    if (_isDisposed || !mounted) return;
+    if (hasAccess) return;
+    final lesson = _currentLesson;
+    final currentVideoName = _currentVideoName;
+    if (lesson == null || currentVideoName == null) return;
+    if (!lesson.isDemo) return;
+    final isTrailer = lesson.trailerVideo.isNotEmpty &&
+        currentVideoName == lesson.trailerVideo;
+    if (!isTrailer) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _showPurchaseDialog();
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     isCheckingFiles = true;
     context.read<LessonBloc>().add(GetLessonEvenet(id: widget.lessonId));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final prefsOperator = locator<PrefsOperator>();
+      if (prefsOperator.isLoggedIn()) {
+        locator<IknowAccessBloc>()
+            .add(FetchIknowAccessEvent(forceRefresh: true));
+      }
+    });
 
     // Check if there's an existing download for this lesson
     // This will be updated when we know the video name
@@ -206,6 +252,16 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
   Widget build(BuildContext context) {
     return MultiBlocListener(
       listeners: [
+        BlocListener<IknowAccessBloc, IknowAccessState>(
+          bloc: locator<IknowAccessBloc>(),
+          listener: (context, state) {
+            if (!mounted || _isDisposed) return;
+            if (state is IknowAccessCompleted) {
+              setState(() {});
+              _checkAndDownloadVideo('', autoStart: false);
+            }
+          },
+        ),
         BlocListener<LessonBloc, LessonState>(
           listener: (context, state) {
             debugPrint("LessonBloc state changed: $state");
@@ -251,25 +307,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
                 }
               }();
 
-              // Determine which video to use
-              final prefsOperator = locator<PrefsOperator>();
-              final isLoggedIn = prefsOperator.isLoggedIn();
-              String? videoToCheck;
-
-              if (isLoggedIn &&
-                  hasAccess &&
-                  state.lesson.video != null &&
-                  state.lesson.video!.isNotEmpty) {
-                videoToCheck = state.lesson.video;
-                debugPrint("Checking for purchased video: $videoToCheck");
-              } else {
-                videoToCheck = state.lesson.trailerVideo;
-                debugPrint("Checking for trailer video: $videoToCheck");
-              }
-
-              if (videoToCheck != null && videoToCheck.isNotEmpty) {
-                _checkAndDownloadVideo(videoToCheck, autoStart: false);
-              }
+              _checkAndDownloadVideo('', autoStart: false);
             } else if (state is LessonError) {
               debugPrint("LessonError: ${state.message}");
               if (mounted) {
@@ -295,7 +333,9 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
         ),
       ],
       child: Scaffold(
-        backgroundColor: const Color(0xFFF6F9FE),
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? MyColors.profileBackgroundDark
+            : MyColors.background3,
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(Dimens.nh(57)),
           child: SafeArea(
@@ -303,7 +343,9 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
               padding: EdgeInsets.fromLTRB(Dimens.nw(16), 0, Dimens.nw(32), 0),
               height: Dimens.nh(57),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? MyColors.darkBackgroundSecondary
+                    : Colors.white,
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(Dimens.nr(33.5)),
                 ),
@@ -320,16 +362,18 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
                 children: [
                   BlocBuilder<LessonBloc, LessonState>(
                     builder: (context, state) {
+                      final isDark =
+                          Theme.of(context).brightness == Brightness.dark;
                       return Text(
                         state is LessonSuccess
                             ? state.lesson.name
                             : widget.title,
                         textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontFamily: 'IranSans',
+                        style: MyTextStyle.textHeader16Bold.copyWith(
                           fontSize: Dimens.nsp(16),
-                          fontWeight: FontWeight.bold,
-                          color: const Color(0xFF3D495C),
+                          color: isDark
+                              ? MyColors.profileTextPrimaryDark
+                              : MyColors.text2,
                         ),
                       );
                     },
@@ -341,7 +385,9 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
                       onPressed: () => Navigator.pop(context),
                       icon: Icon(
                         Icons.arrow_forward,
-                        color: const Color(0xFF3D495C),
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? MyColors.profileTextPrimaryDark
+                            : MyColors.text2,
                         size: Dimens.nsp(28),
                       ),
                     ),
@@ -376,12 +422,13 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
   }
 
   Widget _buildCompletionHeader() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(Dimens.nw(16)),
       margin: EdgeInsets.symmetric(horizontal: Dimens.nw(16)),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? MyColors.termsBackgroundDark : Colors.white,
         borderRadius: BorderRadius.circular(Dimens.nr(20)),
         boxShadow: [
           BoxShadow(
@@ -403,11 +450,11 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
                   children: [
                     Text(
                       'خوانده شده',
-                      style: TextStyle(
-                        fontFamily: 'IranSans',
+                      style: MyTextStyle.textMatn14Bold.copyWith(
                         fontSize: Dimens.nsp(14),
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFF3D495C),
+                        color: isDark
+                            ? MyColors.profileTextPrimaryDark
+                            : MyColors.text2,
                       ),
                     ),
                     SizedBox(width: Dimens.nw(8)),
@@ -440,10 +487,8 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
                     ),
                     child: Text(
                       'مرور دوباره درس',
-                      style: TextStyle(
-                        fontFamily: 'IranSans',
+                      style: MyTextStyle.textMatn16Bold.copyWith(
                         fontSize: Dimens.nsp(16),
-                        fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),
                     ),
@@ -507,12 +552,10 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
                 isDecrypting: currentIsDecrypting,
                 videoPlayerKey: _videoPlayerKey,
                 hasAccess: hasAccess,
-                onVideoEnded: () {},
+                onVideoEnded: _handleVideoEnded,
                 onShowPurchaseDialog: _showPurchaseDialog,
                 onDownload: () {
-                  if (_currentVideoName != null) {
-                    _checkAndDownloadVideo(_currentVideoName!, autoStart: true);
-                  }
+                  _checkAndDownloadVideo('', autoStart: true);
                 },
               ),
               VideoProgressBarWidget(
@@ -533,7 +576,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
 
   Widget _buildConversationCard() {
     return LessonCardWidget(
-      iconPath: "assets/images/chat_icon.png",
+      iconPath: "assets/images/chat_icon.svg",
       englishLabel: "conversation",
       persianLabel: "مکالمه",
       progress: _progress?.conversation,
@@ -562,8 +605,9 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
   }
 
   Widget _buildVocabularyCard() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return LessonCardWidget(
-      iconPath: "assets/images/words_icon.png",
+      iconPath: "assets/images/points/words_icon.svg",
       englishLabel: "vocabulary",
       persianLabel: "واژگان",
       progress: _progress?.vocabulary,
@@ -571,7 +615,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
         width: Dimens.nw(40),
         height: Dimens.nh(15),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDark ? MyColors.profileHeaderDark : Colors.white,
           borderRadius: BorderRadius.circular(Dimens.nr(8)),
         ),
         child: Center(
@@ -602,7 +646,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
 
   Widget _buildQuizCard() {
     return LessonCardWidget(
-      iconPath: "assets/images/quiz_icon.png",
+      iconPath: "assets/images/points/quiz_icon.svg",
       englishLabel: "Quiz",
       persianLabel: "آزمون",
       progress: _progress?.quiz,
@@ -631,6 +675,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
   }
 
   Widget _buildDictionaryButton() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Align(
       alignment: Alignment.centerLeft,
       child: Padding(
@@ -639,7 +684,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
           width: Dimens.nw(63),
           height: Dimens.nh(63),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: isDark ? MyColors.profileHeaderDark : Colors.white,
             borderRadius: BorderRadius.circular(Dimens.nr(50)),
             boxShadow: [
               BoxShadow(
@@ -658,8 +703,8 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
                 builder: (context) => const DictionaryBottomSheet(),
               );
             },
-            icon: Image.asset(
-              "assets/images/iknow/dictionary_icon.png",
+            icon: buildImageFromAssetOrEmbeddedSvg(
+              "assets/images/iknow/dictionary_icon.svg",
               width: Dimens.nw(36),
               height: Dimens.nh(36),
             ),

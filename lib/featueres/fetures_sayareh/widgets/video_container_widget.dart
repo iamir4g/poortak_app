@@ -33,11 +33,12 @@ class VideoContainerWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       width: Dimens.nw(320), // Reduced from 360
       padding: EdgeInsets.all(Dimens.nr(5)),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? MyColors.termsBackgroundDark : Colors.white,
         borderRadius: BorderRadius.circular(Dimens.nr(30)), // Reduced from 40
       ),
       child: ClipRRect(
@@ -77,15 +78,13 @@ class VideoContainerWidget extends StatelessWidget {
       thumbnailUrl: thumbnailUrl,
       onVideoEnded: () {
         debugPrint('Video ended');
-        // If user hasn't purchased and this was a trailer video, show purchase dialog
-        if (!hasAccess && onShowPurchaseDialog != null) {
-          onShowPurchaseDialog!();
-        }
+        onVideoEnded();
       },
     );
   }
 
   Widget _buildDownloadPrompt(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Stack(
       fit: StackFit.expand,
       children: [
@@ -121,8 +120,8 @@ class VideoContainerWidget extends StatelessWidget {
                 child: Container(
                   width: Dimens.nw(64),
                   height: Dimens.nw(64),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
+                  decoration: BoxDecoration(
+                    color: isDark ? MyColors.profileHeaderDark : Colors.white,
                     shape: BoxShape.circle,
                   ),
                   child: Icon(

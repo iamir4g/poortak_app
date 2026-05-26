@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/common/widgets/custom_pdfReader.dart';
 import 'package:poortak/common/services/storage_service.dart';
+import 'package:poortak/config/dimens.dart';
+import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
 import 'package:poortak/locator.dart';
@@ -17,6 +18,7 @@ class PdfReaderScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final args =
         ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
     final bookId = args?['bookId'] as String?;
@@ -25,7 +27,9 @@ class PdfReaderScreen extends StatelessWidget {
       return Scaffold(
         appBar: AppBar(
           title: Text('خطا', style: MyTextStyle.textMatn14Bold),
-          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+          backgroundColor: isDark
+              ? MyColors.darkBackgroundSecondary
+              : Theme.of(context).colorScheme.inversePrimary,
         ),
         body: const Center(
           child: Text('شناسه کتاب یافت نشد'),
@@ -60,7 +64,9 @@ class PdfReaderScreen extends StatelessWidget {
               appBar: AppBar(
                 title: Text('در حال بارگذاری...',
                     style: MyTextStyle.textMatn14Bold),
-                backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+                backgroundColor: isDark
+                    ? MyColors.darkBackgroundSecondary
+                    : Theme.of(context).colorScheme.inversePrimary,
                 leading: IconButton(
                   icon: const Icon(Icons.arrow_back),
                   onPressed: () => Navigator.of(context).pop(),
@@ -68,19 +74,30 @@ class PdfReaderScreen extends StatelessWidget {
               ),
               body: SafeArea(
                 child: Container(
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Color(0xFFE8F0FC),
-                        Color(0xFFFCEBF1),
-                        Color(0xFFEFE8FC),
-                      ],
-                      stops: [0.1, 0.54, 1.0],
-                    ),
+                  decoration: BoxDecoration(
+                    gradient: isDark
+                        ? const LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Color(0xFF171926),
+                              MyColors.darkBackground,
+                              Color(0xFF171926),
+                            ],
+                            stops: [0.1, 0.54, 1.0],
+                          )
+                        : const LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Color(0xFFE8F0FC),
+                              Color(0xFFFCEBF1),
+                              Color(0xFFEFE8FC),
+                            ],
+                            stops: [0.1, 0.54, 1.0],
+                          ),
                   ),
-                  child: Center(child: DotLoadingWidget(size: 100.r)),
+                  child: Center(child: DotLoadingWidget(size: Dimens.nr(100))),
                 ),
               ),
             );
@@ -103,7 +120,9 @@ class PdfReaderScreen extends StatelessWidget {
             return Scaffold(
               appBar: AppBar(
                 title: Text('خطا', style: MyTextStyle.textMatn14Bold),
-                backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+                backgroundColor: isDark
+                    ? MyColors.darkBackgroundSecondary
+                    : Theme.of(context).colorScheme.inversePrimary,
                 leading: IconButton(
                   icon: const Icon(Icons.arrow_back),
                   onPressed: () => Navigator.of(context).pop(),
@@ -111,17 +130,28 @@ class PdfReaderScreen extends StatelessWidget {
               ),
               body: SafeArea(
                 child: Container(
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Color(0xFFE8F0FC),
-                        Color(0xFFFCEBF1),
-                        Color(0xFFEFE8FC),
-                      ],
-                      stops: [0.1, 0.54, 1.0],
-                    ),
+                  decoration: BoxDecoration(
+                    gradient: isDark
+                        ? const LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Color(0xFF171926),
+                              MyColors.darkBackground,
+                              Color(0xFF171926),
+                            ],
+                            stops: [0.1, 0.54, 1.0],
+                          )
+                        : const LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Color(0xFFE8F0FC),
+                              Color(0xFFFCEBF1),
+                              Color(0xFFEFE8FC),
+                            ],
+                            stops: [0.1, 0.54, 1.0],
+                          ),
                   ),
                   child: Center(
                     child: Column(
@@ -160,6 +190,7 @@ class PdfReaderScreen extends StatelessWidget {
   }
 
   Widget _buildPdfReaderContent(BuildContext context, dynamic bookData) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     // Determine which file to download based on login and purchase status
     String? fileToDownload;
     bool usePublicUrl = false;
@@ -207,10 +238,15 @@ class PdfReaderScreen extends StatelessWidget {
           style: MyTextStyle.textMatn14Bold,
         ),
         automaticallyImplyLeading: false,
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor: isDark
+            ? MyColors.darkBackgroundSecondary
+            : Theme.of(context).colorScheme.inversePrimary,
         actions: [
           IconButton(
-            icon: const Icon(Icons.arrow_forward),
+            icon: Icon(
+              Icons.arrow_forward,
+              color: isDark ? MyColors.darkTextPrimary : null,
+            ),
             onPressed: () => Navigator.of(context).pop(),
           ),
         ],
@@ -220,21 +256,32 @@ class PdfReaderScreen extends StatelessWidget {
         // ),
       ),
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFFE8F0FC),
-              Color(0xFFFCEBF1),
-              Color(0xFFEFE8FC),
-            ],
-            stops: [0.1, 0.54, 1.0],
-          ),
+        decoration: BoxDecoration(
+          gradient: isDark
+              ? const LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color(0xFF171926),
+                    MyColors.darkBackground,
+                    Color(0xFF171926),
+                  ],
+                  stops: [0.1, 0.54, 1.0],
+                )
+              : const LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color(0xFFE8F0FC),
+                    Color(0xFFFCEBF1),
+                    Color(0xFFEFE8FC),
+                  ],
+                  stops: [0.1, 0.54, 1.0],
+                ),
         ),
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.all(6.0),
+            padding: EdgeInsets.all(Dimens.nw(6)),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -242,11 +289,13 @@ class PdfReaderScreen extends StatelessWidget {
                 Expanded(
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
+                      color:
+                          isDark ? MyColors.darkCardBackground : Colors.white,
+                      borderRadius: BorderRadius.circular(Dimens.nr(16)),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.grey.withValues(alpha: 0.1),
+                          color: (isDark ? Colors.black : Colors.grey)
+                              .withValues(alpha: isDark ? 0.25 : 0.1),
                           spreadRadius: 1,
                           blurRadius: 10,
                           offset: const Offset(0, 4),
@@ -254,7 +303,7 @@ class PdfReaderScreen extends StatelessWidget {
                       ],
                     ),
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(Dimens.nr(16)),
                       child: fileToDownload != null && fileToDownload.isNotEmpty
                           ? CustomPdfReader(
                               fileKey: fileToDownload,

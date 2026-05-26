@@ -19,6 +19,7 @@ class SessionItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -26,16 +27,23 @@ class SessionItem extends StatelessWidget {
         margin: EdgeInsets.only(bottom: 8.h),
         decoration: BoxDecoration(
           color: isPlaying
-              ? const Color(0xFFF9F6C6)
-              : Colors.transparent, // Highlight if playing
+              ? (isDark
+                  ? MyColors.darkBackgroundSecondary
+                  : const Color(0xFFF9F6C6))
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(12.r),
+          border: isDark && isPlaying
+              ? Border.all(color: MyColors.darkBorder)
+              : null,
         ),
         child: Row(
           children: [
             // Lock/Status Icon
             Icon(
               isLocked ? Icons.lock : Icons.play_circle_outline,
-              color: isLocked ? Colors.amber : MyColors.textMatn2,
+              color: isLocked
+                  ? Colors.amber
+                  : (isDark ? MyColors.darkTextSecondary : MyColors.textMatn2),
               size: 20.r,
             ),
 
@@ -47,7 +55,7 @@ class SessionItem extends StatelessWidget {
                 title,
                 style: MyTextStyle.textMatn12W500.copyWith(
                   fontWeight: isPlaying ? FontWeight.bold : FontWeight.normal,
-                  color: MyColors.textMatn2,
+                  color: isDark ? MyColors.darkTextPrimary : MyColors.textMatn2,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -59,7 +67,7 @@ class SessionItem extends StatelessWidget {
               Icon(
                 Icons.play_arrow,
                 size: 16.r,
-                color: MyColors.text4,
+                color: isDark ? MyColors.darkTextSecondary : MyColors.text4,
               ),
           ],
         ),

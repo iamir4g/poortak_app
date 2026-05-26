@@ -23,8 +23,9 @@ class _KavooshMainScreenState extends State<KavooshMainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: MyColors.background3,
+      backgroundColor: isDark ? MyColors.darkBackground : MyColors.background3,
       body: SafeArea(
         child: Column(
           children: [
@@ -98,6 +99,7 @@ class _KavooshMainScreenState extends State<KavooshMainScreen> {
     required VoidCallback onTap,
     bool showComingSoonBadge = false,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
       onTap: onTap,
       child: Stack(
@@ -105,23 +107,28 @@ class _KavooshMainScreenState extends State<KavooshMainScreen> {
           Container(
             constraints: BoxConstraints(minHeight: Dimens.nh(150.0)),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: gradientColors,
-              ),
+              color: isDark ? const Color(0xFF212332) : null,
+              gradient: isDark
+                  ? null
+                  : LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: gradientColors,
+                    ),
               borderRadius: BorderRadius.circular(Dimens.nr(30.0)),
               border: Border.all(
-                color: Colors.white,
-                width: Dimens.nw(5.0),
+                color: isDark ? const Color(0xFF353850) : Colors.white,
+                width: isDark ? Dimens.nw(2.0) : Dimens.nw(5.0),
               ),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x1F92A2BE),
-                  blurRadius: 13,
-                  offset: Offset(0, -7),
-                ),
-              ],
+              boxShadow: isDark
+                  ? null
+                  : const [
+                      BoxShadow(
+                        color: Color(0x1F92A2BE),
+                        blurRadius: 13,
+                        offset: Offset(0, -7),
+                      ),
+                    ],
             ),
             child: Padding(
               padding: EdgeInsets.all(Dimens.nr(20.0)),
@@ -135,7 +142,9 @@ class _KavooshMainScreenState extends State<KavooshMainScreen> {
                         Text(
                           title,
                           style: MyTextStyle.textMatn17W700.copyWith(
-                            color: MyColors.darkText1,
+                            color: isDark
+                                ? MyColors.darkTextPrimary
+                                : MyColors.darkText1,
                           ),
                           textAlign: TextAlign.right,
                           maxLines: 1,
@@ -146,7 +155,9 @@ class _KavooshMainScreenState extends State<KavooshMainScreen> {
                           subtitle,
                           style: MyTextStyle.textMatn10W300.copyWith(
                             fontWeight: FontWeight.w500,
-                            color: MyColors.text3,
+                            color: isDark
+                                ? MyColors.darkTextSecondary
+                                : MyColors.text3,
                           ),
                           textAlign: TextAlign.right,
                           maxLines: 2,
@@ -161,14 +172,14 @@ class _KavooshMainScreenState extends State<KavooshMainScreen> {
                     width: Dimens.nr(80.0),
                     height: Dimens.nr(80.0),
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.3),
+                      color: Colors.transparent,
                       borderRadius: BorderRadius.circular(Dimens.radiusLarge),
                     ),
                     child: Center(
                       child: Image.asset(
                         _getIconPathForTitle(title),
-                        width: Dimens.nr(60.0),
-                        height: Dimens.nr(60.0),
+                        width: Dimens.nr(100.0),
+                        height: Dimens.nr(120.0),
                         fit: BoxFit.contain,
                       ),
                     ),

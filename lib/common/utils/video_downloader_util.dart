@@ -1,11 +1,62 @@
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:dio/dio.dart';
+import 'package:poortak/common/utils/prefs_operator.dart';
+import 'package:poortak/config/constants.dart';
+import 'package:poortak/locator.dart';
 import '../services/storage_service.dart';
 import 'decryption.dart';
 
 /// Utility class for handling video downloads, file checking, and decryption
 class VideoDownloaderUtil {
+  static bool _shouldAttachAuthHeaders(String url) {
+    final apiBase = Uri.tryParse(Constants.baseUrl);
+    final target = Uri.tryParse(url);
+    if (apiBase == null || target == null) return false;
+    return apiBase.scheme == target.scheme && apiBase.host == target.host;
+  }
+
+  static String? _extractServerMessage(dynamic data) {
+    if (data == null) return null;
+    if (data is String) {
+      final trimmed = data.trim();
+      return trimmed.isEmpty ? null : trimmed;
+    }
+    if (data is Map) {
+      final map = Map<String, dynamic>.from(data);
+      final message = map['message'];
+      if (message is String && message.trim().isNotEmpty) return message.trim();
+      final error = map['error'];
+      if (error is String && error.trim().isNotEmpty) return error.trim();
+      final dataField = map['data'];
+      if (dataField is String && dataField.trim().isNotEmpty) {
+        return dataField.trim();
+      }
+    }
+    return null;
+  }
+
+  static String _mapHttpErrorToMessage(DioException e) {
+    final status = e.response?.statusCode;
+    final serverMessage = _extractServerMessage(e.response?.data);
+    if (status == 401) {
+      return 'لطفاً دوباره وارد حساب کاربری شوید.';
+    }
+    if (status == 403) {
+      return serverMessage ?? 'شما دسترسی دانلود این ویدئو را ندارید.';
+    }
+    if (status == 404) {
+      return serverMessage ?? 'فایل موردنظر پیدا نشد.';
+    }
+    if (status == 400) {
+      return serverMessage ?? 'درخواست دانلود نامعتبر است.';
+    }
+    if (status != null) {
+      return serverMessage ?? 'خطا در دانلود (کد $status).';
+    }
+    return serverMessage ?? (e.message ?? e.toString());
+  }
+
   /// Helper method to extract base filename without flutter_file_downloader suffixes
   static String getBaseFileName(String filePath) {
     final fileName = filePath.split('/').last;
@@ -226,10 +277,17 @@ class VideoDownloaderUtil {
 
       // Download directly to internal storage using Dio
       try {
-        // Create a new Dio instance without interceptors for file downloads
-        // Signed S3 URLs should not have additional headers (x-lang, Authorization)
-        // as they would invalidate the signature
         final dio = Dio();
+        dio.httpClientAdapter = storageService.dio.httpClientAdapter;
+
+        if (_shouldAttachAuthHeaders(downloadUrlString)) {
+          dio.options.headers['x-lang'] = 'fa';
+          final prefsOperator = locator<PrefsOperator>();
+          final token = await prefsOperator.getUserToken();
+          if (token != null && token.isNotEmpty) {
+            dio.options.headers['Authorization'] = 'Bearer $token';
+          }
+        }
 
         // Download with progress tracking
         await dio.download(
@@ -297,15 +355,13 @@ class VideoDownloaderUtil {
         // DioException contains more detailed error information
         String errorMessage;
         if (e is DioException) {
-          errorMessage = e.message ?? e.toString();
-          // Check DioException type for better connectivity error detection
-          // unknown type often occurs when connection is closed during download
+          errorMessage = _mapHttpErrorToMessage(e);
           if (e.type == DioExceptionType.connectionTimeout ||
               e.type == DioExceptionType.receiveTimeout ||
               e.type == DioExceptionType.sendTimeout ||
               e.type == DioExceptionType.connectionError ||
               e.type == DioExceptionType.unknown) {
-            errorMessage = 'Connection error: $errorMessage';
+            errorMessage = 'Connection error: ${e.message ?? e.toString()}';
           }
         } else {
           errorMessage = e.toString();
@@ -322,15 +378,13 @@ class VideoDownloaderUtil {
       // Pass the error message as-is so VideoDownloadService can determine if it's a connectivity error
       String errorMessage;
       if (e is DioException) {
-        errorMessage = e.message ?? e.toString();
-        // Check DioException type for better connectivity error detection
-        // unknown type often occurs when connection is closed during download
+        errorMessage = _mapHttpErrorToMessage(e);
         if (e.type == DioExceptionType.connectionTimeout ||
             e.type == DioExceptionType.receiveTimeout ||
             e.type == DioExceptionType.sendTimeout ||
             e.type == DioExceptionType.connectionError ||
             e.type == DioExceptionType.unknown) {
-          errorMessage = 'Connection error: $errorMessage';
+          errorMessage = 'Connection error: ${e.message ?? e.toString()}';
         }
       } else {
         errorMessage = e.toString();

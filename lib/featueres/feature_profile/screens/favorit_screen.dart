@@ -57,7 +57,7 @@ class _FavoritScreenState extends State<FavoritScreen> {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   offset: Offset(0, 1.h),
                   blurRadius: 1.r,
                 ),
@@ -112,7 +112,7 @@ class _FavoritScreenState extends State<FavoritScreen> {
             angle: 0.025, // تقریباً 1.435 درجه
             child: SizedBox(
               width: 110.7.w,
-              height: 212.8.h,
+              height: 200.8.h,
               child: Image.asset(
                 'assets/images/favorit/Delivery_Final.png',
                 fit: BoxFit.contain,
@@ -120,7 +120,7 @@ class _FavoritScreenState extends State<FavoritScreen> {
             ),
           ),
 
-          SizedBox(height: 58.h),
+          SizedBox(height: 8.h),
 
           // Empty State Text
           Text(
@@ -158,7 +158,7 @@ class _FavoritScreenState extends State<FavoritScreen> {
               borderRadius: BorderRadius.circular(15.r),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.04),
+                  color: Colors.black.withValues(alpha: 0.04),
                   offset: const Offset(0, 0),
                   blurRadius: 4.r,
                 ),
