@@ -63,6 +63,7 @@ class ItemLeason extends StatelessWidget {
       child: Container(
         width: double.infinity,
         margin: EdgeInsets.symmetric(horizontal: Dimens.medium),
+        height: Dimens.nh(88.0),
         padding: EdgeInsets.all(16.r),
         decoration: BoxDecoration(
           color: Theme.of(context).cardColor,
@@ -121,10 +122,10 @@ class ItemLeason extends StatelessWidget {
                       SizedBox(height: 6.h),
                       Text(
                         item.description,
-                        style: MyTextStyle.text10MediumText6.copyWith(
+                        style: MyTextStyle.description10Medium.copyWith(
                           color: isDark
-                              ? const Color(0xFF838697)
-                              : MyTextStyle.text10MediumText6.color,
+                              ? MyColors.loginTextSecondaryDark
+                              : MyColors.text6,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,

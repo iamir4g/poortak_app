@@ -35,7 +35,7 @@ class VideoContainerWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
-      width: Dimens.nw(320), // Reduced from 360
+      width: Dimens.nw(360), // Reduced from 360
       padding: EdgeInsets.all(Dimens.nr(5)),
       decoration: BoxDecoration(
         color: isDark ? MyColors.termsBackgroundDark : Colors.white,

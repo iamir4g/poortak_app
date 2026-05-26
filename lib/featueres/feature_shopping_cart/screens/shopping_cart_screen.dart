@@ -8,6 +8,7 @@ import 'package:poortak/common/widgets/dot_loading_widget.dart';
 import 'package:poortak/common/widgets/primaryButton.dart';
 
 import 'package:poortak/common/resources/data_state.dart';
+import 'package:poortak/common/utils/svg_embedded_png.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/models/shopping_cart_model.dart';
@@ -477,30 +478,10 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                       color:
                           isDark ? MyColors.termsBackgroundDark : Colors.white,
                       borderRadius: BorderRadius.circular(Dimens.nr(22)),
-                      boxShadow: isDark
-                          ? null
-                          : [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.1),
-                                blurRadius: 10,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        // Shopping cart image
-                        SizedBox(
-                          width: Dimens.nw(138),
-                          height: Dimens.nh(117),
-                          child: Image.asset(
-                            'assets/images/cart/shopping_cart.png',
-                            fit: BoxFit.contain,
-                          ),
-                        ),
-                        SizedBox(height: Dimens.nh(20)),
-                        // Empty cart text
                         Text(
                           'سبد خرید شما خالی است!',
                           style: TextStyle(
@@ -511,6 +492,15 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                                 : const Color(0xFF3D495C),
                           ),
                           textAlign: TextAlign.center,
+                        ),
+                        SizedBox(height: Dimens.nh(20)),
+                        SizedBox(
+                          width: Dimens.nw(138),
+                          height: Dimens.nh(117),
+                          child: buildImageFromAssetOrEmbeddedSvg(
+                            'assets/images/cart/shopping_cart.svg',
+                            fit: BoxFit.contain,
+                          ),
                         ),
                       ],
                     ),

@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
+import 'package:poortak/common/utils/svg_embedded_png.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/common/widgets/main_wrapper.dart';
 import 'package:poortak/featueres/feature_intro/presentation/bloc/splash_bloc/splash_cubit.dart';
@@ -43,7 +44,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     // Initialize background animation
     _backgroundAnimationController = AnimationController(
-      duration: const Duration(milliseconds: 2500),
+      duration: const Duration(milliseconds: 3200),
       vsync: this,
     );
     _backgroundAnimation = Tween<double>(
@@ -51,7 +52,7 @@ class _SplashScreenState extends State<SplashScreen>
       end: 1.0,
     ).animate(CurvedAnimation(
       parent: _backgroundAnimationController,
-      curve: Curves.easeOutCubic,
+      curve: Curves.easeInOutCubic,
     ));
 
     // Start background animation after a short delay
@@ -99,7 +100,7 @@ class _SplashScreenState extends State<SplashScreen>
                         fit: BoxFit.cover,
                         alignment: Alignment(
                           0,
-                          -1 + (_backgroundAnimation.value * 2),
+                          1 - (_backgroundAnimation.value * 2),
                         ),
                       ),
                     ),
@@ -118,11 +119,11 @@ class _SplashScreenState extends State<SplashScreen>
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               // Logo
-                              Image.asset(
-                                'assets/images/poortakLogo.png',
-                                width: width * 0.7,
-                                height:
-                                    width * 0.7 * 0.5, // Maintain aspect ratio
+                              buildImageFromAssetOrEmbeddedSvg(
+                                'assets/images/poortak_logo.svg',
+                                width: width * 0.78,
+                                height: width * 0.78 * 0.65,
+                                fit: BoxFit.contain,
                               ),
                               SizedBox(height: 30.h),
                               // Persian text

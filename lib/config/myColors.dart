@@ -166,4 +166,5 @@ class MyColors {
   static const Color activeTabBackground = Color(0xFF363A53);
   static const Color inactiveTabBackground = Color(0xFF9498AC);
   static const Color dividerGray = gray;
+  static const Color modalButtonPressedLight = Color(0xFFCEDEF8);
 }

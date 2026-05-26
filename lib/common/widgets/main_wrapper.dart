@@ -354,6 +354,7 @@ class _MainWrapperState extends State<MainWrapper> {
                     backgroundColor: themeState.isDark
                         ? MyColors.darkBackground
                         : Colors.white,
+                    resizeToAvoidBottomInset: false,
                     extendBodyBehindAppBar: false,
                     drawerScrimColor: Colors.black54,
                     appBar: AppBar(
@@ -421,22 +422,20 @@ class _MainWrapperState extends State<MainWrapper> {
                     ),
                     drawer: const CustomDrawer(),
                     bottomNavigationBar: BottomNav(controller: controller),
-                    body: SafeArea(
-                      child: state is PermissionLoading
-                          ? const Center(child: CircularProgressIndicator())
-                          : PageView(
-                              controller: controller,
-                              onPageChanged: (index) {
-                                context
-                                    .read<BottomNavCubit>()
-                                    .changeSelectedIndex(index);
-                                setState(() {
-                                  currentPageIndex = index;
-                                });
-                              },
-                              children: topLevelScreens,
-                            ),
-                    ),
+                    body: state is PermissionLoading
+                        ? const Center(child: CircularProgressIndicator())
+                        : PageView(
+                            controller: controller,
+                            onPageChanged: (index) {
+                              context
+                                  .read<BottomNavCubit>()
+                                  .changeSelectedIndex(index);
+                              setState(() {
+                                currentPageIndex = index;
+                              });
+                            },
+                            children: topLevelScreens,
+                          ),
                   ),
                 );
               },

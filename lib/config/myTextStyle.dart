@@ -127,6 +127,16 @@ class MyTextStyle {
         height: 1.5,
         letterSpacing: 1.0,
       );
+
+  static TextStyle get description10Medium => TextStyle(
+        fontFamily: "IRANSans",
+        fontSize: 10.sp,
+        fontWeight: FontWeight.w500,
+        fontStyle: FontStyle.normal,
+        height: 1.5,
+        letterSpacing: 0.0,
+        color: MyColors.text6,
+      );
   static TextStyle get textMatn15 => TextStyle(
         fontFamily: "IranSans",
         fontSize: 15.sp,
@@ -252,5 +262,25 @@ class MyTextStyle {
         height: 1.0,
         letterSpacing: 0.0,
         color: MyColors.textMatn1,
+      );
+
+  static TextStyle get modalTitle18Medium => TextStyle(
+        fontFamily: "IRANSans",
+        fontSize: 18.sp,
+        fontWeight: FontWeight.w500,
+        fontStyle: FontStyle.normal,
+        height: 1.0,
+        letterSpacing: 0.0,
+        color: MyColors.textMatn1,
+      );
+
+  static TextStyle get modalMessage14Medium => TextStyle(
+        fontFamily: "IRANSans",
+        fontSize: 14.sp,
+        fontWeight: FontWeight.w500,
+        fontStyle: FontStyle.normal,
+        height: 1.0,
+        letterSpacing: 0.0,
+        color: MyColors.text3,
       );
 }

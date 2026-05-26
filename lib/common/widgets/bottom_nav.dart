@@ -78,7 +78,7 @@ class BottomNav extends StatelessWidget {
             padding:
                 EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
             child: Container(
-              height: 70.h,
+              height: Dimens.bottomNavHeight,
               padding: EdgeInsets.only(bottom: 8.h),
               child: BlocBuilder<BottomNavCubit, int>(
                 builder: (context, state) {

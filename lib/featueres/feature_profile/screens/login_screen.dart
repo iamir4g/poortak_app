@@ -38,6 +38,9 @@ class _LoginScreenState extends State<LoginScreen> {
   String? mobileNumber;
   final FocusNode _mobileFocusNode = FocusNode();
   final FocusNode _otpFocusNode = FocusNode();
+  final ScrollController _scrollController = ScrollController();
+  final GlobalKey _mobileFieldKey = GlobalKey();
+  final GlobalKey _otpFieldKey = GlobalKey();
   late final Future<Uint8List?> _logoBytesFuture;
 
   // Timer variables
@@ -51,6 +54,29 @@ class _LoginScreenState extends State<LoginScreen> {
     _logoBytesFuture =
         loadEmbeddedPngBytesFromSvgAsset('assets/images/poortak_logo.svg');
     _getAppSignature();
+    _mobileFocusNode.addListener(_handleFocusChange);
+    _otpFocusNode.addListener(_handleFocusChange);
+  }
+
+  void _handleFocusChange() {
+    if (_mobileFocusNode.hasFocus) {
+      _ensureVisible(_mobileFieldKey);
+    } else if (_otpFocusNode.hasFocus) {
+      _ensureVisible(_otpFieldKey);
+    }
+  }
+
+  void _ensureVisible(GlobalKey key) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final ctx = key.currentContext;
+      if (ctx == null) return;
+      Scrollable.ensureVisible(
+        ctx,
+        duration: const Duration(milliseconds: 220),
+        curve: Curves.easeOut,
+        alignment: 0.25,
+      );
+    });
   }
 
   void _getAppSignature() async {
@@ -97,6 +123,7 @@ class _LoginScreenState extends State<LoginScreen> {
     _otpController.dispose();
     _mobileFocusNode.dispose();
     _otpFocusNode.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -142,10 +169,18 @@ class _LoginScreenState extends State<LoginScreen> {
         (theme.brightness == Brightness.dark
             ? LoginTheme.dark
             : LoginTheme.light);
+    final bottomOverlayHeight =
+        56.h + (showOtpForm ? 0.0 : (Dimens.small.h + 22.h)) + Dimens.small.h;
+    final scrollBottomPadding = Dimens.bottomNavHeight +
+        12.h +
+        bottomOverlayHeight +
+        MediaQuery.of(context).viewInsets.bottom +
+        24.h;
     return BlocProvider(
       create: (context) => ProfileBloc(repository: locator()),
       child: Scaffold(
-        backgroundColor: Colors.transparent,
+        backgroundColor: const Color(0xFFCDEBF6),
+        resizeToAvoidBottomInset: false,
         body: Stack(
           children: [
             // Background
@@ -153,6 +188,9 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Image.asset(
                 'assets/images/login/login_background.png',
                 fit: BoxFit.cover,
+                alignment: Alignment.topCenter,
+                repeat: ImageRepeat.noRepeat,
+                filterQuality: FilterQuality.high,
               ),
             ),
             Positioned.fill(
@@ -160,159 +198,160 @@ class _LoginScreenState extends State<LoginScreen> {
                 color: loginTheme.backgroundOverlayColor,
               ),
             ),
-            // Content
             SafeArea(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 28.0.w),
-                  child: Column(
-                    children: [
-                      // Top spacing
-                      SizedBox(height: 100.h),
-
-                      // Logo section
-                      Center(
-                        child: FutureBuilder<Uint8List?>(
-                          future: _logoBytesFuture,
-                          builder: (context, snapshot) {
-                            final bytes = snapshot.data;
-                            if (bytes == null) {
-                              return SizedBox(
-                                height: 102.h,
-                                width: 153.w,
-                              );
-                            }
-                            return Image.memory(
-                              bytes,
-                              height: 102.h,
-                              width: 153.w,
-                              fit: BoxFit.contain,
-                              filterQuality: FilterQuality.high,
-                            );
-                          },
-                        ),
+              child: Stack(
+                children: [
+                  SingleChildScrollView(
+                    controller: _scrollController,
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                        left: 28.w,
+                        right: 28.w,
+                        bottom: scrollBottomPadding,
                       ),
-
-                      SizedBox(height: Dimens.medium.h),
-
-                      // Title section
-                      Text(
-                        showOtpForm
-                            ? "کد ارسال شده را وارد کنید:"
-                            : "شماره موبایل خود را وارد کنید:",
-                        style: MyTextStyle.textMatn12Bold.copyWith(
-                          fontSize: 16.sp,
-                          color: loginTheme.titleTextColor,
-                          fontWeight: FontWeight.w500,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-
-                      SizedBox(height: Dimens.medium.h),
-
-                      // Form section
-                      if (!showOtpForm) _buildMobileInput(loginTheme),
-                      if (showOtpForm) _buildOtpInput(loginTheme),
-
-                      SizedBox(height: Dimens.small.h),
-
-                      // Subtitle for OTP
-                      if (showOtpForm) ...[
-                        Text(
-                          "کد ارسال شده به شماره 09${mobileNumber ?? ''} را وارد کنید",
-                          style: MyTextStyle.textMatn13.copyWith(
-                            color: loginTheme.secondaryTextColor,
-                            height: 1.4,
-                            fontSize: 13.sp,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        SizedBox(height: 8.h),
-                        // Timer display or resend button
-                        if (!_canResend)
-                          RichText(
-                            textAlign: TextAlign.center,
-                            text: TextSpan(
-                              children: [
-                                TextSpan(
-                                  text: "ارسال مجدد کد:",
-                                  style: MyTextStyle.textMatn13.copyWith(
-                                    color: loginTheme.actionTextColor,
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 14.sp,
-                                  ),
-                                ),
-                                TextSpan(
-                                  text: _formatTime(_remainingSeconds),
-                                  style: MyTextStyle.textMatn13.copyWith(
-                                    color: theme.brightness == Brightness.dark
-                                        ? MyColors.primary
-                                        : loginTheme.actionTextColor,
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 14.sp,
-                                  ),
-                                ),
-                              ],
+                      child: Column(
+                        children: [
+                          SizedBox(height: Dimens.xxxxxxLarge),
+                          Center(
+                            child: FutureBuilder<Uint8List?>(
+                              future: _logoBytesFuture,
+                              builder: (context, snapshot) {
+                                final bytes = snapshot.data;
+                                if (bytes == null) {
+                                  return SizedBox(
+                                    height: 102.h,
+                                    width: 153.w,
+                                  );
+                                }
+                                return Image.memory(
+                                  bytes,
+                                  height: 102.h,
+                                  width: 153.w,
+                                  fit: BoxFit.contain,
+                                  filterQuality: FilterQuality.high,
+                                );
+                              },
                             ),
-                          )
-                        else
-                          Builder(
-                            builder: (builderContext) {
-                              return TextButton(
-                                onPressed: () {
-                                  if (mobileNumber != null) {
-                                    builderContext.read<ProfileBloc>().add(
-                                          RequestOtpEvent(
-                                              mobile: "09$mobileNumber"),
-                                        );
-                                    // Reset timer after resending
-                                    _resetTimer();
-                                  }
-                                },
-                                child: Text(
-                                  "ارسال مجدد کد",
-                                  style: MyTextStyle.textMatn13.copyWith(
-                                    color: loginTheme.actionTextColor,
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 14.sp,
-                                  ),
+                          ),
+                          SizedBox(height: Dimens.xLarge.h),
+                          Text(
+                            showOtpForm
+                                ? "کد ارسال شده را وارد کنید:"
+                                : "شماره موبایل خود را وارد کنید:",
+                            style: MyTextStyle.textMatn12Bold.copyWith(
+                              fontSize: 16.sp,
+                              color: loginTheme.titleTextColor,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          SizedBox(height: Dimens.medium.h),
+                          if (!showOtpForm) _buildMobileInput(loginTheme),
+                          if (showOtpForm) _buildOtpInput(loginTheme),
+                          SizedBox(height: Dimens.small.h),
+                          if (showOtpForm) ...[
+                            Text(
+                              "کد ارسال شده به شماره 09${mobileNumber ?? ''} را وارد کنید",
+                              style: MyTextStyle.textMatn13.copyWith(
+                                color: loginTheme.secondaryTextColor,
+                                height: 1.4,
+                                fontSize: 13.sp,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            SizedBox(height: 8.h),
+                            if (!_canResend)
+                              RichText(
+                                textAlign: TextAlign.center,
+                                text: TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: "ارسال مجدد کد:",
+                                      style: MyTextStyle.textMatn13.copyWith(
+                                        color:
+                                            theme.brightness == Brightness.dark
+                                                ? loginTheme.actionTextColor
+                                                : MyColors.textMatn1,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 14.sp,
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text: _formatTime(_remainingSeconds),
+                                      style: MyTextStyle.textMatn13.copyWith(
+                                        color: MyColors.secondary,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 14.sp,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              );
-                            },
-                          ),
-                      ],
-
-                      if (!showOtpForm)
-                        Text(
-                          "یک کد تایید برای شما ارسال می شود.",
-                          style: MyTextStyle.textMatn13.copyWith(
-                            color: loginTheme.secondaryTextColor,
-                            height: 1.4,
-                            fontSize: 13.sp,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-
-                      SizedBox(height: 60.h),
-
-                      // Terms and conditions link
-                      if (!showOtpForm) _buildTermsLink(),
-
-                      SizedBox(height: Dimens.small.h),
-
-                      // Action button
-                      _buildActionButton(),
-
-                      SizedBox(height: Dimens.small.h),
-
-                      // Footer buttons removed - resend button is now in OTP section
-
-                      // Bottom spacing
-                      SizedBox(height: 40.h),
-                      // const Expanded(child: SizedBox()),
-                    ],
+                              )
+                            else
+                              Builder(
+                                builder: (builderContext) {
+                                  return TextButton(
+                                    onPressed: () {
+                                      if (mobileNumber != null) {
+                                        builderContext.read<ProfileBloc>().add(
+                                              RequestOtpEvent(
+                                                  mobile: "09$mobileNumber"),
+                                            );
+                                        _resetTimer();
+                                      }
+                                    },
+                                    child: Text(
+                                      "ارسال مجدد کد",
+                                      style: MyTextStyle.textMatn13.copyWith(
+                                        color:
+                                            theme.brightness == Brightness.dark
+                                                ? loginTheme.actionTextColor
+                                                : MyColors.secondary,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 14.sp,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                          ],
+                          if (!showOtpForm)
+                            Text(
+                              "یک کد تایید برای شما ارسال می شود.",
+                              style: MyTextStyle.textMatn13.copyWith(
+                                color: loginTheme.secondaryTextColor,
+                                height: 1.4,
+                                fontSize: 13.sp,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          SizedBox(height: 40.h),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: AnimatedPadding(
+                      duration: const Duration(milliseconds: 180),
+                      curve: Curves.easeOut,
+                      padding: EdgeInsets.only(
+                        left: 28.w,
+                        right: 28.w,
+                        bottom: Dimens.bottomNavHeight + 12.h,
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (!showOtpForm) _buildTermsLink(),
+                          if (!showOtpForm) SizedBox(height: Dimens.small.h),
+                          _buildActionButton(),
+                          SizedBox(height: Dimens.small.h),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -323,6 +362,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget _buildMobileInput(LoginTheme loginTheme) {
     return Container(
+      key: _mobileFieldKey,
       constraints: BoxConstraints(maxWidth: 360.w),
       padding: EdgeInsets.symmetric(horizontal: 4.w),
       decoration: BoxDecoration(
@@ -367,7 +407,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   hintStyle: TextStyle(
                     color: Color(0xFF9E9E9E),
                     fontSize: 16.sp,
-                    fontFamily: 'monospace',
+                    fontFamily: "IranSans",
                   ),
                   border: InputBorder.none,
                   contentPadding: EdgeInsets.symmetric(
@@ -430,6 +470,7 @@ class _LoginScreenState extends State<LoginScreen> {
       children: [
         SizedBox(height: 12.h),
         Container(
+          key: _otpFieldKey,
           decoration: BoxDecoration(
             color: loginTheme.inputBackgroundColor,
             borderRadius: BorderRadius.circular(16.r),
@@ -472,7 +513,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 hintText: "----",
                 hintStyle: MyTextStyle.textMatn13.copyWith(
                   color: MyColors.text4,
-                  letterSpacing: 4.w,
+                  fontSize: 22.sp,
+                  letterSpacing: 8.w,
                 ),
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.symmetric(

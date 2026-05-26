@@ -340,7 +340,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
           preferredSize: Size.fromHeight(Dimens.nh(57)),
           child: SafeArea(
             child: Container(
-              padding: EdgeInsets.fromLTRB(Dimens.nw(16), 0, Dimens.nw(32), 0),
+              padding: EdgeInsets.symmetric(horizontal: Dimens.medium),
               height: Dimens.nh(57),
               decoration: BoxDecoration(
                 color: Theme.of(context).brightness == Brightness.dark
@@ -404,6 +404,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
 
   Widget _buildContent(BuildContext context) {
     return SingleChildScrollView(
+      padding: EdgeInsets.symmetric(horizontal: Dimens.medium),
       child: Column(
         children: [
           SizedBox(height: Dimens.nh(15)), // Reduced from 28
@@ -426,7 +427,6 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(Dimens.nw(16)),
-      margin: EdgeInsets.symmetric(horizontal: Dimens.nw(16)),
       decoration: BoxDecoration(
         color: isDark ? MyColors.termsBackgroundDark : Colors.white,
         borderRadius: BorderRadius.circular(Dimens.nr(20)),
