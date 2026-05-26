@@ -29,6 +29,7 @@ class _SplashScreenState extends State<SplashScreen>
   late final AppLinks _appLinks;
   StreamSubscription<Uri?>? _linkSub;
   bool _hasHandledDeepLink = false;
+  bool _didPrecacheLogo = false;
   static const MethodChannel _channel =
       MethodChannel('poortak.deeplink.flutter.dev/channel');
 
@@ -78,6 +79,14 @@ class _SplashScreenState extends State<SplashScreen>
     _channel.setMethodCallHandler(null);
     _backgroundAnimationController.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_didPrecacheLogo) return;
+    _didPrecacheLogo = true;
+    precacheEmbeddedRasterFromSvg(context, 'assets/images/poortak_logo.svg');
   }
 
   @override

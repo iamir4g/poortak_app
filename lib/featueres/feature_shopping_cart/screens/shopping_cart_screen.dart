@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
 
 import 'package:persian_tools/persian_tools.dart';
@@ -11,6 +10,7 @@ import 'package:poortak/common/resources/data_state.dart';
 import 'package:poortak/common/utils/svg_embedded_png.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
+import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/models/shopping_cart_model.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
@@ -59,6 +59,114 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
   final SayarehRepository _sayarehRepository = locator<SayarehRepository>();
   final Map<String, Future<_LocalCartDisplayItem>> _localCartItemCache = {};
   Future<IKnowSummaryModel>? _summaryFuture;
+
+  Widget _buildInvoiceSummaryCard({
+    required int subTotal,
+    required int discount,
+    required int payable,
+  }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final labelStyle = MyTextStyle.textMatn14Bold.copyWith(
+      fontWeight: FontWeight.w500,
+      color: isDark ? MyColors.darkTextPrimary : MyColors.textMatn1,
+      height: 1.0,
+    );
+    final valueStyle = MyTextStyle.textMatn14Bold.copyWith(
+      fontWeight: FontWeight.w500,
+      color: isDark ? MyColors.darkTextPrimary : MyColors.textMatn1,
+      height: 1.0,
+    );
+    final discountValueStyle = valueStyle.copyWith(
+      color: discount > 0
+          ? MyColors.darkError
+          : (isDark ? MyColors.darkTextSecondary : MyColors.text6),
+    );
+    final innerBg =
+        isDark ? MyColors.darkBackgroundSecondary : const Color(0xFFF7F9FC);
+
+    return Center(
+      child: Container(
+        width: double.infinity,
+        constraints: BoxConstraints(maxWidth: Dimens.nw(360.0)),
+        height: Dimens.nh(140.0),
+        padding: EdgeInsets.symmetric(
+          horizontal: Dimens.medium,
+          vertical: Dimens.medium,
+        ),
+        decoration: BoxDecoration(
+          color: isDark ? MyColors.termsBackgroundDark : MyColors.background,
+          borderRadius: BorderRadius.circular(Dimens.nr(10.0)),
+        ),
+        child: Column(
+          children: [
+            Padding(
+              padding: EdgeInsetsGeometry.symmetric(
+                horizontal: Dimens.medium,
+              ),
+              child: _buildInvoiceRow(
+                label: 'صورت حساب',
+                value: '${subTotal.addComma} تومان',
+                labelStyle: labelStyle,
+                valueStyle: valueStyle,
+              ),
+            ),
+            SizedBox(height: Dimens.nh(12)),
+            Divider(
+              height: Dimens.dividerHeight,
+              thickness: Dimens.dividerHeight,
+              color: isDark ? MyColors.darkBorder : MyColors.divider,
+            ),
+            SizedBox(height: Dimens.nh(12)),
+            Padding(
+              padding: EdgeInsetsGeometry.symmetric(
+                horizontal: Dimens.medium,
+              ),
+              child: _buildInvoiceRow(
+                label: 'تخفیف',
+                value: '${discount.addComma} تومان',
+                labelStyle: labelStyle,
+                valueStyle: discountValueStyle,
+              ),
+            ),
+            SizedBox(height: Dimens.nh(12)),
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(
+                horizontal: Dimens.medium,
+                vertical: Dimens.nh(12),
+              ),
+              decoration: BoxDecoration(
+                color: innerBg,
+                borderRadius: BorderRadius.circular(Dimens.nr(10.0)),
+              ),
+              child: _buildInvoiceRow(
+                label: 'مبلغ قابل پرداخت',
+                value: '${payable.addComma} تومان',
+                labelStyle: labelStyle,
+                valueStyle: valueStyle,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInvoiceRow({
+    required String label,
+    required String value,
+    required TextStyle labelStyle,
+    required TextStyle valueStyle,
+  }) {
+    return Row(
+      textDirection: TextDirection.rtl,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label, style: labelStyle),
+        Text(value, style: valueStyle),
+      ],
+    );
+  }
 
   @override
   void initState() {
@@ -240,12 +348,14 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
   }
 
   int _calculateBundlePayableAmount(IKnowSummaryModel summary) {
-    final subtotal = MoneyUtils.parseRialToTomanInt(summary.data.settings.price);
+    final subtotal =
+        MoneyUtils.parseRialToTomanInt(summary.data.settings.price);
     final isPercent =
         summary.data.settings.discountType.toLowerCase() == 'percent';
 
     final discountAmount = isPercent
-        ? subtotal * MoneyUtils.parseRial(summary.data.settings.discountAmount) ~/
+        ? subtotal *
+            MoneyUtils.parseRial(summary.data.settings.discountAmount) ~/
             100
         : MoneyUtils.parseRialToTomanInt(summary.data.settings.discountAmount);
     final payable = subtotal - discountAmount;
@@ -548,8 +658,29 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
           _buildPointsHeader(),
           Expanded(
             child: ListView.builder(
-              itemCount: cart.items.length,
+              itemCount: cart.items.length + 1,
               itemBuilder: (context, index) {
+                if (index == cart.items.length) {
+                  final computedSubTotal = cart.subTotal ??
+                      cart.items.fold<int>(0, (sum, item) => sum + item.price);
+                  final computedPayable = cart.grandTotal ?? computedSubTotal;
+                  final computedDiscount = (computedSubTotal - computedPayable)
+                      .clamp(0, computedSubTotal)
+                      .toInt();
+                  return Padding(
+                    padding: EdgeInsets.fromLTRB(
+                      Dimens.medium,
+                      Dimens.small,
+                      Dimens.medium,
+                      Dimens.nh(12),
+                    ),
+                    child: _buildInvoiceSummaryCard(
+                      subTotal: computedSubTotal,
+                      discount: computedDiscount,
+                      payable: computedPayable,
+                    ),
+                  );
+                }
                 final item = cart.items[index];
                 return Container(
                   margin: EdgeInsets.symmetric(
@@ -696,38 +827,12 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '${l10n?.total_price} ${cart.grandTotal?.addComma ?? cart.items.fold(0, (sum, item) => sum + item.price).addComma}',
-                        style: TextStyle(
-                          fontSize: Dimens.nsp(18),
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      if (cart.subTotal != null &&
-                          cart.grandTotal != null &&
-                          cart.subTotal != cart.grandTotal)
-                        Text(
-                          'قیمت اصلی: ${cart.subTotal!.addComma} تومان',
-                          style: TextStyle(
-                            color: isDark
-                                ? MyColors.darkTextSecondary
-                                : Colors.grey[600],
-                            fontSize: Dimens.nsp(12),
-                            decoration: TextDecoration.lineThrough,
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
                 PrimaryButton(
                   width: Dimens.nw(160),
                   height: Dimens.nh(50),
                   lable: l10n?.pay_now ?? "Pay Now",
+                  backgroundColor:
+                      isDark ? MyColors.primary : MyColors.secondary,
                   onPressed: () async {
                     try {
                       // Call checkout API directly
@@ -772,6 +877,33 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                     }
                   },
                 ),
+                // SizedBox(width: double.infinity),
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${l10n?.total_price} ${cart.grandTotal?.addComma ?? cart.items.fold(0, (sum, item) => sum + item.price).addComma}',
+                      style: TextStyle(
+                        fontSize: Dimens.nsp(18),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    if (cart.subTotal != null &&
+                        cart.grandTotal != null &&
+                        cart.subTotal != cart.grandTotal)
+                      Text(
+                        'قیمت اصلی: ${cart.subTotal!.addComma} تومان',
+                        style: TextStyle(
+                          color: isDark
+                              ? MyColors.darkTextSecondary
+                              : Colors.grey[600],
+                          fontSize: Dimens.nsp(12),
+                          decoration: TextDecoration.lineThrough,
+                        ),
+                      ),
+                  ],
+                ),
               ],
             ),
           ),
@@ -814,8 +946,29 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
           _buildPointsHeader(),
           Expanded(
             child: ListView.builder(
-              itemCount: localCartItems.length,
+              itemCount: localCartItems.length + 1,
               itemBuilder: (context, index) {
+                if (index == localCartItems.length) {
+                  return FutureBuilder<int>(
+                    future: _calculateTotalPrice(localCartItems),
+                    builder: (context, snapshot) {
+                      final totalPrice = snapshot.data ?? 0;
+                      return Padding(
+                        padding: EdgeInsets.fromLTRB(
+                          Dimens.medium,
+                          Dimens.small,
+                          Dimens.medium,
+                          Dimens.nh(12),
+                        ),
+                        child: _buildInvoiceSummaryCard(
+                          subTotal: totalPrice,
+                          discount: 0,
+                          payable: totalPrice,
+                        ),
+                      );
+                    },
+                  );
+                }
                 final item = localCartItems[index];
                 final itemType = item['type'] as String;
                 final itemId = item['itemId'] as String;
@@ -972,31 +1125,12 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(
-                  child: FutureBuilder<int>(
-                    future: _calculateTotalPrice(localCartItems),
-                    builder: (context, snapshot) {
-                      final totalPrice = snapshot.data ?? 0;
-                      return Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '${l10n?.total_price} ${totalPrice.addComma}',
-                            style: TextStyle(
-                              fontSize: Dimens.nsp(18),
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-                ),
                 PrimaryButton(
                   width: Dimens.nw(160),
                   height: Dimens.nh(50),
                   lable: l10n?.pay_now ?? "Pay Now",
+                  backgroundColor:
+                      isDark ? MyColors.primary : MyColors.secondary,
                   onPressed: () async {
                     try {
                       // Call checkout API directly
@@ -1039,6 +1173,25 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                         }
                       }
                     }
+                  },
+                ),
+                FutureBuilder<int>(
+                  future: _calculateTotalPrice(localCartItems),
+                  builder: (context, snapshot) {
+                    final totalPrice = snapshot.data ?? 0;
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${l10n?.total_price} ${totalPrice.addComma}',
+                          style: TextStyle(
+                            fontSize: Dimens.nsp(18),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    );
                   },
                 ),
               ],

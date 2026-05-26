@@ -139,7 +139,7 @@ class _SayarehScreenState extends State<SayarehScreen> {
                       child: Column(
                         children: [
                           SizedBox(
-                            height: 18.h,
+                            height: Dimens.nh(28.0),
                           ),
                           Text(
                             l10n?.sayareh ?? "",
@@ -150,7 +150,7 @@ class _SayarehScreenState extends State<SayarehScreen> {
                             ),
                           ),
                           SizedBox(
-                            height: 8.h,
+                            height: Dimens.nh(14.0),
                           ),
                           // Sayareh List Section
 
@@ -214,7 +214,7 @@ class _SayarehScreenState extends State<SayarehScreen> {
                     child: Column(
                       children: [
                         SizedBox(
-                          height: 18.h,
+                          height: Dimens.nh(28.0),
                         ),
                         Text(
                           "کتاب های سیاره آی نو",
@@ -225,7 +225,7 @@ class _SayarehScreenState extends State<SayarehScreen> {
                           ),
                         ),
                         SizedBox(
-                          height: 8.h,
+                          height: Dimens.nh(14.0),
                         ),
                         if (sayarehDataCompleted.bookListData.data != null &&
                             sayarehDataCompleted.bookListData.data!.isNotEmpty)
