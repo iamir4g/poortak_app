@@ -6,6 +6,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poortak/common/utils/svg_embedded_png.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
+import 'package:poortak/config/myTextStyle.dart';
 
 class ContestCard extends StatelessWidget {
   final VoidCallback? onTap;
@@ -25,7 +26,7 @@ class ContestCard extends StatelessWidget {
         onTap: onTap,
         child: Container(
           width: double.infinity,
-          height: Dimens.nh(100.0),
+          height: Dimens.nh(104.0),
           margin: EdgeInsets.symmetric(
             horizontal: Dimens.medium,
             vertical: Dimens.nh(8),
@@ -69,15 +70,13 @@ class ContestCard extends StatelessWidget {
                     SizedBox(height: 8.h),
                     Text(
                       'در مسابقه ماهانه پورتک شرکت کنید و جایزه ببرید.',
-                      style: TextStyle(
-                        color: isDark
-                            ? MyColors.loginTextSecondaryDark
-                            : MyColors.text3,
-                        fontSize: 12.sp,
-                        height: 1.0,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+                      style:  MyTextStyle.description10Medium.copyWith(
+                          color: isDark
+                              ? MyColors.loginTextSecondaryDark
+                              : MyColors.text6,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),

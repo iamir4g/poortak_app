@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poortak/common/services/getImageUrl_service.dart';
+import 'package:poortak/common/utils/svg_embedded_png.dart';
 import 'package:poortak/common/widgets/global_progress_bar.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
@@ -63,10 +64,10 @@ class ItemLeason extends StatelessWidget {
       child: Container(
         width: double.infinity,
         margin: EdgeInsets.symmetric(horizontal: Dimens.medium),
-        height: Dimens.nh(88.0),
+        height: Dimens.nh(104.0),
         padding: EdgeInsets.all(16.r),
         decoration: BoxDecoration(
-          color: Theme.of(context).cardColor,
+          color: MyColors.background,
           borderRadius: BorderRadius.circular(40.r),
         ),
         child: Row(
@@ -153,8 +154,12 @@ class ItemLeason extends StatelessWidget {
                     ? SizedBox(
                         width: 24.r,
                         height: 24.r,
-                        child: Image(
-                            image: AssetImage("assets/images/lock_image.png")),
+                        child: buildImageFromAssetOrEmbeddedSvg(
+                          "assets/images/lock_image.svg",
+                          width: 24.r,
+                          height: 24.r,
+                          fit: BoxFit.contain,
+                        ),
                       )
                     : SizedBox(),
                 SizedBox(

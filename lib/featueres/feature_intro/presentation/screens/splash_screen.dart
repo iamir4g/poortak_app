@@ -58,8 +58,10 @@ class _SplashScreenState extends State<SplashScreen>
 
     // Start background animation after a short delay
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      _backgroundAnimationController.forward();
+      Future.delayed(const Duration(seconds: 1), () {
+        if (!mounted) return;
+        _backgroundAnimationController.forward();
+      });
     });
 
     BlocProvider.of<SplashCubit>(context).checkConnectionEvent();
@@ -126,12 +128,13 @@ class _SplashScreenState extends State<SplashScreen>
                         child: Center(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               // Logo
                               buildImageFromAssetOrEmbeddedSvg(
                                 'assets/images/poortak_logo.svg',
-                                width: width * 0.78,
-                                height: width * 0.78 * 0.65,
+                                width: width * 0.68,
+                                height: width * 0.68 * 0.65,
                                 fit: BoxFit.contain,
                               ),
                               SizedBox(height: 30.h),
@@ -140,8 +143,8 @@ class _SplashScreenState extends State<SplashScreen>
                                 'ایده ای جدید از انتشارات تاجیک',
                                 style: TextStyle(
                                   fontFamily: 'IranSans',
-                                  fontSize: 15.sp,
-                                  fontWeight: FontWeight.bold,
+                                  fontSize: 17.sp,
+                                  fontWeight: FontWeight.w900,
                                   color: Colors.white,
                                   height: 1.4,
                                 ),

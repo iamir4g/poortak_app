@@ -30,7 +30,7 @@ class LessonCardWidget extends StatelessWidget {
       onTap: onTap,
       child: Container(
         width: width,
-        height: Dimens.nh(90), // Reduced from 104
+        height: Dimens.nh(104),
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(Dimens.nr(30)), // Reduced from 40

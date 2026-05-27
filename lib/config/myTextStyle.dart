@@ -244,6 +244,46 @@ class MyTextStyle {
         height: 1.0,
       );
 
+  static TextStyle get referralCodeInput14Medium => TextStyle(
+        fontFamily: "IranSans",
+        fontSize: 14.sp,
+        fontWeight: FontWeight.w500,
+        color: MyColors.textMatn1,
+        height: 1.0,
+      );
+
+  static TextStyle get paymentSecurityTitle13Medium => TextStyle(
+        fontFamily: "IRANSans",
+        fontSize: 13.sp,
+        fontWeight: FontWeight.w500,
+        color: MyColors.activeTabBackground,
+        height: 1.0,
+      );
+
+  static TextStyle get paymentSecuritySubtitle10Medium => TextStyle(
+        fontFamily: "IRANSans",
+        fontSize: 10.sp,
+        fontWeight: FontWeight.w500,
+        color: MyColors.activeTabBackground,
+        height: 1.0,
+      );
+
+  static TextStyle get contactTitle18Light => TextStyle(
+        fontFamily: "IRANSans",
+        fontSize: 18.sp,
+        fontWeight: FontWeight.w300,
+        color: MyColors.activeTabBackground,
+        height: 1.0,
+      );
+
+  static TextStyle get contactDescription15Light => TextStyle(
+      fontFamily: "IRANSans",
+      fontSize: 15.sp,
+      fontWeight: FontWeight.w300,
+      color: MyColors.activeTabBackground,
+      height: 1.5,
+      letterSpacing: 1.0);
+
   static TextStyle get paymentHistoryLabel14Light => TextStyle(
         fontFamily: "IRANSans",
         fontSize: 14.sp,

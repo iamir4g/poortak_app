@@ -40,14 +40,14 @@ class ItemBook extends StatelessWidget {
           }
         },
         child: Container(
-          height: Dimens.nh(100.0),
+          height: Dimens.nh(104.0),
           width: double.infinity,
           margin: EdgeInsets.symmetric(
             horizontal: Dimens.medium,
           ),
           padding: EdgeInsets.all(16.r),
           decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
+            color: MyColors.background,
             borderRadius: BorderRadius.circular(20.r),
             boxShadow: [
               BoxShadow(
