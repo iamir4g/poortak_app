@@ -15,8 +15,8 @@ class StepProgress extends StatelessWidget {
       height: 20.h,
       width: 300.w,
       decoration: BoxDecoration(
-        color: MyColors.brandPrimary.withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(10.r),
+        color: MyColors.vocabularyProgressFill.withValues(alpha: 0.35),
+        borderRadius: BorderRadius.circular(20.r),
       ),
       child: Stack(
         alignment: Alignment.centerLeft,
@@ -24,7 +24,7 @@ class StepProgress extends StatelessWidget {
           // Background
           Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10.r),
+              borderRadius: BorderRadius.circular(20.r),
             ),
           ),
           // Progress
@@ -32,8 +32,8 @@ class StepProgress extends StatelessWidget {
             widthFactor: (currentIndex + 1) / totalSteps,
             child: Container(
               decoration: BoxDecoration(
-                color: MyColors.brandPrimary,
-                borderRadius: BorderRadius.circular(10.r),
+                color: MyColors.vocabularyProgressFill,
+                borderRadius: BorderRadius.circular(20.r),
               ),
             ),
           ),

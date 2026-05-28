@@ -576,7 +576,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
 
   Widget _buildConversationCard() {
     return LessonCardWidget(
-      iconPath: "assets/images/chat_icon.svg",
+      iconPath: "assets/images/chat_icon.png",
       englishLabel: "conversation",
       persianLabel: "مکالمه",
       progress: _progress?.conversation,
@@ -607,7 +607,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
   Widget _buildVocabularyCard() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return LessonCardWidget(
-      iconPath: "assets/images/points/words_icon.svg",
+      iconPath: "assets/images/points/words_icon.png",
       englishLabel: "vocabulary",
       persianLabel: "واژگان",
       progress: _progress?.vocabulary,
@@ -646,7 +646,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
 
   Widget _buildQuizCard() {
     return LessonCardWidget(
-      iconPath: "assets/images/points/quiz_icon.svg",
+      iconPath: "assets/images/points/quiz_icon.png",
       englishLabel: "Quiz",
       persianLabel: "آزمون",
       progress: _progress?.quiz,

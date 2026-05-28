@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/locator.dart';
@@ -338,7 +339,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
         isDark ? MyColors.profileTextPrimaryDark : MyColors.textMatn1;
     final iconColor =
         isDark ? MyColors.profileTextPrimaryDark : MyColors.textPrimary;
-    final bottomBarColor = isDark ? MyColors.profileHeaderDark : MyColors.background;
+    final bottomBarColor =
+        isDark ? MyColors.profileHeaderDark : MyColors.background;
     return BlocProvider.value(
       value: _converstionBloc,
       child: Scaffold(
@@ -369,12 +371,12 @@ class _ConversationScreenState extends State<ConversationScreen> {
         ),
         // نوار پایین صفحه شامل دکمه‌های پخش و نمایش ترجمه
         bottomNavigationBar: Container(
-          decoration: BoxDecoration(
-            color: bottomBarColor,
-          ),
+          // decoration: BoxDecoration(
+          //   color: bottomBarColor,
+          // ),
           child: SafeArea(
             child: SizedBox(
-              height: 60.h,
+              height: 94.h,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -398,6 +400,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                       );
                     },
                   ),
+                  // SizedBox(width: Dimens.medium),
                   IconButton(
                       onPressed: () {
                         _playNext();
@@ -411,24 +414,47 @@ class _ConversationScreenState extends State<ConversationScreen> {
                           BlendMode.srcIn,
                         ),
                       )),
+                  SizedBox(width: Dimens.medium),
                   // دکمه پخش/توقف تمام مکالمه
                   ValueListenableBuilder<bool>(
                     valueListenable: isPlayingNotifier,
                     builder: (context, isPlaying, _) {
-                      return IconButton(
-                        onPressed: () {
-                          if (sortedMessages != null) {
-                            playAllConversations(sortedMessages!);
-                          }
-                        },
-                        icon: Icon(
-                          isPlaying ? Icons.stop_circle : Icons.play_circle,
-                          size: 50.r,
-                          color: isPlaying ? MyColors.error : MyColors.success,
+                      final bgColor = isPlaying
+                          ? MyColors.primary
+                          : (isDark
+                              ? MyColors.conversationPlayPauseDarkPaused
+                              : MyColors.gray);
+                      final icon = isPlaying ? Icons.pause : Icons.play_arrow;
+                      final iconFg = isPlaying
+                          ? Colors.white
+                          : (isDark ? Colors.white : MyColors.text2);
+
+                      return SizedBox(
+                        width: 60.r,
+                        height: 60.r,
+                        child: Material(
+                          color: bgColor,
+                          shape: const CircleBorder(),
+                          child: InkWell(
+                            customBorder: const CircleBorder(),
+                            onTap: () {
+                              if (sortedMessages != null) {
+                                playAllConversations(sortedMessages!);
+                              }
+                            },
+                            child: Center(
+                              child: Icon(
+                                icon,
+                                size: 34.r,
+                                color: iconFg,
+                              ),
+                            ),
+                          ),
                         ),
                       );
                     },
                   ),
+                  SizedBox(width: Dimens.medium),
                   IconButton(
                       onPressed: () {
                         _playPrevious();

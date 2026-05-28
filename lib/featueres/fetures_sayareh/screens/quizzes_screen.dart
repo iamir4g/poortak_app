@@ -159,7 +159,7 @@ class QuizItem extends StatelessWidget {
         child: Row(
           children: [
             buildImageFromAssetOrEmbeddedSvg(
-              "assets/images/points/quiz_icon.svg",
+              "assets/images/points/quiz_icon.png",
               width: 48.0.r,
               height: 48.0.r,
             ),

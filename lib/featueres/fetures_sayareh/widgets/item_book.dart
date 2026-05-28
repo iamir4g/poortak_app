@@ -47,7 +47,7 @@ class ItemBook extends StatelessWidget {
           ),
           padding: EdgeInsets.all(16.r),
           decoration: BoxDecoration(
-            color: MyColors.background,
+            color: isDark ? Theme.of(context).cardColor : MyColors.background,
             borderRadius: BorderRadius.circular(20.r),
             boxShadow: [
               BoxShadow(

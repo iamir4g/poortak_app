@@ -274,15 +274,17 @@ class MyTextStyle {
         fontWeight: FontWeight.w300,
         color: MyColors.activeTabBackground,
         height: 1.0,
+        letterSpacing: 0.0,
       );
 
   static TextStyle get contactDescription15Light => TextStyle(
-      fontFamily: "IRANSans",
-      fontSize: 15.sp,
-      fontWeight: FontWeight.w300,
-      color: MyColors.activeTabBackground,
-      height: 1.5,
-      letterSpacing: 1.0);
+        fontFamily: "IRANSans",
+        fontSize: 15.sp,
+        fontWeight: FontWeight.w300,
+        color: MyColors.activeTabBackground,
+        height: 1.0,
+        letterSpacing: 0.0,
+      );
 
   static TextStyle get paymentHistoryLabel14Light => TextStyle(
         fontFamily: "IRANSans",
