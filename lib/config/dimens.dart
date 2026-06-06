@@ -36,6 +36,8 @@ class Dimens {
   // Buttons
   static double get buttonHeight => nh(48.0);
   static double get buttonSmallHeight => nh(36.0);
+  static double get buttonMediumHeight => nh(54.0);
+  static double get buttonSmallWidth => nw(100.0);
   static double get loginButtonWidth => nw(156.0);
 
   // Specific

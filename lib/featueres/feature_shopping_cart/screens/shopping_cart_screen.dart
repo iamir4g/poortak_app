@@ -1073,11 +1073,32 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          '${l10n?.total_price} ${totalPrice.addComma}',
-                          style: TextStyle(
-                            fontSize: Dimens.nsp(18),
-                            fontWeight: FontWeight.bold,
+                        RichText(
+                          textAlign: TextAlign.center,
+                          text: TextSpan(
+                            style: DefaultTextStyle.of(context).style.copyWith(
+                                  color: isDark
+                                      ? MyColors.darkTextPrimary
+                                      : MyColors.textMatn1,
+                                  height: 1.0,
+                                ),
+                            // text: '${l10n?.total_price} ${totalPrice.addComma}',
+                            children: [
+                              TextSpan(
+                                text: totalPrice.addComma,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: Dimens.nsp(16),
+                                ),
+                              ),
+                              TextSpan(
+                                text: ' ${l10n?.toman ?? "تومان"}',
+                                style: TextStyle(
+                                  fontSize: Dimens.nsp(12),
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],

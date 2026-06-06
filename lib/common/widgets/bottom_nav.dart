@@ -207,7 +207,7 @@ class BottomNav extends StatelessWidget {
                 badgeStyle:
                     badges.BadgeStyle(badgeColor: MyColors.primaryShade2),
                 badgeContent: Text(cart.items.length.toString(),
-                    style: MyTextStyle.textMatn12W700),
+                    style: MyTextStyle.textBadge10W700),
                 child: _buildNavSvgIcon(
                   icon: icon,
                   color: iconColor,
@@ -226,7 +226,10 @@ class BottomNav extends StatelessWidget {
           if (cartState is LocalCartLoaded) {
             if (cartState.items.isNotEmpty) {
               return badges.Badge(
-                badgeContent: Text(cartState.items.length.toString()),
+                badgeStyle:
+                    badges.BadgeStyle(badgeColor: MyColors.primaryShade2),
+                badgeContent: Text(cartState.items.length.toString(),
+                    style: MyTextStyle.textBadge10W700),
                 child: _buildNavSvgIcon(
                   icon: icon,
                   color: iconColor,
@@ -245,6 +248,8 @@ class BottomNav extends StatelessWidget {
           if (cartState is LocalCartItemAdded) {
             if (cartState.items.isNotEmpty) {
               return badges.Badge(
+                badgeStyle:
+                    badges.BadgeStyle(badgeColor: MyColors.primaryShade2),
                 badgeContent: Text(cartState.items.length.toString()),
                 child: _buildNavSvgIcon(
                   icon: icon,
@@ -263,6 +268,8 @@ class BottomNav extends StatelessWidget {
           if (cartState is LocalCartItemRemoved) {
             if (cartState.items.isNotEmpty) {
               return badges.Badge(
+                badgeStyle:
+                    badges.BadgeStyle(badgeColor: MyColors.primaryShade2),
                 badgeContent: Text(cartState.items.length.toString()),
                 child: _buildNavSvgIcon(
                   icon: icon,

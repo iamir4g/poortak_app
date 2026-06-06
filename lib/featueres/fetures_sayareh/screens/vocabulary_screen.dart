@@ -42,10 +42,8 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
   final TTSService ttsService = locator<TTSService>();
   final StorageService storageService = locator<StorageService>();
   final PrefsOperator prefsOperator = locator<PrefsOperator>();
-  Timer? _litnerToastTimer;
-  bool _showLitnerToast = false;
-  String _litnerToastText = '';
-  bool _litnerToastShowCheck = false;
+  final LitnerResultToastController _litnerToastController =
+      LitnerResultToastController();
   @override
   void initState() {
     super.initState();
@@ -79,24 +77,6 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
           word: word,
           translation: translation,
         ));
-  }
-
-  void _showLitnerResultToast({
-    required String text,
-    required bool showCheck,
-  }) {
-    _litnerToastTimer?.cancel();
-    setState(() {
-      _showLitnerToast = true;
-      _litnerToastText = text;
-      _litnerToastShowCheck = showCheck;
-    });
-    _litnerToastTimer = Timer(const Duration(seconds: 2), () {
-      if (!mounted) return;
-      setState(() {
-        _showLitnerToast = false;
-      });
-    });
   }
 
   Future<void> _readWord(String word) async {
@@ -245,17 +225,17 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
       child: BlocListener<LitnerBloc, LitnerState>(
         listener: (context, state) {
           if (state is CreateWordSuccess) {
-            _showLitnerResultToast(
+            _litnerToastController.show(
               text: 'به لایتنر اضافه شد!',
-              showCheck: true,
+              showCheckIcon: true,
             );
           } else if (state is LitnerError) {
             final isWordExistsError =
                 state.message == "این کلمه قبلا اضافه شده";
             if (isWordExistsError) {
-              _showLitnerResultToast(
+              _litnerToastController.show(
                 text: 'این کلمه از قبل بوده',
-                showCheck: false,
+                showCheckIcon: false,
               );
             } else {
               ScaffoldMessenger.of(context).showSnackBar(
@@ -454,10 +434,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                                   ),
                                   isAddLoading: litnerState is LitnerLoading,
                                   iconColor: iconColor,
-                                  showLitnerToast: _showLitnerToast,
-                                  litnerToastText: _litnerToastText,
-                                  showLitnerToastCheckIcon:
-                                      _litnerToastShowCheck,
+                                  litnerToastController: _litnerToastController,
                                 );
                               },
                             ),
@@ -512,7 +489,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
 
   @override
   void dispose() {
-    _litnerToastTimer?.cancel();
+    _litnerToastController.dispose();
     super.dispose();
   }
 }

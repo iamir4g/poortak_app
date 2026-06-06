@@ -95,6 +95,12 @@ class MyTextStyle {
         fontWeight: FontWeight.bold,
         color: MyColors.textMatn1,
       );
+  static TextStyle get textBadge10W700 => TextStyle(
+        fontFamily: "IranSans",
+        fontSize: 10.sp,
+        fontWeight: FontWeight.bold,
+        color: MyColors.background,
+      );
   static TextStyle get textMatn12Bold => TextStyle(
         fontFamily: "IranSans",
         fontSize: 12.sp,

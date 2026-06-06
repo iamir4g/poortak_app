@@ -136,6 +136,7 @@ class MyColors {
   // Conversation (Dark Mode)
   static const Color conversationFirstPersonBubbleDark = Color(0xFF262556);
   static const Color conversationSecondPersonBubbleDark = Color(0xFF27221C);
+  static const Color conversationScreenBackgroundLight = Color(0xFFFFFFF8);
   static const Color conversationBubbleLeftLight = Color(0xFFE1E0FA);
   static const Color conversationBubbleRightLight = Color(0xFFFFEFDB);
   static const Color conversationSideCircleLeftLight = Color(0xFF7C79EC);

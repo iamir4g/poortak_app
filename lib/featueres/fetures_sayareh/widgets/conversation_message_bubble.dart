@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:lottie/lottie.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/common/utils/font_size_helper.dart';
 import 'package:poortak/config/dimens.dart';
@@ -31,6 +32,32 @@ class ConversationMessageBubble extends StatelessWidget {
     required this.showTranslations,
     required this.onTap,
   });
+
+  Widget _sideAvatar({
+    required bool isFirstPerson,
+    required Color backgroundColor,
+  }) {
+    final assetPath = isFirstPerson
+        ? 'assets/lottie/Talking_maya avatar.json'
+        : 'assets/lottie/talking-robot.json';
+
+    return SizedBox(
+      width: Dimens.nw(41),
+      height: Dimens.nh(41),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          shape: BoxShape.circle,
+        ),
+        child: ClipOval(
+          child: Lottie.asset(
+            assetPath,
+            fit: BoxFit.cover,
+          ),
+        ),
+      ),
+    );
+  }
 
   /// تجزیه متن به جملات
   List<String> _splitIntoSentences(String text) {
@@ -89,13 +116,9 @@ class ConversationMessageBubble extends StatelessWidget {
             textDirection: TextDirection.rtl,
             children: isFirstPerson
                 ? [
-                    Container(
-                      width: Dimens.nw(41),
-                      height: Dimens.nh(41),
-                      decoration: BoxDecoration(
-                        color: sideCircleColor,
-                        shape: BoxShape.circle,
-                      ),
+                    _sideAvatar(
+                      isFirstPerson: isFirstPerson,
+                      backgroundColor: sideCircleColor,
                     ),
                     SizedBox(width: Dimens.nw(8)),
                     ConstrainedBox(
@@ -217,13 +240,9 @@ class ConversationMessageBubble extends StatelessWidget {
                       ),
                     ),
                     SizedBox(width: Dimens.nw(8)),
-                    Container(
-                      width: Dimens.nw(41),
-                      height: Dimens.nh(41),
-                      decoration: BoxDecoration(
-                        color: sideCircleColor,
-                        shape: BoxShape.circle,
-                      ),
+                    _sideAvatar(
+                      isFirstPerson: isFirstPerson,
+                      backgroundColor: sideCircleColor,
                     ),
                   ],
           ),

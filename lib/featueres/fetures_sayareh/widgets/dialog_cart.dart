@@ -265,39 +265,53 @@ class _DialogCartState extends State<DialogCart> {
                 ),
                 Padding(
                     padding: EdgeInsets.symmetric(horizontal: Dimens.medium),
-                    child: TabBar(
-                        isScrollable: false,
-                        dividerHeight: 0.0,
-                        labelStyle: MyTextStyle.tabLabel16
-                            .copyWith(fontSize: Dimens.nsp(14.0)),
-                        labelPadding:
-                            EdgeInsets.symmetric(horizontal: Dimens.nw(4.0)),
-                        indicatorColor: Colors.transparent,
-                        labelColor: MyColors.textLight,
-                        unselectedLabelColor: MyColors.textSecondary,
-                        indicator: BoxDecoration(
-                          color: MyColors.darkBackground,
+                    child: SizedBox(
+                      height: Dimens.nh(40.0),
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: isDark
+                              ? Colors.transparent
+                              : MyColors.background3,
                           borderRadius: BorderRadius.circular(Dimens.nr(20.0)),
                         ),
-                        indicatorSize: TabBarIndicatorSize.tab,
-                        tabs: [
-                          Tab(
-                            child: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: Text(
-                                "خرید تکی",
-                              ),
+                        child: TabBar(
+                            isScrollable: false,
+                            dividerHeight: 0.0,
+                            labelStyle: MyTextStyle.tabLabel16
+                                .copyWith(fontSize: Dimens.nsp(14.0)),
+                            labelPadding: EdgeInsets.symmetric(
+                                horizontal: Dimens.nw(4.0)),
+                            indicatorColor: Colors.transparent,
+                            labelColor: MyColors.textLight,
+                            unselectedLabelColor: MyColors.textSecondary,
+                            indicator: BoxDecoration(
+                              color: isDark
+                                  ? MyColors.darkBackground
+                                  : MyColors.text1,
+                              borderRadius:
+                                  BorderRadius.circular(Dimens.nr(20.0)),
                             ),
-                          ),
-                          Tab(
-                            child: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: Text(
-                                "خرید مجموعه %",
+                            indicatorSize: TabBarIndicatorSize.tab,
+                            tabs: [
+                              Tab(
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(
+                                    "خرید تکی",
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                        ])),
+                              Tab(
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(
+                                    "خرید مجموعه %",
+                                  ),
+                                ),
+                              ),
+                            ]),
+                      ),
+                    )),
                 SizedBox(
                   height: Dimens.nh(16.0),
                 ),
@@ -366,6 +380,19 @@ class _DialogCartState extends State<DialogCart> {
                                         ),
                                       ),
                                       Positioned(
+                                          bottom: Dimens.nh(5),
+                                          right: Dimens.small,
+                                          child: SvgPicture.asset(
+                                            'assets/images/icons/carbon--play-outline.svg',
+                                            width: Dimens.nw(18.0),
+                                            height: Dimens.nh(18.0),
+                                            fit: BoxFit.contain,
+                                            colorFilter: const ColorFilter.mode(
+                                              MyColors.textLight,
+                                              BlendMode.srcIn,
+                                            ),
+                                          )),
+                                      Positioned(
                                         bottom: Dimens.nh(5.0),
                                         left: Dimens.small,
                                         child: Container(
@@ -422,8 +449,17 @@ class _DialogCartState extends State<DialogCart> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: [
+                                        Image.asset(
+                                          'assets/images/lock_image.png',
+                                          width: Dimens.nw(18.0),
+                                          height: Dimens.nh(18.0),
+                                          fit: BoxFit.contain,
+                                        ),
+                                        SizedBox(
+                                          width: Dimens.nw(4.0),
+                                        ),
                                         Text(
-                                          widget.item.name,
+                                          "${widget.item.name} انیمیشن سیاره آی‌نو",
                                           style: MyTextStyle.textMatn12W500,
                                           maxLines: 2,
                                           overflow: TextOverflow.ellipsis,
@@ -605,15 +641,18 @@ class _DialogCartState extends State<DialogCart> {
                                                   child: SizedBox(
                                                     width: Dimens.nw(30.0),
                                                     height: Dimens.nh(30.0),
-                                                    child: SvgPicture.asset(
-                                                      'assets/images/icons/arcticons--pdf-viewer.svg',
-                                                      width: Dimens.nw(30.0),
-                                                      height: Dimens.nh(30.0),
-                                                      colorFilter:
-                                                          const ColorFilter
-                                                              .mode(
-                                                        MyColors.textLight,
-                                                        BlendMode.srcIn,
+                                                    child: Transform.scale(
+                                                      scale: 1.12,
+                                                      child: SvgPicture.asset(
+                                                        'assets/images/icons/arcticons--pdf-viewer.svg',
+                                                        width: Dimens.nw(30.0),
+                                                        height: Dimens.nh(30.0),
+                                                        colorFilter:
+                                                            const ColorFilter
+                                                                .mode(
+                                                          MyColors.textLight,
+                                                          BlendMode.srcIn,
+                                                        ),
                                                       ),
                                                     ),
                                                   )),

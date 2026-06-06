@@ -11,10 +11,6 @@ import 'package:poortak/common/services/tts_service.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/conversation_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/converstion_bloc/converstion_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/widgets/conversation_message_bubble.dart';
-// import 'package:poortak/featueres/fetures_sayareh/data/models/conversation_model.dart';
-// import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/converstion_bloc.dart';
-// import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/converstion_event.dart';
-// import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/converstion_state.dart';
 
 /// صفحه نمایش مکالمه بین دو شخص
 /// این صفحه لیستی از پیام‌های مکالمه را نمایش می‌دهد و امکان پخش صوتی و نمایش ترجمه را فراهم می‌کند
@@ -331,8 +327,9 @@ class _ConversationScreenState extends State<ConversationScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final pageBackgroundColor =
-        isDark ? MyColors.profileBackgroundDark : MyColors.secondaryTint4;
+    final pageBackgroundColor = isDark
+        ? MyColors.profileBackgroundDark
+        : MyColors.conversationScreenBackgroundLight;
     final headerBackgroundColor =
         isDark ? MyColors.darkBackgroundSecondary : Colors.white;
     final primaryTextColor =
@@ -579,7 +576,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
                 return ListView.builder(
                   controller: _scrollController,
-                  padding: EdgeInsets.all(16.r),
+                  // padding: EdgeInsets.all(2.r),
                   itemCount: sortedMessages?.length ?? 0,
                   itemBuilder: (context, index) {
                     final message = sortedMessages![index];

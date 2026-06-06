@@ -58,9 +58,14 @@ class InvoiceSummaryCard extends StatelessWidget {
               ),
               child: _InvoiceRow(
                 label: 'صورت حساب',
-                value: '${subTotal.addComma} تومان',
+                amount: subTotal,
+                unit: 'تومان',
                 labelStyle: labelStyle,
-                valueStyle: valueStyle,
+                amountStyle: valueStyle,
+                unitStyle: valueStyle.copyWith(
+                  fontSize: Dimens.nsp(12),
+                  fontWeight: FontWeight.w400,
+                ),
               ),
             ),
             SizedBox(height: Dimens.nh(12)),
@@ -76,9 +81,14 @@ class InvoiceSummaryCard extends StatelessWidget {
               ),
               child: _InvoiceRow(
                 label: 'تخفیف',
-                value: '${discount.addComma} تومان',
+                amount: discount,
+                unit: 'تومان',
                 labelStyle: labelStyle,
-                valueStyle: discountValueStyle,
+                amountStyle: discountValueStyle,
+                unitStyle: discountValueStyle.copyWith(
+                  fontSize: Dimens.nsp(12),
+                  fontWeight: FontWeight.w400,
+                ),
               ),
             ),
             SizedBox(height: Dimens.nh(12)),
@@ -94,9 +104,14 @@ class InvoiceSummaryCard extends StatelessWidget {
               ),
               child: _InvoiceRow(
                 label: 'مبلغ قابل پرداخت',
-                value: '${payable.addComma} تومان',
+                amount: payable,
+                unit: 'تومان',
                 labelStyle: labelStyle,
-                valueStyle: valueStyle,
+                amountStyle: valueStyle,
+                unitStyle: valueStyle.copyWith(
+                  fontSize: Dimens.nsp(12),
+                  fontWeight: FontWeight.w400,
+                ),
               ),
             ),
           ],
@@ -108,15 +123,19 @@ class InvoiceSummaryCard extends StatelessWidget {
 
 class _InvoiceRow extends StatelessWidget {
   final String label;
-  final String value;
+  final int amount;
+  final String unit;
   final TextStyle labelStyle;
-  final TextStyle valueStyle;
+  final TextStyle amountStyle;
+  final TextStyle unitStyle;
 
   const _InvoiceRow({
     required this.label,
-    required this.value,
+    required this.amount,
+    required this.unit,
     required this.labelStyle,
-    required this.valueStyle,
+    required this.amountStyle,
+    required this.unitStyle,
   });
 
   @override
@@ -126,7 +145,16 @@ class _InvoiceRow extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(label, style: labelStyle),
-        Text(value, style: valueStyle),
+        RichText(
+          textDirection: TextDirection.rtl,
+          text: TextSpan(
+            style: amountStyle.copyWith(height: 1.0),
+            children: [
+              TextSpan(text: amount.addComma),
+              TextSpan(text: ' $unit', style: unitStyle.copyWith(height: 1.0)),
+            ],
+          ),
+        ),
       ],
     );
   }

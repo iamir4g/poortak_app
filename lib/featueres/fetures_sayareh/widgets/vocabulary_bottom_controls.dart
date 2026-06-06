@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -12,9 +14,7 @@ class VocabularyBottomControls extends StatelessWidget {
   final VoidCallback onAddToLitner;
   final bool isAddLoading;
   final Color iconColor;
-  final bool showLitnerToast;
-  final String litnerToastText;
-  final bool showLitnerToastCheckIcon;
+  final LitnerResultToastController? litnerToastController;
 
   const VocabularyBottomControls({
     super.key,
@@ -24,9 +24,7 @@ class VocabularyBottomControls extends StatelessWidget {
     required this.onAddToLitner,
     required this.isAddLoading,
     required this.iconColor,
-    required this.showLitnerToast,
-    required this.litnerToastText,
-    required this.showLitnerToastCheckIcon,
+    this.litnerToastController,
   });
 
   @override
@@ -36,9 +34,6 @@ class VocabularyBottomControls extends StatelessWidget {
         ? MyColors.darkBackgroundSecondary
         : MyColors.modalHeaderBackground;
     final circleBgPressed = isDark ? MyColors.darkBorder : MyColors.text2;
-    final litnerIconPath = isDark
-        ? 'assets/images/litner/icon_add_litner_touched.png'
-        : 'assets/images/litner/icon_add_litner.png';
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -49,7 +44,7 @@ class VocabularyBottomControls extends StatelessWidget {
           icon: Icon(Icons.arrow_back, color: iconColor),
           iconSize: 32.r,
         ),
-        _PressableCircle(
+        PressableCircle(
           enabled: true,
           backgroundColor: circleBg,
           pressedBackgroundColor: circleBgPressed,
@@ -64,30 +59,13 @@ class VocabularyBottomControls extends StatelessWidget {
             ),
           ),
         ),
-        _LitnerButtonWithToast(
-          showToast: showLitnerToast,
-          toastText: litnerToastText,
-          showCheckIcon: showLitnerToastCheckIcon,
+        LitnerAddCircleButton(
+          toastController: litnerToastController,
           enabled: !isAddLoading,
-          circleBg: circleBg,
-          circleBgPressed: circleBgPressed,
+          backgroundColor: circleBg,
+          pressedBackgroundColor: circleBgPressed,
           onTap: onAddToLitner,
-          child: isAddLoading
-              ? SizedBox(
-                  width: 20.w,
-                  height: 20.h,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2.w,
-                    valueColor:
-                        const AlwaysStoppedAnimation<Color>(MyColors.primary),
-                  ),
-                )
-              : Image.asset(
-                  litnerIconPath,
-                  width: Dimens.nr(26),
-                  height: Dimens.nr(26),
-                  fit: BoxFit.contain,
-                ),
+          isLoading: isAddLoading,
         ),
         IconButton(
           onPressed: onPrevious,
@@ -99,102 +77,86 @@ class VocabularyBottomControls extends StatelessWidget {
   }
 }
 
-class _LitnerButtonWithToast extends StatelessWidget {
-  final bool showToast;
-  final String toastText;
-  final bool showCheckIcon;
-  final bool enabled;
-  final Color circleBg;
-  final Color circleBgPressed;
-  final VoidCallback onTap;
-  final Widget child;
+class LitnerResultToastController extends ChangeNotifier {
+  bool _visible = false;
+  String _text = '';
+  bool _showCheckIcon = false;
+  Timer? _timer;
 
-  const _LitnerButtonWithToast({
-    required this.showToast,
-    required this.toastText,
+  bool get visible => _visible;
+  String get text => _text;
+  bool get showCheckIcon => _showCheckIcon;
+
+  void show({
+    required String text,
+    required bool showCheckIcon,
+    Duration duration = const Duration(seconds: 2),
+  }) {
+    _timer?.cancel();
+    _visible = true;
+    _text = text;
+    _showCheckIcon = showCheckIcon;
+    notifyListeners();
+    _timer = Timer(duration, () {
+      _visible = false;
+      notifyListeners();
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+}
+
+class LitnerResultToast extends StatelessWidget {
+  final String text;
+  final bool showCheckIcon;
+
+  const LitnerResultToast({
+    super.key,
+    required this.text,
     required this.showCheckIcon,
-    required this.enabled,
-    required this.circleBg,
-    required this.circleBgPressed,
-    required this.onTap,
-    required this.child,
   });
 
   @override
   Widget build(BuildContext context) {
     final toastBg = const Color(0xFFF6F5F5);
     final toastTextColor = MyColors.text1;
-    final circleSize = Dimens.nr(60);
-    final toastWidth = Dimens.nw(129);
-    final toastHeight = Dimens.nh(40);
-    final toastGap = Dimens.nh(8);
-    final toastLeft = (circleSize - toastWidth) / 2;
 
-    return SizedBox(
-      width: circleSize,
-      height: circleSize,
-      child: Stack(
-        clipBehavior: Clip.none,
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: toastBg,
+        borderRadius: BorderRadius.circular(Dimens.nr(10)),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        textDirection: TextDirection.rtl,
         children: [
-          Positioned(
-            left: toastLeft,
-            top: -(toastHeight + toastGap),
-            child: AnimatedOpacity(
-              opacity: showToast ? 1.0 : 0.0,
-              duration: const Duration(milliseconds: 160),
-              child: IgnorePointer(
-                ignoring: !showToast,
-                child: SizedBox(
-                  width: toastWidth,
-                  height: toastHeight,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: toastBg,
-                      borderRadius: BorderRadius.circular(Dimens.nr(10)),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      textDirection: TextDirection.rtl,
-                      children: [
-                        if (showCheckIcon) ...[
-                          Image.asset(
-                            'assets/images/litner/check 20 1.png',
-                            width: Dimens.nr(20),
-                            height: Dimens.nr(20),
-                            fit: BoxFit.contain,
-                          ),
-                          SizedBox(width: Dimens.nw(6)),
-                        ],
-                        Flexible(
-                          child: Text(
-                            toastText,
-                            style: MyTextStyle.textMatn10W300.copyWith(
-                              fontFamily: 'IRANSans',
-                              fontWeight: FontWeight.w500,
-                              fontSize: 10.sp,
-                              color: toastTextColor,
-                              height: 1.0,
-                              letterSpacing: 0.0,
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+          if (showCheckIcon) ...[
+            Image.asset(
+              'assets/images/litner/check 20 1.png',
+              width: Dimens.nr(20),
+              height: Dimens.nr(20),
+              fit: BoxFit.contain,
             ),
-          ),
-          Positioned.fill(
-            child: _PressableCircle(
-              enabled: enabled,
-              backgroundColor: circleBg,
-              pressedBackgroundColor: circleBgPressed,
-              onTap: onTap,
-              child: child,
+            SizedBox(width: Dimens.nw(6)),
+          ],
+          Flexible(
+            child: Text(
+              text,
+              style: MyTextStyle.textMatn10W300.copyWith(
+                fontFamily: 'IRANSans',
+                fontWeight: FontWeight.w500,
+                fontSize: 10.sp,
+                color: toastTextColor,
+                height: 1.0,
+                letterSpacing: 0.0,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
             ),
           ),
         ],
@@ -203,7 +165,178 @@ class _LitnerButtonWithToast extends StatelessWidget {
   }
 }
 
-class _PressableCircle extends StatefulWidget {
+class LitnerToastAnchor extends StatelessWidget {
+  final LitnerResultToastController? controller;
+  final Widget child;
+  final double size;
+
+  const LitnerToastAnchor({
+    super.key,
+    required this.child,
+    this.controller,
+    double? size,
+  }) : size = size ?? 60;
+
+  @override
+  Widget build(BuildContext context) {
+    final circleSize = Dimens.nr(size);
+    final toastWidth = Dimens.nw(129);
+    final toastHeight = Dimens.nh(40);
+    final toastGap = Dimens.nh(8);
+    final toastLeft = (circleSize - toastWidth) / 2;
+
+    final controller = this.controller;
+    if (controller == null) {
+      return SizedBox(
+        width: circleSize,
+        height: circleSize,
+        child: child,
+      );
+    }
+
+    return SizedBox(
+      width: circleSize,
+      height: circleSize,
+      child: AnimatedBuilder(
+        animation: controller,
+        builder: (context, _) {
+          final visible = controller.visible;
+          return Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Positioned(
+                left: toastLeft,
+                top: -(toastHeight + toastGap),
+                child: AnimatedOpacity(
+                  opacity: visible ? 1.0 : 0.0,
+                  duration: const Duration(milliseconds: 160),
+                  child: IgnorePointer(
+                    ignoring: !visible,
+                    child: SizedBox(
+                      width: toastWidth,
+                      height: toastHeight,
+                      child: LitnerResultToast(
+                        text: controller.text,
+                        showCheckIcon: controller.showCheckIcon,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Positioned.fill(child: child),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+class LitnerAddButtonContent extends StatelessWidget {
+  final bool isLoading;
+  final double iconSize;
+
+  const LitnerAddButtonContent({
+    super.key,
+    required this.isLoading,
+    double? iconSize,
+  }) : iconSize = iconSize ?? 26;
+
+  @override
+  Widget build(BuildContext context) {
+    if (isLoading) {
+      return SizedBox(
+        width: 20.w,
+        height: 20.h,
+        child: CircularProgressIndicator(
+          strokeWidth: 2.w,
+          valueColor: const AlwaysStoppedAnimation<Color>(MyColors.primary),
+        ),
+      );
+    }
+
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final litnerIconPath = isDark
+        ? 'assets/images/litner/icon_add_litner_touched.png'
+        : 'assets/images/litner/icon_add_litner.png';
+
+    return Image.asset(
+      litnerIconPath,
+      width: Dimens.nr(iconSize),
+      height: Dimens.nr(iconSize),
+      fit: BoxFit.contain,
+    );
+  }
+}
+
+class LitnerAddCircleButton extends StatelessWidget {
+  final LitnerResultToastController? toastController;
+  final bool enabled;
+  final bool isLoading;
+  final Color backgroundColor;
+  final Color pressedBackgroundColor;
+  final VoidCallback onTap;
+
+  const LitnerAddCircleButton({
+    super.key,
+    this.toastController,
+    required this.enabled,
+    required this.isLoading,
+    required this.backgroundColor,
+    required this.pressedBackgroundColor,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return LitnerToastAnchor(
+      controller: toastController,
+      child: PressableCircle(
+        enabled: enabled,
+        backgroundColor: backgroundColor,
+        pressedBackgroundColor: pressedBackgroundColor,
+        onTap: onTap,
+        child: LitnerAddButtonContent(isLoading: isLoading),
+      ),
+    );
+  }
+}
+
+class LitnerAddIconButton extends StatelessWidget {
+  final LitnerResultToastController? toastController;
+  final bool enabled;
+  final bool isLoading;
+  final VoidCallback onPressed;
+  final double iconSize;
+
+  const LitnerAddIconButton({
+    super.key,
+    this.toastController,
+    required this.enabled,
+    required this.isLoading,
+    required this.onPressed,
+    double? iconSize,
+  }) : iconSize = iconSize ?? 32;
+
+  @override
+  Widget build(BuildContext context) {
+    return LitnerToastAnchor(
+      controller: toastController,
+      child: Center(
+        child: IconButton(
+          onPressed: enabled ? onPressed : null,
+          icon: LitnerAddButtonContent(
+            isLoading: isLoading,
+            iconSize: iconSize,
+          ),
+          iconSize: iconSize.r,
+        ),
+      ),
+    );
+  }
+}
+
+class PressableCircle extends StatefulWidget {
   final bool enabled;
   final Color backgroundColor;
   final Color pressedBackgroundColor;
@@ -211,7 +344,7 @@ class _PressableCircle extends StatefulWidget {
   final Widget? child;
   final Widget Function(Color foreground)? childBuilder;
 
-  const _PressableCircle({
+  const PressableCircle({
     required this.enabled,
     required this.backgroundColor,
     required this.pressedBackgroundColor,
@@ -221,10 +354,10 @@ class _PressableCircle extends StatefulWidget {
   }) : assert(child != null || childBuilder != null);
 
   @override
-  State<_PressableCircle> createState() => _PressableCircleState();
+  State<PressableCircle> createState() => _PressableCircleState();
 }
 
-class _PressableCircleState extends State<_PressableCircle> {
+class _PressableCircleState extends State<PressableCircle> {
   bool _pressed = false;
 
   void _setPressed(bool value) {

@@ -107,3 +107,76 @@ class _QuizAnswerItemState extends State<QuizAnswerItem> {
     );
   }
 }
+
+class PressableAnswerOptionButton extends StatefulWidget {
+  final String text;
+  final VoidCallback onTap;
+  final bool enabled;
+
+  const PressableAnswerOptionButton({
+    super.key,
+    required this.text,
+    required this.onTap,
+    this.enabled = true,
+  });
+
+  @override
+  State<PressableAnswerOptionButton> createState() =>
+      _PressableAnswerOptionButtonState();
+}
+
+class _PressableAnswerOptionButtonState extends State<PressableAnswerOptionButton> {
+  bool _pressed = false;
+
+  void _setPressed(bool value) {
+    if (_pressed == value) return;
+    setState(() {
+      _pressed = value;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final normalBg =
+        isDark ? MyColors.darkBackgroundSecondary : const Color(0xFFF3F5F7);
+    final pressedBg = isDark ? MyColors.darkBorder : const Color(0xFF3D495C);
+    final normalFg =
+        isDark ? MyColors.profileTextPrimaryDark : const Color(0xFF3D495C);
+    final pressedFg = Colors.white;
+
+    final bg = _pressed ? pressedBg : normalBg;
+    final fg = _pressed ? pressedFg : normalFg;
+
+    return SizedBox(
+      height: 56.h,
+      child: Material(
+        color: bg,
+        borderRadius: BorderRadius.circular(16.r),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16.r),
+          onTap: widget.enabled ? widget.onTap : null,
+          onTapDown: widget.enabled ? (_) => _setPressed(true) : null,
+          onTapCancel: widget.enabled ? () => _setPressed(false) : null,
+          onTapUp: widget.enabled ? (_) => _setPressed(false) : null,
+          child: Center(
+            child: Opacity(
+              opacity: widget.enabled ? 1.0 : 0.6,
+              child: Text(
+                widget.text,
+                style: TextStyle(
+                  fontFamily: 'IRANSans',
+                  fontWeight: FontWeight.w700,
+                  fontSize: 14.sp,
+                  color: fg,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
