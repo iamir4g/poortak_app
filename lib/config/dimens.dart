@@ -43,5 +43,5 @@ class Dimens {
   // Specific
   static double get cardElevation => nr(4.0);
   static double get dividerHeight => nh(1.0);
-  static double get bottomNavHeight => nh(70.0);
+  static double get bottomNavHeight => nh(78.0);
 }

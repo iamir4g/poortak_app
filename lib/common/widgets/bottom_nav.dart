@@ -86,7 +86,7 @@ class BottomNav extends StatelessWidget {
                 EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
             child: Container(
               height: Dimens.bottomNavHeight,
-              padding: EdgeInsets.only(bottom: 8.h),
+              padding: EdgeInsets.symmetric(vertical: 6.h),
               child: BlocBuilder<BottomNavCubit, int>(
                 builder: (context, state) {
                   return Row(
@@ -325,60 +325,63 @@ class BottomNav extends StatelessWidget {
               onTap: () => onTabSelected(index),
               splashColor: MyColors.primary.withOpacity(0.08),
               highlightColor: MyColors.primary.withOpacity(0.04),
-              child: SizedBox(
-                height: 70.h,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    AnimatedScale(
-                      scale: isSelected ? 1.05 : 1.0,
-                      duration: _navAnimationDuration,
-                      curve: Curves.easeOutCubic,
-                      child: TweenAnimationBuilder<Color?>(
-                        tween: ColorTween(
-                          end: isSelected ? MyColors.primary : unselectedColor,
-                        ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    height: Dimens.iconMedium + 4.h,
+                    child: Center(
+                      child: AnimatedScale(
+                        scale: isSelected ? 1.05 : 1.0,
                         duration: _navAnimationDuration,
                         curve: Curves.easeOutCubic,
-                        builder: (context, color, child) {
-                          return _buildIcon(
-                            context: context,
-                            index: index,
-                            state: state,
-                            icon: icon,
-                            isSelected: isSelected,
-                            themeState: themeState,
-                            iconColor: color ?? unselectedColor,
-                          );
-                        },
+                        child: TweenAnimationBuilder<Color?>(
+                          tween: ColorTween(
+                            end:
+                                isSelected ? MyColors.primary : unselectedColor,
+                          ),
+                          duration: _navAnimationDuration,
+                          curve: Curves.easeOutCubic,
+                          builder: (context, color, child) {
+                            return _buildIcon(
+                              context: context,
+                              index: index,
+                              state: state,
+                              icon: icon,
+                              isSelected: isSelected,
+                              themeState: themeState,
+                              iconColor: color ?? unselectedColor,
+                            );
+                          },
+                        ),
                       ),
                     ),
-                    SizedBox(
-                      height: 14.h,
+                  ),
+                  SizedBox(
+                    height: 18.h,
+                    child: Center(
                       child: AnimatedOpacity(
                         opacity: isSelected ? 1.0 : 0.0,
                         duration: _navAnimationDuration,
                         curve: Curves.easeOutCubic,
-                        child: Padding(
-                          padding: EdgeInsets.only(top: 4.h),
-                          child: Text(
-                            label,
-                            style: TextStyle(
-                              fontFamily: 'IRANSans',
-                              fontWeight: FontWeight.bold,
-                              fontSize: 9.sp,
-                              color: MyColors.primary,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                        child: Text(
+                          label,
+                          style: TextStyle(
+                            fontFamily: 'IRANSans',
+                            fontWeight: FontWeight.bold,
+                            fontSize: 9.sp,
+                            height: 1.2,
+                            color: MyColors.primary,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.center,
                         ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),

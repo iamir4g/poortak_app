@@ -26,7 +26,7 @@ class ProfileRepository {
           response.data['ok'] == true) {
         final AuthRequestOtpModel requestOtpModel =
             AuthRequestOtpModel.fromJson(response.data);
-        log("Repository Success - Parsed Model: ${requestOtpModel.data.result.otp}");
+        log("Repository Success - OTP length: ${requestOtpModel.data.result.otpLength}, message: ${requestOtpModel.message}");
         return DataSuccess(requestOtpModel);
       } else {
         log("Repository Error - Status: ${response.statusCode}, Data: ${response.data}");

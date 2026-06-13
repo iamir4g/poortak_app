@@ -12,20 +12,10 @@ class AuthService {
       : _dio = dio,
         _prefsOperator = locator<PrefsOperator>();
 
-  /// Makes an authenticated API request with automatic token handling
+  /// Makes an authenticated API request with automatic token handling.
   ///
-  /// This method:
-  /// - Gets the user token from preferences
-  /// - Sets the Authorization header
-  /// - Handles only 401 responses by clearing the token and throwing UnauthorisedException
-  /// - Re-throws other DioExceptions
-  ///
-  /// Usage:
-  /// ```dart
-  /// final response = await authService.makeAuthenticatedRequest(
-  ///   () => dio.get('/api/endpoint')
-  /// );
-  /// ```
+  /// Token refresh on 401 is handled globally by [AuthInterceptor].
+  /// This method only throws [UnauthorisedException] when refresh also fails.
   Future<Response> makeAuthenticatedRequest(
       Future<Response> Function() request) async {
     log("🔐 Setting up authenticated request...");
@@ -54,9 +44,7 @@ class AuthService {
       log("   Error message: ${e.message}");
 
       if (e.response?.statusCode == 401) {
-        log("🔐 Authentication failed - clearing token and throwing UnauthorisedException");
-        // Clear token and throw unauthorized exception
-        await _prefsOperator.logout();
+        log("🔐 Authentication failed after token refresh attempt");
         throw UnauthorisedException(
             message: 'Session expired. Please login again.');
       }

@@ -565,15 +565,22 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           );
         } else if (state is ProfileSuccessRequestOtp) {
-          log("success request otp");
-          log(state.data.data.result.otp);
-          // ScaffoldMessenger.of(context).showSnackBar(
-          //   SnackBar(
-          //     content: Text('کد تایید: ${state.data.data.result.otp}'),
-          //     backgroundColor: MyColors.success,
-          //     duration: const Duration(seconds: 5),
-          //   ),
-          // );
+          log("success request otp - length: ${state.data.data.result.otpLength}");
+          final feedbackMessage =
+              state.data.message ?? 'کد تایید ارسال شد';
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                feedbackMessage,
+                style: MyTextStyle.textMatn13.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              backgroundColor: MyColors.success,
+              duration: const Duration(seconds: 2),
+            ),
+          );
           setState(() {
             showOtpForm = true;
             mobileNumber = _mobileController.text;

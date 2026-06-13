@@ -11,6 +11,7 @@ import 'package:poortak/featueres/fetures_sayareh/widgets/item_question.dart';
 import 'package:poortak/common/widgets/reusable_modal.dart';
 import 'package:poortak/locator.dart';
 import 'package:poortak/featueres/fetures_sayareh/repositories/sayareh_repository.dart';
+import 'package:poortak/featueres/fetures_sayareh/screens/quizzes_screen.dart';
 
 class QuizScreen extends StatefulWidget {
   static const routeName = "/quiz";
@@ -37,6 +38,8 @@ class _QuizScreenState extends State<QuizScreen> {
   bool isCorrectAnswer = false;
   bool isWrongSelected = false;
   late QuizesQuestion currentQuestion;
+  bool _isExitDialogOpen = false;
+  bool _canPop = false;
 
   @override
   void initState() {
@@ -45,7 +48,33 @@ class _QuizScreenState extends State<QuizScreen> {
     currentQuestion = widget.initialQuestion;
   }
 
+  Future<void> _leaveQuiz() async {
+    try {
+      await locator<SayarehRepository>()
+          .deleteQuizResult(widget.courseId, widget.quizId);
+    } catch (_) {
+      // Still leave the quiz even if delete fails.
+    }
+
+    if (!mounted) return;
+    _navigateBackToQuizList();
+  }
+
+  void _navigateBackToQuizList() {
+    setState(() => _canPop = true);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      Navigator.of(context).popUntil(
+        (route) =>
+            route.settings.name == QuizzesScreen.routeName || route.isFirst,
+      );
+    });
+  }
+
   void _showExitModal() {
+    if (_isExitDialogOpen) return;
+    _isExitDialogOpen = true;
+
     ReusableModal.show(
       context: context,
       title: 'ترک آزمون',
@@ -55,16 +84,15 @@ class _QuizScreenState extends State<QuizScreen> {
       buttonText: 'ماندن',
       secondButtonText: 'ترک آزمون',
       showSecondButton: true,
+      barrierDismissible: false,
       onButtonPressed: () {
-        Navigator.of(context).pop(); // Close modal
+        _isExitDialogOpen = false;
+        Navigator.of(context, rootNavigator: true).pop();
       },
-      onSecondButtonPressed: () async {
-        Navigator.of(context).pop(); // Close modal
-        // Call delete API
-        await locator<SayarehRepository>()
-            .deleteQuizResult(widget.courseId, widget.quizId);
-        if (!mounted) return;
-        Navigator.of(context).pop(); // Exit quiz screen
+      onSecondButtonPressed: () {
+        _isExitDialogOpen = false;
+        Navigator.of(context, rootNavigator: true).pop();
+        _leaveQuiz();
       },
     );
   }
@@ -78,7 +106,13 @@ class _QuizScreenState extends State<QuizScreen> {
         isDark ? MyColors.darkBackgroundSecondary : Colors.white;
     final primaryTextColor =
         isDark ? MyColors.profileTextPrimaryDark : MyColors.text2;
-    return Scaffold(
+    return PopScope(
+      canPop: _canPop,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        _showExitModal();
+      },
+      child: Scaffold(
       backgroundColor: pageBackgroundColor,
       body: SafeArea(
         child: Column(
@@ -483,6 +517,7 @@ class _QuizScreenState extends State<QuizScreen> {
           ],
         ),
       ),
+    ),
     );
   }
 }
