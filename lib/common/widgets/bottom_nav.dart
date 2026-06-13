@@ -17,8 +17,15 @@ import '../blocs/bottom_nav_cubit/bottom_nav_cubit.dart';
 
 class BottomNav extends StatelessWidget {
   final PageController controller;
+  final ValueChanged<int> onTabSelected;
 
-  const BottomNav({super.key, required this.controller});
+  const BottomNav({
+    super.key,
+    required this.controller,
+    required this.onTabSelected,
+  });
+
+  static const _navAnimationDuration = Duration(milliseconds: 250);
 
   static const Map<String, String> _navIconAssets = {
     'mage:video-player': 'assets/images/icons/mage--video-player.svg',
@@ -92,7 +99,7 @@ class BottomNav extends StatelessWidget {
                         index: 0,
                         icon: "mage:video-player",
                         label: 'سیاره آینو',
-                        controller: controller,
+                        onTabSelected: onTabSelected,
                       ),
                       _buildNavItem(
                         context: context,
@@ -100,7 +107,7 @@ class BottomNav extends StatelessWidget {
                         index: 1,
                         icon: "mage:search", //mdi:text-box-search-outline
                         label: 'کاوش',
-                        controller: controller,
+                        onTabSelected: onTabSelected,
                         // useCustomIcon: false,
                       ),
                       _buildNavItem(
@@ -110,7 +117,7 @@ class BottomNav extends StatelessWidget {
                         label: 'سبد خرید',
                         icon:
                             "hugeicons:shopping-cart-02", //"mage:shopping-cart",
-                        controller: controller,
+                        onTabSelected: onTabSelected,
                         // useCustomIcon: false,
                         // materialIcon: Icons.shopping_cart_outlined,
                       ),
@@ -120,7 +127,7 @@ class BottomNav extends StatelessWidget {
                         index: 3,
                         label: 'لایتنر',
                         icon: "hugeicons:book-open-02", //"mage:book",
-                        controller: controller,
+                        onTabSelected: onTabSelected,
                         // useCustomIcon: false,
                         // materialIcon: Icons.folder_outlined,
                       ),
@@ -129,7 +136,7 @@ class BottomNav extends StatelessWidget {
                         state: state,
                         index: 4,
                         label: 'پروفایل',
-                        controller: controller,
+                        onTabSelected: onTabSelected,
                         icon: "mynaui:user-square", //"mage:user",
                         // useCustomIcon: false,
                         // materialIcon: Icons.account_box_outlined,
@@ -152,6 +159,7 @@ class BottomNav extends StatelessWidget {
     required String icon,
     required bool isSelected,
     required ThemeState themeState,
+    required Color iconColor,
   }) {
     // برای کاوش (index 1) و لایتنر (index 3) از تصویر استفاده می‌کنیم
     if (index == 1 || index == 3) {
@@ -163,16 +171,10 @@ class BottomNav extends StatelessWidget {
         imagePath,
         width: Dimens.iconMedium,
         height: Dimens.iconMedium,
-        color: isSelected
-            ? MyColors.primary
-            : (themeState.isDark ? MyColors.darkTextSecondary : Colors.grey),
+        color: iconColor,
         colorBlendMode: BlendMode.srcIn,
       );
     }
-
-    Color iconColor = isSelected
-        ? MyColors.primary
-        : (themeState.isDark ? MyColors.darkTextSecondary : Colors.grey);
 
     if (index == 2) {
       // برای سبد خرید با badge
@@ -306,54 +308,77 @@ class BottomNav extends StatelessWidget {
     required int state,
     required int index,
     required String label,
-    required PageController controller,
+    required ValueChanged<int> onTabSelected,
     String icon = "",
   }) {
     return BlocBuilder<ThemeCubit, ThemeState>(
       builder: (context, themeState) {
         final isSelected = state == index;
+        final unselectedColor = themeState.isDark
+            ? MyColors.darkTextSecondary
+            : Colors.grey;
+
         return Expanded(
-          child: InkWell(
-            onTap: () {
-              BlocProvider.of<BottomNavCubit>(context)
-                  .changeSelectedIndex(index);
-              controller.animateToPage(
-                index,
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeInOut,
-              );
-            },
-            child: SizedBox(
-              height: 70.h,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  _buildIcon(
-                    context: context,
-                    index: index,
-                    state: state,
-                    icon: icon,
-                    isSelected: isSelected,
-                    themeState: themeState,
-                  ),
-                  if (state == index)
-                    Padding(
-                      padding: EdgeInsets.only(top: 4.h),
-                      child: Text(
-                        label,
-                        style: TextStyle(
-                          fontFamily: 'IRANSans',
-                          fontWeight: FontWeight.bold,
-                          fontSize: 9.sp,
-                          color: MyColors.primary,
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () => onTabSelected(index),
+              splashColor: MyColors.primary.withOpacity(0.08),
+              highlightColor: MyColors.primary.withOpacity(0.04),
+              child: SizedBox(
+                height: 70.h,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    AnimatedScale(
+                      scale: isSelected ? 1.05 : 1.0,
+                      duration: _navAnimationDuration,
+                      curve: Curves.easeOutCubic,
+                      child: TweenAnimationBuilder<Color?>(
+                        tween: ColorTween(
+                          end: isSelected ? MyColors.primary : unselectedColor,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.visible,
+                        duration: _navAnimationDuration,
+                        curve: Curves.easeOutCubic,
+                        builder: (context, color, child) {
+                          return _buildIcon(
+                            context: context,
+                            index: index,
+                            state: state,
+                            icon: icon,
+                            isSelected: isSelected,
+                            themeState: themeState,
+                            iconColor: color ?? unselectedColor,
+                          );
+                        },
                       ),
                     ),
-                ],
+                    SizedBox(
+                      height: 14.h,
+                      child: AnimatedOpacity(
+                        opacity: isSelected ? 1.0 : 0.0,
+                        duration: _navAnimationDuration,
+                        curve: Curves.easeOutCubic,
+                        child: Padding(
+                          padding: EdgeInsets.only(top: 4.h),
+                          child: Text(
+                            label,
+                            style: TextStyle(
+                              fontFamily: 'IRANSans',
+                              fontWeight: FontWeight.bold,
+                              fontSize: 9.sp,
+                              color: MyColors.primary,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
