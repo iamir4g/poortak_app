@@ -265,7 +265,6 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                 icon: Icon(Icons.arrow_forward, color: primaryTextColor),
               ),
             ],
-            centerTitle: true,
             title: Text(
               'واژگان',
               style: MyTextStyle.textHeader16Bold.copyWith(

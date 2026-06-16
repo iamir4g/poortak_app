@@ -57,7 +57,6 @@ class _QuizzesScreenState extends State<QuizzesScreen> {
             icon: const Icon(Icons.arrow_forward),
           ),
         ],
-        centerTitle: true,
         title: Text(
           "آزمون ها",
           style: MyTextStyle.textHeader16Bold,

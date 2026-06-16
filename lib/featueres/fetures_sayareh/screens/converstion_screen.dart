@@ -358,7 +358,6 @@ class _ConversationScreenState extends State<ConversationScreen> {
               icon: Icon(Icons.arrow_forward, color: primaryTextColor),
             ),
           ],
-          centerTitle: true,
           title: Text(
             'مکالمه',
             style: MyTextStyle.textHeader16Bold.copyWith(

@@ -184,6 +184,7 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                               Text(
                                 state.question.data.title,
                                 textAlign: TextAlign.center,
+                                textDirection: TextDirection.ltr,
                                 style: MyTextStyle.textHeader16Bold,
                               ),
 
@@ -319,7 +320,8 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                                       borderRadius: BorderRadius.circular(16.r),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: Colors.black.withValues(alpha: 0.03),
+                                          color: Colors.black
+                                              .withValues(alpha: 0.03),
                                           blurRadius: 4,
                                           offset: Offset(0, 2),
                                         ),

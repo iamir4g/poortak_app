@@ -12,7 +12,7 @@ class StepProgress extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 20.h,
+      height: 15.h,
       width: 300.w,
       decoration: BoxDecoration(
         color: MyColors.vocabularyProgressFill.withValues(alpha: 0.35),

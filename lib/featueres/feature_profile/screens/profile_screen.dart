@@ -105,7 +105,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         clipper: CustomConcaveClipper(
                             curveDepth: 10, bottomOffset: 20),
                         child: Container(
-                          height: 250.h, //double.infinity - 500,
+                          height: 280.h, //double.infinity - 500,
                           color: isDark
                               ? MyColors.profileHeaderDark
                               : Colors.white,

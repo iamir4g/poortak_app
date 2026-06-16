@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/common/services/tts_service.dart';
 import 'package:poortak/config/myColors.dart';
@@ -86,7 +85,6 @@ class _ReviewedVocabulariesScreenState
             },
           ),
         ],
-        centerTitle: true,
         title: Text(
           'واژگان مرور شده',
           style: MyTextStyle.textHeader16Bold,
@@ -257,14 +255,11 @@ class _ReviewedVocabulariesScreenState
                                       ),
                                       child: IconButton(
                                         onPressed: () => _readWord(word.word),
-                                        icon: SvgPicture.asset(
-                                          'assets/images/icons/cuida--volume-2-outline.svg',
+                                        icon: Image.asset(
+                                          'assets/images/icons/volume.png',
                                           width: 28.r,
                                           height: 28.r,
-                                          colorFilter: const ColorFilter.mode(
-                                            Color(0xFF3D495C),
-                                            BlendMode.srcIn,
-                                          ),
+                                          fit: BoxFit.contain,
                                         ),
                                         iconSize: 28.r,
                                       ),

@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poortak/common/services/haptic_service.dart';
 import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/common/services/tts_service.dart';
@@ -20,6 +19,7 @@ import 'package:poortak/featueres/fetures_sayareh/widgets/practice_vocabulary_re
 import 'package:poortak/locator.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/lesson_screen.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/common/widgets/pressable_circle.dart';
 import 'package:poortak/featueres/fetures_sayareh/widgets/vocabulary_bottom_controls.dart';
 import 'package:poortak/featueres/fetures_sayareh/widgets/item_question.dart';
 
@@ -292,7 +292,6 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
                     onPressed: () => _handleExitAttempt(state),
                   ),
                 ],
-                centerTitle: true,
                 title: Text(
                   'تمرین واژگان',
                   style: MyTextStyle.textHeader16Bold,
@@ -351,34 +350,32 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
-                                    if (!showAnswer) ...[
-                                      SizedBox(
-                                        height: 18.h,
+                                    SizedBox(
+                                      height: 18.h,
+                                    ),
+                                    Container(
+                                      width: 268.w,
+                                      height: 45.h,
+                                      decoration: BoxDecoration(
+                                        color: MyColors.infoBg,
+                                        borderRadius:
+                                            BorderRadius.circular(20.r),
                                       ),
-                                      Container(
-                                        width: 268.w,
-                                        height: 45.h,
-                                        decoration: BoxDecoration(
-                                          color: MyColors.infoBg,
-                                          borderRadius:
-                                              BorderRadius.circular(20.r),
-                                        ),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              "گزینه ی درست را انتخاب کنید.",
-                                              style: MyTextStyle.textMatn14Bold,
-                                            ),
-                                          ],
-                                        ),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            "گزینه ی درست را انتخاب کنید.",
+                                            style: MyTextStyle.textMatn14Bold,
+                                          ),
+                                        ],
                                       ),
-                                      SizedBox(
-                                        height: 24.h,
-                                      ),
-                                    ] else
-                                      SizedBox(height: 10.h),
+                                    ),
+                                    SizedBox(
+                                      height: 24.h,
+                                    ),
+                                    SizedBox(height: 10.h),
                                     FutureBuilder<String>(
                                       future: storageService
                                           .callGetDownloadPublicUrl(
@@ -495,37 +492,61 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: [
-                                        IconButton(
-                                          onPressed: () =>
-                                              _readWord(correctWord.word),
-                                          icon: SvgPicture.asset(
-                                            'assets/images/icons/cuida--volume-2-outline.svg',
-                                            width: 32.r,
-                                            height: 32.r,
-                                            colorFilter: ColorFilter.mode(
-                                              Theme.of(context)
-                                                      .iconTheme
-                                                      .color ??
-                                                  Colors.black,
-                                              BlendMode.srcIn,
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(width: 20.w),
-                                        BlocBuilder<LitnerBloc, LitnerState>(
-                                          builder: (context, litnerState) {
-                                            final isLoading =
-                                                litnerState is LitnerLoading;
-                                            return LitnerAddIconButton(
-                                              toastController:
-                                                  _litnerToastController,
-                                              enabled: !isLoading,
-                                              isLoading: isLoading,
-                                              onPressed: () => _addToLitner(
-                                                correctWord.word,
-                                                correctWord.translation,
-                                              ),
-                                              iconSize: 32,
+                                        Builder(
+                                          builder: (context) {
+                                            final isDark =
+                                                Theme.of(context).brightness ==
+                                                    Brightness.dark;
+                                            final circleBg = isDark
+                                                ? MyColors
+                                                    .darkBackgroundSecondary
+                                                : MyColors
+                                                    .modalHeaderBackground;
+                                            final circleBgPressed = isDark
+                                                ? MyColors.darkBorder
+                                                : MyColors.text2;
+
+                                            return Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                PressableCircle(
+                                                  enabled: true,
+                                                  backgroundColor: circleBg,
+                                                  pressedBackgroundColor:
+                                                      circleBgPressed,
+                                                  onTap: () => _readWord(
+                                                      correctWord.word),
+                                                  child: Image.asset(
+                                                    'assets/images/icons/volume.png',
+                                                    width: Dimens.nr(28),
+                                                    height: Dimens.nr(28),
+                                                    fit: BoxFit.contain,
+                                                  ),
+                                                ),
+                                                SizedBox(width: 20.w),
+                                                BlocBuilder<LitnerBloc,
+                                                    LitnerState>(
+                                                  builder:
+                                                      (context, litnerState) {
+                                                    final isLoading =
+                                                        litnerState
+                                                            is LitnerLoading;
+                                                    return LitnerAddButton(
+                                                      toastController:
+                                                          _litnerToastController,
+                                                      enabled: !isLoading,
+                                                      isLoading: isLoading,
+                                                      backgroundColor: circleBg,
+                                                      pressedBackgroundColor:
+                                                          circleBgPressed,
+                                                      onTap: () => _addToLitner(
+                                                        correctWord.word,
+                                                        correctWord.translation,
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ],
                                             );
                                           },
                                         ),

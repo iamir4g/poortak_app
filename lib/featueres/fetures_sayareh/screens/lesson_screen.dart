@@ -368,7 +368,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
                         state is LessonSuccess
                             ? state.lesson.name
                             : widget.title,
-                        textAlign: TextAlign.center,
+                        textAlign: TextAlign.start,
                         style: MyTextStyle.textHeader16Bold.copyWith(
                           fontSize: Dimens.nsp(16),
                           color: isDark

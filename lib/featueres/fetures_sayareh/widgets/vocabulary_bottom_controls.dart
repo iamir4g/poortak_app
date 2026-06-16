@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:poortak/common/widgets/pressable_circle.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
@@ -49,17 +49,14 @@ class VocabularyBottomControls extends StatelessWidget {
           backgroundColor: circleBg,
           pressedBackgroundColor: circleBgPressed,
           onTap: onReadWord,
-          childBuilder: (foreground) => SvgPicture.asset(
-            'assets/images/icons/cuida--volume-2-outline.svg',
+          child: Image.asset(
+            'assets/images/icons/volume.png',
             width: Dimens.nr(28),
             height: Dimens.nr(28),
-            colorFilter: ColorFilter.mode(
-              foreground,
-              BlendMode.srcIn,
-            ),
+            fit: BoxFit.contain,
           ),
         ),
-        LitnerAddCircleButton(
+        LitnerAddButton(
           toastController: litnerToastController,
           enabled: !isAddLoading,
           backgroundColor: circleBg,
@@ -269,135 +266,54 @@ class LitnerAddButtonContent extends StatelessWidget {
   }
 }
 
-class LitnerAddCircleButton extends StatelessWidget {
+class LitnerAddButton extends StatelessWidget {
   final LitnerResultToastController? toastController;
   final bool enabled;
   final bool isLoading;
-  final Color backgroundColor;
-  final Color pressedBackgroundColor;
   final VoidCallback onTap;
-
-  const LitnerAddCircleButton({
-    super.key,
-    this.toastController,
-    required this.enabled,
-    required this.isLoading,
-    required this.backgroundColor,
-    required this.pressedBackgroundColor,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return LitnerToastAnchor(
-      controller: toastController,
-      child: PressableCircle(
-        enabled: enabled,
-        backgroundColor: backgroundColor,
-        pressedBackgroundColor: pressedBackgroundColor,
-        onTap: onTap,
-        child: LitnerAddButtonContent(isLoading: isLoading),
-      ),
-    );
-  }
-}
-
-class LitnerAddIconButton extends StatelessWidget {
-  final LitnerResultToastController? toastController;
-  final bool enabled;
-  final bool isLoading;
-  final VoidCallback onPressed;
+  final Color? backgroundColor;
+  final Color? pressedBackgroundColor;
   final double iconSize;
 
-  const LitnerAddIconButton({
+  const LitnerAddButton({
     super.key,
     this.toastController,
     required this.enabled,
     required this.isLoading,
-    required this.onPressed,
-    double? iconSize,
-  }) : iconSize = iconSize ?? 32;
+    required this.onTap,
+    this.backgroundColor,
+    this.pressedBackgroundColor,
+    this.iconSize = 26,
+  });
+
+  bool get _useCircleStyle =>
+      backgroundColor != null && pressedBackgroundColor != null;
 
   @override
   Widget build(BuildContext context) {
+    final content = LitnerAddButtonContent(
+      isLoading: isLoading,
+      iconSize: iconSize,
+    );
+
     return LitnerToastAnchor(
       controller: toastController,
-      child: Center(
-        child: IconButton(
-          onPressed: enabled ? onPressed : null,
-          icon: LitnerAddButtonContent(
-            isLoading: isLoading,
-            iconSize: iconSize,
-          ),
-          iconSize: iconSize.r,
-        ),
-      ),
-    );
-  }
-}
-
-class PressableCircle extends StatefulWidget {
-  final bool enabled;
-  final Color backgroundColor;
-  final Color pressedBackgroundColor;
-  final VoidCallback onTap;
-  final Widget? child;
-  final Widget Function(Color foreground)? childBuilder;
-
-  const PressableCircle({
-    required this.enabled,
-    required this.backgroundColor,
-    required this.pressedBackgroundColor,
-    required this.onTap,
-    this.child,
-    this.childBuilder,
-  }) : assert(child != null || childBuilder != null);
-
-  @override
-  State<PressableCircle> createState() => _PressableCircleState();
-}
-
-class _PressableCircleState extends State<PressableCircle> {
-  bool _pressed = false;
-
-  void _setPressed(bool value) {
-    if (_pressed == value) return;
-    setState(() {
-      _pressed = value;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final bg =
-        _pressed ? widget.pressedBackgroundColor : widget.backgroundColor;
-    final fg = _pressed
-        ? Colors.white
-        : (Theme.of(context).brightness == Brightness.dark
-            ? Colors.white
-            : MyColors.text2);
-    final child = widget.childBuilder?.call(fg) ?? widget.child!;
-
-    return SizedBox(
-      width: Dimens.nr(60),
-      height: Dimens.nr(60),
-      child: Material(
-        color: bg,
-        shape: const CircleBorder(),
-        child: InkWell(
-          customBorder: const CircleBorder(),
-          onTap: widget.enabled ? widget.onTap : null,
-          onTapDown: widget.enabled ? (_) => _setPressed(true) : null,
-          onTapCancel: widget.enabled ? () => _setPressed(false) : null,
-          onTapUp: widget.enabled ? (_) => _setPressed(false) : null,
-          child: Center(
-            child: Opacity(
-              opacity: widget.enabled ? 1.0 : 0.6,
-              child: child,
+      size: _useCircleStyle ? 60 : 48,
+      child: _useCircleStyle
+          ? PressableCircle(
+              enabled: enabled,
+              backgroundColor: backgroundColor!,
+              pressedBackgroundColor: pressedBackgroundColor!,
+              onTap: onTap,
+              child: content,
+            )
+          : Center(
+              child: IconButton(
+                onPressed: enabled ? onTap : null,
+                icon: content,
+                iconSize: iconSize.r,
+              ),
             ),
-          ),
-        ),
-      ),
     );
   }
 }

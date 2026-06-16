@@ -40,6 +40,15 @@ class TTSService {
   double _currentSpeechRate = _defaultSpeechRate;
   bool _stopRequested = false;
 
+  /// Removes emoji and pictographic characters so TTS reads only speakable text.
+  static String sanitizeForSpeech(String text) {
+    return text
+        .replaceAll(RegExp(r'\p{Extended_Pictographic}', unicode: true), '')
+        .replaceAll(RegExp(r'[\u200D\uFE0F]'), '')
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .trim();
+  }
+
   Future<void> initialize() async {
     if (_isInitialized) {
       print('TTS already initialized');
@@ -198,6 +207,11 @@ class TTSService {
       await initialize();
     }
 
+    final sanitizedText = sanitizeForSpeech(text);
+    if (sanitizedText.isEmpty) {
+      return;
+    }
+
     // بازنشانی وضعیت توقف برای پخش جدید
     _stopRequested = false;
 
@@ -230,14 +244,14 @@ class TTSService {
 
     _speechCompleter = Completer<void>();
     try {
-      var result = await _flutterTts.speak(text);
+      var result = await _flutterTts.speak(sanitizedText);
       // اگر نتیجه 1 نباشد و درخواست توقف نداده باشیم، تلاش مجدد می‌کنیم
       if (result != 1 && !_stopRequested) {
         print('Speak method returned $result - might have failed');
         // اگر speak ناموفق بود، شاید موتور آماده نیست. یک بار دیگر زبان را ست می‌کنیم
         await _flutterTts.setLanguage('en-US');
         if (!_stopRequested) {
-          await _flutterTts.speak(text);
+          await _flutterTts.speak(sanitizedText);
         }
       }
     } catch (e) {
@@ -251,7 +265,7 @@ class TTSService {
         try {
           await initialize();
           await _flutterTts.setLanguage('en-US');
-          await _flutterTts.speak(text);
+          await _flutterTts.speak(sanitizedText);
           return;
         } catch (retryError) {
           print('Retry failed: $retryError');
