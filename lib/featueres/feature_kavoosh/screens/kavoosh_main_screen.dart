@@ -168,18 +168,13 @@ class _KavooshMainScreenState extends State<KavooshMainScreen> {
                   ),
                   SizedBox(width: Dimens.medium),
                   // Icon placeholder
-                  Container(
-                    width: Dimens.nr(80.0),
-                    height: Dimens.nr(80.0),
-                    decoration: BoxDecoration(
-                      color: Colors.transparent,
-                      borderRadius: BorderRadius.circular(Dimens.radiusLarge),
-                    ),
-                    child: Center(
+                  SizedBox(
+                    width: Dimens.nw(100.0),
+                    child: Align(
+                      alignment: Alignment.center,
                       child: Image.asset(
                         _getIconPathForTitle(title),
-                        width: Dimens.nr(100.0),
-                        height: Dimens.nr(120.0),
+                        width: Dimens.nw(100.0),
                         fit: BoxFit.contain,
                       ),
                     ),

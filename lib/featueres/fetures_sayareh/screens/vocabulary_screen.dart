@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:async';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +18,8 @@ import 'package:poortak/locator.dart';
 import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/common/services/tts_service.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/config/dimens.dart';
+import 'package:poortak/featueres/fetures_sayareh/widgets/vocabulary_bottom_controls.dart';
 
 class VocabularyScreen extends StatefulWidget {
   static const routeName = "/vocabulary_screen";
@@ -39,6 +42,8 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
   final TTSService ttsService = locator<TTSService>();
   final StorageService storageService = locator<StorageService>();
   final PrefsOperator prefsOperator = locator<PrefsOperator>();
+  final LitnerResultToastController _litnerToastController =
+      LitnerResultToastController();
   @override
   void initState() {
     super.initState();
@@ -204,40 +209,45 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final pageBackgroundColor =
-        isDark ? MyColors.profileBackgroundDark : MyColors.secondaryTint4;
+        isDark ? MyColors.darkBackground : MyColors.secondaryTint4;
     final headerBackgroundColor =
         isDark ? MyColors.darkBackgroundSecondary : Colors.white;
     final primaryTextColor =
-        isDark ? MyColors.profileTextPrimaryDark : MyColors.textMatn1;
+        isDark ? MyColors.darkTextPrimary : MyColors.textMatn1;
     final secondaryTextColor =
-        isDark ? MyColors.loginTextSecondaryDark : MyColors.textSecondary;
-    final iconColor =
-        isDark ? MyColors.profileTextPrimaryDark : (Theme.of(context).iconTheme.color ?? Colors.black);
+        isDark ? MyColors.darkTextSecondary : MyColors.textSecondary;
+    final imageCardColor =
+        isDark ? MyColors.darkCardBackground : Colors.transparent;
+    final iconColor = isDark
+        ? MyColors.darkTextPrimary
+        : (Theme.of(context).iconTheme.color ?? Colors.black);
     return BlocProvider(
       create: (context) => VocabularyBloc(sayarehRepository: locator())
         ..add(VocabularyFetchEvent(id: widget.id)),
       child: BlocListener<LitnerBloc, LitnerState>(
         listener: (context, state) {
           if (state is CreateWordSuccess) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('لغت به لایتنر اضافه شد'),
-                backgroundColor: MyColors.success,
-                duration: Duration(seconds: 2),
-              ),
+            _litnerToastController.show(
+              text: 'به لایتنر اضافه شد!',
+              showCheckIcon: true,
             );
           } else if (state is LitnerError) {
-            // Check if it's the "word already exists" error
             final isWordExistsError =
                 state.message == "این کلمه قبلا اضافه شده";
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor:
-                    isWordExistsError ? MyColors.warning : MyColors.error,
-                duration: const Duration(seconds: 2),
-              ),
-            );
+            if (isWordExistsError) {
+              _litnerToastController.show(
+                text: 'این کلمه از قبل بوده',
+                showCheckIcon: false,
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: MyColors.error,
+                  duration: const Duration(seconds: 2),
+                ),
+              );
+            }
           }
         },
         child: Scaffold(
@@ -257,7 +267,6 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                 icon: Icon(Icons.arrow_forward, color: primaryTextColor),
               ),
             ],
-            centerTitle: true,
             title: Text(
               'واژگان',
               style: MyTextStyle.textHeader16Bold.copyWith(
@@ -275,7 +284,8 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                 if (state is VocabularyLoading) {
                   return const Center(
                     child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(MyColors.primary),
+                      valueColor:
+                          AlwaysStoppedAnimation<Color>(MyColors.primary),
                     ),
                   );
                 }
@@ -333,7 +343,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   SizedBox(
-                                    height: 20.h,
+                                    height: Dimens.nh(24),
                                   ),
                                   //step progress bar
                                   StepProgress(
@@ -341,28 +351,32 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                                       totalSteps: totalWords),
 
                                   SizedBox(
-                                    height: 30.h,
+                                    height: Dimens.nh(85),
                                   ),
                                   Builder(
                                     builder: (context) {
-                                      double imageHeight = 200.h;
-                                      final screenHeight =
-                                          MediaQuery.of(context).size.height;
-                                      if (screenHeight < 600) {
-                                        imageHeight = 150.h;
-                                      }
-
                                       return Container(
+                                        padding: isDark
+                                            ? EdgeInsets.all(8.r)
+                                            : EdgeInsets.zero,
                                         decoration: BoxDecoration(
+                                          color: imageCardColor,
                                           borderRadius:
-                                              BorderRadius.circular(16.r),
+                                              BorderRadius.circular(20.r),
+                                          border: isDark
+                                              ? Border.all(
+                                                  color: MyColors.darkBorder
+                                                      .withValues(alpha: 0.35),
+                                                  width: 1,
+                                                )
+                                              : null,
                                         ),
                                         child: ClipRRect(
                                           borderRadius:
                                               BorderRadius.circular(16.r),
                                           child: SizedBox(
-                                            width: imageHeight,
-                                            height: imageHeight,
+                                            width: Dimens.nw(264),
+                                            height: Dimens.nh(264),
                                             child: currentImageUrl == null
                                                 ? _buildImageLoader()
                                                 : CachedNetworkImage(
@@ -376,8 +390,9 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                                                             _buildImageLoader(),
                                                     errorWidget:
                                                         (context, url, error) =>
-                                                            const Icon(
+                                                            Icon(
                                                       Icons.error,
+                                                      color: primaryTextColor,
                                                     ),
                                                   ),
                                           ),
@@ -385,7 +400,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                                       );
                                     },
                                   ),
-                                  SizedBox(height: 20.h),
+                                  SizedBox(height: Dimens.nh(20)),
                                   Text(
                                     currentWord.word,
                                     style: MyTextStyle.textMatn18Bold.copyWith(
@@ -409,88 +424,59 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                         ),
                       ),
                       Padding(
-                        padding: EdgeInsets.all(16.0.r),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        padding: EdgeInsets.only(
+                          left: 16.w,
+                          right: 16.w,
+                          top: 16.h,
+                          bottom: Dimens.nh(90),
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            IconButton(
-                              key: const Key('vocabulary_forward_button'),
-                              onPressed: () =>
-                                  _goToNextWord(state.vocabulary.data),
-                              icon: Icon(Icons.arrow_back, color: iconColor),
-                              iconSize: 32.r,
-                            ),
                             BlocBuilder<LitnerBloc, LitnerState>(
                               builder: (context, litnerState) {
-                                return IconButton(
-                                  onPressed: litnerState is LitnerLoading
-                                      ? null
-                                      : () => _addToLitner(
-                                            currentWord.word,
-                                            currentWord.translation,
-                                          ),
-                                  icon: litnerState is LitnerLoading
-                                      ? SizedBox(
-                                          width: 20.w,
-                                          height: 20.h,
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2.w,
-                                            valueColor:
-                                                const AlwaysStoppedAnimation<Color>(
-                                                    MyColors.primary),
-                                          ),
-                                        )
-                                      : Icon(Icons.add_circle_outline,
-                                          color: iconColor),
-                                  iconSize: 32.r,
+                                return VocabularyBottomControls(
+                                  onNext: () =>
+                                      _goToNextWord(state.vocabulary.data),
+                                  onPrevious: () =>
+                                      _goToPreviousWord(state.vocabulary.data),
+                                  onReadWord: () => _readWord(currentWord.word),
+                                  onAddToLitner: () => _addToLitner(
+                                    currentWord.word,
+                                    currentWord.translation,
+                                  ),
+                                  isAddLoading: litnerState is LitnerLoading,
+                                  iconColor: iconColor,
+                                  litnerToastController: _litnerToastController,
                                 );
                               },
                             ),
-                            IconButton(
-                              onPressed: () => _readWord(currentWord.word),
-                              icon: SvgPicture.asset(
-                                'assets/images/icons/cuida--volume-2-outline.svg',
-                                width: 32.r,
-                                height: 32.r,
-                                colorFilter: ColorFilter.mode(
-                                  iconColor,
-                                  BlendMode.srcIn,
+                            if (currentIndex == totalWords - 1) ...[
+                              SizedBox(height: 16.h),
+                              ElevatedButton(
+                                onPressed: () {
+                                  Navigator.pushNamed(
+                                    context,
+                                    PracticeVocabularyScreen.routeName,
+                                    arguments: {'courseId': widget.id},
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: MyColors.primary,
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 32.w,
+                                    vertical: 16.h,
+                                  ),
+                                ),
+                                child: Text(
+                                  'تمرین ها',
+                                  style: MyTextStyle.textMatnBtn,
                                 ),
                               ),
-                            ),
-                            IconButton(
-                              onPressed: () =>
-                                  _goToPreviousWord(state.vocabulary.data),
-                              icon: Icon(Icons.arrow_forward, color: iconColor),
-                              iconSize: 32.r,
-                            ),
+                            ],
                           ],
                         ),
                       ),
-                      if (currentIndex == totalWords - 1)
-                        Padding(
-                          padding: EdgeInsets.only(bottom: 16.0.h),
-                          child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.pushNamed(
-                                context,
-                                PracticeVocabularyScreen.routeName,
-                                arguments: {'courseId': widget.id},
-                              );
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: MyColors.primary,
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 32.w,
-                                vertical: 16.h,
-                              ),
-                            ),
-                            child: Text(
-                              'تمرین ها',
-                              style: MyTextStyle.textMatnBtn,
-                            ),
-                          ),
-                        ),
                     ],
                   );
                 }
@@ -512,5 +498,11 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _litnerToastController.dispose();
+    super.dispose();
   }
 }

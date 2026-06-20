@@ -56,7 +56,6 @@ class _PaymentResultScreenState extends State<PaymentResultScreen> {
         ),
         backgroundColor: isSuccess ? MyColors.success : MyColors.error,
         elevation: 0,
-        centerTitle: true,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: MyColors.textLight, size: 24.sp),
           onPressed: () => Navigator.of(context).pop(),

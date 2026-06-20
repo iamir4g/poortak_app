@@ -11,7 +11,16 @@ class TestScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      bottomNavigationBar: BottomNav(controller: pageController),
+      bottomNavigationBar: BottomNav(
+        controller: pageController,
+        onTabSelected: (index) {
+          pageController.animateToPage(
+            index,
+            duration: const Duration(milliseconds: 350),
+            curve: Curves.easeOutCubic,
+          );
+        },
+      ),
     );
   }
 }

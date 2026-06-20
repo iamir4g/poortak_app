@@ -10,6 +10,7 @@ import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/payment_history_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/edit_profile_screen.dart';
 import 'package:poortak/common/widgets/custom_concave_clipper.dart';
+import 'package:poortak/featueres/feature_profile/widgets/profile_action_card.dart';
 import 'package:poortak/locator.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -104,7 +105,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         clipper: CustomConcaveClipper(
                             curveDepth: 10, bottomOffset: 20),
                         child: Container(
-                          height: 250.h, //double.infinity - 500,
+                          height: 280.h, //double.infinity - 500,
                           color: isDark
                               ? MyColors.profileHeaderDark
                               : Colors.white,
@@ -182,8 +183,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   horizontal: 16.w, vertical: 16.h),
                               child: Center(
                                 child: SizedBox(
-                                  width: 160.w,
-                                  height: 32.h,
+                                  width: 190.w,
+                                  height: 48.h,
                                   child: OutlinedButton(
                                     onPressed: () {
                                       Navigator.pushNamed(
@@ -204,7 +205,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       ),
                                       backgroundColor: Colors.transparent,
                                       padding: EdgeInsets.symmetric(
-                                          horizontal: 16.w),
+                                          horizontal: 20.w),
                                     ),
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
@@ -215,14 +216,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           width: 16.r,
                                           height: 16.r,
                                           decoration: BoxDecoration(
-                                            color: MyColors.text4,
+                                            color: isDark
+                                                ? MyColors
+                                                    .loginIconContainerDark
+                                                : MyColors.background,
                                             shape: BoxShape.rectangle,
                                             borderRadius:
                                                 BorderRadius.circular(2.r),
                                           ),
                                           child: Icon(
                                             Icons.edit,
-                                            color: Colors.black,
+                                            color: isDark
+                                                ? MyColors.loginTextPrimaryDark
+                                                : MyColors.text3,
                                             size: 10.r,
                                           ),
                                         ),
@@ -251,8 +257,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             // child:
                             Column(
                               children: [
-                                _ProfileActionCard(
-                                  icon: Icons.star,
+                                ProfileActionCard(
+                                  iconAssetPath:
+                                      'assets/images/profile/icon_star.png',
                                   label: 'امتیازات',
                                   onTap: () {
                                     Navigator.pushNamed(
@@ -262,8 +269,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   },
                                 ),
                                 SizedBox(height: 16.h),
-                                _ProfileActionCard(
-                                  icon: Icons.history,
+                                ProfileActionCard(
+                                  iconAssetPath:
+                                      'assets/images/profile/icon_history.png',
                                   label: 'تاریخچه خرید',
                                   onTap: () {
                                     Navigator.push(
@@ -276,8 +284,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   },
                                 ),
                                 SizedBox(height: 16.h),
-                                _ProfileActionCard(
-                                  icon: Icons.bookmark,
+                                ProfileActionCard(
+                                  iconAssetPath:
+                                      'assets/images/profile/icon_bookmark.png',
                                   label: 'علاقه مندی ها',
                                   onTap: () {
                                     Navigator.pushNamed(
@@ -304,69 +313,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ],
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _ProfileActionCard extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-  const _ProfileActionCard({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Container(
-      height: 60.h,
-      width: 357.838.w,
-      margin: EdgeInsets.symmetric(horizontal: 17.w),
-      decoration: BoxDecoration(
-        color: isDark ? MyColors.termsBackgroundDark : Colors.white,
-        borderRadius: BorderRadius.circular(22.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 4.r,
-            offset: Offset(0, 2.h),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(22.r),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(22.r),
-          onTap: onTap,
-          child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 24.w),
-            alignment: Alignment.centerRight,
-            child: Row(
-              children: [
-                Icon(icon, color: const Color(0xFFFFB200), size: 32.r),
-                SizedBox(width: 16.w),
-                Expanded(
-                  child: Text(
-                    label,
-                    style: MyTextStyle.textMatn16.copyWith(
-                      fontWeight: FontWeight.w500,
-                      color: isDark
-                          ? MyColors.profileTextPrimaryDark
-                          : MyColors.textCancelButton,
-                      height: 1.375, // 22px line height for 16px font
-                    ),
-                    textAlign: TextAlign.right,
-                  ),
-                ),
-              ],
-            ),
-          ),
         ),
       ),
     );

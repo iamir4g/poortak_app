@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lottie/lottie.dart';
 
 import 'package:persian_tools/persian_tools.dart';
@@ -7,8 +8,10 @@ import 'package:poortak/common/widgets/dot_loading_widget.dart';
 import 'package:poortak/common/widgets/primaryButton.dart';
 
 import 'package:poortak/common/resources/data_state.dart';
+import 'package:poortak/common/utils/svg_embedded_png.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
+import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/models/shopping_cart_model.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
@@ -19,6 +22,7 @@ import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_home_model
 import 'package:poortak/featueres/fetures_sayareh/data/models/single_book_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/repositories/sayareh_repository.dart';
 import 'package:poortak/common/services/getImageUrl_service.dart';
+import 'package:poortak/featueres/feature_shopping_cart/widgets/cart_summary_section.dart';
 import 'package:poortak/l10n/app_localizations.dart';
 import 'package:poortak/locator.dart';
 // import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -58,6 +62,43 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
   final Map<String, Future<_LocalCartDisplayItem>> _localCartItemCache = {};
   Future<IKnowSummaryModel>? _summaryFuture;
 
+  String? _getCartItemOverlayIconPath(String type) {
+    if (type == 'IKnowBook') {
+      return 'assets/images/icons/arcticons--pdf-viewer.svg';
+    }
+    if (type == 'IKnowCourse') {
+      return 'assets/images/icons/carbon--play-outline.svg';
+    }
+    return null;
+  }
+
+  Widget _buildCartItemOverlayIcon(String type) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final assetPath = _getCartItemOverlayIconPath(type);
+    if (assetPath == null) return const SizedBox.shrink();
+
+    return Positioned(
+      right: Dimens.nw(6),
+      bottom: Dimens.nh(6),
+      child: Container(
+        width: Dimens.nr(24),
+        height: Dimens.nr(24),
+        decoration: BoxDecoration(
+          color: Colors.black.withValues(alpha: 0.55),
+          borderRadius: BorderRadius.circular(Dimens.nr(6)),
+        ),
+        child: Center(
+          child: SvgPicture.asset(
+            assetPath,
+            width: Dimens.nr(16),
+            height: Dimens.nr(16),
+            colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -94,11 +135,9 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Color(0xFFE8F0FC),
-                        Color(0xFFFCEBF1),
-                        Color(0xFFEFE8FC),
+                        MyColors.shoppingCartBackground,
+                        MyColors.shoppingCartBackground,
                       ],
-                      stops: [0.1, 0.54, 1.0],
                     ),
             ),
             child: Center(child: DotLoadingWidget(size: Dimens.nr(100))),
@@ -167,11 +206,9 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Color(0xFFE8F0FC),
-                        Color(0xFFFCEBF1),
-                        Color(0xFFEFE8FC),
+                        MyColors.shoppingCartBackground,
+                        MyColors.shoppingCartBackground,
                       ],
-                      stops: [0.1, 0.54, 1.0],
                     ),
             ),
             child: Center(
@@ -456,7 +493,8 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? MyColors.darkBackground : const Color(0xFFF6F9FE),
+        color:
+            isDark ? MyColors.darkBackground : MyColors.shoppingCartBackground,
       ),
       child: Column(
         children: [
@@ -478,30 +516,10 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                       color:
                           isDark ? MyColors.termsBackgroundDark : Colors.white,
                       borderRadius: BorderRadius.circular(Dimens.nr(22)),
-                      boxShadow: isDark
-                          ? null
-                          : [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.1),
-                                blurRadius: 10,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        // Shopping cart image
-                        SizedBox(
-                          width: Dimens.nw(138),
-                          height: Dimens.nh(117),
-                          child: Image.asset(
-                            'assets/images/cart/shopping_cart.png',
-                            fit: BoxFit.contain,
-                          ),
-                        ),
-                        SizedBox(height: Dimens.nh(20)),
-                        // Empty cart text
                         Text(
                           'سبد خرید شما خالی است!',
                           style: TextStyle(
@@ -512,6 +530,15 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                                 : const Color(0xFF3D495C),
                           ),
                           textAlign: TextAlign.center,
+                        ),
+                        SizedBox(height: Dimens.nh(20)),
+                        SizedBox(
+                          width: Dimens.nw(138),
+                          height: Dimens.nh(117),
+                          child: buildImageFromAssetOrEmbeddedSvg(
+                            'assets/images/cart/shopping_cart.svg',
+                            fit: BoxFit.contain,
+                          ),
                         ),
                       ],
                     ),
@@ -531,27 +558,8 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
-        gradient: isDark
-            ? const LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Color(0xFF171926),
-                  MyColors.darkBackground,
-                  Color(0xFF171926),
-                ],
-                stops: [0.1, 0.54, 1.0],
-              )
-            : const LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Color(0xFFE8F0FC),
-                  Color(0xFFFCEBF1),
-                  Color(0xFFEFE8FC),
-                ],
-                stops: [0.1, 0.54, 1.0],
-              ),
+        color:
+            isDark ? MyColors.darkBackground : MyColors.shoppingCartBackground,
       ),
       child: Column(
         children: [
@@ -559,8 +567,36 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
           _buildPointsHeader(),
           Expanded(
             child: ListView.builder(
-              itemCount: cart.items.length,
+              padding: EdgeInsets.only(
+                bottom:
+                    MediaQuery.of(context).viewInsets.bottom + Dimens.nh(12),
+              ),
+              itemCount: cart.items.length + 1,
               itemBuilder: (context, index) {
+                if (index == cart.items.length) {
+                  final computedSubTotal = cart.subTotal ??
+                      cart.items.fold<int>(0, (sum, item) => sum + item.price);
+                  final computedPayable = cart.grandTotal ?? computedSubTotal;
+                  final computedDiscount = (computedSubTotal - computedPayable)
+                      .clamp(0, computedSubTotal)
+                      .toInt();
+                  return Padding(
+                    padding: EdgeInsets.fromLTRB(
+                      Dimens.medium,
+                      Dimens.small,
+                      Dimens.medium,
+                      Dimens.nh(12),
+                    ),
+                    child: CartSummarySection(
+                      subTotal: computedSubTotal,
+                      discount: computedDiscount,
+                      payable: computedPayable,
+                      onReferralSubmit: (code) {
+                        log("🎟️ Referral code submitted: $code");
+                      },
+                    ),
+                  );
+                }
                 final item = cart.items[index];
                 return Container(
                   margin: EdgeInsets.symmetric(
@@ -612,7 +648,14 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                             child: ClipRRect(
                               borderRadius:
                                   BorderRadius.circular(Dimens.nr(10)),
-                              child: _buildCartItemImage(item),
+                              child: Stack(
+                                fit: StackFit.expand,
+                                children: [
+                                  _buildCartItemImage(item),
+                                  if (item.type != null)
+                                    _buildCartItemOverlayIcon(item.type!),
+                                ],
+                              ),
                             ),
                           ),
                           SizedBox(width: Dimens.small),
@@ -628,18 +671,6 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                                     fontSize: Dimens.nsp(16),
                                   ),
                                   maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                SizedBox(height: Dimens.nh(4)),
-                                Text(
-                                  item.description,
-                                  style: TextStyle(
-                                    color: isDark
-                                        ? MyColors.darkTextSecondary
-                                        : Colors.grey[600],
-                                    fontSize: Dimens.nsp(14),
-                                  ),
-                                  maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
                                 ),
                                 SizedBox(height: Dimens.nh(8)),
@@ -707,38 +738,12 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '${l10n?.total_price} ${cart.grandTotal?.addComma ?? cart.items.fold(0, (sum, item) => sum + item.price).addComma}',
-                        style: TextStyle(
-                          fontSize: Dimens.nsp(18),
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      if (cart.subTotal != null &&
-                          cart.grandTotal != null &&
-                          cart.subTotal != cart.grandTotal)
-                        Text(
-                          'قیمت اصلی: ${cart.subTotal!.addComma} تومان',
-                          style: TextStyle(
-                            color: isDark
-                                ? MyColors.darkTextSecondary
-                                : Colors.grey[600],
-                            fontSize: Dimens.nsp(12),
-                            decoration: TextDecoration.lineThrough,
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
                 PrimaryButton(
                   width: Dimens.nw(160),
                   height: Dimens.nh(50),
                   lable: l10n?.pay_now ?? "Pay Now",
+                  backgroundColor:
+                      isDark ? MyColors.primary : MyColors.secondary,
                   onPressed: () async {
                     try {
                       // Call checkout API directly
@@ -783,6 +788,33 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                     }
                   },
                 ),
+                // SizedBox(width: double.infinity),
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${l10n?.total_price} ${cart.grandTotal?.addComma ?? cart.items.fold(0, (sum, item) => sum + item.price).addComma}',
+                      style: TextStyle(
+                        fontSize: Dimens.nsp(18),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    if (cart.subTotal != null &&
+                        cart.grandTotal != null &&
+                        cart.subTotal != cart.grandTotal)
+                      Text(
+                        'قیمت اصلی: ${cart.subTotal!.addComma} تومان',
+                        style: TextStyle(
+                          color: isDark
+                              ? MyColors.darkTextSecondary
+                              : Colors.grey[600],
+                          fontSize: Dimens.nsp(12),
+                          decoration: TextDecoration.lineThrough,
+                        ),
+                      ),
+                  ],
+                ),
               ],
             ),
           ),
@@ -797,27 +829,8 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
-        gradient: isDark
-            ? const LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Color(0xFF171926),
-                  MyColors.darkBackground,
-                  Color(0xFF171926),
-                ],
-                stops: [0.1, 0.54, 1.0],
-              )
-            : const LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Color(0xFFE8F0FC),
-                  Color(0xFFFCEBF1),
-                  Color(0xFFEFE8FC),
-                ],
-                stops: [0.1, 0.54, 1.0],
-              ),
+        color:
+            isDark ? MyColors.darkBackground : MyColors.shoppingCartBackground,
       ),
       child: Column(
         children: [
@@ -825,8 +838,36 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
           _buildPointsHeader(),
           Expanded(
             child: ListView.builder(
-              itemCount: localCartItems.length,
+              padding: EdgeInsets.only(
+                bottom:
+                    MediaQuery.of(context).viewInsets.bottom + Dimens.nh(12),
+              ),
+              itemCount: localCartItems.length + 1,
               itemBuilder: (context, index) {
+                if (index == localCartItems.length) {
+                  return FutureBuilder<int>(
+                    future: _calculateTotalPrice(localCartItems),
+                    builder: (context, snapshot) {
+                      final totalPrice = snapshot.data ?? 0;
+                      return Padding(
+                        padding: EdgeInsets.fromLTRB(
+                          Dimens.medium,
+                          Dimens.small,
+                          Dimens.medium,
+                          Dimens.nh(12),
+                        ),
+                        child: CartSummarySection(
+                          subTotal: totalPrice,
+                          discount: 0,
+                          payable: totalPrice,
+                          onReferralSubmit: (code) {
+                            log("🎟️ Referral code submitted: $code");
+                          },
+                        ),
+                      );
+                    },
+                  );
+                }
                 final item = localCartItems[index];
                 final itemType = item['type'] as String;
                 final itemId = item['itemId'] as String;
@@ -885,9 +926,15 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                                 child: ClipRRect(
                                   borderRadius:
                                       BorderRadius.circular(Dimens.nr(10)),
-                                  child: _buildLocalCartItemImage(
-                                    resolvedItem,
-                                    itemType,
+                                  child: Stack(
+                                    fit: StackFit.expand,
+                                    children: [
+                                      _buildLocalCartItemImage(
+                                        resolvedItem,
+                                        itemType,
+                                      ),
+                                      _buildCartItemOverlayIcon(itemType),
+                                    ],
                                   ),
                                 ),
                               ),
@@ -907,21 +954,6 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                                         fontSize: Dimens.nsp(16),
                                       ),
                                       maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    SizedBox(height: Dimens.nh(4)),
-                                    Text(
-                                      resolvedItem?.description ??
-                                          (isLoading
-                                              ? 'در حال دریافت اطلاعات'
-                                              : 'اطلاعات این آیتم در دسترس نیست'),
-                                      style: TextStyle(
-                                        color: isDark
-                                            ? MyColors.darkTextSecondary
-                                            : Colors.grey[600],
-                                        fontSize: Dimens.nsp(14),
-                                      ),
-                                      maxLines: 2,
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                     SizedBox(height: Dimens.nh(8)),
@@ -983,31 +1015,12 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(
-                  child: FutureBuilder<int>(
-                    future: _calculateTotalPrice(localCartItems),
-                    builder: (context, snapshot) {
-                      final totalPrice = snapshot.data ?? 0;
-                      return Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '${l10n?.total_price} ${totalPrice.addComma}',
-                            style: TextStyle(
-                              fontSize: Dimens.nsp(18),
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-                ),
                 PrimaryButton(
                   width: Dimens.nw(160),
                   height: Dimens.nh(50),
                   lable: l10n?.pay_now ?? "Pay Now",
+                  backgroundColor:
+                      isDark ? MyColors.primary : MyColors.secondary,
                   onPressed: () async {
                     try {
                       // Call checkout API directly
@@ -1050,6 +1063,46 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                         }
                       }
                     }
+                  },
+                ),
+                FutureBuilder<int>(
+                  future: _calculateTotalPrice(localCartItems),
+                  builder: (context, snapshot) {
+                    final totalPrice = snapshot.data ?? 0;
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        RichText(
+                          textAlign: TextAlign.center,
+                          text: TextSpan(
+                            style: DefaultTextStyle.of(context).style.copyWith(
+                                  color: isDark
+                                      ? MyColors.darkTextPrimary
+                                      : MyColors.textMatn1,
+                                  height: 1.0,
+                                ),
+                            // text: '${l10n?.total_price} ${totalPrice.addComma}',
+                            children: [
+                              TextSpan(
+                                text: totalPrice.addComma,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: Dimens.nsp(16),
+                                ),
+                              ),
+                              TextSpan(
+                                text: ' ${l10n?.toman ?? "تومان"}',
+                                style: TextStyle(
+                                  fontSize: Dimens.nsp(12),
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    );
                   },
                 ),
               ],

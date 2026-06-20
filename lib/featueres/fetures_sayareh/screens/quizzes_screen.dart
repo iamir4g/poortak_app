@@ -47,20 +47,30 @@ class _QuizzesScreenState extends State<QuizzesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor =
+        isDark ? MyColors.darkBackground : MyColors.background1;
+    final primaryTextColor =
+        isDark ? MyColors.darkTextPrimary : MyColors.textMatn1;
+
     return Scaffold(
-      backgroundColor: MyColors.background1,
+      backgroundColor: backgroundColor,
       appBar: AppBar(
         automaticallyImplyLeading: false,
+        backgroundColor:
+            isDark ? MyColors.darkBackground : MyColors.background,
+        foregroundColor: primaryTextColor,
         actions: [
           IconButton(
             onPressed: () => Navigator.of(context).pop(),
-            icon: const Icon(Icons.arrow_forward),
+            icon: Icon(Icons.arrow_forward, color: primaryTextColor),
           ),
         ],
-        centerTitle: true,
         title: Text(
           "آزمون ها",
-          style: MyTextStyle.textHeader16Bold,
+          style: MyTextStyle.textHeader16Bold.copyWith(
+            color: primaryTextColor,
+          ),
         ),
       ),
       body: SafeArea(
@@ -148,18 +158,26 @@ class QuizItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardBackgroundColor =
+        isDark ? MyColors.darkCardBackground : MyColors.background;
+    final descriptionColor =
+        isDark ? MyColors.darkTextSecondary : MyColors.text4;
+    final titleColor =
+        isDark ? MyColors.darkTextPrimary : MyColors.textMatn1;
+
     return Container(
       width: 350.w,
       height: 104.h,
       decoration: BoxDecoration(
           borderRadius: BorderRadius.all(Radius.circular(40.r)),
-          color: MyColors.background),
+          color: cardBackgroundColor),
       child: Padding(
         padding: EdgeInsets.symmetric(vertical: 22.h, horizontal: 28.w),
         child: Row(
           children: [
             buildImageFromAssetOrEmbeddedSvg(
-              "assets/images/points/quiz_icon.svg",
+              "assets/images/points/quiz_icon.png",
               width: 48.0.r,
               height: 48.0.r,
             ),
@@ -170,8 +188,18 @@ class QuizItem extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(description, style: CustomTextStyle.titleLesonText),
-                Text(title, style: CustomTextStyle.subTitleLeasonText)
+                Text(
+                  description,
+                  style: CustomTextStyle.titleLesonText.copyWith(
+                    color: descriptionColor,
+                  ),
+                ),
+                Text(
+                  title,
+                  style: CustomTextStyle.subTitleLeasonText.copyWith(
+                    color: titleColor,
+                  ),
+                )
               ],
             )
           ],

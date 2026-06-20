@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/locator.dart';
@@ -10,10 +11,6 @@ import 'package:poortak/common/services/tts_service.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/conversation_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/converstion_bloc/converstion_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/widgets/conversation_message_bubble.dart';
-// import 'package:poortak/featueres/fetures_sayareh/data/models/conversation_model.dart';
-// import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/converstion_bloc.dart';
-// import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/converstion_event.dart';
-// import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/converstion_state.dart';
 
 /// صفحه نمایش مکالمه بین دو شخص
 /// این صفحه لیستی از پیام‌های مکالمه را نمایش می‌دهد و امکان پخش صوتی و نمایش ترجمه را فراهم می‌کند
@@ -330,15 +327,17 @@ class _ConversationScreenState extends State<ConversationScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final pageBackgroundColor =
-        isDark ? MyColors.profileBackgroundDark : MyColors.secondaryTint4;
+    final pageBackgroundColor = isDark
+        ? MyColors.profileBackgroundDark
+        : MyColors.conversationScreenBackgroundLight;
     final headerBackgroundColor =
         isDark ? MyColors.darkBackgroundSecondary : Colors.white;
     final primaryTextColor =
         isDark ? MyColors.profileTextPrimaryDark : MyColors.textMatn1;
     final iconColor =
         isDark ? MyColors.profileTextPrimaryDark : MyColors.textPrimary;
-    final bottomBarColor = isDark ? MyColors.profileHeaderDark : MyColors.background;
+    final bottomBarColor =
+        isDark ? MyColors.profileHeaderDark : MyColors.background;
     return BlocProvider.value(
       value: _converstionBloc,
       child: Scaffold(
@@ -359,7 +358,6 @@ class _ConversationScreenState extends State<ConversationScreen> {
               icon: Icon(Icons.arrow_forward, color: primaryTextColor),
             ),
           ],
-          centerTitle: true,
           title: Text(
             'مکالمه',
             style: MyTextStyle.textHeader16Bold.copyWith(
@@ -369,12 +367,12 @@ class _ConversationScreenState extends State<ConversationScreen> {
         ),
         // نوار پایین صفحه شامل دکمه‌های پخش و نمایش ترجمه
         bottomNavigationBar: Container(
-          decoration: BoxDecoration(
-            color: bottomBarColor,
-          ),
+          // decoration: BoxDecoration(
+          //   color: bottomBarColor,
+          // ),
           child: SafeArea(
             child: SizedBox(
-              height: 60.h,
+              height: 94.h,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -398,6 +396,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                       );
                     },
                   ),
+                  // SizedBox(width: Dimens.medium),
                   IconButton(
                       onPressed: () {
                         _playNext();
@@ -411,24 +410,47 @@ class _ConversationScreenState extends State<ConversationScreen> {
                           BlendMode.srcIn,
                         ),
                       )),
+                  SizedBox(width: Dimens.medium),
                   // دکمه پخش/توقف تمام مکالمه
                   ValueListenableBuilder<bool>(
                     valueListenable: isPlayingNotifier,
                     builder: (context, isPlaying, _) {
-                      return IconButton(
-                        onPressed: () {
-                          if (sortedMessages != null) {
-                            playAllConversations(sortedMessages!);
-                          }
-                        },
-                        icon: Icon(
-                          isPlaying ? Icons.stop_circle : Icons.play_circle,
-                          size: 50.r,
-                          color: isPlaying ? MyColors.error : MyColors.success,
+                      final bgColor = isPlaying
+                          ? MyColors.primary
+                          : (isDark
+                              ? MyColors.conversationPlayPauseDarkPaused
+                              : MyColors.gray);
+                      final icon = isPlaying ? Icons.pause : Icons.play_arrow;
+                      final iconFg = isPlaying
+                          ? Colors.white
+                          : (isDark ? Colors.white : MyColors.text2);
+
+                      return SizedBox(
+                        width: 60.r,
+                        height: 60.r,
+                        child: Material(
+                          color: bgColor,
+                          shape: const CircleBorder(),
+                          child: InkWell(
+                            customBorder: const CircleBorder(),
+                            onTap: () {
+                              if (sortedMessages != null) {
+                                playAllConversations(sortedMessages!);
+                              }
+                            },
+                            child: Center(
+                              child: Icon(
+                                icon,
+                                size: 34.r,
+                                color: iconFg,
+                              ),
+                            ),
+                          ),
                         ),
                       );
                     },
                   ),
+                  SizedBox(width: Dimens.medium),
                   IconButton(
                       onPressed: () {
                         _playPrevious();
@@ -553,7 +575,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
                 return ListView.builder(
                   controller: _scrollController,
-                  padding: EdgeInsets.all(16.r),
+                  // padding: EdgeInsets.all(2.r),
                   itemCount: sortedMessages?.length ?? 0,
                   itemBuilder: (context, index) {
                     final message = sortedMessages![index];

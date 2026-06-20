@@ -40,7 +40,7 @@ class SelfAssessmentGradeCard extends StatelessWidget {
         child: Row(
           children: [
             buildImageFromAssetOrEmbeddedSvg(
-              'assets/images/points/quiz_icon.svg',
+              'assets/images/points/quiz_icon.png',
               width: 40.r,
               height: 40.r,
             ),

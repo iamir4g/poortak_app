@@ -52,6 +52,16 @@ class ReusableModal extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final modalBackgroundColor = isDarkMode
+        ? MyColors.darkBackgroundSecondary
+        : Colors.white;
+    final titleColor =
+        isDarkMode ? MyColors.darkTextPrimary : MyColors.textMatn1;
+    final messageColor =
+        isDarkMode ? MyColors.darkTextSecondary : const Color(0xFF3D495C);
+    final closeButtonBackground = isDarkMode
+        ? MyColors.paymentHistoryCardHeaderDark
+        : const Color(0xFFF6F9FE);
 
     if (cartSuccessStyle) {
       return _buildCartSuccessModal(context, isDarkMode);
@@ -63,7 +73,7 @@ class ReusableModal extends StatelessWidget {
         width: 0.9.sw,
         constraints: BoxConstraints(maxWidth: 350.w),
         decoration: BoxDecoration(
-          color: isDarkMode ? const Color(0xFF2C2E3F) : Colors.white,
+          color: modalBackgroundColor,
           borderRadius: BorderRadius.circular(20.r),
         ),
         child: Stack(
@@ -95,7 +105,9 @@ class ReusableModal extends StatelessWidget {
                       margin: EdgeInsets.only(bottom: 10.h),
                       child: Text(
                         title,
-                        style: MyTextStyle.textHeader16Bold,
+                        style: MyTextStyle.textHeader16Bold.copyWith(
+                          color: titleColor,
+                        ),
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -111,7 +123,7 @@ class ReusableModal extends StatelessWidget {
                       child: Text(
                         message,
                         style: MyTextStyle.textMatn14Bold.copyWith(
-                          color: const Color(0xFF3D495C),
+                          color: messageColor,
                           height: 1.4,
                           fontWeight: FontWeight.w500,
                         ),
@@ -172,8 +184,12 @@ class ReusableModal extends StatelessWidget {
                                   backgroundColor: Colors.transparent,
                                   padding:
                                       EdgeInsets.symmetric(horizontal: 8.w),
-                                  side: const BorderSide(
-                                      color: MyColors.primary, width: 1),
+                                  side: BorderSide(
+                                    color: isDarkMode
+                                        ? MyColors.darkBorder
+                                        : MyColors.primary,
+                                    width: 1,
+                                  ),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(20.r),
                                   ),
@@ -185,7 +201,9 @@ class ReusableModal extends StatelessWidget {
                                     secondButtonText!,
                                     maxLines: 1,
                                     style: MyTextStyle.textMatn14Bold.copyWith(
-                                      color: MyColors.primary,
+                                      color: isDarkMode
+                                          ? MyColors.darkTextPrimary
+                                          : MyColors.primary,
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),
@@ -242,9 +260,7 @@ class ReusableModal extends StatelessWidget {
                     width: 32.w,
                     height: 32.h,
                     decoration: BoxDecoration(
-                      color: isDarkMode
-                          ? const Color(0xFF323548)
-                          : const Color(0xFFF6F9FE),
+                      color: closeButtonBackground,
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -263,60 +279,64 @@ class ReusableModal extends StatelessWidget {
   }
 
   Widget _buildCartSuccessModal(BuildContext context, bool isDarkMode) {
+    final onPrimaryTap = onButtonPressed ?? () => Navigator.of(context).pop();
+    final onSecondaryTap =
+        onSecondButtonPressed ?? () => Navigator.of(context).pop();
     return Dialog(
       backgroundColor: Colors.transparent,
       child: Container(
         width: 0.9.sw,
         constraints: BoxConstraints(maxWidth: 350.w),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDarkMode ? MyColors.darkBackgroundSecondary : Colors.white,
           borderRadius: BorderRadius.circular(20.r),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Top section with icon and text
-            Padding(
+            Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: isDarkMode
+                    ? MyColors.darkBackgroundSecondary
+                    : MyColors.modalHeaderBackground,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20.r),
+                  topRight: Radius.circular(20.r),
+                ),
+              ),
               padding: EdgeInsets.only(top: 30.h, left: 20.w, right: 20.w),
               child: Column(
                 children: [
-                  // Success icon with gradient background
                   SizedBox(
-                      width: 140.w,
-                      height: 140.h,
-                      child: Image.asset("assets/images/cart/tick_cart.png")),
-
-                  SizedBox(),
-
-                  // Title
+                    width: 140.w,
+                    height: 140.h,
+                    child: Lottie.asset(
+                      'assets/images/cart/Tick Market.json',
+                      fit: BoxFit.contain,
+                      repeat: false,
+                    ),
+                  ),
                   Text(
                     title,
-                    style: TextStyle(
-                      fontFamily: 'IRANSans',
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18.sp,
-                      color: Colors.black,
+                    style: MyTextStyle.modalTitle18Medium.copyWith(
+                      color: isDarkMode
+                          ? MyColors.darkTextPrimary
+                          : MyColors.textMatn1,
                     ),
                     textAlign: TextAlign.center,
                   ),
-
                   SizedBox(height: 12.h),
-
-                  // Message
                   Text(
                     message,
-                    style: TextStyle(
-                      fontFamily: 'IRANSans',
-                      fontWeight: FontWeight.w400,
-                      fontSize: 14.sp,
-                      color: Colors.black,
-                      height: 1.4,
+                    style: MyTextStyle.modalMessage14Medium.copyWith(
+                      color: isDarkMode
+                          ? MyColors.darkTextSecondary
+                          : MyColors.text3,
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  SizedBox(
-                    height: 28.h,
-                  )
+                  SizedBox(height: 28.h),
                 ],
               ),
             ),
@@ -331,56 +351,77 @@ class ReusableModal extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  // Primary button in light blue section
-                  GestureDetector(
-                    onTap: onButtonPressed ?? () => Navigator.of(context).pop(),
-                    child: Container(
-                      alignment: Alignment.center,
-                      height: 70.h,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: Color(0xFFE8F0FE), // Light blue background
-                      ),
-                      padding: EdgeInsets.symmetric(vertical: 14.h),
-                      child: Text(
-                        buttonText,
-                        style: TextStyle(
-                          fontFamily: 'IRANSans',
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16.sp,
-                          color: Color(0xFF1A73E8), // Dark blue
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
+                  _buildCartActionButton(
+                    context: context,
+                    isDarkMode: isDarkMode,
+                    text: buttonText,
+                    onTap: onPrimaryTap,
+                    textStyle: TextStyle(
+                      fontFamily: 'IRANSans',
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16.sp,
+                      color: const Color(0xFF1A73E8),
                     ),
                   ),
-                  SizedBox(
-                    height: 10.h,
-                  ),
-                  // Secondary button in white section
-                  if (showSecondButton && secondButtonText != null)
-                    GestureDetector(
-                        onTap: onSecondButtonPressed ??
-                            () => Navigator.of(context).pop(),
-                        child: Container(
-                          alignment: Alignment.center,
-                          height: 70.h,
-                          decoration: BoxDecoration(),
-                          child: Text(
-                            secondButtonText!,
-                            style: TextStyle(
-                              fontFamily: 'IRANSans',
-                              fontWeight: FontWeight.w500,
-                              fontSize: 16.sp,
-                              color: Colors.black, // Dark gray
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        )),
+                  if (showSecondButton && secondButtonText != null) ...[
+                    SizedBox(height: 10.h),
+                    _buildCartActionButton(
+                      context: context,
+                      isDarkMode: isDarkMode,
+                      text: secondButtonText!,
+                      onTap: onSecondaryTap,
+                      textStyle: TextStyle(
+                        fontFamily: 'IRANSans',
+                        fontWeight: FontWeight.w500,
+                        fontSize: 16.sp,
+                        color: isDarkMode
+                            ? MyColors.darkTextPrimary
+                            : MyColors.textMatn1,
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCartActionButton({
+    required BuildContext context,
+    required bool isDarkMode,
+    required String text,
+    required VoidCallback onTap,
+    required TextStyle textStyle,
+  }) {
+    return SizedBox(
+      height: 70.h,
+      width: double.infinity,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          hoverColor: isDarkMode
+              ? Colors.transparent
+              : MyColors.modalButtonPressedLight,
+          splashColor: isDarkMode
+              ? Colors.transparent
+              : MyColors.modalButtonPressedLight,
+          highlightColor: isDarkMode
+              ? Colors.transparent
+              : MyColors.modalButtonPressedLight,
+          child: Center(
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 14.h),
+              child: Text(
+                text,
+                style: textStyle,
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
         ),
       ),
     );

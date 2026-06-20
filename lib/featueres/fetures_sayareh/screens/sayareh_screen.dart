@@ -139,7 +139,7 @@ class _SayarehScreenState extends State<SayarehScreen> {
                       child: Column(
                         children: [
                           SizedBox(
-                            height: 18.h,
+                            height: Dimens.nh(28.0),
                           ),
                           Text(
                             l10n?.sayareh ?? "",
@@ -150,7 +150,7 @@ class _SayarehScreenState extends State<SayarehScreen> {
                             ),
                           ),
                           SizedBox(
-                            height: 8.h,
+                            height: Dimens.nh(14.0),
                           ),
                           // Sayareh List Section
 
@@ -160,7 +160,7 @@ class _SayarehScreenState extends State<SayarehScreen> {
                             physics: const NeverScrollableScrollPhysics(),
                             itemCount: sayarehDataCompleted.data.data.length,
                             separatorBuilder: (context, index) {
-                              return SizedBox(height: Dimens.nh(13.0));
+                              return SizedBox(height: Dimens.nh(14.0));
                             },
                             itemBuilder: (context, index) {
                               final item =
@@ -187,7 +187,7 @@ class _SayarehScreenState extends State<SayarehScreen> {
                             },
                           ),
                           SizedBox(
-                            height: 10.h,
+                            height: 32.h,
                           ),
                         ],
                       ),
@@ -214,7 +214,7 @@ class _SayarehScreenState extends State<SayarehScreen> {
                     child: Column(
                       children: [
                         SizedBox(
-                          height: 18.h,
+                          height: Dimens.nh(28.0),
                         ),
                         Text(
                           "کتاب های سیاره آی نو",
@@ -225,7 +225,7 @@ class _SayarehScreenState extends State<SayarehScreen> {
                           ),
                         ),
                         SizedBox(
-                          height: 8.h,
+                          height: Dimens.nh(14.0),
                         ),
                         if (sayarehDataCompleted.bookListData.data != null &&
                             sayarehDataCompleted.bookListData.data!.isNotEmpty)
@@ -274,14 +274,14 @@ class _SayarehScreenState extends State<SayarehScreen> {
                           ),
                         // Example Box 1
                         SizedBox(
-                          height: 12.h,
+                          height: 32.h,
                         ),
                       ],
                     ),
                   ),
 
                   // Contest Card Section
-                  SizedBox(height: 10.h),
+                  SizedBox(height: 28.h),
                   ContestCard(
                     onTap: () {
                       if (locator<PrefsOperator>().isLoggedIn()) {
@@ -296,7 +296,7 @@ class _SayarehScreenState extends State<SayarehScreen> {
                       }
                     },
                   ),
-                  SizedBox(height: 50.h),
+                  SizedBox(height: 40.h),
                 ],
               ),
             );

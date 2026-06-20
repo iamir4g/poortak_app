@@ -137,7 +137,7 @@ class _MatchPrizeScreenState extends State<MatchPrizeScreen>
                                   ),
                                 ),
                                 buildImageFromAssetOrEmbeddedSvg(
-                                  'assets/images/mony/allmony.svg',
+                                  'assets/images/mony/allmony.png',
                                   width: Dimens.nw(176),
                                   height: Dimens.nh(187),
                                   fit: BoxFit.contain,

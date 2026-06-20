@@ -87,7 +87,6 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
             ),
           ),
         ],
-        centerTitle: true,
         title: Flexible(
           child: Text(
             l10n!.litner_review,
@@ -320,16 +319,11 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
                 SizedBox(width: Dimens.small.w),
                 GestureDetector(
                   onTap: () => ttsService.speak(englishWord, voice: 'male'),
-                  child: SvgPicture.asset(
-                    'assets/images/icons/cuida--volume-2-outline.svg',
+                  child: Image.asset(
+                    'assets/images/icons/volume.png',
                     width: 28.r,
                     height: 28.r,
-                    colorFilter: ColorFilter.mode(
-                      isDark
-                          ? MyColors.darkTextPrimary
-                          : const Color(0xFF3A465A),
-                      BlendMode.srcIn,
-                    ),
+                    fit: BoxFit.contain,
                   ),
                 ),
               ],
@@ -390,13 +384,16 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
                   SizedBox(width: Dimens.small.w),
                   GestureDetector(
                     onTap: () => ttsService.speak(englishWord, voice: 'male'),
-                    child: SvgPicture.asset(
-                      'assets/images/icons/cuida--volume-2-outline.svg',
-                      width: 28.r,
-                      height: 28.r,
+                    child: ColorFiltered(
                       colorFilter: const ColorFilter.mode(
                         Colors.white,
                         BlendMode.srcIn,
+                      ),
+                      child: Image.asset(
+                        'assets/images/icons/volume.png',
+                        width: 28.r,
+                        height: 28.r,
+                        fit: BoxFit.contain,
                       ),
                     ),
                   ),

@@ -37,6 +37,14 @@ class PrefsOperator {
     return refreshToken;
   }
 
+  Future<void> updateTokens(String accessToken, String refreshToken) async {
+    log("🔄 Updating auth tokens...");
+    await sharedPreferences.setString("user_token", accessToken);
+    await sharedPreferences.setString("refresh_token", refreshToken);
+    await sharedPreferences.setBool("loggedIn", true);
+    log("✅ Auth tokens updated");
+  }
+
   changeIntroState() async {
     sharedPreferences.setBool("showIntro", false);
   }

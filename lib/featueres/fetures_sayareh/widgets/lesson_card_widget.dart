@@ -25,12 +25,12 @@ class LessonCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final width = Dimens.nw(320); // Reduced from 359 to be more responsive
+    final width = Dimens.nw(360); // Reduced from 359 to be more responsive
     return InkWell(
       onTap: onTap,
       child: Container(
         width: width,
-        height: Dimens.nh(90), // Reduced from 104
+        height: Dimens.nh(104),
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(Dimens.nr(30)), // Reduced from 40

@@ -40,13 +40,14 @@ class ItemBook extends StatelessWidget {
           }
         },
         child: Container(
+          height: Dimens.nh(104.0),
           width: double.infinity,
           margin: EdgeInsets.symmetric(
             horizontal: Dimens.medium,
           ),
           padding: EdgeInsets.all(16.r),
           decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
+            color: isDark ? Theme.of(context).cardColor : MyColors.background,
             borderRadius: BorderRadius.circular(20.r),
             boxShadow: [
               BoxShadow(
@@ -79,13 +80,13 @@ class ItemBook extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     if (description != null && description!.isNotEmpty) ...[
-                      SizedBox(height: 4.h),
+                      SizedBox(height: 8.h),
                       Text(
                         description!,
-                        style: MyTextStyle.text10MediumText6.copyWith(
+                        style: MyTextStyle.description10Medium.copyWith(
                           color: isDark
-                              ? const Color(0xFF838697)
-                              : MyTextStyle.text10MediumText6.color,
+                              ? MyColors.loginTextSecondaryDark
+                              : MyColors.text6,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,

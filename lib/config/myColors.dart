@@ -30,8 +30,10 @@ class MyColors {
 
   // Background Colors
   static const Color background = Color(0xFFFFFFFF); // White
+  static const Color shoppingCartBackground = Color(0xFFF4F6FB);
   static const Color lightDarkBackground = Color(0xFF121212); // Dark background
   static const Color modalHeaderBackground = Color(0xFFF3F4F7);
+  static const Color inputBorder = Color(0xFFD1D1D6);
   // Text Colors
   static const Color textBase = Color(0xFF14181F);
   static const Color text1 = Color(0xFF29303D);
@@ -134,6 +136,12 @@ class MyColors {
   // Conversation (Dark Mode)
   static const Color conversationFirstPersonBubbleDark = Color(0xFF262556);
   static const Color conversationSecondPersonBubbleDark = Color(0xFF27221C);
+  static const Color conversationScreenBackgroundLight = Color(0xFFFFFFF8);
+  static const Color conversationBubbleLeftLight = Color(0xFFE1E0FA);
+  static const Color conversationBubbleRightLight = Color(0xFFFFEFDB);
+  static const Color conversationSideCircleLeftLight = Color(0xFF7C79EC);
+  static const Color conversationSideCircleRightLight = Color(0xFFFFC785);
+  static const Color conversationPlayPauseDarkPaused = Color(0xFF3B3E54);
 
   // Quiz
   static const Color quizAnswerDefaultLightBackground = background3;
@@ -154,6 +162,7 @@ class MyColors {
   // Progress Bar Colors
   static const Color progressBarColor = Color(0xFF5E85F2);
   static const Color progressBarBackground = Color(0xFFE0E0E0);
+  static const Color vocabularyProgressFill = Color(0xFFFFD099);
 
   // Shopping / promo specific
   static const Color discountBackground = Color(0xFFFEF3E6);
@@ -166,4 +175,5 @@ class MyColors {
   static const Color activeTabBackground = Color(0xFF363A53);
   static const Color inactiveTabBackground = Color(0xFF9498AC);
   static const Color dividerGray = gray;
+  static const Color modalButtonPressedLight = Color(0xFFCEDEF8);
 }

@@ -11,29 +11,33 @@ class StepProgress extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final trackColor = isDark
+        ? MyColors.darkCardBackground
+        : MyColors.vocabularyProgressFill.withValues(alpha: 0.35);
+    final fillColor = MyColors.vocabularyProgressFill;
+
     return Container(
-      height: 20.h,
+      height: 15.h,
       width: 300.w,
       decoration: BoxDecoration(
-        color: MyColors.brandPrimary.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(10.r),
+        color: trackColor,
+        borderRadius: BorderRadius.circular(20.r),
       ),
       child: Stack(
         alignment: Alignment.centerLeft,
         children: [
-          // Background
           Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10.r),
+              borderRadius: BorderRadius.circular(20.r),
             ),
           ),
-          // Progress
           FractionallySizedBox(
             widthFactor: (currentIndex + 1) / totalSteps,
             child: Container(
               decoration: BoxDecoration(
-                color: MyColors.brandPrimary,
-                borderRadius: BorderRadius.circular(10.r),
+                color: fillColor,
+                borderRadius: BorderRadius.circular(20.r),
               ),
             ),
           ),

@@ -239,6 +239,7 @@ class MyThemes {
           backgroundColor: MyColors.darkBackground,
           foregroundColor: MyColors.darkTextPrimary,
           elevation: 0,
+          centerTitle: false,
         ),
         cardTheme: const CardThemeData(
           color: MyColors.darkCardBackground,
@@ -336,6 +337,7 @@ class MyThemes {
           backgroundColor: MyColors.background,
           foregroundColor: MyColors.textPrimary,
           elevation: 0,
+          centerTitle: false,
         ),
         cardTheme: const CardThemeData(
           color: MyColors.cardBackground,

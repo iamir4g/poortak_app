@@ -46,7 +46,7 @@ class LogoutConfirmationModal extends StatelessWidget {
 
                 // Confirmation text
                 Container(
-                  width: Dimens.nw(211.48),
+                  width: double.infinity,
                   margin: EdgeInsets.only(bottom: Dimens.nh(40)),
                   child: Text(
                     'از حساب کاربری خود خارج می شوید؟',
@@ -65,32 +65,6 @@ class LogoutConfirmationModal extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Logout button
-                    SizedBox(
-                      width: Dimens.nw(144),
-                      height: Dimens.nh(56),
-                      child: ElevatedButton(
-                        onPressed: onLogout,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFFF5A5A),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(Dimens.nr(20)),
-                          ),
-                          elevation: 0,
-                        ),
-                        child: Text(
-                          'خروج از حساب',
-                          style: MyTextStyle.textMatnBtn.copyWith(
-                            fontWeight: FontWeight.bold,
-                            fontSize: Dimens.nsp(14),
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    SizedBox(width: Dimens.nw(8)),
-
                     // Stay button
                     SizedBox(
                       width: Dimens.nw(144),
@@ -116,6 +90,32 @@ class LogoutConfirmationModal extends StatelessWidget {
                             color: isDarkMode
                                 ? MyColors.profileTextPrimaryDark
                                 : MyColors.text2,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    SizedBox(width: Dimens.nw(8)),
+
+                    // Logout button
+                    SizedBox(
+                      width: Dimens.nw(144),
+                      height: Dimens.nh(56),
+                      child: ElevatedButton(
+                        onPressed: onLogout,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFFF5A5A),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(Dimens.nr(20)),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: Text(
+                          'خروج از حساب',
+                          style: MyTextStyle.textMatnBtn.copyWith(
+                            fontWeight: FontWeight.bold,
+                            fontSize: Dimens.nsp(14),
+                            color: Colors.white,
                           ),
                         ),
                       ),

@@ -6,6 +6,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poortak/common/utils/svg_embedded_png.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
+import 'package:poortak/config/myTextStyle.dart';
 
 class ContestCard extends StatelessWidget {
   final VoidCallback? onTap;
@@ -25,13 +26,15 @@ class ContestCard extends StatelessWidget {
         onTap: onTap,
         child: Container(
           width: double.infinity,
+          height: Dimens.nh(104.0),
           margin: EdgeInsets.symmetric(
             horizontal: Dimens.medium,
             vertical: Dimens.nh(8),
           ),
           padding: EdgeInsets.all(16.r),
           decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
+            color: isDark ? Theme.of(context).cardColor : null,
+            gradient: isDark ? null : MyColors.contestCardGradient,
             borderRadius: BorderRadius.circular(20.r),
             boxShadow: [
               BoxShadow(
@@ -47,7 +50,6 @@ class ContestCard extends StatelessWidget {
           child: Row(
             children: [
               Expanded(
-                flex: 3,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -57,24 +59,24 @@ class ContestCard extends StatelessWidget {
                       style: TextStyle(
                         color: isDark
                             ? const Color(0xFFFFFFFF)
-                            : Theme.of(context).textTheme.titleMedium?.color,
+                            : MyColors.textMatn1,
                         fontSize: 16.sp,
                         fontWeight: FontWeight.w600,
+                        height: 1.0,
                       ),
-                      maxLines: 2,
+                      maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    SizedBox(height: 4.h),
+                    SizedBox(height: 8.h),
                     Text(
                       'در مسابقه ماهانه پورتک شرکت کنید و جایزه ببرید.',
-                      style: TextStyle(
-                        color: isDark
-                            ? const Color(0xFF838697)
-                            : Theme.of(context).textTheme.bodySmall?.color,
-                        fontSize: 12.sp,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+                      style:  MyTextStyle.description10Medium.copyWith(
+                          color: isDark
+                              ? MyColors.loginTextSecondaryDark
+                              : MyColors.text6,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
@@ -86,15 +88,6 @@ class ContestCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: isDark ? const Color(0xFF11131C) : MyColors.background,
                   shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? Colors.black.withValues(alpha: 0.18)
-                          : Colors.black.withValues(alpha: 0.08),
-                      blurRadius: 8.r,
-                      offset: Offset(0, 3.h),
-                    ),
-                  ],
                 ),
                 child: Center(
                   child: _GiftBoxAsset(

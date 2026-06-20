@@ -4,7 +4,6 @@ import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_bloc.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_event.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_state.dart';
@@ -363,17 +362,11 @@ class _LitnerWordsInprogressScreenState
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           IconButton(
-                                            icon: SvgPicture.asset(
-                                              'assets/images/icons/cuida--volume-2-outline.svg',
+                                            icon: Image.asset(
+                                              'assets/images/icons/volume.png',
                                               width: 18.r,
                                               height: 18.r,
-                                              colorFilter:
-                                                  ColorFilter.mode(
-                                                isDark
-                                                    ? MyColors.darkTextSecondary
-                                                    : const Color(0xFFA3AFC2),
-                                                BlendMode.srcIn,
-                                              ),
+                                              fit: BoxFit.contain,
                                             ),
                                             splashRadius: 18.r,
                                             padding: EdgeInsets.zero,
