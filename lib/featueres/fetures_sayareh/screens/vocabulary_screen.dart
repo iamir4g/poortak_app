@@ -209,15 +209,17 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final pageBackgroundColor =
-        isDark ? MyColors.profileBackgroundDark : MyColors.secondaryTint4;
+        isDark ? MyColors.darkBackground : MyColors.secondaryTint4;
     final headerBackgroundColor =
         isDark ? MyColors.darkBackgroundSecondary : Colors.white;
     final primaryTextColor =
-        isDark ? MyColors.profileTextPrimaryDark : MyColors.textMatn1;
+        isDark ? MyColors.darkTextPrimary : MyColors.textMatn1;
     final secondaryTextColor =
-        isDark ? MyColors.loginTextSecondaryDark : MyColors.textSecondary;
+        isDark ? MyColors.darkTextSecondary : MyColors.textSecondary;
+    final imageCardColor =
+        isDark ? MyColors.darkCardBackground : Colors.transparent;
     final iconColor = isDark
-        ? MyColors.profileTextPrimaryDark
+        ? MyColors.darkTextPrimary
         : (Theme.of(context).iconTheme.color ?? Colors.black);
     return BlocProvider(
       create: (context) => VocabularyBloc(sayarehRepository: locator())
@@ -354,9 +356,20 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                                   Builder(
                                     builder: (context) {
                                       return Container(
+                                        padding: isDark
+                                            ? EdgeInsets.all(8.r)
+                                            : EdgeInsets.zero,
                                         decoration: BoxDecoration(
+                                          color: imageCardColor,
                                           borderRadius:
-                                              BorderRadius.circular(16.r),
+                                              BorderRadius.circular(20.r),
+                                          border: isDark
+                                              ? Border.all(
+                                                  color: MyColors.darkBorder
+                                                      .withValues(alpha: 0.35),
+                                                  width: 1,
+                                                )
+                                              : null,
                                         ),
                                         child: ClipRRect(
                                           borderRadius:
@@ -377,8 +390,9 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                                                             _buildImageLoader(),
                                                     errorWidget:
                                                         (context, url, error) =>
-                                                            const Icon(
+                                                            Icon(
                                                       Icons.error,
+                                                      color: primaryTextColor,
                                                     ),
                                                   ),
                                           ),

@@ -107,18 +107,40 @@ class _FAQScreenState extends State<FAQScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor =
+        isDark ? MyColors.darkBackground : MyColors.background;
+    final cardBackgroundColor =
+        isDark ? MyColors.darkCardBackground : const Color(0xFFFBFBFF);
+    final primaryTextColor =
+        isDark ? MyColors.darkTextPrimary : MyColors.textMatn1;
+    final secondaryTextColor =
+        isDark ? MyColors.darkTextSecondary : MyColors.text3;
+    final headerBackgroundColor =
+        isDark ? MyColors.darkCardBackground : MyColors.background;
+    final chipBorderColor =
+        isDark ? MyColors.darkBorder : const Color(0xFFD9D9D9);
+    final inactiveChipBackground =
+        isDark ? MyColors.darkBackgroundSecondary : MyColors.background;
+
     return Scaffold(
-      backgroundColor: MyColors.background,
+      backgroundColor: backgroundColor,
       body: SafeArea(
         child: Column(
           children: [
-            // Header
-            _buildHeader(),
-            // Category Filters
-            _buildCategoryFilters(),
-            // FAQ List
+            _buildHeader(headerBackgroundColor, primaryTextColor),
+            _buildCategoryFilters(
+              chipBorderColor: chipBorderColor,
+              inactiveChipBackground: inactiveChipBackground,
+              primaryTextColor: primaryTextColor,
+              secondaryTextColor: secondaryTextColor,
+            ),
             Expanded(
-              child: _buildFAQList(),
+              child: _buildFAQList(
+                cardBackgroundColor: cardBackgroundColor,
+                primaryTextColor: primaryTextColor,
+                secondaryTextColor: secondaryTextColor,
+              ),
             ),
           ],
         ),
@@ -126,11 +148,11 @@ class _FAQScreenState extends State<FAQScreen> {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(Color headerBackgroundColor, Color primaryTextColor) {
     return Container(
       height: 57.h,
       decoration: BoxDecoration(
-        color: MyColors.background,
+        color: headerBackgroundColor,
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(33.5.r),
         ),
@@ -148,7 +170,9 @@ class _FAQScreenState extends State<FAQScreen> {
             child: Center(
               child: Text(
                 'سوالات رایج',
-                style: MyTextStyle.textHeader16Bold,
+                style: MyTextStyle.textHeader16Bold.copyWith(
+                  color: primaryTextColor,
+                ),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -157,7 +181,7 @@ class _FAQScreenState extends State<FAQScreen> {
             onPressed: () => Navigator.of(context).pop(),
             icon: Icon(
               Icons.arrow_forward,
-              color: MyColors.textMatn1,
+              color: primaryTextColor,
               size: 24.r,
             ),
           ),
@@ -166,7 +190,12 @@ class _FAQScreenState extends State<FAQScreen> {
     );
   }
 
-  Widget _buildCategoryFilters() {
+  Widget _buildCategoryFilters({
+    required Color chipBorderColor,
+    required Color inactiveChipBackground,
+    required Color primaryTextColor,
+    required Color secondaryTextColor,
+  }) {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 16.h),
       child: SingleChildScrollView(
@@ -183,11 +212,10 @@ class _FAQScreenState extends State<FAQScreen> {
                   height: 33.h,
                   padding: EdgeInsets.symmetric(horizontal: 16.w),
                   decoration: BoxDecoration(
-                    color: isActive ? MyColors.primary : MyColors.background,
+                    color: isActive ? MyColors.primary : inactiveChipBackground,
                     borderRadius: BorderRadius.circular(20.r),
                     border: Border.all(
-                      color:
-                          isActive ? MyColors.primary : const Color(0xFFD9D9D9),
+                      color: isActive ? MyColors.primary : chipBorderColor,
                       width: 1,
                     ),
                   ),
@@ -195,7 +223,9 @@ class _FAQScreenState extends State<FAQScreen> {
                     child: Text(
                       category.displayName,
                       style: MyTextStyle.textMatn12W500.copyWith(
-                        color: isActive ? MyColors.background : MyColors.text3,
+                        color: isActive
+                            ? MyColors.background
+                            : secondaryTextColor,
                       ),
                     ),
                   ),
@@ -208,22 +238,36 @@ class _FAQScreenState extends State<FAQScreen> {
     );
   }
 
-  Widget _buildFAQList() {
+  Widget _buildFAQList({
+    required Color cardBackgroundColor,
+    required Color primaryTextColor,
+    required Color secondaryTextColor,
+  }) {
     return ListView.builder(
       padding: EdgeInsets.symmetric(horizontal: 25.w),
       itemCount: _filteredFAQItems.length,
       itemBuilder: (context, index) {
         final faqItem = _filteredFAQItems[index];
-        return _buildFAQCard(faqItem);
+        return _buildFAQCard(
+          faqItem,
+          cardBackgroundColor: cardBackgroundColor,
+          primaryTextColor: primaryTextColor,
+          secondaryTextColor: secondaryTextColor,
+        );
       },
     );
   }
 
-  Widget _buildFAQCard(FAQItem faqItem) {
+  Widget _buildFAQCard(
+    FAQItem faqItem, {
+    required Color cardBackgroundColor,
+    required Color primaryTextColor,
+    required Color secondaryTextColor,
+  }) {
     return Container(
       margin: EdgeInsets.only(bottom: 16.h),
       decoration: BoxDecoration(
-        color: const Color(0xFFFBFBFF),
+        color: cardBackgroundColor,
         borderRadius: BorderRadius.circular(20.r),
         border: faqItem.isExpanded
             ? Border.all(color: MyColors.secondary, width: 1)
@@ -231,7 +275,6 @@ class _FAQScreenState extends State<FAQScreen> {
       ),
       child: Column(
         children: [
-          // Question Row
           InkWell(
             onTap: () => _toggleFAQExpansion(faqItem.id),
             child: Container(
@@ -239,10 +282,7 @@ class _FAQScreenState extends State<FAQScreen> {
               padding: EdgeInsets.symmetric(horizontal: 20.w),
               child: Row(
                 children: [
-                  // Arrow Icon
-
                   SizedBox(width: 12.w),
-                  // Question Text
                   Expanded(
                     child: Text(
                       faqItem.question,
@@ -251,8 +291,10 @@ class _FAQScreenState extends State<FAQScreen> {
                             ? FontWeight.w500
                             : FontWeight.w400,
                         color: faqItem.isExpanded
-                            ? MyColors.textMatn2
-                            : MyColors.textMatn1,
+                            ? (Theme.of(context).brightness == Brightness.dark
+                                ? MyColors.darkTextPrimary
+                                : MyColors.textMatn2)
+                            : primaryTextColor,
                       ),
                       textAlign: TextAlign.right,
                     ),
@@ -261,10 +303,10 @@ class _FAQScreenState extends State<FAQScreen> {
                     width: 20.r,
                     height: 20.r,
                     child: Transform.rotate(
-                      angle: faqItem.isExpanded ? 6.2 : 1.5, // 315° or 45°
+                      angle: faqItem.isExpanded ? 6.2 : 1.5,
                       child: Icon(
                         Icons.keyboard_arrow_down,
-                        color: MyColors.textMatn1,
+                        color: primaryTextColor,
                         size: 20.r,
                       ),
                     ),
@@ -273,14 +315,13 @@ class _FAQScreenState extends State<FAQScreen> {
               ),
             ),
           ),
-          // Answer (if expanded)
           if (faqItem.isExpanded)
             Container(
               padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 20.h),
               child: Text(
                 faqItem.answer,
                 style: MyTextStyle.textMatn12W300.copyWith(
-                  color: MyColors.text3,
+                  color: secondaryTextColor,
                   height: 1.4,
                 ),
                 textAlign: TextAlign.right,

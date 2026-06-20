@@ -254,7 +254,7 @@ class _QuizScreenState extends State<QuizScreen> {
                                   fontWeight: FontWeight.bold,
                                   color: isDark
                                       ? MyColors.profileTextPrimaryDark
-                                      : null,
+                                      : MyColors.textMatn1,
                                 ),
                               ),
                               const SizedBox(height: 32),

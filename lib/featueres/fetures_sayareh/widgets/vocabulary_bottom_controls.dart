@@ -34,6 +34,9 @@ class VocabularyBottomControls extends StatelessWidget {
         ? MyColors.darkBackgroundSecondary
         : MyColors.modalHeaderBackground;
     final circleBgPressed = isDark ? MyColors.darkBorder : MyColors.text2;
+    final volumeIconPath = isDark
+        ? 'assets/images/icons/volume\u0640dark.png'
+        : 'assets/images/icons/volume.png';
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -50,7 +53,7 @@ class VocabularyBottomControls extends StatelessWidget {
           pressedBackgroundColor: circleBgPressed,
           onTap: onReadWord,
           child: Image.asset(
-            'assets/images/icons/volume.png',
+            volumeIconPath,
             width: Dimens.nr(28),
             height: Dimens.nr(28),
             fit: BoxFit.contain,
@@ -119,8 +122,11 @@ class LitnerResultToast extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final toastBg = const Color(0xFFF6F5F5);
-    final toastTextColor = MyColors.text1;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final toastBg =
+        isDark ? MyColors.termsBackgroundDark : const Color(0xFFF6F5F5);
+    final toastTextColor =
+        isDark ? MyColors.darkTextPrimary : MyColors.text1;
 
     return DecoratedBox(
       decoration: BoxDecoration(

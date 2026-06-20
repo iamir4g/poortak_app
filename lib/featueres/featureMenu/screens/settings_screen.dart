@@ -16,15 +16,25 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor =
+        isDark ? MyColors.darkBackground : MyColors.background;
+    final primaryTextColor =
+        isDark ? MyColors.darkTextPrimary : MyColors.textMatn1;
+    final secondaryTextColor =
+        isDark ? MyColors.darkTextSecondary : MyColors.textSecondary;
+    final cardBackgroundColor =
+        isDark ? MyColors.darkCardBackground : MyColors.background2;
+
     return BlocBuilder<SettingsCubit, SettingsState>(
       builder: (context, state) {
         return Scaffold(
-          backgroundColor: MyColors.background,
+          backgroundColor: backgroundColor,
           body: SafeArea(
             child: Column(
               children: [
                 // Header
-                _buildHeader(),
+                _buildHeader(primaryTextColor),
 
                 // Settings Sections
                 Expanded(
@@ -38,9 +48,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         _buildSettingsSection(
                           title: "تنظیمات نمایش",
                           icon: Icons.monitor,
+                          primaryTextColor: primaryTextColor,
+                          secondaryTextColor: secondaryTextColor,
                           children: [
                             _buildToggleOption(
                               title: "نمایش اپلیکیشن به صورت تمام صفحه",
+                              primaryTextColor: primaryTextColor,
                               value: state.fullScreenMode,
                               onChanged: (value) {
                                 context
@@ -57,9 +70,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         _buildSettingsSection(
                           title: "اعلانات برنامه",
                           icon: Icons.notifications,
+                          primaryTextColor: primaryTextColor,
+                          secondaryTextColor: secondaryTextColor,
                           children: [
                             _buildToggleOption(
                               title: "دریافت اعلان هنگام دستاورد جدید",
+                              primaryTextColor: primaryTextColor,
                               value: state.achievementNotifications,
                               onChanged: (value) {
                                 context
@@ -70,6 +86,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ),
                             _buildToggleOption(
                               title: "دریافت اعلان های عمومی",
+                              primaryTextColor: primaryTextColor,
                               value: state.generalNotifications,
                               onChanged: (value) {
                                 context
@@ -87,9 +104,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         _buildSettingsSection(
                           title: "تنظیمات صوتی",
                           icon: Icons.volume_up,
+                          primaryTextColor: primaryTextColor,
+                          secondaryTextColor: secondaryTextColor,
                           children: [
                             _buildToggleOption(
                               title: "پخش خودکار تلفظ در صفحه واژگان جدید",
+                              primaryTextColor: primaryTextColor,
                               value: state.autoPlayPronunciation,
                               onChanged: (value) {
                                 context
@@ -100,6 +120,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ),
                             _buildToggleOption(
                               title: "پخش خودکار صوت تمرین ها",
+                              primaryTextColor: primaryTextColor,
                               value: state.autoPlayExerciseSounds,
                               onChanged: (value) {
                                 context
@@ -110,6 +131,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ),
                             _buildToggleOption(
                               title: "پخش افکت های صوتی",
+                              primaryTextColor: primaryTextColor,
                               value: state.playSoundEffects,
                               onChanged: (value) {
                                 context
@@ -127,15 +149,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         _buildSettingsSection(
                           title: "اندازه متون محتوای درسی",
                           icon: Icons.text_fields,
+                          primaryTextColor: primaryTextColor,
+                          secondaryTextColor: secondaryTextColor,
                           children: [
-                            _buildTextSizeSlider(state.textSize),
+                            _buildTextSizeSlider(
+                              state.textSize,
+                              secondaryTextColor,
+                            ),
                           ],
                         ),
 
                         SizedBox(height: 40.h),
 
                         // Test Text Box
-                        _buildTestTextBox(state.textSize),
+                        _buildTestTextBox(
+                          state.textSize,
+                          cardBackgroundColor,
+                          primaryTextColor,
+                        ),
 
                         SizedBox(height: 20.h),
                       ],
@@ -150,7 +181,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(Color primaryTextColor) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
       child: Row(
@@ -158,7 +189,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           IconButton(
             onPressed: () => Navigator.pop(context),
             icon: Icon(Icons.arrow_back_ios,
-                size: 24.r, color: MyColors.textMatn1),
+                size: 24.r, color: primaryTextColor),
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(),
           ),
@@ -168,6 +199,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               textAlign: TextAlign.center,
               style: MyTextStyle.textHeader16Bold.copyWith(
                 fontSize: 20.sp,
+                color: primaryTextColor,
               ),
             ),
           ),
@@ -180,6 +212,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget _buildSettingsSection({
     required String title,
     required IconData icon,
+    required Color primaryTextColor,
+    required Color secondaryTextColor,
     required List<Widget> children,
   }) {
     return Column(
@@ -187,12 +221,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
       children: [
         Row(
           children: [
-            Icon(icon, size: 20.r, color: MyColors.textSecondary),
+            Icon(icon, size: 20.r, color: secondaryTextColor),
             SizedBox(width: 8.w),
             Text(
               title,
               style: MyTextStyle.textMatn16Bold.copyWith(
-                color: MyColors.textMatn1,
+                color: primaryTextColor,
               ),
             ),
           ],
@@ -206,6 +240,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget _buildToggleOption({
     required String title,
     required bool value,
+    required Color primaryTextColor,
     required ValueChanged<bool> onChanged,
     Color? activeColor,
   }) {
@@ -217,7 +252,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: Text(
               title,
               style: MyTextStyle.textMatn14Bold.copyWith(
-                color: MyColors.textMatn1,
+                color: primaryTextColor,
                 fontWeight: FontWeight.normal,
               ),
             ),
@@ -225,9 +260,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Switch(
             value: value,
             onChanged: onChanged,
-            activeThumbColor: activeColor ?? MyColors.textSecondary,
-            activeTrackColor: activeColor?.withValues(alpha: 0.3) ??
-                MyColors.textSecondary.withValues(alpha: 0.3),
+            activeThumbColor: activeColor ?? MyColors.primary,
+            activeTrackColor: (activeColor ?? MyColors.primary)
+                .withValues(alpha: 0.3),
             inactiveThumbColor: Colors.white,
             inactiveTrackColor: MyColors.textSecondary.withValues(alpha: 0.3),
           ),
@@ -236,7 +271,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildTextSizeSlider(double textSize) {
+  Widget _buildTextSizeSlider(double textSize, Color secondaryTextColor) {
     return Column(
       children: [
         SliderTheme(
@@ -262,13 +297,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
             Text(
               "اندازه کوچک",
               style: MyTextStyle.textMatn12W500.copyWith(
-                color: MyColors.textSecondary,
+                color: secondaryTextColor,
               ),
             ),
             Text(
               "اندازه بزرگ",
               style: MyTextStyle.textMatn12W500.copyWith(
-                color: MyColors.textSecondary,
+                color: secondaryTextColor,
               ),
             ),
           ],
@@ -277,7 +312,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildTestTextBox(double textSize) {
+  Widget _buildTestTextBox(
+    double textSize,
+    Color cardBackgroundColor,
+    Color primaryTextColor,
+  ) {
     // محاسبه اندازه فونت بر اساس مقدار اسلایدر
     // حداقل 12 و حداکثر 24 پیکسل
     double fontSize = 12 + (textSize * 12);
@@ -286,7 +325,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       width: double.infinity,
       padding: EdgeInsets.all(16.r),
       decoration: BoxDecoration(
-        color: MyColors.background2,
+        color: cardBackgroundColor,
         borderRadius: BorderRadius.circular(12.r),
       ),
       child: Text(
@@ -294,7 +333,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         textAlign: TextAlign.center,
         style: MyTextStyle.textMatn14Bold.copyWith(
           fontSize: fontSize.sp,
-          color: MyColors.textMatn1,
+          color: primaryTextColor,
         ),
       ),
     );

@@ -21,15 +21,22 @@ class _AddReminderModalState extends State<AddReminderModal> {
   ReminderType? _selectedType;
 
   Future<void> _selectTime() async {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: _selectedTime,
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: MyColors.primary,
-            ),
+            colorScheme: isDark
+                ? const ColorScheme.dark(
+                    primary: MyColors.primary,
+                    surface: MyColors.darkCardBackground,
+                    onSurface: MyColors.darkTextPrimary,
+                  )
+                : const ColorScheme.light(
+                    primary: MyColors.primary,
+                  ),
           ),
           child: child!,
         );
@@ -373,7 +380,7 @@ class ReminderTypeCard extends StatelessWidget {
         final cardBackground =
             themeState.isDark ? MyColors.darkCardBackground : Colors.white;
         final selectedBackground = themeState.isDark
-            ? MyColors.darkCardBackground
+            ? MyColors.termsBackgroundDark
             : MyColors.primaryTint3;
         final textColor =
             themeState.isDark ? MyColors.darkTextPrimary : MyColors.textMatn1;
@@ -403,7 +410,7 @@ class ReminderTypeCard extends StatelessWidget {
                     color: isSelected
                         ? MyColors.primary
                         : (themeState.isDark
-                            ? MyColors.darkCardBackground
+                            ? MyColors.loginIconContainerDark
                             : Colors.transparent),
                     borderRadius: BorderRadius.circular(12.r),
                   ),

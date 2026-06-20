@@ -46,6 +46,7 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
   String? selectedWord;
   List<String> randomizedOptions = [];
   bool _isExitDialogOpen = false;
+  bool _hasShownResultModal = false;
 
   @override
   void initState() {
@@ -234,6 +235,23 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
     _showExitModal();
   }
 
+  void _showResultModal(PracticeVocabularyCompleted state) {
+    if (_hasShownResultModal || !mounted) return;
+    _hasShownResultModal = true;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => PracticeVocabularyResultModal(
+        totalQuestions: state.totalQuestions,
+        correctAnswers: state.correctAnswersCount,
+        wrongAnswers: state.wrongAnswersCount,
+        reviewedVocabularies: state.reviewedVocabularies,
+        courseId: widget.courseId,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocListener<LitnerBloc, LitnerState>(
@@ -262,7 +280,15 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
           }
         }
       },
-      child: BlocBuilder<PracticeVocabularyBloc, PracticeVocabularyState>(
+      child: BlocListener<PracticeVocabularyBloc, PracticeVocabularyState>(
+        listenWhen: (previous, current) =>
+            current is PracticeVocabularyCompleted,
+        listener: (context, state) {
+          if (state is PracticeVocabularyCompleted) {
+            _showResultModal(state);
+          }
+        },
+        child: BlocBuilder<PracticeVocabularyBloc, PracticeVocabularyState>(
         builder: (context, state) {
           if (state is PracticeVocabularyInitial) {
             context.read<PracticeVocabularyBloc>().add(
@@ -305,19 +331,6 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
                           child: CircularProgressIndicator(strokeWidth: 4.w));
                     }
                     if (state is PracticeVocabularyCompleted) {
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        showDialog(
-                          context: innerContext,
-                          barrierDismissible: false,
-                          builder: (context) => PracticeVocabularyResultModal(
-                            totalQuestions: state.totalQuestions,
-                            correctAnswers: state.correctAnswersCount,
-                            wrongAnswers: state.wrongAnswersCount,
-                            reviewedVocabularies: state.reviewedVocabularies,
-                            courseId: widget.courseId,
-                          ),
-                        );
-                      });
                       return Center(
                           child: CircularProgressIndicator(strokeWidth: 4.w));
                     }
@@ -603,6 +616,7 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
             ),
           );
         },
+      ),
       ),
     );
   }

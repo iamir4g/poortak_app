@@ -14,25 +14,50 @@ class ContactUsScreen extends StatefulWidget {
 
 class _ContactUsScreenState extends State<ContactUsScreen> {
   @override
-  void dispose() {
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final titleStyle = MyTextStyle.contactTitle18Light;
-    final descriptionStyle = MyTextStyle.contactDescription15Light;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor =
+        isDark ? MyColors.darkBackground : MyColors.background3;
+    final headerBackgroundColor =
+        isDark ? MyColors.darkCardBackground : MyColors.background;
+    final cardBackgroundColor =
+        isDark ? MyColors.darkCardBackground : MyColors.background;
+    final titleColor =
+        isDark ? MyColors.darkTextPrimary : MyColors.activeTabBackground;
+    final descriptionColor =
+        isDark ? MyColors.darkTextSecondary : MyColors.activeTabBackground;
+    final titleStyle =
+        MyTextStyle.contactTitle18Light.copyWith(color: titleColor);
+    final descriptionStyle =
+        MyTextStyle.contactDescription15Light.copyWith(color: descriptionColor);
+
     return Scaffold(
-      backgroundColor: MyColors.background3,
+      backgroundColor: backgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             children: [
-              _buildHeaderSection(titleStyle),
+              _buildHeaderSection(
+                headerBackgroundColor: headerBackgroundColor,
+                titleStyle: titleStyle,
+                iconColor: titleColor,
+              ),
               SizedBox(height: 15.h),
-              _buildContactInfoSection(titleStyle, descriptionStyle),
-              _buildWebsiteInfoSection(titleStyle, descriptionStyle),
-              _buildEmailSection(titleStyle, descriptionStyle),
+              _buildContactInfoSection(
+                cardBackgroundColor: cardBackgroundColor,
+                titleStyle: titleStyle,
+                descriptionStyle: descriptionStyle,
+              ),
+              _buildWebsiteInfoSection(
+                cardBackgroundColor: cardBackgroundColor,
+                titleStyle: titleStyle,
+                descriptionStyle: descriptionStyle,
+              ),
+              _buildEmailSection(
+                cardBackgroundColor: cardBackgroundColor,
+                titleStyle: titleStyle,
+                descriptionStyle: descriptionStyle,
+              ),
               SizedBox(height: 20.h),
               SizedBox(
                 height: 187.h,
@@ -50,55 +75,60 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
     );
   }
 
-  // Section 1: Header based on Figma design 467:5902
-  Widget _buildHeaderSection(TextStyle titleStyle) {
+  Widget _buildHeaderSection({
+    required Color headerBackgroundColor,
+    required TextStyle titleStyle,
+    required Color iconColor,
+  }) {
     return Container(
-        height: 57.h,
-        decoration: BoxDecoration(
-          color: MyColors.background,
-          borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(40.r),
+      height: 57.h,
+      decoration: BoxDecoration(
+        color: headerBackgroundColor,
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(40.r),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0x0D000000),
+            blurRadius: 1.r,
+            offset: Offset(0, 2.h),
           ),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0x0D000000),
-              blurRadius: 1.r,
-              offset: Offset(0, 2.h),
+        ],
+      ),
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 24.w),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'تماس با ما',
+              style: titleStyle,
+              textAlign: TextAlign.center,
+            ),
+            IconButton(
+              onPressed: () => Navigator.pop(context),
+              icon: Icon(
+                Icons.arrow_forward,
+                color: iconColor,
+                size: 24.w,
+              ),
             ),
           ],
         ),
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 24.w),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'تماس با ما',
-                style: titleStyle,
-                textAlign: TextAlign.center,
-              ),
-              IconButton(
-                  onPressed: () => Navigator.pop(context),
-                  icon: Icon(
-                    Icons.arrow_forward,
-                    color: MyColors.activeTabBackground,
-                    size: 24.w,
-                  )),
-            ],
-          ),
-        ));
+      ),
+    );
   }
 
-  // Section 2: Contact Information based on Figma design 769:10683
-  Widget _buildContactInfoSection(
-    TextStyle titleStyle,
-    TextStyle descriptionStyle,
-  ) {
+  Widget _buildContactInfoSection({
+    required Color cardBackgroundColor,
+    required TextStyle titleStyle,
+    required TextStyle descriptionStyle,
+  }) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 15.w, vertical: 4.h),
       padding: EdgeInsets.all(24.r),
       decoration: BoxDecoration(
-        color: MyColors.background,
+        color: cardBackgroundColor,
         boxShadow: [
           BoxShadow(
             color: MyColors.shadow,
@@ -108,7 +138,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
         ],
         borderRadius: BorderRadius.circular(10.r),
         border: Border.all(
-          color: MyColors.background,
+          color: cardBackgroundColor,
           width: 1,
         ),
       ),
@@ -143,16 +173,16 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
     );
   }
 
-  // Section 4: Additional Info based on Figma design 769:10685
-  Widget _buildWebsiteInfoSection(
-    TextStyle titleStyle,
-    TextStyle descriptionStyle,
-  ) {
+  Widget _buildWebsiteInfoSection({
+    required Color cardBackgroundColor,
+    required TextStyle titleStyle,
+    required TextStyle descriptionStyle,
+  }) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 15.w, vertical: 4.h),
       padding: EdgeInsets.all(24.r),
       decoration: BoxDecoration(
-        color: MyColors.background,
+        color: cardBackgroundColor,
         borderRadius: BorderRadius.circular(10.r),
         boxShadow: [
           BoxShadow(
@@ -162,7 +192,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
           ),
         ],
         border: Border.all(
-          color: MyColors.background,
+          color: cardBackgroundColor,
           width: 1,
         ),
       ),
@@ -193,16 +223,16 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
     );
   }
 
-  // Section 5: Illustration/Image Section
-  Widget _buildEmailSection(
-    TextStyle titleStyle,
-    TextStyle descriptionStyle,
-  ) {
+  Widget _buildEmailSection({
+    required Color cardBackgroundColor,
+    required TextStyle titleStyle,
+    required TextStyle descriptionStyle,
+  }) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 15.w, vertical: 4.h),
       padding: EdgeInsets.all(24.r),
       decoration: BoxDecoration(
-        color: MyColors.background,
+        color: cardBackgroundColor,
         boxShadow: [
           BoxShadow(
             color: MyColors.shadow,
@@ -212,7 +242,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
         ],
         borderRadius: BorderRadius.circular(10.r),
         border: Border.all(
-          color: MyColors.background,
+          color: cardBackgroundColor,
           width: 1,
         ),
       ),

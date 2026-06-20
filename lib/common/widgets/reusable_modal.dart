@@ -52,6 +52,16 @@ class ReusableModal extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final modalBackgroundColor = isDarkMode
+        ? MyColors.darkBackgroundSecondary
+        : Colors.white;
+    final titleColor =
+        isDarkMode ? MyColors.darkTextPrimary : MyColors.textMatn1;
+    final messageColor =
+        isDarkMode ? MyColors.darkTextSecondary : const Color(0xFF3D495C);
+    final closeButtonBackground = isDarkMode
+        ? MyColors.paymentHistoryCardHeaderDark
+        : const Color(0xFFF6F9FE);
 
     if (cartSuccessStyle) {
       return _buildCartSuccessModal(context, isDarkMode);
@@ -63,7 +73,7 @@ class ReusableModal extends StatelessWidget {
         width: 0.9.sw,
         constraints: BoxConstraints(maxWidth: 350.w),
         decoration: BoxDecoration(
-          color: isDarkMode ? const Color(0xFF2C2E3F) : Colors.white,
+          color: modalBackgroundColor,
           borderRadius: BorderRadius.circular(20.r),
         ),
         child: Stack(
@@ -95,7 +105,9 @@ class ReusableModal extends StatelessWidget {
                       margin: EdgeInsets.only(bottom: 10.h),
                       child: Text(
                         title,
-                        style: MyTextStyle.textHeader16Bold,
+                        style: MyTextStyle.textHeader16Bold.copyWith(
+                          color: titleColor,
+                        ),
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -111,7 +123,7 @@ class ReusableModal extends StatelessWidget {
                       child: Text(
                         message,
                         style: MyTextStyle.textMatn14Bold.copyWith(
-                          color: const Color(0xFF3D495C),
+                          color: messageColor,
                           height: 1.4,
                           fontWeight: FontWeight.w500,
                         ),
@@ -172,8 +184,12 @@ class ReusableModal extends StatelessWidget {
                                   backgroundColor: Colors.transparent,
                                   padding:
                                       EdgeInsets.symmetric(horizontal: 8.w),
-                                  side: const BorderSide(
-                                      color: MyColors.primary, width: 1),
+                                  side: BorderSide(
+                                    color: isDarkMode
+                                        ? MyColors.darkBorder
+                                        : MyColors.primary,
+                                    width: 1,
+                                  ),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(20.r),
                                   ),
@@ -185,7 +201,9 @@ class ReusableModal extends StatelessWidget {
                                     secondButtonText!,
                                     maxLines: 1,
                                     style: MyTextStyle.textMatn14Bold.copyWith(
-                                      color: MyColors.primary,
+                                      color: isDarkMode
+                                          ? MyColors.darkTextPrimary
+                                          : MyColors.primary,
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),
@@ -242,9 +260,7 @@ class ReusableModal extends StatelessWidget {
                     width: 32.w,
                     height: 32.h,
                     decoration: BoxDecoration(
-                      color: isDarkMode
-                          ? const Color(0xFF323548)
-                          : const Color(0xFFF6F9FE),
+                      color: closeButtonBackground,
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -272,7 +288,7 @@ class ReusableModal extends StatelessWidget {
         width: 0.9.sw,
         constraints: BoxConstraints(maxWidth: 350.w),
         decoration: BoxDecoration(
-          color: isDarkMode ? const Color(0xFF2C2E3F) : Colors.white,
+          color: isDarkMode ? MyColors.darkBackgroundSecondary : Colors.white,
           borderRadius: BorderRadius.circular(20.r),
         ),
         child: Column(
@@ -282,7 +298,7 @@ class ReusableModal extends StatelessWidget {
               width: double.infinity,
               decoration: BoxDecoration(
                 color: isDarkMode
-                    ? const Color(0xFF2C2E3F)
+                    ? MyColors.darkBackgroundSecondary
                     : MyColors.modalHeaderBackground,
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(20.r),

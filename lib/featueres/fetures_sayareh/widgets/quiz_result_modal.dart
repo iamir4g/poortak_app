@@ -159,8 +159,12 @@ class QuizResultModal extends StatelessWidget {
               height: 50.h,
               child: ElevatedButton(
                 onPressed: () async {
-                  await locator<SayarehRepository>()
-                      .deleteQuizResult(courseId, quizId);
+                  try {
+                    await locator<SayarehRepository>()
+                        .deleteQuizResult(courseId, quizId);
+                  } catch (_) {
+                    // Continue navigation even if delete fails.
+                  }
                   if (context.mounted) {
                     Navigator.of(context)
                         .popUntil(ModalRoute.withName(QuizzesScreen.routeName));

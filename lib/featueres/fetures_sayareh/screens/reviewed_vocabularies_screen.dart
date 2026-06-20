@@ -289,7 +289,7 @@ class _ReviewedVocabulariesScreenState
               child: SafeArea(
                 child: Row(
                   children: [
-                    // تمرین ها Button
+                    // بازگشت به درس Button
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () {
@@ -311,7 +311,7 @@ class _ReviewedVocabulariesScreenState
                           ),
                         ),
                         child: Text(
-                          'تمرین ها',
+                          'بازگشت به درس',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 16.sp,

@@ -9,6 +9,7 @@ import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_start_b
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_answer_bloc/quiz_answer_bloc.dart';
 import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/quiz_screen.dart';
+import 'package:poortak/featueres/fetures_sayareh/screens/quizzes_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/widgets/item_question.dart';
 import 'package:poortak/common/widgets/reusable_modal.dart';
 import 'package:poortak/locator.dart';
@@ -32,6 +33,8 @@ class FirstQuizScreen extends StatefulWidget {
 
 class _FirstQuizScreenState extends State<FirstQuizScreen> {
   String? selectedAnswerId;
+  bool _isExitDialogOpen = false;
+  bool _canPop = false;
 
   @override
   void initState() {
@@ -54,7 +57,33 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
     Navigator.pushReplacementNamed(context, LoginScreen.routeName);
   }
 
+  Future<void> _leaveQuiz() async {
+    try {
+      await locator<SayarehRepository>()
+          .deleteQuizResult(widget.courseId, widget.quizId);
+    } catch (_) {
+      // Still leave the quiz even if delete fails (e.g. 404 when no result exists).
+    }
+
+    if (!mounted) return;
+    _navigateBackToQuizList();
+  }
+
+  void _navigateBackToQuizList() {
+    setState(() => _canPop = true);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      Navigator.of(context).popUntil(
+        (route) =>
+            route.settings.name == QuizzesScreen.routeName || route.isFirst,
+      );
+    });
+  }
+
   void _showExitModal() {
+    if (_isExitDialogOpen) return;
+    _isExitDialogOpen = true;
+
     ReusableModal.show(
       context: context,
       title: 'ترک آزمون',
@@ -64,24 +93,37 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
       buttonText: 'ماندن',
       secondButtonText: 'ترک آزمون',
       showSecondButton: true,
+      barrierDismissible: false,
       onButtonPressed: () {
-        Navigator.of(context).pop(); // Close modal
+        _isExitDialogOpen = false;
+        Navigator.of(context, rootNavigator: true).pop();
       },
-      onSecondButtonPressed: () async {
-        Navigator.of(context).pop(); // Close modal
-        // Call delete API
-        await locator<SayarehRepository>()
-            .deleteQuizResult(widget.courseId, widget.quizId);
-        if (!mounted) return;
-        Navigator.of(context).pop(); // Exit quiz screen
+      onSecondButtonPressed: () {
+        _isExitDialogOpen = false;
+        Navigator.of(context, rootNavigator: true).pop();
+        _leaveQuiz();
       },
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final pageBackgroundColor =
+        isDark ? MyColors.profileBackgroundDark : Colors.white;
+    final headerBackgroundColor =
+        isDark ? MyColors.darkBackgroundSecondary : Colors.white;
+    final primaryTextColor =
+        isDark ? MyColors.profileTextPrimaryDark : MyColors.text2;
+
+    return PopScope(
+      canPop: _canPop,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        _showExitModal();
+      },
+      child: Scaffold(
+      backgroundColor: pageBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
@@ -92,12 +134,12 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                   width: double.infinity,
                   height: 80.h,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: headerBackgroundColor,
                     borderRadius: BorderRadius.only(
                       bottomLeft: Radius.circular(33.5.r),
                       bottomRight: Radius.circular(33.5.r),
                     ),
-                    boxShadow: [
+                    boxShadow: const [
                       BoxShadow(
                         color: Color(0x0D000000),
                         blurRadius: 1,
@@ -117,11 +159,13 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                             width: 34.w,
                             height: 34.h,
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: headerBackgroundColor,
                               borderRadius: BorderRadius.circular(17.r),
                             ),
-                            child: const Icon(Icons.arrow_forward,
-                                color: Color(0xFF3D495C)),
+                            child: Icon(
+                              Icons.arrow_forward,
+                              color: primaryTextColor,
+                            ),
                           ),
                         ),
 
@@ -185,7 +229,11 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                                 state.question.data.title,
                                 textAlign: TextAlign.center,
                                 textDirection: TextDirection.ltr,
-                                style: MyTextStyle.textHeader16Bold,
+                                style: MyTextStyle.textHeader16Bold.copyWith(
+                                  color: isDark
+                                      ? MyColors.profileTextPrimaryDark
+                                      : MyColors.textMatn1,
+                                ),
                               ),
 
                               SizedBox(height: 32.h),
@@ -316,7 +364,9 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                                     margin: const EdgeInsets.symmetric(
                                         horizontal: 0),
                                     decoration: BoxDecoration(
-                                      color: MyColors.cardBackground1,
+                                      color: isDark
+                                          ? MyColors.termsBackgroundDark
+                                          : MyColors.cardBackground1,
                                       borderRadius: BorderRadius.circular(16.r),
                                       boxShadow: [
                                         BoxShadow(
@@ -331,7 +381,9 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                                       answerState.explanation!,
                                       style:
                                           MyTextStyle.textMatn12W500.copyWith(
-                                        color: MyColors.textMatn1,
+                                        color: isDark
+                                            ? MyColors.profileTextPrimaryDark
+                                            : MyColors.textMatn1,
                                         fontSize: 13.sp,
                                       ),
                                       textAlign: TextAlign.center,
@@ -348,13 +400,23 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                                           width: 54.w,
                                           height: 54.h,
                                           decoration: BoxDecoration(
-                                            color: const Color(0xFFEDFAEB),
+                                            color: isDark
+                                                ? MyColors
+                                                    .quizAnswerCorrectBackgroundDark
+                                                : MyColors
+                                                    .quizAnswerCorrectBackgroundLight,
                                             borderRadius:
                                                 BorderRadius.circular(50.r),
                                           ),
-                                          child: Icon(Icons.check_circle,
-                                              color: Color(0xFF6FC845),
-                                              size: 40.r),
+                                          child: Icon(
+                                            Icons.check_circle,
+                                            color: isDark
+                                                ? MyColors
+                                                    .quizAnswerCorrectTextDark
+                                                : MyColors
+                                                    .quizAnswerCorrectBorderLight,
+                                            size: 40.r,
+                                          ),
                                         ),
                                         SizedBox(height: 12.h),
                                         Text(
@@ -363,7 +425,10 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                                             fontFamily: 'IRANSans',
                                             fontWeight: FontWeight.w300,
                                             fontSize: 12.sp,
-                                            color: Color(0xFF3D495C),
+                                            color: isDark
+                                                ? MyColors
+                                                    .quizAnswerCorrectTextDark
+                                                : MyColors.text2,
                                           ),
                                           textAlign: TextAlign.center,
                                         ),
@@ -497,7 +562,9 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                           state.message,
                           textAlign: TextAlign.center,
                           style: MyTextStyle.textMatn15.copyWith(
-                            color: const Color(0xFF3D495C),
+                            color: isDark
+                                ? MyColors.profileTextPrimaryDark
+                                : const Color(0xFF3D495C),
                           ),
                         ),
                       ),
@@ -510,6 +577,7 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
           ],
         ),
       ),
+    ),
     );
   }
 }
