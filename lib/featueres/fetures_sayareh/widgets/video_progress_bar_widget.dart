@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/config/myColors.dart';
 
 class VideoProgressBarWidget extends StatelessWidget {
   final bool isVisible;
@@ -16,6 +17,9 @@ class VideoProgressBarWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (!isVisible) return const SizedBox.shrink();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor =
+        isDark ? MyColors.profileTextPrimaryDark : MyColors.textMatn1;
 
     return Container(
       margin: EdgeInsets.only(top: 12.h),
@@ -31,6 +35,7 @@ class VideoProgressBarWidget extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 12.sp,
                   fontWeight: FontWeight.bold,
+                  color: textColor,
                 ),
               ),
               Text(
@@ -38,6 +43,7 @@ class VideoProgressBarWidget extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 12.sp,
                   fontWeight: FontWeight.bold,
+                  color: textColor,
                 ),
               ),
             ],
@@ -48,8 +54,9 @@ class VideoProgressBarWidget extends StatelessWidget {
             child: LinearProgressIndicator(
               value: progress.clamp(0.0, 1.0),
               minHeight: 6.h,
-              backgroundColor: Colors.grey[300],
-              valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
+              backgroundColor:
+                  isDark ? MyColors.loginIconContainerDark : Colors.grey[300],
+              valueColor: const AlwaysStoppedAnimation<Color>(MyColors.primary),
             ),
           ),
         ],
@@ -71,6 +78,9 @@ class DecryptionProgressBarWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (!isVisible) return const SizedBox.shrink();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor =
+        isDark ? MyColors.profileTextPrimaryDark : MyColors.textMatn1;
 
     return Container(
       margin: EdgeInsets.only(top: 12.h),
@@ -86,6 +96,7 @@ class DecryptionProgressBarWidget extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 12.sp,
                   fontWeight: FontWeight.bold,
+                  color: textColor,
                 ),
               ),
               Text(
@@ -93,6 +104,7 @@ class DecryptionProgressBarWidget extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 12.sp,
                   fontWeight: FontWeight.bold,
+                  color: textColor,
                 ),
               ),
             ],
@@ -103,8 +115,9 @@ class DecryptionProgressBarWidget extends StatelessWidget {
             child: LinearProgressIndicator(
               value: progress.clamp(0.0, 1.0),
               minHeight: 6.h,
-              backgroundColor: Colors.grey[300],
-              valueColor: const AlwaysStoppedAnimation<Color>(Colors.green),
+              backgroundColor:
+                  isDark ? MyColors.loginIconContainerDark : Colors.grey[300],
+              valueColor: const AlwaysStoppedAnimation<Color>(MyColors.success),
             ),
           ),
         ],

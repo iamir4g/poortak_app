@@ -13,6 +13,15 @@ class ProfileApiProvider {
   ProfileApiProvider({required this.dio})
       : _authService = locator<AuthService>();
 
+  dynamic callRefreshToken(String refreshToken) async {
+    final response = await dio.post(
+      "${Constants.baseUrl}auth/refresh",
+      data: {"refreshToken": refreshToken},
+      options: Options(extra: {'skipAuthRefresh': true}),
+    );
+    return response;
+  }
+
   dynamic callRequestOtp(String phone) async {
     final response = await dio.post(
       "${Constants.baseUrl}auth/otp",

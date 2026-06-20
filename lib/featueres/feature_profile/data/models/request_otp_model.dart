@@ -12,21 +12,25 @@ String authRequestOtpModelToJson(AuthRequestOtpModel data) =>
 
 class AuthRequestOtpModel {
   bool ok;
+  String? message;
   Data data;
 
   AuthRequestOtpModel({
     required this.ok,
+    this.message,
     required this.data,
   });
 
   factory AuthRequestOtpModel.fromJson(Map<String, dynamic> json) =>
       AuthRequestOtpModel(
         ok: json["ok"],
+        message: json["message"],
         data: Data.fromJson(json["data"]),
       );
 
   Map<String, dynamic> toJson() => {
         "ok": ok,
+        "message": message,
         "data": data.toJson(),
       };
 }
@@ -48,17 +52,17 @@ class Data {
 }
 
 class Result {
-  String otp;
+  int otpLength;
 
   Result({
-    required this.otp,
+    required this.otpLength,
   });
 
   factory Result.fromJson(Map<String, dynamic> json) => Result(
-        otp: json["otp"],
+        otpLength: json["otpLength"] ?? 4,
       );
 
   Map<String, dynamic> toJson() => {
-        "otp": otp,
+        "otpLength": otpLength,
       };
 }

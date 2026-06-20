@@ -13,6 +13,7 @@ import 'package:poortak/common/widgets/logout_confirmation_modal.dart';
 import 'package:poortak/common/widgets/exit_confirmation_modal.dart';
 import 'package:poortak/common/services/auth_navigation_manager.dart';
 import 'package:poortak/config/myColors.dart';
+import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/kavoosh_main_screen.dart';
 import 'package:poortak/featueres/feature_litner/screens/litner_main_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/profile_screen.dart';
@@ -47,6 +48,11 @@ class _MainWrapperState extends State<MainWrapper> {
   late final VoidCallback _authNavigationListener;
 
   late int currentPageIndex;
+  bool _isProgrammaticNavigation = false;
+  int? _targetPageIndex;
+
+  static const _tabAnimationDuration = Duration(milliseconds: 350);
+  static const _tabAnimationCurve = Curves.easeOutCubic;
 
   // Deep link handling
   late final AppLinks _appLinks;
@@ -195,16 +201,40 @@ class _MainWrapperState extends State<MainWrapper> {
   }
 
   void _animateToTab(int index) {
-    if (!mounted) return;
+    if (!mounted || index == currentPageIndex) return;
+
+    _isProgrammaticNavigation = true;
+    _targetPageIndex = index;
+
     context.read<BottomNavCubit>().changeSelectedIndex(index);
-    controller.animateToPage(
-      index,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-    );
     setState(() {
       currentPageIndex = index;
     });
+
+    controller
+        .animateToPage(
+          index,
+          duration: _tabAnimationDuration,
+          curve: _tabAnimationCurve,
+        )
+        .whenComplete(() {
+          if (!mounted) return;
+          _isProgrammaticNavigation = false;
+          _targetPageIndex = null;
+        });
+  }
+
+  void _onPageChanged(int index) {
+    if (_isProgrammaticNavigation && index != _targetPageIndex) {
+      return;
+    }
+
+    context.read<BottomNavCubit>().changeSelectedIndex(index);
+    if (currentPageIndex != index) {
+      setState(() {
+        currentPageIndex = index;
+      });
+    }
   }
 
   void _logout() async {
@@ -256,11 +286,7 @@ class _MainWrapperState extends State<MainWrapper> {
 
     // If not on Sayareh screen (index 0), navigate to Sayareh
     if (currentPageIndex != 0) {
-      controller.animateToPage(
-        0,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
+      _animateToTab(0);
       return false; // Prevent default back behavior
     }
 
@@ -327,20 +353,6 @@ class _MainWrapperState extends State<MainWrapper> {
 
             return BlocBuilder<ThemeCubit, ThemeState>(
               builder: (context, themeState) {
-                // Update BottomNavCubit if initialIndex is provided (only once)
-                if (widget.initialIndex != null &&
-                    currentPageIndex == widget.initialIndex) {
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    try {
-                      context
-                          .read<BottomNavCubit>()
-                          .changeSelectedIndex(widget.initialIndex!);
-                    } catch (e) {
-                      // BottomNavCubit might not be available yet, ignore
-                    }
-                  });
-                }
-
                 return PopScope(
                   canPop: false,
                   onPopInvoked: (didPop) async {
@@ -353,6 +365,7 @@ class _MainWrapperState extends State<MainWrapper> {
                     backgroundColor: themeState.isDark
                         ? MyColors.darkBackground
                         : Colors.white,
+                    resizeToAvoidBottomInset: false,
                     extendBodyBehindAppBar: false,
                     drawerScrimColor: Colors.black54,
                     appBar: AppBar(
@@ -380,10 +393,11 @@ class _MainWrapperState extends State<MainWrapper> {
                                     value: 'logout',
                                     child: Text(
                                       'خروج از ناحیه کاربری',
-                                      style: TextStyle(
+                                      style: MyTextStyle.textMatn13.copyWith(
                                         color: themeState.isDark
                                             ? MyColors.darkTextPrimary
                                             : MyColors.textMatn1,
+                                        fontWeight: FontWeight.w500,
                                       ),
                                     ),
                                   ),
@@ -418,23 +432,18 @@ class _MainWrapperState extends State<MainWrapper> {
                       ),
                     ),
                     drawer: const CustomDrawer(),
-                    bottomNavigationBar: BottomNav(controller: controller),
-                    body: SafeArea(
-                      child: state is PermissionLoading
-                          ? const Center(child: CircularProgressIndicator())
-                          : PageView(
-                              controller: controller,
-                              onPageChanged: (index) {
-                                context
-                                    .read<BottomNavCubit>()
-                                    .changeSelectedIndex(index);
-                                setState(() {
-                                  currentPageIndex = index;
-                                });
-                              },
-                              children: topLevelScreens,
-                            ),
+                    bottomNavigationBar: BottomNav(
+                      controller: controller,
+                      onTabSelected: _animateToTab,
                     ),
+                    body: state is PermissionLoading
+                        ? const Center(child: CircularProgressIndicator())
+                        : PageView(
+                            controller: controller,
+                            physics: const ClampingScrollPhysics(),
+                            onPageChanged: _onPageChanged,
+                            children: topLevelScreens,
+                          ),
                   ),
                 );
               },

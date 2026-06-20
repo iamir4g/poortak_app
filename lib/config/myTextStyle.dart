@@ -3,6 +3,36 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/config/myColors.dart';
 
 class MyTextStyle {
+  static TextStyle get sayarehHeader12Bold => TextStyle(
+        fontFamily: "IRANSans",
+        fontSize: 12.sp,
+        fontWeight: FontWeight.w700,
+        fontStyle: FontStyle.normal,
+        height: 1.0,
+        letterSpacing: 0.0,
+        color: MyColors.text1,
+      );
+
+  static TextStyle get modalAction16MediumBlue => TextStyle(
+        fontFamily: "IRANSans",
+        fontSize: 16.sp,
+        fontWeight: FontWeight.w500,
+        fontStyle: FontStyle.normal,
+        height: 1.0,
+        letterSpacing: 0.0,
+        color: MyColors.secondaryShade2,
+      );
+
+  static TextStyle get modalAction16MediumOnDark => TextStyle(
+        fontFamily: "IRANSans",
+        fontSize: 16.sp,
+        fontWeight: FontWeight.w500,
+        fontStyle: FontStyle.normal,
+        height: 1.0,
+        letterSpacing: 0.0,
+        color: Colors.white,
+      );
+
   static TextStyle get bottomNavEnabledTextStyle => TextStyle(
         fontFamily: "IranSans",
         fontSize: 14.sp,
@@ -65,6 +95,12 @@ class MyTextStyle {
         fontWeight: FontWeight.bold,
         color: MyColors.textMatn1,
       );
+  static TextStyle get textBadge10W700 => TextStyle(
+        fontFamily: "IranSans",
+        fontSize: 10.sp,
+        fontWeight: FontWeight.bold,
+        color: MyColors.background,
+      );
   static TextStyle get textMatn12Bold => TextStyle(
         fontFamily: "IranSans",
         fontSize: 12.sp,
@@ -88,6 +124,24 @@ class MyTextStyle {
         fontSize: 10.sp,
         fontWeight: FontWeight.normal,
         color: MyColors.textMatn1,
+      );
+  static TextStyle get text10MediumText6 => TextStyle(
+        fontFamily: "IranSans",
+        fontSize: 10.sp,
+        fontWeight: FontWeight.w500,
+        color: MyColors.text6,
+        height: 1.5,
+        letterSpacing: 1.0,
+      );
+
+  static TextStyle get description10Medium => TextStyle(
+        fontFamily: "IRANSans",
+        fontSize: 10.sp,
+        fontWeight: FontWeight.w500,
+        fontStyle: FontStyle.normal,
+        height: 1.5,
+        letterSpacing: 0.0,
+        color: MyColors.text6,
       );
   static TextStyle get textMatn15 => TextStyle(
         fontFamily: "IranSans",
@@ -194,5 +248,87 @@ class MyTextStyle {
         fontWeight: FontWeight.w300,
         color: MyColors.text3,
         height: 1.0,
+      );
+
+  static TextStyle get referralCodeInput14Medium => TextStyle(
+        fontFamily: "IranSans",
+        fontSize: 14.sp,
+        fontWeight: FontWeight.w500,
+        color: MyColors.textMatn1,
+        height: 1.0,
+      );
+
+  static TextStyle get paymentSecurityTitle13Medium => TextStyle(
+        fontFamily: "IRANSans",
+        fontSize: 13.sp,
+        fontWeight: FontWeight.w500,
+        color: MyColors.activeTabBackground,
+        height: 1.0,
+      );
+
+  static TextStyle get paymentSecuritySubtitle10Medium => TextStyle(
+        fontFamily: "IRANSans",
+        fontSize: 10.sp,
+        fontWeight: FontWeight.w500,
+        color: MyColors.activeTabBackground,
+        height: 1.0,
+      );
+
+  static TextStyle get contactTitle18Light => TextStyle(
+        fontFamily: "IRANSans",
+        fontSize: 18.sp,
+        fontWeight: FontWeight.w300,
+        color: MyColors.activeTabBackground,
+        height: 1.0,
+        letterSpacing: 0.0,
+      );
+
+  static TextStyle get contactDescription15Light => TextStyle(
+        fontFamily: "IRANSans",
+        fontSize: 15.sp,
+        fontWeight: FontWeight.w300,
+        color: MyColors.activeTabBackground,
+        height: 1.0,
+        letterSpacing: 0.0,
+      );
+
+  static TextStyle get paymentHistoryLabel14Light => TextStyle(
+        fontFamily: "IRANSans",
+        fontSize: 14.sp,
+        fontWeight: FontWeight.w300,
+        fontStyle: FontStyle.normal,
+        height: 1.0,
+        letterSpacing: 0.0,
+        color: MyColors.textMatn1,
+      );
+
+  static TextStyle get paymentHistoryValue14Medium => TextStyle(
+        fontFamily: "IRANSans",
+        fontSize: 14.sp,
+        fontWeight: FontWeight.w500,
+        fontStyle: FontStyle.normal,
+        height: 1.0,
+        letterSpacing: 0.0,
+        color: MyColors.textMatn1,
+      );
+
+  static TextStyle get modalTitle18Medium => TextStyle(
+        fontFamily: "IRANSans",
+        fontSize: 18.sp,
+        fontWeight: FontWeight.w500,
+        fontStyle: FontStyle.normal,
+        height: 1.0,
+        letterSpacing: 0.0,
+        color: MyColors.textMatn1,
+      );
+
+  static TextStyle get modalMessage14Medium => TextStyle(
+        fontFamily: "IRANSans",
+        fontSize: 14.sp,
+        fontWeight: FontWeight.w500,
+        fontStyle: FontStyle.normal,
+        height: 1.0,
+        letterSpacing: 0.0,
+        color: MyColors.text3,
       );
 }

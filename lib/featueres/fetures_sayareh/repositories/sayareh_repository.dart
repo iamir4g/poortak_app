@@ -374,6 +374,9 @@ class SayarehRepository {
       }
     } on AppException catch (e) {
       return CheckExceptions.getError<void>(e);
+    } catch (_) {
+      // No saved result to delete (e.g. 404) — treat as success for exit flow.
+      return DataSuccess(null);
     }
   }
 

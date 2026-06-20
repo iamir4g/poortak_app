@@ -21,7 +21,7 @@ class AppLocalizationsFa extends AppLocalizations {
   String get settings => 'تنظیمات';
 
   @override
-  String get sayareh => 'سیاره آی نو';
+  String get sayareh => 'انیمیشن سیاره آی نو';
 
   @override
   String get price => 'قیمت محصول:';

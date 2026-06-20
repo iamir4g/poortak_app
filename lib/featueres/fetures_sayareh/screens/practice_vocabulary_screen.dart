@@ -3,12 +3,12 @@ import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poortak/common/services/haptic_service.dart';
 import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/common/services/tts_service.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/common/widgets/reusable_modal.dart';
+import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_bloc.dart';
@@ -19,6 +19,9 @@ import 'package:poortak/featueres/fetures_sayareh/widgets/practice_vocabulary_re
 import 'package:poortak/locator.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/lesson_screen.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/common/widgets/pressable_circle.dart';
+import 'package:poortak/featueres/fetures_sayareh/widgets/vocabulary_bottom_controls.dart';
+import 'package:poortak/featueres/fetures_sayareh/widgets/item_question.dart';
 
 class PracticeVocabularyScreen extends StatefulWidget {
   static const routeName = "/practice_vocabulary_screen";
@@ -36,11 +39,14 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
   final TTSService ttsService = locator<TTSService>();
   final StorageService storageService = locator<StorageService>();
   final PrefsOperator prefsOperator = locator<PrefsOperator>();
+  final LitnerResultToastController _litnerToastController =
+      LitnerResultToastController();
   bool showAnswer = false;
   bool isCorrect = false;
   String? selectedWord;
   List<String> randomizedOptions = [];
   bool _isExitDialogOpen = false;
+  bool _hasShownResultModal = false;
 
   @override
   void initState() {
@@ -55,6 +61,7 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
   @override
   void dispose() {
     unawaited(_feedbackPlayer.dispose());
+    _litnerToastController.dispose();
     super.dispose();
   }
 
@@ -228,31 +235,60 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
     _showExitModal();
   }
 
+  void _showResultModal(PracticeVocabularyCompleted state) {
+    if (_hasShownResultModal || !mounted) return;
+    _hasShownResultModal = true;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => PracticeVocabularyResultModal(
+        totalQuestions: state.totalQuestions,
+        correctAnswers: state.correctAnswersCount,
+        wrongAnswers: state.wrongAnswersCount,
+        reviewedVocabularies: state.reviewedVocabularies,
+        courseId: widget.courseId,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocListener<LitnerBloc, LitnerState>(
       listener: (context, state) {
         if (state is CreateWordSuccess) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('لغت به لایتنر اضافه شد'),
-              backgroundColor: Colors.green,
-              duration: Duration(seconds: 2),
-            ),
+          _litnerToastController.show(
+            text: 'به لایتنر اضافه شد!',
+            showCheckIcon: true,
           );
         } else if (state is LitnerError) {
           // Check if it's the "word already exists" error
           final isWordExistsError = state.message == "این کلمه قبلا اضافه شده";
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.message),
-              backgroundColor: isWordExistsError ? Colors.orange : Colors.red,
-              duration: const Duration(seconds: 2),
-            ),
-          );
+          if (isWordExistsError) {
+            _litnerToastController.show(
+              text: 'این کلمه از قبل بوده',
+              showCheckIcon: false,
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: Colors.red,
+                duration: const Duration(seconds: 2),
+              ),
+            );
+          }
         }
       },
-      child: BlocBuilder<PracticeVocabularyBloc, PracticeVocabularyState>(
+      child: BlocListener<PracticeVocabularyBloc, PracticeVocabularyState>(
+        listenWhen: (previous, current) =>
+            current is PracticeVocabularyCompleted,
+        listener: (context, state) {
+          if (state is PracticeVocabularyCompleted) {
+            _showResultModal(state);
+          }
+        },
+        child: BlocBuilder<PracticeVocabularyBloc, PracticeVocabularyState>(
         builder: (context, state) {
           if (state is PracticeVocabularyInitial) {
             context.read<PracticeVocabularyBloc>().add(
@@ -267,7 +303,7 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
               }
             },
             child: Scaffold(
-              backgroundColor: MyColors.secondaryTint4,
+              backgroundColor: MyColors.background,
               appBar: AppBar(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.only(
@@ -282,7 +318,6 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
                     onPressed: () => _handleExitAttempt(state),
                   ),
                 ],
-                centerTitle: true,
                 title: Text(
                   'تمرین واژگان',
                   style: MyTextStyle.textHeader16Bold,
@@ -296,19 +331,6 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
                           child: CircularProgressIndicator(strokeWidth: 4.w));
                     }
                     if (state is PracticeVocabularyCompleted) {
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        showDialog(
-                          context: innerContext,
-                          barrierDismissible: false,
-                          builder: (context) => PracticeVocabularyResultModal(
-                            totalQuestions: state.totalQuestions,
-                            correctAnswers: state.correctAnswersCount,
-                            wrongAnswers: state.wrongAnswersCount,
-                            reviewedVocabularies: state.reviewedVocabularies,
-                            courseId: widget.courseId,
-                          ),
-                        );
-                      });
                       return Center(
                           child: CircularProgressIndicator(strokeWidth: 4.w));
                     }
@@ -319,43 +341,54 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
 
                       _generateRandomOptions(correctWord.word, wrongWord.word);
 
+                      final optionButtons = randomizedOptions
+                          .map(
+                            (word) => Expanded(
+                              child: PressableAnswerOptionButton(
+                                text: word,
+                                onTap: () => _checkAnswer(word),
+                              ),
+                            ),
+                          )
+                          .toList();
+
                       return Column(
                         children: [
                           Expanded(
                             child: SingleChildScrollView(
-                              padding: EdgeInsets.only(bottom: 20.h),
+                              padding: EdgeInsets.only(
+                                bottom: !showAnswer ? 120.h : 170.h,
+                              ),
                               child: Center(
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
-                                    if (!showAnswer) ...[
-                                      SizedBox(
-                                        height: 18.h,
+                                    SizedBox(
+                                      height: 18.h,
+                                    ),
+                                    Container(
+                                      width: 268.w,
+                                      height: 45.h,
+                                      decoration: BoxDecoration(
+                                        color: MyColors.infoBg,
+                                        borderRadius:
+                                            BorderRadius.circular(20.r),
                                       ),
-                                      Container(
-                                        width: 268.w,
-                                        height: 45.h,
-                                        decoration: BoxDecoration(
-                                          color: MyColors.infoBg,
-                                          borderRadius:
-                                              BorderRadius.circular(20.r),
-                                        ),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              "گزینه ی درست را انتخاب کنید.",
-                                              style: MyTextStyle.textMatn14Bold,
-                                            ),
-                                          ],
-                                        ),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            "گزینه ی درست را انتخاب کنید.",
+                                            style: MyTextStyle.textMatn14Bold,
+                                          ),
+                                        ],
                                       ),
-                                      SizedBox(
-                                        height: 24.h,
-                                      ),
-                                    ] else
-                                      SizedBox(height: 10.h),
+                                    ),
+                                    SizedBox(
+                                      height: 24.h,
+                                    ),
+                                    SizedBox(height: 10.h),
                                     FutureBuilder<String>(
                                       future: storageService
                                           .callGetDownloadPublicUrl(
@@ -395,15 +428,6 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
                                       },
                                     ),
                                     SizedBox(height: showAnswer ? 20.h : 30.h),
-                                    if (!showAnswer)
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
-                                        children: randomizedOptions
-                                            .map((word) =>
-                                                _buildWordButton(word))
-                                            .toList(),
-                                      ),
                                     SizedBox(height: showAnswer ? 10.h : 30.h),
                                     if (showAnswer) ...[
                                       if (!isCorrect) ...[
@@ -413,9 +437,22 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
                                         ),
                                         SizedBox(height: 5.h),
                                       ],
-                                      Text(
-                                        correctWord.word,
-                                        style: MyTextStyle.text24Correct,
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Image.asset(
+                                            'assets/images/check_icon2.png',
+                                            width: 22.r,
+                                            height: 22.r,
+                                            fit: BoxFit.contain,
+                                          ),
+                                          SizedBox(width: 8.w),
+                                          Text(
+                                            correctWord.word,
+                                            style: MyTextStyle.text24Correct,
+                                          ),
+                                        ],
                                       ),
                                       SizedBox(height: 2.h),
                                       Text(
@@ -425,81 +462,147 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
                                           color: Colors.grey,
                                         ),
                                       ),
-                                      SizedBox(height: 10.h),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          IconButton(
-                                            onPressed: () =>
-                                                _readWord(correctWord.word),
-                                            icon: SvgPicture.asset(
-                                              'assets/images/icons/cuida--volume-2-outline.svg',
-                                              width: 32.r,
-                                              height: 32.r,
-                                              colorFilter: ColorFilter.mode(
-                                                Theme.of(context)
-                                                        .iconTheme
-                                                        .color ??
-                                                    Colors.black,
-                                                BlendMode.srcIn,
-                                              ),
-                                            ),
-                                          ),
-                                          SizedBox(width: 20.w),
-                                          BlocBuilder<LitnerBloc, LitnerState>(
-                                            builder: (context, litnerState) {
-                                              return IconButton(
-                                                onPressed:
-                                                    litnerState is LitnerLoading
-                                                        ? null
-                                                        : () => _addToLitner(
-                                                              correctWord.word,
-                                                              correctWord
-                                                                  .translation,
-                                                            ),
-                                                icon: litnerState
-                                                        is LitnerLoading
-                                                    ? SizedBox(
-                                                        width: 20.w,
-                                                        height: 20.h,
-                                                        child:
-                                                            CircularProgressIndicator(
-                                                          strokeWidth: 2.w,
-                                                        ),
-                                                      )
-                                                    : const Icon(Icons
-                                                        .add_circle_outline),
-                                                iconSize: 32.r,
-                                              );
-                                            },
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(height: 15.h),
-                                      ElevatedButton(
-                                        onPressed: _nextQuestion,
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: MyColors.primary,
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 32.w, vertical: 16.h),
-                                        ),
-                                        child: Text(
-                                          'سوال بعدی',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 16.sp,
-                                            fontFamily: "IranSans",
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
+                                      SizedBox(height: 30.h),
                                     ],
                                   ],
                                 ),
                               ),
                             ),
                           ),
+                          if (!showAnswer)
+                            SafeArea(
+                              top: false,
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 18.w,
+                                  vertical: 64.h,
+                                ),
+                                child: Row(
+                                  children: optionButtons.length == 2
+                                      ? [
+                                          optionButtons[0],
+                                          SizedBox(width: 12.w),
+                                          optionButtons[1],
+                                        ]
+                                      : optionButtons,
+                                ),
+                              ),
+                            ),
+                          if (showAnswer)
+                            SafeArea(
+                              top: false,
+                              child: Padding(
+                                padding: EdgeInsets.only(
+                                  left: 16.w,
+                                  right: 16.w,
+                                  top: 8.h,
+                                  bottom: 64.h,
+                                ),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Builder(
+                                          builder: (context) {
+                                            final isDark =
+                                                Theme.of(context).brightness ==
+                                                    Brightness.dark;
+                                            final circleBg = isDark
+                                                ? MyColors
+                                                    .darkBackgroundSecondary
+                                                : MyColors
+                                                    .modalHeaderBackground;
+                                            final circleBgPressed = isDark
+                                                ? MyColors.darkBorder
+                                                : MyColors.text2;
+
+                                            return Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                PressableCircle(
+                                                  enabled: true,
+                                                  backgroundColor: circleBg,
+                                                  pressedBackgroundColor:
+                                                      circleBgPressed,
+                                                  onTap: () => _readWord(
+                                                      correctWord.word),
+                                                  child: Image.asset(
+                                                    'assets/images/icons/volume.png',
+                                                    width: Dimens.nr(28),
+                                                    height: Dimens.nr(28),
+                                                    fit: BoxFit.contain,
+                                                  ),
+                                                ),
+                                                SizedBox(width: 20.w),
+                                                BlocBuilder<LitnerBloc,
+                                                    LitnerState>(
+                                                  builder:
+                                                      (context, litnerState) {
+                                                    final isLoading =
+                                                        litnerState
+                                                            is LitnerLoading;
+                                                    return LitnerAddButton(
+                                                      toastController:
+                                                          _litnerToastController,
+                                                      enabled: !isLoading,
+                                                      isLoading: isLoading,
+                                                      backgroundColor: circleBg,
+                                                      pressedBackgroundColor:
+                                                          circleBgPressed,
+                                                      onTap: () => _addToLitner(
+                                                        correctWord.word,
+                                                        correctWord.translation,
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ],
+                                            );
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 15.h),
+                                    ElevatedButton(
+                                      onPressed: _nextQuestion,
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: MyColors.primary,
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 32.w,
+                                          vertical: 16.h,
+                                        ),
+                                      ),
+                                      child: SizedBox(
+                                        width: Dimens.buttonSmallWidth,
+                                        height: Dimens.buttonSmallHeight,
+                                        child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            const Icon(Icons.chevron_left),
+                                            SizedBox(width: 4.r),
+                                            Text(
+                                              'بعدی',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 16.sp,
+                                                fontFamily: "IranSans",
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
                         ],
                       );
                     }
@@ -514,25 +617,14 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
           );
         },
       ),
+      ),
     );
   }
 
   Widget _buildWordButton(String word) {
-    return ElevatedButton(
-      onPressed: () => _checkAnswer(word),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: MyColors.primary,
-        padding: EdgeInsets.symmetric(horizontal: 32.w, vertical: 16.h),
-      ),
-      child: Text(
-        word,
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 16.sp,
-          fontFamily: "IranSans",
-          fontWeight: FontWeight.bold,
-        ),
-      ),
+    return PressableAnswerOptionButton(
+      text: word,
+      onTap: () => _checkAnswer(word),
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_kavoosh/widgets/course_card.dart';
 import 'package:poortak/featueres/feature_kavoosh/widgets/section_header.dart';
@@ -27,6 +28,7 @@ class _EducationalVideosScreenState extends State<EducationalVideosScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return BlocProvider(
       create: (context) => locator<CategoriesBloc>()
         ..add(
@@ -35,7 +37,7 @@ class _EducationalVideosScreenState extends State<EducationalVideosScreen> {
           ),
         ),
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: isDark ? MyColors.darkBackground : Colors.white,
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(57.h),
           child: SafeArea(
@@ -43,17 +45,19 @@ class _EducationalVideosScreenState extends State<EducationalVideosScreen> {
               padding: EdgeInsets.fromLTRB(16.w, 0, 32.w, 0),
               height: 57.h,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: isDark ? MyColors.darkBackgroundSecondary : Colors.white,
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(33.5.r),
                 ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
-                    offset: Offset(0, 1.h),
-                    blurRadius: 1.r,
-                  ),
-                ],
+                boxShadow: isDark
+                    ? null
+                    : [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.05),
+                          offset: Offset(0, 1.h),
+                          blurRadius: 1.r,
+                        ),
+                      ],
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -62,7 +66,9 @@ class _EducationalVideosScreenState extends State<EducationalVideosScreen> {
                     child: Text(
                       'ویدئو های آموزشی',
                       style: MyTextStyle.textMatn16Bold.copyWith(
-                        color: const Color(0xFF29303D),
+                        color: isDark
+                            ? MyColors.darkTextPrimary
+                            : const Color(0xFF29303D),
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -75,7 +81,9 @@ class _EducationalVideosScreenState extends State<EducationalVideosScreen> {
                       onPressed: () => Navigator.of(context).pop(),
                       icon: Icon(
                         Icons.arrow_forward,
-                        color: const Color(0xFF29303D),
+                        color: isDark
+                            ? MyColors.darkTextPrimary
+                            : const Color(0xFF29303D),
                         size: 28.sp,
                       ),
                     ),
@@ -93,8 +101,10 @@ class _EducationalVideosScreenState extends State<EducationalVideosScreen> {
                 Container(
                   height: 200.h,
                   width: double.infinity,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFF9F6C6),
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? MyColors.darkBackgroundSecondary
+                        : const Color(0xFFF9F6C6),
                     borderRadius: BorderRadius.only(
                       bottomLeft: Radius.circular(0),
                       bottomRight: Radius.circular(0),
@@ -116,20 +126,21 @@ class _EducationalVideosScreenState extends State<EducationalVideosScreen> {
                 Container(
                   height: 2.h,
                   width: double.infinity,
-                  color: Colors.grey.withValues(alpha: 0.1),
+                  color: (isDark ? MyColors.darkBorder : Colors.grey)
+                      .withValues(alpha: 0.35),
                   child: Row(
                     children: [
                       Expanded(
                         child: Container(
                           color: _selectedTabIndex == 0
-                              ? Colors.orange
+                              ? MyColors.primary
                               : Colors.transparent,
                         ),
                       ),
                       Expanded(
                         child: Container(
                           color: _selectedTabIndex == 1
-                              ? Colors.orange
+                              ? MyColors.primary
                               : Colors.transparent,
                         ),
                       ),
@@ -170,7 +181,9 @@ class _EducationalVideosScreenState extends State<EducationalVideosScreen> {
                               child: Text(
                                 'دسته‌بندی‌ای یافت نشد',
                                 style: MyTextStyle.textMatn14Bold.copyWith(
-                                  color: Colors.grey,
+                                  color: isDark
+                                      ? MyColors.darkTextSecondary
+                                      : Colors.grey,
                                 ),
                               ),
                             ),
@@ -202,6 +215,7 @@ class _EducationalVideosScreenState extends State<EducationalVideosScreen> {
 
   Widget _buildTabItem(int index, String title, IconData icon) {
     final isSelected = _selectedTabIndex == index;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -214,13 +228,17 @@ class _EducationalVideosScreenState extends State<EducationalVideosScreen> {
             title,
             style: MyTextStyle.textMatn14Bold.copyWith(
               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              color: isSelected ? Colors.orange : Colors.grey,
+              color: isSelected
+                  ? MyColors.primary
+                  : (isDark ? MyColors.darkTextSecondary : Colors.grey),
             ),
           ),
           SizedBox(width: 8.w),
           Icon(
             icon,
-            color: isSelected ? Colors.orange : Colors.grey,
+            color: isSelected
+                ? MyColors.primary
+                : (isDark ? MyColors.darkTextSecondary : Colors.grey),
             size: 20.sp,
           ),
         ],

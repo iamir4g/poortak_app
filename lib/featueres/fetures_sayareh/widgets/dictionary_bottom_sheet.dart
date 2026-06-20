@@ -64,12 +64,23 @@ class _DictionaryContentState extends State<_DictionaryContent> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final surfaceColor = isDark ? MyColors.termsBackgroundDark : MyColors.background;
+    final fieldColor = isDark ? MyColors.profileHeaderDark : MyColors.background3;
+    final textColor = isDark ? MyColors.profileTextPrimaryDark : MyColors.textMatn1;
+    final hintColor = isDark ? MyColors.loginTextSecondaryDark : MyColors.textSecondary;
+    final borderColor = isDark ? MyColors.loginIconContainerDark : MyColors.divider;
     return BlocListener<LitnerBloc, LitnerState>(
       listener: (context, state) {
         if (state is CreateWordSuccess) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('لغت به لایتنر اضافه شد'),
+            SnackBar(
+              content: Text(
+                'لغت به لایتنر اضافه شد',
+                style: MyTextStyle.textMatn12Bold.copyWith(
+                  color: MyColors.textLight,
+                ),
+              ),
               backgroundColor: MyColors.success,
               duration: Duration(seconds: 2),
             ),
@@ -78,7 +89,12 @@ class _DictionaryContentState extends State<_DictionaryContent> {
           final isWordExistsError = state.message == "این کلمه قبلا اضافه شده";
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(state.message),
+              content: Text(
+                state.message,
+                style: MyTextStyle.textMatn12Bold.copyWith(
+                  color: MyColors.textLight,
+                ),
+              ),
               backgroundColor:
                   isWordExistsError ? MyColors.warning : MyColors.error,
               duration: const Duration(seconds: 2),
@@ -91,8 +107,8 @@ class _DictionaryContentState extends State<_DictionaryContent> {
               EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
           child: Container(
             height: MediaQuery.of(context).size.height * 0.6,
-            decoration: const BoxDecoration(
-              color: MyColors.background,
+            decoration: BoxDecoration(
+              color: surfaceColor,
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(20),
                 topRight: Radius.circular(20),
@@ -105,40 +121,49 @@ class _DictionaryContentState extends State<_DictionaryContent> {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: MyColors.divider,
+                    color: borderColor,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
                 const SizedBox(height: 16),
                 Text(
                   'دیکشنری',
-                  style: MyTextStyle.textHeader16Bold.copyWith(fontSize: 18),
+                  style: MyTextStyle.textHeader16Bold.copyWith(
+                    fontSize: 18,
+                    color: textColor,
+                  ),
                 ),
                 const SizedBox(height: 20),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: MyColors.background3,
+                      color: fieldColor,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: MyColors.divider),
+                      border: Border.all(color: borderColor),
                     ),
                     child: TextField(
                       controller: _controller,
                       onChanged: _onSearchChanged,
                       textAlign: TextAlign.right,
                       textDirection: TextDirection.ltr,
+                      style: MyTextStyle.textMatn14Bold.copyWith(
+                        fontWeight: FontWeight.normal,
+                        color: textColor,
+                        height: 1.0,
+                        letterSpacing: 0.0,
+                      ),
+                      cursorColor: MyColors.primary,
                       decoration: InputDecoration(
                         hintText: 'جستجوی معنی کلمه',
                         hintStyle: MyTextStyle.textMatn14Bold.copyWith(
-                          color: MyColors.textSecondary,
+                          color: hintColor,
                           fontWeight: FontWeight.normal,
                         ),
                         border: InputBorder.none,
                         contentPadding: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 14),
-                        prefixIcon: const Icon(Icons.search,
-                            color: MyColors.textSecondary),
+                        prefixIcon: Icon(Icons.search, color: hintColor),
                       ),
                     ),
                   ),
@@ -188,7 +213,11 @@ class _DictionaryContentState extends State<_DictionaryContent> {
                                         alignment: WrapAlignment.end,
                                         children: entry.relatedWords
                                             .map((w) => ActionChip(
-                                                label: Text(w),
+                                                label: Text(
+                                                  w,
+                                                  style: MyTextStyle
+                                                      .textMatn12W300,
+                                                ),
                                                 onPressed: () {
                                                   _controller.text = w;
                                                   _onSearchChanged(w);
@@ -204,7 +233,7 @@ class _DictionaryContentState extends State<_DictionaryContent> {
                           child: Text(
                             'موردی یافت نشد',
                             style: MyTextStyle.textMatn14Bold.copyWith(
-                              color: MyColors.textSecondary,
+                              color: hintColor,
                             ),
                           ),
                         );
@@ -365,7 +394,13 @@ class _DictionaryContentState extends State<_DictionaryContent> {
               return Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('• '),
+                  Text(
+                    '• ',
+                    style: MyTextStyle.textMatn16.copyWith(
+                      height: 1.0,
+                      letterSpacing: 0.0,
+                    ),
+                  ),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/common/services/getImageUrl_service.dart';
+import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
+import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/book_detail_screen.dart';
 
 class ItemBook extends StatelessWidget {
@@ -27,6 +29,7 @@ class ItemBook extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -37,11 +40,14 @@ class ItemBook extends StatelessWidget {
           }
         },
         child: Container(
+          height: Dimens.nh(104.0),
           width: double.infinity,
-          margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+          margin: EdgeInsets.symmetric(
+            horizontal: Dimens.medium,
+          ),
           padding: EdgeInsets.all(16.r),
           decoration: BoxDecoration(
-            color: MyColors.background, //Theme.of(context).cardColor,
+            color: isDark ? Theme.of(context).cardColor : MyColors.background,
             borderRadius: BorderRadius.circular(20.r),
             boxShadow: [
               BoxShadow(
@@ -64,21 +70,23 @@ class ItemBook extends StatelessWidget {
                   children: [
                     Text(
                       title ?? 'بدون عنوان',
-                      style: TextStyle(
-                        color: Theme.of(context).textTheme.titleMedium?.color,
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w600,
+                      style: MyTextStyle.textMatn17W700.copyWith(
+                        color:
+                            isDark ? const Color(0xFFFFFFFF) : MyColors.text2,
+                        height: 1.0,
+                        letterSpacing: 0.0,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                     if (description != null && description!.isNotEmpty) ...[
-                      SizedBox(height: 4.h),
+                      SizedBox(height: 8.h),
                       Text(
                         description!,
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color,
-                          fontSize: 12.sp,
+                        style: MyTextStyle.description10Medium.copyWith(
+                          color: isDark
+                              ? MyColors.loginTextSecondaryDark
+                              : MyColors.text6,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,

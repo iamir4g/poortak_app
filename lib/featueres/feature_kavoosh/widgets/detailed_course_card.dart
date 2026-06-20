@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/video_detail_screen.dart';
@@ -26,6 +27,7 @@ class DetailedCourseCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
       onTap: onTap ??
           () {
@@ -36,18 +38,25 @@ class DetailedCourseCard extends StatelessWidget {
             );
           },
       child: Container(
-        margin: EdgeInsets.only(bottom: 16.h, left: 16.w, right: 16.w),
+        margin: EdgeInsets.only(
+          bottom: Dimens.medium,
+          left: Dimens.medium,
+          right: Dimens.medium,
+        ),
         constraints: BoxConstraints(minHeight: 140.h),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDark ? MyColors.termsBackgroundDark : Colors.white,
           borderRadius: BorderRadius.circular(20.r),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 10.r,
-              offset: Offset(0, 4.h),
-            ),
-          ],
+          border: isDark ? Border.all(color: MyColors.darkBorder) : null,
+          boxShadow: isDark
+              ? null
+              : [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 10.r,
+                    offset: Offset(0, 4.h),
+                  ),
+                ],
         ),
         child: Row(
           children: [
@@ -58,7 +67,9 @@ class DetailedCourseCard extends StatelessWidget {
                 width: 100.w,
                 height: 116.h,
                 decoration: BoxDecoration(
-                  color: backgroundColor ?? MyColors.background1,
+                  color: isDark
+                      ? MyColors.darkBackgroundSecondary
+                      : (backgroundColor ?? MyColors.background1),
                   borderRadius: BorderRadius.circular(16.r),
                 ),
                 child: imagePath != null
@@ -70,7 +81,11 @@ class DetailedCourseCard extends StatelessWidget {
                         ),
                       )
                     : Center(
-                        child: Icon(Icons.image, color: Colors.grey, size: 40.r),
+                        child: Icon(
+                          Icons.image,
+                          color: isDark ? MyColors.darkTextSecondary : Colors.grey,
+                          size: 40.r,
+                        ),
                       ),
               ),
             ),
@@ -87,7 +102,8 @@ class DetailedCourseCard extends StatelessWidget {
                     Text(
                       title,
                       style: MyTextStyle.textMatn16Bold.copyWith(
-                        color: MyColors.textMatn2,
+                        color:
+                            isDark ? MyColors.darkTextPrimary : MyColors.textMatn2,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -98,7 +114,7 @@ class DetailedCourseCard extends StatelessWidget {
                     Text(
                       author,
                       style: MyTextStyle.textMatn12W500.copyWith(
-                        color: MyColors.text3,
+                        color: isDark ? MyColors.darkTextSecondary : MyColors.text3,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -118,14 +134,17 @@ class DetailedCourseCard extends StatelessWidget {
                               Icon(
                                 Icons.access_time,
                                 size: 14.r,
-                                color: MyColors.text4,
+                                color:
+                                    isDark ? MyColors.darkTextSecondary : MyColors.text4,
                               ),
                               SizedBox(width: 4.w),
                               Flexible(
                                 child: Text(
                                   date,
                                   style: MyTextStyle.textMatn10W300.copyWith(
-                                    color: MyColors.text4,
+                                    color: isDark
+                                        ? MyColors.darkTextSecondary
+                                        : MyColors.text4,
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,

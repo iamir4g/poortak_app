@@ -6,6 +6,7 @@ import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/dictionary_b
 import 'package:get_it/get_it.dart';
 import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/common/services/tts_service.dart';
+import 'package:poortak/common/services/auth_interceptor.dart';
 import 'package:poortak/common/services/auth_service.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/featueres/feature_litner/data/data_source/litner_api_provider.dart';
@@ -80,6 +81,10 @@ Future<void> initLocator() async {
       return handler.next(options);
     },
   ));
+
+  dio.interceptors.add(
+    AuthInterceptor(prefsOperator: prefsOperator, dio: dio),
+  );
 
   locator.registerSingleton<Dio>(dio);
 

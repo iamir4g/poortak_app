@@ -143,9 +143,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final profileBloc = locator<ProfileBloc>();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final pageBackgroundColor =
+        isDark ? MyColors.profileBackgroundDark : MyColors.background3;
+    final topStatusBarColor =
+        isDark ? MyColors.profileBackgroundDark : const Color(0xFFFFF8E4);
+    final contentBackgroundColor =
+        isDark ? MyColors.profileHeaderDark : Colors.white;
+    final primaryTextColor =
+        isDark ? MyColors.profileTextPrimaryDark : MyColors.textMatn1;
 
     return Scaffold(
-      backgroundColor: MyColors.background3,
+      backgroundColor: pageBackgroundColor,
       body: SafeArea(
         child: BlocListener<ProfileBloc, ProfileState>(
           bloc: profileBloc,
@@ -157,7 +166,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text('پروفایل با موفقیت بروزرسانی شد'),
-                  backgroundColor: Colors.green,
+                  backgroundColor: MyColors.success,
                   duration: Duration(seconds: 2),
                 ),
               );
@@ -172,7 +181,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(state.message),
-                  backgroundColor: Colors.red,
+                  backgroundColor: MyColors.error,
                   duration: const Duration(seconds: 2),
                 ),
               );
@@ -183,7 +192,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               // Status bar area
               Container(
                 height: 22.h,
-                color: const Color(0xFFFFF8E4),
+                color: topStatusBarColor,
               ),
 
               // Main content
@@ -195,7 +204,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   Expanded(
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: contentBackgroundColor,
                         borderRadius: BorderRadius.only(
                           bottomLeft: Radius.circular(81.r),
                         ),
@@ -215,7 +224,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                   'عکس آواتار خود را انتخاب کنید!',
                                   style: MyTextStyle.textMatn13.copyWith(
                                     fontWeight: FontWeight.w500,
-                                    color: MyColors.textMatn1,
+                                    color: primaryTextColor,
                                   ),
                                   textAlign: TextAlign.center,
                                 ),
@@ -233,7 +242,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 'مشخصات خود را وارد کنید:',
                                 style: MyTextStyle.textMatn13.copyWith(
                                   fontWeight: FontWeight.w500,
-                                  color: MyColors.textMatn1,
+                                  color: primaryTextColor,
                                 ),
                                 textAlign: TextAlign.right,
                               ),
@@ -282,7 +291,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                     onPressed:
                                         isLoading ? null : _updateProfile,
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color(0xFFC2C9D6),
+                                      backgroundColor: isDark
+                                          ? MyColors.primary
+                                          : const Color(0xFFC2C9D6),
                                       shape: RoundedRectangleBorder(
                                         borderRadius:
                                             BorderRadius.circular(20.r),
@@ -294,8 +305,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                             width: 20.r,
                                             height: 20.r,
                                             child:
-                                                const CircularProgressIndicator(
-                                              color: Colors.white,
+                                                CircularProgressIndicator(
+                                              color: isDark
+                                                  ? MyColors.loginButtonText
+                                                  : Colors.white,
                                               strokeWidth: 2,
                                             ),
                                           )
@@ -303,7 +316,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                             'تأیید',
                                             style: MyTextStyle.textMatn18Bold
                                                 .copyWith(
-                                              color: Colors.white,
+                                              color: isDark
+                                                  ? MyColors.loginButtonText
+                                                  : Colors.white,
                                             ),
                                           ),
                                   ),
@@ -327,7 +342,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   Widget _buildSelectedAvatar() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final selectedAvatarUrl = _getSelectedAvatarUrl();
+    final borderColor = isDark
+        ? MyColors.profileAvatarBorderDark
+        : const Color(0xFFC2C9D6);
+    final placeholderBackgroundColor =
+        isDark ? MyColors.termsBackgroundDark : const Color(0xFFE3F2FD);
+    final placeholderIconColor =
+        isDark ? MyColors.loginTextSecondaryDark : const Color(0xFFA3AFC2);
 
     return Center(
       child: GestureDetector(
@@ -338,7 +361,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(
-              color: const Color(0xFFC2C9D6),
+              color: borderColor,
               width: 3.r,
             ),
           ),
@@ -349,21 +372,21 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       return Container(
-                        color: const Color(0xFFE3F2FD),
+                        color: placeholderBackgroundColor,
                         child: Icon(
                           Icons.person,
                           size: 50.r,
-                          color: const Color(0xFFA3AFC2),
+                          color: placeholderIconColor,
                         ),
                       );
                     },
                   )
                 : Container(
-                    color: const Color(0xFFE3F2FD),
+                    color: placeholderBackgroundColor,
                     child: Icon(
                       Icons.person,
                       size: 50.r,
-                      color: const Color(0xFFA3AFC2),
+                      color: placeholderIconColor,
                     ),
                   ),
           ),
@@ -385,12 +408,22 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        final backgroundColor =
+            isDark ? MyColors.termsBackgroundDark : Colors.white;
+        final titleTextColor =
+            isDark ? MyColors.profileTextPrimaryDark : MyColors.textMatn1;
+        final actionTextColor =
+            isDark ? MyColors.profileTextPrimaryDark : MyColors.textMatn1;
+
         return AlertDialog(
+          backgroundColor: backgroundColor,
+          surfaceTintColor: Colors.transparent,
           title: Text(
             'انتخاب آواتار',
             textAlign: TextAlign.center,
             style: MyTextStyle.textHeader16Bold.copyWith(
-              color: MyColors.textMatn1,
+              color: titleTextColor,
             ),
           ),
           content: SizedBox(
@@ -409,7 +442,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 'بستن',
                 style: MyTextStyle.textMatn14Bold.copyWith(
                   fontWeight: FontWeight.normal,
-                  color: MyColors.textMatn1,
+                  color: actionTextColor,
                 ),
               ),
             ),
@@ -420,9 +453,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   Widget _buildAvatarGrid() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final emptyTextColor =
+        isDark ? MyColors.profileTextPrimaryDark : MyColors.textMatn1;
+
     if (isLoadingAvatars) {
       return const Center(
-        child: CircularProgressIndicator(),
+        child: CircularProgressIndicator(color: MyColors.primary),
       );
     }
 
@@ -432,7 +469,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           'آواتار موجود نیست',
           style: MyTextStyle.textMatn14Bold.copyWith(
             fontWeight: FontWeight.normal,
-            color: MyColors.textMatn1,
+            color: emptyTextColor,
           ),
         ),
       );
@@ -450,6 +487,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       itemBuilder: (context, index) {
         final avatar = avatars[index];
         final isSelected = selectedAvatar == avatar.fileKey;
+        final selectionBorderColor = isSelected
+            ? (isDark ? MyColors.primary : const Color(0xFFC2C9D6))
+            : Colors.transparent;
+        final placeholderBackgroundColor =
+            isDark ? MyColors.profileHeaderDark : const Color(0xFFE3F2FD);
+        final placeholderIconColor =
+            isDark ? MyColors.loginTextSecondaryDark : const Color(0xFFA3AFC2);
 
         return GestureDetector(
           onTap: () {
@@ -463,8 +507,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(
-                color:
-                    isSelected ? const Color(0xFFC2C9D6) : Colors.transparent,
+                color: selectionBorderColor,
                 width: 3.r,
               ),
             ),
@@ -474,11 +517,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
                   return Container(
-                    color: const Color(0xFFE3F2FD),
+                    color: placeholderBackgroundColor,
                     child: Icon(
                       Icons.person,
                       size: 40.r,
-                      color: const Color(0xFFA3AFC2),
+                      color: placeholderIconColor,
                     ),
                   );
                 },
@@ -495,14 +538,25 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     required String label,
     String? Function(String?)? validator,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final fieldBackgroundColor =
+        isDark ? MyColors.termsBackgroundDark : Colors.white;
+    final fieldBorderColor =
+        isDark ? MyColors.loginIconContainerDark : Colors.transparent;
+    final textColor =
+        isDark ? MyColors.profileTextPrimaryDark : MyColors.textMatn1;
+    final labelColor =
+        isDark ? MyColors.loginTextSecondaryDark : MyColors.textMatn1;
+
     return Container(
       height: 59.h,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: fieldBackgroundColor,
         borderRadius: BorderRadius.circular(19.r),
+        border: Border.all(color: fieldBorderColor),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: isDark ? Colors.transparent : Colors.black.withOpacity(0.04),
             blurRadius: 4.r,
             offset: const Offset(0, 0),
           ),
@@ -513,12 +567,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         validator: validator,
         textAlign: TextAlign.right,
         style: MyTextStyle.textMatn16.copyWith(
-          color: MyColors.textMatn1,
+          color: textColor,
         ),
+        cursorColor: MyColors.primary,
         decoration: InputDecoration(
           labelText: label,
           labelStyle: MyTextStyle.textMatn16.copyWith(
-            color: MyColors.textMatn1,
+            color: labelColor,
           ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(19.r),

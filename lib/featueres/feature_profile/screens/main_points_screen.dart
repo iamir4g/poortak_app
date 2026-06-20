@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
+import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 
 class MainPointsScreen extends StatefulWidget {
@@ -21,8 +22,9 @@ class _MainPointsScreenState extends State<MainPointsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: isDark ? MyColors.profileBackgroundDark : Colors.white,
       body: SafeArea(
         child: Column(
           children: [
@@ -32,7 +34,7 @@ class _MainPointsScreenState extends State<MainPointsScreen> {
               width: double.infinity,
               padding: EdgeInsets.symmetric(horizontal: 16.w),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: isDark ? MyColors.darkBackgroundSecondary : Colors.white,
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(33.5.r),
                 ),
@@ -51,7 +53,9 @@ class _MainPointsScreenState extends State<MainPointsScreen> {
                   Text(
                     'امتیازات',
                     style: MyTextStyle.textHeader16Bold.copyWith(
-                      color: const Color(0xFF3D495C),
+                      color: isDark
+                          ? MyColors.profileTextPrimaryDark
+                          : const Color(0xFF3D495C),
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -65,7 +69,9 @@ class _MainPointsScreenState extends State<MainPointsScreen> {
                       onPressed: () => Navigator.of(context).pop(),
                       icon: Icon(
                         Icons.arrow_forward,
-                        color: const Color(0xFF3D495C),
+                        color: isDark
+                            ? MyColors.profileTextPrimaryDark
+                            : const Color(0xFF3D495C),
                         size: 20.r,
                       ),
                     ),
@@ -98,10 +104,11 @@ class _MainPointsScreenState extends State<MainPointsScreen> {
   }
 
   Widget _buildPointsEarnedSection() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: EdgeInsets.symmetric(vertical: 24.h),
       width: double.infinity,
-      color: const Color(0xFFFBFCFE),
+      color: isDark ? MyColors.profileHeaderDark : const Color(0xFFFBFCFE),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -118,12 +125,20 @@ class _MainPointsScreenState extends State<MainPointsScreen> {
                       Text(
                         "امتیاز کسب شده:",
                         textAlign: TextAlign.right,
-                        style: MyTextStyle.textMatn16Bold,
+                        style: MyTextStyle.textMatn16Bold.copyWith(
+                          color: isDark
+                              ? MyColors.profileTextPrimaryDark
+                              : MyTextStyle.textMatn16Bold.color,
+                        ),
                       ),
                       Text(
                         "امتیاز کسب شده از ابتدای آموزش",
                         textAlign: TextAlign.right,
-                        style: MyTextStyle.textMatn12W300,
+                        style: MyTextStyle.textMatn12W300.copyWith(
+                          color: isDark
+                              ? MyColors.profileTextPrimaryDark
+                              : MyTextStyle.textMatn12W300.color,
+                        ),
                       ),
                     ],
                   ),
@@ -131,7 +146,8 @@ class _MainPointsScreenState extends State<MainPointsScreen> {
                 SizedBox(width: 16.w),
                 // 200 coins container
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
                   decoration: BoxDecoration(
                     color: const Color(0xFFFFE8CC),
                     borderRadius: BorderRadius.circular(10.r),
@@ -141,7 +157,9 @@ class _MainPointsScreenState extends State<MainPointsScreen> {
                       "۲۰۰ سکه",
                       textAlign: TextAlign.center,
                       style: MyTextStyle.textMatn16Bold.copyWith(
-                        color: const Color(0xFF28303D),
+                        color: isDark
+                            ? MyColors.profileTextPrimaryDark
+                            : const Color(0xFF28303D),
                       ),
                     ),
                   ),
@@ -192,6 +210,7 @@ class _MainPointsScreenState extends State<MainPointsScreen> {
   }
 
   Widget _buildPointsHistoryCard() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
       onTap: () {
         Navigator.pushNamed(context, '/history_prize_screen');
@@ -200,7 +219,9 @@ class _MainPointsScreenState extends State<MainPointsScreen> {
         margin: EdgeInsets.symmetric(horizontal: 23.w, vertical: 12.h),
         padding: EdgeInsets.all(16.r),
         decoration: BoxDecoration(
-          color: const Color(0xFFE9EFFF),
+          color: isDark
+              ? MyColors.darkBackgroundSecondary
+              : const Color(0xFFE9EFFF),
           borderRadius: BorderRadius.circular(20.r),
           boxShadow: [
             BoxShadow(
@@ -222,13 +243,21 @@ class _MainPointsScreenState extends State<MainPointsScreen> {
                   Text(
                     "تاریخچه امتیاز",
                     textAlign: TextAlign.right,
-                    style: MyTextStyle.textMatn13,
+                    style: MyTextStyle.textMatn13.copyWith(
+                      color: isDark
+                          ? MyColors.profileTextPrimaryDark
+                          : MyTextStyle.textMatn13.color,
+                    ),
                   ),
                   SizedBox(height: 8.h),
                   Text(
                     "تاریخچه ی امتیازهای کسب شده خود را ببینید.",
                     textAlign: TextAlign.right,
-                    style: MyTextStyle.textMatn10W300,
+                    style: MyTextStyle.textMatn10W300.copyWith(
+                      color: isDark
+                          ? MyColors.profileTextPrimaryDark
+                          : MyTextStyle.textMatn10W300.color,
+                    ),
                   ),
                 ],
               ),
@@ -250,6 +279,7 @@ class _MainPointsScreenState extends State<MainPointsScreen> {
   }
 
   Widget _buildDiscountsCard() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
       onTap: () {
         Navigator.pushNamed(context, '/prize_screen');
@@ -258,7 +288,9 @@ class _MainPointsScreenState extends State<MainPointsScreen> {
         margin: EdgeInsets.symmetric(horizontal: 23.w, vertical: 12.h),
         padding: EdgeInsets.all(16.r),
         decoration: BoxDecoration(
-          color: const Color(0xFFFFF9EB),
+          color: isDark
+              ? MyColors.darkBackgroundSecondary
+              : const Color(0xFFFFF9EB),
           borderRadius: BorderRadius.circular(20.r),
           boxShadow: [
             BoxShadow(
@@ -280,13 +312,21 @@ class _MainPointsScreenState extends State<MainPointsScreen> {
                   Text(
                     "تخفیف ها و جایزه",
                     textAlign: TextAlign.right,
-                    style: MyTextStyle.textMatn13,
+                    style: MyTextStyle.textMatn13.copyWith(
+                      color: isDark
+                          ? MyColors.profileTextPrimaryDark
+                          : MyTextStyle.textMatn13.color,
+                    ),
                   ),
                   SizedBox(height: 8.h),
                   Text(
                     "جایزه سکه های جمع شده خود را مشاهده کنید.",
                     textAlign: TextAlign.right,
-                    style: MyTextStyle.textMatn10W300,
+                    style: MyTextStyle.textMatn10W300.copyWith(
+                      color: isDark
+                          ? MyColors.profileTextPrimaryDark
+                          : MyTextStyle.textMatn10W300.color,
+                    ),
                   ),
                 ],
               ),

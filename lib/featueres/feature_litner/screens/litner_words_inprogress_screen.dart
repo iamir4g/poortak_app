@@ -4,7 +4,6 @@ import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_bloc.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_event.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_state.dart';
@@ -134,14 +133,19 @@ class _LitnerWordsInprogressScreenState
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: const Color(0xFFFFFFFF),
+      backgroundColor:
+          isDark ? MyColors.profileBackgroundDark : const Color(0xFFFFFFFF),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFFFFFFF),
+        backgroundColor:
+            isDark ? MyColors.profileHeaderDark : const Color(0xFFFFFFFF),
         title: Flexible(
           child: Text(
             'لغات در حال یادگیری',
-            style: MyTextStyle.textHeader16Bold,
+            style: MyTextStyle.textHeader16Bold.copyWith(
+              color: isDark ? MyColors.darkTextPrimary : MyColors.textMatn1,
+            ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -155,7 +159,7 @@ class _LitnerWordsInprogressScreenState
         ),
         backgroundColor: MyColors.brandPrimary,
         onPressed: _showAddWordBottomSheet,
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add, color: Colors.white),
       ),
       body: SafeArea(
         child: BlocConsumer<LitnerBloc, LitnerState>(
@@ -202,10 +206,12 @@ class _LitnerWordsInprogressScreenState
                   child: Container(
                     height: 48.h,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF6F9FE),
+                      color: isDark
+                          ? MyColors.loginInputBackgroundDark
+                          : const Color(0xFFF6F9FE),
                       borderRadius: BorderRadius.circular(12.r),
                       border: Border.all(
-                        color: const Color(0xFFE5E7EB),
+                        color: isDark ? MyColors.darkBorder : const Color(0xFFE5E7EB),
                         width: 1.w,
                       ),
                     ),
@@ -218,7 +224,9 @@ class _LitnerWordsInprogressScreenState
                         hintStyle: TextStyle(
                           fontFamily: 'IRANSans',
                           fontSize: 14.sp,
-                          color: Color(0xFF9CA3AF),
+                          color: isDark
+                              ? MyColors.darkTextSecondary
+                              : const Color(0xFF9CA3AF),
                         ),
                         prefixIcon: _isSearching
                             ? SizedBox(
@@ -235,7 +243,9 @@ class _LitnerWordsInprogressScreenState
                               )
                             : Icon(
                                 Icons.search,
-                                color: Color(0xFF9CA3AF),
+                                color: isDark
+                                    ? MyColors.darkTextSecondary
+                                    : const Color(0xFF9CA3AF),
                                 size: 20.r,
                               ),
                         border: InputBorder.none,
@@ -247,7 +257,7 @@ class _LitnerWordsInprogressScreenState
                       style: TextStyle(
                         fontFamily: 'IRANSans',
                         fontSize: 14.sp,
-                        color: Color(0xFF29303D),
+                        color: isDark ? MyColors.darkTextPrimary : const Color(0xFF29303D),
                       ),
                     ),
                   ),
@@ -271,7 +281,9 @@ class _LitnerWordsInprogressScreenState
                                       Icon(
                                         Icons.search_off,
                                         size: 64.r,
-                                        color: Color(0xFF9CA3AF),
+                                        color: isDark
+                                            ? MyColors.darkTextSecondary
+                                            : const Color(0xFF9CA3AF),
                                       ),
                                       SizedBox(height: Dimens.small.h),
                                       Text(
@@ -281,7 +293,9 @@ class _LitnerWordsInprogressScreenState
                                         style: TextStyle(
                                           fontFamily: 'IRANSans',
                                           fontSize: 14.sp,
-                                          color: Color(0xFF9CA3AF),
+                                          color: isDark
+                                              ? MyColors.darkTextSecondary
+                                              : const Color(0xFF9CA3AF),
                                         ),
                                         textAlign: TextAlign.center,
                                       ),
@@ -292,13 +306,16 @@ class _LitnerWordsInprogressScreenState
                             )
                           : ListView.separated(
                               controller: _scrollController,
-                              padding: EdgeInsets.symmetric(horizontal: 16.w),
+                              padding:
+                                  EdgeInsets.symmetric(horizontal: Dimens.medium),
                               itemCount:
                                   _words.length + (_isLoadingMore ? 1 : 0),
                               separatorBuilder: (context, index) => Container(
                                 height: 1.5.h,
                                 width: double.infinity,
-                                color: const Color(0xFFF2F2F2),
+                                color: isDark
+                                    ? MyColors.darkBorder.withValues(alpha: 0.35)
+                                    : const Color(0xFFF2F2F2),
                               ),
                               itemBuilder: (context, index) {
                                 if (index == _words.length) {
@@ -315,7 +332,9 @@ class _LitnerWordsInprogressScreenState
                                   constraints: BoxConstraints(minHeight: 48.h),
                                   padding: EdgeInsets.symmetric(vertical: 4.h),
                                   decoration: BoxDecoration(
-                                    color: Colors.white,
+                                    color: isDark
+                                        ? MyColors.termsBackgroundDark
+                                        : Colors.white,
                                     borderRadius: BorderRadius.circular(8.r),
                                   ),
                                   child: Row(
@@ -329,7 +348,9 @@ class _LitnerWordsInprogressScreenState
                                               fontFamily: 'IRANSans',
                                               fontWeight: FontWeight.w700,
                                               fontSize: 16.sp,
-                                              color: Color(0xFF29303D),
+                                              color: isDark
+                                                  ? MyColors.darkTextPrimary
+                                                  : const Color(0xFF29303D),
                                             ),
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
@@ -341,15 +362,11 @@ class _LitnerWordsInprogressScreenState
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           IconButton(
-                                            icon: SvgPicture.asset(
-                                              'assets/images/icons/cuida--volume-2-outline.svg',
+                                            icon: Image.asset(
+                                              'assets/images/icons/volume.png',
                                               width: 18.r,
                                               height: 18.r,
-                                              colorFilter:
-                                                  const ColorFilter.mode(
-                                                Color(0xFFA3AFC2),
-                                                BlendMode.srcIn,
-                                              ),
+                                              fit: BoxFit.contain,
                                             ),
                                             splashRadius: 18.r,
                                             padding: EdgeInsets.zero,
@@ -369,7 +386,9 @@ class _LitnerWordsInprogressScreenState
                                                 fontFamily: 'IRANSans',
                                                 fontWeight: FontWeight.w400,
                                                 fontSize: 14.sp,
-                                                color: Color(0xFF29303D),
+                                                color: isDark
+                                                    ? MyColors.darkTextPrimary
+                                                    : const Color(0xFF29303D),
                                               ),
                                               textAlign: TextAlign.right,
                                               maxLines: 1,

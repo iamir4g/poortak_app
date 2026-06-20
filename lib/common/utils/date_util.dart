@@ -117,6 +117,11 @@ class DateUtil {
     return '$year$separator$month$separator$day';
   }
 
+  static String formatPersianDateWithDigits(DateTime dateTime,
+      {String separator = '/'}) {
+    return convertEnglishToPersianDigits(formatPersianDate(dateTime, separator));
+  }
+
   /// Get Persian day name
   static String getPersianDayName(DateTime dateTime) {
     final shamsiDate = Jalali.fromDateTime(dateTime);

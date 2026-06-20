@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/common/services/getImageUrl_service.dart';
+import 'package:poortak/common/utils/money_utils.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/common/widgets/dot_loading_widget.dart';
+import 'package:poortak/common/widgets/primaryButton.dart';
 import 'package:poortak/common/widgets/reusable_modal.dart';
+import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/data_source/shopping_cart_api_provider.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/models/cart_enum.dart';
@@ -69,17 +72,31 @@ class _BookDetailScreenState extends State<BookDetailScreen>
         ),
       ],
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? MyColors.darkBackground
+            : Colors.white,
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: Theme.of(context).brightness == Brightness.dark
+              ? MyColors.darkBackgroundSecondary
+              : Colors.white,
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(Icons.bookmark_border, color: Colors.black),
+            icon: Icon(
+              Icons.bookmark_border,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? MyColors.darkTextPrimary
+                  : Colors.black,
+            ),
             onPressed: () {},
           ),
           actions: [
             IconButton(
-              icon: const Icon(Icons.arrow_forward, color: Colors.black),
+              icon: Icon(
+                Icons.arrow_forward,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? MyColors.darkTextPrimary
+                    : Colors.black,
+              ),
               onPressed: () => Navigator.of(context).pop(),
             )
           ],
@@ -134,23 +151,24 @@ class _BookDetailScreenState extends State<BookDetailScreen>
     final String? trialFile = bookData.trialFile;
     final bool showSampleButton =
         hasDemo && trialFile != null && trialFile.isNotEmpty;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Column(
       children: [
         Expanded(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: EdgeInsets.symmetric(horizontal: Dimens.nw(24)),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const SizedBox(height: 20),
+                SizedBox(height: Dimens.nh(20)),
                 // Book Cover
                 Center(
                   child: Container(
-                    width: 200,
-                    height: 300,
+                    width: Dimens.nw(261.0),
+                    height: Dimens.nh(216.0),
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(Dimens.nr(12)),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withValues(alpha: 0.1),
@@ -160,7 +178,7 @@ class _BookDetailScreenState extends State<BookDetailScreen>
                       ],
                     ),
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(Dimens.nr(12)),
                       child: FutureBuilder<String>(
                         future: GetImageUrlService()
                             .getImageUrl(bookData.thumbnail ?? ""),
@@ -180,69 +198,98 @@ class _BookDetailScreenState extends State<BookDetailScreen>
                     ),
                   ),
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: Dimens.nh(24)),
                 // Title
                 Text(
                   bookData.title ?? "",
-                  style: const TextStyle(
-                    fontSize: 20,
+                  style: TextStyle(
+                    fontSize: Dimens.nsp(20),
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF2B3A4A),
+                    color: isDark ? MyColors.darkTextPrimary : MyColors.text2,
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 8),
-                const Text(
+                SizedBox(height: Dimens.nh(8)),
+                Text(
                   "نسخه الکترونیکی",
                   style: TextStyle(
-                    fontSize: 14,
-                    color: Color(0xFF94A3B8),
+                    fontSize: Dimens.nsp(14),
+                    color: isDark ? MyColors.darkTextSecondary : MyColors.text5,
                   ),
                 ),
                 // const SizedBox(height: 2),
                 // Price
                 if (!isPurchased) ...[
-                  const Divider(
-                    height: 32,
-                    color: MyColors.dividerGray,
+                  Divider(
+                    height: Dimens.nh(32),
+                    color: isDark ? MyColors.darkBorder : MyColors.dividerGray,
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text("قیمت:",
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold)),
+                      Text(
+                        "قیمت:",
+                        style: TextStyle(
+                          fontSize: Dimens.nsp(16),
+                          fontWeight: FontWeight.bold,
+                          color: isDark
+                              ? MyColors.darkTextPrimary
+                              : MyColors.textMatn1,
+                        ),
+                      ),
                       Row(
                         children: [
                           Text(
                             bookData.price != null
-                                ? bookData.price.toString().addComma
+                                ? MoneyUtils.formatTomanFromRial(bookData.price)
                                 : "0",
-                            style: const TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              fontSize: Dimens.nsp(16),
+                              fontWeight: FontWeight.bold,
+                              color: isDark
+                                  ? MyColors.darkTextPrimary
+                                  : MyColors.textMatn1,
+                            ),
                           ),
-                          const SizedBox(width: 4),
-                          const Text("تومان", style: TextStyle(fontSize: 14)),
+                          SizedBox(width: Dimens.nw(4)),
+                          Text(
+                            "تومان",
+                            style: TextStyle(
+                              fontSize: Dimens.nsp(14),
+                              color: isDark
+                                  ? MyColors.darkTextSecondary
+                                  : MyColors.text3,
+                            ),
+                          ),
                         ],
                       ),
                     ],
                   ),
                 ],
 
-                const SizedBox(height: 32),
+                SizedBox(height: Dimens.nh(32)),
                 SizedBox(
-                  height: 40, // ارتفاع برای TabBar
+                  height: Dimens.nh(40),
                   // child: Align(
                   // alignment: Alignment.centerRight,
                   child: TabBar(
-                    dividerColor: MyColors.dividerGray,
+                    dividerColor:
+                        isDark ? MyColors.darkBorder : MyColors.dividerGray,
                     controller: _tabController,
                     isScrollable: true,
-                    labelStyle: MyTextStyle.tabActiveTextStyle,
-                    unselectedLabelStyle: MyTextStyle.tabInactiveTextStyle,
-                    indicatorColor: Colors.orange,
+                    labelStyle: MyTextStyle.tabLabel16.copyWith(
+                      color: isDark
+                          ? MyColors.darkTextPrimary
+                          : MyColors.activeTabBackground,
+                    ),
+                    unselectedLabelStyle: MyTextStyle.tabLabel16.copyWith(
+                      color: isDark
+                          ? MyColors.darkTextSecondary
+                          : MyColors.inactiveTabBackground,
+                    ),
+                    indicatorColor: MyColors.primary,
                     indicatorSize: TabBarIndicatorSize.label,
-                    indicatorWeight: 2,
+                    indicatorWeight: Dimens.nw(2),
                     tabs: const [
                       Tab(text: "درباره کالا"),
                       Tab(text: "ویژگی های کالا"),
@@ -250,9 +297,9 @@ class _BookDetailScreenState extends State<BookDetailScreen>
                   ),
                   // ),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: Dimens.nh(16)),
                 SizedBox(
-                  height: 200, // ارتفاع ثابت برای TabBarView
+                  height: Dimens.nh(200),
                   child: TabBarView(
                     controller: _tabController,
                     children: [
@@ -260,7 +307,13 @@ class _BookDetailScreenState extends State<BookDetailScreen>
                       SingleChildScrollView(
                         child: Text(
                           bookData.description ?? "توضیحاتی موجود نیست.",
-                          style: const TextStyle(fontSize: 14, height: 1.5),
+                          style: TextStyle(
+                            fontSize: Dimens.nsp(14),
+                            height: 1.5,
+                            color: isDark
+                                ? MyColors.darkTextPrimary
+                                : MyColors.textMatn1,
+                          ),
                           textAlign: TextAlign.justify,
                         ),
                       ),
@@ -281,16 +334,16 @@ class _BookDetailScreenState extends State<BookDetailScreen>
                     ],
                   ),
                 ),
-                const SizedBox(height: 100), // Space for bottom buttons
+                SizedBox(height: Dimens.nh(100)),
               ],
             ),
           ),
         ),
         // Bottom Buttons
         Container(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(Dimens.medium),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: isDark ? MyColors.darkBackgroundSecondary : Colors.white,
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.05),
@@ -305,7 +358,7 @@ class _BookDetailScreenState extends State<BookDetailScreen>
               if (showSampleButton && !isPurchased) ...[
                 SizedBox(
                   width: double.infinity,
-                  height: 48,
+                  height: Dimens.buttonHeight,
                   child: OutlinedButton(
                     onPressed: () {
                       Navigator.pushNamed(
@@ -317,48 +370,41 @@ class _BookDetailScreenState extends State<BookDetailScreen>
                       );
                     },
                     style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Colors.grey),
+                      side: BorderSide(
+                        color: isDark ? MyColors.darkBorder : Colors.grey,
+                      ),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(Dimens.nr(12)),
                       ),
                     ),
-                    child: const Text("خواندن نمونه",
-                        style: TextStyle(color: Colors.grey)),
-                  ),
-                ),
-                const SizedBox(height: 12),
-              ],
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (isPurchased) {
-                      Navigator.pushNamed(
-                        context,
-                        '/pdf_reader_screen',
-                        arguments: {
-                          'bookId': bookData.id,
-                        },
-                      );
-                    } else {
-                      _addItemToCart(context, bookData);
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF4285F4), // Blue color
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                    child: Text(
+                      "خواندن نمونه",
+                      style: TextStyle(
+                        color:
+                            isDark ? MyColors.darkTextSecondary : Colors.grey,
+                      ),
                     ),
                   ),
-                  child: Text(
-                    isPurchased ? "خواندن کتاب" : "خرید کتاب",
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold),
-                  ),
                 ),
+                SizedBox(height: Dimens.nh(12)),
+              ],
+              PrimaryButton(
+                width: double.infinity,
+                height: Dimens.buttonHeight,
+                lable: isPurchased ? "خواندن کتاب" : "خرید کتاب",
+                onPressed: () {
+                  if (isPurchased) {
+                    Navigator.pushNamed(
+                      context,
+                      '/pdf_reader_screen',
+                      arguments: {
+                        'bookId': bookData.id,
+                      },
+                    );
+                  } else {
+                    _addItemToCart(context, bookData);
+                  }
+                },
               ),
             ],
           ),
@@ -368,14 +414,26 @@ class _BookDetailScreenState extends State<BookDetailScreen>
   }
 
   Widget _buildAttributeRow(String label, String value) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: EdgeInsets.symmetric(vertical: Dimens.nh(8)),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(color: Colors.grey, fontSize: 14)),
-          Text(value,
-              style: const TextStyle(color: Colors.black, fontSize: 14)),
+          Text(
+            label,
+            style: TextStyle(
+              color: isDark ? MyColors.darkTextSecondary : Colors.grey,
+              fontSize: Dimens.nsp(14),
+            ),
+          ),
+          Text(
+            value,
+            style: TextStyle(
+              color: isDark ? MyColors.darkTextPrimary : Colors.black,
+              fontSize: Dimens.nsp(14),
+            ),
+          ),
         ],
       ),
     );

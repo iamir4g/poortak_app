@@ -2,6 +2,167 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'myColors.dart';
 
+@immutable
+class LoginTheme extends ThemeExtension<LoginTheme> {
+  final Color backgroundOverlayColor;
+  final Color inputBackgroundColor;
+  final Color inputTextColor;
+  final Color iconColor;
+  final Color iconContainerColor;
+  final Color titleTextColor;
+  final Color secondaryTextColor;
+  final Color actionTextColor;
+  final Color buttonTextColor;
+
+  const LoginTheme({
+    required this.backgroundOverlayColor,
+    required this.inputBackgroundColor,
+    required this.inputTextColor,
+    required this.iconColor,
+    required this.iconContainerColor,
+    required this.titleTextColor,
+    required this.secondaryTextColor,
+    required this.actionTextColor,
+    required this.buttonTextColor,
+  });
+
+  static const light = LoginTheme(
+    backgroundOverlayColor: Colors.transparent,
+    inputBackgroundColor: Colors.white,
+    inputTextColor: MyColors.textMatn1,
+    iconColor: MyColors.text4,
+    iconContainerColor: Color(0xFFF6F6F6),
+    titleTextColor: MyColors.textMatn1,
+    secondaryTextColor: MyColors.text3,
+    actionTextColor: MyColors.primary,
+    buttonTextColor: Colors.white,
+  );
+
+  static const dark = LoginTheme(
+    backgroundOverlayColor: MyColors.loginBackgroundOverlayDark,
+    inputBackgroundColor: MyColors.loginInputBackgroundDark,
+    inputTextColor: MyColors.loginTextPrimaryDark,
+    iconColor: MyColors.loginIconColorDark,
+    iconContainerColor: MyColors.loginIconContainerDark,
+    titleTextColor: MyColors.loginTextPrimaryDark,
+    secondaryTextColor: MyColors.loginTextPrimaryDark,
+    actionTextColor: MyColors.loginTextPrimaryDark,
+    buttonTextColor: MyColors.loginButtonText,
+  );
+
+  @override
+  LoginTheme copyWith({
+    Color? backgroundOverlayColor,
+    Color? inputBackgroundColor,
+    Color? inputTextColor,
+    Color? iconColor,
+    Color? iconContainerColor,
+    Color? titleTextColor,
+    Color? secondaryTextColor,
+    Color? actionTextColor,
+    Color? buttonTextColor,
+  }) {
+    return LoginTheme(
+      backgroundOverlayColor:
+          backgroundOverlayColor ?? this.backgroundOverlayColor,
+      inputBackgroundColor: inputBackgroundColor ?? this.inputBackgroundColor,
+      inputTextColor: inputTextColor ?? this.inputTextColor,
+      iconColor: iconColor ?? this.iconColor,
+      iconContainerColor: iconContainerColor ?? this.iconContainerColor,
+      titleTextColor: titleTextColor ?? this.titleTextColor,
+      secondaryTextColor: secondaryTextColor ?? this.secondaryTextColor,
+      actionTextColor: actionTextColor ?? this.actionTextColor,
+      buttonTextColor: buttonTextColor ?? this.buttonTextColor,
+    );
+  }
+
+  @override
+  LoginTheme lerp(ThemeExtension<LoginTheme>? other, double t) {
+    if (other is! LoginTheme) return this;
+    return LoginTheme(
+      backgroundOverlayColor:
+          Color.lerp(backgroundOverlayColor, other.backgroundOverlayColor, t) ??
+              backgroundOverlayColor,
+      inputBackgroundColor:
+          Color.lerp(inputBackgroundColor, other.inputBackgroundColor, t) ??
+              inputBackgroundColor,
+      inputTextColor:
+          Color.lerp(inputTextColor, other.inputTextColor, t) ?? inputTextColor,
+      iconColor: Color.lerp(iconColor, other.iconColor, t) ?? iconColor,
+      iconContainerColor:
+          Color.lerp(iconContainerColor, other.iconContainerColor, t) ??
+              iconContainerColor,
+      titleTextColor:
+          Color.lerp(titleTextColor, other.titleTextColor, t) ?? titleTextColor,
+      secondaryTextColor:
+          Color.lerp(secondaryTextColor, other.secondaryTextColor, t) ??
+              secondaryTextColor,
+      actionTextColor: Color.lerp(actionTextColor, other.actionTextColor, t) ??
+          actionTextColor,
+      buttonTextColor: Color.lerp(buttonTextColor, other.buttonTextColor, t) ??
+          buttonTextColor,
+    );
+  }
+}
+
+@immutable
+class TermsConditionsTheme extends ThemeExtension<TermsConditionsTheme> {
+  final Color backgroundColor;
+  final Color textColor;
+  final Color iconColor;
+  final Color dividerColor;
+
+  const TermsConditionsTheme({
+    required this.backgroundColor,
+    required this.textColor,
+    required this.iconColor,
+    required this.dividerColor,
+  });
+
+  static const light = TermsConditionsTheme(
+    backgroundColor: Colors.white,
+    textColor: MyColors.textMatn1,
+    iconColor: MyColors.textPrimary,
+    dividerColor: MyColors.divider,
+  );
+
+  static const dark = TermsConditionsTheme(
+    backgroundColor: MyColors.termsBackgroundDark,
+    textColor: MyColors.loginTextPrimaryDark,
+    iconColor: MyColors.loginTextPrimaryDark,
+    dividerColor: MyColors.loginIconContainerDark,
+  );
+
+  @override
+  TermsConditionsTheme copyWith({
+    Color? backgroundColor,
+    Color? textColor,
+    Color? iconColor,
+    Color? dividerColor,
+  }) {
+    return TermsConditionsTheme(
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      textColor: textColor ?? this.textColor,
+      iconColor: iconColor ?? this.iconColor,
+      dividerColor: dividerColor ?? this.dividerColor,
+    );
+  }
+
+  @override
+  TermsConditionsTheme lerp(
+      ThemeExtension<TermsConditionsTheme>? other, double t) {
+    if (other is! TermsConditionsTheme) return this;
+    return TermsConditionsTheme(
+      backgroundColor: Color.lerp(backgroundColor, other.backgroundColor, t) ??
+          backgroundColor,
+      textColor: Color.lerp(textColor, other.textColor, t) ?? textColor,
+      iconColor: Color.lerp(iconColor, other.iconColor, t) ?? iconColor,
+      dividerColor:
+          Color.lerp(dividerColor, other.dividerColor, t) ?? dividerColor,
+    );
+  }
+}
+
 class MyThemes {
   static ThemeData get darkTheme => ThemeData(
         textTheme: TextTheme(
@@ -78,6 +239,7 @@ class MyThemes {
           backgroundColor: MyColors.darkBackground,
           foregroundColor: MyColors.darkTextPrimary,
           elevation: 0,
+          centerTitle: false,
         ),
         cardTheme: const CardThemeData(
           color: MyColors.darkCardBackground,
@@ -94,6 +256,10 @@ class MyThemes {
             foregroundColor: MyColors.darkTextAccent,
           ),
         ),
+        extensions: const <ThemeExtension<dynamic>>[
+          LoginTheme.dark,
+          TermsConditionsTheme.dark,
+        ],
       );
 
   static ThemeData get lightTheme => ThemeData(
@@ -171,6 +337,7 @@ class MyThemes {
           backgroundColor: MyColors.background,
           foregroundColor: MyColors.textPrimary,
           elevation: 0,
+          centerTitle: false,
         ),
         cardTheme: const CardThemeData(
           color: MyColors.cardBackground,
@@ -187,5 +354,9 @@ class MyThemes {
             foregroundColor: MyColors.primary,
           ),
         ),
+        extensions: const <ThemeExtension<dynamic>>[
+          LoginTheme.light,
+          TermsConditionsTheme.light,
+        ],
       );
 }

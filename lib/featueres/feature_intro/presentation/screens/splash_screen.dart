@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
+import 'package:poortak/common/utils/svg_embedded_png.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/common/widgets/main_wrapper.dart';
 import 'package:poortak/featueres/feature_intro/presentation/bloc/splash_bloc/splash_cubit.dart';
@@ -28,6 +29,7 @@ class _SplashScreenState extends State<SplashScreen>
   late final AppLinks _appLinks;
   StreamSubscription<Uri?>? _linkSub;
   bool _hasHandledDeepLink = false;
+  bool _didPrecacheLogo = false;
   static const MethodChannel _channel =
       MethodChannel('poortak.deeplink.flutter.dev/channel');
 
@@ -43,7 +45,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     // Initialize background animation
     _backgroundAnimationController = AnimationController(
-      duration: const Duration(milliseconds: 4500), // 4.5 seconds
+      duration: const Duration(milliseconds: 3200),
       vsync: this,
     );
     _backgroundAnimation = Tween<double>(
@@ -51,14 +53,15 @@ class _SplashScreenState extends State<SplashScreen>
       end: 1.0,
     ).animate(CurvedAnimation(
       parent: _backgroundAnimationController,
-      curve: Curves.easeInOut,
+      curve: Curves.easeInOutCubic,
     ));
 
     // Start background animation after a short delay
-    Future.delayed(const Duration(milliseconds: 500), () {
-      if (mounted) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(const Duration(seconds: 1), () {
+        if (!mounted) return;
         _backgroundAnimationController.forward();
-      }
+      });
     });
 
     BlocProvider.of<SplashCubit>(context).checkConnectionEvent();
@@ -81,6 +84,14 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_didPrecacheLogo) return;
+    _didPrecacheLogo = true;
+    precacheEmbeddedRasterFromSvg(context, 'assets/images/poortak_logo.svg');
+  }
+
+  @override
   Widget build(BuildContext context) {
     var width = MediaQuery.of(context).size.width;
     return Scaffold(
@@ -91,35 +102,17 @@ class _SplashScreenState extends State<SplashScreen>
             width: width,
             child: Stack(
               children: [
-                // Second background image (splash2.png) - slides down from top
-                Positioned(
-                  top: -MediaQuery.of(context).size.height +
-                      (_backgroundAnimation.value *
-                          MediaQuery.of(context).size.height),
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
+                Positioned.fill(
                   child: Container(
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       image: DecorationImage(
-                        image: AssetImage('assets/images/splash/splash2.png'),
+                        image: const AssetImage(
+                            'assets/images/splash/splash_full.png'),
                         fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                ),
-                // First background image (splash1.png) - moves down
-                Positioned(
-                  top: _backgroundAnimation.value *
-                      MediaQuery.of(context).size.height,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  child: Container(
-                    decoration: const BoxDecoration(
-                      image: DecorationImage(
-                        image: AssetImage('assets/images/splash/splash1.png'),
-                        fit: BoxFit.cover,
+                        alignment: Alignment(
+                          0,
+                          1 - (_backgroundAnimation.value * 2),
+                        ),
                       ),
                     ),
                   ),
@@ -135,13 +128,14 @@ class _SplashScreenState extends State<SplashScreen>
                         child: Center(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               // Logo
-                              Image.asset(
-                                'assets/images/poortakLogo.png',
-                                width: width * 0.7,
-                                height:
-                                    width * 0.7 * 0.5, // Maintain aspect ratio
+                              buildImageFromAssetOrEmbeddedSvg(
+                                'assets/images/poortak_logo.svg',
+                                width: width * 0.68,
+                                height: width * 0.68 * 0.65,
+                                fit: BoxFit.contain,
                               ),
                               SizedBox(height: 30.h),
                               // Persian text
@@ -149,8 +143,8 @@ class _SplashScreenState extends State<SplashScreen>
                                 'ایده ای جدید از انتشارات تاجیک',
                                 style: TextStyle(
                                   fontFamily: 'IranSans',
-                                  fontSize: 15.sp,
-                                  fontWeight: FontWeight.bold,
+                                  fontSize: 17.sp,
+                                  fontWeight: FontWeight.w900,
                                   color: Colors.white,
                                   height: 1.4,
                                 ),

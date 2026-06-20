@@ -30,7 +30,10 @@ class MyColors {
 
   // Background Colors
   static const Color background = Color(0xFFFFFFFF); // White
+  static const Color shoppingCartBackground = Color(0xFFF4F6FB);
   static const Color lightDarkBackground = Color(0xFF121212); // Dark background
+  static const Color modalHeaderBackground = Color(0xFFF3F4F7);
+  static const Color inputBorder = Color(0xFFD1D1D6);
   // Text Colors
   static const Color textBase = Color(0xFF14181F);
   static const Color text1 = Color(0xFF29303D);
@@ -42,7 +45,7 @@ class MyColors {
   static const Color text7 = Color(0xFFC2C9D6);
   static const Color gray = Color(0xFFE0E4EB);
 
-  static const Color textPrimary = Color(0xFF000000); // Black
+  static const Color textPrimary = Color(0xFF14181F);
   static const Color textSecondary = Color(0xFF757575); // Grey
   static const Color textLight = Color(0xFFFFFFFF); // White
   static const Color textMatn1 = Color.fromRGBO(54, 58, 83, 1);
@@ -68,6 +71,16 @@ class MyColors {
   static const Color background1 = Color(0xffF2F5FA);
   static const Color background2 = Color(0xFFF3F5F7);
   static const Color background3 = Color(0xFFF6F9FE);
+  static const Color contestCardGradientStart = Color(0xFFF2F0FF);
+  static const Color contestCardGradientEnd = Color(0xFFF2F6FD);
+  static const LinearGradient contestCardGradient = LinearGradient(
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight,
+    colors: [
+      contestCardGradientStart,
+      contestCardGradientEnd,
+    ],
+  );
 
   // Dark Mode Colors
   static const Color darkBackground =
@@ -94,9 +107,62 @@ class MyColors {
   static const Color darkMatn1 = Color(0xFF363A53); // Dark text color
   static const Color darkText1 = text1; // Dark text variant
 
+  // Login (Dark Mode)
+  static const Color loginBackgroundOverlayDark = Color(0x99000000);
+  static const Color loginInputBackgroundDark = Color(0xFF282A39);
+  static const Color loginIconColorDark = Color(0xFFD3D4DA);
+  static const Color loginIconContainerDark = Color(0xFF545878);
+  static const Color loginTextPrimaryDark = Color(0xFFFFFFFF);
+  static const Color loginTextSecondaryDark = Color(0xFF838697);
+  static const Color loginButtonText = Color(0xFF171926);
+  static const Color termsBackgroundDark = Color(0xFF282A39);
+
+  // Profile (Dark Mode)
+  static const Color profileBackgroundDark = Color(0xFF171926);
+  static const Color profileHeaderDark = Color(0xFF212332);
+  static const Color profileTextPrimaryDark = loginTextPrimaryDark;
+  static const Color profileAvatarBorderDark = Color(0xFF3A3C45);
+
+  // Payment History
+  static const Color paymentHistoryScreenHeaderDark =
+      darkBackgroundSecondary; // #2C2E3F
+  static const Color paymentHistoryCardDark = termsBackgroundDark; // #282A39
+  static const Color paymentHistoryCardHeaderDark = Color(0xFF323548);
+  static const Color paymentHistoryCardHeaderLight = Color(0xFFF9F9F9);
+  static const Color paymentHistoryHeaderTitleLight = Color(0xFF29303D);
+  static const Color paymentHistoryDetailValueLight = Color(0xFF494E6A);
+  static const Color paymentHistoryDetailLabelLight = Color(0xFF717483);
+
+  // Conversation (Dark Mode)
+  static const Color conversationFirstPersonBubbleDark = Color(0xFF262556);
+  static const Color conversationSecondPersonBubbleDark = Color(0xFF27221C);
+  static const Color conversationScreenBackgroundLight = Color(0xFFFFFFF8);
+  static const Color conversationBubbleLeftLight = Color(0xFFE1E0FA);
+  static const Color conversationBubbleRightLight = Color(0xFFFFEFDB);
+  static const Color conversationSideCircleLeftLight = Color(0xFF7C79EC);
+  static const Color conversationSideCircleRightLight = Color(0xFFFFC785);
+  static const Color conversationPlayPauseDarkPaused = Color(0xFF3B3E54);
+
+  // Quiz
+  static const Color quizAnswerDefaultLightBackground = background3;
+  static const Color quizAnswerDefaultDarkBackground =
+      darkBackgroundSecondary; // #2C2E3F
+  static const Color quizAnswerSelectedBorder = primary;
+  static const Color quizAnswerCorrectBackgroundLight = Color(0xFFEDFAEB);
+  static const Color quizAnswerCorrectBorderLight = Color(0xFF6FC845);
+  static const Color quizAnswerWrongBackgroundLight = Color(0xFFFDEFE8);
+  static const Color quizAnswerWrongBorderLight = Color(0xFFE96217);
+  static const Color quizAnswerCorrectBackgroundDark = Color(0xFF10160F);
+  static const Color quizAnswerCorrectBorderDark = Color(0xFF68D451);
+  static const Color quizAnswerCorrectTextDark = Color(0xFF6EC644);
+  static const Color quizAnswerWrongBackgroundDark = Color(0xFF351705);
+  static const Color quizAnswerWrongBorderDark = Color(0xFFE96217);
+  static const Color quizAnswerWrongTextDark = Color(0xFFE96216);
+
   // Progress Bar Colors
   static const Color progressBarColor = Color(0xFF5E85F2);
   static const Color progressBarBackground = Color(0xFFE0E0E0);
+  static const Color vocabularyProgressFill = Color(0xFFFFD099);
 
   // Shopping / promo specific
   static const Color discountBackground = Color(0xFFFEF3E6);
@@ -109,4 +175,5 @@ class MyColors {
   static const Color activeTabBackground = Color(0xFF363A53);
   static const Color inactiveTabBackground = Color(0xFF9498AC);
   static const Color dividerGray = gray;
+  static const Color modalButtonPressedLight = Color(0xFFCEDEF8);
 }

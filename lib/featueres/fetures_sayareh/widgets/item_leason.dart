@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poortak/common/services/getImageUrl_service.dart';
+import 'package:poortak/common/utils/svg_embedded_png.dart';
 import 'package:poortak/common/widgets/global_progress_bar.dart';
+import 'package:poortak/config/dimens.dart';
+import 'package:poortak/config/myColors.dart';
+import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/all_courses_progress_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/iknow_summary_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_home_model.dart';
@@ -29,6 +33,7 @@ class ItemLeason extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final isLocked = !purchased && !item.isDemo;
 
     double average = 0;
@@ -58,10 +63,11 @@ class ItemLeason extends StatelessWidget {
       },
       child: Container(
         width: double.infinity,
-        margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 2.h),
+        margin: EdgeInsets.symmetric(horizontal: Dimens.medium),
+        height: Dimens.nh(104.0),
         padding: EdgeInsets.all(16.r),
         decoration: BoxDecoration(
-          color: Theme.of(context).cardColor,
+          color: isDark ? Theme.of(context).cardColor : MyColors.background,
           borderRadius: BorderRadius.circular(40.r),
         ),
         child: Row(
@@ -105,14 +111,23 @@ class ItemLeason extends StatelessWidget {
                     children: [
                       Text(
                         item.name,
-                        style: Theme.of(context).textTheme.titleSmall,
+                        style: MyTextStyle.textMatn17W700.copyWith(
+                          color:
+                              isDark ? const Color(0xFFFFFFFF) : MyColors.text2,
+                          height: 1.0,
+                          letterSpacing: 0.0,
+                        ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                       SizedBox(height: 6.h),
                       Text(
                         item.description,
-                        style: Theme.of(context).textTheme.labelMedium,
+                        style: MyTextStyle.description10Medium.copyWith(
+                          color: isDark
+                              ? MyColors.loginTextSecondaryDark
+                              : MyColors.text6,
+                        ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -139,8 +154,12 @@ class ItemLeason extends StatelessWidget {
                     ? SizedBox(
                         width: 24.r,
                         height: 24.r,
-                        child: Image(
-                            image: AssetImage("assets/images/lock_image.png")),
+                        child: buildImageFromAssetOrEmbeddedSvg(
+                          "assets/images/lock_image.svg",
+                          width: 24.r,
+                          height: 24.r,
+                          fit: BoxFit.contain,
+                        ),
                       )
                     : SizedBox(),
                 SizedBox(
@@ -151,9 +170,11 @@ class ItemLeason extends StatelessWidget {
                   width: 32.r,
                   height: 32.r,
                   colorFilter: ColorFilter.mode(
-                    Theme.of(context).textTheme.titleMedium?.color ??
-                        Theme.of(context).iconTheme.color ??
-                        Colors.black,
+                    isDark
+                        ? const Color(0xFFFFFFFF)
+                        : Theme.of(context).textTheme.titleMedium?.color ??
+                            Theme.of(context).iconTheme.color ??
+                            Colors.black,
                     BlendMode.srcIn,
                   ),
                 ),

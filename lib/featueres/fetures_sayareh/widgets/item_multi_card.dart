@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/common/utils/money_utils.dart';
 import 'package:poortak/l10n/app_localizations.dart';
 // import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:poortak/config/myColors.dart';
@@ -46,7 +47,7 @@ class ItemMultiCard extends StatelessWidget {
             Row(
               children: [
                 Text(
-                  convertEnToFa(price).addComma,
+                  convertEnToFa(MoneyUtils.formatTomanFromRial(price)),
                   style: MyTextStyle.textMatn12W500,
                 ),
                 Text(
