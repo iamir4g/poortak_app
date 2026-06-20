@@ -84,7 +84,6 @@ class _LoginScreenState extends State<LoginScreen> {
       final res = await SmartAuth.instance.getAppSignature();
       log("📱 App Signature for SMS Retriever: ${res.data}");
     } catch (e) {
-    } catch (e) {
       log("Error getting app signature: $e");
     }
   }

@@ -31,7 +31,7 @@ class LitnerWordBoxScreen extends StatelessWidget {
 }
 
 class _LitnerWordBoxView extends StatefulWidget {
-  const _LitnerWordBoxView({super.key});
+  const _LitnerWordBoxView();
 
   @override
   State<_LitnerWordBoxView> createState() => _LitnerWordBoxViewState();
@@ -75,8 +75,9 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
           isDark ? MyColors.profileBackgroundDark : MyColors.background,
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor:
-            isDark ? MyColors.profileHeaderDark : Theme.of(context).appBarTheme.backgroundColor,
+        backgroundColor: isDark
+            ? MyColors.profileHeaderDark
+            : Theme.of(context).appBarTheme.backgroundColor,
         actions: [
           IconButton(
             onPressed: () => Navigator.of(context).pop(),
@@ -336,9 +337,7 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
               width: 32.r,
               height: 32.r,
               colorFilter: ColorFilter.mode(
-                isDark
-                    ? MyColors.darkTextSecondary
-                    : const Color(0xFF3A465A),
+                isDark ? MyColors.darkTextSecondary : const Color(0xFF3A465A),
                 BlendMode.srcIn,
               ),
             ),

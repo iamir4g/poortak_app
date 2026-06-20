@@ -304,8 +304,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                         ? SizedBox(
                                             width: 20.r,
                                             height: 20.r,
-                                            child:
-                                                CircularProgressIndicator(
+                                            child: CircularProgressIndicator(
                                               color: isDark
                                                   ? MyColors.loginButtonText
                                                   : Colors.white,
@@ -344,9 +343,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Widget _buildSelectedAvatar() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final selectedAvatarUrl = _getSelectedAvatarUrl();
-    final borderColor = isDark
-        ? MyColors.profileAvatarBorderDark
-        : const Color(0xFFC2C9D6);
+    final borderColor =
+        isDark ? MyColors.profileAvatarBorderDark : const Color(0xFFC2C9D6);
     final placeholderBackgroundColor =
         isDark ? MyColors.termsBackgroundDark : const Color(0xFFE3F2FD);
     final placeholderIconColor =
@@ -556,7 +554,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         border: Border.all(color: fieldBorderColor),
         boxShadow: [
           BoxShadow(
-            color: isDark ? Colors.transparent : Colors.black.withOpacity(0.04),
+            color: isDark
+                ? Colors.transparent
+                : Colors.black.withValues(alpha: 0.04),
             blurRadius: 4.r,
             offset: const Offset(0, 0),
           ),

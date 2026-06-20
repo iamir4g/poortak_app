@@ -51,9 +51,8 @@ class _ReminderScreenState extends State<ReminderScreen> {
   Widget build(BuildContext context) {
     return BlocBuilder<ThemeCubit, ThemeState>(
       builder: (context, themeState) {
-        final backgroundColor = themeState.isDark
-            ? MyColors.darkBackground
-            : MyColors.background3;
+        final backgroundColor =
+            themeState.isDark ? MyColors.darkBackground : MyColors.background3;
         final cardBackground =
             themeState.isDark ? MyColors.darkCardBackground : Colors.white;
 
@@ -72,7 +71,7 @@ class _ReminderScreenState extends State<ReminderScreen> {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: Colors.black.withValues(alpha: 0.05),
                         offset: Offset(0, 1.h),
                         blurRadius: 1.r,
                       ),
@@ -224,7 +223,7 @@ class ReminderCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(12.r),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 offset: Offset(0, 2.h),
                 blurRadius: 4.r,
               ),

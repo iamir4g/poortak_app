@@ -13,7 +13,6 @@ import 'package:poortak/featueres/featureMenu/screens/contactUs_screen.dart';
 import 'package:poortak/featueres/featureMenu/screens/settings_screen.dart';
 import 'package:poortak/featueres/featureMenu/screens/main_reminder.dart';
 import 'package:poortak/featueres/feature_profile/screens/profile_screen.dart';
-import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
 import 'package:poortak/locator.dart';
 import 'package:poortak/common/blocs/bottom_nav_cubit/bottom_nav_cubit.dart';
 import 'package:poortak/common/bloc/theme_cubit/theme_cubit.dart';

@@ -23,7 +23,7 @@ class VideoDownloaderUtil {
       return trimmed.isEmpty ? null : trimmed;
     }
     if (data is Map) {
-      final map = Map<String, dynamic>.from(data as Map);
+      final map = Map<String, dynamic>.from(data);
       final message = map['message'];
       if (message is String && message.trim().isNotEmpty) return message.trim();
       final error = map['error'];

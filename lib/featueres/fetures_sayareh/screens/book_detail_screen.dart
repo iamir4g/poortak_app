@@ -15,7 +15,6 @@ import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shoppi
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/single_book_bloc/single_book_cubit.dart';
 import 'package:poortak/locator.dart';
-import 'package:persian_tools/persian_tools.dart';
 import 'package:poortak/common/widgets/main_wrapper.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:dio/dio.dart';

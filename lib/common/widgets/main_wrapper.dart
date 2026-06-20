@@ -416,7 +416,7 @@ class _MainWrapperState extends State<MainWrapper> {
                           boxShadow: [
                             BoxShadow(
                               color: themeState.isDark
-                                  ? Colors.black.withOpacity(0.3)
+                                  ? Colors.black.withValues(alpha: 0.3)
                                   : const Color.fromRGBO(0, 0, 0, 0.05),
                               offset: Offset(0, 1.h),
                               blurRadius: 1.r,

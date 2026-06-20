@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/common/widgets/custom_pdfReader.dart';
 import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/config/dimens.dart';
@@ -290,9 +289,8 @@ class PdfReaderScreen extends StatelessWidget {
                 Expanded(
                   child: Container(
                     decoration: BoxDecoration(
-                      color: isDark
-                          ? MyColors.darkCardBackground
-                          : Colors.white,
+                      color:
+                          isDark ? MyColors.darkCardBackground : Colors.white,
                       borderRadius: BorderRadius.circular(Dimens.nr(16)),
                       boxShadow: [
                         BoxShadow(

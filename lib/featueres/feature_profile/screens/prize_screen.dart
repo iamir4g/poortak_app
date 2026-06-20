@@ -305,7 +305,7 @@ class _PrizeScreenState extends State<PrizeScreen> {
   }
 
   Widget _buildBottomButton() {
-     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: EdgeInsets.only(bottom: 16.h),
       width: double.infinity,
@@ -313,7 +313,7 @@ class _PrizeScreenState extends State<PrizeScreen> {
         color: isDarkMode ? MyColors.profileHeaderDark : Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             offset: Offset(0, -2.h),
             blurRadius: 4.r,
           ),

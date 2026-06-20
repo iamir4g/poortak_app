@@ -57,7 +57,7 @@ class _FavoritScreenState extends State<FavoritScreen> {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   offset: Offset(0, 1.h),
                   blurRadius: 1.r,
                 ),
@@ -158,7 +158,7 @@ class _FavoritScreenState extends State<FavoritScreen> {
               borderRadius: BorderRadius.circular(15.r),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.04),
+                  color: Colors.black.withValues(alpha: 0.04),
                   offset: const Offset(0, 0),
                   blurRadius: 4.r,
                 ),

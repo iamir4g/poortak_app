@@ -101,7 +101,7 @@ class _CourseListScreenState extends State<CourseListScreen> {
               _filterCategories = state.category.children;
               _filters = [
                 'همه',
-                ..._filterCategories.map((e) => e.title).toList(),
+                ..._filterCategories.map((e) => e.title),
               ];
               _selectedFilterIndex = 0;
             });
@@ -130,7 +130,8 @@ class _CourseListScreenState extends State<CourseListScreen> {
                 padding: EdgeInsets.fromLTRB(16.w, 0, 32.w, 0),
                 height: 57.h,
                 decoration: BoxDecoration(
-                  color: isDark ? MyColors.darkBackgroundSecondary : Colors.white,
+                  color:
+                      isDark ? MyColors.darkBackgroundSecondary : Colors.white,
                   borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(33.5.r),
                   ),

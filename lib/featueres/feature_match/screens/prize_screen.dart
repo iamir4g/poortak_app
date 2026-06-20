@@ -103,7 +103,7 @@ class _MatchPrizeScreenState extends State<MatchPrizeScreen>
                               ? null
                               : [
                                   BoxShadow(
-                                    color: Colors.black.withOpacity(0.04),
+                                    color: Colors.black.withValues(alpha: 0.04),
                                     offset: const Offset(0, 10),
                                     blurRadius: 20,
                                   ),

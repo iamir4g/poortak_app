@@ -358,7 +358,7 @@ class _MatchScreenState extends State<MatchScreen> {
                               style: MyTextStyle.textMatn16.copyWith(
                                 fontWeight: FontWeight.w500,
                                 color: _isAnswerSubmitted()
-                                    ? Colors.white.withOpacity(0.7)
+                                    ? Colors.white.withValues(alpha: 0.7)
                                     : Colors.white,
                               ),
                             ),
@@ -507,7 +507,7 @@ class _MatchScreenState extends State<MatchScreen> {
                       border: Border.all(
                         color: isDark
                             ? MyColors.darkBorder
-                            : MyColors.text4.withOpacity(0.3),
+                            : MyColors.text4.withValues(alpha: 0.3),
                         width: Dimens.nw(1),
                       ),
                     ),
@@ -550,7 +550,7 @@ class _MatchScreenState extends State<MatchScreen> {
                       border: Border.all(
                         color: isDark
                             ? MyColors.darkBorder
-                            : MyColors.text4.withOpacity(0.3),
+                            : MyColors.text4.withValues(alpha: 0.3),
                         width: Dimens.nw(1),
                       ),
                     ),
