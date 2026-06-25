@@ -65,7 +65,15 @@ class _SayarehScreenState extends State<SayarehScreen> {
           value: locator<IknowAccessBloc>(),
         ),
       ],
-      child: BlocBuilder<SayarehCubit, SayarehState>(
+      child: BlocBuilder<IknowAccessBloc, IknowAccessState>(
+        buildWhen: (previous, current) =>
+            previous.runtimeType != current.runtimeType ||
+            (current is IknowAccessCompleted &&
+                previous is IknowAccessCompleted &&
+                previous.data != current.data),
+        builder: (context, accessState) {
+          final accessBloc = context.read<IknowAccessBloc>();
+          return BlocBuilder<SayarehCubit, SayarehState>(
         buildWhen: (previous, current) {
           if (previous.sayarehDataStatus == current.sayarehDataStatus) {
             return false;
@@ -180,7 +188,7 @@ class _SayarehScreenState extends State<SayarehScreen> {
                                   item: item,
                                   onTap: () {},
                                   index: index,
-                                  purchased: item.purchased,
+                                  purchased: accessBloc.hasCourseAccess(item.id),
                                   progress: progress,
                                   summaryData:
                                       sayarehDataCompleted.summaryData);
@@ -250,8 +258,9 @@ class _SayarehScreenState extends State<SayarehScreen> {
                                     .bookListData.data![index].file,
                                 trialFile: sayarehDataCompleted
                                     .bookListData.data![index].trialFile,
-                                purchased: sayarehDataCompleted
-                                    .bookListData.data![index].purchased,
+                                purchased: accessBloc.hasBookAccess(
+                                    sayarehDataCompleted
+                                        .bookListData.data![index].id),
                                 price: sayarehDataCompleted
                                     .bookListData.data![index].price,
                                 bookId: sayarehDataCompleted
@@ -362,6 +371,8 @@ class _SayarehScreenState extends State<SayarehScreen> {
             );
           }
           return Container();
+        },
+      );
         },
       ),
     );

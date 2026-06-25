@@ -79,7 +79,6 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
     final currentState = context.read<PracticeVocabularyBloc>().state
         as PracticeVocabularySuccess;
     final correctWord = currentState.practiceVocabulary.data.correctWord;
-    final wrongWord = currentState.practiceVocabulary.data.wrongWord;
 
     setState(() {
       selectedWord = word;
@@ -100,15 +99,12 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
           ),
         );
 
-    // Determine answer ID
-    final answerId = word == correctWord.word ? correctWord.id : wrongWord.id;
-
-    // Submit the answer to the API
+    // Submit the selected answer text to the API
     context.read<PracticeVocabularyBloc>().add(
           PracticeVocabularySubmitEvent(
             courseId: widget.courseId,
             vocabularyId: correctWord.id,
-            answer: answerId,
+            answer: word,
             previousVocabularyIds: currentState.correctWords,
           ),
         );
@@ -189,15 +185,7 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
   }
 
   void _navigateToLessonScreen() {
-    Navigator.pushReplacementNamed(
-      context,
-      LessonScreen.routeName,
-      arguments: {
-        'index': 0,
-        'title': 'درس',
-        'lessonId': widget.courseId,
-      },
-    );
+    LessonScreen.popBackToLesson(context);
   }
 
   void _showExitModal() {

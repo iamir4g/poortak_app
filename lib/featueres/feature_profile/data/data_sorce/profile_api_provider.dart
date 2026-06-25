@@ -49,6 +49,13 @@ class ProfileApiProvider {
     return response;
   }
 
+  dynamic callGetPaymentById(String paymentId) async {
+    final response = await dio.get(
+      "${Constants.baseUrl}payments/$paymentId",
+    );
+    return response;
+  }
+
   ///api/v1/user/profile
 
   dynamic callPutUserProfile(UpdateProfileParams updateProfileModel) async {

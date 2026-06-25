@@ -9,10 +9,10 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 import 'package:poortak/common/utils/svg_embedded_png.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
+import 'package:poortak/common/services/payment_deep_link_service.dart';
 import 'package:poortak/common/widgets/main_wrapper.dart';
 import 'package:poortak/featueres/feature_intro/presentation/bloc/splash_bloc/splash_cubit.dart';
 import 'package:poortak/featueres/feature_intro/presentation/screens/intro_main_wrapper.dart';
-import 'package:poortak/featueres/feature_payment/presentation/screens/payment_result_screen.dart';
 import 'package:poortak/locator.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -225,15 +225,20 @@ class _SplashScreenState extends State<SplashScreen>
     var shouldShowIntro = await prefsOperator.getIntroState();
 
     return Future.delayed(const Duration(seconds: 3), () {
-      // Don't auto-navigate if deep link was handled
-      if (_hasHandledDeepLink) {
-        debugPrint(
-            "SplashScreen: Deep link was handled, skipping auto-navigation");
-        return;
-      }
+      if (!mounted) return;
 
       debugPrint("SplashScreen: Proceeding with auto-navigation");
       final navigatorContext = context;
+
+      if (_hasHandledDeepLink) {
+        Navigator.pushNamedAndRemoveUntil(
+          navigatorContext,
+          MainWrapper.routeName,
+          (route) => false,
+        );
+        return;
+      }
+
       if (shouldShowIntro) {
         Navigator.pushNamedAndRemoveUntil(
           navigatorContext,
@@ -256,10 +261,10 @@ class _SplashScreenState extends State<SplashScreen>
     debugPrint("🔧 SplashScreen: AppLinks created");
 
     // وقتی اپ بازه
-    _linkSub = _appLinks.uriLinkStream.listen((Uri? uri) {
+    _linkSub = _appLinks.uriLinkStream.listen((Uri? uri) async {
       debugPrint("🔗 SplashScreen: Stream received URI: $uri");
       if (uri != null) {
-        _handleIncomingLink(uri);
+        await _handleIncomingLink(uri);
       }
     }, onError: (error) {
       debugPrint("❌ SplashScreen: Stream error: $error");
@@ -277,40 +282,24 @@ class _SplashScreenState extends State<SplashScreen>
     }
   }
 
-  void _handleIncomingLink(Uri uri) {
+  Future<void> _handleIncomingLink(Uri uri) async {
     debugPrint("📌 Deep Link received: $uri");
-    debugPrint("📌 URI scheme: ${uri.scheme}");
-    debugPrint("📌 URI host: ${uri.host}");
-    debugPrint("📌 URI query parameters: ${uri.queryParameters}");
-    debugPrint("📌 Full URI string: ${uri.toString()}");
 
-    // More flexible matching
-    if (uri.scheme == "return" && uri.host == "poortak") {
-      debugPrint("📌 Scheme and host match!");
-      final okParam = uri.queryParameters["ok"];
-      if (okParam != null) {
-        debugPrint(
-            "📌 Valid deep link detected, navigating to PaymentResultScreen");
-        _hasHandledDeepLink = true;
+    final paymentLink = locator<PaymentDeepLinkService>();
+    final paymentData = await paymentLink.tryConsume(uri);
+    if (paymentData == null) {
+      debugPrint("📌 Deep link ignored (already handled or invalid)");
+      return;
+    }
 
-        // Add delay to ensure navigation works properly
-        Future.delayed(const Duration(milliseconds: 500), () {
-          Navigator.pushNamed(
-            context,
-            PaymentResultScreen.routeName,
-            arguments: {
-              "status": int.parse(okParam),
-              "ref": uri.queryParameters["ref"],
-            },
-          );
-        });
-      } else {
-        debugPrint("📌 Deep link missing 'ok' parameter");
-      }
-    } else {
-      debugPrint("📌 Deep link does not match expected format");
-      debugPrint("📌 Expected: scheme='return', host='poortak'");
-      debugPrint("📌 Got: scheme='${uri.scheme}', host='${uri.host}'");
+    debugPrint(
+        "📌 Valid payment deep link, will show PaymentResultScreen after home");
+    _hasHandledDeepLink = true;
+
+    try {
+      await _channel.invokeMethod('clearInitialLink');
+    } catch (e) {
+      debugPrint("❌ SplashScreen: Error clearing native initial link: $e");
     }
   }
 
@@ -338,8 +327,7 @@ class _SplashScreenState extends State<SplashScreen>
         final String? link = call.arguments as String?;
         if (link != null) {
           debugPrint("🔧 SplashScreen: Method channel deep link: $link");
-          final Uri uri = Uri.parse(link);
-          _handleIncomingLink(uri);
+          await _handleIncomingLink(Uri.parse(link));
         }
       }
     });

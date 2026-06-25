@@ -40,6 +40,14 @@ class LessonScreen extends StatefulWidget {
     required this.purchased,
   });
 
+  /// Pops vocabulary/practice/review screens and returns to the existing lesson.
+  static void popBackToLesson(BuildContext context) {
+    Navigator.of(context).popUntil(
+      (route) =>
+          route.settings.name == LessonScreen.routeName || route.isFirst,
+    );
+  }
+
   @override
   State<LessonScreen> createState() => _LessonScreenState();
 }
@@ -64,11 +72,8 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
   bool _isCompletionPopupShown = false;
 
   bool get hasAccess {
-    final prefsOperator = locator<PrefsOperator>();
-    if (!prefsOperator.isLoggedIn()) return false;
-    if (widget.purchased == true) return true;
-    final accessBloc = locator<IknowAccessBloc>();
-    return accessBloc.hasCourseAccess(widget.lessonId);
+    if (widget.purchased) return true;
+    return locator<IknowAccessBloc>().hasCourseAccess(widget.lessonId);
   }
 
   Future<void> _checkAndDownloadVideo(String _, {bool autoStart = true}) async {

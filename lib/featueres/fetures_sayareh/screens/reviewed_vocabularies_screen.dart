@@ -72,17 +72,7 @@ class _ReviewedVocabulariesScreenState
         actions: [
           IconButton(
             icon: const Icon(Icons.arrow_forward),
-            onPressed: () {
-              Navigator.pushReplacementNamed(
-                context,
-                LessonScreen.routeName,
-                arguments: {
-                  'index': 0,
-                  'title': 'درس',
-                  'lessonId': widget.courseId,
-                },
-              );
-            },
+            onPressed: () => LessonScreen.popBackToLesson(context),
           ),
         ],
         title: Text(
@@ -292,17 +282,7 @@ class _ReviewedVocabulariesScreenState
                     // بازگشت به درس Button
                     Expanded(
                       child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.pushReplacementNamed(
-                            context,
-                            LessonScreen.routeName,
-                            arguments: {
-                              'index': 0,
-                              'title': 'درس',
-                              'lessonId': widget.courseId,
-                            },
-                          );
-                        },
+                        onPressed: () => LessonScreen.popBackToLesson(context),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: MyColors.primary,
                           padding: EdgeInsets.symmetric(vertical: 16.h),

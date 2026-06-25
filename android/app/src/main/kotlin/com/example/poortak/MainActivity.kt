@@ -26,11 +26,12 @@ class MainActivity: FlutterActivity() {
         // Method Channel for initial link
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler { call, result ->
             if (call.method == "initialLink") {
-                if (startString != null) {
-                    result.success(startString)
-                } else {
-                    result.success(null)
-                }
+                val link = startString
+                startString = null
+                result.success(link)
+            } else if (call.method == "clearInitialLink") {
+                startString = null
+                result.success(true)
             } else {
                 result.notImplemented()
             }
@@ -77,8 +78,9 @@ class MainActivity: FlutterActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        setIntent(intent) // مهم: intent جدید را set کنیم
+        setIntent(intent)
         if (intent.action == Intent.ACTION_VIEW) {
+            startString = intent.data?.toString()
             linksReceiver?.onReceive(this.applicationContext, intent)
         }
     }

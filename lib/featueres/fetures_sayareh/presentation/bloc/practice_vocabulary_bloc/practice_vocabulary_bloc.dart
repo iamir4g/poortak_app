@@ -123,12 +123,16 @@ class PracticeVocabularyBloc
     });
 
     on<PracticeVocabularySubmitEvent>((event, emit) async {
-      await sayarehRepository.submitVocabulary(
+      final response = await sayarehRepository.submitVocabulary(
         event.courseId,
         event.vocabularyId,
         event.answer,
         event.previousVocabularyIds,
       );
+
+      if (response is DataFailed) {
+        print('DEBUG: Submit vocabulary failed: ${response.error}');
+      }
     });
   }
 }
