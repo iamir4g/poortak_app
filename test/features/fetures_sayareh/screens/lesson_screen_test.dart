@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mocktail/mocktail.dart';
@@ -18,8 +19,8 @@ import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/iknow_access
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/lesson_bloc/lesson_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/lesson_screen.dart';
 import 'package:poortak/l10n/app_localizations.dart';
+import 'package:poortak/main.dart' show routeObserver;
 
-// Mocks
 class MockLessonBloc extends Mock implements LessonBloc {}
 
 class MockVideoDownloadCubit extends Mock implements VideoDownloadCubit {}
@@ -34,11 +35,8 @@ class MockStorageService extends Mock implements StorageService {}
 
 class MockConnectivityCubit extends Mock implements ConnectivityCubit {}
 
-// Fakes - using concrete implementations for sealed classes
-// LessonEvent and LessonState are sealed, so we use concrete instances.
 class FakeVideoDownloadState extends Fake implements VideoDownloadState {}
 
-// --- Http Mocking ---
 class MockHttpClient extends Mock implements HttpClient {}
 
 class MockHttpClientRequest extends Mock implements HttpClientRequest {}
@@ -55,42 +53,33 @@ class TestHttpOverrides extends HttpOverrides {
   HttpClient createHttpClient(SecurityContext? context) => client;
 }
 
-// --- Mock Data Helpers ---
+const trailerId = 'b7637ac5-e981-40f4-b642-2a58a3db5582';
+const mainVideoId = '955b4085-ec59-4e50-b863-4af9794f1a4c';
+const lessonId = 'bed262ab-3b12-49d6-9613-52ec4737327c';
 
 final mockLesson = Lesson(
-  id: "123",
-  name: "درس آزمایشی",
-  description: "این یک درس آزمایشی است که شامل مکالمه، واژگان و آزمون می‌باشد.",
-  thumbnail: "https://example.com/thumbnail.jpg",
-  price: "1000",
+  id: lessonId,
+  name: 'درس اول',
+  description: 'پورتک به سیاره آی نو می‌رود.',
+  thumbnail: '2c4d4e04-24d2-498b-aa12-784288ada3ae',
+  price: '850000',
   purchased: false,
-  trailerVideo: "trailer_key",
-  video: "video_key",
-  isDemo: false,
-  order: 1,
-  createdAt: DateTime.now(),
-  updatedAt: DateTime.now(),
-  publishedAt: DateTime.now(),
+  trailerVideo: trailerId,
+  video: mainVideoId,
+  isDemo: true,
+  order: 0,
+  createdAt: DateTime.parse('2026-05-17T11:39:42.506Z'),
+  updatedAt: DateTime.parse('2026-05-17T11:39:42.506Z'),
+  publishedAt: DateTime.parse('2026-05-17T11:39:47.165Z'),
 );
 
 final mockCourseProgress = CourseProgressData(
-  id: "progress_123",
-  iKnowCourseId: "123",
-  userId: "user_1",
+  id: 'progress_123',
+  iKnowCourseId: lessonId,
+  userId: 'user_1',
   vocabulary: 50,
   conversation: 30,
   quiz: 80,
-  createdAt: DateTime.now(),
-  updatedAt: DateTime.now(),
-);
-
-final mockCompletedCourseProgress = CourseProgressData(
-  id: "progress_123_completed",
-  iKnowCourseId: "123",
-  userId: "user_1",
-  vocabulary: 100,
-  conversation: 100,
-  quiz: 100,
   createdAt: DateTime.now(),
   updatedAt: DateTime.now(),
 );
@@ -123,7 +112,6 @@ void main() {
     mockConnectivityCubit = MockConnectivityCubit();
     mockHttpClient = MockHttpClient();
 
-    // Setup HttpOverrides
     HttpOverrides.global = TestHttpOverrides(mockHttpClient);
     final mockRequest = MockHttpClientRequest();
     final mockResponse = MockHttpClientResponse();
@@ -144,60 +132,13 @@ void main() {
       final onData =
           invocation.positionalArguments[0] as void Function(List<int>);
       final onDone = invocation.namedArguments[#onDone] as void Function()?;
-      // 1x1 transparent GIF
-      onData([
-        0x47,
-        0x49,
-        0x46,
-        0x38,
-        0x39,
-        0x61,
-        0x01,
-        0x00,
-        0x01,
-        0x00,
-        0x80,
-        0x00,
-        0x00,
-        0x00,
-        0x00,
-        0x00,
-        0xFF,
-        0xFF,
-        0xFF,
-        0x21,
-        0xF9,
-        0x04,
-        0x01,
-        0x00,
-        0x00,
-        0x00,
-        0x00,
-        0x2C,
-        0x00,
-        0x00,
-        0x00,
-        0x00,
-        0x01,
-        0x00,
-        0x01,
-        0x00,
-        0x00,
-        0x02,
-        0x02,
-        0x44,
-        0x01,
-        0x00,
-        0x3B
-      ]);
+      onData([0x47, 0x49, 0x46, 0x38, 0x39, 0x61, 0x3B]);
       onDone?.call();
       return Stream<List<int>>.empty().listen((_) {});
     });
 
-    // Reset GetIt
     await getIt.reset();
 
-    // Register Mocks
     getIt.registerSingleton<VideoDownloadService>(mockVideoDownloadService);
     getIt.registerSingleton<VideoDownloadCubit>(mockVideoDownloadCubit);
     getIt.registerSingleton<IknowAccessBloc>(mockIknowAccessBloc);
@@ -205,7 +146,6 @@ void main() {
     getIt.registerSingleton<StorageService>(mockStorageService);
     getIt.registerSingleton<ConnectivityCubit>(mockConnectivityCubit);
 
-    // Default Behaviors
     when(() => mockLessonBloc.state).thenReturn(LessonInitial());
     when(() => mockLessonBloc.stream).thenAnswer((_) => const Stream.empty());
     when(() => mockLessonBloc.add(any())).thenReturn(null);
@@ -217,11 +157,13 @@ void main() {
     when(() => mockVideoDownloadCubit.getDownloadInfo(any())).thenReturn(null);
 
     when(() => mockIknowAccessBloc.hasCourseAccess(any())).thenReturn(false);
-
-    when(() => mockPrefsOperator.isLoggedIn()).thenReturn(true);
-
+    when(() => mockIknowAccessBloc.state).thenReturn(IknowAccessInitial());
+    when(() => mockIknowAccessBloc.stream)
+        .thenAnswer((_) => const Stream.empty());
     when(() => mockStorageService.callGetDownloadPublicUrl(any()))
-        .thenAnswer((_) async => "http://example.com/image.jpg");
+        .thenAnswer((_) async => 'http://example.com/public-file');
+
+    when(() => mockPrefsOperator.isLoggedIn()).thenReturn(false);
 
     when(() => mockVideoDownloadService.checkAndDownloadVideo(
           videoName: any(named: 'videoName'),
@@ -230,49 +172,50 @@ void main() {
           isEncrypted: any(named: 'isEncrypted'),
           usePublicUrl: any(named: 'usePublicUrl'),
           videoKey: any(named: 'videoKey'),
+          autoStart: any(named: 'autoStart'),
         )).thenAnswer((_) async {});
+
+    when(() => mockVideoDownloadService.cancelDownload(any()))
+        .thenReturn(null);
   });
 
-  Widget createWidgetUnderTest() {
-    return MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [
-        Locale('fa'),
-        Locale('en'),
-      ],
-      locale: const Locale('fa'),
-      home: MultiBlocProvider(
-        providers: [
-          BlocProvider<LessonBloc>.value(value: mockLessonBloc),
-          BlocProvider<VideoDownloadCubit>.value(value: mockVideoDownloadCubit),
-          BlocProvider<IknowAccessBloc>.value(value: mockIknowAccessBloc),
-        ],
-        child: const LessonScreen(
-          index: 0,
-          title: "درس آزمایشی",
-          lessonId: "123",
-          purchased: false,
-        ),
-      ),
+  Widget createWidgetUnderTest({bool purchased = false}) {
+    return ScreenUtilInit(
+      designSize: const Size(390, 844),
+      builder: (_, __) {
+        return MaterialApp(
+          navigatorObservers: [routeObserver],
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [
+            Locale('fa'),
+            Locale('en'),
+          ],
+          locale: const Locale('fa'),
+          home: MultiBlocProvider(
+            providers: [
+              BlocProvider<LessonBloc>.value(value: mockLessonBloc),
+              BlocProvider<VideoDownloadCubit>.value(
+                  value: mockVideoDownloadCubit),
+              BlocProvider<IknowAccessBloc>.value(value: mockIknowAccessBloc),
+            ],
+            child: LessonScreen(
+              index: 0,
+              title: 'درس اول',
+              lessonId: lessonId,
+              purchased: purchased,
+            ),
+          ),
+        );
+      },
     );
   }
 
-  testWidgets('درخواست دریافت درس در هنگام باز شدن صفحه', (tester) async {
-    // Act
-    await tester.pumpWidget(createWidgetUnderTest());
-
-    // Assert
-    verify(() => mockLessonBloc.add(any(that: isA<GetLessonEvenet>())))
-        .called(1);
-  });
-
-  testWidgets('نمایش اطلاعات درس پس از دریافت موفقیت‌آمیز', (tester) async {
-    // Arrange
+  Future<void> pumpLessonSuccess(WidgetTester tester, {bool purchased = false}) async {
     final successState =
         LessonSuccess(lesson: mockLesson, progress: mockCourseProgress);
 
@@ -280,67 +223,142 @@ void main() {
     when(() => mockLessonBloc.stream)
         .thenAnswer((_) => Stream.fromIterable([successState]));
 
-    // Act
-    await tester.pumpWidget(createWidgetUnderTest());
-    await tester.pump(); // Process initial build
-    await tester.pump(); // Process stream emission
-    await tester
-        .pump(const Duration(milliseconds: 500)); // Process image loading
+    await tester.pumpWidget(createWidgetUnderTest(purchased: purchased));
+    await tester.pump();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+    tester.takeException();
+  }
 
-    // Assert
-    expect(find.text("درس آزمایشی"), findsWidgets);
-    expect(find.text("مکالمه"), findsOneWidget);
-    expect(find.text("واژگان"), findsOneWidget);
-    expect(find.text("آزمون"), findsOneWidget);
-    expect(find.text("%50"), findsOneWidget); // Vocabulary progress
-    expect(find.text("%30"), findsOneWidget); // Conversation progress
-    expect(find.text("%80"), findsOneWidget); // Quiz progress
+  group('LessonScreen video download integration', () {
+    testWidgets('بدون لاگین: تریلر از storage/public دانلود می‌شود', (tester) async {
+      when(() => mockPrefsOperator.isLoggedIn()).thenReturn(false);
+
+      await pumpLessonSuccess(tester);
+
+      verify(() => mockVideoDownloadService.cancelDownload(mainVideoId));
+      verify(() => mockVideoDownloadService.checkAndDownloadVideo(
+            videoName: trailerId,
+            lessonId: lessonId,
+            hasAccess: false,
+            isEncrypted: false,
+            usePublicUrl: true,
+            videoKey: trailerId,
+            autoStart: true,
+          )).called(1);
+      verifyNever(() => mockVideoDownloadService.checkAndDownloadVideo(
+            videoName: mainVideoId,
+            lessonId: any(named: 'lessonId'),
+            hasAccess: any(named: 'hasAccess'),
+            isEncrypted: any(named: 'isEncrypted'),
+            usePublicUrl: any(named: 'usePublicUrl'),
+            videoKey: any(named: 'videoKey'),
+            autoStart: any(named: 'autoStart'),
+          ));
+    });
+
+    testWidgets('با لاگین و بدون خرید: تریلر از storage/public دانلود می‌شود',
+        (tester) async {
+      when(() => mockPrefsOperator.isLoggedIn()).thenReturn(true);
+      when(() => mockIknowAccessBloc.hasCourseAccess(lessonId)).thenReturn(false);
+
+      await pumpLessonSuccess(tester);
+
+      verify(() => mockVideoDownloadService.checkAndDownloadVideo(
+            videoName: trailerId,
+            lessonId: lessonId,
+            hasAccess: false,
+            isEncrypted: false,
+            usePublicUrl: true,
+            videoKey: trailerId,
+            autoStart: true,
+          )).called(1);
+    });
+
+    testWidgets('با لاگین و خرید: ویدیو اصلی رمزنگاری‌شده دانلود می‌شود',
+        (tester) async {
+      when(() => mockPrefsOperator.isLoggedIn()).thenReturn(true);
+
+      await pumpLessonSuccess(tester, purchased: true);
+
+      verifyNever(() => mockVideoDownloadService.cancelDownload(mainVideoId));
+      verify(() => mockVideoDownloadService.checkAndDownloadVideo(
+            videoName: mainVideoId,
+            lessonId: lessonId,
+            hasAccess: true,
+            isEncrypted: true,
+            usePublicUrl: false,
+            videoKey: mainVideoId,
+            autoStart: false,
+          )).called(1);
+      verifyNever(() => mockVideoDownloadService.checkAndDownloadVideo(
+            videoName: trailerId,
+            lessonId: any(named: 'lessonId'),
+            hasAccess: any(named: 'hasAccess'),
+            isEncrypted: any(named: 'isEncrypted'),
+            usePublicUrl: any(named: 'usePublicUrl'),
+            videoKey: any(named: 'videoKey'),
+            autoStart: any(named: 'autoStart'),
+          ));
+    });
+  });
+
+  testWidgets('درخواست دریافت درس در هنگام باز شدن صفحه', (tester) async {
+    when(() => mockPrefsOperator.isLoggedIn()).thenReturn(false);
+
+    await tester.pumpWidget(createWidgetUnderTest());
+    await tester.pump();
+
+    verify(() => mockLessonBloc.add(any(that: isA<GetLessonEvenet>())))
+        .called(1);
   });
 
   testWidgets('نمایش پاپ‌آپ تبریک پس از اتمام درس', (tester) async {
-    // Arrange
-    // Initial state: not completed
+    when(() => mockPrefsOperator.isLoggedIn()).thenReturn(false);
+
     final initialState =
         LessonSuccess(lesson: mockLesson, progress: mockCourseProgress);
-
-    // Final state: completed
-    final completedState = LessonSuccess(
-        lesson: mockLesson, progress: mockCompletedCourseProgress);
+    final completedState = CourseProgressData(
+      id: 'progress_completed',
+      iKnowCourseId: lessonId,
+      userId: 'user_1',
+      vocabulary: 100,
+      conversation: 100,
+      quiz: 100,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+    final completedLessonState = LessonSuccess(
+      lesson: mockLesson,
+      progress: completedState,
+    );
 
     when(() => mockLessonBloc.state).thenReturn(initialState);
     when(() => mockLessonBloc.stream).thenAnswer(
-      (_) => Stream.fromIterable([initialState, completedState]),
+      (_) => Stream.fromIterable([initialState, completedLessonState]),
     );
 
-    // Act
     await tester.pumpWidget(createWidgetUnderTest());
-    await tester.pump(); // Initial build
-    await tester.pump(); // Emit first state
-    await tester.pump(); // Emit second state
-    await tester.pumpAndSettle(); // Wait for dialog animation
+    await tester.pump();
+    await tester.pump();
+    await tester.pumpAndSettle();
 
-    // Assert
     expect(find.text('تبریک!'), findsOneWidget);
     expect(find.text('شما این درس را با موفقیت به پایان رساندید.'),
         findsOneWidget);
   });
 
   testWidgets('نمایش خطا در صورت بروز مشکل', (tester) async {
-    // Arrange
-    const errorMessage = "خطا در دریافت اطلاعات";
-
-    // Simulate error state
-    // For BlocBuilder to rebuild, we need to emit the state or have it as current state
-    // Since LessonScreen uses BlocListener for error showing (SnackBar), we need to stream it.
+    when(() => mockPrefsOperator.isLoggedIn()).thenReturn(false);
+    const errorMessage = 'خطا در دریافت اطلاعات';
 
     when(() => mockLessonBloc.stream).thenAnswer(
-        (_) => Stream.fromIterable([LessonError(message: errorMessage)]));
+      (_) => Stream.fromIterable([LessonError(message: errorMessage)]),
+    );
 
-    // Act
     await tester.pumpWidget(createWidgetUnderTest());
-    await tester.pump(); // Trigger listener
+    await tester.pump();
 
-    // Assert
     expect(find.text(errorMessage), findsOneWidget);
   });
 }

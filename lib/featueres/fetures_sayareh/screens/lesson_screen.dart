@@ -15,6 +15,7 @@ import 'package:poortak/featueres/fetures_sayareh/widgets/dialog_cart.dart';
 import 'package:poortak/featueres/fetures_sayareh/widgets/lesson_card_widget.dart';
 import 'package:poortak/featueres/fetures_sayareh/widgets/video_container_widget.dart';
 import 'package:poortak/featueres/fetures_sayareh/widgets/video_progress_bar_widget.dart';
+import 'package:poortak/featueres/fetures_sayareh/utils/lesson_video_playback_resolver.dart';
 import 'package:poortak/featueres/fetures_sayareh/widgets/dictionary_bottom_sheet.dart';
 import 'package:poortak/locator.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
@@ -74,40 +75,33 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
   bool get hasAccess => _hasFullVideoAccess();
 
   bool _hasFullVideoAccess() {
-    final prefsOperator = locator<PrefsOperator>();
-    if (!prefsOperator.isLoggedIn()) return false;
-    if (widget.purchased) return true;
-    return locator<IknowAccessBloc>().hasCourseAccess(widget.lessonId);
+    return LessonVideoPlaybackResolver.hasFullVideoAccess(
+      isLoggedIn: locator<PrefsOperator>().isLoggedIn(),
+      purchasedFromRoute: widget.purchased,
+      hasCourseAccess:
+          locator<IknowAccessBloc>().hasCourseAccess(widget.lessonId),
+    );
   }
 
-  _VideoPlaybackTarget? _resolvePlaybackTarget(Lesson lesson) {
-    final trailerId = lesson.trailerVideo.trim();
-    final mainVideoId = (lesson.video ?? '').trim();
-
-    if (!_hasFullVideoAccess()) {
-      if (trailerId.isEmpty) return null;
-      debugPrint(
-          'Lesson playback: trailer via storage/public -> $trailerId');
-      return _VideoPlaybackTarget(
-        videoId: trailerId,
-        usePublicUrl: true,
-        isEncrypted: false,
-      );
-    }
-
-    if (mainVideoId.isEmpty) return null;
-    debugPrint('Lesson playback: purchased full video -> $mainVideoId');
-    return _VideoPlaybackTarget(
-      videoId: mainVideoId,
-      usePublicUrl: false,
-      isEncrypted: true,
+  LessonVideoPlaybackTarget? _resolvePlaybackTarget(Lesson lesson) {
+    return LessonVideoPlaybackResolver.resolve(
+      lesson: lesson,
+      isLoggedIn: locator<PrefsOperator>().isLoggedIn(),
+      purchasedFromRoute: widget.purchased,
+      hasCourseAccess:
+          locator<IknowAccessBloc>().hasCourseAccess(widget.lessonId),
     );
   }
 
   void _cancelStaleMainVideoDownload(Lesson lesson) {
-    if (_hasFullVideoAccess()) return;
-    final mainVideoId = (lesson.video ?? '').trim();
-    if (mainVideoId.isEmpty) return;
+    final mainVideoId = LessonVideoPlaybackResolver.mainVideoIdToCancelWhenPreviewing(
+      lesson: lesson,
+      isLoggedIn: locator<PrefsOperator>().isLoggedIn(),
+      purchasedFromRoute: widget.purchased,
+      hasCourseAccess:
+          locator<IknowAccessBloc>().hasCourseAccess(widget.lessonId),
+    );
+    if (mainVideoId == null) return;
     _downloadService.cancelDownload(mainVideoId);
   }
 
@@ -153,10 +147,11 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
 
   bool _isPlayingTrailer() {
     final lesson = _currentLesson;
-    final currentVideoName = _currentVideoName;
-    if (lesson == null || currentVideoName == null) return false;
-    return lesson.trailerVideo.isNotEmpty &&
-        currentVideoName == lesson.trailerVideo;
+    if (lesson == null) return false;
+    return LessonVideoPlaybackResolver.isPlayingTrailer(
+      lesson: lesson,
+      currentVideoId: _currentVideoName,
+    );
   }
 
   void _updateLocalStateFromCubit(VideoDownloadInfo? downloadInfo) {
@@ -740,16 +735,4 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
       ),
     );
   }
-}
-
-class _VideoPlaybackTarget {
-  final String videoId;
-  final bool usePublicUrl;
-  final bool isEncrypted;
-
-  const _VideoPlaybackTarget({
-    required this.videoId,
-    required this.usePublicUrl,
-    required this.isEncrypted,
-  });
 }
