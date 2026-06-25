@@ -137,6 +137,9 @@ class VideoDownloadService {
     String? videoKey,
     bool autoStart = true,
   }) async {
+    final effectiveUsePublicUrl = usePublicUrl;
+    final effectiveIsEncrypted = effectiveUsePublicUrl ? false : isEncrypted;
+    final effectiveHasAccess = effectiveUsePublicUrl ? false : hasAccess;
     // If not auto-starting and no existing download info, we should still check if file exists
     // to update the UI state (e.g., show local path if already downloaded)
 
@@ -150,9 +153,9 @@ class VideoDownloadService {
       _pausedDownloads[videoName] = PausedDownloadInfo(
         videoName: videoName,
         lessonId: lessonId,
-        hasAccess: hasAccess,
-        isEncrypted: isEncrypted,
-        usePublicUrl: usePublicUrl,
+        hasAccess: effectiveHasAccess,
+        isEncrypted: effectiveIsEncrypted,
+        usePublicUrl: effectiveUsePublicUrl,
         videoKey: videoKey,
       );
       _downloadCubit.updateDownloadState(
@@ -191,7 +194,7 @@ class VideoDownloadService {
       final existingPath = await VideoDownloaderUtil.checkExistingFiles(
         name: videoName,
         storageService: _storageService,
-        hasAccess: hasAccess,
+        hasAccess: effectiveHasAccess,
         onDecrypting: (decrypting) {
           _downloadCubit.updateDownloadState(
             videoName: videoName,
@@ -258,8 +261,8 @@ class VideoDownloadService {
         name: videoName,
         fileId: videoName,
         lessonId: lessonId,
-        isEncrypted: isEncrypted,
-        usePublicUrl: usePublicUrl,
+        isEncrypted: effectiveIsEncrypted,
+        usePublicUrl: effectiveUsePublicUrl,
         onDownloading: (downloading) {
           _downloadCubit.updateDownloadState(
             videoName: videoName,
@@ -315,9 +318,9 @@ class VideoDownloadService {
             _pausedDownloads[videoName] = PausedDownloadInfo(
               videoName: videoName,
               lessonId: lessonId,
-              hasAccess: hasAccess,
-              isEncrypted: isEncrypted,
-              usePublicUrl: usePublicUrl,
+              hasAccess: effectiveHasAccess,
+              isEncrypted: effectiveIsEncrypted,
+              usePublicUrl: effectiveUsePublicUrl,
               videoKey: videoKey,
               downloadProgress:
                   _downloadCubit.getDownloadInfo(videoName)?.downloadProgress ??
@@ -359,9 +362,9 @@ class VideoDownloadService {
         _pausedDownloads[videoName] = PausedDownloadInfo(
           videoName: videoName,
           lessonId: lessonId,
-          hasAccess: hasAccess,
-          isEncrypted: isEncrypted,
-          usePublicUrl: usePublicUrl,
+          hasAccess: effectiveHasAccess,
+          isEncrypted: effectiveIsEncrypted,
+          usePublicUrl: effectiveUsePublicUrl,
           videoKey: videoKey,
         );
         _downloadCubit.updateDownloadState(
@@ -407,6 +410,7 @@ class VideoDownloadService {
   /// Cancel a download (if possible)
   void cancelDownload(String videoName) {
     _activeDownloads[videoName] = false;
+    _pausedDownloads.remove(videoName);
     _updateWakelock();
     _downloadCubit.updateDownloadState(
       videoName: videoName,

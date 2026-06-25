@@ -71,39 +71,58 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
   String? _thumbnailUrl;
   bool _isCompletionPopupShown = false;
 
-  bool get hasAccess {
+  bool get hasAccess => _hasFullVideoAccess();
+
+  bool _hasFullVideoAccess() {
+    final prefsOperator = locator<PrefsOperator>();
+    if (!prefsOperator.isLoggedIn()) return false;
     if (widget.purchased) return true;
     return locator<IknowAccessBloc>().hasCourseAccess(widget.lessonId);
   }
 
-  Future<void> _checkAndDownloadVideo(String _, {bool autoStart = true}) async {
+  _VideoPlaybackTarget? _resolvePlaybackTarget(Lesson lesson) {
+    final trailerId = lesson.trailerVideo.trim();
+    final mainVideoId = (lesson.video ?? '').trim();
+
+    if (!_hasFullVideoAccess()) {
+      if (trailerId.isEmpty) return null;
+      debugPrint(
+          'Lesson playback: trailer via storage/public -> $trailerId');
+      return _VideoPlaybackTarget(
+        videoId: trailerId,
+        usePublicUrl: true,
+        isEncrypted: false,
+      );
+    }
+
+    if (mainVideoId.isEmpty) return null;
+    debugPrint('Lesson playback: purchased full video -> $mainVideoId');
+    return _VideoPlaybackTarget(
+      videoId: mainVideoId,
+      usePublicUrl: false,
+      isEncrypted: true,
+    );
+  }
+
+  void _cancelStaleMainVideoDownload(Lesson lesson) {
+    if (_hasFullVideoAccess()) return;
+    final mainVideoId = (lesson.video ?? '').trim();
+    if (mainVideoId.isEmpty) return;
+    _downloadService.cancelDownload(mainVideoId);
+  }
+
+  Future<void> _checkAndDownloadVideo(String _, {bool? autoStart}) async {
     final lesson = _currentLesson;
     if (lesson == null) return;
 
-    final hasPaidAccess = hasAccess;
-    String? videoId;
-    bool usePublicUrl = false;
-    bool isEncrypted = true;
+    final target = _resolvePlaybackTarget(lesson);
+    if (target == null) return;
 
-    if (hasPaidAccess && lesson.video != null && lesson.video!.isNotEmpty) {
-      videoId = lesson.video;
-      usePublicUrl = false;
-      isEncrypted = true;
-    } else if (lesson.isDemo && lesson.trailerVideo.isNotEmpty) {
-      videoId = lesson.trailerVideo;
-      usePublicUrl = true;
-      isEncrypted = false;
-    } else if (lesson.trailerVideo.isNotEmpty) {
-      videoId = lesson.trailerVideo;
-      usePublicUrl = true;
-      isEncrypted = false;
-    } else if (lesson.video != null && lesson.video!.isNotEmpty) {
-      videoId = lesson.video;
-      usePublicUrl = false;
-      isEncrypted = true;
-    }
+    _cancelStaleMainVideoDownload(lesson);
 
-    if (videoId == null || videoId.isEmpty) return;
+    final hasPaidAccess = _hasFullVideoAccess();
+    final shouldAutoStart = autoStart ?? !hasPaidAccess;
+    final videoId = target.videoId;
 
     if (_currentVideoName != videoId) {
       _videoPlayerKey.currentState?.stopVideo();
@@ -125,11 +144,19 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
       videoName: videoId,
       lessonId: widget.lessonId,
       hasAccess: hasPaidAccess,
-      isEncrypted: isEncrypted,
-      usePublicUrl: usePublicUrl,
+      isEncrypted: target.isEncrypted,
+      usePublicUrl: target.usePublicUrl,
       videoKey: videoId,
-      autoStart: autoStart,
+      autoStart: shouldAutoStart,
     );
+  }
+
+  bool _isPlayingTrailer() {
+    final lesson = _currentLesson;
+    final currentVideoName = _currentVideoName;
+    if (lesson == null || currentVideoName == null) return false;
+    return lesson.trailerVideo.isNotEmpty &&
+        currentVideoName == lesson.trailerVideo;
   }
 
   void _updateLocalStateFromCubit(VideoDownloadInfo? downloadInfo) {
@@ -150,12 +177,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
     // Show success/error messages only once
     if (downloadInfo.status == DownloadStatus.completed &&
         downloadInfo.localPath != null) {
-      final prefsOperator = locator<PrefsOperator>();
-      final isLoggedIn = prefsOperator.isLoggedIn();
-      final usePublicUrl = !(isLoggedIn &&
-          hasAccess &&
-          _currentLesson?.video != null &&
-          _currentLesson!.video!.isNotEmpty);
+      final isTrailer = _isPlayingTrailer();
 
       // Only show snackbar if we just completed (check previous state)
       final previousInfo =
@@ -163,7 +185,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
       if (previousInfo?.status != DownloadStatus.completed) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(usePublicUrl ? 'تریلر دانلود شد' : 'فایل دانلود شد'),
+            content: Text(isTrailer ? 'تریلر دانلود شد' : 'فایل دانلود شد'),
             backgroundColor: Colors.green,
             duration: const Duration(seconds: 2),
           ),
@@ -197,13 +219,8 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
   void _handleVideoEnded() {
     if (_isDisposed || !mounted) return;
     if (hasAccess) return;
-    final lesson = _currentLesson;
-    final currentVideoName = _currentVideoName;
-    if (lesson == null || currentVideoName == null) return;
-    if (!lesson.isDemo) return;
-    final isTrailer = lesson.trailerVideo.isNotEmpty &&
-        currentVideoName == lesson.trailerVideo;
-    if (!isTrailer) return;
+    if (!_isPlayingTrailer()) return;
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       _showPurchaseDialog();
@@ -263,7 +280,10 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
             if (!mounted || _isDisposed) return;
             if (state is IknowAccessCompleted) {
               setState(() {});
-              _checkAndDownloadVideo('', autoStart: false);
+              if (_currentLesson != null) {
+                _cancelStaleMainVideoDownload(_currentLesson!);
+              }
+              _checkAndDownloadVideo('', autoStart: _hasFullVideoAccess());
             }
           },
         ),
@@ -312,7 +332,8 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
                 }
               }();
 
-              _checkAndDownloadVideo('', autoStart: false);
+              _cancelStaleMainVideoDownload(state.lesson);
+              _checkAndDownloadVideo('');
             } else if (state is LessonError) {
               debugPrint("LessonError: ${state.message}");
               if (mounted) {
@@ -560,6 +581,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
                 onVideoEnded: _handleVideoEnded,
                 onShowPurchaseDialog: _showPurchaseDialog,
                 onDownload: () {
+                  if (_currentLesson == null) return;
                   _checkAndDownloadVideo('', autoStart: true);
                 },
               ),
@@ -718,4 +740,16 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
       ),
     );
   }
+}
+
+class _VideoPlaybackTarget {
+  final String videoId;
+  final bool usePublicUrl;
+  final bool isEncrypted;
+
+  const _VideoPlaybackTarget({
+    required this.videoId,
+    required this.usePublicUrl,
+    required this.isEncrypted,
+  });
 }

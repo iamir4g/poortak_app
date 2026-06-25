@@ -34,7 +34,8 @@ class ItemLeason extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final isLocked = !purchased && !item.isDemo;
+    final isLocked =
+        !purchased && !item.isDemo && item.trailerVideo.isEmpty;
 
     double average = 0;
     if (progress != null) {
@@ -44,8 +45,8 @@ class ItemLeason extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
-        // If isDemo is true OR user has access, go directly to lesson screen
-        if (item.isDemo || purchased) {
+        final canPreviewTrailer = item.trailerVideo.isNotEmpty;
+        if (item.isDemo || purchased || canPreviewTrailer) {
           Navigator.pushNamed(context, LessonScreen.routeName, arguments: {
             'index': index,
             'title': item.name,
@@ -53,7 +54,6 @@ class ItemLeason extends StatelessWidget {
             'purchased': purchased,
           });
         } else {
-          // If isDemo is false AND user doesn't have access, show add to cart modal
           showDialog(
             context: context,
             builder: (BuildContext context) =>

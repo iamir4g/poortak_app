@@ -212,8 +212,12 @@ class VideoDownloaderUtil {
     Function(String)? onSuccess,
     Function(String)? onError,
   }) async {
+    if (usePublicUrl) {
+      isEncrypted = false;
+    }
+
     print(
-        "Starting download process for key: $key, name: $name, isEncrypted: $isEncrypted");
+        "Starting download process for key: $key, name: $name, isEncrypted: $isEncrypted, usePublicUrl: $usePublicUrl");
 
     try {
       // Get the application documents directory
@@ -312,7 +316,7 @@ class VideoDownloaderUtil {
         }
 
         // If file is encrypted, get decryption key and decrypt
-        if (isEncrypted) {
+        if (isEncrypted && !usePublicUrl) {
           print("File is encrypted, getting decryption key");
           final decryptionKeyResponse =
               await storageService.callGetDecryptedFile(fileId);

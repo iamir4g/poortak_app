@@ -74,7 +74,7 @@ class Lesson {
         price: json["price"] ?? "",
         video: json["video"],
         purchased: json["purchased"] ?? false,
-        trailerVideo: json["trailerVideo"] ?? "",
+        trailerVideo: json["trailerVideo"]?.toString() ?? "",
         isDemo: json["isDemo"] ?? false,
         order: json["order"] ?? 0,
         createdAt: DateTime.parse(json["createdAt"]),
