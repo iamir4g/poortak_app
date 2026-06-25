@@ -85,27 +85,50 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
     }
   }
 
-  void _loadLocalPdf(String path) async {
-    setState(() {
-      _currentPdfPath = path;
-      _isLoading = false;
-    });
+  Future<void> _loadLocalPdf(String path) async {
+    if (!await PdfDownloader.isValidPdfFile(path)) {
+      print("Invalid PDF at $path, removing and re-downloading");
+      await PdfDownloader.deletePdfByFileId(widget.fileId);
+      if (widget.fileKey != null && widget.autoDownload) {
+        await _downloadPdf();
+      } else {
+        setState(() {
+          _errorMessage = 'فایل PDF نامعتبر است. لطفاً دوباره دانلود کنید.';
+          _isLoading = false;
+        });
+      }
+      return;
+    }
 
+    _pdfController?.dispose();
     _pdfController = PdfController(
       document: PdfDocument.openFile(path),
     );
 
-    // Get total pages count
     try {
       final document = await _pdfController!.document;
+      if (!mounted) return;
       setState(() {
+        _currentPdfPath = path;
+        _isLoading = false;
         _totalPages = document.pagesCount;
+        _errorMessage = null;
       });
       print("Total pages: $_totalPages");
-
-      // Note: PdfController doesn't have addListener, page changes will be handled by navigation methods
     } catch (e) {
       print("Error getting page count: $e");
+      _pdfController?.dispose();
+      _pdfController = null;
+      await PdfDownloader.deletePdfByFileId(widget.fileId);
+      if (!mounted) return;
+      if (widget.fileKey != null && widget.autoDownload) {
+        await _downloadPdf();
+      } else {
+        setState(() {
+          _errorMessage = 'خطا در باز کردن فایل PDF. لطفاً دوباره تلاش کنید.';
+          _isLoading = false;
+        });
+      }
     }
   }
 

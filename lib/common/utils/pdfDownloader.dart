@@ -1,9 +1,80 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:poortak/common/utils/prefs_operator.dart';
+import 'package:poortak/config/constants.dart';
+import 'package:poortak/locator.dart';
 import '../services/storage_service.dart';
+import 'decryption.dart';
 
 class PdfDownloader {
+  static bool _shouldAttachAuthHeaders(String url) {
+    final apiBase = Uri.tryParse(Constants.baseUrl);
+    final target = Uri.tryParse(url);
+    if (apiBase == null || target == null) return false;
+    return apiBase.scheme == target.scheme && apiBase.host == target.host;
+  }
+
+  static Future<Dio> _createDownloadClient(StorageService storageService) async {
+    final dio = Dio();
+    dio.httpClientAdapter = storageService.dio.httpClientAdapter;
+    return dio;
+  }
+
+  static Future<void> _attachAuthHeadersIfNeeded(
+    Dio dio,
+    String downloadUrl,
+  ) async {
+    if (!_shouldAttachAuthHeaders(downloadUrl)) return;
+
+    dio.options.headers['x-lang'] = 'fa';
+    final prefsOperator = locator<PrefsOperator>();
+    final token = await prefsOperator.getUserToken();
+    if (token != null && token.isNotEmpty) {
+      dio.options.headers['Authorization'] = 'Bearer $token';
+    }
+  }
+
+  static Future<void> _processDownloadedPdf({
+    required File encryptedFile,
+    required File decryptedFile,
+    required StorageService storageService,
+    required String key,
+    required bool allowDecryption,
+  }) async {
+    final fileSize = await encryptedFile.length();
+    print("Downloaded file size: $fileSize bytes");
+
+    if (await isValidPdfFile(encryptedFile.path)) {
+      print("Downloaded file is a valid PDF, no decryption needed");
+      await encryptedFile.copy(decryptedFile.path);
+      return;
+    }
+
+    if (!allowDecryption) {
+      throw Exception(
+          'Downloaded file is not a valid PDF. The file may be corrupted.');
+    }
+
+    print("PDF appears encrypted, getting decryption key for: $key");
+    try {
+      final decryptionKeyResponse =
+          await storageService.callGetDecryptedFile(key);
+      print("Decryption key received for file: $key");
+
+      await decryptFile(
+        encryptedFile.path,
+        decryptedFile.path,
+        decryptionKeyResponse.data.key,
+      );
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 403) {
+        throw Exception(
+            'دسترسی به فایل کتاب مجاز نیست. لطفاً با پشتیبانی تماس بگیرید.');
+      }
+      rethrow;
+    }
+  }
   // Helper method to sanitize filename for safe file operations
   static String _sanitizeFileName(String fileName) {
     // Extract the base name without extension
@@ -102,6 +173,23 @@ class PdfDownloader {
     return _sanitizeFileName(fileName);
   }
 
+  static Future<bool> isValidPdfFile(String path) async {
+    try {
+      final file = File(path);
+      if (!await file.exists()) return false;
+      if (await file.length() < 4) return false;
+      final bytes = await file.openRead(0, 4).first;
+      return bytes.length >= 4 &&
+          bytes[0] == 0x25 &&
+          bytes[1] == 0x50 &&
+          bytes[2] == 0x44 &&
+          bytes[3] == 0x46;
+    } catch (e) {
+      print('Error validating PDF file: $e');
+      return false;
+    }
+  }
+
   // Debug method to test filename sanitization
   static void testSanitization(String fileName) {
     print("=== Filename Sanitization Test ===");
@@ -152,10 +240,15 @@ class PdfDownloader {
       print("Encrypted file path: ${encryptedFile.path}");
       print("Decrypted file path: ${decryptedFile.path}");
 
-      // Check if decrypted file already exists
+      // Check if decrypted file already exists and is a valid PDF
       if (await decryptedFile.exists()) {
-        print("PDF already exists, using local path: ${decryptedFile.path}");
-        return decryptedFile.path;
+        if (await isValidPdfFile(decryptedFile.path)) {
+          print("PDF already exists, using local path: ${decryptedFile.path}");
+          onDownloadCompleted?.call(decryptedFile.path);
+          return decryptedFile.path;
+        }
+        print("Existing PDF is invalid, deleting and re-downloading");
+        await decryptedFile.delete();
       }
 
       // Get download URL from StorageService
@@ -184,14 +277,11 @@ class PdfDownloader {
         await encryptedFile.delete();
       }
 
-      // Download directly to internal storage using Dio
       try {
-        // Create a new Dio instance without interceptors for file downloads
-        // Signed S3 URLs should not have additional headers (x-lang, Authorization)
-        // as they would invalidate the signature
-        final dio = Dio();
+        final dio = await _createDownloadClient(storageService);
+        await _attachAuthHeadersIfNeeded(dio, downloadUrl);
 
-        // Download with progress tracking
+        print("Downloading PDF from: $downloadUrl");
         await dio.download(
           downloadUrl,
           encryptedFile.path,
@@ -207,29 +297,39 @@ class PdfDownloader {
 
         print("PDF download completed, file saved to: ${encryptedFile.path}");
 
-        // Verify file was downloaded
         if (!await encryptedFile.exists()) {
           throw Exception(
               "Downloaded PDF file does not exist at: ${encryptedFile.path}");
         }
 
-        // If file is encrypted, get decryption key and decrypt
-        if (isEncrypted) {
-          print("PDF is encrypted, getting decryption key");
-          // TODO: Implement decryption logic for PDFs
-          // For now, just copy to pdf directory
-          await encryptedFile.copy(decryptedFile.path);
-        } else {
-          // If not encrypted, just copy to pdf directory
-          print("File is not encrypted, copying to PDF directory");
-          await encryptedFile.copy(decryptedFile.path);
+        await _processDownloadedPdf(
+          encryptedFile: encryptedFile,
+          decryptedFile: decryptedFile,
+          storageService: storageService,
+          key: key,
+          allowDecryption: isEncrypted || !usePublicUrl,
+        );
+
+        if (!await isValidPdfFile(decryptedFile.path)) {
+          await decryptedFile.delete();
+          throw Exception(
+              'Downloaded file is not a valid PDF. It may be corrupted or still encrypted.');
         }
 
         print("File processing completed successfully");
         print("Final PDF path: ${decryptedFile.path}");
 
-        // Call the completion callback with the local file path
         onDownloadCompleted?.call(decryptedFile.path);
+      } on DioException catch (e) {
+        print("Error downloading PDF file: $e");
+        final status = e.response?.statusCode;
+        if (status == 403) {
+          onDownloadError?.call('شما دسترسی دانلود این کتاب را ندارید.');
+        } else if (status == 401) {
+          onDownloadError?.call('لطفاً دوباره وارد حساب کاربری شوید.');
+        } else {
+          onDownloadError?.call('خطا در دانلود فایل: $e');
+        }
       } catch (e) {
         print("Error downloading PDF file: $e");
         onDownloadError?.call('خطا در دانلود فایل: $e');
@@ -291,8 +391,12 @@ class PdfDownloader {
           final fileName = file.path.split('/').last;
           // Check if the file name contains our fileId
           if (fileName.contains(fileId)) {
-            print("Found PDF file with fileId $fileId: $fileName");
-            return file.path;
+            if (await isValidPdfFile(file.path)) {
+              print("Found PDF file with fileId $fileId: $fileName");
+              return file.path;
+            }
+            print("Invalid cached PDF found, deleting: $fileName");
+            await file.delete();
           }
         }
       }

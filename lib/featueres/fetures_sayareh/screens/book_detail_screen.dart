@@ -13,6 +13,7 @@ import 'package:poortak/featueres/feature_shopping_cart/data/data_source/shoppin
 import 'package:poortak/featueres/feature_shopping_cart/data/models/cart_enum.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
+import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/iknow_access_bloc/iknow_access_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/single_book_bloc/single_book_cubit.dart';
 import 'package:poortak/locator.dart';
 import 'package:poortak/common/widgets/main_wrapper.dart';
@@ -36,6 +37,7 @@ class _BookDetailScreenState extends State<BookDetailScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    locator<IknowAccessBloc>().add(FetchIknowAccessEvent());
   }
 
   @override
@@ -101,7 +103,10 @@ class _BookDetailScreenState extends State<BookDetailScreen>
           ],
         ),
         body: SafeArea(
-          child: BlocBuilder<SingleBookCubit, SingleBookState>(
+          child: BlocBuilder<IknowAccessBloc, IknowAccessState>(
+            bloc: locator<IknowAccessBloc>(),
+            builder: (context, accessState) {
+              return BlocBuilder<SingleBookCubit, SingleBookState>(
             builder: (context, state) {
               if (state.singleBookDataStatus is SingleBookDataLoading) {
                 return Center(child: DotLoadingWidget(size: 50.r));
@@ -134,6 +139,8 @@ class _BookDetailScreenState extends State<BookDetailScreen>
 
               return const SizedBox();
             },
+              );
+            },
           ),
         ),
       ),
@@ -141,11 +148,7 @@ class _BookDetailScreenState extends State<BookDetailScreen>
   }
 
   Widget _buildContent(BuildContext context, dynamic bookData) {
-    // bookData is likely of type BookData from SingleBookModel
-    // I need to check the fields. Based on user log:
-    // id, title, description, price, author, publisher, pageCount, publishDate, isDemo, trialFile, purchased
-
-    final bool isPurchased = bookData.purchased ?? false;
+    final bool hasAccess = locator<IknowAccessBloc>().hasBookAccess(bookData.id);
     final bool hasDemo = bookData.isDemo ?? false;
     final String? trialFile = bookData.trialFile;
     final bool showSampleButton =
@@ -218,7 +221,7 @@ class _BookDetailScreenState extends State<BookDetailScreen>
                 ),
                 // const SizedBox(height: 2),
                 // Price
-                if (!isPurchased) ...[
+                if (!hasAccess) ...[
                   Divider(
                     height: Dimens.nh(32),
                     color: isDark ? MyColors.darkBorder : MyColors.dividerGray,
@@ -354,7 +357,7 @@ class _BookDetailScreenState extends State<BookDetailScreen>
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (showSampleButton && !isPurchased) ...[
+              if (showSampleButton && !hasAccess) ...[
                 SizedBox(
                   width: double.infinity,
                   height: Dimens.buttonHeight,
@@ -390,9 +393,9 @@ class _BookDetailScreenState extends State<BookDetailScreen>
               PrimaryButton(
                 width: double.infinity,
                 height: Dimens.buttonHeight,
-                lable: isPurchased ? "خواندن کتاب" : "خرید کتاب",
+                lable: hasAccess ? "خواندن کتاب" : "خرید کتاب",
                 onPressed: () {
-                  if (isPurchased) {
+                  if (hasAccess) {
                     Navigator.pushNamed(
                       context,
                       '/pdf_reader_screen',

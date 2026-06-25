@@ -7,7 +7,7 @@ import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
 import 'package:poortak/locator.dart';
-import 'package:poortak/common/utils/prefs_operator.dart';
+import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/iknow_access_bloc/iknow_access_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/single_book_bloc/single_book_cubit.dart';
 import 'package:poortak/common/widgets/dot_loading_widget.dart';
 
@@ -191,44 +191,24 @@ class PdfReaderScreen extends StatelessWidget {
 
   Widget _buildPdfReaderContent(BuildContext context, dynamic bookData) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    // Determine which file to download based on login and purchase status
     String? fileToDownload;
     bool usePublicUrl = false;
 
-    // Check if user is logged in
-    final prefsOperator = locator<PrefsOperator>();
-    final isLoggedIn = prefsOperator.isLoggedIn();
+    final hasPaidAccess =
+        locator<IknowAccessBloc>().hasBookAccess(bookData.id);
 
-    if (isLoggedIn) {
-      // User is logged in
+    if (hasPaidAccess &&
+        bookData.file != null &&
+        bookData.file.toString().trim().isNotEmpty) {
+      fileToDownload = bookData.file;
+      usePublicUrl = false;
       debugPrint(
-          "User is logged in. purchased: ${bookData.purchased}, file: ${bookData.file}, trialFile: ${bookData.trialFile}");
-      if (bookData.purchased == true &&
-          bookData.file != null &&
-          bookData.file.toString().trim().isNotEmpty) {
-        // User has purchased the book, use the full file
-        fileToDownload = bookData.file;
-        usePublicUrl = false;
-        debugPrint(
-            "Using purchased file: $fileToDownload with authenticated URL");
-      } else if (bookData.trialFile != null &&
-          bookData.trialFile.toString().trim().isNotEmpty) {
-        // User hasn't purchased or file is not available, use trial file with public URL
-        fileToDownload = bookData.trialFile;
-        usePublicUrl = true;
-        debugPrint("Using trial file: $fileToDownload with public URL");
-      }
-    } else {
-      // User is not logged in, always use trial file with public URL
-      debugPrint("User is not logged in. trialFile: ${bookData.trialFile}");
-      if (bookData.trialFile != null &&
-          bookData.trialFile.toString().trim().isNotEmpty) {
-        fileToDownload = bookData.trialFile;
-        usePublicUrl = true;
-        debugPrint("Using trial file: $fileToDownload with public URL");
-      } else {
-        debugPrint("Trial file is not available for non-logged in user");
-      }
+          "Using full book file: $fileToDownload (iknow access granted)");
+    } else if (bookData.trialFile != null &&
+        bookData.trialFile.toString().trim().isNotEmpty) {
+      fileToDownload = bookData.trialFile;
+      usePublicUrl = true;
+      debugPrint("Using trial file: $fileToDownload with public URL");
     }
 
     return Scaffold(
