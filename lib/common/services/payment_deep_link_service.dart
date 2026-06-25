@@ -48,7 +48,13 @@ class PaymentDeepLinkService {
   }
 
   /// Returns payment data when the link should be handled; null if stale/duplicate.
-  Future<PaymentDeepLinkData?> tryConsume(Uri uri) async {
+  ///
+  /// When [defer] is true (cold start from splash), the result is stored for
+  /// [MainWrapper] to present. Otherwise the caller should navigate immediately.
+  Future<PaymentDeepLinkData?> tryConsume(
+    Uri uri, {
+    bool defer = false,
+  }) async {
     if (!isPaymentReturnUri(uri)) {
       return null;
     }
@@ -75,7 +81,9 @@ class PaymentDeepLinkService {
 
     _handledInSession.add(key);
     await _prefs.setString(_handledRefKey, key);
-    _pendingResult = data;
+    if (defer) {
+      _pendingResult = data;
+    }
     return data;
   }
 }

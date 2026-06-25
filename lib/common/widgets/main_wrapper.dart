@@ -107,16 +107,20 @@ class _MainWrapperState extends State<MainWrapper> {
   }
 
   void _showPendingPaymentResultIfNeeded() {
-    final pending =
-        locator<PaymentDeepLinkService>().takePendingResult();
+    final pending = locator<PaymentDeepLinkService>().takePendingResult();
     if (pending == null) return;
+    _openPaymentResultScreen(pending);
+  }
+
+  void _openPaymentResultScreen(PaymentDeepLinkData data) {
+    if (!mounted) return;
 
     Navigator.pushNamed(
       context,
       PaymentResultScreen.routeName,
       arguments: {
-        "status": pending.ok,
-        "ref": pending.ref,
+        "status": data.ok,
+        "ref": data.ref,
       },
     );
   }
@@ -149,14 +153,7 @@ class _MainWrapperState extends State<MainWrapper> {
     log("📌 MainWrapper: Navigating to PaymentResultScreen");
     if (!mounted) return;
 
-    Navigator.pushNamed(
-      context,
-      PaymentResultScreen.routeName,
-      arguments: {
-        "status": paymentData.ok,
-        "ref": paymentData.ref,
-      },
-    );
+    _openPaymentResultScreen(paymentData);
   }
 
   @override

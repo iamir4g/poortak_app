@@ -63,6 +63,13 @@ class _PaymentResultScreenState extends State<PaymentResultScreen> {
     }
   }
 
+  void _goToMain() {
+    Navigator.of(context).popUntil(
+      (route) =>
+          route.settings.name == MainWrapper.routeName || route.isFirst,
+    );
+  }
+
   Future<void> _loadPaymentDetails() async {
     if (widget.ref == null || widget.ref!.isEmpty) return;
 
@@ -103,7 +110,7 @@ class _PaymentResultScreenState extends State<PaymentResultScreen> {
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: MyColors.textLight, size: 24.sp),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: _goToMain,
         ),
       ),
       body: SafeArea(
@@ -211,12 +218,7 @@ class _PaymentResultScreenState extends State<PaymentResultScreen> {
                   width: double.infinity,
                   height: 50.h,
                   child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).pushNamedAndRemoveUntil(
-                        MainWrapper.routeName,
-                        (route) => false,
-                      );
-                    },
+                    onPressed: _goToMain,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: MyColors.success,
                       shape: RoundedRectangleBorder(
@@ -235,12 +237,7 @@ class _PaymentResultScreenState extends State<PaymentResultScreen> {
                   width: double.infinity,
                   height: 50.h,
                   child: OutlinedButton(
-                    onPressed: () {
-                      Navigator.of(context).pushNamedAndRemoveUntil(
-                        MainWrapper.routeName,
-                        (route) => false,
-                      );
-                    },
+                    onPressed: _goToMain,
                     style: OutlinedButton.styleFrom(
                       side: BorderSide(color: MyColors.divider),
                       shape: RoundedRectangleBorder(

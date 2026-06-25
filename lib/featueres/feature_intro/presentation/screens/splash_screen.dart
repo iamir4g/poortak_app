@@ -286,7 +286,7 @@ class _SplashScreenState extends State<SplashScreen>
     debugPrint("📌 Deep Link received: $uri");
 
     final paymentLink = locator<PaymentDeepLinkService>();
-    final paymentData = await paymentLink.tryConsume(uri);
+    final paymentData = await paymentLink.tryConsume(uri, defer: true);
     if (paymentData == null) {
       debugPrint("📌 Deep link ignored (already handled or invalid)");
       return;
