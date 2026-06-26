@@ -7,9 +7,11 @@ import '../services/storage_service.dart';
 
 class CustomPdfReader extends StatefulWidget {
   final String? fileKey;
+  final String? decryptionFileId;
   final String? localPath;
   final String fileName;
   final String fileId;
+  final String? bookId;
   final bool isEncrypted;
   final bool showDownloadButton;
   final bool autoDownload;
@@ -19,9 +21,11 @@ class CustomPdfReader extends StatefulWidget {
   const CustomPdfReader({
     super.key,
     this.fileKey,
+    this.decryptionFileId,
     this.localPath,
     required this.fileName,
     required this.fileId,
+    this.bookId,
     required this.storageService,
     this.isEncrypted = false,
     this.showDownloadButton = true,
@@ -65,7 +69,7 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
       }
 
       // If no local file and we have a fileKey, check if we should auto-download
-      if (widget.fileKey != null && widget.autoDownload) {
+      if (widget.autoDownload && _canDownload()) {
         // Start downloading immediately
         _downloadPdf();
       } else if (widget.fileKey != null) {
@@ -89,7 +93,7 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
     if (!await PdfDownloader.isValidPdfFile(path)) {
       print("Invalid PDF at $path, removing and re-downloading");
       await PdfDownloader.deletePdfByFileId(widget.fileId);
-      if (widget.fileKey != null && widget.autoDownload) {
+      if (widget.fileKey != null && widget.autoDownload && _canDownload()) {
         await _downloadPdf();
       } else {
         setState(() {
@@ -121,7 +125,7 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
       _pdfController = null;
       await PdfDownloader.deletePdfByFileId(widget.fileId);
       if (!mounted) return;
-      if (widget.fileKey != null && widget.autoDownload) {
+      if (widget.fileKey != null && widget.autoDownload && _canDownload()) {
         await _downloadPdf();
       } else {
         setState(() {
@@ -130,6 +134,32 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
         });
       }
     }
+  }
+
+  bool _canDownload() {
+    if (widget.usePublicUrl) {
+      return widget.fileKey != null && widget.fileKey!.trim().isNotEmpty;
+    }
+    return widget.bookId != null && widget.bookId!.trim().isNotEmpty;
+  }
+
+  String _resolveBookId() {
+    if (widget.bookId != null && widget.bookId!.trim().isNotEmpty) {
+      return widget.bookId!.trim();
+    }
+    if (widget.fileId.startsWith('book_full_')) {
+      return widget.fileId.substring('book_full_'.length);
+    }
+    if (widget.fileId.startsWith('book_')) {
+      return widget.fileId.substring('book_'.length);
+    }
+    return widget.fileId;
+  }
+
+  String? _resolveDecryptionFileId() {
+    final fileId = widget.decryptionFileId?.trim();
+    if (fileId != null && fileId.isNotEmpty) return fileId;
+    return null;
   }
 
   void _loadUrlPdf() async {
@@ -143,10 +173,7 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
         await widget.storageService.callGetDownloadPublicUrl(widget.fileKey!);
       } else {
         // Use new API endpoint for purchased book files
-        final bookId = widget.fileId.startsWith('book_')
-            ? widget.fileId.substring(5)
-            : widget.fileId;
-        await widget.storageService.callDownloadBookFile(bookId);
+        await widget.storageService.callDownloadBookFile(_resolveBookId());
       }
 
       // For now, we'll use a placeholder and let the user download the PDF
@@ -238,7 +265,7 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
   }
 
   Future<void> _downloadPdf() async {
-    if (widget.fileKey == null) return;
+    if (!_canDownload()) return;
 
     setState(() {
       _isDownloading = true;
@@ -248,11 +275,12 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
     try {
       await PdfDownloader.downloadAndStorePdf(
         storageService: widget.storageService,
-        key: widget.fileKey!,
         fileName: widget.fileName,
         fileId: widget.fileId,
-        isEncrypted: widget.isEncrypted,
+        bookId: _resolveBookId(),
         usePublicUrl: widget.usePublicUrl,
+        publicStorageKey: widget.fileKey,
+        decryptionFileId: _resolveDecryptionFileId(),
         onProgress: (progress) {
           setState(() {
             _downloadProgress = progress;
@@ -334,7 +362,7 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
                 color: Colors.red,
               ),
             ),
-            if (widget.fileKey != null && !widget.autoDownload) ...[
+            if (widget.fileKey != null && !widget.autoDownload && _canDownload()) ...[
               SizedBox(height: Dimens.medium),
               ElevatedButton.icon(
                 onPressed: _downloadPdf,
@@ -547,7 +575,7 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
 
         // Bottom controls - only show if not auto-downloading
         if (widget.showDownloadButton &&
-            widget.fileKey != null &&
+            _canDownload() &&
             _currentPdfPath == null &&
             !widget.autoDownload)
           Container(

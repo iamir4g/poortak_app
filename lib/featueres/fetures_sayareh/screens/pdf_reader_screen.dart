@@ -9,12 +9,24 @@ import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shoppi
 import 'package:poortak/locator.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/iknow_access_bloc/iknow_access_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/single_book_bloc/single_book_cubit.dart';
+import 'package:poortak/featueres/fetures_sayareh/utils/book_pdf_playback_resolver.dart';
 import 'package:poortak/common/widgets/dot_loading_widget.dart';
 
-class PdfReaderScreen extends StatelessWidget {
+class PdfReaderScreen extends StatefulWidget {
   static const routeName = "/pdf_reader_screen";
 
   const PdfReaderScreen({super.key});
+
+  @override
+  State<PdfReaderScreen> createState() => _PdfReaderScreenState();
+}
+
+class _PdfReaderScreenState extends State<PdfReaderScreen> {
+  @override
+  void initState() {
+    super.initState();
+    locator<IknowAccessBloc>().add(FetchIknowAccessEvent());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,6 +34,7 @@ class PdfReaderScreen extends StatelessWidget {
     final args =
         ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
     final bookId = args?['bookId'] as String?;
+    final isTrialRead = args?['isTrialRead'] as bool? ?? false;
 
     if (bookId == null) {
       return Scaffold(
@@ -50,14 +63,18 @@ class PdfReaderScreen extends StatelessWidget {
           create: (context) => ShoppingCartBloc(repository: locator()),
         ),
       ],
-      child: BlocBuilder<SingleBookCubit, SingleBookState>(
-        buildWhen: (previous, current) {
-          if (previous.singleBookDataStatus == current.singleBookDataStatus) {
-            return false;
-          }
-          return true;
-        },
-        builder: (context, state) {
+      child: BlocBuilder<IknowAccessBloc, IknowAccessState>(
+        bloc: locator<IknowAccessBloc>(),
+        builder: (context, accessState) {
+          return BlocBuilder<SingleBookCubit, SingleBookState>(
+            buildWhen: (previous, current) {
+              if (previous.singleBookDataStatus ==
+                  current.singleBookDataStatus) {
+                return false;
+              }
+              return true;
+            },
+            builder: (context, state) {
           /// loading
           if (state.singleBookDataStatus is SingleBookDataLoading) {
             return Scaffold(
@@ -109,7 +126,11 @@ class PdfReaderScreen extends StatelessWidget {
                 state.singleBookDataStatus as SingleBookDataCompleted;
             final bookData = bookDataCompleted.data.data;
 
-            return _buildPdfReaderContent(context, bookData);
+            return _buildPdfReaderContent(
+              context,
+              bookData,
+              isTrialRead: isTrialRead,
+            );
           }
 
           /// error
@@ -183,33 +204,76 @@ class PdfReaderScreen extends StatelessWidget {
             );
           }
 
-          return Container();
+              return Container();
+            },
+          );
         },
       ),
     );
   }
 
-  Widget _buildPdfReaderContent(BuildContext context, dynamic bookData) {
+  Widget _buildPdfReaderContent(
+    BuildContext context,
+    dynamic bookData, {
+    required bool isTrialRead,
+  }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    String? fileToDownload;
-    bool usePublicUrl = false;
 
-    final hasPaidAccess =
-        locator<IknowAccessBloc>().hasBookAccess(bookData.id);
+    final playbackTarget = BookPdfPlaybackResolver.resolve(
+      book: bookData,
+      forceTrial: isTrialRead,
+      hasBookAccess: locator<IknowAccessBloc>().hasBookAccess(bookData.id),
+    );
 
-    if (hasPaidAccess &&
-        bookData.file != null &&
-        bookData.file.toString().trim().isNotEmpty) {
-      fileToDownload = bookData.file;
-      usePublicUrl = false;
-      debugPrint(
-          "Using full book file: $fileToDownload (iknow access granted)");
-    } else if (bookData.trialFile != null &&
-        bookData.trialFile.toString().trim().isNotEmpty) {
-      fileToDownload = bookData.trialFile;
-      usePublicUrl = true;
-      debugPrint("Using trial file: $fileToDownload with public URL");
+    if (playbackTarget == null) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(
+            bookData.title,
+            style: MyTextStyle.textMatn14Bold,
+          ),
+          automaticallyImplyLeading: false,
+          backgroundColor: isDark
+              ? MyColors.darkBackgroundSecondary
+              : Theme.of(context).colorScheme.inversePrimary,
+          actions: [
+            IconButton(
+              icon: Icon(
+                Icons.arrow_forward,
+                color: isDark ? MyColors.darkTextPrimary : null,
+              ),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ],
+        ),
+        body: const Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.error_outline,
+                size: 64,
+                color: Colors.red,
+              ),
+              SizedBox(height: 16),
+              Text(
+                'فایل کتاب در دسترس نیست',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.red,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
     }
+
+    debugPrint(
+      playbackTarget.usePublicUrl
+          ? "Using trial file: ${playbackTarget.publicStorageKey} with public URL (no decryption)"
+          : "Using full book download for bookId: ${playbackTarget.bookId}, decrypt with fileId: ${playbackTarget.decryptionFileId}",
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -284,36 +348,17 @@ class PdfReaderScreen extends StatelessWidget {
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(Dimens.nr(16)),
-                      child: fileToDownload != null && fileToDownload.isNotEmpty
-                          ? CustomPdfReader(
-                              fileKey: fileToDownload,
-                              fileName: '${bookData.title}.pdf',
-                              fileId: 'book_${bookData.id}',
-                              storageService: locator<StorageService>(),
-                              showDownloadButton: false,
-                              autoDownload: true,
-                              usePublicUrl: usePublicUrl,
-                            )
-                          : const Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.error_outline,
-                                    size: 64,
-                                    color: Colors.red,
-                                  ),
-                                  SizedBox(height: 16),
-                                  Text(
-                                    'فایل کتاب در دسترس نیست',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.red,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
+                      child: CustomPdfReader(
+                        fileKey: playbackTarget.publicStorageKey,
+                        decryptionFileId: playbackTarget.decryptionFileId,
+                        fileName: '${bookData.title}.pdf',
+                        fileId: playbackTarget.cacheFileId,
+                        bookId: playbackTarget.bookId,
+                        storageService: locator<StorageService>(),
+                        showDownloadButton: false,
+                        autoDownload: true,
+                        usePublicUrl: playbackTarget.usePublicUrl,
+                      ),
                     ),
                   ),
                 ),

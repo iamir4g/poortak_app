@@ -91,7 +91,7 @@ class StorageService {
       "${Constants.baseUrl}storage/key/$fileId",
     );
 
-    log("Sayareh Storage File URL: ${response.data}");
+    log("Decrypt key response for $fileId: ${response.statusCode} ${response.data}");
     return GetDeceryptKey.fromJson(response.data);
   }
 

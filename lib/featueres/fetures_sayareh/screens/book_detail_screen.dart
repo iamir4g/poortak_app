@@ -15,6 +15,7 @@ import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shoppi
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/iknow_access_bloc/iknow_access_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/single_book_bloc/single_book_cubit.dart';
+import 'package:poortak/featueres/fetures_sayareh/utils/book_pdf_playback_resolver.dart';
 import 'package:poortak/locator.dart';
 import 'package:poortak/common/widgets/main_wrapper.dart';
 import 'package:poortak/config/myTextStyle.dart';
@@ -148,7 +149,12 @@ class _BookDetailScreenState extends State<BookDetailScreen>
   }
 
   Widget _buildContent(BuildContext context, dynamic bookData) {
-    final bool hasAccess = locator<IknowAccessBloc>().hasBookAccess(bookData.id);
+    final bool purchased = bookData.purchased ?? false;
+    final bool hasBookAccess =
+        locator<IknowAccessBloc>().hasBookAccess(bookData.id);
+    final bool hasAccess = purchased ||
+        hasBookAccess ||
+        (bookData.isDemo ?? false);
     final bool hasDemo = bookData.isDemo ?? false;
     final String? trialFile = bookData.trialFile;
     final bool showSampleButton =
@@ -368,6 +374,7 @@ class _BookDetailScreenState extends State<BookDetailScreen>
                         '/pdf_reader_screen',
                         arguments: {
                           'bookId': bookData.id,
+                          'isTrialRead': true,
                         },
                       );
                     },
@@ -396,11 +403,17 @@ class _BookDetailScreenState extends State<BookDetailScreen>
                 lable: hasAccess ? "خواندن کتاب" : "خرید کتاب",
                 onPressed: () {
                   if (hasAccess) {
+                    final hasFullAccess = BookPdfPlaybackResolver.hasFullBookAccess(
+                      hasBookAccess: hasBookAccess,
+                      purchasedFromApi: purchased,
+                      isDemo: hasDemo,
+                    );
                     Navigator.pushNamed(
                       context,
                       '/pdf_reader_screen',
                       arguments: {
                         'bookId': bookData.id,
+                        'isTrialRead': !hasFullAccess,
                       },
                     );
                   } else {

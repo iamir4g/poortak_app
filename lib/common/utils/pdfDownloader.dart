@@ -35,45 +35,84 @@ class PdfDownloader {
     }
   }
 
-  static Future<void> _processDownloadedPdf({
-    required File encryptedFile,
+  static Future<void> _processTrialPdf({
+    required File downloadedFile,
     required File decryptedFile,
-    required StorageService storageService,
-    required String key,
-    required bool allowDecryption,
   }) async {
-    final fileSize = await encryptedFile.length();
-    print("Downloaded file size: $fileSize bytes");
-
-    if (await isValidPdfFile(encryptedFile.path)) {
-      print("Downloaded file is a valid PDF, no decryption needed");
-      await encryptedFile.copy(decryptedFile.path);
+    if (await isValidPdfFile(downloadedFile.path)) {
+      await downloadedFile.copy(decryptedFile.path);
       return;
     }
 
-    if (!allowDecryption) {
-      throw Exception(
-          'Downloaded file is not a valid PDF. The file may be corrupted.');
-    }
+    throw Exception(
+      'فایل نمونه کتاب معتبر نیست. لطفاً دوباره تلاش کنید.',
+    );
+  }
 
-    print("PDF appears encrypted, getting decryption key for: $key");
-    try {
-      final decryptionKeyResponse =
-          await storageService.callGetDecryptedFile(key);
-      print("Decryption key received for file: $key");
+  static final RegExp _uuidPattern = RegExp(
+    r'[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}',
+  );
 
-      await decryptFile(
-        encryptedFile.path,
-        decryptedFile.path,
-        decryptionKeyResponse.data.key,
-      );
-    } on DioException catch (e) {
-      if (e.response?.statusCode == 403) {
-        throw Exception(
-            'دسترسی به فایل کتاب مجاز نیست. لطفاً با پشتیبانی تماس بگیرید.');
+  static String? extractStorageFileIdFromUrl(String url) {
+    final uri = Uri.tryParse(url);
+    if (uri == null) return null;
+
+    for (final segment in uri.pathSegments.reversed) {
+      if (_uuidPattern.hasMatch(segment)) {
+        return segment;
       }
-      rethrow;
     }
+
+    final match = _uuidPattern.firstMatch(url);
+    return match?.group(0);
+  }
+
+  static Future<void> _processPurchasedPdf({
+    required File encryptedFile,
+    required File decryptedFile,
+    required StorageService storageService,
+    required List<String> decryptionFileIds,
+  }) async {
+    if (decryptionFileIds.isEmpty) {
+      throw Exception('شناسه فایل کتاب برای رمزگشایی موجود نیست.');
+    }
+
+    DioException? lastForbidden;
+
+    for (final decryptionFileId in decryptionFileIds) {
+      print(
+        "Purchased book is encrypted, getting decryption key for: $decryptionFileId",
+      );
+      try {
+        final decryptionKeyResponse =
+            await storageService.callGetDecryptedFile(decryptionFileId);
+        print("Decryption key received for file: $decryptionFileId");
+
+        await decryptFile(
+          encryptedFile.path,
+          decryptedFile.path,
+          decryptionKeyResponse.data.key,
+        );
+        return;
+      } on DioException catch (e) {
+        if (e.response?.statusCode == 403) {
+          print(
+            "Decrypt key forbidden for fileId $decryptionFileId, trying next candidate",
+          );
+          lastForbidden = e;
+          continue;
+        }
+        rethrow;
+      }
+    }
+
+    if (lastForbidden != null) {
+      throw Exception(
+        'دسترسی به فایل کتاب مجاز نیست. لطفاً با پشتیبانی تماس بگیرید.',
+      );
+    }
+
+    throw Exception('کلید رمزگشایی کتاب یافت نشد.');
   }
   // Helper method to sanitize filename for safe file operations
   static String _sanitizeFileName(String fileName) {
@@ -200,10 +239,11 @@ class PdfDownloader {
 
   static Future<String?> downloadAndStorePdf({
     required StorageService storageService,
-    required String key,
     required String fileName,
     required String fileId,
-    bool isEncrypted = false,
+    String? bookId,
+    String? publicStorageKey,
+    String? decryptionFileId,
     bool usePublicUrl = false,
     Function(double)? onProgress,
     Function(String)? onDownloadCompleted,
@@ -253,19 +293,31 @@ class PdfDownloader {
 
       // Get download URL from StorageService
       print("Getting download URL from StorageService");
-      print("usePublicUrl: $usePublicUrl, key: $key, fileId: $fileId");
+      print(
+        "usePublicUrl: $usePublicUrl, decryptionFileId: $decryptionFileId, fileId: $fileId",
+      );
       String downloadUrl;
+      String? resolvedBookId;
       if (usePublicUrl) {
-        // For trailer book files, use public download URL (DO NOT TOUCH - this is correct)
-        downloadUrl = await storageService.callGetDownloadPublicUrl(key);
+        final storageKey = publicStorageKey?.trim();
+        if (storageKey == null || storageKey.isEmpty) {
+          throw Exception('کلید فایل نمونه کتاب موجود نیست.');
+        }
+        downloadUrl = await storageService.callGetDownloadPublicUrl(storageKey);
         print("Public download URL received: $downloadUrl");
       } else {
-        // For purchased book files, use new API endpoint
-        // Extract bookId from fileId (format: 'book_{bookId}')
-        final bookId =
-            fileId.startsWith('book_') ? fileId.substring(5) : fileId;
-        print("Extracted bookId: $bookId from fileId: $fileId");
-        downloadUrl = await storageService.callDownloadBookFile(bookId);
+        resolvedBookId = (bookId ??
+                (fileId.startsWith('book_full_')
+                    ? fileId.substring('book_full_'.length)
+                    : fileId.startsWith('book_')
+                        ? fileId.substring('book_'.length)
+                        : fileId))
+            .trim();
+        if (resolvedBookId.isEmpty) {
+          throw Exception('شناسه کتاب برای دانلود موجود نیست.');
+        }
+        print("Downloading purchased book with bookId: $resolvedBookId");
+        downloadUrl = await storageService.callDownloadBookFile(resolvedBookId);
         print("Authenticated book download URL received: $downloadUrl");
       }
 
@@ -302,13 +354,38 @@ class PdfDownloader {
               "Downloaded PDF file does not exist at: ${encryptedFile.path}");
         }
 
-        await _processDownloadedPdf(
-          encryptedFile: encryptedFile,
-          decryptedFile: decryptedFile,
-          storageService: storageService,
-          key: key,
-          allowDecryption: isEncrypted || !usePublicUrl,
-        );
+        if (usePublicUrl) {
+          await _processTrialPdf(
+            downloadedFile: encryptedFile,
+            decryptedFile: decryptedFile,
+          );
+        } else {
+          final urlFileId = extractStorageFileIdFromUrl(downloadUrl);
+          final decryptionCandidates = <String>[];
+
+          void addCandidate(String? value) {
+            final trimmed = value?.trim();
+            if (trimmed == null || trimmed.isEmpty) return;
+            if (!decryptionCandidates.contains(trimmed)) {
+              decryptionCandidates.add(trimmed);
+            }
+          }
+
+          addCandidate(urlFileId);
+          addCandidate(decryptionFileId);
+          addCandidate(resolvedBookId);
+
+          print(
+            "Decrypt key candidates (in order): ${decryptionCandidates.join(', ')}",
+          );
+
+          await _processPurchasedPdf(
+            encryptedFile: encryptedFile,
+            decryptedFile: decryptedFile,
+            storageService: storageService,
+            decryptionFileIds: decryptionCandidates,
+          );
+        }
 
         if (!await isValidPdfFile(decryptedFile.path)) {
           await decryptedFile.delete();
