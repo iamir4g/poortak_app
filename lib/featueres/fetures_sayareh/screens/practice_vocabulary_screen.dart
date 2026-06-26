@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:poortak/common/widgets/step_progress.dart';
 import 'package:poortak/common/services/haptic_service.dart';
 import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/common/services/tts_service.dart';
@@ -326,6 +327,10 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
                       final correctWord =
                           state.practiceVocabulary.data.correctWord;
                       final wrongWord = state.practiceVocabulary.data.wrongWord;
+                      final stats = state.practiceVocabulary.data.stats;
+                      final totalSteps =
+                          stats.total > 0 ? stats.total : stats.test;
+                      final currentIndex = stats.currentIndex;
 
                       _generateRandomOptions(correctWord.word, wrongWord.word);
 
@@ -352,7 +357,15 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     SizedBox(
-                                      height: 18.h,
+                                      height: Dimens.nh(24),
+                                    ),
+                                    if (totalSteps > 0)
+                                      StepProgress(
+                                        currentIndex: currentIndex,
+                                        totalSteps: totalSteps,
+                                      ),
+                                    SizedBox(
+                                      height: Dimens.nh(24),
                                     ),
                                     Container(
                                       width: 268.w,
@@ -609,10 +622,4 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
     );
   }
 
-  Widget _buildWordButton(String word) {
-    return PressableAnswerOptionButton(
-      text: word,
-      onTap: () => _checkAnswer(word),
-    );
-  }
 }

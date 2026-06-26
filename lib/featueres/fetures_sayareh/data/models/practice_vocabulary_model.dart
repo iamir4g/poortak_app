@@ -38,20 +38,55 @@ class PracticeVocabularyModel {
 class Data {
   Word correctWord;
   Word wrongWord;
+  PracticeStats stats;
 
   Data({
     required this.correctWord,
     required this.wrongWord,
+    required this.stats,
   });
 
   factory Data.fromJson(Map<String, dynamic> json) => Data(
         correctWord: Word.fromJson(json["correctWord"]),
         wrongWord: Word.fromJson(json["wrongWord"]),
+        stats: json["stats"] != null
+            ? PracticeStats.fromJson(json["stats"] as Map<String, dynamic>)
+            : const PracticeStats(total: 0, test: 0, remaining: 0),
       );
 
   Map<String, dynamic> toJson() => {
         "correctWord": correctWord.toJson(),
         "wrongWord": wrongWord.toJson(),
+        "stats": stats.toJson(),
+      };
+}
+
+class PracticeStats {
+  final int total;
+  final int test;
+  final int remaining;
+
+  const PracticeStats({
+    required this.total,
+    required this.test,
+    required this.remaining,
+  });
+
+  int get currentIndex {
+    if (total <= 0) return 0;
+    return (total - remaining).clamp(0, total - 1);
+  }
+
+  factory PracticeStats.fromJson(Map<String, dynamic> json) => PracticeStats(
+        total: json["total"] ?? 0,
+        test: json["test"] ?? 0,
+        remaining: json["remaining"] ?? 0,
+      );
+
+  Map<String, dynamic> toJson() => {
+        "total": total,
+        "test": test,
+        "remaining": remaining,
       };
 }
 
