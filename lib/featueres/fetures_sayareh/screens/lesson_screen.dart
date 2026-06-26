@@ -45,8 +45,7 @@ class LessonScreen extends StatefulWidget {
   /// Pops vocabulary/practice/review screens and returns to the existing lesson.
   static void popBackToLesson(BuildContext context) {
     Navigator.of(context).popUntil(
-      (route) =>
-          route.settings.name == LessonScreen.routeName || route.isFirst,
+      (route) => route.settings.name == LessonScreen.routeName || route.isFirst,
     );
   }
 
@@ -112,7 +111,8 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
   }
 
   void _cancelStaleMainVideoDownload(Lesson lesson) {
-    final mainVideoId = LessonVideoPlaybackResolver.mainVideoIdToCancelWhenPreviewing(
+    final mainVideoId =
+        LessonVideoPlaybackResolver.mainVideoIdToCancelWhenPreviewing(
       lesson: lesson,
       isLoggedIn: locator<PrefsOperator>().isLoggedIn(),
       purchasedFromRoute: widget.purchased,
@@ -133,7 +133,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
     _cancelStaleMainVideoDownload(lesson);
 
     final hasPaidAccess = _hasFullVideoAccess();
-    final shouldAutoStart = autoStart ?? !hasPaidAccess;
+    final shouldAutoStart = autoStart ?? false;
     final videoId = target.videoId;
 
     if (_currentVideoName != videoId) {
@@ -282,7 +282,6 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
   @override
   void initState() {
     super.initState();
-    isCheckingFiles = true;
     context.read<LessonBloc>().add(GetLessonEvenet(id: widget.lessonId));
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
@@ -335,7 +334,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
               if (_currentLesson != null) {
                 _cancelStaleMainVideoDownload(_currentLesson!);
               }
-              _checkAndDownloadVideo('', autoStart: _hasFullVideoAccess());
+              _checkAndDownloadVideo('');
             }
           },
         ),

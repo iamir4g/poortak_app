@@ -132,15 +132,15 @@ class VideoContainerWidget extends StatelessWidget {
                 ),
               ),
               SizedBox(height: Dimens.nh(12)),
-              Text(
-                'برای مشاهده، ویدیو را دانلود کنید',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: Dimens.nsp(14),
-                  fontFamily: 'IranSans',
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              // Text(
+              //   'برای مشاهده، ویدیو را دانلود کنید',
+              //   style: TextStyle(
+              //     color: Colors.white,
+              //     fontSize: Dimens.nsp(14),
+              //     fontFamily: 'IranSans',
+              //     fontWeight: FontWeight.bold,
+              //   ),
+              // ),
             ],
           ),
         ),
@@ -177,18 +177,18 @@ class VideoContainerWidget extends StatelessWidget {
                   color: Theme.of(context).textTheme.titleMedium?.color,
                 ),
               SizedBox(height: Dimens.nh(16)),
-              Text(
-                isDecrypting
-                    ? 'در حال رمزگشایی ویدیو...'
-                    : isDownloading
-                        ? 'در حال دانلود ویدیو...'
-                        : 'در حال پردازش ویدیو...',
-                style: TextStyle(
-                  color: Theme.of(context).textTheme.titleMedium?.color,
-                  fontSize: Dimens.nsp(14), // Reduced from 16
-                  fontFamily: 'IranSans',
-                ),
-              ),
+              // Text(
+              //   isDecrypting
+              //       ? 'در حال رمزگشایی ویدیو...'
+              //       : isDownloading
+              //           ? 'در حال دانلود ویدیو...'
+              //           : 'در حال پردازش ویدیو...',
+              //   style: TextStyle(
+              //     color: Theme.of(context).textTheme.titleMedium?.color,
+              //     fontSize: Dimens.nsp(14), // Reduced from 16
+              //     fontFamily: 'IranSans',
+              //   ),
+              // ),
             ],
           ),
         ),
