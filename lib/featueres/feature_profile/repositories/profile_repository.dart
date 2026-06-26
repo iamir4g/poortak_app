@@ -38,9 +38,10 @@ class ProfileRepository {
     }
   }
 
-  Future<DataState<AuthLoginOtpModel>> callLoginWithOtp(String otp) async {
+  Future<DataState<AuthLoginOtpModel>> callLoginWithOtp(
+      String otp, String mobile) async {
     try {
-      final response = await profileApiProvider.callLoginWithOtp(otp);
+      final response = await profileApiProvider.callLoginWithOtp(otp, mobile);
       log("Login Response: ${response.data}");
 
       if ((response.statusCode == 200 || response.statusCode == 201) &&

@@ -117,6 +117,39 @@ class MyColors {
   static const Color loginButtonText = Color(0xFF171926);
   static const Color termsBackgroundDark = Color(0xFF282A39);
 
+  // Sayareh / reader screen gradients
+  static const List<Color> sayarehGradientDarkColors = [
+    profileBackgroundDark,
+    darkBackground,
+    profileBackgroundDark,
+  ];
+  static const List<Color> sayarehGradientLightColors = [
+    Color(0xFFE8F0FC),
+    Color(0xFFFCEBF1),
+    Color(0xFFEFE8FC),
+  ];
+  static const List<double> sayarehGradientStops = [0.1, 0.54, 1.0];
+
+  static const LinearGradient sayarehScreenGradientDark = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: sayarehGradientDarkColors,
+    stops: sayarehGradientStops,
+  );
+
+  static const LinearGradient sayarehScreenGradientLight = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: sayarehGradientLightColors,
+    stops: sayarehGradientStops,
+  );
+
+  // PDF reader controls
+  static const Color pdfReaderControlsBackgroundLight = Color(0xFFF5F7FA);
+  static const Color pdfReaderControlsBackgroundDark = darkBackgroundSecondary;
+  static const Color pdfReaderInputBorderDark = darkBorder;
+  static const Color pdfReaderInputFillDark = termsBackgroundDark;
+
   // Profile (Dark Mode)
   static const Color profileBackgroundDark = Color(0xFF171926);
   static const Color profileHeaderDark = Color(0xFF212332);

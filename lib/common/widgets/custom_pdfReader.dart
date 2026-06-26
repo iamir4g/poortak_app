@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pdfx/pdfx.dart';
 import 'package:poortak/config/dimens.dart';
+import 'package:poortak/config/myColors.dart';
+import 'package:poortak/config/myTextStyle.dart';
 import '../utils/pdfDownloader.dart';
 import '../services/storage_service.dart';
 
@@ -366,9 +368,21 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final primaryTextColor =
+        isDark ? MyColors.darkTextPrimary : MyColors.textMatn1;
+    final secondaryTextColor =
+        isDark ? MyColors.darkTextSecondary : MyColors.text3;
+    final errorColor = isDark ? MyColors.darkError : MyColors.error;
+    final controlsBackground = isDark
+        ? MyColors.pdfReaderControlsBackgroundDark
+        : MyColors.pdfReaderControlsBackgroundLight;
+
     if (_isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(),
+      return Center(
+        child: CircularProgressIndicator(
+          color: Theme.of(context).colorScheme.primary,
+        ),
       );
     }
 
@@ -380,15 +394,15 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
             Icon(
               Icons.error_outline,
               size: 64.r,
-              color: Colors.red[300],
+              color: errorColor,
             ),
             SizedBox(height: Dimens.medium),
-            Text(
-              _errorMessage!,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16.sp,
-                color: Colors.red,
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 24.w),
+              child: Text(
+                _errorMessage!,
+                textAlign: TextAlign.center,
+                style: MyTextStyle.body16For(context).copyWith(color: errorColor),
               ),
             ),
             if (_canDownload() && !widget.autoDownload) ...[
@@ -398,8 +412,6 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
                 icon: const Icon(Icons.download),
                 label: const Text('دانلود کتاب'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).primaryColor,
-                  foregroundColor: Colors.white,
                   padding:
                       EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
                 ),
@@ -422,21 +434,19 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
           children: [
             CircularProgressIndicator(
               value: progress > 0 ? progress : null,
+              color: Theme.of(context).colorScheme.primary,
             ),
             SizedBox(height: Dimens.medium),
             Text(
               statusText,
-              style: TextStyle(fontSize: 16.sp),
+              style: MyTextStyle.body16For(context),
             ),
             SizedBox(height: Dimens.small),
             Text(
               _isDecrypting
                   ? 'لطفاً صبر کنید'
                   : 'فایل رمزگذاری‌شده در حال دریافت است',
-              style: TextStyle(
-                fontSize: 14.sp,
-                color: Colors.grey[600],
-              ),
+              style: MyTextStyle.body14SecondaryFor(context),
             ),
           ],
         ),
@@ -444,8 +454,11 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
     }
 
     if (_pdfController == null) {
-      return const Center(
-        child: Text('PDF not loaded'),
+      return Center(
+        child: Text(
+          'PDF not loaded',
+          style: MyTextStyle.body16For(context),
+        ),
       );
     }
 
@@ -460,33 +473,29 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
                 Container(
                   padding: EdgeInsets.all(8.r),
                   decoration: BoxDecoration(
-                    color: Colors.grey[100],
+                    color: controlsBackground,
                     borderRadius: BorderRadius.circular(8.r),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // Previous page button
                       IconButton(
                         onPressed: _currentPage > 1 ? _goToPreviousPage : null,
-                        icon: const Icon(Icons.arrow_back_ios),
+                        icon: Icon(
+                          Icons.arrow_back_ios,
+                          color: primaryTextColor,
+                        ),
                         tooltip: 'صفحه قبل',
                       ),
-
-                      // Page info and navigation
                       Expanded(
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
                               'صفحه $_currentPage از $_totalPages',
-                              style: TextStyle(
-                                fontSize: 16.sp,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: MyTextStyle.textMatn14BoldFor(context),
                             ),
                             SizedBox(width: Dimens.medium),
-                            // Page input field
                             SizedBox(
                               width: 80.w,
                               child: TextField(
@@ -494,9 +503,43 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
                                     text: _currentPage.toString()),
                                 keyboardType: TextInputType.number,
                                 textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: primaryTextColor,
+                                  fontSize: 14.sp,
+                                ),
                                 decoration: InputDecoration(
                                   hintText: 'صفحه',
-                                  border: OutlineInputBorder(),
+                                  hintStyle: TextStyle(
+                                    color: secondaryTextColor,
+                                  ),
+                                  filled: true,
+                                  fillColor: isDark
+                                      ? MyColors.pdfReaderInputFillDark
+                                      : Colors.white,
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8.r),
+                                    borderSide: BorderSide(
+                                      color: isDark
+                                          ? MyColors.pdfReaderInputBorderDark
+                                          : MyColors.inputBorder,
+                                    ),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8.r),
+                                    borderSide: BorderSide(
+                                      color: isDark
+                                          ? MyColors.pdfReaderInputBorderDark
+                                          : MyColors.inputBorder,
+                                    ),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8.r),
+                                    borderSide: BorderSide(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .primary,
+                                    ),
+                                  ),
                                   contentPadding: EdgeInsets.symmetric(
                                       horizontal: 8.w, vertical: 4.h),
                                   isDense: true,
@@ -527,11 +570,13 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
                         ),
                       ),
 
-                      // Next page button
                       IconButton(
                         onPressed:
                             _currentPage < _totalPages ? _goToNextPage : null,
-                        icon: const Icon(Icons.arrow_forward_ios),
+                        icon: Icon(
+                          Icons.arrow_forward_ios,
+                          color: primaryTextColor,
+                        ),
                         tooltip: 'صفحه بعد',
                       ),
                     ],
@@ -560,7 +605,12 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
                           child: CircularProgressIndicator(),
                         ),
                         errorBuilder: (_, error) => Center(
-                          child: Text('Error loading PDF: $error'),
+                          child: Text(
+                            'Error loading PDF: $error',
+                            style: MyTextStyle.body16For(context).copyWith(
+                              color: errorColor,
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -624,8 +674,6 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
                     icon: const Icon(Icons.download),
                     label: const Text('دانلود کتاب'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).primaryColor,
-                      foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(
                           horizontal: 24, vertical: 12),
                     ),

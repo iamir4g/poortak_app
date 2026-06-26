@@ -47,7 +47,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     emit(ProfileLoading());
     try {
       log("🔄 Starting login process for mobile: ${event.mobile}");
-      final response = await repository.callLoginWithOtp(event.otp);
+      final response =
+          await repository.callLoginWithOtp(event.otp, event.mobile);
       log("📡 Login Response: $response");
 
       if (response is DataSuccess) {
