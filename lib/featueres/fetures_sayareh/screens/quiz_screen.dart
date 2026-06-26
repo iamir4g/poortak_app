@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
+import 'package:poortak/common/utils/bidi_text_helper.dart';
 import 'package:poortak/common/utils/font_size_helper.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_answer_bloc/quiz_answer_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_result_bloc/quiz_result_bloc.dart';
@@ -244,10 +246,9 @@ class _QuizScreenState extends State<QuizScreen> {
                             children: [
                               const SizedBox(height: 32),
                               // Question Text
-                              Text(
-                                questionData.title,
+                              BidiText(
+                                text: questionData.title,
                                 textAlign: TextAlign.center,
-                                textDirection: TextDirection.ltr,
                                 style: FontSizeHelper.getContentTextStyle(
                                   context,
                                   baseFontSize: 16.0,
@@ -339,8 +340,8 @@ class _QuizScreenState extends State<QuizScreen> {
                                         ),
                                       ],
                                     ),
-                                    child: Text(
-                                      answerState.explanation!,
+                                    child: BidiText(
+                                      text: answerState.explanation!,
                                       style:
                                           MyTextStyle.textMatn12W500.copyWith(
                                         color: isDark
@@ -389,6 +390,7 @@ class _QuizScreenState extends State<QuizScreen> {
                                       ),
                                       textAlign: TextAlign.center,
                                     ),
+                                    SizedBox(height: 12.h),
                                   ],
                                 )),
                               // Button logic

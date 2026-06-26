@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/common/services/getImageUrl_service.dart';
+import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
+import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/iknow_access_bloc/iknow_access_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/book_detail_screen.dart';
+import 'package:poortak/featueres/fetures_sayareh/screens/pdf_reader_screen.dart';
+import 'package:poortak/featueres/fetures_sayareh/utils/book_pdf_playback_resolver.dart';
+import 'package:poortak/locator.dart';
 
 class ItemBook extends StatelessWidget {
   final String? title;
@@ -12,9 +17,11 @@ class ItemBook extends StatelessWidget {
   final String? thumbnail;
   final String? fileKey;
   final String? trialFile;
-  final bool purchased;
+  final bool purchasedFromApi;
+  final bool isDemo;
   final String? price;
   final String? bookId;
+
   const ItemBook({
     super.key,
     this.title,
@@ -22,7 +29,8 @@ class ItemBook extends StatelessWidget {
     this.thumbnail,
     this.fileKey,
     this.trialFile,
-    this.purchased = false,
+    this.purchasedFromApi = false,
+    this.isDemo = false,
     this.price,
     this.bookId,
   });
@@ -34,11 +42,7 @@ class ItemBook extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         borderRadius: BorderRadius.circular(20.r),
-        onTap: () {
-          if (bookId != null && bookId!.isNotEmpty) {
-            _navigateToPdfReader(context);
-          }
-        },
+        onTap: () => _handleTap(context),
         child: Container(
           height: Dimens.nh(104.0),
           width: double.infinity,
@@ -47,7 +51,7 @@ class ItemBook extends StatelessWidget {
           ),
           padding: EdgeInsets.all(16.r),
           decoration: BoxDecoration(
-            color: isDark ? Theme.of(context).cardColor : MyColors.background,
+            color: isDark ? Theme.of(context).cardColor : Color(0xFFFFFFFF),
             borderRadius: BorderRadius.circular(20.r),
             boxShadow: [
               BoxShadow(
@@ -136,10 +140,34 @@ class ItemBook extends StatelessWidget {
     );
   }
 
-  void _navigateToPdfReader(BuildContext context) {
+  void _handleTap(BuildContext context) {
     if (bookId == null || bookId!.isEmpty) return;
 
-    // Navigate to BookDetailScreen with book ID
+    final isLoggedIn = locator<PrefsOperator>().isLoggedIn();
+    final hasBookAccess =
+        isLoggedIn && locator<IknowAccessBloc>().hasBookAccess(bookId!);
+    final canOpen = BookPdfPlaybackResolver.canOpenReaderDirectly(
+      purchasedFromApi: purchasedFromApi,
+      hasBookAccess: hasBookAccess,
+    );
+    final canDecrypt = BookPdfPlaybackResolver.canDecryptFullBook(
+      hasBookAccess: hasBookAccess,
+      purchasedFromApi: purchasedFromApi,
+      isDemo: isDemo,
+    );
+
+    if (isLoggedIn && canOpen) {
+      Navigator.pushNamed(
+        context,
+        PdfReaderScreen.routeName,
+        arguments: {
+          'bookId': bookId!,
+          'isTrialRead': !canDecrypt,
+        },
+      );
+      return;
+    }
+
     Navigator.pushNamed(
       context,
       BookDetailScreen.routeName,

@@ -41,7 +41,7 @@ class MyTextStyle {
       );
 
   static TextStyle get textHeader16Bold => TextStyle(
-        fontFamily: "IranSans",
+        fontFamily: "IRANSans",
         fontSize: 16.sp,
         fontWeight: FontWeight.bold,
         color: MyColors.textMatn1,
@@ -165,7 +165,7 @@ class MyTextStyle {
   static TextStyle get textMatnBtn => TextStyle(
         color: MyColors.textLight,
         fontSize: 16.sp,
-        fontFamily: "IranSans",
+        fontFamily: "IRANSans",
         fontWeight: FontWeight.bold,
       );
   static TextStyle get textMatn13PrimaryShade1 => TextStyle(

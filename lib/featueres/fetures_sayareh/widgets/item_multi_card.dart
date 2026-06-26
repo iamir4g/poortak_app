@@ -19,12 +19,17 @@ class ItemMultiCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor =
+        isDark ? MyColors.darkTextPrimary : MyColors.textMatn1;
+    final secondaryTextColor =
+        isDark ? MyColors.darkTextSecondary : MyColors.textMatn1;
 
     return Container(
       width: 248.w,
       height: 25.h,
       decoration: BoxDecoration(
-        color: MyColors.background,
+        color: isDark ? MyColors.cartItemCardDark : MyColors.background,
         borderRadius: BorderRadius.all(Radius.circular(10.r)),
       ),
       child: Padding(
@@ -40,7 +45,7 @@ class ItemMultiCard extends StatelessWidget {
                 ),
                 Text(
                   title,
-                  style: MyTextStyle.textMatn12W300,
+                  style: MyTextStyle.textMatn12W300.copyWith(color: textColor),
                 )
               ],
             ),
@@ -48,11 +53,12 @@ class ItemMultiCard extends StatelessWidget {
               children: [
                 Text(
                   convertEnToFa(MoneyUtils.formatTomanFromRial(price)),
-                  style: MyTextStyle.textMatn12W500,
+                  style: MyTextStyle.textMatn12W500.copyWith(color: textColor),
                 ),
                 Text(
                   l10n?.toman ?? "",
-                  style: MyTextStyle.textMatn12W300,
+                  style:
+                      MyTextStyle.textMatn12W300.copyWith(color: secondaryTextColor),
                 )
               ],
             )

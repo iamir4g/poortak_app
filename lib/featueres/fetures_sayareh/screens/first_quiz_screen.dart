@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/common/utils/bidi_text_helper.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_start_bloc/quiz_start_bloc.dart';
@@ -225,10 +226,9 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                             children: [
                               SizedBox(height: 32.h),
                               // Question Text
-                              Text(
-                                state.question.data.title,
+                              BidiText(
+                                text: state.question.data.title,
                                 textAlign: TextAlign.center,
-                                textDirection: TextDirection.ltr,
                                 style: MyTextStyle.textHeader16Bold.copyWith(
                                   color: isDark
                                       ? MyColors.profileTextPrimaryDark
@@ -377,8 +377,8 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                                         ),
                                       ],
                                     ),
-                                    child: Text(
-                                      answerState.explanation!,
+                                    child: BidiText(
+                                      text: answerState.explanation!,
                                       style:
                                           MyTextStyle.textMatn12W500.copyWith(
                                         color: isDark

@@ -5,6 +5,7 @@ import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
+import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
 import 'package:poortak/locator.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/iknow_access_bloc/iknow_access_bloc.dart';
@@ -25,7 +26,7 @@ class _PdfReaderScreenState extends State<PdfReaderScreen> {
   @override
   void initState() {
     super.initState();
-    locator<IknowAccessBloc>().add(FetchIknowAccessEvent());
+    locator<IknowAccessBloc>().add(FetchIknowAccessEvent(forceRefresh: true));
   }
 
   @override
@@ -67,13 +68,6 @@ class _PdfReaderScreenState extends State<PdfReaderScreen> {
         bloc: locator<IknowAccessBloc>(),
         builder: (context, accessState) {
           return BlocBuilder<SingleBookCubit, SingleBookState>(
-            buildWhen: (previous, current) {
-              if (previous.singleBookDataStatus ==
-                  current.singleBookDataStatus) {
-                return false;
-              }
-              return true;
-            },
             builder: (context, state) {
           /// loading
           if (state.singleBookDataStatus is SingleBookDataLoading) {
@@ -122,6 +116,19 @@ class _PdfReaderScreenState extends State<PdfReaderScreen> {
 
           /// completed
           if (state.singleBookDataStatus is SingleBookDataCompleted) {
+            if (accessState is IknowAccessLoading) {
+              return Scaffold(
+                appBar: AppBar(
+                  title: Text('در حال بارگذاری...',
+                      style: MyTextStyle.textMatn14Bold),
+                  backgroundColor: isDark
+                      ? MyColors.darkBackgroundSecondary
+                      : Theme.of(context).colorScheme.inversePrimary,
+                ),
+                body: Center(child: DotLoadingWidget(size: Dimens.nr(100))),
+              );
+            }
+
             final SingleBookDataCompleted bookDataCompleted =
                 state.singleBookDataStatus as SingleBookDataCompleted;
             final bookData = bookDataCompleted.data.data;
@@ -218,11 +225,21 @@ class _PdfReaderScreenState extends State<PdfReaderScreen> {
     required bool isTrialRead,
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isLoggedIn = locator<PrefsOperator>().isLoggedIn();
+    final hasBookAccess = isLoggedIn &&
+        locator<IknowAccessBloc>().hasBookAccess(bookData.id);
+    final canDecrypt = isLoggedIn &&
+        BookPdfPlaybackResolver.canDecryptFullBook(
+          hasBookAccess: hasBookAccess,
+          purchasedFromApi: bookData.purchased ?? false,
+          isDemo: bookData.isDemo ?? false,
+        );
+    final effectiveTrialRead = isTrialRead || !canDecrypt;
 
     final playbackTarget = BookPdfPlaybackResolver.resolve(
       book: bookData,
-      forceTrial: isTrialRead,
-      hasBookAccess: locator<IknowAccessBloc>().hasBookAccess(bookData.id),
+      forceTrial: effectiveTrialRead,
+      hasBookAccess: hasBookAccess,
     );
 
     if (playbackTarget == null) {

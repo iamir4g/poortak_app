@@ -54,22 +54,52 @@ class _DictionaryContentState extends State<_DictionaryContent> {
   }
 
   void _onSearchChanged(String query) {
-    if (_debounce?.isActive ?? false) _debounce!.cancel();
-    _debounce = Timer(const Duration(seconds: 1), () {
-      if (query.trim().isNotEmpty) {
-        context.read<DictionaryBloc>().add(SearchWord(query));
-      }
+    setState(() {
+      _showDetail = false;
+      _selectedTranslation = null;
     });
+
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 350), () {
+      final trimmed = query.trim();
+      if (trimmed.isEmpty) {
+        context.read<DictionaryBloc>().add(const FetchSuggestions(''));
+        return;
+      }
+      if (trimmed.length < 2) {
+        context.read<DictionaryBloc>().add(const FetchSuggestions(''));
+        return;
+      }
+      context.read<DictionaryBloc>().add(FetchSuggestions(trimmed));
+    });
+  }
+
+  void _searchWord(String word) {
+    final trimmed = word.trim();
+    if (trimmed.isEmpty) return;
+
+    _controller.text = trimmed;
+    _controller.selection = TextSelection.collapsed(offset: trimmed.length);
+    setState(() {
+      _showDetail = false;
+      _selectedTranslation = null;
+    });
+    context.read<DictionaryBloc>().add(SearchWord(trimmed));
   }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final surfaceColor = isDark ? MyColors.termsBackgroundDark : MyColors.background;
-    final fieldColor = isDark ? MyColors.profileHeaderDark : MyColors.background3;
-    final textColor = isDark ? MyColors.profileTextPrimaryDark : MyColors.textMatn1;
-    final hintColor = isDark ? MyColors.loginTextSecondaryDark : MyColors.textSecondary;
-    final borderColor = isDark ? MyColors.loginIconContainerDark : MyColors.divider;
+    final surfaceColor =
+        isDark ? MyColors.termsBackgroundDark : MyColors.background;
+    final fieldColor =
+        isDark ? MyColors.profileHeaderDark : MyColors.background3;
+    final textColor =
+        isDark ? MyColors.profileTextPrimaryDark : MyColors.textMatn1;
+    final hintColor =
+        isDark ? MyColors.loginTextSecondaryDark : MyColors.textSecondary;
+    final borderColor =
+        isDark ? MyColors.loginIconContainerDark : MyColors.divider;
     return BlocListener<LitnerBloc, LitnerState>(
       listener: (context, state) {
         if (state is CreateWordSuccess) {
@@ -145,6 +175,8 @@ class _DictionaryContentState extends State<_DictionaryContent> {
                     child: TextField(
                       controller: _controller,
                       onChanged: _onSearchChanged,
+                      onSubmitted: _searchWord,
+                      textInputAction: TextInputAction.search,
                       textAlign: TextAlign.right,
                       textDirection: TextDirection.ltr,
                       style: MyTextStyle.textMatn14Bold.copyWith(
@@ -174,6 +206,37 @@ class _DictionaryContentState extends State<_DictionaryContent> {
                     builder: (context, state) {
                       if (state is DictionaryLoading) {
                         return const Center(child: CircularProgressIndicator());
+                      } else if (state is DictionarySuggestionsLoaded) {
+                        return ListView.separated(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 8,
+                          ),
+                          itemCount: state.suggestions.length,
+                          separatorBuilder: (_, __) => Divider(
+                            height: 1,
+                            color: borderColor,
+                          ),
+                          itemBuilder: (context, index) {
+                            final suggestion = state.suggestions[index];
+                            return ListTile(
+                              contentPadding: EdgeInsets.zero,
+                              title: Text(
+                                suggestion.word,
+                                style: MyTextStyle.textMatn16Bold.copyWith(
+                                  color: textColor,
+                                ),
+                                textAlign: TextAlign.left,
+                              ),
+                              trailing: Icon(
+                                Icons.north_west,
+                                size: 18,
+                                color: hintColor,
+                              ),
+                              onTap: () => _searchWord(suggestion.word),
+                            );
+                          },
+                        );
                       } else if (state is DictionaryLoaded) {
                         final entry = state.entry;
                         return AnimatedSwitcher(
@@ -219,8 +282,7 @@ class _DictionaryContentState extends State<_DictionaryContent> {
                                                       .textMatn12W300,
                                                 ),
                                                 onPressed: () {
-                                                  _controller.text = w;
-                                                  _onSearchChanged(w);
+                                                  _searchWord(w);
                                                 }))
                                             .toList(),
                                       )
@@ -290,7 +352,7 @@ class _DictionaryContentState extends State<_DictionaryContent> {
                   const SizedBox(width: 8),
                   IconButton(
                     onPressed: () {
-                      locator<TTSService>().speak(entry.word);
+                      locator<TTSService>().speak(entry.word, speechRate: 0.25);
                     },
                     icon: const Icon(
                       Icons.volume_up_rounded,

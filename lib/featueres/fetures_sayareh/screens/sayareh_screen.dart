@@ -247,24 +247,19 @@ class _SayarehScreenState extends State<SayarehScreen> {
                               return SizedBox(height: Dimens.nh(13.0));
                             },
                             itemBuilder: (context, index) {
+                              final book =
+                                  sayarehDataCompleted.bookListData.data![index];
+
                               return ItemBook(
-                                title: sayarehDataCompleted
-                                    .bookListData.data![index].title,
-                                description: sayarehDataCompleted
-                                    .bookListData.data![index].description,
-                                thumbnail: sayarehDataCompleted
-                                    .bookListData.data![index].thumbnail,
-                                fileKey: sayarehDataCompleted
-                                    .bookListData.data![index].file,
-                                trialFile: sayarehDataCompleted
-                                    .bookListData.data![index].trialFile,
-                                purchased: accessBloc.hasBookAccess(
-                                    sayarehDataCompleted
-                                        .bookListData.data![index].id),
-                                price: sayarehDataCompleted
-                                    .bookListData.data![index].price,
-                                bookId: sayarehDataCompleted
-                                    .bookListData.data![index].id,
+                                title: book.title,
+                                description: book.description,
+                                thumbnail: book.thumbnail,
+                                fileKey: book.file,
+                                trialFile: book.trialFile,
+                                purchasedFromApi: book.purchased,
+                                isDemo: book.isDemo,
+                                price: book.price,
+                                bookId: book.id,
                               );
                             },
                           )

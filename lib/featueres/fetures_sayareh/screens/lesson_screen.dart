@@ -7,6 +7,7 @@ import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_home_model
 import 'package:poortak/featueres/fetures_sayareh/data/models/course_progress_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/iknow_access_bloc/iknow_access_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/lesson_bloc/lesson_bloc.dart';
+import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/converstion_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/quizzes_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/vocabulary_screen.dart';
@@ -71,8 +72,25 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
   bool _isDisposed = false;
   String? _thumbnailUrl;
   bool _isCompletionPopupShown = false;
+  bool _isTrailerEndModalShown = false;
 
   bool get hasAccess => _hasFullVideoAccess();
+
+  bool get _isFirstLesson => widget.index == 0;
+
+  void _promptLogin() {
+    ReusableModal.show(
+      context: context,
+      title: '',
+      message: 'لطفا ابتدا وارد حساب کاربری خود شوید',
+      type: ModalType.info,
+      buttonText: 'ورود',
+      onButtonPressed: () {
+        Navigator.of(context).pop();
+        Navigator.pushNamed(context, LoginScreen.routeName);
+      },
+    );
+  }
 
   bool _hasFullVideoAccess() {
     return LessonVideoPlaybackResolver.hasFullVideoAccess(
@@ -211,14 +229,53 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
     );
   }
 
+  void _showTrailerEndedModal() {
+    if (_currentLesson == null) return;
+
+    ReusableModal.show(
+      context: context,
+      title: 'پایان پیش‌نمایش',
+      message:
+          'برای مشاهده ویدیو کامل درس و استفاده از تمامی بخش‌های آموزشی، بسته‌های خرید را مشاهده کنید.',
+      type: ModalType.info,
+      buttonText: 'مشاهده بسته های خرید',
+      secondButtonText: 'بستن',
+      showSecondButton: true,
+      cartSuccessStyle: true,
+      customLottiePath: 'assets/lottie/Talking_maya avatar.json',
+      onButtonPressed: () {
+        Navigator.of(context).pop();
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          _showPurchaseDialog();
+        });
+      },
+      onSecondButtonPressed: () {
+        Navigator.of(context).pop();
+      },
+    );
+  }
+
   void _handleVideoEnded() {
     if (_isDisposed || !mounted) return;
-    if (hasAccess) return;
-    if (!_isPlayingTrailer()) return;
+    if (_currentLesson == null || _isTrailerEndModalShown) return;
+
+    final shouldShow =
+        LessonVideoPlaybackResolver.shouldShowPurchaseDialogAfterVideo(
+      lesson: _currentLesson!,
+      currentVideoId: _currentVideoName,
+      isLoggedIn: locator<PrefsOperator>().isLoggedIn(),
+      purchasedFromRoute: widget.purchased,
+      hasCourseAccess:
+          locator<IknowAccessBloc>().hasCourseAccess(widget.lessonId),
+    );
+    if (!shouldShow) return;
+
+    _isTrailerEndModalShown = true;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      _showPurchaseDialog();
+      _showTrailerEndedModal();
     });
   }
 
@@ -316,7 +373,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
               }
 
               () async {
-                final key = state.lesson.thumbnail;
+                final key = state.lesson.videoThumbnailOrThumbnail;
                 if (key.isNotEmpty) {
                   final imageUrl = await GetImageUrlService().getImageUrl(key);
                   if (mounted) {
@@ -603,12 +660,16 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
       persianLabel: "مکالمه",
       progress: _progress?.conversation,
       onTap: () async {
-        if (!hasAccess) {
+        final prefsOperator = locator<PrefsOperator>();
+        if (_isFirstLesson) {
+          if (!prefsOperator.isLoggedIn()) {
+            _promptLogin();
+            return;
+          }
+        } else if (!hasAccess) {
           _showPurchaseDialog();
           return;
-        }
-        final prefsOperator = locator<PrefsOperator>();
-        if (!prefsOperator.isLoggedIn()) {
+        } else if (!prefsOperator.isLoggedIn()) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('لطفا ابتدا وارد حساب کاربری خود شوید'),
@@ -653,7 +714,13 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
         ),
       ),
       onTap: () async {
-        if (!hasAccess) {
+        final prefsOperator = locator<PrefsOperator>();
+        if (_isFirstLesson) {
+          if (!prefsOperator.isLoggedIn()) {
+            _promptLogin();
+            return;
+          }
+        } else if (!hasAccess) {
           _showPurchaseDialog();
           return;
         }
@@ -673,19 +740,26 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
       persianLabel: "آزمون",
       progress: _progress?.quiz,
       onTap: () async {
-        if (!hasAccess) {
-          _showPurchaseDialog();
-          return;
-        }
         final prefsOperator = locator<PrefsOperator>();
-        if (!prefsOperator.isLoggedIn()) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('لطفا ابتدا وارد حساب کاربری خود شوید'),
-              duration: Duration(seconds: 2),
-            ),
-          );
-          return;
+        if (_isFirstLesson) {
+          if (!prefsOperator.isLoggedIn()) {
+            _promptLogin();
+            return;
+          }
+        } else {
+          if (!hasAccess) {
+            _showPurchaseDialog();
+            return;
+          }
+          if (!prefsOperator.isLoggedIn()) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('لطفا ابتدا وارد حساب کاربری خود شوید'),
+                duration: Duration(seconds: 2),
+              ),
+            );
+            return;
+          }
         }
         await Navigator.pushNamed(context, QuizzesScreen.routeName,
             arguments: {"courseId": widget.lessonId});

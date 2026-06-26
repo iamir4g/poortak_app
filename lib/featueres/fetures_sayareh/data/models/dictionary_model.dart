@@ -1,3 +1,13 @@
+class DictionarySuggestion {
+  final String word;
+
+  const DictionarySuggestion({required this.word});
+
+  factory DictionarySuggestion.fromJson(Map<String, dynamic> json) {
+    return DictionarySuggestion(word: json['word'] as String? ?? '');
+  }
+}
+
 class DictionaryEntry {
   final String word;
   final List<String> persianTranslations;

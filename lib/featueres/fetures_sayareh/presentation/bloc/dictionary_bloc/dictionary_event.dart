@@ -15,3 +15,12 @@ class SearchWord extends DictionaryEvent {
   @override
   List<Object> get props => [word];
 }
+
+class FetchSuggestions extends DictionaryEvent {
+  final String query;
+
+  const FetchSuggestions(this.query);
+
+  @override
+  List<Object> get props => [query];
+}

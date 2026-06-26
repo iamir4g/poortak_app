@@ -6,11 +6,46 @@ import 'dictionary_state.dart';
 
 class DictionaryBloc extends Bloc<DictionaryEvent, DictionaryState> {
   final DictionaryRepository _repository;
+  String _latestSuggestionQuery = '';
 
   DictionaryBloc({DictionaryRepository? repository})
       : _repository = repository ?? locator<DictionaryRepository>(),
         super(DictionaryInitial()) {
     on<SearchWord>(_onSearchWord);
+    on<FetchSuggestions>(_onFetchSuggestions);
+  }
+
+  Future<void> _onFetchSuggestions(
+    FetchSuggestions event,
+    Emitter<DictionaryState> emit,
+  ) async {
+    final query = event.query.trim();
+    if (query.length < 2) {
+      _latestSuggestionQuery = '';
+      emit(DictionaryInitial());
+      return;
+    }
+
+    _latestSuggestionQuery = query;
+    emit(DictionaryLoading());
+
+    try {
+      final suggestions = await _repository.suggestWords(query);
+      if (query != _latestSuggestionQuery) return;
+
+      if (suggestions.isEmpty) {
+        emit(DictionaryEmpty());
+      } else {
+        emit(DictionarySuggestionsLoaded(
+          query: query,
+          suggestions: suggestions,
+        ));
+      }
+    } catch (e) {
+      if (query != _latestSuggestionQuery) return;
+      print('[DictionaryBloc] Suggest error: $e');
+      emit(DictionaryError('خطا در دریافت پیشنهادات'));
+    }
   }
 
   Future<void> _onSearchWord(

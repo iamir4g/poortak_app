@@ -49,6 +49,7 @@ class CustomVideoPlayerState extends State<CustomVideoPlayer> {
   bool _isDragging = false;
   double _dragValue = 0.0;
   bool _hasNotifiedEnded = false;
+  bool _isFullscreenOpen = false;
 
   @override
   void initState() {
@@ -172,19 +173,21 @@ class CustomVideoPlayerState extends State<CustomVideoPlayer> {
       _isPlaying = false;
     });
     WakelockPlus.disable();
-    widget.onVideoEnded?.call();
+    if (!_isFullscreenOpen) {
+      widget.onVideoEnded?.call();
+    }
   }
 
   void _togglePlayPause() {
+    final isPlaying = _videoPlayerController.value.isPlaying;
+    if (isPlaying) {
+      _videoPlayerController.pause();
+      WakelockPlus.disable();
+    } else {
+      _videoPlayerController.play();
+      WakelockPlus.enable();
+    }
     setState(() {
-      if (_isPlaying) {
-        _videoPlayerController.pause();
-        WakelockPlus.disable();
-      } else {
-        _videoPlayerController.play();
-        WakelockPlus.enable();
-      }
-      _isPlaying = !_isPlaying;
       _showControls = true;
     });
     _startHideTimer();
@@ -219,7 +222,9 @@ class CustomVideoPlayerState extends State<CustomVideoPlayer> {
   }
 
   void _enterFullscreen() {
-    Navigator.of(context).push(
+    _isFullscreenOpen = true;
+    Navigator.of(context)
+        .push(
       MaterialPageRoute(
         builder: (context) => FullscreenVideoPlayer(
           videoPlayerController: _videoPlayerController,
@@ -229,7 +234,24 @@ class CustomVideoPlayerState extends State<CustomVideoPlayer> {
         ),
         fullscreenDialog: true,
       ),
-    );
+    )
+        .then((_) {
+      if (mounted) {
+        _isFullscreenOpen = false;
+      }
+    });
+  }
+
+  /// Aspect ratio for layout, accounting for video rotation metadata.
+  static double displayAspectRatio(VideoPlayerValue value) {
+    if (!value.isInitialized || value.size.width == 0 || value.size.height == 0) {
+      return 16 / 9;
+    }
+    final rotation = value.rotationCorrection % 360;
+    if (rotation == 90 || rotation == 270) {
+      return value.size.height / value.size.width;
+    }
+    return value.aspectRatio;
   }
 
   Widget _buildVideoControls() {
@@ -363,12 +385,14 @@ class CustomVideoPlayerState extends State<CustomVideoPlayer> {
             children: [
               if (_isVideoInitialized)
                 Positioned.fill(
-                  child: FittedBox(
-                    fit: BoxFit.cover,
-                    child: SizedBox(
-                      width: _videoPlayerController.value.size.width,
-                      height: _videoPlayerController.value.size.height,
-                      child: VideoPlayer(_videoPlayerController),
+                  child: ClipRect(
+                    child: FittedBox(
+                      fit: BoxFit.cover,
+                      child: SizedBox(
+                        width: _videoPlayerController.value.size.width,
+                        height: _videoPlayerController.value.size.height,
+                        child: VideoPlayer(_videoPlayerController),
+                      ),
                     ),
                   ),
                 )
@@ -450,6 +474,7 @@ class _FullscreenVideoPlayerState extends State<FullscreenVideoPlayer> {
   bool _showControls = true;
   Timer? _hideTimer;
   bool _isPlaying = false;
+  bool _hasNotifiedEnded = false;
 
   @override
   void initState() {
@@ -492,6 +517,29 @@ class _FullscreenVideoPlayerState extends State<FullscreenVideoPlayer> {
         }
       }
     }
+
+    final value = widget.videoPlayerController.value;
+    final duration = value.duration;
+    if (duration != Duration.zero && value.position < duration) {
+      _hasNotifiedEnded = false;
+      return;
+    }
+    if (duration == Duration.zero || _hasNotifiedEnded) return;
+    _hasNotifiedEnded = true;
+    _handleVideoEndedInFullscreen();
+  }
+
+  void _handleVideoEndedInFullscreen() {
+    if (!mounted) return;
+
+    WakelockPlus.disable();
+    _setSecureFlag(false);
+
+    final onVideoEnded = widget.onVideoEnded;
+    Navigator.of(context).pop();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      onVideoEnded?.call();
+    });
   }
 
   @override
@@ -537,20 +585,31 @@ class _FullscreenVideoPlayerState extends State<FullscreenVideoPlayer> {
   }
 
   void _togglePlayPause() {
+    final isPlaying = widget.videoPlayerController.value.isPlaying;
+    if (isPlaying) {
+      widget.videoPlayerController.pause();
+      _setSecureFlag(false);
+      WakelockPlus.disable();
+    } else {
+      widget.videoPlayerController.play();
+      _setSecureFlag(true);
+      WakelockPlus.enable();
+    }
     setState(() {
-      if (_isPlaying) {
-        widget.videoPlayerController.pause();
-        _setSecureFlag(false);
-        WakelockPlus.disable();
-      } else {
-        widget.videoPlayerController.play();
-        _setSecureFlag(true);
-        WakelockPlus.enable();
-      }
-      _isPlaying = !_isPlaying;
       _showControls = true;
     });
     _startHideTimer();
+  }
+
+  void _toggleControlsVisibility() {
+    setState(() {
+      _showControls = !_showControls;
+    });
+    if (_showControls) {
+      _startHideTimer();
+    } else {
+      _hideTimer?.cancel();
+    }
   }
 
   Future<void> _setSecureFlag(bool enable) async {
@@ -597,10 +656,7 @@ class _FullscreenVideoPlayerState extends State<FullscreenVideoPlayer> {
   }
 
   Widget _buildFullscreenControls() {
-    return AnimatedOpacity(
-      opacity: _showControls ? 1.0 : 0.0,
-      duration: const Duration(milliseconds: 300),
-      child: Container(
+    return Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
@@ -757,7 +813,44 @@ class _FullscreenVideoPlayerState extends State<FullscreenVideoPlayer> {
             ),
           ],
         ),
-      ),
+      );
+  }
+
+  Widget _buildFullscreenVideo() {
+    return ValueListenableBuilder<VideoPlayerValue>(
+      valueListenable: widget.videoPlayerController,
+      builder: (context, value, child) {
+        if (!value.isInitialized) {
+          return const SizedBox.shrink();
+        }
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            final aspectRatio =
+                CustomVideoPlayerState.displayAspectRatio(value);
+            final screenWidth = constraints.maxWidth;
+            final screenHeight = constraints.maxHeight;
+            final screenAspect = screenWidth / screenHeight;
+
+            double width;
+            double height;
+            if (aspectRatio > screenAspect) {
+              width = screenWidth;
+              height = width / aspectRatio;
+            } else {
+              height = screenHeight;
+              width = height * aspectRatio;
+            }
+
+            return Center(
+              child: SizedBox(
+                width: width,
+                height: height,
+                child: VideoPlayer(widget.videoPlayerController),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 
@@ -765,33 +858,23 @@ class _FullscreenVideoPlayerState extends State<FullscreenVideoPlayer> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      body: GestureDetector(
-        onTap: () {
-          setState(() {
-            _showControls = !_showControls;
-          });
-          if (_showControls) {
-            _startHideTimer();
-          }
-        },
-        child: Stack(
-          children: [
-            // Video player - fill screen
-            Positioned.fill(
-              child: FittedBox(
-                fit: BoxFit.cover,
-                child: SizedBox(
-                  width: widget.videoPlayerController.value.size.width,
-                  height: widget.videoPlayerController.value.size.height,
-                  child: VideoPlayer(widget.videoPlayerController),
-                ),
-              ),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          GestureDetector(
+            onTap: _toggleControlsVisibility,
+            behavior: HitTestBehavior.opaque,
+            child: _buildFullscreenVideo(),
+          ),
+          IgnorePointer(
+            ignoring: !_showControls,
+            child: AnimatedOpacity(
+              opacity: _showControls ? 1.0 : 0.0,
+              duration: const Duration(milliseconds: 300),
+              child: _buildFullscreenControls(),
             ),
-
-            // Controls overlay
-            _buildFullscreenControls(),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

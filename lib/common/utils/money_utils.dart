@@ -1,4 +1,5 @@
- import 'package:persian_tools/persian_tools.dart';
+import 'package:persian_tools/persian_tools.dart';
+import 'package:poortak/common/utils/digit_utils.dart';
 
 class MoneyUtils {
   MoneyUtils._();
@@ -24,7 +25,11 @@ class MoneyUtils {
 
   static String formatTomanFromRial(dynamic value) {
     final toman = parseRialToTomanInt(value);
-    return toman.toString().addComma;
+    return formatTomanDisplay(toman);
+  }
+
+  static String formatTomanDisplay(int toman) {
+    return toPersianDigits(toman.toString().addComma);
   }
 }
 

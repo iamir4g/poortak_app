@@ -149,16 +149,21 @@ class _BookDetailScreenState extends State<BookDetailScreen>
   }
 
   Widget _buildContent(BuildContext context, dynamic bookData) {
+    final bool isLoggedIn = locator<PrefsOperator>().isLoggedIn();
     final bool purchased = bookData.purchased ?? false;
-    final bool hasBookAccess =
+    final bool hasBookAccess = isLoggedIn &&
         locator<IknowAccessBloc>().hasBookAccess(bookData.id);
-    final bool hasAccess = purchased ||
-        hasBookAccess ||
-        (bookData.isDemo ?? false);
     final bool hasDemo = bookData.isDemo ?? false;
+    final bool hasFullAccess = isLoggedIn &&
+        BookPdfPlaybackResolver.canDecryptFullBook(
+          hasBookAccess: hasBookAccess,
+          purchasedFromApi: purchased,
+          isDemo: hasDemo,
+        );
     final String? trialFile = bookData.trialFile;
-    final bool showSampleButton =
-        hasDemo && trialFile != null && trialFile.isNotEmpty;
+    final bool showSampleButton = trialFile != null &&
+        trialFile.isNotEmpty &&
+        !hasFullAccess;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Column(
@@ -227,7 +232,7 @@ class _BookDetailScreenState extends State<BookDetailScreen>
                 ),
                 // const SizedBox(height: 2),
                 // Price
-                if (!hasAccess) ...[
+                if (!hasFullAccess) ...[
                   Divider(
                     height: Dimens.nh(32),
                     color: isDark ? MyColors.darkBorder : MyColors.dividerGray,
@@ -363,7 +368,7 @@ class _BookDetailScreenState extends State<BookDetailScreen>
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (showSampleButton && !hasAccess) ...[
+              if (showSampleButton) ...[
                 SizedBox(
                   width: double.infinity,
                   height: Dimens.buttonHeight,
@@ -400,20 +405,15 @@ class _BookDetailScreenState extends State<BookDetailScreen>
               PrimaryButton(
                 width: double.infinity,
                 height: Dimens.buttonHeight,
-                lable: hasAccess ? "خواندن کتاب" : "خرید کتاب",
+                lable: hasFullAccess ? "خواندن کتاب" : "خرید کتاب",
                 onPressed: () {
-                  if (hasAccess) {
-                    final hasFullAccess = BookPdfPlaybackResolver.hasFullBookAccess(
-                      hasBookAccess: hasBookAccess,
-                      purchasedFromApi: purchased,
-                      isDemo: hasDemo,
-                    );
+                  if (hasFullAccess) {
                     Navigator.pushNamed(
                       context,
                       '/pdf_reader_screen',
                       arguments: {
                         'bookId': bookData.id,
-                        'isTrialRead': !hasFullAccess,
+                        'isTrialRead': false,
                       },
                     );
                   } else {

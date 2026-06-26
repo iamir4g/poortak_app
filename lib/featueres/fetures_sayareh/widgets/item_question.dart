@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/common/utils/bidi_text_helper.dart';
 import 'package:poortak/config/myColors.dart';
 
 class QuizAnswerItem extends StatefulWidget {
@@ -93,8 +94,8 @@ class _QuizAnswerItemState extends State<QuizAnswerItem> {
         ),
       ),
       child: Center(
-        child: Text(
-          widget.title,
+        child: BidiText(
+          text: widget.title,
           style: TextStyle(
             fontFamily: 'IRANSans',
             fontWeight: FontWeight.w500,

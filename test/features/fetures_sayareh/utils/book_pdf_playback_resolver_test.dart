@@ -29,21 +29,21 @@ void main() {
     );
   }
 
-  group('BookPdfPlaybackResolver.hasFullBookAccess', () {
-    test('کتاب دمو با دسترسی iknow/access فقط نمونه است', () {
+  group('BookPdfPlaybackResolver.canDecryptFullBook', () {
+    test('کتاب دمو با دسترسی iknow/access می‌تواند decrypt شود', () {
       expect(
-        BookPdfPlaybackResolver.hasFullBookAccess(
+        BookPdfPlaybackResolver.canDecryptFullBook(
           hasBookAccess: true,
           purchasedFromApi: false,
           isDemo: true,
         ),
-        isFalse,
+        isTrue,
       );
     });
 
     test('کتاب دمو با خرید واقعی دسترسی کامل دارد', () {
       expect(
-        BookPdfPlaybackResolver.hasFullBookAccess(
+        BookPdfPlaybackResolver.canDecryptFullBook(
           hasBookAccess: false,
           purchasedFromApi: true,
           isDemo: true,
@@ -54,7 +54,7 @@ void main() {
 
     test('کتاب غیر دمو با دسترسی iknow/access دسترسی کامل دارد', () {
       expect(
-        BookPdfPlaybackResolver.hasFullBookAccess(
+        BookPdfPlaybackResolver.canDecryptFullBook(
           hasBookAccess: true,
           purchasedFromApi: false,
           isDemo: false,
@@ -62,14 +62,64 @@ void main() {
         isTrue,
       );
     });
+
+    test('بدون دسترسی decrypt ممکن نیست', () {
+      expect(
+        BookPdfPlaybackResolver.canDecryptFullBook(
+          hasBookAccess: false,
+          purchasedFromApi: false,
+          isDemo: true,
+        ),
+        isFalse,
+      );
+    });
+  });
+
+  group('BookPdfPlaybackResolver.canOpenReaderDirectly', () {
+    test('با دسترسی iknow/access مستقیم باز می‌شود', () {
+      expect(
+        BookPdfPlaybackResolver.canOpenReaderDirectly(
+          hasBookAccess: true,
+          purchasedFromApi: false,
+        ),
+        isTrue,
+      );
+    });
+  });
+
+  group('BookPdfPlaybackResolver.hasFullBookAccess', () {
+    test('hasFullBookAccess همان canDecryptFullBook است', () {
+      expect(
+        BookPdfPlaybackResolver.hasFullBookAccess(
+          hasBookAccess: true,
+          purchasedFromApi: false,
+          isDemo: true,
+        ),
+        isTrue,
+      );
+    });
   });
 
   group('BookPdfPlaybackResolver.resolve', () {
-    test('کتاب دمو با دسترسی ولی بدون خرید، نمونه بدون رمزگشایی', () {
+    test('کتاب دمو با دسترسی iknow/access، نسخه کامل', () {
+      final target = BookPdfPlaybackResolver.resolve(
+        book: sampleBook(file: fullFile),
+        forceTrial: false,
+        hasBookAccess: true,
+      );
+
+      expect(target, isNotNull);
+      expect(target!.usePublicUrl, isFalse);
+      expect(target.requiresDecryption, isTrue);
+      expect(target.decryptionFileId, fullFile);
+      expect(target.cacheFileId, 'book_full_$bookId');
+    });
+
+    test('کتاب دمو بدون دسترسی، نمونه بدون رمزگشایی', () {
       final target = BookPdfPlaybackResolver.resolve(
         book: sampleBook(),
         forceTrial: false,
-        hasBookAccess: true,
+        hasBookAccess: false,
       );
 
       expect(target, isNotNull);

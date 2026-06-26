@@ -168,6 +168,20 @@ class MyColors {
   static const Color discountBackground = Color(0xFFFEF3E6);
   static const Color cartFooterBackground = Color(0xFFEFF1F4);
 
+  // Cart dialog (Dark Mode)
+  static const Color cartDialogBackgroundDark = darkBackgroundSecondary;
+  static const Color cartTabBarBackgroundDark = termsBackgroundDark;
+  static const Color cartTabSelectedDark = profileBackgroundDark;
+  static const Color cartTabUnselectedTextDark = loginTextSecondaryDark;
+  static const Color cartPriceCardDark = termsBackgroundDark;
+  static const Color cartBundleSectionDark = darkBackground;
+  static const Color cartItemCardDark = termsBackgroundDark;
+  static const Color cartDiscountBackgroundDark = Color(0xFF3D2A1A);
+  static const Color cartPayableBackgroundDark = darkBackgroundSecondary;
+  static const Color cartFooterBackgroundDark = paymentHistoryCardHeaderDark;
+  static const Color cartCoinBadgeDark = darkBackgroundSecondary;
+  static const Color cartImageFrameDark = termsBackgroundDark;
+
   // New colors for AddWordBottomSheet
   static const Color inputBackground = Color(0xFFF7F7FB);
   static const Color textHint = Color(0xFFBDBDBD);

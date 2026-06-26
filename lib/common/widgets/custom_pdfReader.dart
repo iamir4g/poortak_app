@@ -12,6 +12,8 @@ class CustomPdfReader extends StatefulWidget {
   final String fileName;
   final String fileId;
   final String? bookId;
+  final String? trialStorageKey;
+  final bool allowTrialFallback;
   final bool isEncrypted;
   final bool showDownloadButton;
   final bool autoDownload;
@@ -26,6 +28,8 @@ class CustomPdfReader extends StatefulWidget {
     required this.fileName,
     required this.fileId,
     this.bookId,
+    this.trialStorageKey,
+    this.allowTrialFallback = false,
     required this.storageService,
     this.isEncrypted = false,
     this.showDownloadButton = true,
@@ -41,7 +45,9 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
   PdfController? _pdfController;
   String? _currentPdfPath;
   bool _isDownloading = false;
+  bool _isDecrypting = false;
   double _downloadProgress = 0.0;
+  double _decryptionProgress = 0.0;
   bool _isLoading = true;
   String? _errorMessage;
 
@@ -93,7 +99,7 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
     if (!await PdfDownloader.isValidPdfFile(path)) {
       print("Invalid PDF at $path, removing and re-downloading");
       await PdfDownloader.deletePdfByFileId(widget.fileId);
-      if (widget.fileKey != null && widget.autoDownload && _canDownload()) {
+      if (widget.autoDownload && _canDownload()) {
         await _downloadPdf();
       } else {
         setState(() {
@@ -125,7 +131,7 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
       _pdfController = null;
       await PdfDownloader.deletePdfByFileId(widget.fileId);
       if (!mounted) return;
-      if (widget.fileKey != null && widget.autoDownload && _canDownload()) {
+      if (widget.autoDownload && _canDownload()) {
         await _downloadPdf();
       } else {
         setState(() {
@@ -268,8 +274,12 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
     if (!_canDownload()) return;
 
     setState(() {
+      _isLoading = false;
       _isDownloading = true;
+      _isDecrypting = false;
       _downloadProgress = 0.0;
+      _decryptionProgress = 0.0;
+      _errorMessage = null;
     });
 
     try {
@@ -281,15 +291,32 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
         usePublicUrl: widget.usePublicUrl,
         publicStorageKey: widget.fileKey,
         decryptionFileId: _resolveDecryptionFileId(),
+        trialStorageKey: widget.trialStorageKey,
+        allowTrialFallback: widget.allowTrialFallback,
         onProgress: (progress) {
           setState(() {
             _downloadProgress = progress;
           });
         },
+        onDecrypting: (isDecrypting) {
+          setState(() {
+            _isDecrypting = isDecrypting;
+            if (isDecrypting) {
+              _isDownloading = false;
+            }
+          });
+        },
+        onDecryptionProgress: (progress) {
+          setState(() {
+            _decryptionProgress = progress;
+          });
+        },
         onDownloadCompleted: (path) {
           setState(() {
             _isDownloading = false;
+            _isDecrypting = false;
             _downloadProgress = 1.0;
+            _decryptionProgress = 1.0;
           });
           _loadLocalPdf(path);
 
@@ -307,6 +334,7 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
         onDownloadError: (error) {
           setState(() {
             _isDownloading = false;
+            _isDecrypting = false;
             _errorMessage = error;
           });
 
@@ -324,6 +352,7 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
     } catch (e) {
       setState(() {
         _isDownloading = false;
+        _isDecrypting = false;
         _errorMessage = 'خطا در دانلود: $e';
       });
     }
@@ -362,7 +391,7 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
                 color: Colors.red,
               ),
             ),
-            if (widget.fileKey != null && !widget.autoDownload && _canDownload()) ...[
+            if (_canDownload() && !widget.autoDownload) ...[
               SizedBox(height: Dimens.medium),
               ElevatedButton.icon(
                 onPressed: _downloadPdf,
@@ -381,22 +410,29 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
       );
     }
 
-    if (_isDownloading) {
+    if (_isDownloading || _isDecrypting) {
+      final progress = _isDecrypting ? _decryptionProgress : _downloadProgress;
+      final statusText = _isDecrypting
+          ? 'در حال رمزگشایی کتاب... ${(progress * 100).toInt()}%'
+          : 'در حال دانلود کتاب... ${(progress * 100).toInt()}%';
+
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             CircularProgressIndicator(
-              value: _downloadProgress,
+              value: progress > 0 ? progress : null,
             ),
             SizedBox(height: Dimens.medium),
             Text(
-              'در حال بارگذاری کتاب... ${(_downloadProgress * 100).toInt()}%',
+              statusText,
               style: TextStyle(fontSize: 16.sp),
             ),
             SizedBox(height: Dimens.small),
             Text(
-              'لطفاً صبر کنید',
+              _isDecrypting
+                  ? 'لطفاً صبر کنید'
+                  : 'فایل رمزگذاری‌شده در حال دریافت است',
               style: TextStyle(
                 fontSize: 14.sp,
                 color: Colors.grey[600],

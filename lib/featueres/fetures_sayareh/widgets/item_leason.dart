@@ -31,11 +31,14 @@ class ItemLeason extends StatelessWidget {
     this.summaryData,
   });
 
+  bool get _isFirstLesson => index == 0;
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final isLocked =
-        !purchased && !item.isDemo && item.trailerVideo.isEmpty;
+    final isLocked = _isFirstLesson
+        ? false
+        : !purchased && !item.isDemo && item.trailerVideo.isEmpty;
 
     double average = 0;
     if (progress != null) {
@@ -45,6 +48,16 @@ class ItemLeason extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
+        if (_isFirstLesson) {
+          Navigator.pushNamed(context, LessonScreen.routeName, arguments: {
+            'index': index,
+            'title': item.name,
+            'lessonId': item.id,
+            'purchased': purchased,
+          });
+          return;
+        }
+
         final canPreviewTrailer = item.trailerVideo.isNotEmpty;
         if (item.isDemo || purchased || canPreviewTrailer) {
           Navigator.pushNamed(context, LessonScreen.routeName, arguments: {

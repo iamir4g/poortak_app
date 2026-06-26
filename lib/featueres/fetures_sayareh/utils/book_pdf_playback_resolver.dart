@@ -21,15 +21,32 @@ class BookPdfPlaybackTarget {
 class BookPdfPlaybackResolver {
   const BookPdfPlaybackResolver._();
 
+  static bool canOpenReaderDirectly({
+    required bool purchasedFromApi,
+    required bool hasBookAccess,
+  }) {
+    return purchasedFromApi || hasBookAccess;
+  }
+
+  /// User can read the encrypted full book when purchased or listed in access.
+  static bool canDecryptFullBook({
+    required bool hasBookAccess,
+    required bool purchasedFromApi,
+    required bool isDemo,
+  }) {
+    return purchasedFromApi || hasBookAccess;
+  }
+
   static bool hasFullBookAccess({
     required bool hasBookAccess,
     required bool purchasedFromApi,
     required bool isDemo,
   }) {
-    if (purchasedFromApi) return true;
-    // Demo books in iknow/access only grant trial access until purchased.
-    if (isDemo) return false;
-    return hasBookAccess;
+    return canDecryptFullBook(
+      hasBookAccess: hasBookAccess,
+      purchasedFromApi: purchasedFromApi,
+      isDemo: isDemo,
+    );
   }
 
   /// [forceTrial] is true when user taps "خواندن نمونه".

@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lottie/lottie.dart';
 
-import 'package:persian_tools/persian_tools.dart';
 import 'package:poortak/common/widgets/dot_loading_widget.dart';
 import 'package:poortak/common/widgets/primaryButton.dart';
 
@@ -11,7 +10,6 @@ import 'package:poortak/common/resources/data_state.dart';
 import 'package:poortak/common/utils/svg_embedded_png.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
-import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/models/shopping_cart_model.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
@@ -23,6 +21,8 @@ import 'package:poortak/featueres/fetures_sayareh/data/models/single_book_model.
 import 'package:poortak/featueres/fetures_sayareh/repositories/sayareh_repository.dart';
 import 'package:poortak/common/services/getImageUrl_service.dart';
 import 'package:poortak/featueres/feature_shopping_cart/widgets/cart_summary_section.dart';
+import 'package:poortak/featueres/feature_shopping_cart/widgets/cart_item_card.dart';
+import 'package:poortak/featueres/feature_shopping_cart/utils/cart_item_pricing.dart';
 import 'package:poortak/l10n/app_localizations.dart';
 import 'package:poortak/locator.dart';
 // import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -73,7 +73,6 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
   }
 
   Widget _buildCartItemOverlayIcon(String type) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final assetPath = _getCartItemOverlayIconPath(type);
     if (assetPath == null) return const SizedBox.shrink();
 
@@ -300,7 +299,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
           title: course.name,
           description: course.description,
           price: MoneyUtils.parseRialToTomanInt(course.price),
-          thumbnailId: course.thumbnail,
+          thumbnailId: course.videoThumbnailOrThumbnail,
           type: itemType,
         );
       }
@@ -381,19 +380,19 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
             children: [
               // Star animation
               SizedBox(
-                width: Dimens.nw(50),
-                height: Dimens.nh(50),
+                width: Dimens.nw(90),
+                height: Dimens.nh(90),
                 child: Lottie.asset(
                   'assets/images/cart/star.json',
                   fit: BoxFit.cover,
                 ),
               ),
-              SizedBox(width: Dimens.small),
+              // SizedBox(width: Dimens.nw(8)),
               Expanded(
                 child: Wrap(
                   alignment: WrapAlignment.start,
                   crossAxisAlignment: WrapCrossAlignment.center,
-                  spacing: Dimens.small,
+                  spacing: Dimens.nw(8),
                   runSpacing: Dimens.nh(4),
                   children: [
                     Text(
@@ -441,7 +440,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                   vertical: Dimens.nh(8),
                 ),
                 decoration: BoxDecoration(
-                  border: Border.all(color: const Color(0xFFFFA73F)),
+                  border: Border.all(color: MyColors.text6),
                   borderRadius: BorderRadius.circular(Dimens.nr(22)),
                 ),
                 child: Center(
@@ -450,7 +449,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                     style: TextStyle(
                       fontSize: Dimens.nsp(14),
                       fontWeight: FontWeight.bold,
-                      color: const Color(0xFFFFA73F),
+                      color: MyColors.text6,
                     ),
                   ),
                 ),
@@ -463,7 +462,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                     border: Border.all(
                       color: isDark
                           ? MyColors.darkBorder
-                          : const Color(0xFFC2C9D6),
+                          : const Color(0xFFFFA73F),
                     ),
                     borderRadius: BorderRadius.circular(Dimens.nr(22)),
                   ),
@@ -475,7 +474,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                         fontWeight: FontWeight.bold,
                         color: isDark
                             ? MyColors.darkTextSecondary
-                            : const Color(0xFFC2C9D6),
+                            : const Color(0xFFFFA73F),
                       ),
                     ),
                   ),
@@ -556,6 +555,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
   // Build server cart items UI
   Widget _buildCartItemsUI(ShoppingCart cart, AppLocalizations? l10n) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final totals = resolveCartTotals(cart);
     return Container(
       decoration: BoxDecoration(
         color:
@@ -574,151 +574,39 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
               itemCount: cart.items.length + 1,
               itemBuilder: (context, index) {
                 if (index == cart.items.length) {
-                  final computedSubTotal = cart.subTotal ??
-                      cart.items.fold<int>(0, (sum, item) => sum + item.price);
-                  final computedPayable = cart.grandTotal ?? computedSubTotal;
-                  final computedDiscount = (computedSubTotal - computedPayable)
-                      .clamp(0, computedSubTotal)
-                      .toInt();
-                  return Padding(
-                    padding: EdgeInsets.fromLTRB(
-                      Dimens.medium,
-                      Dimens.small,
-                      Dimens.medium,
-                      Dimens.nh(12),
-                    ),
-                    child: CartSummarySection(
-                      subTotal: computedSubTotal,
-                      discount: computedDiscount,
-                      payable: computedPayable,
-                      onReferralSubmit: (code) {
-                        log("🎟️ Referral code submitted: $code");
-                      },
-                    ),
+                  return CartSummarySection(
+                    subTotal: totals.subTotal,
+                    discount: totals.discount,
+                    payable: totals.payable,
+                    onReferralSubmit: (code) {
+                      log("🎟️ Referral code submitted: $code");
+                    },
                   );
                 }
                 final item = cart.items[index];
-                return Container(
-                  margin: EdgeInsets.symmetric(
-                    horizontal: Dimens.medium,
-                    vertical: Dimens.small,
-                  ),
-                  padding: EdgeInsets.all(Dimens.medium),
-                  decoration: BoxDecoration(
-                    color: isDark
-                        ? MyColors.termsBackgroundDark
-                        : MyColors.background,
-                    borderRadius: BorderRadius.circular(Dimens.nr(16)),
-                  ),
-                  child: Stack(
+                final pricing = resolveServerCartItemPricing(item);
+                final typeLabel =
+                    item.type != null ? _getItemTypeLabel(item.type!) : null;
+                final subtitle = item.quantity != null && item.quantity! > 1
+                    ? 'تعداد: ${item.quantity}'
+                    : typeLabel;
+                return CartItemCard(
+                  title: item.title,
+                  subtitle: subtitle,
+                  pricing: pricing,
+                  onRemove: () {
+                    if (item.itemId != null) {
+                      context
+                          .read<ShoppingCartBloc>()
+                          .add(RemoveFromCartEvent(item.itemId!));
+                    }
+                  },
+                  image: Stack(
+                    fit: StackFit.expand,
                     children: [
-                      Positioned(
-                        top: -Dimens.nh(10),
-                        left: -Dimens.nw(10),
-                        child: IconButton(
-                          iconSize: Dimens.nr(18),
-                          icon: Icon(
-                            Icons.close,
-                            color: isDark
-                                ? MyColors.darkTextSecondary
-                                : MyColors.text3,
-                          ),
-                          onPressed: () {
-                            if (item.itemId != null) {
-                              context
-                                  .read<ShoppingCartBloc>()
-                                  .add(RemoveFromCartEvent(item.itemId!));
-                            }
-                          },
-                        ),
-                      ),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            width: Dimens.nw(100),
-                            height: Dimens.nh(100),
-                            decoration: BoxDecoration(
-                              borderRadius:
-                                  BorderRadius.circular(Dimens.nr(10)),
-                              color: isDark
-                                  ? MyColors.darkCardBackground
-                                  : Colors.grey[300],
-                            ),
-                            child: ClipRRect(
-                              borderRadius:
-                                  BorderRadius.circular(Dimens.nr(10)),
-                              child: Stack(
-                                fit: StackFit.expand,
-                                children: [
-                                  _buildCartItemImage(item),
-                                  if (item.type != null)
-                                    _buildCartItemOverlayIcon(item.type!),
-                                ],
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: Dimens.small),
-                          Expanded(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  item.title,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: Dimens.nsp(16),
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                SizedBox(height: Dimens.nh(8)),
-                                if (item.quantity != null && item.quantity! > 1)
-                                  Text(
-                                    'تعداد: ${item.quantity}',
-                                    style: TextStyle(
-                                      color: isDark
-                                          ? MyColors.darkTextSecondary
-                                          : Colors.grey[500],
-                                      fontSize: Dimens.nsp(12),
-                                    ),
-                                  ),
-                                if (item.source != null &&
-                                    item.source!['discountAmount'] != null)
-                                  Text(
-                                    'تخفیف: ${item.source!['discountAmount']}%',
-                                    style: TextStyle(
-                                      color: Colors.green[600],
-                                      fontSize: Dimens.nsp(12),
-                                    ),
-                                  ),
-                                SizedBox(height: Dimens.nh(24)),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      Positioned(
-                        bottom: 0,
-                        left: 0,
-                        child: Row(
-                          children: [
-                            Text(
-                              item.price.toString().addComma,
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: Dimens.nsp(16),
-                              ),
-                            ),
-                            SizedBox(width: Dimens.nw(4)),
-                            Text(
-                              "تومان",
-                              style: TextStyle(fontSize: Dimens.nsp(12)),
-                            ),
-                          ],
-                        ),
-                      ),
+                      _buildCartItemImage(item),
+                      if (item.type != null)
+                        _buildCartItemOverlayIcon(item.type!),
                     ],
                   ),
                 );
@@ -793,26 +681,51 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      '${l10n?.total_price} ${cart.grandTotal?.addComma ?? cart.items.fold(0, (sum, item) => sum + item.price).addComma}',
-                      style: TextStyle(
-                        fontSize: Dimens.nsp(18),
-                        fontWeight: FontWeight.bold,
+                    RichText(
+                      textDirection: TextDirection.rtl,
+                      text: TextSpan(
+                        style: DefaultTextStyle.of(context).style.copyWith(
+                              color: isDark
+                                  ? MyColors.darkTextPrimary
+                                  : MyColors.textMatn1,
+                              height: 1.0,
+                            ),
+                        children: [
+                          // TextSpan(
+                          //   text: '${l10n?.total_price ?? 'جمع کل: '}',
+                          //   style: TextStyle(
+                          //     fontSize: Dimens.nsp(14),
+                          //     fontWeight: FontWeight.w400,
+                          //   ),
+                          // ),
+                          TextSpan(
+                            text: MoneyUtils.formatTomanDisplay(totals.payable),
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: Dimens.nsp(18),
+                            ),
+                          ),
+                          TextSpan(
+                            text: ' ${l10n?.toman ?? 'تومان'}',
+                            style: TextStyle(
+                              fontSize: Dimens.nsp(12),
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    if (cart.subTotal != null &&
-                        cart.grandTotal != null &&
-                        cart.subTotal != cart.grandTotal)
-                      Text(
-                        'قیمت اصلی: ${cart.subTotal!.addComma} تومان',
-                        style: TextStyle(
-                          color: isDark
-                              ? MyColors.darkTextSecondary
-                              : Colors.grey[600],
-                          fontSize: Dimens.nsp(12),
-                          decoration: TextDecoration.lineThrough,
-                        ),
-                      ),
+                    // if (totals.discount > 0)
+                    //   Text(
+                    //     'قیمت اصلی: ${MoneyUtils.formatTomanDisplay(totals.subTotal)} تومان',
+                    //     style: TextStyle(
+                    //       color: isDark
+                    //           ? MyColors.darkTextSecondary
+                    //           : Colors.grey[600],
+                    //       fontSize: Dimens.nsp(12),
+                    //       decoration: TextDecoration.lineThrough,
+                    //     ),
+                    //   ),
                   ],
                 ),
               ],
@@ -879,121 +792,26 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                         snapshot.connectionState == ConnectionState.waiting &&
                             resolvedItem == null;
 
-                    return Container(
-                      margin: EdgeInsets.symmetric(
-                        horizontal: Dimens.medium,
-                        vertical: Dimens.small,
+                    return CartItemCard(
+                      title: resolvedItem?.title ??
+                          (isLoading ? 'در حال بارگذاری...' : 'محصول'),
+                      subtitle: 'نوع: ${_getItemTypeLabel(itemType)}',
+                      pricing: resolveCartItemPricing(
+                        finalPriceToman: resolvedItem?.price ?? 0,
                       ),
-                      padding: EdgeInsets.all(Dimens.medium),
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? MyColors.termsBackgroundDark
-                            : MyColors.background,
-                        borderRadius: BorderRadius.circular(Dimens.nr(16)),
-                      ),
-                      child: Stack(
+                      onRemove: () {
+                        context
+                            .read<ShoppingCartBloc>()
+                            .add(RemoveFromLocalCartEvent(itemType, itemId));
+                      },
+                      image: Stack(
+                        fit: StackFit.expand,
                         children: [
-                          Positioned(
-                            top: -Dimens.nh(10),
-                            left: -Dimens.nw(10),
-                            child: IconButton(
-                              iconSize: Dimens.nr(18),
-                              icon: Icon(
-                                Icons.close,
-                                color: isDark
-                                    ? MyColors.darkTextSecondary
-                                    : MyColors.text3,
-                              ),
-                              onPressed: () {
-                                context.read<ShoppingCartBloc>().add(
-                                    RemoveFromLocalCartEvent(itemType, itemId));
-                              },
-                            ),
+                          _buildLocalCartItemImage(
+                            resolvedItem,
+                            itemType,
                           ),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                width: Dimens.nw(100),
-                                height: Dimens.nh(100),
-                                decoration: BoxDecoration(
-                                  borderRadius:
-                                      BorderRadius.circular(Dimens.nr(10)),
-                                  color: isDark
-                                      ? MyColors.darkCardBackground
-                                      : Colors.grey[300],
-                                ),
-                                child: ClipRRect(
-                                  borderRadius:
-                                      BorderRadius.circular(Dimens.nr(10)),
-                                  child: Stack(
-                                    fit: StackFit.expand,
-                                    children: [
-                                      _buildLocalCartItemImage(
-                                        resolvedItem,
-                                        itemType,
-                                      ),
-                                      _buildCartItemOverlayIcon(itemType),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              SizedBox(width: Dimens.small),
-                              Expanded(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      resolvedItem?.title ??
-                                          (isLoading
-                                              ? 'در حال بارگذاری...'
-                                              : 'محصول'),
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: Dimens.nsp(16),
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    SizedBox(height: Dimens.nh(8)),
-                                    Text(
-                                      'نوع: ${_getItemTypeLabel(itemType)}',
-                                      style: TextStyle(
-                                        color: isDark
-                                            ? MyColors.darkTextSecondary
-                                            : Colors.grey[500],
-                                        fontSize: Dimens.nsp(12),
-                                      ),
-                                    ),
-                                    SizedBox(height: Dimens.nh(24)),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                          Positioned(
-                            bottom: 0,
-                            left: 0,
-                            child: Row(
-                              children: [
-                                Text(
-                                  (resolvedItem?.price ?? 0)
-                                      .toString()
-                                      .addComma,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: Dimens.nsp(16),
-                                  ),
-                                ),
-                                SizedBox(width: Dimens.nw(4)),
-                                Text(
-                                  "تومان",
-                                  style: TextStyle(fontSize: Dimens.nsp(12)),
-                                ),
-                              ],
-                            ),
-                          ),
+                          _buildCartItemOverlayIcon(itemType),
                         ],
                       ),
                     );
@@ -1074,6 +892,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         RichText(
+                          textDirection: TextDirection.rtl,
                           textAlign: TextAlign.center,
                           text: TextSpan(
                             style: DefaultTextStyle.of(context).style.copyWith(
@@ -1082,17 +901,16 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                                       : MyColors.textMatn1,
                                   height: 1.0,
                                 ),
-                            // text: '${l10n?.total_price} ${totalPrice.addComma}',
                             children: [
                               TextSpan(
-                                text: totalPrice.addComma,
+                                text: MoneyUtils.formatTomanDisplay(totalPrice),
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: Dimens.nsp(16),
                                 ),
                               ),
                               TextSpan(
-                                text: ' ${l10n?.toman ?? "تومان"}',
+                                text: ' ${l10n?.toman ?? 'تومان'}',
                                 style: TextStyle(
                                   fontSize: Dimens.nsp(12),
                                   fontWeight: FontWeight.w400,
@@ -1184,14 +1002,29 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
     );
   }
 
+  String? _resolveCartItemThumbnailId(ShoppingCartItem item) {
+    final source = item.source;
+    if (source == null) return null;
+
+    if (item.type == 'IKnowCourse') {
+      final videoThumbnail = source['videoThumbnail']?.toString();
+      if (videoThumbnail != null && videoThumbnail.isNotEmpty) {
+        return videoThumbnail;
+      }
+    }
+
+    final thumbnail = source['thumbnail']?.toString();
+    if (thumbnail != null && thumbnail.isNotEmpty) {
+      return thumbnail;
+    }
+
+    return null;
+  }
+
   // Helper method to build cart item image
   Widget _buildCartItemImage(ShoppingCartItem item) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    // Check if source has thumbnail
-    String? thumbnailId;
-    if (item.source != null && item.source!['thumbnail'] != null) {
-      thumbnailId = item.source!['thumbnail'] as String?;
-    }
+    final thumbnailId = _resolveCartItemThumbnailId(item);
 
     // If we have a thumbnail ID, use GetImageUrlService
     if (thumbnailId != null && thumbnailId.isNotEmpty) {
@@ -1230,6 +1063,13 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
             },
           );
         },
+      );
+    }
+
+    if (item.type == 'IKnow') {
+      return Image.asset(
+        'assets/images/cart/bundle_lesson.png',
+        fit: BoxFit.cover,
       );
     }
 

@@ -312,7 +312,7 @@ class ReusableModal extends StatelessWidget {
                     width: 140.w,
                     height: 140.h,
                     child: Lottie.asset(
-                      'assets/images/cart/Tick Market.json',
+                      customLottiePath ?? 'assets/images/cart/Tick Market.json',
                       fit: BoxFit.contain,
                       repeat: false,
                     ),
