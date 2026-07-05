@@ -122,7 +122,14 @@ class _MainWrapperState extends State<MainWrapper> {
         "status": data.ok,
         "ref": data.ref,
       },
-    );
+    ).then((_) async {
+      if (!mounted || data.ok != 1) return;
+      try {
+        await locator<ShoppingCartBloc>().clearAfterSuccessfulPayment();
+      } catch (e) {
+        log("⚠️ MainWrapper: Failed to refresh cart after payment: $e");
+      }
+    });
   }
 
   Future<void> _initDeepLinks() async {
@@ -209,6 +216,21 @@ class _MainWrapperState extends State<MainWrapper> {
     return '';
   }
 
+  void _refreshShoppingCartIfNeeded(int index) {
+    if (index != 2) return;
+
+    try {
+      final cartBloc = locator<ShoppingCartBloc>();
+      if (prefsOperator.isLoggedIn()) {
+        cartBloc.add(GetCartEvent());
+      } else {
+        cartBloc.add(GetLocalCartEvent());
+      }
+    } catch (e) {
+      log("⚠️ Failed to refresh shopping cart: $e");
+    }
+  }
+
   void _animateToTab(int index) {
     if (!mounted || index == currentPageIndex) return;
 
@@ -219,6 +241,7 @@ class _MainWrapperState extends State<MainWrapper> {
     setState(() {
       currentPageIndex = index;
     });
+    _refreshShoppingCartIfNeeded(index);
 
     controller
         .animateToPage(
@@ -244,6 +267,7 @@ class _MainWrapperState extends State<MainWrapper> {
         currentPageIndex = index;
       });
     }
+    _refreshShoppingCartIfNeeded(index);
   }
 
   void _logout() async {

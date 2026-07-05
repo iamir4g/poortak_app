@@ -9,7 +9,7 @@ import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_profile/data/models/payment_history_model.dart';
 import 'package:poortak/featueres/feature_profile/repositories/profile_repository.dart';
-import 'package:poortak/featueres/feature_shopping_cart/repositories/shopping_cart_repository.dart';
+import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/iknow_access_bloc/iknow_access_bloc.dart';
 import 'package:poortak/locator.dart';
 
@@ -33,6 +33,9 @@ class _PaymentResultScreenState extends State<PaymentResultScreen> {
   Datum? _payment;
   bool _isLoadingPayment = false;
   String? _paymentError;
+  bool _isCartCleared = false;
+  bool _isClearingCart = false;
+  bool _isNavigatingBack = false;
 
   @override
   void initState() {
@@ -46,24 +49,47 @@ class _PaymentResultScreenState extends State<PaymentResultScreen> {
     }
   }
 
+  Future<void> _clearCartAfterPayment() async {
+    if (_isCartCleared || _isClearingCart) return;
+
+    setState(() => _isClearingCart = true);
+    try {
+      await locator<ShoppingCartBloc>().clearAfterSuccessfulPayment();
+      _isCartCleared = true;
+      debugPrint(
+          "✅ PaymentResultScreen: Shopping cart cleared after successful payment");
+    } catch (e) {
+      debugPrint("⚠️ PaymentResultScreen: Failed to clear cart: $e");
+    } finally {
+      if (mounted) {
+        setState(() => _isClearingCart = false);
+      }
+    }
+  }
+
   Future<void> _handleSuccessfulPayment() async {
     final accessBloc = locator<IknowAccessBloc>();
     accessBloc.add(FetchIknowAccessEvent(forceRefresh: true));
     debugPrint(
         "🔄 PaymentResultScreen: Refreshing IknowAccessBloc after successful payment");
 
-    try {
-      await locator<ShoppingCartRepository>().clearCart();
-    } catch (e) {
-      debugPrint("⚠️ PaymentResultScreen: Failed to clear cart: $e");
-    }
+    await _clearCartAfterPayment();
 
     if (widget.ref != null && widget.ref!.isNotEmpty) {
       await _loadPaymentDetails();
     }
   }
 
-  void _goToMain() {
+  Future<void> _goToMain() async {
+    if (_isNavigatingBack) return;
+    _isNavigatingBack = true;
+
+    if (widget.ok == 1) {
+      await _clearCartAfterPayment();
+    }
+
+    if (!mounted) return;
+
     Navigator.of(context).popUntil(
       (route) =>
           route.settings.name == MainWrapper.routeName || route.isFirst,
@@ -97,7 +123,14 @@ class _PaymentResultScreenState extends State<PaymentResultScreen> {
   Widget build(BuildContext context) {
     final isSuccess = widget.ok == 1;
 
-    return Scaffold(
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (!didPop) {
+          await _goToMain();
+        }
+      },
+      child: Scaffold(
       backgroundColor: MyColors.background1,
       appBar: AppBar(
         title: Text(
@@ -110,7 +143,8 @@ class _PaymentResultScreenState extends State<PaymentResultScreen> {
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: MyColors.textLight, size: 24.sp),
-          onPressed: _goToMain,
+          onPressed:
+              (_isClearingCart || _isNavigatingBack) ? null : _goToMain,
         ),
       ),
       body: SafeArea(
@@ -218,17 +252,27 @@ class _PaymentResultScreenState extends State<PaymentResultScreen> {
                   width: double.infinity,
                   height: 50.h,
                   child: ElevatedButton(
-                    onPressed: _goToMain,
+                    onPressed:
+                        (_isClearingCart || _isNavigatingBack) ? null : _goToMain,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: MyColors.success,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8.r),
                       ),
                     ),
-                    child: Text(
-                      'بازگشت به صفحه اصلی',
-                      style: MyTextStyle.textMatnBtn,
-                    ),
+                    child: _isClearingCart
+                        ? SizedBox(
+                            width: 24.w,
+                            height: 24.h,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.w,
+                              color: MyColors.textLight,
+                            ),
+                          )
+                        : Text(
+                            'بازگشت به صفحه اصلی',
+                            style: MyTextStyle.textMatnBtn,
+                          ),
                   ),
                 ),
               ] else ...[
@@ -286,6 +330,7 @@ class _PaymentResultScreenState extends State<PaymentResultScreen> {
           ),
         ),
       ),
+    ),
     );
   }
 

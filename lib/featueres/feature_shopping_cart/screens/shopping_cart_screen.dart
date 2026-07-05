@@ -117,30 +117,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
         log("🔄 Builder called with state: ${state.runtimeType}");
 
         if (state is ShoppingCartLoading) {
-          return Container(
-            decoration: BoxDecoration(
-              gradient: isDark
-                  ? const LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Color(0xFF171926),
-                        MyColors.darkBackground,
-                        Color(0xFF171926),
-                      ],
-                      stops: [0.1, 0.54, 1.0],
-                    )
-                  : const LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        MyColors.shoppingCartBackground,
-                        MyColors.shoppingCartBackground,
-                      ],
-                    ),
-            ),
-            child: Center(child: DotLoadingWidget(size: Dimens.nr(100))),
-          );
+          return _buildCartLoadingUI(isDark);
         }
 
         // Handle server cart (for logged-in users)
@@ -173,18 +150,20 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
 
         // Handle local cart item added/removed states
         if (state is LocalCartItemAdded || state is LocalCartItemRemoved) {
-          // Refresh the cart to show updated items
           WidgetsBinding.instance.addPostFrameCallback((_) {
             _loadAppropriateCart(context.read<ShoppingCartBloc>());
           });
+          return _buildCartLoadingUI(isDark);
         }
 
         // Handle local cart cleared state
         if (state is LocalCartCleared) {
-          // Refresh the cart to show empty state
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            _loadAppropriateCart(context.read<ShoppingCartBloc>());
+            if (!locator<PrefsOperator>().isLoggedIn()) {
+              _loadAppropriateCart(context.read<ShoppingCartBloc>());
+            }
           });
+          return buildEmptyCartUI();
         }
 
         if (state is ShoppingCartError) {
@@ -484,6 +463,33 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildCartLoadingUI(bool isDark) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: isDark
+            ? const LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color(0xFF171926),
+                  MyColors.darkBackground,
+                  Color(0xFF171926),
+                ],
+                stops: [0.1, 0.54, 1.0],
+              )
+            : const LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  MyColors.shoppingCartBackground,
+                  MyColors.shoppingCartBackground,
+                ],
+              ),
+      ),
+      child: Center(child: DotLoadingWidget(size: Dimens.nr(100))),
     );
   }
 
