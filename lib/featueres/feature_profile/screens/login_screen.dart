@@ -102,7 +102,7 @@ class _LoginScreenState extends State<LoginScreen> {
           if (mobileNumber != null) {
             context.read<ProfileBloc>().add(
                   LoginWithOtpEvent(
-                    mobile: mobileNumber!,
+                    mobile: _localMobileFromInput(mobileNumber!),
                     otp: normalizeOtpForServer(code),
                   ),
                 );
@@ -159,6 +159,23 @@ class _LoginScreenState extends State<LoginScreen> {
     int minutes = seconds ~/ 60;
     int remainingSeconds = seconds % 60;
     return '${minutes.toString().padLeft(2, '0')}:${remainingSeconds.toString().padLeft(2, '0')}';
+  }
+
+  bool _isValidMobileInput(String digits) {
+    final mobile = toEnglishDigits(digits);
+    return mobile.length == 10 && mobile.startsWith('9');
+  }
+
+  String _localMobileFromInput(String digits) {
+    return '0${toEnglishDigits(digits)}';
+  }
+
+  String _displayMobileForOtpMessage(String? digits) {
+    if (digits == null || digits.isEmpty) return '09';
+    final mobile = toEnglishDigits(digits);
+    final suffix =
+        mobile.length == 10 && mobile.startsWith('9') ? mobile.substring(1) : mobile;
+    return '09${toPersianDigits(suffix)}';
   }
 
   @override
@@ -250,7 +267,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           SizedBox(height: Dimens.small.h),
                           if (showOtpForm) ...[
                             Text(
-                              "کد ارسال شده به شماره 09${mobileNumber ?? ''} را وارد کنید",
+                              "کد ارسال شده به شماره ${_displayMobileForOtpMessage(mobileNumber)} را وارد کنید",
                               style: MyTextStyle.textMatn13.copyWith(
                                 color: loginTheme.secondaryTextColor,
                                 height: 1.4,
@@ -294,7 +311,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                       if (mobileNumber != null) {
                                         builderContext.read<ProfileBloc>().add(
                                               RequestOtpEvent(
-                                                  mobile: "09$mobileNumber"),
+                                                mobile: _localMobileFromInput(
+                                                    mobileNumber!),
+                                              ),
                                             );
                                         _resetTimer();
                                       }
@@ -388,11 +407,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 textAlign: TextAlign.left,
                 inputFormatters: [
                   FilteringTextInputFormatter.digitsOnly,
-                  LengthLimitingTextInputFormatter(9),
+                  LengthLimitingTextInputFormatter(10),
                 ],
                 onChanged: (value) {
-                  // Close keyboard when mobile number is complete (9 digits)
-                  if (value.length == 9) {
+                  if (value.length == 10) {
                     FocusScope.of(context).unfocus();
                   }
                 },
@@ -402,7 +420,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   // fontFamily: 'monospace', // برای نمایش بهتر اعداد
                 ),
                 decoration: InputDecoration(
-                  hintText: "xxxxxxxxx",
+                  hintText: "xxxxxxxxxx",
                   hintStyle: TextStyle(
                     color: Color(0xFF9E9E9E),
                     fontSize: 16.sp,
@@ -424,13 +442,16 @@ class _LoginScreenState extends State<LoginScreen> {
             margin: EdgeInsets.symmetric(horizontal: 8.w),
             color: MyColors.divider,
           ),
-          // Prefix "۰۹"
-          Text(
-            "۰۹",
-            style: MyTextStyle.textMatn12Bold.copyWith(
-              fontSize: 22.sp,
-              color: loginTheme.inputTextColor,
-              fontWeight: FontWeight.w500,
+          // Prefix "+۹۸"
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: Text(
+              "+۹۸",
+              style: MyTextStyle.textMatn12Bold.copyWith(
+                fontSize: 22.sp,
+                color: loginTheme.inputTextColor,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
           SizedBox(width: 8.w),
@@ -593,8 +614,8 @@ class _LoginScreenState extends State<LoginScreen> {
           locator<PrefsOperator>().saveUserData(
             state.data.data.result.accessToken,
             state.data.data.result.refreshToken,
-            "09${mobileNumber ?? ''}",
-            "09${mobileNumber ?? ''}",
+            _localMobileFromInput(mobileNumber ?? ''),
+            _localMobileFromInput(mobileNumber ?? ''),
             // userId: state.data.data.result.user.id,
             // referrerCode: state.data.data.result.user.referrerCode,
             // rate: state.data.data.result.user.rate,
@@ -666,17 +687,18 @@ class _LoginScreenState extends State<LoginScreen> {
                   if (_otpController.text.isNotEmpty && mobileNumber != null) {
                     context.read<ProfileBloc>().add(
                           LoginWithOtpEvent(
-                            mobile: mobileNumber!,
+                            mobile: _localMobileFromInput(mobileNumber!),
                             otp: normalizeOtpForServer(_otpController.text),
                           ),
                         );
                   }
                 } else {
-                  if (_mobileController.text.isNotEmpty &&
-                      _mobileController.text.length == 9) {
+                  if (_isValidMobileInput(_mobileController.text)) {
                     context.read<ProfileBloc>().add(
                           RequestOtpEvent(
-                            mobile: "09${_mobileController.text}",
+                            mobile: _localMobileFromInput(
+                              _mobileController.text,
+                            ),
                           ),
                         );
                   } else {
