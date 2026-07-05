@@ -74,10 +74,15 @@ class _DictionaryContentState extends State<_DictionaryContent> {
     });
   }
 
+  void _dismissKeyboard() {
+    FocusManager.instance.primaryFocus?.unfocus();
+  }
+
   void _searchWord(String word) {
     final trimmed = word.trim();
     if (trimmed.isEmpty) return;
 
+    _dismissKeyboard();
     _controller.text = trimmed;
     _controller.selection = TextSelection.collapsed(offset: trimmed.length);
     setState(() {
@@ -249,24 +254,38 @@ class _DictionaryContentState extends State<_DictionaryContent> {
                             child: FadeTransition(opacity: anim, child: child),
                           ),
                           child: _showDetail
-                              ? _buildDetailView(entry.word,
-                                  _selectedTranslation, entry.examples)
+                              ? _buildDetailView(
+                                  entry.word,
+                                  _selectedTranslation,
+                                  entry.examples,
+                                  textColor: textColor,
+                                  hintColor: hintColor,
+                                  borderColor: borderColor,
+                                )
                               : ListView(
                                   key: const ValueKey('list_view'),
                                   padding: const EdgeInsets.all(20),
                                   children: [
-                                    _buildGroupedItem(context, entry),
+                                    _buildGroupedItem(
+                                      context,
+                                      entry,
+                                      isDark: isDark,
+                                      textColor: textColor,
+                                      hintColor: hintColor,
+                                    ),
                                     if (entry.relatedWords.isNotEmpty) ...[
                                       const SizedBox(height: 24),
-                                      const Divider(),
+                                      Divider(color: borderColor),
                                       const SizedBox(height: 12),
                                       Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.end,
                                         children: [
-                                          Text('کلمات مرتبط',
-                                              style:
-                                                  MyTextStyle.textHeader16Bold),
+                                          Text(
+                                            'کلمات مرتبط',
+                                            style: MyTextStyle.textHeader16Bold
+                                                .copyWith(color: textColor),
+                                          ),
                                         ],
                                       ),
                                       const SizedBox(height: 12),
@@ -276,14 +295,25 @@ class _DictionaryContentState extends State<_DictionaryContent> {
                                         alignment: WrapAlignment.end,
                                         children: entry.relatedWords
                                             .map((w) => ActionChip(
-                                                label: Text(
-                                                  w,
-                                                  style: MyTextStyle
-                                                      .textMatn12W300,
-                                                ),
-                                                onPressed: () {
-                                                  _searchWord(w);
-                                                }))
+                                                  label: Text(
+                                                    w,
+                                                    style: MyTextStyle
+                                                        .textMatn12W300
+                                                        .copyWith(
+                                                      color: textColor,
+                                                    ),
+                                                  ),
+                                                  backgroundColor: isDark
+                                                      ? MyColors
+                                                          .profileHeaderDark
+                                                      : null,
+                                                  side: BorderSide(
+                                                    color: borderColor,
+                                                  ),
+                                                  onPressed: () {
+                                                    _searchWord(w);
+                                                  },
+                                                ))
                                             .toList(),
                                       )
                                     ]
@@ -325,13 +355,23 @@ class _DictionaryContentState extends State<_DictionaryContent> {
     );
   }
 
-  Widget _buildGroupedItem(BuildContext context, DictionaryEntry entry) {
+  Widget _buildGroupedItem(
+    BuildContext context,
+    DictionaryEntry entry, {
+    required bool isDark,
+    required Color textColor,
+    required Color hintColor,
+  }) {
     final translations = entry.persianTranslations.join('، ');
+    final litnerIconPath = isDark
+        ? 'assets/images/litner/icon_add_litner_touched.png'
+        : 'assets/images/icons/litner_icon.png';
 
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: () {
+          _dismissKeyboard();
           setState(() {
             _showDetail = true;
             _selectedTranslation = translations;
@@ -347,16 +387,19 @@ class _DictionaryContentState extends State<_DictionaryContent> {
                 children: [
                   Text(
                     entry.word,
-                    style: MyTextStyle.textMatn16Bold,
+                    style: MyTextStyle.textMatn16Bold.copyWith(
+                      color: textColor,
+                    ),
                   ),
                   const SizedBox(width: 8),
                   IconButton(
                     onPressed: () {
+                      _dismissKeyboard();
                       locator<TTSService>().speak(entry.word, speechRate: 0.25);
                     },
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.volume_up_rounded,
-                      color: MyColors.textSecondary,
+                      color: hintColor,
                       size: 20,
                     ),
                   ),
@@ -365,14 +408,17 @@ class _DictionaryContentState extends State<_DictionaryContent> {
                       return IconButton(
                         onPressed: litnerState is LitnerLoading
                             ? null
-                            : () => context.read<LitnerBloc>().add(
-                                  CreateWordEvent(
-                                    word: entry.word,
-                                    translation: translations,
-                                  ),
-                                ),
+                            : () {
+                                _dismissKeyboard();
+                                context.read<LitnerBloc>().add(
+                                      CreateWordEvent(
+                                        word: entry.word,
+                                        translation: translations,
+                                      ),
+                                    );
+                              },
                         icon: Image.asset(
-                          'assets/images/icons/litner_icon.png',
+                          litnerIconPath,
                           width: 22,
                           height: 22,
                         ),
@@ -384,7 +430,7 @@ class _DictionaryContentState extends State<_DictionaryContent> {
               Expanded(
                 child: Text(
                   translations,
-                  style: MyTextStyle.textMatn16,
+                  style: MyTextStyle.textMatn16.copyWith(color: textColor),
                   textAlign: TextAlign.right,
                 ),
               ),
@@ -395,7 +441,14 @@ class _DictionaryContentState extends State<_DictionaryContent> {
     );
   }
 
-  Widget _buildDetailView(String word, String? translation, List examples) {
+  Widget _buildDetailView(
+    String word,
+    String? translation,
+    List examples, {
+    required Color textColor,
+    required Color hintColor,
+    required Color borderColor,
+  }) {
     return Column(
       key: const ValueKey('detail_view'),
       children: [
@@ -410,14 +463,19 @@ class _DictionaryContentState extends State<_DictionaryContent> {
                     _selectedTranslation = null;
                   });
                 },
-                icon: const Icon(Icons.arrow_back),
+                icon: Icon(Icons.arrow_back, color: textColor),
               ),
               const SizedBox(width: 8),
-              Text('جزئیات', style: MyTextStyle.textHeader16Bold),
+              Text(
+                'جزئیات',
+                style: MyTextStyle.textHeader16Bold.copyWith(
+                  color: textColor,
+                ),
+              ),
             ],
           ),
         ),
-        const Divider(),
+        Divider(color: borderColor),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8),
           child: Row(
@@ -426,7 +484,7 @@ class _DictionaryContentState extends State<_DictionaryContent> {
               Expanded(
                 child: Text(
                   translation ?? '',
-                  style: MyTextStyle.textMatn16,
+                  style: MyTextStyle.textMatn16.copyWith(color: textColor),
                   textAlign: TextAlign.right,
                 ),
               ),
@@ -435,21 +493,30 @@ class _DictionaryContentState extends State<_DictionaryContent> {
                 children: [
                   IconButton(
                     onPressed: () => locator<TTSService>().speak(word),
-                    icon: const Icon(Icons.volume_up_rounded, size: 22),
+                    icon: Icon(
+                      Icons.volume_up_rounded,
+                      size: 22,
+                      color: hintColor,
+                    ),
                   ),
                   const SizedBox(width: 8),
-                  Text(word, style: MyTextStyle.textMatn16Bold),
+                  Text(
+                    word,
+                    style: MyTextStyle.textMatn16Bold.copyWith(
+                      color: textColor,
+                    ),
+                  ),
                 ],
               ),
             ],
           ),
         ),
-        const Divider(),
+        Divider(color: borderColor),
         Expanded(
           child: ListView.separated(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             itemCount: examples.length,
-            separatorBuilder: (_, __) => const Divider(),
+            separatorBuilder: (_, __) => Divider(color: borderColor),
             itemBuilder: (context, index) {
               final ex = examples[index];
               final text = (ex is String) ? ex : ex.text?.toString() ?? '';
@@ -459,6 +526,7 @@ class _DictionaryContentState extends State<_DictionaryContent> {
                   Text(
                     '• ',
                     style: MyTextStyle.textMatn16.copyWith(
+                      color: textColor,
                       height: 1.0,
                       letterSpacing: 0.0,
                     ),
@@ -469,7 +537,9 @@ class _DictionaryContentState extends State<_DictionaryContent> {
                       children: [
                         Text(
                           text,
-                          style: MyTextStyle.textMatn16,
+                          style: MyTextStyle.textMatn16.copyWith(
+                            color: textColor,
+                          ),
                         ),
                         const SizedBox(height: 6),
                       ],
@@ -477,7 +547,11 @@ class _DictionaryContentState extends State<_DictionaryContent> {
                   ),
                   IconButton(
                     onPressed: () => locator<TTSService>().speak(text),
-                    icon: const Icon(Icons.volume_up_rounded, size: 18),
+                    icon: Icon(
+                      Icons.volume_up_rounded,
+                      size: 18,
+                      color: hintColor,
+                    ),
                   ),
                 ],
               );
