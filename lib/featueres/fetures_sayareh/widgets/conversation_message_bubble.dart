@@ -15,8 +15,14 @@ class ConversationMessageBubble extends StatelessWidget {
   /// مشخص می‌کند که آیا این پیام در حال پخش است
   final bool isCurrentPlaying;
 
+  /// مشخص می‌کند که آیا پخش خودکار فعال است
+  final bool isPlaybackActive;
+
   /// ایندکس جمله فعلی که در حال پخش است (برای Shadowing)
   final int currentSentenceIndex;
+
+  /// کلیدهای هر جمله برای اسکرول دقیق به جمله در حال پخش
+  final Map<int, GlobalKey>? sentenceKeys;
 
   /// مشخص می‌کند که آیا ترجمه باید نمایش داده شود
   final bool showTranslations;
@@ -28,7 +34,9 @@ class ConversationMessageBubble extends StatelessWidget {
     super.key,
     required this.message,
     required this.isCurrentPlaying,
+    this.isPlaybackActive = false,
     this.currentSentenceIndex = 0,
+    this.sentenceKeys,
     required this.showTranslations,
     required this.onTap,
   });
@@ -63,6 +71,51 @@ class ConversationMessageBubble extends StatelessWidget {
   List<String> _splitIntoSentences(String text) {
     final RegExp regExp = RegExp(r'[^.!?]+[.!?]*');
     return regExp.allMatches(text).map((m) => m.group(0)!).toList();
+  }
+
+  double _sentenceOpacity(int index) {
+    if (!isPlaybackActive) return 1.0;
+    if (isCurrentPlaying && index == currentSentenceIndex) return 1.0;
+    return 0.18;
+  }
+
+  Widget _buildMessageText({
+    required BuildContext context,
+    required List<String> sentences,
+    required Color baseTextColor,
+  }) {
+    return Directionality(
+      textDirection: TextDirection.ltr,
+      child: Text.rich(
+        textDirection: TextDirection.ltr,
+        TextSpan(
+          children: [
+            for (var index = 0; index < sentences.length; index++) ...[
+              if (sentenceKeys?[index] != null)
+                WidgetSpan(
+                  alignment: PlaceholderAlignment.baseline,
+                  baseline: TextBaseline.alphabetic,
+                  child: SizedBox(
+                    key: sentenceKeys![index],
+                    width: 0,
+                    height: 0,
+                  ),
+                ),
+              TextSpan(
+                text: sentences[index],
+                style: FontSizeHelper.getContentTextStyle(
+                  context,
+                  baseFontSize: 16.0.sp,
+                  color: baseTextColor.withValues(
+                    alpha: _sentenceOpacity(index),
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -140,26 +193,10 @@ class ConversationMessageBubble extends StatelessWidget {
                             mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              RichText(
-                                textDirection: TextDirection.ltr,
-                                text: TextSpan(
-                                  children:
-                                      List.generate(sentences.length, (index) {
-                                    final isSentenceActive = isCurrentPlaying &&
-                                        index == currentSentenceIndex;
-                                    final sentenceColor = isSentenceActive
-                                        ? baseTextColor
-                                        : baseTextColor.withValues(alpha: 0.6);
-                                    return TextSpan(
-                                      text: sentences[index],
-                                      style: FontSizeHelper.getContentTextStyle(
-                                        context,
-                                        baseFontSize: 16.0.sp,
-                                        color: sentenceColor,
-                                      ),
-                                    );
-                                  }),
-                                ),
+                              _buildMessageText(
+                                context: context,
+                                sentences: sentences,
+                                baseTextColor: baseTextColor,
                               ),
                               if (showTranslations) ...[
                                 SizedBox(height: 4.h),
@@ -200,26 +237,10 @@ class ConversationMessageBubble extends StatelessWidget {
                             mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              RichText(
-                                textDirection: TextDirection.ltr,
-                                text: TextSpan(
-                                  children:
-                                      List.generate(sentences.length, (index) {
-                                    final isSentenceActive = isCurrentPlaying &&
-                                        index == currentSentenceIndex;
-                                    final sentenceColor = isSentenceActive
-                                        ? baseTextColor
-                                        : baseTextColor.withValues(alpha: 0.6);
-                                    return TextSpan(
-                                      text: sentences[index],
-                                      style: FontSizeHelper.getContentTextStyle(
-                                        context,
-                                        baseFontSize: 16.0.sp,
-                                        color: sentenceColor,
-                                      ),
-                                    );
-                                  }),
-                                ),
+                              _buildMessageText(
+                                context: context,
+                                sentences: sentences,
+                                baseTextColor: baseTextColor,
                               ),
                               if (showTranslations) ...[
                                 SizedBox(height: 4.h),

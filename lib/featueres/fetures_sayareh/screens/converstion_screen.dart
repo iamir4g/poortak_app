@@ -72,6 +72,96 @@ class _ConversationScreenState extends State<ConversationScreen> {
   final ScrollController _scrollController = ScrollController();
   // مپ برای ذخیره GlobalKey هر آیتم جهت اسکرول دقیق
   final Map<int, GlobalKey> _itemKeys = {};
+  // کلیدهای جملات هر پیام برای اسکرول دقیق
+  final Map<int, Map<int, GlobalKey>> _messageSentenceKeys = {};
+  int _lastScrolledMessageIndex = -1;
+  int _lastScrolledSentenceIndex = -1;
+  static const double _estimatedMessageItemHeight = 92;
+
+  Map<int, GlobalKey> _getSentenceKeysForMessage(
+    int messageIndex,
+    int sentenceCount,
+  ) {
+    _messageSentenceKeys[messageIndex] ??= {};
+    final keys = _messageSentenceKeys[messageIndex]!;
+    for (var i = 0; i < sentenceCount; i++) {
+      keys[i] ??= GlobalKey();
+    }
+    return keys;
+  }
+
+  void _resetScrollTracking() {
+    _lastScrolledMessageIndex = -1;
+    _lastScrolledSentenceIndex = -1;
+  }
+
+  void _scrollToCurrentSentence(
+    int messageIndex,
+    int sentenceIndex, {
+    bool force = false,
+  }) {
+    if (!force &&
+        messageIndex == _lastScrolledMessageIndex &&
+        sentenceIndex == _lastScrolledSentenceIndex) {
+      return;
+    }
+
+    _lastScrolledMessageIndex = messageIndex;
+    _lastScrolledSentenceIndex = sentenceIndex;
+    _ensureSentenceVisible(messageIndex, sentenceIndex);
+  }
+
+  void _ensureSentenceVisible(
+    int messageIndex,
+    int sentenceIndex, {
+    int attemptsLeft = 10,
+    bool animate = true,
+  }) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      if (!_scrollController.hasClients) {
+        if (attemptsLeft > 0) {
+          _ensureSentenceVisible(
+            messageIndex,
+            sentenceIndex,
+            attemptsLeft: attemptsLeft - 1,
+            animate: animate,
+          );
+        }
+        return;
+      }
+
+      final key = _messageSentenceKeys[messageIndex]?[sentenceIndex];
+      if (key?.currentContext != null) {
+        Scrollable.ensureVisible(
+          key!.currentContext!,
+          duration: animate
+              ? const Duration(milliseconds: 600)
+              : Duration.zero,
+          curve: Curves.easeInOut,
+          alignment: 0.5,
+        );
+        return;
+      }
+
+      if (attemptsLeft <= 0) return;
+
+      final maxOffset = _scrollController.position.maxScrollExtent;
+      final targetOffset = (messageIndex * _estimatedMessageItemHeight)
+          .clamp(0.0, maxOffset);
+      if (_scrollController.offset != targetOffset) {
+        _scrollController.jumpTo(targetOffset);
+      }
+
+      _ensureSentenceVisible(
+        messageIndex,
+        sentenceIndex,
+        attemptsLeft: attemptsLeft - 1,
+        animate: animate,
+      );
+    });
+  }
 
   @override
   void dispose() {
@@ -129,7 +219,14 @@ class _ConversationScreenState extends State<ConversationScreen> {
     // شروع پخش
     _playbackSessionId++;
     final int mySessionId = _playbackSessionId;
+    _resetScrollTracking();
     isPlayingNotifier.value = true;
+
+    _scrollToCurrentSentence(
+      currentPlayingIndexNotifier.value,
+      currentSentenceIndexNotifier.value,
+      force: true,
+    );
 
     // اگر مکالمه قبلاً تمام شده بود، از اول شروع کن
     if (currentPlayingIndexNotifier.value >= messages.length) {
@@ -292,6 +389,12 @@ class _ConversationScreenState extends State<ConversationScreen> {
       currentSentenceIndexNotifier.value = 0;
     }
 
+    _scrollToCurrentSentence(
+      currentPlayingIndexNotifier.value,
+      currentSentenceIndexNotifier.value,
+      force: true,
+    );
+
     if (wasPlaying) {
       playAllConversations(sortedMessages!);
     }
@@ -318,6 +421,12 @@ class _ConversationScreenState extends State<ConversationScreen> {
       final prevSentences = _splitIntoSentences(prevMessage.text);
       currentSentenceIndexNotifier.value = prevSentences.length - 1;
     }
+
+    _scrollToCurrentSentence(
+      currentPlayingIndexNotifier.value,
+      currentSentenceIndexNotifier.value,
+      force: true,
+    );
 
     if (wasPlaying) {
       playAllConversations(sortedMessages!);
@@ -485,6 +594,14 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
                 if (index != -1) {
                   currentPlayingIndexNotifier.value = index;
+                  _resetScrollTracking();
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    _scrollToCurrentSentence(
+                      index,
+                      currentSentenceIndexNotifier.value,
+                      force: true,
+                    );
+                  });
                 }
               }
             },
@@ -533,72 +650,61 @@ class _ConversationScreenState extends State<ConversationScreen> {
   /// ساخت لیست مکالمه با استفاده از ListView.builder
   /// این متد پیام‌های مرتب شده را به صورت اسکرول‌پذیر نمایش می‌دهد
   Widget _buildConversationList(BuildContext context, ConversationModel data) {
-    // اسکرول به آخرین پیام پخش شده پس از رندر شدن لیست
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (currentPlayingIndexNotifier.value > 0 &&
-          _scrollController.hasClients) {
-        final key = _itemKeys[currentPlayingIndexNotifier.value];
-        if (key?.currentContext != null) {
-          Scrollable.ensureVisible(
-            key!.currentContext!,
-            duration: const Duration(milliseconds: 500),
-            curve: Curves.easeInOut,
-            alignment: 0.5, // قرار دادن در وسط صفحه
-          );
-        }
-      }
-    });
-
     return ValueListenableBuilder<bool>(
       valueListenable: showTranslationsNotifier,
       builder: (context, showTranslations, _) {
-        return ValueListenableBuilder<int>(
-          valueListenable: currentPlayingIndexNotifier,
-          builder: (context, currentPlayingIndex, _) {
+        return ValueListenableBuilder<bool>(
+          valueListenable: isPlayingNotifier,
+          builder: (context, isPlaybackActive, _) {
             return ValueListenableBuilder<int>(
-              valueListenable: currentSentenceIndexNotifier,
-              builder: (context, currentSentenceIndex, _) {
-                // اضافه کردن اسکرول خودکار هنگام تغییر ایندکس
-                if (_scrollController.hasClients) {
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    final key = _itemKeys[currentPlayingIndex];
-                    if (key?.currentContext != null) {
-                      Scrollable.ensureVisible(
-                        key!.currentContext!,
-                        duration: const Duration(milliseconds: 600),
-                        curve: Curves.easeInOut,
-                        alignment: 0.5, // قرار دادن در وسط صفحه
+              valueListenable: currentPlayingIndexNotifier,
+              builder: (context, currentPlayingIndex, _) {
+                return ValueListenableBuilder<int>(
+                  valueListenable: currentSentenceIndexNotifier,
+                  builder: (context, currentSentenceIndex, _) {
+                    if (isPlaybackActive) {
+                      _scrollToCurrentSentence(
+                        currentPlayingIndex,
+                        currentSentenceIndex,
                       );
                     }
-                  });
-                }
 
-                return ListView.builder(
-                  controller: _scrollController,
-                  // padding: EdgeInsets.all(2.r),
-                  itemCount: sortedMessages?.length ?? 0,
-                  itemBuilder: (context, index) {
-                    final message = sortedMessages![index];
+                    return ListView.builder(
+                      controller: _scrollController,
+                      itemCount: sortedMessages?.length ?? 0,
+                      itemBuilder: (context, index) {
+                        final message = sortedMessages![index];
+                        final sentenceCount =
+                            _splitIntoSentences(message.text).length;
+                        final sentenceKeys = _getSentenceKeysForMessage(
+                          index,
+                          sentenceCount,
+                        );
 
-                    // ایجاد یا دریافت کلید برای این ایندکس
-                    _itemKeys[index] ??= GlobalKey();
+                        _itemKeys[index] ??= GlobalKey();
 
-                    // بررسی اینکه آیا این پیام در حال پخش است
-                    final isCurrentPlaying = sortedMessages != null &&
-                        currentPlayingIndex < sortedMessages!.length &&
-                        sortedMessages![currentPlayingIndex].id == message.id;
+                        final isCurrentPlaying = sortedMessages != null &&
+                            currentPlayingIndex < sortedMessages!.length &&
+                            sortedMessages![currentPlayingIndex].id ==
+                                message.id;
 
-                    // استفاده از widget جداگانه برای نمایش هر حباب پیام
-                    return ConversationMessageBubble(
-                      key: _itemKeys[index],
-                      message: message,
-                      isCurrentPlaying: isCurrentPlaying,
-                      currentSentenceIndex:
-                          isCurrentPlaying ? currentSentenceIndex : 0,
-                      showTranslations: showTranslations,
-                      onTap: () {
-                        // پخش صوتی پیام هنگام لمس
-                        speakText(message.text, message.voice, message.id);
+                        return ConversationMessageBubble(
+                          key: _itemKeys[index],
+                          message: message,
+                          isCurrentPlaying: isCurrentPlaying,
+                          isPlaybackActive: isPlaybackActive,
+                          currentSentenceIndex:
+                              isCurrentPlaying ? currentSentenceIndex : 0,
+                          sentenceKeys: sentenceKeys,
+                          showTranslations: showTranslations,
+                          onTap: () {
+                            speakText(
+                              message.text,
+                              message.voice,
+                              message.id,
+                            );
+                          },
+                        );
                       },
                     );
                   },

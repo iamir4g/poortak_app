@@ -631,7 +631,7 @@ class _FullscreenVideoPlayerState extends State<FullscreenVideoPlayer> {
   void _skipForward() {
     final currentPosition = widget.videoPlayerController.value.position;
     final duration = widget.videoPlayerController.value.duration;
-    final newPosition = currentPosition + const Duration(seconds: 15);
+    final newPosition = currentPosition + const Duration(seconds: 10);
 
     if (newPosition > duration) {
       widget.videoPlayerController.seekTo(duration);
@@ -644,7 +644,7 @@ class _FullscreenVideoPlayerState extends State<FullscreenVideoPlayer> {
 
   void _skipBackward() {
     final currentPosition = widget.videoPlayerController.value.position;
-    final newPosition = currentPosition - const Duration(seconds: 15);
+    final newPosition = currentPosition - const Duration(seconds: 10);
 
     if (newPosition.isNegative) {
       widget.videoPlayerController.seekTo(Duration.zero);
@@ -763,7 +763,7 @@ class _FullscreenVideoPlayerState extends State<FullscreenVideoPlayer> {
                           size: 28,
                         ),
                         onPressed: _skipBackward,
-                        tooltip: '15 ثانیه به عقب',
+                        tooltip: '10 ثانیه به عقب',
                       ),
                       const SizedBox(width: 8),
                       // Skip forward button
@@ -774,7 +774,7 @@ class _FullscreenVideoPlayerState extends State<FullscreenVideoPlayer> {
                           size: 28,
                         ),
                         onPressed: _skipForward,
-                        tooltip: '15 ثانیه به جلو',
+                        tooltip: '10 ثانیه به جلو',
                       ),
                       Spacer(),
                       // SizedBox(
