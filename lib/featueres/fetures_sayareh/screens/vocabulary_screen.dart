@@ -35,7 +35,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
   int currentIndex = 0;
   int totalWords = 0;
   String? lastPlayedWord;
-  String? currentImageWordKey;
+  String? currentWordKey;
   String? currentImageUrl;
   bool isCurrentImageReady = false;
   final Map<String, String> imageUrlCache = {};
@@ -79,12 +79,31 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
         ));
   }
 
-  Future<void> _readWord(String word) async {
+  String _wordKeyAt(int index, List<dynamic> words) {
+    final word = words[index];
+    return '${index}_${word.word}';
+  }
+
+  Future<void> _readWord(String word, {String? wordKey}) async {
+    final activeKey = wordKey ?? currentWordKey;
+    await ttsService.stop();
+    await ttsService.setMaleVoice();
     await ttsService.speak(
       word,
-      voice: 'male',
       speechRate: _vocabularySpeechRate,
     );
+    if (!mounted || activeKey == null || currentWordKey != activeKey) return;
+    setState(() {
+      lastPlayedWord = word;
+    });
+  }
+
+  void _autoReadCurrentWord(List<dynamic> words, int index) {
+    final wordKey = _wordKeyAt(index, words);
+    final word = words[index].word;
+    if (lastPlayedWord == word) return;
+
+    unawaited(_readWord(word, wordKey: wordKey));
   }
 
   void _nextWord(int totalWords, String word) {
@@ -174,19 +193,11 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
       return;
     }
 
-    if (!mounted || currentImageWordKey != currentWord.thumbnail) return;
+    if (!mounted || currentWordKey != _wordKeyAt(index, words)) return;
 
     setState(() {
       isCurrentImageReady = true;
     });
-
-    if (lastPlayedWord != currentWord.word) {
-      await _readWord(currentWord.word);
-      if (!mounted || currentImageWordKey != currentWord.thumbnail) return;
-      setState(() {
-        lastPlayedWord = currentWord.word;
-      });
-    }
 
     _prefetchNearbyImages(words, index);
   }
@@ -316,9 +327,14 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                   final currentWord = state.vocabulary.data[currentIndex];
                   totalWords = state.vocabulary.data.length;
 
-                  if (currentImageWordKey != currentWord.thumbnail) {
-                    currentImageWordKey = currentWord.thumbnail;
+                  final wordKey = _wordKeyAt(currentIndex, state.vocabulary.data);
+                  if (currentWordKey != wordKey) {
+                    currentWordKey = wordKey;
                     WidgetsBinding.instance.addPostFrameCallback((_) {
+                      _autoReadCurrentWord(
+                        state.vocabulary.data,
+                        currentIndex,
+                      );
                       _prepareCurrentWordImage(
                         state.vocabulary.data,
                         currentIndex,
@@ -443,7 +459,8 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                                       _goToNextWord(state.vocabulary.data),
                                   onPrevious: () =>
                                       _goToPreviousWord(state.vocabulary.data),
-                                  onReadWord: () => _readWord(currentWord.word),
+                                  onReadWord: () =>
+                                      _readWord(currentWord.word, wordKey: wordKey),
                                   onAddToLitner: () => _addToLitner(
                                     currentWord.word,
                                     currentWord.translation,

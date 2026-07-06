@@ -1,8 +1,10 @@
 import 'dart:async';
 
 import 'package:audioplayers/audioplayers.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:poortak/common/widgets/image_skeleton.dart';
 import 'package:poortak/common/widgets/step_progress.dart';
 import 'package:poortak/common/services/haptic_service.dart';
 import 'package:poortak/common/services/storage_service.dart';
@@ -161,6 +163,53 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
 
   void _readWord(String word) async {
     await ttsService.speak(word, voice: 'male');
+  }
+
+  double _vocabularyImageSize(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    return screenHeight < 600 ? 180.h : 264.h;
+  }
+
+  Widget _buildVocabularyImage(String thumbnail) {
+    final imageSize = _vocabularyImageSize(context);
+
+    return SizedBox(
+      key: ValueKey(thumbnail),
+      width: imageSize,
+      height: imageSize,
+      child: FutureBuilder<String>(
+        future: storageService.callGetDownloadPublicUrl(thumbnail),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Center(child: Icon(Icons.error, size: 24.r));
+          }
+
+          if (!snapshot.hasData) {
+            return ImageSkeleton(
+              width: imageSize,
+              height: imageSize,
+            );
+          }
+
+          return ClipRRect(
+            borderRadius: BorderRadius.circular(24.r),
+            child: CachedNetworkImage(
+              imageUrl: snapshot.data!,
+              width: imageSize,
+              height: imageSize,
+              fit: BoxFit.cover,
+              fadeInDuration: const Duration(milliseconds: 150),
+              placeholder: (_, __) => ImageSkeleton(
+                width: imageSize,
+                height: imageSize,
+              ),
+              errorWidget: (_, __, ___) =>
+                  Center(child: Icon(Icons.error, size: 24.r)),
+            ),
+          );
+        },
+      ),
+    );
   }
 
   void _addToLitner(String word, String translation) async {
@@ -436,45 +485,7 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
                                         height: 24.h,
                                       ),
                                       SizedBox(height: 10.h),
-                                      FutureBuilder<String>(
-                                        future: storageService
-                                            .callGetDownloadPublicUrl(
-                                                correctWord.thumbnail),
-                                        builder: (context, snapshot) {
-                                          if (snapshot.connectionState ==
-                                              ConnectionState.waiting) {
-                                            return CircularProgressIndicator(
-                                                strokeWidth: 4.w);
-                                          }
-                                          if (snapshot.hasError) {
-                                            return Icon(Icons.error,
-                                                size: 24.r);
-                                          }
-                                          if (snapshot.hasData) {
-                                            // Responsive height for image
-                                            double imageHeight = 264.h;
-                                            final screenHeight =
-                                                MediaQuery.of(context)
-                                                    .size
-                                                    .height;
-                                            if (screenHeight < 600) {
-                                              imageHeight = 180.h;
-                                            }
-
-                                            return ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(24.r),
-                                              child: Image.network(
-                                                snapshot.data!,
-                                                height: imageHeight,
-                                                width: imageHeight,
-                                                fit: BoxFit.cover,
-                                              ),
-                                            );
-                                          }
-                                          return const SizedBox.shrink();
-                                        },
-                                      ),
+                                      _buildVocabularyImage(correctWord.thumbnail),
                                       SizedBox(
                                           height: showAnswer ? 20.h : 30.h),
                                       SizedBox(
