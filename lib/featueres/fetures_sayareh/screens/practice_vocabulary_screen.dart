@@ -1,11 +1,11 @@
 import 'dart:async';
 
-import 'package:audioplayers/audioplayers.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poortak/common/widgets/image_skeleton.dart';
 import 'package:poortak/common/widgets/step_progress.dart';
+import 'package:poortak/common/services/answer_feedback_sound_service.dart';
 import 'package:poortak/common/services/haptic_service.dart';
 import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/common/services/tts_service.dart';
@@ -38,7 +38,6 @@ class PracticeVocabularyScreen extends StatefulWidget {
 }
 
 class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
-  final AudioPlayer _feedbackPlayer = AudioPlayer();
   final TTSService ttsService = locator<TTSService>();
   final StorageService storageService = locator<StorageService>();
   final PrefsOperator prefsOperator = locator<PrefsOperator>();
@@ -63,7 +62,6 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
 
   @override
   void dispose() {
-    unawaited(_feedbackPlayer.dispose());
     _litnerToastController.dispose();
     super.dispose();
   }
@@ -89,7 +87,7 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
       isCorrect = word == correctWord.word;
     });
 
-    unawaited(_playAnswerFeedbackSound(isCorrect));
+    unawaited(AnswerFeedbackSoundService.play(isCorrect));
     if (!isCorrect) {
       unawaited(HapticService.wrongAnswerFeedback());
     }
@@ -119,19 +117,6 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
               wordId: correctWord.id,
             ),
           );
-    }
-  }
-
-  Future<void> _playAnswerFeedbackSound(bool isAnswerCorrect) async {
-    final assetPath = isAnswerCorrect
-        ? 'sounds/dragon-studio-correct.mp3'
-        : 'sounds/freesound_community-wrong.mp3';
-
-    try {
-      await _feedbackPlayer.stop();
-      await _feedbackPlayer.play(AssetSource(assetPath), volume: 50.0);
-    } catch (e) {
-      debugPrint('Failed to play answer feedback sound: $e');
     }
   }
 

@@ -1,8 +1,11 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/common/services/answer_feedback_sound_service.dart';
+import 'package:poortak/common/services/haptic_service.dart';
 import 'package:poortak/common/utils/bidi_text_helper.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
@@ -194,9 +197,14 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                             ),
                           );
                         } else if (answerState is QuizAnswerLoaded) {
-                          // setState(() {
-                          //   selectedAnswerId = null;
-                          // });
+                          unawaited(
+                            AnswerFeedbackSoundService.play(
+                              answerState.isCorrect,
+                            ),
+                          );
+                          if (!answerState.isCorrect) {
+                            unawaited(HapticService.wrongAnswerFeedback());
+                          }
                         }
                       },
                       builder: (context, answerState) {
