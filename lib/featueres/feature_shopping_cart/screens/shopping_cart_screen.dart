@@ -5,6 +5,8 @@ import 'package:lottie/lottie.dart';
 
 import 'package:poortak/common/widgets/dot_loading_widget.dart';
 import 'package:poortak/common/widgets/primaryButton.dart';
+import 'package:poortak/common/widgets/reusable_modal.dart';
+import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
 
 import 'package:poortak/common/resources/data_state.dart';
 import 'package:poortak/common/utils/svg_embedded_png.dart';
@@ -106,6 +108,20 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
       final bloc = context.read<ShoppingCartBloc>();
       _loadAppropriateCart(bloc);
     });
+  }
+
+  void _promptLogin() {
+    ReusableModal.show(
+      context: context,
+      title: '',
+      message: 'لطفا ابتدا وارد حساب کاربری خود شوید',
+      type: ModalType.info,
+      buttonText: 'ورود',
+      onButtonPressed: () {
+        Navigator.of(context).pop();
+        Navigator.pushNamed(context, LoginScreen.routeName);
+      },
+    );
   }
 
   @override
@@ -639,6 +655,10 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                   backgroundColor:
                       isDark ? MyColors.primary : MyColors.secondary,
                   onPressed: () async {
+                    if (!locator<PrefsOperator>().isLoggedIn()) {
+                      _promptLogin();
+                      return;
+                    }
                     try {
                       // Call checkout API directly
                       final apiProvider = locator<ShoppingCartApiProvider>();
@@ -659,16 +679,8 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                     } catch (e) {
                       log("❌ Checkout failed: $e");
                       if (mounted) {
-                        // Check if error is UnauthorisedException (user not logged in)
                         if (e is UnauthorisedException) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content:
-                                  Text('برای ادامه پرداخت باید لاگین کنید'),
-                              backgroundColor: Colors.orange,
-                              duration: Duration(seconds: 2),
-                            ),
-                          );
+                          _promptLogin();
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
@@ -846,6 +858,10 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                   backgroundColor:
                       isDark ? MyColors.primary : MyColors.secondary,
                   onPressed: () async {
+                    if (!locator<PrefsOperator>().isLoggedIn()) {
+                      _promptLogin();
+                      return;
+                    }
                     try {
                       // Call checkout API directly
                       final apiProvider = locator<ShoppingCartApiProvider>();
@@ -866,16 +882,8 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                     } catch (e) {
                       log("❌ Checkout failed: $e");
                       if (mounted) {
-                        // Check if error is UnauthorisedException (user not logged in)
                         if (e is UnauthorisedException) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content:
-                                  Text('برای ادامه پرداخت باید لاگین کنید'),
-                              backgroundColor: Colors.orange,
-                              duration: Duration(seconds: 2),
-                            ),
-                          );
+                          _promptLogin();
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(

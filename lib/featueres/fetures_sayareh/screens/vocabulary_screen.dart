@@ -459,6 +459,8 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                                       _goToNextWord(state.vocabulary.data),
                                   onPrevious: () =>
                                       _goToPreviousWord(state.vocabulary.data),
+                                  isNextEnabled: currentIndex < totalWords - 1,
+                                  isPreviousEnabled: currentIndex > 0,
                                   onReadWord: () =>
                                       _readWord(currentWord.word, wordKey: wordKey),
                                   onAddToLitner: () => _addToLitner(

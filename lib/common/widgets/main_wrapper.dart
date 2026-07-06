@@ -13,6 +13,7 @@ import 'package:poortak/common/widgets/logout_confirmation_modal.dart';
 import 'package:poortak/common/widgets/exit_confirmation_modal.dart';
 import 'package:poortak/common/services/payment_deep_link_service.dart';
 import 'package:poortak/common/services/auth_navigation_manager.dart';
+import 'package:poortak/common/services/otp_login_session_manager.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/kavoosh_main_screen.dart';
@@ -150,8 +151,7 @@ class _MainWrapperState extends State<MainWrapper> {
   Future<void> _handleIncomingLink(Uri uri) async {
     log("📌 MainWrapper: Deep Link received: $uri");
 
-    final paymentData =
-        await locator<PaymentDeepLinkService>().tryConsume(uri);
+    final paymentData = await locator<PaymentDeepLinkService>().tryConsume(uri);
     if (paymentData == null) {
       log("📌 MainWrapper: Deep link ignored (already handled or invalid)");
       return;
@@ -245,15 +245,15 @@ class _MainWrapperState extends State<MainWrapper> {
 
     controller
         .animateToPage(
-          index,
-          duration: _tabAnimationDuration,
-          curve: _tabAnimationCurve,
-        )
+      index,
+      duration: _tabAnimationDuration,
+      curve: _tabAnimationCurve,
+    )
         .whenComplete(() {
-          if (!mounted) return;
-          _isProgrammaticNavigation = false;
-          _targetPageIndex = null;
-        });
+      if (!mounted) return;
+      _isProgrammaticNavigation = false;
+      _targetPageIndex = null;
+    });
   }
 
   void _onPageChanged(int index) {
@@ -272,6 +272,7 @@ class _MainWrapperState extends State<MainWrapper> {
 
   void _logout() async {
     // Clear user data from preferences
+    OtpLoginSessionManager().clearSession();
     await prefsOperator.logout();
     final accessBloc = locator<IknowAccessBloc>();
     accessBloc.add(ClearIknowAccessEvent());
@@ -427,7 +428,7 @@ class _MainWrapperState extends State<MainWrapper> {
                                   PopupMenuItem(
                                     value: 'logout',
                                     child: Text(
-                                      'خروج از ناحیه کاربری',
+                                      'خروج از حساب کاربری',
                                       style: MyTextStyle.textMatn13.copyWith(
                                         color: themeState.isDark
                                             ? MyColors.darkTextPrimary

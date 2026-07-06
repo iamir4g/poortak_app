@@ -8,6 +8,7 @@ import 'package:poortak/common/utils/svg_embedded_png.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poortak/common/widgets/main_wrapper.dart';
 import 'package:poortak/common/services/auth_navigation_manager.dart';
+import 'package:poortak/common/services/otp_login_session_manager.dart';
 import 'package:poortak/common/utils/digit_utils.dart';
 import 'package:poortak/featueres/feature_profile/widgets/terms_conditions_modal.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
@@ -42,6 +43,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final GlobalKey _mobileFieldKey = GlobalKey();
   final GlobalKey _otpFieldKey = GlobalKey();
   late final Future<Uint8List?> _logoBytesFuture;
+  final OtpLoginSessionManager _otpSessionManager = OtpLoginSessionManager();
 
   // Timer variables
   Timer? _timer;
@@ -51,11 +53,31 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
+    _restoreOtpSessionIfNeeded();
     _logoBytesFuture =
         loadEmbeddedPngBytesFromSvgAsset('assets/images/poortak_logo.svg');
     _getAppSignature();
     _mobileFocusNode.addListener(_handleFocusChange);
     _otpFocusNode.addListener(_handleFocusChange);
+  }
+
+  void _restoreOtpSessionIfNeeded() {
+    final session = _otpSessionManager.session;
+    if (session == null) return;
+
+    mobileNumber = session.mobileDigits;
+    _mobileController.text = session.mobileDigits;
+    showOtpForm = true;
+    _remainingSeconds = session.remainingSeconds;
+    _canResend = session.canResend;
+
+    if (!session.canResend) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        _startTimer();
+        _startSmsListener();
+      });
+    }
   }
 
   void _handleFocusChange() {
@@ -128,18 +150,32 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _startTimer() {
     _timer?.cancel();
-    _remainingSeconds = 120;
-    _canResend = false;
+
+    final session = _otpSessionManager.session;
+    if (session != null) {
+      _remainingSeconds = session.remainingSeconds;
+      _canResend = session.canResend;
+    } else {
+      _remainingSeconds = OtpLoginSession.timeoutSeconds;
+      _canResend = false;
+    }
+
+    if (_canResend) return;
+
     log("🕐 Timer started: $_remainingSeconds seconds remaining");
 
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_remainingSeconds > 0) {
+      final activeSession = _otpSessionManager.session;
+      final remaining = activeSession?.remainingSeconds ?? 0;
+
+      if (remaining > 0) {
         setState(() {
-          _remainingSeconds--;
+          _remainingSeconds = remaining;
+          _canResend = false;
         });
-        log("🕐 Timer tick: $_remainingSeconds seconds remaining");
       } else {
         setState(() {
+          _remainingSeconds = 0;
           _canResend = true;
         });
         log("🕐 Timer finished: Resend button now available");
@@ -149,9 +185,9 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _resetTimer() {
-    _timer?.cancel();
-    _remainingSeconds = 120;
-    _canResend = false;
+    if (mobileNumber != null) {
+      _otpSessionManager.startSession(mobileNumber!);
+    }
     _startTimer();
   }
 
@@ -605,11 +641,13 @@ class _LoginScreenState extends State<LoginScreen> {
             showOtpForm = true;
             mobileNumber = _mobileController.text;
           });
+          _otpSessionManager.startSession(mobileNumber!);
           // Start the timer when OTP is successfully requested
           log("🕐 Starting OTP timer...");
           _startTimer();
           _startSmsListener();
         } else if (state is ProfileSuccessLogin) {
+          _otpSessionManager.clearSession();
           // Save user data and login state
           locator<PrefsOperator>().saveUserData(
             state.data.data.result.accessToken,

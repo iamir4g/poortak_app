@@ -13,6 +13,8 @@ class VocabularyBottomControls extends StatelessWidget {
   final VoidCallback onReadWord;
   final VoidCallback onAddToLitner;
   final bool isAddLoading;
+  final bool isNextEnabled;
+  final bool isPreviousEnabled;
   final Color iconColor;
   final LitnerResultToastController? litnerToastController;
 
@@ -23,6 +25,8 @@ class VocabularyBottomControls extends StatelessWidget {
     required this.onReadWord,
     required this.onAddToLitner,
     required this.isAddLoading,
+    this.isNextEnabled = true,
+    this.isPreviousEnabled = true,
     required this.iconColor,
     this.litnerToastController,
   });
@@ -37,14 +41,18 @@ class VocabularyBottomControls extends StatelessWidget {
     final volumeIconPath = isDark
         ? 'assets/images/icons/volume_dark.png'
         : 'assets/images/icons/volume.png';
+    final disabledIconColor = iconColor.withValues(alpha: 0.3);
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         IconButton(
           key: const Key('vocabulary_forward_button'),
-          onPressed: onNext,
-          icon: Icon(Icons.arrow_back, color: iconColor),
+          onPressed: isNextEnabled ? onNext : null,
+          icon: Icon(
+            Icons.arrow_back,
+            color: isNextEnabled ? iconColor : disabledIconColor,
+          ),
           iconSize: 32.r,
         ),
         PressableCircle(
@@ -68,8 +76,12 @@ class VocabularyBottomControls extends StatelessWidget {
           isLoading: isAddLoading,
         ),
         IconButton(
-          onPressed: onPrevious,
-          icon: Icon(Icons.arrow_forward, color: iconColor),
+          key: const Key('vocabulary_back_button'),
+          onPressed: isPreviousEnabled ? onPrevious : null,
+          icon: Icon(
+            Icons.arrow_forward,
+            color: isPreviousEnabled ? iconColor : disabledIconColor,
+          ),
           iconSize: 32.r,
         ),
       ],

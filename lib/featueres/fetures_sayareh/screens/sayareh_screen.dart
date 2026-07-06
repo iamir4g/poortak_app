@@ -10,6 +10,7 @@ import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/sayareh_bloc/sayareh_cubit.dart';
 import 'package:poortak/featueres/feature_match/screens/main_match_screen.dart';
+import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
 
@@ -296,6 +297,11 @@ class _SayarehScreenState extends State<SayarehScreen> {
                           title: '',
                           message: 'لطفا ابتدا وارد حساب کاربری خود شوید',
                           type: ModalType.info,
+                          buttonText: 'ورود',
+                          onButtonPressed: () {
+                            Navigator.of(context).pop();
+                            Navigator.pushNamed(context, LoginScreen.routeName);
+                          },
                         );
                       }
                     },
