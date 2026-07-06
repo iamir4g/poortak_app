@@ -58,10 +58,40 @@ class _ReviewedVocabulariesScreenState
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final pageBackgroundColor =
+        isDark ? MyColors.profileBackgroundDark : MyColors.secondaryTint4;
+    final headerBackgroundColor =
+        isDark ? MyColors.profileBackgroundDark : Colors.white;
+    final primaryTextColor =
+        isDark ? MyColors.profileTextPrimaryDark : MyColors.textMatn1;
+    final secondaryTextColor =
+        isDark ? MyColors.darkTextSecondary : const Color(0xFF52617A);
+    final cardBackgroundColor =
+        isDark ? MyColors.termsBackgroundDark : Colors.white;
+    final bottomBarColor = isDark ? MyColors.termsBackgroundDark : Colors.white;
+    final imagePlaceholderColor =
+        isDark ? MyColors.paymentHistoryCardHeaderDark : Colors.grey[200]!;
+    final buttonTextColor = isDark ? MyColors.loginButtonText : Colors.white;
+    final secondaryButtonBg = isDark
+        ? MyColors.paymentHistoryCardHeaderDark
+        : MyColors.secondaryTint4;
+    final secondaryButtonTextColor =
+        isDark ? MyColors.profileTextPrimaryDark : const Color(0xFF3D495C);
+    final actionButtonBg = isDark
+        ? MyColors.paymentHistoryCardHeaderDark
+        : MyColors.secondaryTint4;
+    final actionIconColor =
+        isDark ? MyColors.profileTextPrimaryDark : const Color(0xFF3D495C);
+    final volumeIconPath = isDark
+        ? 'assets/images/icons/volume_dark.png'
+        : 'assets/images/icons/volume.png';
+
     return Scaffold(
-      backgroundColor: MyColors.secondaryTint4,
+      backgroundColor: pageBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: headerBackgroundColor,
+        foregroundColor: primaryTextColor,
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
@@ -71,13 +101,15 @@ class _ReviewedVocabulariesScreenState
         automaticallyImplyLeading: false,
         actions: [
           IconButton(
-            icon: const Icon(Icons.arrow_forward),
+            icon: Icon(Icons.arrow_forward, color: primaryTextColor),
             onPressed: () => LessonScreen.popBackToLesson(context),
           ),
         ],
         title: Text(
           'واژگان مرور شده',
-          style: MyTextStyle.textHeader16Bold,
+          style: MyTextStyle.textHeader16Bold.copyWith(
+            color: primaryTextColor,
+          ),
         ),
       ),
       body: SafeArea(
@@ -88,7 +120,9 @@ class _ReviewedVocabulariesScreenState
                   ? Center(
                       child: Text(
                         'هیچ واژه‌ای مرور نشده است',
-                        style: MyTextStyle.textMatn14Bold,
+                        style: MyTextStyle.textMatn14Bold.copyWith(
+                          color: primaryTextColor,
+                        ),
                       ),
                     )
                   : ListView.builder(
@@ -103,12 +137,16 @@ class _ReviewedVocabulariesScreenState
                         return Container(
                           margin: EdgeInsets.only(bottom: 16.h),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: cardBackgroundColor,
                             borderRadius: BorderRadius.circular(20.r),
                             border: Border.all(
                               color: isCorrect
-                                  ? const Color(0xFFADFF99)
-                                  : const Color(0xFFFFB199),
+                                  ? (isDark
+                                      ? MyColors.quizAnswerCorrectBorderDark
+                                      : const Color(0xFFADFF99))
+                                  : (isDark
+                                      ? MyColors.quizAnswerWrongBorderDark
+                                      : const Color(0xFFFFB199)),
                               width: 2.w,
                             ),
                           ),
@@ -131,13 +169,16 @@ class _ReviewedVocabulariesScreenState
                                             width: 80.w,
                                             height: 80.h,
                                             decoration: BoxDecoration(
-                                              color: Colors.grey[200],
+                                              color: imagePlaceholderColor,
                                               borderRadius:
                                                   BorderRadius.circular(16.r),
                                             ),
-                                            child: const Center(
-                                              child:
-                                                  CircularProgressIndicator(),
+                                            child: Center(
+                                              child: CircularProgressIndicator(
+                                                color: isDark
+                                                    ? MyColors.primary
+                                                    : null,
+                                              ),
                                             ),
                                           );
                                         }
@@ -147,11 +188,14 @@ class _ReviewedVocabulariesScreenState
                                             width: 80.w,
                                             height: 80.h,
                                             decoration: BoxDecoration(
-                                              color: Colors.grey[200],
+                                              color: imagePlaceholderColor,
                                               borderRadius:
                                                   BorderRadius.circular(16.r),
                                             ),
-                                            child: const Icon(Icons.error),
+                                            child: Icon(
+                                              Icons.error,
+                                              color: secondaryTextColor,
+                                            ),
                                           );
                                         }
                                         return ClipRRect(
@@ -181,8 +225,7 @@ class _ReviewedVocabulariesScreenState
                                                   style: MyTextStyle
                                                       .textHeader16Bold
                                                       .copyWith(
-                                                    color:
-                                                        const Color(0xFF3D495C),
+                                                    color: primaryTextColor,
                                                     fontSize: 18.sp,
                                                   ),
                                                 ),
@@ -192,8 +235,15 @@ class _ReviewedVocabulariesScreenState
                                                     ? Icons.check_circle
                                                     : Icons.cancel,
                                                 color: isCorrect
-                                                    ? const Color(0xFF4CAF50)
-                                                    : const Color(0xFFFF5252),
+                                                    ? (isDark
+                                                        ? MyColors
+                                                            .quizAnswerCorrectTextDark
+                                                        : const Color(
+                                                            0xFF4CAF50))
+                                                    : (isDark
+                                                        ? MyColors.darkError
+                                                        : const Color(
+                                                            0xFFFF5252)),
                                                 size: 24.r,
                                               ),
                                             ],
@@ -203,7 +253,7 @@ class _ReviewedVocabulariesScreenState
                                             word.translation,
                                             style: MyTextStyle.textMatn14Bold
                                                 .copyWith(
-                                              color: const Color(0xFF52617A),
+                                              color: secondaryTextColor,
                                               fontSize: 14.sp,
                                             ),
                                           ),
@@ -220,33 +270,35 @@ class _ReviewedVocabulariesScreenState
                                     // Add to Listener Button
                                     Container(
                                       decoration: BoxDecoration(
-                                        color: MyColors.secondaryTint4,
+                                        color: actionButtonBg,
                                         borderRadius:
                                             BorderRadius.circular(12.r),
                                       ),
                                       child: IconButton(
                                         onPressed: () =>
                                             _addToListener(word.id),
-                                        icon: const Icon(
+                                        icon: Icon(
                                           Icons.add_circle_outline,
-                                          color: Color(0xFF3D495C),
+                                          color: actionIconColor,
                                         ),
                                         iconSize: 28.r,
                                       ),
                                     ),
                                     SizedBox(width: 12.w),
-                                    // Speak Button
                                     Container(
                                       decoration: BoxDecoration(
-                                        color: MyColors.primary
-                                            .withValues(alpha: 0.1),
+                                        color: isDark
+                                            ? MyColors
+                                                .paymentHistoryCardHeaderDark
+                                            : MyColors.primary
+                                                .withValues(alpha: 0.1),
                                         borderRadius:
                                             BorderRadius.circular(12.r),
                                       ),
                                       child: IconButton(
                                         onPressed: () => _readWord(word.word),
                                         icon: Image.asset(
-                                          'assets/images/icons/volume.png',
+                                          volumeIconPath,
                                           width: 28.r,
                                           height: 28.r,
                                           fit: BoxFit.contain,
@@ -266,10 +318,12 @@ class _ReviewedVocabulariesScreenState
             // Sticky Bottom Buttons
             Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: bottomBarColor,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
+                    color: Colors.black.withValues(
+                      alpha: isDark ? 0.35 : 0.1,
+                    ),
                     blurRadius: 10.r,
                     offset: Offset(0, -2.h),
                   ),
@@ -285,6 +339,7 @@ class _ReviewedVocabulariesScreenState
                         onPressed: () => LessonScreen.popBackToLesson(context),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: MyColors.primary,
+                          foregroundColor: buttonTextColor,
                           padding: EdgeInsets.symmetric(vertical: 16.h),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16.r),
@@ -293,7 +348,7 @@ class _ReviewedVocabulariesScreenState
                         child: Text(
                           'بازگشت به درس',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: buttonTextColor,
                             fontSize: 16.sp,
                             fontFamily: "IranSans",
                             fontWeight: FontWeight.bold,
@@ -313,7 +368,8 @@ class _ReviewedVocabulariesScreenState
                           );
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: MyColors.secondaryTint4,
+                          backgroundColor: secondaryButtonBg,
+                          foregroundColor: secondaryButtonTextColor,
                           padding: EdgeInsets.symmetric(vertical: 16.h),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16.r),
@@ -322,7 +378,7 @@ class _ReviewedVocabulariesScreenState
                         child: Text(
                           'مرور دوباره',
                           style: TextStyle(
-                            color: Color(0xFF3D495C),
+                            color: secondaryButtonTextColor,
                             fontSize: 16.sp,
                             fontFamily: "IranSans",
                             fontWeight: FontWeight.bold,

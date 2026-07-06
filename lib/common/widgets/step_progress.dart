@@ -13,7 +13,7 @@ class StepProgress extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final trackColor = isDark
-        ? MyColors.darkCardBackground
+        ? MyColors.paymentHistoryCardHeaderDark
         : MyColors.vocabularyProgressFill.withValues(alpha: 0.35);
     final fillColor = MyColors.vocabularyProgressFill;
 

@@ -211,7 +211,9 @@ class _LitnerWordsInprogressScreenState
                           : const Color(0xFFF6F9FE),
                       borderRadius: BorderRadius.circular(12.r),
                       border: Border.all(
-                        color: isDark ? MyColors.darkBorder : const Color(0xFFE5E7EB),
+                        color: isDark
+                            ? MyColors.darkBorder
+                            : const Color(0xFFE5E7EB),
                         width: 1.w,
                       ),
                     ),
@@ -257,7 +259,9 @@ class _LitnerWordsInprogressScreenState
                       style: TextStyle(
                         fontFamily: 'IRANSans',
                         fontSize: 14.sp,
-                        color: isDark ? MyColors.darkTextPrimary : const Color(0xFF29303D),
+                        color: isDark
+                            ? MyColors.darkTextPrimary
+                            : const Color(0xFF29303D),
                       ),
                     ),
                   ),
@@ -306,15 +310,16 @@ class _LitnerWordsInprogressScreenState
                             )
                           : ListView.separated(
                               controller: _scrollController,
-                              padding:
-                                  EdgeInsets.symmetric(horizontal: Dimens.medium),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: Dimens.medium),
                               itemCount:
                                   _words.length + (_isLoadingMore ? 1 : 0),
                               separatorBuilder: (context, index) => Container(
                                 height: 1.5.h,
                                 width: double.infinity,
                                 color: isDark
-                                    ? MyColors.darkBorder.withValues(alpha: 0.35)
+                                    ? MyColors.darkBorder
+                                        .withValues(alpha: 0.35)
                                     : const Color(0xFFF2F2F2),
                               ),
                               itemBuilder: (context, index) {
@@ -330,7 +335,8 @@ class _LitnerWordsInprogressScreenState
                                 return Container(
                                   width: double.infinity,
                                   constraints: BoxConstraints(minHeight: 48.h),
-                                  padding: EdgeInsets.symmetric(vertical: 4.h),
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: 4.h, horizontal: 8.w),
                                   decoration: BoxDecoration(
                                     color: isDark
                                         ? MyColors.termsBackgroundDark
@@ -363,7 +369,9 @@ class _LitnerWordsInprogressScreenState
                                         children: [
                                           IconButton(
                                             icon: Image.asset(
-                                              'assets/images/icons/volume.png',
+                                              isDark
+                                                  ? 'assets/images/icons/volume_dark.png'
+                                                  : 'assets/images/icons/volume.png',
                                               width: 18.r,
                                               height: 18.r,
                                               fit: BoxFit.contain,

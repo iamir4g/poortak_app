@@ -116,7 +116,7 @@ class MyColors {
   static const Color loginTextSecondaryDark = Color(0xFF838697);
   static const Color loginButtonText = Color(0xFF171926);
   static const Color termsBackgroundDark = Color(0xFF282A39);
-
+  static const Color textInputBackgroundDark = Color(0xFF35374B);
   // Sayareh / reader screen gradients
   static const List<Color> sayarehGradientDarkColors = [
     profileBackgroundDark,

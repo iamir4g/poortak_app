@@ -141,8 +141,10 @@ class _PressableAnswerOptionButtonState extends State<PressableAnswerOptionButto
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final normalBg =
-        isDark ? MyColors.darkBackgroundSecondary : const Color(0xFFF3F5F7);
-    final pressedBg = isDark ? MyColors.darkBorder : const Color(0xFF3D495C);
+        isDark ? MyColors.termsBackgroundDark : const Color(0xFFF3F5F7);
+    final pressedBg = isDark
+        ? MyColors.paymentHistoryCardHeaderDark
+        : const Color(0xFF3D495C);
     final normalFg =
         isDark ? MyColors.profileTextPrimaryDark : const Color(0xFF3D495C);
     final pressedFg = Colors.white;

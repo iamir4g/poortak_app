@@ -35,7 +35,7 @@ class VocabularyBottomControls extends StatelessWidget {
         : MyColors.modalHeaderBackground;
     final circleBgPressed = isDark ? MyColors.darkBorder : MyColors.text2;
     final volumeIconPath = isDark
-        ? 'assets/images/icons/volume\u0640dark.png'
+        ? 'assets/images/icons/volume_dark.png'
         : 'assets/images/icons/volume.png';
 
     return Row(
@@ -125,8 +125,7 @@ class LitnerResultToast extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final toastBg =
         isDark ? MyColors.termsBackgroundDark : const Color(0xFFF6F5F5);
-    final toastTextColor =
-        isDark ? MyColors.darkTextPrimary : MyColors.text1;
+    final toastTextColor = isDark ? MyColors.darkTextPrimary : MyColors.text1;
 
     return DecoratedBox(
       decoration: BoxDecoration(
