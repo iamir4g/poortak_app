@@ -127,7 +127,7 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
 
     try {
       await _feedbackPlayer.stop();
-      await _feedbackPlayer.play(AssetSource(assetPath));
+      await _feedbackPlayer.play(AssetSource(assetPath), volume: 50.0);
     } catch (e) {
       debugPrint('Failed to play answer feedback sound: $e');
     }
@@ -316,13 +316,25 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
               child: Scaffold(
                 backgroundColor: pageBackgroundColor,
                 appBar: AppBar(
-                  backgroundColor: headerBackgroundColor,
-                  foregroundColor: primaryTextColor,
+                  elevation: 0,
+                  scrolledUnderElevation: 0,
+                  shadowColor: Colors.transparent,
+                  surfaceTintColor: Colors.transparent,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.only(
                       bottomLeft: Radius.circular(30.r),
                     ),
                   ),
+                  flexibleSpace: Container(
+                    decoration: MyColors.headerDecoration(
+                      backgroundColor: headerBackgroundColor,
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(30.r),
+                      ),
+                    ),
+                  ),
+                  backgroundColor: Colors.transparent,
+                  foregroundColor: primaryTextColor,
                   automaticallyImplyLeading: false,
                   actions: [
                     IconButton(

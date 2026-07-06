@@ -90,14 +90,25 @@ class _ReviewedVocabulariesScreenState
     return Scaffold(
       backgroundColor: pageBackgroundColor,
       appBar: AppBar(
-        backgroundColor: headerBackgroundColor,
-        foregroundColor: primaryTextColor,
         elevation: 0,
+        scrolledUnderElevation: 0,
+        shadowColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
             bottomLeft: Radius.circular(30.r),
           ),
         ),
+        flexibleSpace: Container(
+          decoration: MyColors.headerDecoration(
+            backgroundColor: headerBackgroundColor,
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(30.r),
+            ),
+          ),
+        ),
+        backgroundColor: Colors.transparent,
+        foregroundColor: primaryTextColor,
         automaticallyImplyLeading: false,
         actions: [
           IconButton(

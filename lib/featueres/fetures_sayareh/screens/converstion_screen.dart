@@ -136,9 +136,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
       if (key?.currentContext != null) {
         Scrollable.ensureVisible(
           key!.currentContext!,
-          duration: animate
-              ? const Duration(milliseconds: 600)
-              : Duration.zero,
+          duration: animate ? const Duration(milliseconds: 600) : Duration.zero,
           curve: Curves.easeInOut,
           alignment: 0.5,
         );
@@ -148,8 +146,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
       if (attemptsLeft <= 0) return;
 
       final maxOffset = _scrollController.position.maxScrollExtent;
-      final targetOffset = (messageIndex * _estimatedMessageItemHeight)
-          .clamp(0.0, maxOffset);
+      final targetOffset =
+          (messageIndex * _estimatedMessageItemHeight).clamp(0.0, maxOffset);
       if (_scrollController.offset != targetOffset) {
         _scrollController.jumpTo(targetOffset);
       }
@@ -453,12 +451,24 @@ class _ConversationScreenState extends State<ConversationScreen> {
         backgroundColor: pageBackgroundColor,
         // نوار بالای صفحه با عنوان "مکالمه"
         appBar: AppBar(
+          elevation: 0,
+          scrolledUnderElevation: 0,
+          shadowColor: Colors.transparent,
+          surfaceTintColor: Colors.transparent,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
               bottomLeft: Radius.circular(30.r),
             ),
           ),
-          backgroundColor: headerBackgroundColor,
+          flexibleSpace: Container(
+            decoration: MyColors.headerDecoration(
+              backgroundColor: headerBackgroundColor,
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(30.r),
+              ),
+            ),
+          ),
+          backgroundColor: Colors.transparent,
           foregroundColor: primaryTextColor,
           automaticallyImplyLeading: false,
           actions: [
@@ -476,103 +486,135 @@ class _ConversationScreenState extends State<ConversationScreen> {
         ),
         // نوار پایین صفحه شامل دکمه‌های پخش و نمایش ترجمه
         bottomNavigationBar: Container(
-          // decoration: BoxDecoration(
-          //   color: bottomBarColor,
-          // ),
           child: SafeArea(
             child: SizedBox(
               height: 94.h,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+              child: Stack(
+                alignment: Alignment.center,
                 children: [
-                  // دکمه نمایش/مخفی کردن ترجمه
-                  ValueListenableBuilder<bool>(
-                    valueListenable: showTranslationsNotifier,
-                    builder: (context, showTranslations, _) {
-                      return IconButton(
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
                         onPressed: () {
-                          showTranslationsNotifier.value =
-                              !showTranslationsNotifier.value;
+                          _playNext();
                         },
-                        icon: Icon(
-                          Icons.translate,
-                          color: showTranslations
-                              ? MyColors.secondary
+                        icon: SvgPicture.asset(
+                          'assets/images/icons/ri--skip-right-fill.svg',
+                          width: 30.r,
+                          height: 30.r,
+                          colorFilter: ColorFilter.mode(
+                            iconColor,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: Dimens.medium),
+                      // دکمه پخش/توقف تمام مکالمه
+                      ValueListenableBuilder<bool>(
+                        valueListenable: isPlayingNotifier,
+                        builder: (context, isPlaying, _) {
+                          final bgColor = isPlaying
+                              ? MyColors.primary
                               : (isDark
-                                  ? MyColors.loginTextSecondaryDark
-                                  : MyColors.textSecondary),
-                        ),
-                      );
-                    },
-                  ),
-                  // SizedBox(width: Dimens.medium),
-                  IconButton(
-                      onPressed: () {
-                        _playNext();
-                      },
-                      icon: SvgPicture.asset(
-                        'assets/images/icons/ri--skip-right-fill.svg',
-                        width: 30.r,
-                        height: 30.r,
-                        colorFilter: ColorFilter.mode(
-                          iconColor,
-                          BlendMode.srcIn,
-                        ),
-                      )),
-                  SizedBox(width: Dimens.medium),
-                  // دکمه پخش/توقف تمام مکالمه
-                  ValueListenableBuilder<bool>(
-                    valueListenable: isPlayingNotifier,
-                    builder: (context, isPlaying, _) {
-                      final bgColor = isPlaying
-                          ? MyColors.primary
-                          : (isDark
-                              ? MyColors.conversationPlayPauseDarkPaused
-                              : MyColors.gray);
-                      final icon = isPlaying ? Icons.pause : Icons.play_arrow;
-                      final iconFg = isPlaying
-                          ? Colors.white
-                          : (isDark ? Colors.white : MyColors.text2);
+                                  ? MyColors.conversationPlayPauseDarkPaused
+                                  : MyColors.gray);
+                          final icon =
+                              isPlaying ? Icons.pause : Icons.play_arrow;
+                          final iconFg = isPlaying
+                              ? Colors.white
+                              : (isDark ? Colors.white : MyColors.text2);
 
-                      return SizedBox(
-                        width: 60.r,
-                        height: 60.r,
-                        child: Material(
-                          color: bgColor,
-                          shape: const CircleBorder(),
+                          return SizedBox(
+                            width: 60.r,
+                            height: 60.r,
+                            child: Material(
+                              color: bgColor,
+                              shape: const CircleBorder(),
+                              child: InkWell(
+                                customBorder: const CircleBorder(),
+                                onTap: () {
+                                  if (sortedMessages != null) {
+                                    playAllConversations(sortedMessages!);
+                                  }
+                                },
+                                child: Center(
+                                  child: Icon(
+                                    icon,
+                                    size: 34.r,
+                                    color: iconFg,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      SizedBox(width: Dimens.medium),
+                      IconButton(
+                        onPressed: () {
+                          _playPrevious();
+                        },
+                        icon: SvgPicture.asset(
+                          'assets/images/icons/ri--skip-left-fill.svg',
+                          width: 30.r,
+                          height: 30.r,
+                          colorFilter: ColorFilter.mode(
+                            iconColor,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  // دکمه نمایش/مخفی کردن ترجمه
+                  PositionedDirectional(
+                    start: Dimens.xLarge,
+                    child: ValueListenableBuilder<bool>(
+                      valueListenable: showTranslationsNotifier,
+                      builder: (context, showTranslations, _) {
+                        final labelColor = showTranslations
+                            ? MyColors.secondary
+                            : (isDark
+                                ? MyColors.loginTextSecondaryDark
+                                : MyColors.textSecondary);
+
+                        return Material(
+                          color: Colors.transparent,
                           child: InkWell(
-                            customBorder: const CircleBorder(),
                             onTap: () {
-                              if (sortedMessages != null) {
-                                playAllConversations(sortedMessages!);
-                              }
+                              showTranslationsNotifier.value =
+                                  !showTranslationsNotifier.value;
                             },
-                            child: Center(
-                              child: Icon(
-                                icon,
-                                size: 34.r,
-                                color: iconFg,
+                            borderRadius: BorderRadius.circular(8.r),
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: Dimens.small,
+                                vertical: 4.h,
+                              ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.translate,
+                                    size: 22.r,
+                                    color: labelColor,
+                                  ),
+                                  SizedBox(height: 2.h),
+                                  Text(
+                                    'ترجمه',
+                                    style: MyTextStyle.textMatn10W300.copyWith(
+                                      color: labelColor,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
-                        ),
-                      );
-                    },
-                  ),
-                  SizedBox(width: Dimens.medium),
-                  IconButton(
-                      onPressed: () {
-                        _playPrevious();
+                        );
                       },
-                      icon: SvgPicture.asset(
-                        'assets/images/icons/ri--skip-left-fill.svg',
-                        width: 30.r,
-                        height: 30.r,
-                        colorFilter: ColorFilter.mode(
-                          iconColor,
-                          BlendMode.srcIn,
-                        ),
-                      )),
+                    ),
+                  ),
                 ],
               ),
             ),

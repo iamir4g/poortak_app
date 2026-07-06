@@ -108,38 +108,40 @@ class _BookDetailScreenState extends State<BookDetailScreen>
             bloc: locator<IknowAccessBloc>(),
             builder: (context, accessState) {
               return BlocBuilder<SingleBookCubit, SingleBookState>(
-            builder: (context, state) {
-              if (state.singleBookDataStatus is SingleBookDataLoading) {
-                return Center(child: DotLoadingWidget(size: 50.r));
-              }
+                builder: (context, state) {
+                  if (state.singleBookDataStatus is SingleBookDataLoading) {
+                    return Center(child: DotLoadingWidget(size: 50.r));
+                  }
 
-              if (state.singleBookDataStatus is SingleBookDataCompleted) {
-                final bookData =
-                    (state.singleBookDataStatus as SingleBookDataCompleted)
-                        .data
-                        .data;
-                return _buildContent(context, bookData);
-              }
+                  if (state.singleBookDataStatus is SingleBookDataCompleted) {
+                    final bookData =
+                        (state.singleBookDataStatus as SingleBookDataCompleted)
+                            .data
+                            .data;
+                    return _buildContent(context, bookData);
+                  }
 
-              if (state.singleBookDataStatus is SingleBookDataError) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text('خطا در دریافت اطلاعات'),
-                      ElevatedButton(
-                        onPressed: () {
-                          context.read<SingleBookCubit>().fetchBookById(bookId);
-                        },
-                        child: const Text('تلاش دوباره'),
+                  if (state.singleBookDataStatus is SingleBookDataError) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text('خطا در دریافت اطلاعات'),
+                          ElevatedButton(
+                            onPressed: () {
+                              context
+                                  .read<SingleBookCubit>()
+                                  .fetchBookById(bookId);
+                            },
+                            child: const Text('تلاش دوباره'),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                );
-              }
+                    );
+                  }
 
-              return const SizedBox();
-            },
+                  return const SizedBox();
+                },
               );
             },
           ),
@@ -151,8 +153,8 @@ class _BookDetailScreenState extends State<BookDetailScreen>
   Widget _buildContent(BuildContext context, dynamic bookData) {
     final bool isLoggedIn = locator<PrefsOperator>().isLoggedIn();
     final bool purchased = bookData.purchased ?? false;
-    final bool hasBookAccess = isLoggedIn &&
-        locator<IknowAccessBloc>().hasBookAccess(bookData.id);
+    final bool hasBookAccess =
+        isLoggedIn && locator<IknowAccessBloc>().hasBookAccess(bookData.id);
     final bool hasDemo = bookData.isDemo ?? false;
     final bool hasFullAccess = isLoggedIn &&
         BookPdfPlaybackResolver.canDecryptFullBook(
@@ -161,9 +163,8 @@ class _BookDetailScreenState extends State<BookDetailScreen>
           isDemo: hasDemo,
         );
     final String? trialFile = bookData.trialFile;
-    final bool showSampleButton = trialFile != null &&
-        trialFile.isNotEmpty &&
-        !hasFullAccess;
+    final bool showSampleButton =
+        trialFile != null && trialFile.isNotEmpty && !hasFullAccess;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Column(
@@ -393,9 +394,10 @@ class _BookDetailScreenState extends State<BookDetailScreen>
                     ),
                     child: Text(
                       "خواندن نمونه",
-                      style: TextStyle(
-                        color:
-                            isDark ? MyColors.darkTextSecondary : Colors.grey,
+                      style: MyTextStyle.textMatn14Bold.copyWith(
+                        color: isDark
+                            ? MyColors.darkTextSecondary
+                            : MyColors.text4,
                       ),
                     ),
                   ),

@@ -64,6 +64,26 @@ class MyColors {
   static const Color cardBackground1 = Color.fromRGBO(245, 247, 250, 1);
   static const Color shadow = Color(0x1F000000); // Black with opacity
 
+  // Header shadow (Figma: x=0, y=1, blur=1, spread=0, #000000 5%)
+  static const Color headerShadowColor = Color(0x0D000000);
+  static const BoxShadow headerBoxShadow = BoxShadow(
+    color: headerShadowColor,
+    offset: Offset(0, 1),
+    blurRadius: 1,
+    spreadRadius: 0,
+  );
+  static const List<BoxShadow> headerShadows = [headerBoxShadow];
+
+  static BoxDecoration headerDecoration({
+    required Color backgroundColor,
+    BorderRadius? borderRadius,
+  }) =>
+      BoxDecoration(
+        color: backgroundColor,
+        borderRadius: borderRadius,
+        boxShadow: headerShadows,
+      );
+
   // Brand Colors (you can customize these based on your brand)
   static const Color brandPrimary = primary;
   static const Color brandSecondary = secondary;
@@ -71,6 +91,7 @@ class MyColors {
   static const Color background1 = Color(0xffF2F5FA);
   static const Color background2 = Color(0xFFF3F5F7);
   static const Color background3 = Color(0xFFF6F9FE);
+  static const Color background4 = Color(0xFFEFEFEF);
   static const Color contestCardGradientStart = Color(0xFFF2F0FF);
   static const Color contestCardGradientEnd = Color(0xFFF2F6FD);
   static const LinearGradient contestCardGradient = LinearGradient(

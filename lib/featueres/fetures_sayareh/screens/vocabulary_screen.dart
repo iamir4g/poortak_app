@@ -209,7 +209,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final pageBackgroundColor =
-        isDark ? MyColors.darkBackground : MyColors.secondaryTint4;
+        isDark ? MyColors.darkBackground : MyColors.background;
     final headerBackgroundColor =
         isDark ? MyColors.darkBackgroundSecondary : Colors.white;
     final primaryTextColor =
@@ -253,12 +253,24 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
         child: Scaffold(
           backgroundColor: pageBackgroundColor,
           appBar: AppBar(
+            elevation: 0,
+            scrolledUnderElevation: 0,
+            shadowColor: Colors.transparent,
+            surfaceTintColor: Colors.transparent,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(30.r),
               ),
             ),
-            backgroundColor: headerBackgroundColor,
+            flexibleSpace: Container(
+              decoration: MyColors.headerDecoration(
+                backgroundColor: headerBackgroundColor,
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(30.r),
+                ),
+              ),
+            ),
+            backgroundColor: Colors.transparent,
             foregroundColor: primaryTextColor,
             automaticallyImplyLeading: false,
             actions: [

@@ -50,17 +50,20 @@ class ConversationMessageBubble extends StatelessWidget {
         : 'assets/lottie/talking-robot.json';
 
     return SizedBox(
-      width: Dimens.nw(41),
-      height: Dimens.nh(41),
+      width: Dimens.nw(50),
+      height: Dimens.nh(50),
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: backgroundColor,
           shape: BoxShape.circle,
         ),
-        child: ClipOval(
-          child: Lottie.asset(
-            assetPath,
-            fit: BoxFit.cover,
+        child: Padding(
+          padding: EdgeInsets.all(4),
+          child: ClipOval(
+            child: Lottie.asset(
+              assetPath,
+              fit: BoxFit.cover,
+            ),
           ),
         ),
       ),
