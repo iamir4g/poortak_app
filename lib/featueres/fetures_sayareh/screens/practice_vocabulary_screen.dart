@@ -204,15 +204,15 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
       showSecondButton: true,
       barrierDismissible: false,
       onButtonPressed: () {
-        _isExitDialogOpen = false;
-        Navigator.of(context).pop();
+        Navigator.of(context, rootNavigator: true).pop();
       },
       onSecondButtonPressed: () {
-        _isExitDialogOpen = false;
-        Navigator.of(context).pop();
+        Navigator.of(context, rootNavigator: true).pop();
         _navigateToLessonScreen();
       },
-    );
+    ).whenComplete(() {
+      _isExitDialogOpen = false;
+    });
   }
 
   void _handleExitAttempt(PracticeVocabularyState state) {
@@ -309,9 +309,12 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
             return PopScope(
               canPop: false,
               onPopInvokedWithResult: (didPop, result) {
-                if (!didPop) {
-                  _handleExitAttempt(state);
+                if (didPop) return;
+                if (_isExitDialogOpen) {
+                  Navigator.of(context, rootNavigator: true).maybePop();
+                  return;
                 }
+                _handleExitAttempt(state);
               },
               child: Scaffold(
                 backgroundColor: pageBackgroundColor,

@@ -96,15 +96,15 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
       showSecondButton: true,
       barrierDismissible: false,
       onButtonPressed: () {
-        _isExitDialogOpen = false;
         Navigator.of(context, rootNavigator: true).pop();
       },
       onSecondButtonPressed: () {
-        _isExitDialogOpen = false;
         Navigator.of(context, rootNavigator: true).pop();
         _leaveQuiz();
       },
-    );
+    ).whenComplete(() {
+      _isExitDialogOpen = false;
+    });
   }
 
   @override
@@ -121,6 +121,10 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
       canPop: _canPop,
       onPopInvokedWithResult: (didPop, result) {
         if (didPop) return;
+        if (_isExitDialogOpen) {
+          Navigator.of(context, rootNavigator: true).maybePop();
+          return;
+        }
         _showExitModal();
       },
       child: Scaffold(

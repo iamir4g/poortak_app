@@ -368,21 +368,12 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                                   Builder(
                                     builder: (context) {
                                       return Container(
-                                        padding: isDark
-                                            ? EdgeInsets.all(8.r)
-                                            : EdgeInsets.zero,
+                                        padding: EdgeInsets.zero,
                                         decoration: BoxDecoration(
-                                          color: imageCardColor,
-                                          borderRadius:
-                                              BorderRadius.circular(20.r),
-                                          border: isDark
-                                              ? Border.all(
-                                                  color: MyColors.darkBorder
-                                                      .withValues(alpha: 0.35),
-                                                  width: 1,
-                                                )
-                                              : null,
-                                        ),
+                                            color: imageCardColor,
+                                            borderRadius:
+                                                BorderRadius.circular(20.r),
+                                            border: null),
                                         child: ClipRRect(
                                           borderRadius:
                                               BorderRadius.circular(16.r),

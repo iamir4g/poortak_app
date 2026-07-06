@@ -562,7 +562,7 @@ class ReusableModal extends StatelessWidget {
     );
   }
 
-  static void show({
+  static Future<T?> show<T>({
     required BuildContext context,
     required String title,
     required String message,
@@ -578,7 +578,7 @@ class ReusableModal extends StatelessWidget {
     String? customLottiePath,
     bool cartSuccessStyle = false,
   }) {
-    showDialog(
+    return showDialog<T>(
       context: context,
       barrierDismissible: barrierDismissible,
       builder: (BuildContext context) {

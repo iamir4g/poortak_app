@@ -29,7 +29,7 @@ class StepProgress extends StatelessWidget {
         children: [
           Container(
             decoration: BoxDecoration(
-              color: MyColors.background4,
+              color: isDark ? MyColors.background5 : MyColors.background4,
               borderRadius: BorderRadius.circular(20.r),
             ),
           ),

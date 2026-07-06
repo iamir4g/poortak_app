@@ -92,6 +92,7 @@ class MyColors {
   static const Color background2 = Color(0xFFF3F5F7);
   static const Color background3 = Color(0xFFF6F9FE);
   static const Color background4 = Color(0xFFEFEFEF);
+  static const Color background5 = Color(0xFF545664);
   static const Color contestCardGradientStart = Color(0xFFF2F0FF);
   static const Color contestCardGradientEnd = Color(0xFFF2F6FD);
   static const LinearGradient contestCardGradient = LinearGradient(
