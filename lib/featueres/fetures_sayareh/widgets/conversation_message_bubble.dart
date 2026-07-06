@@ -42,12 +42,9 @@ class ConversationMessageBubble extends StatelessWidget {
   });
 
   Widget _sideAvatar({
-    required bool isFirstPerson,
+    required String assetPath,
     required Color backgroundColor,
   }) {
-    final assetPath = isFirstPerson
-        ? 'assets/lottie/Talking_maya avatar.json'
-        : 'assets/lottie/talking-robot.json';
 
     return SizedBox(
       width: Dimens.nw(50),
@@ -124,7 +121,8 @@ class ConversationMessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final isFirstPerson = message.voice == 'male';
+    final isFirstPerson = message.isMaleSpeaker;
+    final avatarPath = message.conversationAvatarPath;
     final sentences = _splitIntoSentences(message.text);
 
     final bubbleColor = isDark
@@ -173,7 +171,7 @@ class ConversationMessageBubble extends StatelessWidget {
             children: isFirstPerson
                 ? [
                     _sideAvatar(
-                      isFirstPerson: isFirstPerson,
+                      assetPath: avatarPath,
                       backgroundColor: sideCircleColor,
                     ),
                     SizedBox(width: Dimens.nw(8)),
@@ -265,7 +263,7 @@ class ConversationMessageBubble extends StatelessWidget {
                     ),
                     SizedBox(width: Dimens.nw(8)),
                     _sideAvatar(
-                      isFirstPerson: isFirstPerson,
+                      assetPath: avatarPath,
                       backgroundColor: sideCircleColor,
                     ),
                   ],

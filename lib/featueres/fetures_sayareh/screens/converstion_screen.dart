@@ -268,33 +268,13 @@ class _ConversationScreenState extends State<ConversationScreen> {
             _messagesPlayedSinceLastSave = 0;
           }
 
-          // پخش جمله با صدای مناسب
+          // پخش جمله با صدای متناسب آواتار (ربات=آقا، مایا=خانم)
           try {
-            if (message.voice == 'male') {
-              await ttsService.stop();
-              await ttsService.setMaleVoice();
-              await Future.delayed(const Duration(milliseconds: 100));
-              if (!isPlayingNotifier.value ||
-                  _playbackSessionId != mySessionId) {
-                break;
-              }
-              await ttsService.speak(sentence);
-            } else if (message.voice == 'female') {
-              await ttsService.stop();
-              await ttsService.setFemaleVoice();
-              await Future.delayed(const Duration(milliseconds: 100));
-              if (!isPlayingNotifier.value ||
-                  _playbackSessionId != mySessionId) {
-                break;
-              }
-              await ttsService.speak(sentence);
-            } else {
-              if (!isPlayingNotifier.value ||
-                  _playbackSessionId != mySessionId) {
-                break;
-              }
-              await ttsService.speak(sentence, voice: message.voice);
+            if (!isPlayingNotifier.value ||
+                _playbackSessionId != mySessionId) {
+              break;
             }
+            await _speakWithAvatarVoice(sentence, message);
           } catch (e) {
             debugPrint("Error during sentence playback: $e");
           }
@@ -335,10 +315,22 @@ class _ConversationScreenState extends State<ConversationScreen> {
     }
   }
 
+  /// پخش متن با صدای متناسب آواتار پیام
+  Future<void> _speakWithAvatarVoice(String text, Datum message) async {
+    await ttsService.stop();
+    if (message.isMaleSpeaker) {
+      await ttsService.setMaleVoice();
+    } else {
+      await ttsService.setFemaleVoice();
+    }
+    await Future.delayed(const Duration(milliseconds: 100));
+    await ttsService.speak(text);
+  }
+
   /// پخش یک متن با صدای مشخص شده
   /// این متد زمانی که کاربر روی یک پیام کلیک می‌کند فراخوانی می‌شود
   Future<void> speakText(
-      String text, String voice, String conversationId) async {
+      String text, Datum message, String conversationId) async {
     // اگر در حال پخش خودکار هستیم، آن را متوقف کن
     if (isPlayingNotifier.value) {
       isPlayingNotifier.value = false;
@@ -347,22 +339,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
     // ذخیره وضعیت پخش به عنوان آخرین متن پخش شده
     _savePlayback(conversationId);
 
-    if (voice == 'male') {
-      // استفاده مستقیم از صدای مردانه انتخابی
-      await ttsService.stop();
-      await ttsService.setMaleVoice();
-      await Future.delayed(const Duration(milliseconds: 100));
-      await ttsService.speak(text);
-    } else if (voice == 'female') {
-      // استفاده از صدای زنانه
-      await ttsService.stop();
-      await ttsService.setFemaleVoice();
-      await Future.delayed(const Duration(milliseconds: 100));
-      await ttsService.speak(text);
-    } else {
-      // استفاده از متد عادی
-      await ttsService.speak(text, voice: voice);
-    }
+    await _speakWithAvatarVoice(text, message);
   }
 
   /// رفتن به جمله بعدی
@@ -742,7 +719,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                           onTap: () {
                             speakText(
                               message.text,
-                              message.voice,
+                              message,
                               message.id,
                             );
                           },
