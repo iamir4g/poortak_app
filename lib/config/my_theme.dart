@@ -164,6 +164,29 @@ class TermsConditionsTheme extends ThemeExtension<TermsConditionsTheme> {
 }
 
 class MyThemes {
+  static const Color _noHover = Colors.transparent;
+
+  static WidgetStateProperty<Color?> get _overlayWithoutHover =>
+      WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.hovered)) {
+          return _noHover;
+        }
+        return null;
+      });
+
+  static ButtonStyle _buttonStyleWithoutHover({
+    Color? backgroundColor,
+    Color? foregroundColor,
+  }) {
+    return ButtonStyle(
+      backgroundColor:
+          backgroundColor != null ? WidgetStatePropertyAll(backgroundColor) : null,
+      foregroundColor:
+          foregroundColor != null ? WidgetStatePropertyAll(foregroundColor) : null,
+      overlayColor: _overlayWithoutHover,
+    );
+  }
+
   static ThemeData get darkTheme => ThemeData(
         textTheme: TextTheme(
           titleLarge: TextStyle(
@@ -222,6 +245,7 @@ class MyThemes {
           ),
         ),
         primaryColor: MyColors.primary,
+        hoverColor: _noHover,
         scaffoldBackgroundColor: MyColors.darkBackground,
         cardColor: MyColors.darkCardBackground,
         dividerColor: MyColors.darkBorder,
@@ -246,15 +270,24 @@ class MyThemes {
           elevation: 2,
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
+          style: _buttonStyleWithoutHover(
             backgroundColor: MyColors.primary,
             foregroundColor: MyColors.darkTextPrimary,
           ),
         ),
         textButtonTheme: TextButtonThemeData(
-          style: TextButton.styleFrom(
+          style: _buttonStyleWithoutHover(
             foregroundColor: MyColors.darkTextAccent,
           ),
+        ),
+        outlinedButtonTheme: OutlinedButtonThemeData(
+          style: _buttonStyleWithoutHover(),
+        ),
+        iconButtonTheme: IconButtonThemeData(
+          style: _buttonStyleWithoutHover(),
+        ),
+        filledButtonTheme: FilledButtonThemeData(
+          style: _buttonStyleWithoutHover(),
         ),
         extensions: const <ThemeExtension<dynamic>>[
           LoginTheme.dark,
@@ -320,6 +353,7 @@ class MyThemes {
           ),
         ),
         primaryColor: MyColors.primary,
+        hoverColor: _noHover,
         scaffoldBackgroundColor: MyColors.background,
         cardColor: MyColors.cardBackground,
         dividerColor: MyColors.divider,
@@ -344,15 +378,24 @@ class MyThemes {
           elevation: 2,
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
+          style: _buttonStyleWithoutHover(
             backgroundColor: MyColors.primary,
             foregroundColor: MyColors.textLight,
           ),
         ),
         textButtonTheme: TextButtonThemeData(
-          style: TextButton.styleFrom(
+          style: _buttonStyleWithoutHover(
             foregroundColor: MyColors.primary,
           ),
+        ),
+        outlinedButtonTheme: OutlinedButtonThemeData(
+          style: _buttonStyleWithoutHover(),
+        ),
+        iconButtonTheme: IconButtonThemeData(
+          style: _buttonStyleWithoutHover(),
+        ),
+        filledButtonTheme: FilledButtonThemeData(
+          style: _buttonStyleWithoutHover(),
         ),
         extensions: const <ThemeExtension<dynamic>>[
           LoginTheme.light,

@@ -486,11 +486,11 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
         children: [
           SizedBox(height: Dimens.nh(15)), // Reduced from 28
           _buildVideoSection(),
-          SizedBox(height: Dimens.nh(15)), // Reduced from 18
+          SizedBox(height: Dimens.nh(12)), // Reduced from 18
           _buildConversationCard(),
-          SizedBox(height: Dimens.nh(10)), // Reduced from 12
+          SizedBox(height: Dimens.nh(12)), // Reduced from 12
           _buildVocabularyCard(),
-          SizedBox(height: Dimens.nh(10)), // Reduced from 12
+          SizedBox(height: Dimens.nh(12)), // Reduced from 12
           _buildQuizCard(),
           SizedBox(height: Dimens.nh(60)), // Reduced from 88
           _buildDictionaryButton(),
@@ -698,7 +698,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
         height: Dimens.nh(15),
         decoration: BoxDecoration(
           color: isDark ? MyColors.profileHeaderDark : Colors.white,
-          borderRadius: BorderRadius.circular(Dimens.nr(8)),
+          borderRadius: BorderRadius.circular(Dimens.nr(40)),
         ),
         child: Center(
           child: Text(

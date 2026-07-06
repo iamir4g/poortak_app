@@ -403,9 +403,7 @@ class ReusableModal extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          hoverColor: isDarkMode
-              ? Colors.transparent
-              : MyColors.modalButtonPressedLight,
+          hoverColor: Colors.transparent,
           splashColor: isDarkMode
               ? Colors.transparent
               : MyColors.modalButtonPressedLight,

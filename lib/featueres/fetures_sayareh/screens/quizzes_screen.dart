@@ -50,16 +50,34 @@ class _QuizzesScreenState extends State<QuizzesScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final backgroundColor =
         isDark ? MyColors.darkBackground : MyColors.background1;
+    final headerBackgroundColor =
+        isDark ? MyColors.darkBackgroundSecondary : Colors.white;
     final primaryTextColor =
         isDark ? MyColors.darkTextPrimary : MyColors.textMatn1;
 
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
-        automaticallyImplyLeading: false,
-        backgroundColor:
-            isDark ? MyColors.darkBackground : MyColors.background,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        shadowColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(30.r),
+          ),
+        ),
+        flexibleSpace: Container(
+          decoration: MyColors.headerDecoration(
+            backgroundColor: headerBackgroundColor,
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(30.r),
+            ),
+          ),
+        ),
+        backgroundColor: Colors.transparent,
         foregroundColor: primaryTextColor,
+        automaticallyImplyLeading: false,
         actions: [
           IconButton(
             onPressed: () => Navigator.of(context).pop(),
@@ -67,7 +85,7 @@ class _QuizzesScreenState extends State<QuizzesScreen> {
           ),
         ],
         title: Text(
-          "آزمون ها",
+          'آزمون ها',
           style: MyTextStyle.textHeader16Bold.copyWith(
             color: primaryTextColor,
           ),
@@ -117,6 +135,7 @@ class _QuizzesScreenState extends State<QuizzesScreen> {
                       },
                       itemCount: state.quizzes.data.length,
                     ),
+                    SizedBox(height: 40.h),
                   ],
                 ),
               );
@@ -163,8 +182,7 @@ class QuizItem extends StatelessWidget {
         isDark ? MyColors.darkCardBackground : MyColors.background;
     final descriptionColor =
         isDark ? MyColors.darkTextSecondary : MyColors.text4;
-    final titleColor =
-        isDark ? MyColors.darkTextPrimary : MyColors.textMatn1;
+    final titleColor = isDark ? MyColors.darkTextPrimary : MyColors.textMatn1;
 
     return Container(
       width: 350.w,
