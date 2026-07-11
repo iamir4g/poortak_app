@@ -33,7 +33,7 @@ class LessonCardWidget extends StatelessWidget {
         height: Dimens.nh(104),
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(Dimens.nr(30)), // Reduced from 40
+          borderRadius: BorderRadius.circular(Dimens.nr(40)), // Reduced from 40
           color: isDark ? MyColors.termsBackgroundDark : Colors.white,
           boxShadow: [
             BoxShadow(
@@ -52,9 +52,12 @@ class LessonCardWidget extends StatelessWidget {
                 left: 0, // In RTL, progress should start from right
                 child: Container(
                   width: width * (progress! / 100),
-                  color: isDark
-                      ? MyColors.paymentHistoryCardHeaderDark
-                      : const Color(0xFFE3F2FD),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(Dimens.nr(40)),
+                    color: isDark
+                        ? MyColors.lessonCardProgressDark
+                        : MyColors.lessonCardProgressLight,
+                  ),
                 ),
               ),
             Padding(

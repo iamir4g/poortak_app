@@ -67,6 +67,7 @@ class _LitnerMainScreenState extends State<LitnerMainScreen> with RouteAware {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return BlocListener<BottomNavCubit, int>(
       listener: (context, selectedIndex) async {
         if (selectedIndex == 3) {
@@ -96,7 +97,11 @@ class _LitnerMainScreenState extends State<LitnerMainScreen> with RouteAware {
                         padding: EdgeInsets.all(Dimens.small),
                         child: Text(
                           l10n!.you_are_not_logged_in_litner,
-                          style: MyTextStyle.textCenter16,
+                          style: MyTextStyle.textCenter16.copyWith(
+                            color: isDark
+                                ? MyColors.darkTextPrimary
+                                : MyColors.textMatn1,
+                          ),
                           textAlign: TextAlign.center,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,

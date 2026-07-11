@@ -40,6 +40,7 @@ class Lesson {
   String name;
   String description;
   String thumbnail;
+  String videoThumbnail;
   String price;
   String? video;
   String trailerVideo;
@@ -55,6 +56,7 @@ class Lesson {
     required this.name,
     required this.description,
     required this.thumbnail,
+    this.videoThumbnail = '',
     required this.price,
     this.video,
     required this.purchased,
@@ -66,15 +68,19 @@ class Lesson {
     required this.publishedAt,
   });
 
+  String get videoThumbnailOrThumbnail =>
+      videoThumbnail.isNotEmpty ? videoThumbnail : thumbnail;
+
   factory Lesson.fromJson(Map<String, dynamic> json) => Lesson(
         id: json["id"] ?? "",
         name: json["name"] ?? "",
         description: json["description"] ?? "",
         thumbnail: json["thumbnail"] ?? "",
+        videoThumbnail: json["videoThumbnail"]?.toString() ?? "",
         price: json["price"] ?? "",
         video: json["video"],
         purchased: json["purchased"] ?? false,
-        trailerVideo: json["trailerVideo"] ?? "",
+        trailerVideo: json["trailerVideo"]?.toString() ?? "",
         isDemo: json["isDemo"] ?? false,
         order: json["order"] ?? 0,
         createdAt: DateTime.parse(json["createdAt"]),
@@ -89,6 +95,7 @@ class Lesson {
         "name": name,
         "description": description,
         "thumbnail": thumbnail,
+        "videoThumbnail": videoThumbnail,
         "price": price,
         "video": video,
         "purchased": purchased,

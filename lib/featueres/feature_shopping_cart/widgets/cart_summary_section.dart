@@ -30,7 +30,7 @@ class CartSummarySection extends StatelessWidget {
         ),
         SizedBox(height: Dimens.nh(12)),
         Padding(
-          padding: EdgeInsets.only(bottom: Dimens.nh(90)),
+          padding: EdgeInsets.only(bottom: Dimens.nh(8)),
           child: ReferralCodeCard(
             onSubmit: onReferralSubmit,
           ),
@@ -40,4 +40,3 @@ class CartSummarySection extends StatelessWidget {
     );
   }
 }
-

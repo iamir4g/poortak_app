@@ -147,6 +147,7 @@ class CartItemSource {
   String? name;
   String? description;
   String? thumbnail;
+  String? videoThumbnail;
   bool? isDemo;
   String price;
   String? video;
@@ -160,6 +161,7 @@ class CartItemSource {
     this.name,
     this.description,
     this.thumbnail,
+    this.videoThumbnail,
     this.isDemo,
     required this.price,
     this.video,
@@ -174,6 +176,7 @@ class CartItemSource {
         name: json["name"],
         description: json["description"],
         thumbnail: json["thumbnail"],
+        videoThumbnail: json["videoThumbnail"]?.toString(),
         isDemo: json["isDemo"],
         price: json["price"] ?? "0",
         video: json["video"],
@@ -188,6 +191,7 @@ class CartItemSource {
         if (name != null) "name": name,
         if (description != null) "description": description,
         if (thumbnail != null) "thumbnail": thumbnail,
+        if (videoThumbnail != null) "videoThumbnail": videoThumbnail,
         if (isDemo != null) "isDemo": isDemo,
         "price": price,
         if (video != null) "video": video,

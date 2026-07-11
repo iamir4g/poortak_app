@@ -2,14 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pdfx/pdfx.dart';
 import 'package:poortak/config/dimens.dart';
+import 'package:poortak/config/myColors.dart';
+import 'package:poortak/config/myTextStyle.dart';
 import '../utils/pdfDownloader.dart';
 import '../services/storage_service.dart';
 
 class CustomPdfReader extends StatefulWidget {
   final String? fileKey;
+  final String? decryptionFileId;
   final String? localPath;
   final String fileName;
   final String fileId;
+  final String? bookId;
+  final String? trialStorageKey;
+  final bool allowTrialFallback;
   final bool isEncrypted;
   final bool showDownloadButton;
   final bool autoDownload;
@@ -19,9 +25,13 @@ class CustomPdfReader extends StatefulWidget {
   const CustomPdfReader({
     super.key,
     this.fileKey,
+    this.decryptionFileId,
     this.localPath,
     required this.fileName,
     required this.fileId,
+    this.bookId,
+    this.trialStorageKey,
+    this.allowTrialFallback = false,
     required this.storageService,
     this.isEncrypted = false,
     this.showDownloadButton = true,
@@ -37,7 +47,9 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
   PdfController? _pdfController;
   String? _currentPdfPath;
   bool _isDownloading = false;
+  bool _isDecrypting = false;
   double _downloadProgress = 0.0;
+  double _decryptionProgress = 0.0;
   bool _isLoading = true;
   String? _errorMessage;
 
@@ -65,7 +77,7 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
       }
 
       // If no local file and we have a fileKey, check if we should auto-download
-      if (widget.fileKey != null && widget.autoDownload) {
+      if (widget.autoDownload && _canDownload()) {
         // Start downloading immediately
         _downloadPdf();
       } else if (widget.fileKey != null) {
@@ -85,28 +97,77 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
     }
   }
 
-  void _loadLocalPdf(String path) async {
-    setState(() {
-      _currentPdfPath = path;
-      _isLoading = false;
-    });
+  Future<void> _loadLocalPdf(String path) async {
+    if (!await PdfDownloader.isValidPdfFile(path)) {
+      print("Invalid PDF at $path, removing and re-downloading");
+      await PdfDownloader.deletePdfByFileId(widget.fileId);
+      if (widget.autoDownload && _canDownload()) {
+        await _downloadPdf();
+      } else {
+        setState(() {
+          _errorMessage = 'فایل PDF نامعتبر است. لطفاً دوباره دانلود کنید.';
+          _isLoading = false;
+        });
+      }
+      return;
+    }
 
+    _pdfController?.dispose();
     _pdfController = PdfController(
       document: PdfDocument.openFile(path),
     );
 
-    // Get total pages count
     try {
       final document = await _pdfController!.document;
+      if (!mounted) return;
       setState(() {
+        _currentPdfPath = path;
+        _isLoading = false;
         _totalPages = document.pagesCount;
+        _errorMessage = null;
       });
       print("Total pages: $_totalPages");
-
-      // Note: PdfController doesn't have addListener, page changes will be handled by navigation methods
     } catch (e) {
       print("Error getting page count: $e");
+      _pdfController?.dispose();
+      _pdfController = null;
+      await PdfDownloader.deletePdfByFileId(widget.fileId);
+      if (!mounted) return;
+      if (widget.autoDownload && _canDownload()) {
+        await _downloadPdf();
+      } else {
+        setState(() {
+          _errorMessage = 'خطا در باز کردن فایل PDF. لطفاً دوباره تلاش کنید.';
+          _isLoading = false;
+        });
+      }
     }
+  }
+
+  bool _canDownload() {
+    if (widget.usePublicUrl) {
+      return widget.fileKey != null && widget.fileKey!.trim().isNotEmpty;
+    }
+    return widget.bookId != null && widget.bookId!.trim().isNotEmpty;
+  }
+
+  String _resolveBookId() {
+    if (widget.bookId != null && widget.bookId!.trim().isNotEmpty) {
+      return widget.bookId!.trim();
+    }
+    if (widget.fileId.startsWith('book_full_')) {
+      return widget.fileId.substring('book_full_'.length);
+    }
+    if (widget.fileId.startsWith('book_')) {
+      return widget.fileId.substring('book_'.length);
+    }
+    return widget.fileId;
+  }
+
+  String? _resolveDecryptionFileId() {
+    final fileId = widget.decryptionFileId?.trim();
+    if (fileId != null && fileId.isNotEmpty) return fileId;
+    return null;
   }
 
   void _loadUrlPdf() async {
@@ -120,10 +181,7 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
         await widget.storageService.callGetDownloadPublicUrl(widget.fileKey!);
       } else {
         // Use new API endpoint for purchased book files
-        final bookId = widget.fileId.startsWith('book_')
-            ? widget.fileId.substring(5)
-            : widget.fileId;
-        await widget.storageService.callDownloadBookFile(bookId);
+        await widget.storageService.callDownloadBookFile(_resolveBookId());
       }
 
       // For now, we'll use a placeholder and let the user download the PDF
@@ -215,30 +273,52 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
   }
 
   Future<void> _downloadPdf() async {
-    if (widget.fileKey == null) return;
+    if (!_canDownload()) return;
 
     setState(() {
+      _isLoading = false;
       _isDownloading = true;
+      _isDecrypting = false;
       _downloadProgress = 0.0;
+      _decryptionProgress = 0.0;
+      _errorMessage = null;
     });
 
     try {
       await PdfDownloader.downloadAndStorePdf(
         storageService: widget.storageService,
-        key: widget.fileKey!,
         fileName: widget.fileName,
         fileId: widget.fileId,
-        isEncrypted: widget.isEncrypted,
+        bookId: _resolveBookId(),
         usePublicUrl: widget.usePublicUrl,
+        publicStorageKey: widget.fileKey,
+        decryptionFileId: _resolveDecryptionFileId(),
+        trialStorageKey: widget.trialStorageKey,
+        allowTrialFallback: widget.allowTrialFallback,
         onProgress: (progress) {
           setState(() {
             _downloadProgress = progress;
           });
         },
+        onDecrypting: (isDecrypting) {
+          setState(() {
+            _isDecrypting = isDecrypting;
+            if (isDecrypting) {
+              _isDownloading = false;
+            }
+          });
+        },
+        onDecryptionProgress: (progress) {
+          setState(() {
+            _decryptionProgress = progress;
+          });
+        },
         onDownloadCompleted: (path) {
           setState(() {
             _isDownloading = false;
+            _isDecrypting = false;
             _downloadProgress = 1.0;
+            _decryptionProgress = 1.0;
           });
           _loadLocalPdf(path);
 
@@ -256,6 +336,7 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
         onDownloadError: (error) {
           setState(() {
             _isDownloading = false;
+            _isDecrypting = false;
             _errorMessage = error;
           });
 
@@ -273,6 +354,7 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
     } catch (e) {
       setState(() {
         _isDownloading = false;
+        _isDecrypting = false;
         _errorMessage = 'خطا در دانلود: $e';
       });
     }
@@ -286,9 +368,21 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final primaryTextColor =
+        isDark ? MyColors.darkTextPrimary : MyColors.textMatn1;
+    final secondaryTextColor =
+        isDark ? MyColors.darkTextSecondary : MyColors.text3;
+    final errorColor = isDark ? MyColors.darkError : MyColors.error;
+    final controlsBackground = isDark
+        ? MyColors.pdfReaderControlsBackgroundDark
+        : MyColors.pdfReaderControlsBackgroundLight;
+
     if (_isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(),
+      return Center(
+        child: CircularProgressIndicator(
+          color: Theme.of(context).colorScheme.primary,
+        ),
       );
     }
 
@@ -300,26 +394,24 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
             Icon(
               Icons.error_outline,
               size: 64.r,
-              color: Colors.red[300],
+              color: errorColor,
             ),
             SizedBox(height: Dimens.medium),
-            Text(
-              _errorMessage!,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16.sp,
-                color: Colors.red,
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 24.w),
+              child: Text(
+                _errorMessage!,
+                textAlign: TextAlign.center,
+                style: MyTextStyle.body16For(context).copyWith(color: errorColor),
               ),
             ),
-            if (widget.fileKey != null && !widget.autoDownload) ...[
+            if (_canDownload() && !widget.autoDownload) ...[
               SizedBox(height: Dimens.medium),
               ElevatedButton.icon(
                 onPressed: _downloadPdf,
                 icon: const Icon(Icons.download),
                 label: const Text('دانلود کتاب'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).primaryColor,
-                  foregroundColor: Colors.white,
                   padding:
                       EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
                 ),
@@ -330,26 +422,31 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
       );
     }
 
-    if (_isDownloading) {
+    if (_isDownloading || _isDecrypting) {
+      final progress = _isDecrypting ? _decryptionProgress : _downloadProgress;
+      final statusText = _isDecrypting
+          ? 'در حال رمزگشایی کتاب... ${(progress * 100).toInt()}%'
+          : 'در حال دانلود کتاب... ${(progress * 100).toInt()}%';
+
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             CircularProgressIndicator(
-              value: _downloadProgress,
+              value: progress > 0 ? progress : null,
+              color: Theme.of(context).colorScheme.primary,
             ),
             SizedBox(height: Dimens.medium),
             Text(
-              'در حال بارگذاری کتاب... ${(_downloadProgress * 100).toInt()}%',
-              style: TextStyle(fontSize: 16.sp),
+              statusText,
+              style: MyTextStyle.body16For(context),
             ),
             SizedBox(height: Dimens.small),
             Text(
-              'لطفاً صبر کنید',
-              style: TextStyle(
-                fontSize: 14.sp,
-                color: Colors.grey[600],
-              ),
+              _isDecrypting
+                  ? 'لطفاً صبر کنید'
+                  : 'فایل رمزگذاری‌شده در حال دریافت است',
+              style: MyTextStyle.body14SecondaryFor(context),
             ),
           ],
         ),
@@ -357,8 +454,11 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
     }
 
     if (_pdfController == null) {
-      return const Center(
-        child: Text('PDF not loaded'),
+      return Center(
+        child: Text(
+          'PDF not loaded',
+          style: MyTextStyle.body16For(context),
+        ),
       );
     }
 
@@ -373,33 +473,29 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
                 Container(
                   padding: EdgeInsets.all(8.r),
                   decoration: BoxDecoration(
-                    color: Colors.grey[100],
+                    color: controlsBackground,
                     borderRadius: BorderRadius.circular(8.r),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // Previous page button
                       IconButton(
                         onPressed: _currentPage > 1 ? _goToPreviousPage : null,
-                        icon: const Icon(Icons.arrow_back_ios),
+                        icon: Icon(
+                          Icons.arrow_back_ios,
+                          color: primaryTextColor,
+                        ),
                         tooltip: 'صفحه قبل',
                       ),
-
-                      // Page info and navigation
                       Expanded(
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
                               'صفحه $_currentPage از $_totalPages',
-                              style: TextStyle(
-                                fontSize: 16.sp,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: MyTextStyle.textMatn14BoldFor(context),
                             ),
                             SizedBox(width: Dimens.medium),
-                            // Page input field
                             SizedBox(
                               width: 80.w,
                               child: TextField(
@@ -407,9 +503,43 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
                                     text: _currentPage.toString()),
                                 keyboardType: TextInputType.number,
                                 textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: primaryTextColor,
+                                  fontSize: 14.sp,
+                                ),
                                 decoration: InputDecoration(
                                   hintText: 'صفحه',
-                                  border: OutlineInputBorder(),
+                                  hintStyle: TextStyle(
+                                    color: secondaryTextColor,
+                                  ),
+                                  filled: true,
+                                  fillColor: isDark
+                                      ? MyColors.pdfReaderInputFillDark
+                                      : Colors.white,
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8.r),
+                                    borderSide: BorderSide(
+                                      color: isDark
+                                          ? MyColors.pdfReaderInputBorderDark
+                                          : MyColors.inputBorder,
+                                    ),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8.r),
+                                    borderSide: BorderSide(
+                                      color: isDark
+                                          ? MyColors.pdfReaderInputBorderDark
+                                          : MyColors.inputBorder,
+                                    ),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8.r),
+                                    borderSide: BorderSide(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .primary,
+                                    ),
+                                  ),
                                   contentPadding: EdgeInsets.symmetric(
                                       horizontal: 8.w, vertical: 4.h),
                                   isDense: true,
@@ -440,11 +570,13 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
                         ),
                       ),
 
-                      // Next page button
                       IconButton(
                         onPressed:
                             _currentPage < _totalPages ? _goToNextPage : null,
-                        icon: const Icon(Icons.arrow_forward_ios),
+                        icon: Icon(
+                          Icons.arrow_forward_ios,
+                          color: primaryTextColor,
+                        ),
                         tooltip: 'صفحه بعد',
                       ),
                     ],
@@ -473,7 +605,12 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
                           child: CircularProgressIndicator(),
                         ),
                         errorBuilder: (_, error) => Center(
-                          child: Text('Error loading PDF: $error'),
+                          child: Text(
+                            'Error loading PDF: $error',
+                            style: MyTextStyle.body16For(context).copyWith(
+                              color: errorColor,
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -524,7 +661,7 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
 
         // Bottom controls - only show if not auto-downloading
         if (widget.showDownloadButton &&
-            widget.fileKey != null &&
+            _canDownload() &&
             _currentPdfPath == null &&
             !widget.autoDownload)
           Container(
@@ -537,8 +674,6 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
                     icon: const Icon(Icons.download),
                     label: const Text('دانلود کتاب'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).primaryColor,
-                      foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(
                           horizontal: 24, vertical: 12),
                     ),

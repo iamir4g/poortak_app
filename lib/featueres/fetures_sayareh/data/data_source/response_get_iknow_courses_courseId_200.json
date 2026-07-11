@@ -1,0 +1,19 @@
+{
+  "ok": true,
+  "meta": {},
+  "data": {
+    "id": "bed262ab-3b12-49d6-9613-52ec4737327c",
+    "name": "درس اول",
+    "description": "پورتک به سیاره آی نو می‌رود.",
+    "thumbnail": "2c4d4e04-24d2-498b-aa12-784288ada3ae",
+    "isDemo": true,
+    "price": "850000",
+    "video": "955b4085-ec59-4e50-b863-4af9794f1a4c",
+    "videoThumbnail": "a6f9233e-95e5-42a6-92dc-00dfd51160e7",
+    "trailerVideo": "b7637ac5-e981-40f4-b642-2a58a3db5582",
+    "order": 0,
+    "createdAt": "2026-05-17T11:39:42.506Z",
+    "updatedAt": "2026-05-17T11:39:42.506Z",
+    "publishedAt": "2026-05-17T11:39:47.165Z"
+  }
+}

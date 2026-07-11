@@ -41,7 +41,7 @@ class MyTextStyle {
       );
 
   static TextStyle get textHeader16Bold => TextStyle(
-        fontFamily: "IranSans",
+        fontFamily: "IRANSans",
         fontSize: 16.sp,
         fontWeight: FontWeight.bold,
         color: MyColors.textMatn1,
@@ -77,6 +77,32 @@ class MyTextStyle {
         fontWeight: FontWeight.bold,
         color: MyColors.textMatn1,
       );
+
+  static TextStyle textMatn14BoldFor(BuildContext context) =>
+      textMatn14Bold.copyWith(
+        color: Theme.of(context).brightness == Brightness.dark
+            ? MyColors.darkTextPrimary
+            : MyColors.textMatn1,
+      );
+
+  static TextStyle body16For(BuildContext context) => TextStyle(
+        fontFamily: "IranSans",
+        fontSize: 16.sp,
+        fontWeight: FontWeight.w400,
+        color: Theme.of(context).brightness == Brightness.dark
+            ? MyColors.darkTextPrimary
+            : MyColors.textMatn1,
+      );
+
+  static TextStyle body14SecondaryFor(BuildContext context) => TextStyle(
+        fontFamily: "IranSans",
+        fontSize: 14.sp,
+        fontWeight: FontWeight.w400,
+        color: Theme.of(context).brightness == Brightness.dark
+            ? MyColors.darkTextSecondary
+            : MyColors.text3,
+      );
+
   static TextStyle get textMatn18Bold => TextStyle(
         fontFamily: "IranSans",
         fontSize: 18.sp,
@@ -165,7 +191,7 @@ class MyTextStyle {
   static TextStyle get textMatnBtn => TextStyle(
         color: MyColors.textLight,
         fontSize: 16.sp,
-        fontFamily: "IranSans",
+        fontFamily: "IRANSans",
         fontWeight: FontWeight.bold,
       );
   static TextStyle get textMatn13PrimaryShade1 => TextStyle(

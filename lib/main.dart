@@ -115,6 +115,16 @@ Future<void> _requestStoragePermission() async {
   }
 }
 
+void _loadInitialShoppingCart() {
+  final bloc = locator<ShoppingCartBloc>();
+  final prefsOperator = locator<PrefsOperator>();
+  if (prefsOperator.isLoggedIn()) {
+    bloc.add(GetCartEvent());
+  } else {
+    bloc.add(GetLocalCartEvent());
+  }
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // runApp(const MyApp());
@@ -140,6 +150,7 @@ void main() async {
 
   await locator<TTSService>().initialize();
   await ReminderNotificationService.initialize();
+  _loadInitialShoppingCart();
   runApp(MultiBlocProvider(
       providers: [
         BlocProvider(create: (_) => SplashCubit()),
@@ -148,18 +159,8 @@ void main() async {
         BlocProvider(create: (_) => locator<SettingsCubit>()),
         BlocProvider(create: (_) => locator<ConnectivityCubit>()),
         BlocProvider(create: (_) => locator<VideoDownloadCubit>()),
-        BlocProvider(
-          create: (_) {
-            final bloc = ShoppingCartBloc(repository: locator());
-            final prefsOperator = locator<PrefsOperator>();
-            // Load appropriate cart based on login status
-            if (prefsOperator.isLoggedIn()) {
-              bloc.add(GetCartEvent());
-            } else {
-              bloc.add(GetLocalCartEvent());
-            }
-            return bloc;
-          },
+        BlocProvider.value(
+          value: locator<ShoppingCartBloc>(),
         ),
         BlocProvider(create: (_) => locator<LitnerBloc>()),
       ],

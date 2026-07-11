@@ -34,12 +34,14 @@ class _DialogCartState extends State<DialogCart> {
   final PrefsOperator _prefsOperator = locator<PrefsOperator>();
   static const String _bundleName = "مجموعه کامل سیاره آی نو";
 
-  Widget _buildCartFooter() {
+  Widget _buildCartFooter(bool isDark) {
     return Container(
       width: Dimens.nw(360.0),
       height: Dimens.nh(112.0),
       decoration: ShapeDecoration(
-        color: MyColors.cartFooterBackground,
+        color: isDark
+            ? MyColors.cartFooterBackgroundDark
+            : MyColors.cartFooterBackground,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
             bottomLeft: Radius.circular(Dimens.nr(25.0)),
@@ -53,11 +55,75 @@ class _DialogCartState extends State<DialogCart> {
           Expanded(
             child: Text(
               "جهت کسب اطلاعات بیشتر به وبسایت پورتک به نشانی www.poortak.ir مراجه کنید.",
-              style: MyTextStyle.textMatn11,
+              style: MyTextStyle.textMatn11.copyWith(
+                color: isDark
+                    ? MyColors.darkTextSecondary
+                    : MyColors.textMatn1,
+              ),
               textAlign: TextAlign.center,
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildCoinBadge({
+    required bool isDark,
+    required String coinAmount,
+    required String coinLabel,
+  }) {
+    return Container(
+      width: Dimens.nw(104.0),
+      height: Dimens.nh(30.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.all(Radius.circular(Dimens.nr(20.0))),
+        color: isDark ? MyColors.cartCoinBadgeDark : MyColors.background,
+      ),
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(Dimens.tiny, 0, Dimens.tiny, 0),
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Image.asset(
+                "assets/images/star_icon.png",
+                width: Dimens.nw(18.0),
+                height: Dimens.nh(18.0),
+                fit: BoxFit.contain,
+              ),
+              SizedBox(width: Dimens.nw(2.0)),
+              Text(
+                convertEnToFa(coinAmount),
+                style: MyTextStyle.textMatn13PrimaryShade1,
+              ),
+              SizedBox(width: Dimens.nw(2.0)),
+              Text(
+                coinLabel,
+                style: MyTextStyle.textMatn9.copyWith(
+                  color: isDark
+                      ? MyColors.darkTextPrimary
+                      : MyColors.textMatn1,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  ButtonStyle _cartButtonStyle(bool isDark) {
+    return ElevatedButton.styleFrom(
+      backgroundColor: isDark ? MyColors.primary : MyColors.secondary,
+      foregroundColor:
+          isDark ? MyColors.loginButtonText : MyColors.textLight,
+      elevation: 0,
+      shadowColor: Colors.transparent,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(Dimens.radiusLarge),
       ),
     );
   }
@@ -252,8 +318,18 @@ class _DialogCartState extends State<DialogCart> {
     final l10n = AppLocalizations.of(context)!;
     final summaryData = widget.summaryData;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final primaryTextColor =
+        isDark ? MyColors.darkTextPrimary : MyColors.textMatn1;
+    final secondaryTextColor =
+        isDark ? MyColors.darkTextSecondary : MyColors.text1;
+    final imageFrameColor =
+        isDark ? MyColors.cartImageFrameDark : MyColors.background;
     return Dialog(
-        backgroundColor: MyColors.background,
+        backgroundColor:
+            isDark ? MyColors.cartDialogBackgroundDark : MyColors.background,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(Dimens.nr(25.0)),
+        ),
         child: ConstrainedBox(
           constraints: BoxConstraints(maxHeight: Dimens.nh(700.0)),
           child: DefaultTabController(
@@ -270,7 +346,7 @@ class _DialogCartState extends State<DialogCart> {
                       child: DecoratedBox(
                         decoration: BoxDecoration(
                           color: isDark
-                              ? Colors.transparent
+                              ? MyColors.cartTabBarBackgroundDark
                               : MyColors.background3,
                           borderRadius: BorderRadius.circular(Dimens.nr(20.0)),
                         ),
@@ -283,10 +359,12 @@ class _DialogCartState extends State<DialogCart> {
                                 horizontal: Dimens.nw(4.0)),
                             indicatorColor: Colors.transparent,
                             labelColor: MyColors.textLight,
-                            unselectedLabelColor: MyColors.textSecondary,
+                            unselectedLabelColor: isDark
+                                ? MyColors.cartTabUnselectedTextDark
+                                : MyColors.textSecondary,
                             indicator: BoxDecoration(
                               color: isDark
-                                  ? MyColors.darkBackground
+                                  ? MyColors.cartTabSelectedDark
                                   : MyColors.text1,
                               borderRadius:
                                   BorderRadius.circular(Dimens.nr(20.0)),
@@ -338,7 +416,7 @@ class _DialogCartState extends State<DialogCart> {
                                         decoration: BoxDecoration(
                                           borderRadius: BorderRadius.all(
                                               Radius.circular(Dimens.nr(27.0))),
-                                          color: MyColors.background,
+                                          color: imageFrameColor,
                                         ),
                                         child: ClipRRect(
                                           borderRadius: BorderRadius.all(
@@ -347,7 +425,8 @@ class _DialogCartState extends State<DialogCart> {
                                           child: FutureBuilder<String>(
                                             future: GetImageUrlService()
                                                 .getImageUrl(
-                                                    widget.item.thumbnail),
+                                                    widget.item
+                                                        .videoThumbnailOrThumbnail),
                                             builder: (context, snapshot) {
                                               if (snapshot.connectionState ==
                                                   ConnectionState.waiting) {
@@ -395,48 +474,10 @@ class _DialogCartState extends State<DialogCart> {
                                       Positioned(
                                         bottom: Dimens.nh(5.0),
                                         left: Dimens.small,
-                                        child: Container(
-                                          width: Dimens.nw(104.0),
-                                          height: Dimens.nh(30.0),
-                                          decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(
-                                                      Dimens.nr(20.0))),
-                                              color: MyColors.background),
-                                          child: Padding(
-                                            padding: EdgeInsets.fromLTRB(
-                                                Dimens.tiny, 0, Dimens.tiny, 0),
-                                            child: FittedBox(
-                                              fit: BoxFit.scaleDown,
-                                              child: Row(
-                                                mainAxisSize: MainAxisSize.min,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                children: [
-                                                  Image.asset(
-                                                    "assets/images/star_icon.png",
-                                                    width: Dimens.nw(18.0),
-                                                    height: Dimens.nh(18.0),
-                                                    fit: BoxFit.contain,
-                                                  ),
-                                                  SizedBox(
-                                                      width: Dimens.nw(2.0)),
-                                                  Text(
-                                                    convertEnToFa("+5"),
-                                                    style: MyTextStyle
-                                                        .textMatn13PrimaryShade1,
-                                                  ),
-                                                  SizedBox(
-                                                      width: Dimens.nw(2.0)),
-                                                  Text(
-                                                    l10n.coin_with_buy,
-                                                    style:
-                                                        MyTextStyle.textMatn9,
-                                                  )
-                                                ],
-                                              ),
-                                            ),
-                                          ),
+                                        child: _buildCoinBadge(
+                                          isDark: isDark,
+                                          coinAmount: "+5",
+                                          coinLabel: l10n.coin_with_buy,
                                         ),
                                       ),
                                     ],
@@ -460,7 +501,8 @@ class _DialogCartState extends State<DialogCart> {
                                         ),
                                         Text(
                                           "${widget.item.name} انیمیشن سیاره آی‌نو",
-                                          style: MyTextStyle.textMatn12W500,
+                                          style: MyTextStyle.textMatn12W500
+                                              .copyWith(color: primaryTextColor),
                                           maxLines: 2,
                                           overflow: TextOverflow.ellipsis,
                                         ),
@@ -478,7 +520,9 @@ class _DialogCartState extends State<DialogCart> {
                                   Container(
                                       height: Dimens.nh(54.0),
                                       decoration: BoxDecoration(
-                                        color: MyColors.cardBackground1,
+                                        color: isDark
+                                            ? MyColors.cartPriceCardDark
+                                            : MyColors.cardBackground1,
                                         borderRadius: BorderRadius.all(
                                             Radius.circular(Dimens.nr(10.0))),
                                       ),
@@ -498,7 +542,7 @@ class _DialogCartState extends State<DialogCart> {
                                                 fontStyle: FontStyle.normal,
                                                 height: 1.0,
                                                 letterSpacing: 0.0,
-                                                color: MyColors.text1,
+                                                color: secondaryTextColor,
                                               ),
                                             ),
                                             Row(
@@ -512,13 +556,16 @@ class _DialogCartState extends State<DialogCart> {
                                                     fontStyle: FontStyle.normal,
                                                     height: 1.0,
                                                     letterSpacing: 0.0,
-                                                    color: MyColors.textMatn1,
+                                                    color: primaryTextColor,
                                                   ),
                                                   textAlign: TextAlign.center,
                                                 ),
                                                 Text(
                                                   l10n.toman,
-                                                  style: MyTextStyle.textMatn13,
+                                                  style: MyTextStyle.textMatn13
+                                                      .copyWith(
+                                                          color:
+                                                              primaryTextColor),
                                                 )
                                               ],
                                             )
@@ -539,22 +586,14 @@ class _DialogCartState extends State<DialogCart> {
                                           widget.item.name,
                                         );
                                       },
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: isDark
-                                            ? MyColors.primary
-                                            : MyColors.secondary,
-                                        foregroundColor: MyColors.textLight,
-                                        elevation: 0,
-                                        shadowColor: Colors.transparent,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            Dimens.radiusLarge,
-                                          ),
-                                        ),
-                                      ),
+                                      style: _cartButtonStyle(isDark),
                                       child: Text(
                                         l10n.add_to_cart,
-                                        style: MyTextStyle.textMatnBtn,
+                                        style: MyTextStyle.textMatnBtn.copyWith(
+                                          color: isDark
+                                              ? MyColors.loginButtonText
+                                              : MyColors.textLight,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -569,7 +608,7 @@ class _DialogCartState extends State<DialogCart> {
                             hasScrollBody: false,
                             child: Align(
                               alignment: Alignment.bottomCenter,
-                              child: _buildCartFooter(),
+                              child: _buildCartFooter(isDark),
                             ),
                           ),
                         ],
@@ -587,7 +626,8 @@ class _DialogCartState extends State<DialogCart> {
                                         SizedBox(height: Dimens.nh(16.0)),
                                         Text(
                                           "اطلاعات خرید مجموعه در حال بارگذاری است",
-                                          style: MyTextStyle.textMatn12W500,
+                                          style: MyTextStyle.textMatn12W500
+                                              .copyWith(color: primaryTextColor),
                                           textAlign: TextAlign.center,
                                         ),
                                         SizedBox(height: Dimens.nh(24.0)),
@@ -628,7 +668,7 @@ class _DialogCartState extends State<DialogCart> {
                                                     Radius.circular(
                                                         Dimens.nr(27.0)),
                                                   ),
-                                                  color: MyColors.background,
+                                                  color: imageFrameColor,
                                                 ),
                                                 child: Image.asset(
                                                   "assets/images/cart/bundle_lesson.png",
@@ -677,60 +717,10 @@ class _DialogCartState extends State<DialogCart> {
                                               Positioned(
                                                 bottom: Dimens.nh(5.0),
                                                 left: Dimens.small,
-                                                child: Container(
-                                                  width: Dimens.nw(104.0),
-                                                  height: Dimens.nh(30.0),
-                                                  decoration: BoxDecoration(
-                                                      borderRadius: BorderRadius
-                                                          .all(Radius.circular(
-                                                              Dimens.nr(20.0))),
-                                                      color:
-                                                          MyColors.background),
-                                                  child: Padding(
-                                                    padding:
-                                                        EdgeInsets.fromLTRB(
-                                                            Dimens.tiny,
-                                                            0,
-                                                            Dimens.nw(2.0),
-                                                            0),
-                                                    child: FittedBox(
-                                                      fit: BoxFit.scaleDown,
-                                                      child: Row(
-                                                        mainAxisSize:
-                                                            MainAxisSize.min,
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .center,
-                                                        children: [
-                                                          Image.asset(
-                                                            "assets/images/star_icon.png",
-                                                            width:
-                                                                Dimens.nw(18.0),
-                                                            height:
-                                                                Dimens.nh(18.0),
-                                                            fit: BoxFit.contain,
-                                                          ),
-                                                          SizedBox(
-                                                              width: Dimens.nw(
-                                                                  2.0)),
-                                                          Text(
-                                                            convertEnToFa(
-                                                                "+50"),
-                                                            style: MyTextStyle
-                                                                .textMatn13PrimaryShade1,
-                                                          ),
-                                                          SizedBox(
-                                                              width: Dimens.nw(
-                                                                  2.0)),
-                                                          Text(
-                                                            l10n.coin_with_buy,
-                                                            style: MyTextStyle
-                                                                .textMatn9,
-                                                          )
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ),
+                                                child: _buildCoinBadge(
+                                                  isDark: isDark,
+                                                  coinAmount: "+50",
+                                                  coinLabel: l10n.coin_with_buy,
                                                 ),
                                               ),
                                             ],
@@ -739,8 +729,11 @@ class _DialogCartState extends State<DialogCart> {
                                             height: Dimens.nh(26.0),
                                           ),
                                           Container(
-                                            decoration: const BoxDecoration(
-                                                color: MyColors.background1),
+                                            decoration: BoxDecoration(
+                                                color: isDark
+                                                    ? MyColors
+                                                        .cartBundleSectionDark
+                                                    : MyColors.background1),
                                             child: Column(
                                               children: [
                                                 SizedBox(
@@ -750,7 +743,10 @@ class _DialogCartState extends State<DialogCart> {
                                                   child: Text(
                                                     _bundleName,
                                                     style: MyTextStyle
-                                                        .textMatn14Bold,
+                                                        .textMatn14Bold
+                                                        .copyWith(
+                                                            color:
+                                                                primaryTextColor),
                                                   ),
                                                 ),
                                                 SizedBox(
@@ -788,7 +784,10 @@ class _DialogCartState extends State<DialogCart> {
                                                   child: Text(
                                                     "کتاب های الکترونیکی",
                                                     style: MyTextStyle
-                                                        .textMatn14Bold,
+                                                        .textMatn14Bold
+                                                        .copyWith(
+                                                            color:
+                                                                primaryTextColor),
                                                   ),
                                                 ),
                                                 SizedBox(
@@ -843,19 +842,28 @@ class _DialogCartState extends State<DialogCart> {
                                                     Text(
                                                       "جمع دروس و کتاب ها",
                                                       style: MyTextStyle
-                                                          .textMatn12W300,
+                                                          .textMatn12W300
+                                                          .copyWith(
+                                                              color:
+                                                                  secondaryTextColor),
                                                     ),
                                                     Row(
                                                       children: [
                                                         Text(
                                                           "${subtotal.toString().addComma} ",
                                                           style: MyTextStyle
-                                                              .textMatn14Bold,
+                                                              .textMatn14Bold
+                                                              .copyWith(
+                                                                  color:
+                                                                      primaryTextColor),
                                                         ),
                                                         Text(
                                                           l10n.toman,
                                                           style: MyTextStyle
-                                                              .textMatn10W300,
+                                                              .textMatn10W300
+                                                              .copyWith(
+                                                                  color:
+                                                                      primaryTextColor),
                                                         )
                                                       ],
                                                     )
@@ -868,8 +876,11 @@ class _DialogCartState extends State<DialogCart> {
                                                   width: Dimens.nw(286.0),
                                                   height: Dimens.nh(42.0),
                                                   decoration: ShapeDecoration(
-                                                    color: MyColors
-                                                        .discountBackground,
+                                                    color: isDark
+                                                        ? MyColors
+                                                            .cartDiscountBackgroundDark
+                                                        : MyColors
+                                                            .discountBackground,
                                                     shape:
                                                         RoundedRectangleBorder(
                                                       borderRadius:
@@ -885,7 +896,10 @@ class _DialogCartState extends State<DialogCart> {
                                                       Text(
                                                         "تخفیف",
                                                         style: MyTextStyle
-                                                            .textMatn12W300,
+                                                            .textMatn12W300
+                                                            .copyWith(
+                                                                color:
+                                                                    secondaryTextColor),
                                                       ),
                                                       Row(
                                                         children: [
@@ -913,7 +927,10 @@ class _DialogCartState extends State<DialogCart> {
                                                               child: Text(
                                                                 "${settings.discountAmount}%",
                                                                 style: MyTextStyle
-                                                                    .textMatn10W300,
+                                                                    .textMatn10W300
+                                                                    .copyWith(
+                                                                        color: MyColors
+                                                                            .textLight),
                                                               ),
                                                             ),
                                                           if (isPercentDiscount)
@@ -926,7 +943,12 @@ class _DialogCartState extends State<DialogCart> {
                                                                 .toString()
                                                                 .addComma,
                                                             style: MyTextStyle
-                                                                .textMatn12W300,
+                                                                .textMatn12W300
+                                                                .copyWith(
+                                                                    color: isDark
+                                                                        ? MyColors
+                                                                            .darkTextAccent
+                                                                        : primaryTextColor),
                                                           ),
                                                           SizedBox(
                                                             width:
@@ -935,7 +957,12 @@ class _DialogCartState extends State<DialogCart> {
                                                           Text(
                                                             l10n.toman,
                                                             style: MyTextStyle
-                                                                .textMatn10W300,
+                                                                .textMatn10W300
+                                                                .copyWith(
+                                                                    color: isDark
+                                                                        ? MyColors
+                                                                            .darkTextAccent
+                                                                        : primaryTextColor),
                                                           ),
                                                         ],
                                                       )
@@ -949,7 +976,10 @@ class _DialogCartState extends State<DialogCart> {
                                                   width: Dimens.nw(286.0),
                                                   height: Dimens.nh(54.0),
                                                   decoration: ShapeDecoration(
-                                                    color: MyColors.background2,
+                                                    color: isDark
+                                                        ? MyColors
+                                                            .cartPayableBackgroundDark
+                                                        : MyColors.background2,
                                                     shape:
                                                         RoundedRectangleBorder(
                                                       side: BorderSide(
@@ -969,7 +999,10 @@ class _DialogCartState extends State<DialogCart> {
                                                       Text(
                                                         "مبلغ قابل پرداخت",
                                                         style: MyTextStyle
-                                                            .textMatn12W300,
+                                                            .textMatn12W300
+                                                            .copyWith(
+                                                                color:
+                                                                    secondaryTextColor),
                                                       ),
                                                       Row(
                                                         children: [
@@ -978,7 +1011,10 @@ class _DialogCartState extends State<DialogCart> {
                                                                 .toString()
                                                                 .addComma,
                                                             style: MyTextStyle
-                                                                .textMatn14Bold,
+                                                                .textMatn14Bold
+                                                                .copyWith(
+                                                                    color:
+                                                                        primaryTextColor),
                                                           ),
                                                           SizedBox(
                                                             width:
@@ -987,7 +1023,10 @@ class _DialogCartState extends State<DialogCart> {
                                                           Text(
                                                             l10n.toman,
                                                             style: MyTextStyle
-                                                                .textMatn10W300,
+                                                                .textMatn10W300
+                                                                .copyWith(
+                                                                    color:
+                                                                        primaryTextColor),
                                                           )
                                                         ],
                                                       )
@@ -1014,24 +1053,16 @@ class _DialogCartState extends State<DialogCart> {
                                                   _bundleName,
                                                 );
                                               },
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor: isDark
-                                                    ? MyColors.primary
-                                                    : MyColors.secondary,
-                                                foregroundColor:
-                                                    MyColors.textLight,
-                                                elevation: 0,
-                                                shadowColor: Colors.transparent,
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                    Dimens.radiusLarge,
-                                                  ),
-                                                ),
-                                              ),
+                                              style: _cartButtonStyle(isDark),
                                               child: Text(
                                                 l10n.add_to_cart,
-                                                style: MyTextStyle.textMatnBtn,
+                                                style:
+                                                    MyTextStyle.textMatnBtn
+                                                        .copyWith(
+                                                  color: isDark
+                                                      ? MyColors.loginButtonText
+                                                      : MyColors.textLight,
+                                                ),
                                               ),
                                             ),
                                           ),
@@ -1047,7 +1078,7 @@ class _DialogCartState extends State<DialogCart> {
                             hasScrollBody: false,
                             child: Align(
                               alignment: Alignment.bottomCenter,
-                              child: _buildCartFooter(),
+                              child: _buildCartFooter(isDark),
                             ),
                           ),
                         ],

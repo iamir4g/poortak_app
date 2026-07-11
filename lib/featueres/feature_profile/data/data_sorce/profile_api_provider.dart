@@ -31,10 +31,10 @@ class ProfileApiProvider {
     return response;
   }
 
-  dynamic callLoginWithOtp(String otp) async {
+  dynamic callLoginWithOtp(String otp, String mobile) async {
     final response = await dio.post(
       "${Constants.baseUrl}auth/otp/login",
-      data: {"otp": otp},
+      data: {"otp": otp, "mobile": mobile},
     );
     return response;
   }
@@ -45,6 +45,13 @@ class ProfileApiProvider {
     final response = await dio.get(
       "${Constants.baseUrl}payments",
       queryParameters: queryParams,
+    );
+    return response;
+  }
+
+  dynamic callGetPaymentById(String paymentId) async {
+    final response = await dio.get(
+      "${Constants.baseUrl}payments/$paymentId",
     );
     return response;
   }

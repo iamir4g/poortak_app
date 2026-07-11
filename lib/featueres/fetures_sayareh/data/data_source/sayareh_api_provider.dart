@@ -83,6 +83,9 @@ class SayarehApiProvider {
     String answer,
     List<String> previousVocabularyIds,
   ) async {
+    log(
+      "submitVocabulary payload: courseId=$courseId, vocabularyId=$vocabularyId, answer=$answer, previousVocabularyIds=$previousVocabularyIds",
+    );
     return _retryRequest(() => dio.post(
           "${Constants.baseUrl}iknow/courses/$courseId/vocabulary/$vocabularyId/submit",
           data: {

@@ -1,8 +1,12 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/common/services/answer_feedback_sound_service.dart';
+import 'package:poortak/common/services/haptic_service.dart';
+import 'package:poortak/common/utils/bidi_text_helper.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_start_bloc/quiz_start_bloc.dart';
@@ -95,15 +99,15 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
       showSecondButton: true,
       barrierDismissible: false,
       onButtonPressed: () {
-        _isExitDialogOpen = false;
         Navigator.of(context, rootNavigator: true).pop();
       },
       onSecondButtonPressed: () {
-        _isExitDialogOpen = false;
         Navigator.of(context, rootNavigator: true).pop();
         _leaveQuiz();
       },
-    );
+    ).whenComplete(() {
+      _isExitDialogOpen = false;
+    });
   }
 
   @override
@@ -114,74 +118,56 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
     final headerBackgroundColor =
         isDark ? MyColors.darkBackgroundSecondary : Colors.white;
     final primaryTextColor =
-        isDark ? MyColors.profileTextPrimaryDark : MyColors.text2;
+        isDark ? MyColors.darkTextPrimary : MyColors.textMatn1;
 
     return PopScope(
       canPop: _canPop,
       onPopInvokedWithResult: (didPop, result) {
         if (didPop) return;
+        if (_isExitDialogOpen) {
+          Navigator.of(context, rootNavigator: true).maybePop();
+          return;
+        }
         _showExitModal();
       },
       child: Scaffold(
       backgroundColor: pageBackgroundColor,
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Custom Header
-            Stack(
-              children: [
-                Container(
-                  width: double.infinity,
-                  height: 80.h,
-                  decoration: BoxDecoration(
-                    color: headerBackgroundColor,
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(33.5.r),
-                      bottomRight: Radius.circular(33.5.r),
-                    ),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color(0x0D000000),
-                        blurRadius: 1,
-                        offset: Offset(0, 1),
-                      ),
-                    ],
-                  ),
-                  child: Padding(
-                    padding:
-                        EdgeInsets.only(top: 24.h, left: 16.w, right: 16.w),
-                    child: Row(
-                      children: [
-                        const Spacer(),
-                        GestureDetector(
-                          onTap: _showExitModal,
-                          child: Container(
-                            width: 34.w,
-                            height: 34.h,
-                            decoration: BoxDecoration(
-                              color: headerBackgroundColor,
-                              borderRadius: BorderRadius.circular(17.r),
-                            ),
-                            child: Icon(
-                              Icons.arrow_forward,
-                              color: primaryTextColor,
-                            ),
-                          ),
-                        ),
-
-                        // Text(
-                        //   widget.title,
-                        //   style: MyTextStyle.textHeader16Bold,
-                        // ),
-                        // const Spacer(flex: 2),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
+      appBar: AppBar(
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        shadowColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(30.r),
+          ),
+        ),
+        flexibleSpace: Container(
+          decoration: MyColors.headerDecoration(
+            backgroundColor: headerBackgroundColor,
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(30.r),
             ),
-            Expanded(
-              child: BlocConsumer<QuizStartBloc, QuizStartState>(
+          ),
+        ),
+        backgroundColor: Colors.transparent,
+        foregroundColor: primaryTextColor,
+        automaticallyImplyLeading: false,
+        actions: [
+          IconButton(
+            onPressed: _showExitModal,
+            icon: Icon(Icons.arrow_forward, color: primaryTextColor),
+          ),
+        ],
+        title: Text(
+          widget.title,
+          style: MyTextStyle.textHeader16Bold.copyWith(
+            color: primaryTextColor,
+          ),
+        ),
+      ),
+      body: SafeArea(
+        child: BlocConsumer<QuizStartBloc, QuizStartState>(
                 listener: (context, state) {
                   if (state is QuizStartError) {
                     if (state.message.contains('Please login') ||
@@ -211,9 +197,14 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                             ),
                           );
                         } else if (answerState is QuizAnswerLoaded) {
-                          // setState(() {
-                          //   selectedAnswerId = null;
-                          // });
+                          unawaited(
+                            AnswerFeedbackSoundService.play(
+                              answerState.isCorrect,
+                            ),
+                          );
+                          if (!answerState.isCorrect) {
+                            unawaited(HapticService.wrongAnswerFeedback());
+                          }
                         }
                       },
                       builder: (context, answerState) {
@@ -225,10 +216,9 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                             children: [
                               SizedBox(height: 32.h),
                               // Question Text
-                              Text(
-                                state.question.data.title,
+                              BidiText(
+                                text: state.question.data.title,
                                 textAlign: TextAlign.center,
-                                textDirection: TextDirection.ltr,
                                 style: MyTextStyle.textHeader16Bold.copyWith(
                                   color: isDark
                                       ? MyColors.profileTextPrimaryDark
@@ -377,8 +367,8 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                                         ),
                                       ],
                                     ),
-                                    child: Text(
-                                      answerState.explanation!,
+                                    child: BidiText(
+                                      text: answerState.explanation!,
                                       style:
                                           MyTextStyle.textMatn12W500.copyWith(
                                         color: isDark
@@ -573,9 +563,6 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                   return const SizedBox();
                 },
               ),
-            ),
-          ],
-        ),
       ),
     ),
     );

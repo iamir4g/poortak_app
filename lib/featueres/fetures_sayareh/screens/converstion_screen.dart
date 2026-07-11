@@ -72,6 +72,94 @@ class _ConversationScreenState extends State<ConversationScreen> {
   final ScrollController _scrollController = ScrollController();
   // مپ برای ذخیره GlobalKey هر آیتم جهت اسکرول دقیق
   final Map<int, GlobalKey> _itemKeys = {};
+  // کلیدهای جملات هر پیام برای اسکرول دقیق
+  final Map<int, Map<int, GlobalKey>> _messageSentenceKeys = {};
+  int _lastScrolledMessageIndex = -1;
+  int _lastScrolledSentenceIndex = -1;
+  static const double _estimatedMessageItemHeight = 92;
+
+  Map<int, GlobalKey> _getSentenceKeysForMessage(
+    int messageIndex,
+    int sentenceCount,
+  ) {
+    _messageSentenceKeys[messageIndex] ??= {};
+    final keys = _messageSentenceKeys[messageIndex]!;
+    for (var i = 0; i < sentenceCount; i++) {
+      keys[i] ??= GlobalKey();
+    }
+    return keys;
+  }
+
+  void _resetScrollTracking() {
+    _lastScrolledMessageIndex = -1;
+    _lastScrolledSentenceIndex = -1;
+  }
+
+  void _scrollToCurrentSentence(
+    int messageIndex,
+    int sentenceIndex, {
+    bool force = false,
+  }) {
+    if (!force &&
+        messageIndex == _lastScrolledMessageIndex &&
+        sentenceIndex == _lastScrolledSentenceIndex) {
+      return;
+    }
+
+    _lastScrolledMessageIndex = messageIndex;
+    _lastScrolledSentenceIndex = sentenceIndex;
+    _ensureSentenceVisible(messageIndex, sentenceIndex);
+  }
+
+  void _ensureSentenceVisible(
+    int messageIndex,
+    int sentenceIndex, {
+    int attemptsLeft = 10,
+    bool animate = true,
+  }) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      if (!_scrollController.hasClients) {
+        if (attemptsLeft > 0) {
+          _ensureSentenceVisible(
+            messageIndex,
+            sentenceIndex,
+            attemptsLeft: attemptsLeft - 1,
+            animate: animate,
+          );
+        }
+        return;
+      }
+
+      final key = _messageSentenceKeys[messageIndex]?[sentenceIndex];
+      if (key?.currentContext != null) {
+        Scrollable.ensureVisible(
+          key!.currentContext!,
+          duration: animate ? const Duration(milliseconds: 600) : Duration.zero,
+          curve: Curves.easeInOut,
+          alignment: 0.5,
+        );
+        return;
+      }
+
+      if (attemptsLeft <= 0) return;
+
+      final maxOffset = _scrollController.position.maxScrollExtent;
+      final targetOffset =
+          (messageIndex * _estimatedMessageItemHeight).clamp(0.0, maxOffset);
+      if (_scrollController.offset != targetOffset) {
+        _scrollController.jumpTo(targetOffset);
+      }
+
+      _ensureSentenceVisible(
+        messageIndex,
+        sentenceIndex,
+        attemptsLeft: attemptsLeft - 1,
+        animate: animate,
+      );
+    });
+  }
 
   @override
   void dispose() {
@@ -129,7 +217,14 @@ class _ConversationScreenState extends State<ConversationScreen> {
     // شروع پخش
     _playbackSessionId++;
     final int mySessionId = _playbackSessionId;
+    _resetScrollTracking();
     isPlayingNotifier.value = true;
+
+    _scrollToCurrentSentence(
+      currentPlayingIndexNotifier.value,
+      currentSentenceIndexNotifier.value,
+      force: true,
+    );
 
     // اگر مکالمه قبلاً تمام شده بود، از اول شروع کن
     if (currentPlayingIndexNotifier.value >= messages.length) {
@@ -173,33 +268,13 @@ class _ConversationScreenState extends State<ConversationScreen> {
             _messagesPlayedSinceLastSave = 0;
           }
 
-          // پخش جمله با صدای مناسب
+          // پخش جمله با صدای متناسب آواتار (ربات=آقا، مایا=خانم)
           try {
-            if (message.voice == 'male') {
-              await ttsService.stop();
-              await ttsService.setMaleVoice();
-              await Future.delayed(const Duration(milliseconds: 100));
-              if (!isPlayingNotifier.value ||
-                  _playbackSessionId != mySessionId) {
-                break;
-              }
-              await ttsService.speak(sentence);
-            } else if (message.voice == 'female') {
-              await ttsService.stop();
-              await ttsService.setFemaleVoice();
-              await Future.delayed(const Duration(milliseconds: 100));
-              if (!isPlayingNotifier.value ||
-                  _playbackSessionId != mySessionId) {
-                break;
-              }
-              await ttsService.speak(sentence);
-            } else {
-              if (!isPlayingNotifier.value ||
-                  _playbackSessionId != mySessionId) {
-                break;
-              }
-              await ttsService.speak(sentence, voice: message.voice);
+            if (!isPlayingNotifier.value ||
+                _playbackSessionId != mySessionId) {
+              break;
             }
+            await _speakWithAvatarVoice(sentence, message);
           } catch (e) {
             debugPrint("Error during sentence playback: $e");
           }
@@ -240,10 +315,22 @@ class _ConversationScreenState extends State<ConversationScreen> {
     }
   }
 
+  /// پخش متن با صدای متناسب آواتار پیام
+  Future<void> _speakWithAvatarVoice(String text, Datum message) async {
+    await ttsService.stop();
+    if (message.isMaleSpeaker) {
+      await ttsService.setMaleVoice();
+    } else {
+      await ttsService.setFemaleVoice();
+    }
+    await Future.delayed(const Duration(milliseconds: 100));
+    await ttsService.speak(text);
+  }
+
   /// پخش یک متن با صدای مشخص شده
   /// این متد زمانی که کاربر روی یک پیام کلیک می‌کند فراخوانی می‌شود
   Future<void> speakText(
-      String text, String voice, String conversationId) async {
+      String text, Datum message, String conversationId) async {
     // اگر در حال پخش خودکار هستیم، آن را متوقف کن
     if (isPlayingNotifier.value) {
       isPlayingNotifier.value = false;
@@ -252,22 +339,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
     // ذخیره وضعیت پخش به عنوان آخرین متن پخش شده
     _savePlayback(conversationId);
 
-    if (voice == 'male') {
-      // استفاده مستقیم از صدای مردانه انتخابی
-      await ttsService.stop();
-      await ttsService.setMaleVoice();
-      await Future.delayed(const Duration(milliseconds: 100));
-      await ttsService.speak(text);
-    } else if (voice == 'female') {
-      // استفاده از صدای زنانه
-      await ttsService.stop();
-      await ttsService.setFemaleVoice();
-      await Future.delayed(const Duration(milliseconds: 100));
-      await ttsService.speak(text);
-    } else {
-      // استفاده از متد عادی
-      await ttsService.speak(text, voice: voice);
-    }
+    await _speakWithAvatarVoice(text, message);
   }
 
   /// رفتن به جمله بعدی
@@ -291,6 +363,12 @@ class _ConversationScreenState extends State<ConversationScreen> {
       currentPlayingIndexNotifier.value++;
       currentSentenceIndexNotifier.value = 0;
     }
+
+    _scrollToCurrentSentence(
+      currentPlayingIndexNotifier.value,
+      currentSentenceIndexNotifier.value,
+      force: true,
+    );
 
     if (wasPlaying) {
       playAllConversations(sortedMessages!);
@@ -319,6 +397,12 @@ class _ConversationScreenState extends State<ConversationScreen> {
       currentSentenceIndexNotifier.value = prevSentences.length - 1;
     }
 
+    _scrollToCurrentSentence(
+      currentPlayingIndexNotifier.value,
+      currentSentenceIndexNotifier.value,
+      force: true,
+    );
+
     if (wasPlaying) {
       playAllConversations(sortedMessages!);
     }
@@ -344,12 +428,24 @@ class _ConversationScreenState extends State<ConversationScreen> {
         backgroundColor: pageBackgroundColor,
         // نوار بالای صفحه با عنوان "مکالمه"
         appBar: AppBar(
+          elevation: 0,
+          scrolledUnderElevation: 0,
+          shadowColor: Colors.transparent,
+          surfaceTintColor: Colors.transparent,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
               bottomLeft: Radius.circular(30.r),
             ),
           ),
-          backgroundColor: headerBackgroundColor,
+          flexibleSpace: Container(
+            decoration: MyColors.headerDecoration(
+              backgroundColor: headerBackgroundColor,
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(30.r),
+              ),
+            ),
+          ),
+          backgroundColor: Colors.transparent,
           foregroundColor: primaryTextColor,
           automaticallyImplyLeading: false,
           actions: [
@@ -367,103 +463,135 @@ class _ConversationScreenState extends State<ConversationScreen> {
         ),
         // نوار پایین صفحه شامل دکمه‌های پخش و نمایش ترجمه
         bottomNavigationBar: Container(
-          // decoration: BoxDecoration(
-          //   color: bottomBarColor,
-          // ),
           child: SafeArea(
             child: SizedBox(
               height: 94.h,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+              child: Stack(
+                alignment: Alignment.center,
                 children: [
-                  // دکمه نمایش/مخفی کردن ترجمه
-                  ValueListenableBuilder<bool>(
-                    valueListenable: showTranslationsNotifier,
-                    builder: (context, showTranslations, _) {
-                      return IconButton(
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
                         onPressed: () {
-                          showTranslationsNotifier.value =
-                              !showTranslationsNotifier.value;
+                          _playNext();
                         },
-                        icon: Icon(
-                          Icons.translate,
-                          color: showTranslations
-                              ? MyColors.secondary
+                        icon: SvgPicture.asset(
+                          'assets/images/icons/ri--skip-right-fill.svg',
+                          width: 30.r,
+                          height: 30.r,
+                          colorFilter: ColorFilter.mode(
+                            iconColor,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: Dimens.medium),
+                      // دکمه پخش/توقف تمام مکالمه
+                      ValueListenableBuilder<bool>(
+                        valueListenable: isPlayingNotifier,
+                        builder: (context, isPlaying, _) {
+                          final bgColor = isPlaying
+                              ? MyColors.primary
                               : (isDark
-                                  ? MyColors.loginTextSecondaryDark
-                                  : MyColors.textSecondary),
-                        ),
-                      );
-                    },
-                  ),
-                  // SizedBox(width: Dimens.medium),
-                  IconButton(
-                      onPressed: () {
-                        _playNext();
-                      },
-                      icon: SvgPicture.asset(
-                        'assets/images/icons/ri--skip-right-fill.svg',
-                        width: 30.r,
-                        height: 30.r,
-                        colorFilter: ColorFilter.mode(
-                          iconColor,
-                          BlendMode.srcIn,
-                        ),
-                      )),
-                  SizedBox(width: Dimens.medium),
-                  // دکمه پخش/توقف تمام مکالمه
-                  ValueListenableBuilder<bool>(
-                    valueListenable: isPlayingNotifier,
-                    builder: (context, isPlaying, _) {
-                      final bgColor = isPlaying
-                          ? MyColors.primary
-                          : (isDark
-                              ? MyColors.conversationPlayPauseDarkPaused
-                              : MyColors.gray);
-                      final icon = isPlaying ? Icons.pause : Icons.play_arrow;
-                      final iconFg = isPlaying
-                          ? Colors.white
-                          : (isDark ? Colors.white : MyColors.text2);
+                                  ? MyColors.conversationPlayPauseDarkPaused
+                                  : MyColors.gray);
+                          final icon =
+                              isPlaying ? Icons.pause : Icons.play_arrow;
+                          final iconFg = isPlaying
+                              ? Colors.white
+                              : (isDark ? Colors.white : MyColors.text2);
 
-                      return SizedBox(
-                        width: 60.r,
-                        height: 60.r,
-                        child: Material(
-                          color: bgColor,
-                          shape: const CircleBorder(),
+                          return SizedBox(
+                            width: 60.r,
+                            height: 60.r,
+                            child: Material(
+                              color: bgColor,
+                              shape: const CircleBorder(),
+                              child: InkWell(
+                                customBorder: const CircleBorder(),
+                                onTap: () {
+                                  if (sortedMessages != null) {
+                                    playAllConversations(sortedMessages!);
+                                  }
+                                },
+                                child: Center(
+                                  child: Icon(
+                                    icon,
+                                    size: 34.r,
+                                    color: iconFg,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      SizedBox(width: Dimens.medium),
+                      IconButton(
+                        onPressed: () {
+                          _playPrevious();
+                        },
+                        icon: SvgPicture.asset(
+                          'assets/images/icons/ri--skip-left-fill.svg',
+                          width: 30.r,
+                          height: 30.r,
+                          colorFilter: ColorFilter.mode(
+                            iconColor,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  // دکمه نمایش/مخفی کردن ترجمه
+                  PositionedDirectional(
+                    start: Dimens.xLarge,
+                    child: ValueListenableBuilder<bool>(
+                      valueListenable: showTranslationsNotifier,
+                      builder: (context, showTranslations, _) {
+                        final labelColor = showTranslations
+                            ? MyColors.secondary
+                            : (isDark
+                                ? MyColors.loginTextSecondaryDark
+                                : MyColors.textSecondary);
+
+                        return Material(
+                          color: Colors.transparent,
                           child: InkWell(
-                            customBorder: const CircleBorder(),
                             onTap: () {
-                              if (sortedMessages != null) {
-                                playAllConversations(sortedMessages!);
-                              }
+                              showTranslationsNotifier.value =
+                                  !showTranslationsNotifier.value;
                             },
-                            child: Center(
-                              child: Icon(
-                                icon,
-                                size: 34.r,
-                                color: iconFg,
+                            borderRadius: BorderRadius.circular(8.r),
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: Dimens.small,
+                                vertical: 4.h,
+                              ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.translate,
+                                    size: 22.r,
+                                    color: labelColor,
+                                  ),
+                                  SizedBox(height: 2.h),
+                                  Text(
+                                    'ترجمه',
+                                    style: MyTextStyle.textMatn10W300.copyWith(
+                                      color: labelColor,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
-                        ),
-                      );
-                    },
-                  ),
-                  SizedBox(width: Dimens.medium),
-                  IconButton(
-                      onPressed: () {
-                        _playPrevious();
+                        );
                       },
-                      icon: SvgPicture.asset(
-                        'assets/images/icons/ri--skip-left-fill.svg',
-                        width: 30.r,
-                        height: 30.r,
-                        colorFilter: ColorFilter.mode(
-                          iconColor,
-                          BlendMode.srcIn,
-                        ),
-                      )),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -485,6 +613,14 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
                 if (index != -1) {
                   currentPlayingIndexNotifier.value = index;
+                  _resetScrollTracking();
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    _scrollToCurrentSentence(
+                      index,
+                      currentSentenceIndexNotifier.value,
+                      force: true,
+                    );
+                  });
                 }
               }
             },
@@ -533,72 +669,61 @@ class _ConversationScreenState extends State<ConversationScreen> {
   /// ساخت لیست مکالمه با استفاده از ListView.builder
   /// این متد پیام‌های مرتب شده را به صورت اسکرول‌پذیر نمایش می‌دهد
   Widget _buildConversationList(BuildContext context, ConversationModel data) {
-    // اسکرول به آخرین پیام پخش شده پس از رندر شدن لیست
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (currentPlayingIndexNotifier.value > 0 &&
-          _scrollController.hasClients) {
-        final key = _itemKeys[currentPlayingIndexNotifier.value];
-        if (key?.currentContext != null) {
-          Scrollable.ensureVisible(
-            key!.currentContext!,
-            duration: const Duration(milliseconds: 500),
-            curve: Curves.easeInOut,
-            alignment: 0.5, // قرار دادن در وسط صفحه
-          );
-        }
-      }
-    });
-
     return ValueListenableBuilder<bool>(
       valueListenable: showTranslationsNotifier,
       builder: (context, showTranslations, _) {
-        return ValueListenableBuilder<int>(
-          valueListenable: currentPlayingIndexNotifier,
-          builder: (context, currentPlayingIndex, _) {
+        return ValueListenableBuilder<bool>(
+          valueListenable: isPlayingNotifier,
+          builder: (context, isPlaybackActive, _) {
             return ValueListenableBuilder<int>(
-              valueListenable: currentSentenceIndexNotifier,
-              builder: (context, currentSentenceIndex, _) {
-                // اضافه کردن اسکرول خودکار هنگام تغییر ایندکس
-                if (_scrollController.hasClients) {
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    final key = _itemKeys[currentPlayingIndex];
-                    if (key?.currentContext != null) {
-                      Scrollable.ensureVisible(
-                        key!.currentContext!,
-                        duration: const Duration(milliseconds: 600),
-                        curve: Curves.easeInOut,
-                        alignment: 0.5, // قرار دادن در وسط صفحه
+              valueListenable: currentPlayingIndexNotifier,
+              builder: (context, currentPlayingIndex, _) {
+                return ValueListenableBuilder<int>(
+                  valueListenable: currentSentenceIndexNotifier,
+                  builder: (context, currentSentenceIndex, _) {
+                    if (isPlaybackActive) {
+                      _scrollToCurrentSentence(
+                        currentPlayingIndex,
+                        currentSentenceIndex,
                       );
                     }
-                  });
-                }
 
-                return ListView.builder(
-                  controller: _scrollController,
-                  // padding: EdgeInsets.all(2.r),
-                  itemCount: sortedMessages?.length ?? 0,
-                  itemBuilder: (context, index) {
-                    final message = sortedMessages![index];
+                    return ListView.builder(
+                      controller: _scrollController,
+                      itemCount: sortedMessages?.length ?? 0,
+                      itemBuilder: (context, index) {
+                        final message = sortedMessages![index];
+                        final sentenceCount =
+                            _splitIntoSentences(message.text).length;
+                        final sentenceKeys = _getSentenceKeysForMessage(
+                          index,
+                          sentenceCount,
+                        );
 
-                    // ایجاد یا دریافت کلید برای این ایندکس
-                    _itemKeys[index] ??= GlobalKey();
+                        _itemKeys[index] ??= GlobalKey();
 
-                    // بررسی اینکه آیا این پیام در حال پخش است
-                    final isCurrentPlaying = sortedMessages != null &&
-                        currentPlayingIndex < sortedMessages!.length &&
-                        sortedMessages![currentPlayingIndex].id == message.id;
+                        final isCurrentPlaying = sortedMessages != null &&
+                            currentPlayingIndex < sortedMessages!.length &&
+                            sortedMessages![currentPlayingIndex].id ==
+                                message.id;
 
-                    // استفاده از widget جداگانه برای نمایش هر حباب پیام
-                    return ConversationMessageBubble(
-                      key: _itemKeys[index],
-                      message: message,
-                      isCurrentPlaying: isCurrentPlaying,
-                      currentSentenceIndex:
-                          isCurrentPlaying ? currentSentenceIndex : 0,
-                      showTranslations: showTranslations,
-                      onTap: () {
-                        // پخش صوتی پیام هنگام لمس
-                        speakText(message.text, message.voice, message.id);
+                        return ConversationMessageBubble(
+                          key: _itemKeys[index],
+                          message: message,
+                          isCurrentPlaying: isCurrentPlaying,
+                          isPlaybackActive: isPlaybackActive,
+                          currentSentenceIndex:
+                              isCurrentPlaying ? currentSentenceIndex : 0,
+                          sentenceKeys: sentenceKeys,
+                          showTranslations: showTranslations,
+                          onTap: () {
+                            speakText(
+                              message.text,
+                              message,
+                              message.id,
+                            );
+                          },
+                        );
                       },
                     );
                   },

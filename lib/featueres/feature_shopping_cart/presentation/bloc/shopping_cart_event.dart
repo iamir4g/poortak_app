@@ -22,6 +22,8 @@ class UpdateQuantityEvent extends ShoppingCartEvent {
 
 class ClearCartEvent extends ShoppingCartEvent {}
 
+class ClearCartAfterPaymentEvent extends ShoppingCartEvent {}
+
 // Local Cart Events
 class AddToLocalCartEvent extends ShoppingCartEvent {
   final String type;

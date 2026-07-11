@@ -5,34 +5,97 @@ import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
+import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
 import 'package:poortak/locator.dart';
-import 'package:poortak/common/utils/prefs_operator.dart';
+import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/iknow_access_bloc/iknow_access_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/single_book_bloc/single_book_cubit.dart';
+import 'package:poortak/featueres/fetures_sayareh/utils/book_pdf_playback_resolver.dart';
 import 'package:poortak/common/widgets/dot_loading_widget.dart';
 
-class PdfReaderScreen extends StatelessWidget {
+class PdfReaderScreen extends StatefulWidget {
   static const routeName = "/pdf_reader_screen";
 
   const PdfReaderScreen({super.key});
 
   @override
+  State<PdfReaderScreen> createState() => _PdfReaderScreenState();
+}
+
+class _PdfReaderScreenState extends State<PdfReaderScreen> {
+  bool _isDark(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark;
+
+  Color _appBarBackground(BuildContext context) => _isDark(context)
+      ? MyColors.darkBackgroundSecondary
+      : Theme.of(context).colorScheme.inversePrimary;
+
+  Color _primaryTextColor(BuildContext context) => _isDark(context)
+      ? MyColors.darkTextPrimary
+      : MyColors.textMatn1;
+
+  BoxDecoration _screenDecoration(BuildContext context) => BoxDecoration(
+        gradient: _isDark(context)
+            ? MyColors.sayarehScreenGradientDark
+            : MyColors.sayarehScreenGradientLight,
+      );
+
+  PreferredSizeWidget _buildAppBar(
+    BuildContext context, {
+    required String title,
+    bool showBack = true,
+  }) {
+    final primaryTextColor = _primaryTextColor(context);
+    return AppBar(
+      title: Text(
+        title,
+        style: MyTextStyle.textMatn14BoldFor(context),
+      ),
+      automaticallyImplyLeading: false,
+      backgroundColor: _appBarBackground(context),
+      foregroundColor: primaryTextColor,
+      iconTheme: IconThemeData(color: primaryTextColor),
+      actions: [
+        if (showBack)
+          IconButton(
+            icon: Icon(Icons.arrow_forward, color: primaryTextColor),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildScreenBody(BuildContext context, {required Widget child}) {
+    return Container(
+      decoration: _screenDecoration(context),
+      child: SafeArea(child: child),
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    locator<IknowAccessBloc>().add(FetchIknowAccessEvent(forceRefresh: true));
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final args =
         ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
     final bookId = args?['bookId'] as String?;
+    final isTrialRead = args?['isTrialRead'] as bool? ?? false;
 
     if (bookId == null) {
       return Scaffold(
-        appBar: AppBar(
-          title: Text('خطا', style: MyTextStyle.textMatn14Bold),
-          backgroundColor: isDark
-              ? MyColors.darkBackgroundSecondary
-              : Theme.of(context).colorScheme.inversePrimary,
-        ),
-        body: const Center(
-          child: Text('شناسه کتاب یافت نشد'),
+        backgroundColor: _isDark(context)
+            ? MyColors.profileBackgroundDark
+            : MyColors.background,
+        appBar: _buildAppBar(context, title: 'خطا'),
+        body: Center(
+          child: Text(
+            'شناسه کتاب یافت نشد',
+            style: MyTextStyle.body16For(context),
+          ),
         ),
       );
     }
@@ -50,252 +113,179 @@ class PdfReaderScreen extends StatelessWidget {
           create: (context) => ShoppingCartBloc(repository: locator()),
         ),
       ],
-      child: BlocBuilder<SingleBookCubit, SingleBookState>(
-        buildWhen: (previous, current) {
-          if (previous.singleBookDataStatus == current.singleBookDataStatus) {
-            return false;
-          }
-          return true;
-        },
-        builder: (context, state) {
-          /// loading
-          if (state.singleBookDataStatus is SingleBookDataLoading) {
-            return Scaffold(
-              appBar: AppBar(
-                title: Text('در حال بارگذاری...',
-                    style: MyTextStyle.textMatn14Bold),
-                backgroundColor: isDark
-                    ? MyColors.darkBackgroundSecondary
-                    : Theme.of(context).colorScheme.inversePrimary,
-                leading: IconButton(
-                  icon: const Icon(Icons.arrow_back),
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
-              ),
-              body: SafeArea(
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: isDark
-                        ? const LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Color(0xFF171926),
-                              MyColors.darkBackground,
-                              Color(0xFF171926),
-                            ],
-                            stops: [0.1, 0.54, 1.0],
-                          )
-                        : const LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Color(0xFFE8F0FC),
-                              Color(0xFFFCEBF1),
-                              Color(0xFFEFE8FC),
-                            ],
-                            stops: [0.1, 0.54, 1.0],
-                          ),
-                  ),
-                  child: Center(child: DotLoadingWidget(size: Dimens.nr(100))),
-                ),
-              ),
-            );
-          }
-
-          /// completed
-          if (state.singleBookDataStatus is SingleBookDataCompleted) {
-            final SingleBookDataCompleted bookDataCompleted =
-                state.singleBookDataStatus as SingleBookDataCompleted;
-            final bookData = bookDataCompleted.data.data;
-
-            return _buildPdfReaderContent(context, bookData);
-          }
-
-          /// error
-          if (state.singleBookDataStatus is SingleBookDataError) {
-            final SingleBookDataError bookDataError =
-                state.singleBookDataStatus as SingleBookDataError;
-
-            return Scaffold(
-              appBar: AppBar(
-                title: Text('خطا', style: MyTextStyle.textMatn14Bold),
-                backgroundColor: isDark
-                    ? MyColors.darkBackgroundSecondary
-                    : Theme.of(context).colorScheme.inversePrimary,
-                leading: IconButton(
-                  icon: const Icon(Icons.arrow_back),
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
-              ),
-              body: SafeArea(
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: isDark
-                        ? const LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Color(0xFF171926),
-                              MyColors.darkBackground,
-                              Color(0xFF171926),
-                            ],
-                            stops: [0.1, 0.54, 1.0],
-                          )
-                        : const LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Color(0xFFE8F0FC),
-                              Color(0xFFFCEBF1),
-                              Color(0xFFEFE8FC),
-                            ],
-                            stops: [0.1, 0.54, 1.0],
-                          ),
-                  ),
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          bookDataError.errorMessage,
-                          style: TextStyle(
-                            color:
-                                Theme.of(context).textTheme.titleMedium?.color,
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.amber.shade800),
-                          onPressed: () {
-                            /// call data again
-                            BlocProvider.of<SingleBookCubit>(context)
-                                .fetchBookById(bookId);
-                          },
-                          child: const Text("تلاش دوباره"),
-                        )
-                      ],
+      child: BlocBuilder<IknowAccessBloc, IknowAccessState>(
+        bloc: locator<IknowAccessBloc>(),
+        builder: (context, accessState) {
+          return BlocBuilder<SingleBookCubit, SingleBookState>(
+            builder: (context, state) {
+              /// loading
+              if (state.singleBookDataStatus is SingleBookDataLoading) {
+                return Scaffold(
+                  backgroundColor: _isDark(context)
+                      ? MyColors.profileBackgroundDark
+                      : null,
+                  appBar: _buildAppBar(context, title: 'در حال بارگذاری...'),
+                  body: _buildScreenBody(
+                    context,
+                    child: Center(
+                      child: DotLoadingWidget(size: Dimens.nr(100)),
                     ),
                   ),
-                ),
-              ),
-            );
-          }
+                );
+              }
 
-          return Container();
+              /// completed
+              if (state.singleBookDataStatus is SingleBookDataCompleted) {
+                if (accessState is IknowAccessLoading) {
+                  return Scaffold(
+                    backgroundColor: _isDark(context)
+                        ? MyColors.profileBackgroundDark
+                        : null,
+                    appBar:
+                        _buildAppBar(context, title: 'در حال بارگذاری...'),
+                    body: _buildScreenBody(
+                      context,
+                      child: Center(
+                        child: DotLoadingWidget(size: Dimens.nr(100)),
+                      ),
+                    ),
+                  );
+                }
+
+                final SingleBookDataCompleted bookDataCompleted =
+                    state.singleBookDataStatus as SingleBookDataCompleted;
+                final bookData = bookDataCompleted.data.data;
+
+                return _buildPdfReaderContent(
+                  context,
+                  bookData,
+                  isTrialRead: isTrialRead,
+                );
+              }
+
+              /// error
+              if (state.singleBookDataStatus is SingleBookDataError) {
+                final SingleBookDataError bookDataError =
+                    state.singleBookDataStatus as SingleBookDataError;
+
+                return Scaffold(
+                  backgroundColor: _isDark(context)
+                      ? MyColors.profileBackgroundDark
+                      : null,
+                  appBar: _buildAppBar(context, title: 'خطا'),
+                  body: _buildScreenBody(
+                    context,
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            bookDataError.errorMessage,
+                            style: MyTextStyle.body16For(context),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 10),
+                          ElevatedButton(
+                            onPressed: () {
+                              BlocProvider.of<SingleBookCubit>(context)
+                                  .fetchBookById(bookId);
+                            },
+                            child: const Text('تلاش دوباره'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              }
+
+              return const SizedBox.shrink();
+            },
+          );
         },
       ),
     );
   }
 
-  Widget _buildPdfReaderContent(BuildContext context, dynamic bookData) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    // Determine which file to download based on login and purchase status
-    String? fileToDownload;
-    bool usePublicUrl = false;
+  Widget _buildPdfReaderContent(
+    BuildContext context,
+    dynamic bookData, {
+    required bool isTrialRead,
+  }) {
+    final isDark = _isDark(context);
+    final isLoggedIn = locator<PrefsOperator>().isLoggedIn();
+    final hasBookAccess = isLoggedIn &&
+        locator<IknowAccessBloc>().hasBookAccess(bookData.id);
+    final canDecrypt = isLoggedIn &&
+        BookPdfPlaybackResolver.canDecryptFullBook(
+          hasBookAccess: hasBookAccess,
+          purchasedFromApi: bookData.purchased ?? false,
+          isDemo: bookData.isDemo ?? false,
+        );
+    final effectiveTrialRead = isTrialRead || !canDecrypt;
 
-    // Check if user is logged in
-    final prefsOperator = locator<PrefsOperator>();
-    final isLoggedIn = prefsOperator.isLoggedIn();
+    final playbackTarget = BookPdfPlaybackResolver.resolve(
+      book: bookData,
+      forceTrial: effectiveTrialRead,
+      hasBookAccess: hasBookAccess,
+    );
 
-    if (isLoggedIn) {
-      // User is logged in
-      debugPrint(
-          "User is logged in. purchased: ${bookData.purchased}, file: ${bookData.file}, trialFile: ${bookData.trialFile}");
-      if (bookData.purchased == true &&
-          bookData.file != null &&
-          bookData.file.toString().trim().isNotEmpty) {
-        // User has purchased the book, use the full file
-        fileToDownload = bookData.file;
-        usePublicUrl = false;
-        debugPrint(
-            "Using purchased file: $fileToDownload with authenticated URL");
-      } else if (bookData.trialFile != null &&
-          bookData.trialFile.toString().trim().isNotEmpty) {
-        // User hasn't purchased or file is not available, use trial file with public URL
-        fileToDownload = bookData.trialFile;
-        usePublicUrl = true;
-        debugPrint("Using trial file: $fileToDownload with public URL");
-      }
-    } else {
-      // User is not logged in, always use trial file with public URL
-      debugPrint("User is not logged in. trialFile: ${bookData.trialFile}");
-      if (bookData.trialFile != null &&
-          bookData.trialFile.toString().trim().isNotEmpty) {
-        fileToDownload = bookData.trialFile;
-        usePublicUrl = true;
-        debugPrint("Using trial file: $fileToDownload with public URL");
-      } else {
-        debugPrint("Trial file is not available for non-logged in user");
-      }
+    if (playbackTarget == null) {
+      return Scaffold(
+        backgroundColor:
+            isDark ? MyColors.profileBackgroundDark : MyColors.background,
+        appBar: _buildAppBar(context, title: bookData.title),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.error_outline,
+                size: 64,
+                color: isDark ? MyColors.darkError : MyColors.error,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'فایل کتاب در دسترس نیست',
+                style: MyTextStyle.body16For(context).copyWith(
+                  color: isDark ? MyColors.darkError : MyColors.error,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
     }
 
+    debugPrint(
+      playbackTarget.usePublicUrl
+          ? "Using trial file: ${playbackTarget.publicStorageKey} with public URL (no decryption)"
+          : "Using full book download for bookId: ${playbackTarget.bookId}, decrypt with fileId: ${playbackTarget.decryptionFileId}",
+    );
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          bookData.title,
-          style: MyTextStyle.textMatn14Bold,
-        ),
-        automaticallyImplyLeading: false,
-        backgroundColor: isDark
-            ? MyColors.darkBackgroundSecondary
-            : Theme.of(context).colorScheme.inversePrimary,
-        actions: [
-          IconButton(
-            icon: Icon(
-              Icons.arrow_forward,
-              color: isDark ? MyColors.darkTextPrimary : null,
-            ),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-        ],
-        // leading: IconButton(
-        //   icon: const Icon(Icons.arrow_back),
-        //   onPressed: () => Navigator.of(context).pop(),
-        // ),
-      ),
+      backgroundColor:
+          isDark ? MyColors.profileBackgroundDark : MyColors.background,
+      appBar: _buildAppBar(context, title: bookData.title),
       body: Container(
-        decoration: BoxDecoration(
-          gradient: isDark
-              ? const LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Color(0xFF171926),
-                    MyColors.darkBackground,
-                    Color(0xFF171926),
-                  ],
-                  stops: [0.1, 0.54, 1.0],
-                )
-              : const LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Color(0xFFE8F0FC),
-                    Color(0xFFFCEBF1),
-                    Color(0xFFEFE8FC),
-                  ],
-                  stops: [0.1, 0.54, 1.0],
-                ),
-        ),
+        decoration: _screenDecoration(context),
         child: SafeArea(
           child: Padding(
             padding: EdgeInsets.all(Dimens.nw(6)),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // PDF Reader
                 Expanded(
                   child: Container(
                     decoration: BoxDecoration(
-                      color:
-                          isDark ? MyColors.darkCardBackground : Colors.white,
+                      color: isDark
+                          ? MyColors.darkCardBackground
+                          : Colors.white,
                       borderRadius: BorderRadius.circular(Dimens.nr(16)),
                       boxShadow: [
                         BoxShadow(
                           color: (isDark ? Colors.black : Colors.grey)
-                              .withValues(alpha: isDark ? 0.25 : 0.1),
+                              .withValues(alpha: isDark ? 0.35 : 0.1),
                           spreadRadius: 1,
                           blurRadius: 10,
                           offset: const Offset(0, 4),
@@ -304,36 +294,17 @@ class PdfReaderScreen extends StatelessWidget {
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(Dimens.nr(16)),
-                      child: fileToDownload != null && fileToDownload.isNotEmpty
-                          ? CustomPdfReader(
-                              fileKey: fileToDownload,
-                              fileName: '${bookData.title}.pdf',
-                              fileId: 'book_${bookData.id}',
-                              storageService: locator<StorageService>(),
-                              showDownloadButton: false,
-                              autoDownload: true,
-                              usePublicUrl: usePublicUrl,
-                            )
-                          : const Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.error_outline,
-                                    size: 64,
-                                    color: Colors.red,
-                                  ),
-                                  SizedBox(height: 16),
-                                  Text(
-                                    'فایل کتاب در دسترس نیست',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.red,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
+                      child: CustomPdfReader(
+                        fileKey: playbackTarget.publicStorageKey,
+                        decryptionFileId: playbackTarget.decryptionFileId,
+                        fileName: '${bookData.title}.pdf',
+                        fileId: playbackTarget.cacheFileId,
+                        bookId: playbackTarget.bookId,
+                        storageService: locator<StorageService>(),
+                        showDownloadButton: false,
+                        autoDownload: true,
+                        usePublicUrl: playbackTarget.usePublicUrl,
+                      ),
                     ),
                   ),
                 ),

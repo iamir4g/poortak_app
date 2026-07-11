@@ -40,6 +40,7 @@ import 'package:poortak/featueres/feature_kavoosh/repositories/kavoosh_repositor
 import 'package:poortak/featueres/feature_kavoosh/presentation/bloc/categories_bloc/categories_bloc.dart';
 import 'package:poortak/common/bloc/connectivity_cubit/connectivity_cubit.dart';
 import 'package:poortak/common/bloc/video_download_cubit/video_download_cubit.dart';
+import 'package:poortak/common/services/payment_deep_link_service.dart';
 import 'package:poortak/common/services/video_download_service.dart';
 
 GetIt locator = GetIt.instance;
@@ -72,10 +73,12 @@ Future<void> initLocator() async {
       // Ensure x-lang header is set (in case it was removed)
       options.headers['x-lang'] = 'fa';
 
-      // Add authorization token if available
+      // Add authorization token if available; remove stale header after logout
       final token = await prefsOperator.getUserToken();
       if (token != null && token.isNotEmpty) {
         options.headers['Authorization'] = 'Bearer $token';
+      } else {
+        options.headers.remove('Authorization');
       }
 
       return handler.next(options);
@@ -171,5 +174,9 @@ Future<void> initLocator() async {
       downloadCubit: locator<VideoDownloadCubit>(),
       connectivityCubit: locator<ConnectivityCubit>(),
     ),
+  );
+
+  locator.registerSingleton<PaymentDeepLinkService>(
+    PaymentDeepLinkService(prefsOperator: locator<PrefsOperator>()),
   );
 }

@@ -7,6 +7,7 @@ import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_home_model
 import 'package:poortak/featueres/fetures_sayareh/data/models/course_progress_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/iknow_access_bloc/iknow_access_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/lesson_bloc/lesson_bloc.dart';
+import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/converstion_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/quizzes_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/vocabulary_screen.dart';
@@ -15,6 +16,7 @@ import 'package:poortak/featueres/fetures_sayareh/widgets/dialog_cart.dart';
 import 'package:poortak/featueres/fetures_sayareh/widgets/lesson_card_widget.dart';
 import 'package:poortak/featueres/fetures_sayareh/widgets/video_container_widget.dart';
 import 'package:poortak/featueres/fetures_sayareh/widgets/video_progress_bar_widget.dart';
+import 'package:poortak/featueres/fetures_sayareh/utils/lesson_video_playback_resolver.dart';
 import 'package:poortak/featueres/fetures_sayareh/widgets/dictionary_bottom_sheet.dart';
 import 'package:poortak/locator.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
@@ -40,6 +42,13 @@ class LessonScreen extends StatefulWidget {
     required this.purchased,
   });
 
+  /// Pops vocabulary/practice/review screens and returns to the existing lesson.
+  static void popBackToLesson(BuildContext context) {
+    Navigator.of(context).popUntil(
+      (route) => route.settings.name == LessonScreen.routeName || route.isFirst,
+    );
+  }
+
   @override
   State<LessonScreen> createState() => _LessonScreenState();
 }
@@ -62,43 +71,70 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
   bool _isDisposed = false;
   String? _thumbnailUrl;
   bool _isCompletionPopupShown = false;
+  bool _isTrailerEndModalShown = false;
 
-  bool get hasAccess {
-    final prefsOperator = locator<PrefsOperator>();
-    if (!prefsOperator.isLoggedIn()) return false;
-    if (widget.purchased == true) return true;
-    final accessBloc = locator<IknowAccessBloc>();
-    return accessBloc.hasCourseAccess(widget.lessonId);
+  bool get hasAccess => _hasFullVideoAccess();
+
+  bool get _isFirstLesson => widget.index == 0;
+
+  void _promptLogin() {
+    ReusableModal.show(
+      context: context,
+      title: '',
+      message: 'لطفا ابتدا وارد حساب کاربری خود شوید',
+      type: ModalType.info,
+      buttonText: 'ورود',
+      onButtonPressed: () {
+        Navigator.of(context).pop();
+        Navigator.pushNamed(context, LoginScreen.routeName);
+      },
+    );
   }
 
-  Future<void> _checkAndDownloadVideo(String _, {bool autoStart = true}) async {
+  bool _hasFullVideoAccess() {
+    return LessonVideoPlaybackResolver.hasFullVideoAccess(
+      isLoggedIn: locator<PrefsOperator>().isLoggedIn(),
+      purchasedFromRoute: widget.purchased,
+      hasCourseAccess:
+          locator<IknowAccessBloc>().hasCourseAccess(widget.lessonId),
+    );
+  }
+
+  LessonVideoPlaybackTarget? _resolvePlaybackTarget(Lesson lesson) {
+    return LessonVideoPlaybackResolver.resolve(
+      lesson: lesson,
+      isLoggedIn: locator<PrefsOperator>().isLoggedIn(),
+      purchasedFromRoute: widget.purchased,
+      hasCourseAccess:
+          locator<IknowAccessBloc>().hasCourseAccess(widget.lessonId),
+    );
+  }
+
+  void _cancelStaleMainVideoDownload(Lesson lesson) {
+    final mainVideoId =
+        LessonVideoPlaybackResolver.mainVideoIdToCancelWhenPreviewing(
+      lesson: lesson,
+      isLoggedIn: locator<PrefsOperator>().isLoggedIn(),
+      purchasedFromRoute: widget.purchased,
+      hasCourseAccess:
+          locator<IknowAccessBloc>().hasCourseAccess(widget.lessonId),
+    );
+    if (mainVideoId == null) return;
+    _downloadService.cancelDownload(mainVideoId);
+  }
+
+  Future<void> _checkAndDownloadVideo(String _, {bool? autoStart}) async {
     final lesson = _currentLesson;
     if (lesson == null) return;
 
-    final hasPaidAccess = hasAccess;
-    String? videoId;
-    bool usePublicUrl = false;
-    bool isEncrypted = true;
+    final target = _resolvePlaybackTarget(lesson);
+    if (target == null) return;
 
-    if (hasPaidAccess && lesson.video != null && lesson.video!.isNotEmpty) {
-      videoId = lesson.video;
-      usePublicUrl = false;
-      isEncrypted = true;
-    } else if (lesson.isDemo && lesson.trailerVideo.isNotEmpty) {
-      videoId = lesson.trailerVideo;
-      usePublicUrl = true;
-      isEncrypted = false;
-    } else if (lesson.trailerVideo.isNotEmpty) {
-      videoId = lesson.trailerVideo;
-      usePublicUrl = true;
-      isEncrypted = false;
-    } else if (lesson.video != null && lesson.video!.isNotEmpty) {
-      videoId = lesson.video;
-      usePublicUrl = false;
-      isEncrypted = true;
-    }
+    _cancelStaleMainVideoDownload(lesson);
 
-    if (videoId == null || videoId.isEmpty) return;
+    final hasPaidAccess = _hasFullVideoAccess();
+    final shouldAutoStart = autoStart ?? false;
+    final videoId = target.videoId;
 
     if (_currentVideoName != videoId) {
       _videoPlayerKey.currentState?.stopVideo();
@@ -120,10 +156,19 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
       videoName: videoId,
       lessonId: widget.lessonId,
       hasAccess: hasPaidAccess,
-      isEncrypted: isEncrypted,
-      usePublicUrl: usePublicUrl,
+      isEncrypted: target.isEncrypted,
+      usePublicUrl: target.usePublicUrl,
       videoKey: videoId,
-      autoStart: autoStart,
+      autoStart: shouldAutoStart,
+    );
+  }
+
+  bool _isPlayingTrailer() {
+    final lesson = _currentLesson;
+    if (lesson == null) return false;
+    return LessonVideoPlaybackResolver.isPlayingTrailer(
+      lesson: lesson,
+      currentVideoId: _currentVideoName,
     );
   }
 
@@ -145,12 +190,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
     // Show success/error messages only once
     if (downloadInfo.status == DownloadStatus.completed &&
         downloadInfo.localPath != null) {
-      final prefsOperator = locator<PrefsOperator>();
-      final isLoggedIn = prefsOperator.isLoggedIn();
-      final usePublicUrl = !(isLoggedIn &&
-          hasAccess &&
-          _currentLesson?.video != null &&
-          _currentLesson!.video!.isNotEmpty);
+      final isTrailer = _isPlayingTrailer();
 
       // Only show snackbar if we just completed (check previous state)
       final previousInfo =
@@ -158,7 +198,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
       if (previousInfo?.status != DownloadStatus.completed) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(usePublicUrl ? 'تریلر دانلود شد' : 'فایل دانلود شد'),
+            content: Text(isTrailer ? 'تریلر دانلود شد' : 'فایل دانلود شد'),
             backgroundColor: Colors.green,
             duration: const Duration(seconds: 2),
           ),
@@ -189,26 +229,59 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
     );
   }
 
+  void _showTrailerEndedModal() {
+    if (_currentLesson == null) return;
+
+    ReusableModal.show(
+      context: context,
+      title: 'پایان پیش‌نمایش',
+      message:
+          'برای مشاهده ویدیو کامل درس و استفاده از تمامی بخش‌های آموزشی، بسته‌های خرید را مشاهده کنید.',
+      type: ModalType.info,
+      buttonText: 'مشاهده بسته های خرید',
+      secondButtonText: 'بستن',
+      showSecondButton: true,
+      cartSuccessStyle: true,
+      customLottiePath: 'assets/lottie/Talking_maya avatar.json',
+      onButtonPressed: () {
+        Navigator.of(context).pop();
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          _showPurchaseDialog();
+        });
+      },
+      onSecondButtonPressed: () {
+        Navigator.of(context).pop();
+      },
+    );
+  }
+
   void _handleVideoEnded() {
     if (_isDisposed || !mounted) return;
-    if (hasAccess) return;
-    final lesson = _currentLesson;
-    final currentVideoName = _currentVideoName;
-    if (lesson == null || currentVideoName == null) return;
-    if (!lesson.isDemo) return;
-    final isTrailer = lesson.trailerVideo.isNotEmpty &&
-        currentVideoName == lesson.trailerVideo;
-    if (!isTrailer) return;
+    if (_currentLesson == null || _isTrailerEndModalShown) return;
+
+    final shouldShow =
+        LessonVideoPlaybackResolver.shouldShowPurchaseDialogAfterVideo(
+      lesson: _currentLesson!,
+      currentVideoId: _currentVideoName,
+      isLoggedIn: locator<PrefsOperator>().isLoggedIn(),
+      purchasedFromRoute: widget.purchased,
+      hasCourseAccess:
+          locator<IknowAccessBloc>().hasCourseAccess(widget.lessonId),
+    );
+    if (!shouldShow) return;
+
+    _isTrailerEndModalShown = true;
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      _showPurchaseDialog();
+      _showTrailerEndedModal();
     });
   }
 
   @override
   void initState() {
     super.initState();
-    isCheckingFiles = true;
     context.read<LessonBloc>().add(GetLessonEvenet(id: widget.lessonId));
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
@@ -258,7 +331,10 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
             if (!mounted || _isDisposed) return;
             if (state is IknowAccessCompleted) {
               setState(() {});
-              _checkAndDownloadVideo('', autoStart: false);
+              if (_currentLesson != null) {
+                _cancelStaleMainVideoDownload(_currentLesson!);
+              }
+              _checkAndDownloadVideo('');
             }
           },
         ),
@@ -296,7 +372,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
               }
 
               () async {
-                final key = state.lesson.thumbnail;
+                final key = state.lesson.videoThumbnailOrThumbnail;
                 if (key.isNotEmpty) {
                   final imageUrl = await GetImageUrlService().getImageUrl(key);
                   if (mounted) {
@@ -307,7 +383,8 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
                 }
               }();
 
-              _checkAndDownloadVideo('', autoStart: false);
+              _cancelStaleMainVideoDownload(state.lesson);
+              _checkAndDownloadVideo('');
             } else if (state is LessonError) {
               debugPrint("LessonError: ${state.message}");
               if (mounted) {
@@ -409,11 +486,11 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
         children: [
           SizedBox(height: Dimens.nh(15)), // Reduced from 28
           _buildVideoSection(),
-          SizedBox(height: Dimens.nh(15)), // Reduced from 18
+          SizedBox(height: Dimens.nh(12)), // Reduced from 18
           _buildConversationCard(),
-          SizedBox(height: Dimens.nh(10)), // Reduced from 12
+          SizedBox(height: Dimens.nh(12)), // Reduced from 12
           _buildVocabularyCard(),
-          SizedBox(height: Dimens.nh(10)), // Reduced from 12
+          SizedBox(height: Dimens.nh(12)), // Reduced from 12
           _buildQuizCard(),
           SizedBox(height: Dimens.nh(60)), // Reduced from 88
           _buildDictionaryButton(),
@@ -555,6 +632,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
                 onVideoEnded: _handleVideoEnded,
                 onShowPurchaseDialog: _showPurchaseDialog,
                 onDownload: () {
+                  if (_currentLesson == null) return;
                   _checkAndDownloadVideo('', autoStart: true);
                 },
               ),
@@ -581,12 +659,16 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
       persianLabel: "مکالمه",
       progress: _progress?.conversation,
       onTap: () async {
-        if (!hasAccess) {
+        final prefsOperator = locator<PrefsOperator>();
+        if (_isFirstLesson) {
+          if (!prefsOperator.isLoggedIn()) {
+            _promptLogin();
+            return;
+          }
+        } else if (!hasAccess) {
           _showPurchaseDialog();
           return;
-        }
-        final prefsOperator = locator<PrefsOperator>();
-        if (!prefsOperator.isLoggedIn()) {
+        } else if (!prefsOperator.isLoggedIn()) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('لطفا ابتدا وارد حساب کاربری خود شوید'),
@@ -616,7 +698,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
         height: Dimens.nh(15),
         decoration: BoxDecoration(
           color: isDark ? MyColors.profileHeaderDark : Colors.white,
-          borderRadius: BorderRadius.circular(Dimens.nr(8)),
+          borderRadius: BorderRadius.circular(Dimens.nr(40)),
         ),
         child: Center(
           child: Text(
@@ -631,7 +713,13 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
         ),
       ),
       onTap: () async {
-        if (!hasAccess) {
+        final prefsOperator = locator<PrefsOperator>();
+        if (_isFirstLesson) {
+          if (!prefsOperator.isLoggedIn()) {
+            _promptLogin();
+            return;
+          }
+        } else if (!hasAccess) {
           _showPurchaseDialog();
           return;
         }
@@ -651,19 +739,26 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
       persianLabel: "آزمون",
       progress: _progress?.quiz,
       onTap: () async {
-        if (!hasAccess) {
-          _showPurchaseDialog();
-          return;
-        }
         final prefsOperator = locator<PrefsOperator>();
-        if (!prefsOperator.isLoggedIn()) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('لطفا ابتدا وارد حساب کاربری خود شوید'),
-              duration: Duration(seconds: 2),
-            ),
-          );
-          return;
+        if (_isFirstLesson) {
+          if (!prefsOperator.isLoggedIn()) {
+            _promptLogin();
+            return;
+          }
+        } else {
+          if (!hasAccess) {
+            _showPurchaseDialog();
+            return;
+          }
+          if (!prefsOperator.isLoggedIn()) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('لطفا ابتدا وارد حساب کاربری خود شوید'),
+                duration: Duration(seconds: 2),
+              ),
+            );
+            return;
+          }
         }
         await Navigator.pushNamed(context, QuizzesScreen.routeName,
             arguments: {"courseId": widget.lessonId});

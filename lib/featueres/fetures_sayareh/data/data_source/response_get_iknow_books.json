@@ -1,0 +1,40 @@
+{
+  "ok": true,
+  "meta": {},
+  "data": [
+    {
+      "id": "30086bbe-2bc6-4c4b-9266-01bc290c4e51",
+      "title": "فرهنگ لغات پورتک",
+      "description": "شامل تمامی لغت های به کار رفته در دروس انیمیشن با\nمثال های کاربردی ",
+      "order": 0,
+      "isDemo": true,
+      "thumbnail": "89c3b338-9a4d-4f58-91b4-995d465ff79e",
+      "price": "850000",
+      "author": "پرویز تاجیک",
+      "publisher": "انتشارات تاجیک",
+      "pageCount": 171,
+      "publishDate": "1404",
+      "trialFile": "29226be1-3989-4234-8b46-0b92d7164989",
+      "createdAt": "2026-05-17T10:52:08.814Z",
+      "updatedAt": "2026-05-17T10:52:08.814Z",
+      "publishedAt": "2026-05-17T10:52:15.950Z"
+    },
+    {
+      "id": "9320292c-3705-4ed1-9b2c-0399a1954d87",
+      "title": "گرامر انگلیسی پورتک",
+      "description": "شامل تمامی گرامر های کاربردی مناسب برای پایه دبستان تا دانشگاه",
+      "order": 0,
+      "isDemo": true,
+      "thumbnail": "dd521b77-944e-4ba9-884c-37b4358faff4",
+      "price": "850000",
+      "author": "پرویز تاجیک",
+      "publisher": "انتشارات تاجیک",
+      "pageCount": 208,
+      "publishDate": "1404",
+      "trialFile": "340ace0b-aad2-45ed-a1a7-514a455d7d6e",
+      "createdAt": "2026-05-17T10:58:07.629Z",
+      "updatedAt": "2026-05-17T10:58:07.629Z",
+      "publishedAt": "2026-05-17T10:58:13.389Z"
+    }
+  ]
+}

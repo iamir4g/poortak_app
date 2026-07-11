@@ -10,6 +10,7 @@ import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/sayareh_bloc/sayareh_cubit.dart';
 import 'package:poortak/featueres/feature_match/screens/main_match_screen.dart';
+import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
 
@@ -65,7 +66,15 @@ class _SayarehScreenState extends State<SayarehScreen> {
           value: locator<IknowAccessBloc>(),
         ),
       ],
-      child: BlocBuilder<SayarehCubit, SayarehState>(
+      child: BlocBuilder<IknowAccessBloc, IknowAccessState>(
+        buildWhen: (previous, current) =>
+            previous.runtimeType != current.runtimeType ||
+            (current is IknowAccessCompleted &&
+                previous is IknowAccessCompleted &&
+                previous.data != current.data),
+        builder: (context, accessState) {
+          final accessBloc = context.read<IknowAccessBloc>();
+          return BlocBuilder<SayarehCubit, SayarehState>(
         buildWhen: (previous, current) {
           if (previous.sayarehDataStatus == current.sayarehDataStatus) {
             return false;
@@ -180,7 +189,7 @@ class _SayarehScreenState extends State<SayarehScreen> {
                                   item: item,
                                   onTap: () {},
                                   index: index,
-                                  purchased: item.purchased,
+                                  purchased: accessBloc.hasCourseAccess(item.id),
                                   progress: progress,
                                   summaryData:
                                       sayarehDataCompleted.summaryData);
@@ -239,23 +248,19 @@ class _SayarehScreenState extends State<SayarehScreen> {
                               return SizedBox(height: Dimens.nh(13.0));
                             },
                             itemBuilder: (context, index) {
+                              final book =
+                                  sayarehDataCompleted.bookListData.data![index];
+
                               return ItemBook(
-                                title: sayarehDataCompleted
-                                    .bookListData.data![index].title,
-                                description: sayarehDataCompleted
-                                    .bookListData.data![index].description,
-                                thumbnail: sayarehDataCompleted
-                                    .bookListData.data![index].thumbnail,
-                                fileKey: sayarehDataCompleted
-                                    .bookListData.data![index].file,
-                                trialFile: sayarehDataCompleted
-                                    .bookListData.data![index].trialFile,
-                                purchased: sayarehDataCompleted
-                                    .bookListData.data![index].purchased,
-                                price: sayarehDataCompleted
-                                    .bookListData.data![index].price,
-                                bookId: sayarehDataCompleted
-                                    .bookListData.data![index].id,
+                                title: book.title,
+                                description: book.description,
+                                thumbnail: book.thumbnail,
+                                fileKey: book.file,
+                                trialFile: book.trialFile,
+                                purchasedFromApi: book.purchased,
+                                isDemo: book.isDemo,
+                                price: book.price,
+                                bookId: book.id,
                               );
                             },
                           )
@@ -292,6 +297,11 @@ class _SayarehScreenState extends State<SayarehScreen> {
                           title: '',
                           message: 'لطفا ابتدا وارد حساب کاربری خود شوید',
                           type: ModalType.info,
+                          buttonText: 'ورود',
+                          onButtonPressed: () {
+                            Navigator.of(context).pop();
+                            Navigator.pushNamed(context, LoginScreen.routeName);
+                          },
                         );
                       }
                     },
@@ -362,6 +372,8 @@ class _SayarehScreenState extends State<SayarehScreen> {
             );
           }
           return Container();
+        },
+      );
         },
       ),
     );

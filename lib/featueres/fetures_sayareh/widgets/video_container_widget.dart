@@ -36,13 +36,14 @@ class VideoContainerWidget extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       width: Dimens.nw(360), // Reduced from 360
+      height: Dimens.nh(250),
       padding: EdgeInsets.all(Dimens.nr(5)),
       decoration: BoxDecoration(
         color: isDark ? MyColors.termsBackgroundDark : Colors.white,
-        borderRadius: BorderRadius.circular(Dimens.nr(30)), // Reduced from 40
+        borderRadius: BorderRadius.circular(Dimens.nr(40)), // Reduced from 40
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(Dimens.nr(27)), // Reduced from 37
+        borderRadius: BorderRadius.circular(Dimens.nr(37)), // Reduced from 37
         child: SizedBox(
           width: Dimens.nw(310), // Reduced from 350
           height: Dimens.nh(200), // Reduced from 240
@@ -72,7 +73,7 @@ class VideoContainerWidget extends StatelessWidget {
       isNetworkVideo: videoPath == null && videoUrl != null,
       width: Dimens.nw(310),
       height: Dimens.nh(200),
-      borderRadius: Dimens.nr(27),
+      borderRadius: Dimens.nr(37),
       autoPlay: false,
       showControls: true,
       thumbnailUrl: thumbnailUrl,
@@ -132,15 +133,15 @@ class VideoContainerWidget extends StatelessWidget {
                 ),
               ),
               SizedBox(height: Dimens.nh(12)),
-              Text(
-                'برای مشاهده، ویدیو را دانلود کنید',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: Dimens.nsp(14),
-                  fontFamily: 'IranSans',
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              // Text(
+              //   'برای مشاهده، ویدیو را دانلود کنید',
+              //   style: TextStyle(
+              //     color: Colors.white,
+              //     fontSize: Dimens.nsp(14),
+              //     fontFamily: 'IranSans',
+              //     fontWeight: FontWeight.bold,
+              //   ),
+              // ),
             ],
           ),
         ),
@@ -177,18 +178,18 @@ class VideoContainerWidget extends StatelessWidget {
                   color: Theme.of(context).textTheme.titleMedium?.color,
                 ),
               SizedBox(height: Dimens.nh(16)),
-              Text(
-                isDecrypting
-                    ? 'در حال رمزگشایی ویدیو...'
-                    : isDownloading
-                        ? 'در حال دانلود ویدیو...'
-                        : 'در حال پردازش ویدیو...',
-                style: TextStyle(
-                  color: Theme.of(context).textTheme.titleMedium?.color,
-                  fontSize: Dimens.nsp(14), // Reduced from 16
-                  fontFamily: 'IranSans',
-                ),
-              ),
+              // Text(
+              //   isDecrypting
+              //       ? 'در حال رمزگشایی ویدیو...'
+              //       : isDownloading
+              //           ? 'در حال دانلود ویدیو...'
+              //           : 'در حال پردازش ویدیو...',
+              //   style: TextStyle(
+              //     color: Theme.of(context).textTheme.titleMedium?.color,
+              //     fontSize: Dimens.nsp(14), // Reduced from 16
+              //     fontFamily: 'IranSans',
+              //   ),
+              // ),
             ],
           ),
         ),

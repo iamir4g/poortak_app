@@ -83,6 +83,22 @@ class Datum {
       };
 }
 
+extension ConversationSpeaker on Datum {
+  static const mayaAvatarPath = 'assets/lottie/Talking_maya avatar.json';
+  static const robotAvatarPath = 'assets/lottie/talking-robot.json';
+
+  /// talking-robot.json → صدای آقا
+  bool get isMaleSpeaker => voice == 'male';
+
+  /// Talking_maya avatar.json → صدای خانم
+  bool get isFemaleSpeaker => !isMaleSpeaker;
+
+  String get conversationAvatarPath =>
+      isMaleSpeaker ? robotAvatarPath : mayaAvatarPath;
+
+  String get playbackVoice => isMaleSpeaker ? 'male' : 'female';
+}
+
 class Meta {
   Meta();
 

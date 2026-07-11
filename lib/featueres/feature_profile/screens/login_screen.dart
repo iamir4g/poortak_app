@@ -8,6 +8,7 @@ import 'package:poortak/common/utils/svg_embedded_png.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poortak/common/widgets/main_wrapper.dart';
 import 'package:poortak/common/services/auth_navigation_manager.dart';
+import 'package:poortak/common/services/otp_login_session_manager.dart';
 import 'package:poortak/common/utils/digit_utils.dart';
 import 'package:poortak/featueres/feature_profile/widgets/terms_conditions_modal.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
@@ -42,6 +43,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final GlobalKey _mobileFieldKey = GlobalKey();
   final GlobalKey _otpFieldKey = GlobalKey();
   late final Future<Uint8List?> _logoBytesFuture;
+  final OtpLoginSessionManager _otpSessionManager = OtpLoginSessionManager();
 
   // Timer variables
   Timer? _timer;
@@ -51,11 +53,31 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
+    _restoreOtpSessionIfNeeded();
     _logoBytesFuture =
         loadEmbeddedPngBytesFromSvgAsset('assets/images/poortak_logo.svg');
     _getAppSignature();
     _mobileFocusNode.addListener(_handleFocusChange);
     _otpFocusNode.addListener(_handleFocusChange);
+  }
+
+  void _restoreOtpSessionIfNeeded() {
+    final session = _otpSessionManager.session;
+    if (session == null) return;
+
+    mobileNumber = session.mobileDigits;
+    _mobileController.text = session.mobileDigits;
+    showOtpForm = true;
+    _remainingSeconds = session.remainingSeconds;
+    _canResend = session.canResend;
+
+    if (!session.canResend) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        _startTimer();
+        _startSmsListener();
+      });
+    }
   }
 
   void _handleFocusChange() {
@@ -102,7 +124,7 @@ class _LoginScreenState extends State<LoginScreen> {
           if (mobileNumber != null) {
             context.read<ProfileBloc>().add(
                   LoginWithOtpEvent(
-                    mobile: mobileNumber!,
+                    mobile: _localMobileFromInput(mobileNumber!),
                     otp: normalizeOtpForServer(code),
                   ),
                 );
@@ -128,18 +150,32 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _startTimer() {
     _timer?.cancel();
-    _remainingSeconds = 120;
-    _canResend = false;
+
+    final session = _otpSessionManager.session;
+    if (session != null) {
+      _remainingSeconds = session.remainingSeconds;
+      _canResend = session.canResend;
+    } else {
+      _remainingSeconds = OtpLoginSession.timeoutSeconds;
+      _canResend = false;
+    }
+
+    if (_canResend) return;
+
     log("🕐 Timer started: $_remainingSeconds seconds remaining");
 
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_remainingSeconds > 0) {
+      final activeSession = _otpSessionManager.session;
+      final remaining = activeSession?.remainingSeconds ?? 0;
+
+      if (remaining > 0) {
         setState(() {
-          _remainingSeconds--;
+          _remainingSeconds = remaining;
+          _canResend = false;
         });
-        log("🕐 Timer tick: $_remainingSeconds seconds remaining");
       } else {
         setState(() {
+          _remainingSeconds = 0;
           _canResend = true;
         });
         log("🕐 Timer finished: Resend button now available");
@@ -149,9 +185,9 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _resetTimer() {
-    _timer?.cancel();
-    _remainingSeconds = 120;
-    _canResend = false;
+    if (mobileNumber != null) {
+      _otpSessionManager.startSession(mobileNumber!);
+    }
     _startTimer();
   }
 
@@ -159,6 +195,23 @@ class _LoginScreenState extends State<LoginScreen> {
     int minutes = seconds ~/ 60;
     int remainingSeconds = seconds % 60;
     return '${minutes.toString().padLeft(2, '0')}:${remainingSeconds.toString().padLeft(2, '0')}';
+  }
+
+  bool _isValidMobileInput(String digits) {
+    final mobile = toEnglishDigits(digits);
+    return mobile.length == 10 && mobile.startsWith('9');
+  }
+
+  String _localMobileFromInput(String digits) {
+    return '0${toEnglishDigits(digits)}';
+  }
+
+  String _displayMobileForOtpMessage(String? digits) {
+    if (digits == null || digits.isEmpty) return '09';
+    final mobile = toEnglishDigits(digits);
+    final suffix =
+        mobile.length == 10 && mobile.startsWith('9') ? mobile.substring(1) : mobile;
+    return '09${toPersianDigits(suffix)}';
   }
 
   @override
@@ -250,7 +303,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           SizedBox(height: Dimens.small.h),
                           if (showOtpForm) ...[
                             Text(
-                              "کد ارسال شده به شماره 09${mobileNumber ?? ''} را وارد کنید",
+                              "کد ارسال شده به شماره ${_displayMobileForOtpMessage(mobileNumber)} را وارد کنید",
                               style: MyTextStyle.textMatn13.copyWith(
                                 color: loginTheme.secondaryTextColor,
                                 height: 1.4,
@@ -294,7 +347,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                       if (mobileNumber != null) {
                                         builderContext.read<ProfileBloc>().add(
                                               RequestOtpEvent(
-                                                  mobile: "09$mobileNumber"),
+                                                mobile: _localMobileFromInput(
+                                                    mobileNumber!),
+                                              ),
                                             );
                                         _resetTimer();
                                       }
@@ -388,11 +443,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 textAlign: TextAlign.left,
                 inputFormatters: [
                   FilteringTextInputFormatter.digitsOnly,
-                  LengthLimitingTextInputFormatter(9),
+                  LengthLimitingTextInputFormatter(10),
                 ],
                 onChanged: (value) {
-                  // Close keyboard when mobile number is complete (9 digits)
-                  if (value.length == 9) {
+                  if (value.length == 10) {
                     FocusScope.of(context).unfocus();
                   }
                 },
@@ -402,7 +456,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   // fontFamily: 'monospace', // برای نمایش بهتر اعداد
                 ),
                 decoration: InputDecoration(
-                  hintText: "xxxxxxxxx",
+                  hintText: "xxxxxxxxxx",
                   hintStyle: TextStyle(
                     color: Color(0xFF9E9E9E),
                     fontSize: 16.sp,
@@ -424,13 +478,16 @@ class _LoginScreenState extends State<LoginScreen> {
             margin: EdgeInsets.symmetric(horizontal: 8.w),
             color: MyColors.divider,
           ),
-          // Prefix "۰۹"
-          Text(
-            "۰۹",
-            style: MyTextStyle.textMatn12Bold.copyWith(
-              fontSize: 22.sp,
-              color: loginTheme.inputTextColor,
-              fontWeight: FontWeight.w500,
+          // Prefix "+۹۸"
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: Text(
+              "+۹۸",
+              style: MyTextStyle.textMatn12Bold.copyWith(
+                fontSize: 22.sp,
+                color: loginTheme.inputTextColor,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
           SizedBox(width: 8.w),
@@ -584,17 +641,19 @@ class _LoginScreenState extends State<LoginScreen> {
             showOtpForm = true;
             mobileNumber = _mobileController.text;
           });
+          _otpSessionManager.startSession(mobileNumber!);
           // Start the timer when OTP is successfully requested
           log("🕐 Starting OTP timer...");
           _startTimer();
           _startSmsListener();
         } else if (state is ProfileSuccessLogin) {
+          _otpSessionManager.clearSession();
           // Save user data and login state
           locator<PrefsOperator>().saveUserData(
             state.data.data.result.accessToken,
             state.data.data.result.refreshToken,
-            "09${mobileNumber ?? ''}",
-            "09${mobileNumber ?? ''}",
+            _localMobileFromInput(mobileNumber ?? ''),
+            _localMobileFromInput(mobileNumber ?? ''),
             // userId: state.data.data.result.user.id,
             // referrerCode: state.data.data.result.user.referrerCode,
             // rate: state.data.data.result.user.rate,
@@ -666,17 +725,18 @@ class _LoginScreenState extends State<LoginScreen> {
                   if (_otpController.text.isNotEmpty && mobileNumber != null) {
                     context.read<ProfileBloc>().add(
                           LoginWithOtpEvent(
-                            mobile: mobileNumber!,
+                            mobile: _localMobileFromInput(mobileNumber!),
                             otp: normalizeOtpForServer(_otpController.text),
                           ),
                         );
                   }
                 } else {
-                  if (_mobileController.text.isNotEmpty &&
-                      _mobileController.text.length == 9) {
+                  if (_isValidMobileInput(_mobileController.text)) {
                     context.read<ProfileBloc>().add(
                           RequestOtpEvent(
-                            mobile: "09${_mobileController.text}",
+                            mobile: _localMobileFromInput(
+                              _mobileController.text,
+                            ),
                           ),
                         );
                   } else {

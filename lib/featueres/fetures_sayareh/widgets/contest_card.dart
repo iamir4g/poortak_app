@@ -70,13 +70,13 @@ class ContestCard extends StatelessWidget {
                     SizedBox(height: 8.h),
                     Text(
                       'در مسابقه ماهانه پورتک شرکت کنید و جایزه ببرید.',
-                      style:  MyTextStyle.description10Medium.copyWith(
-                          color: isDark
-                              ? MyColors.loginTextSecondaryDark
-                              : MyColors.text6,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+                      style: MyTextStyle.description10Medium.copyWith(
+                        color: isDark
+                            ? MyColors.loginTextSecondaryDark
+                            : MyColors.text4,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),

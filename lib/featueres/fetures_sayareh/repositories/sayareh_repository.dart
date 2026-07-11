@@ -256,6 +256,14 @@ class SayarehRepository {
       } else {
         return DataFailed(response.data['message'] ?? "خطا در ارسال اطلاعات");
       }
+    } on DioException catch (e) {
+      log("submitVocabulary failed: status=${e.response?.statusCode}, body=${e.response?.data}");
+      return DataFailed(
+        _extractErrorMessage(
+          e.response?.data,
+          fallbackMessage: "خطا در ثبت پاسخ لغت",
+        ),
+      );
     } on AppException catch (e) {
       return CheckExceptions.getError<void>(e);
     }

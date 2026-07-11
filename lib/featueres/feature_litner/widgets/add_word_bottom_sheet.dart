@@ -27,6 +27,34 @@ class _AddWordBottomSheetState extends State<AddWordBottomSheet> {
     super.dispose();
   }
 
+  InputDecoration _buildInputDecoration({
+    required String hintText,
+    required bool isDark,
+  }) {
+    final borderRadius = BorderRadius.circular(16.r);
+    final darkOutline = OutlineInputBorder(
+      borderRadius: borderRadius,
+      borderSide: const BorderSide(
+        color: Colors.transparent,
+        width: 1,
+      ),
+    );
+
+    return InputDecoration(
+      hintText: hintText,
+      hintStyle: MyTextStyle.textHint.copyWith(
+        color: isDark ? MyColors.darkTextSecondary : null,
+      ),
+      filled: isDark,
+      fillColor: isDark ? MyColors.textInputBackgroundDark : null,
+      border: isDark ? darkOutline : InputBorder.none,
+      enabledBorder: isDark ? darkOutline : InputBorder.none,
+      errorBorder: isDark ? darkOutline : InputBorder.none,
+      focusedErrorBorder: isDark ? darkOutline : InputBorder.none,
+      contentPadding: EdgeInsets.symmetric(vertical: 18.h),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -100,9 +128,8 @@ class _AddWordBottomSheetState extends State<AddWordBottomSheet> {
                 // English Word Input
                 Container(
                   decoration: BoxDecoration(
-                    color: isDark
-                        ? MyColors.loginInputBackgroundDark
-                        : MyColors.inputBackground,
+                    color:
+                        isDark ? Colors.transparent : MyColors.inputBackground,
                     borderRadius: BorderRadius.circular(16.r),
                   ),
                   child: TextFormField(
@@ -111,13 +138,9 @@ class _AddWordBottomSheetState extends State<AddWordBottomSheet> {
                     style: MyTextStyle.textMatn15.copyWith(
                       color: isDark ? MyColors.darkTextPrimary : null,
                     ),
-                    decoration: InputDecoration(
+                    decoration: _buildInputDecoration(
                       hintText: 'واژه را وارد کنید',
-                      hintStyle: MyTextStyle.textHint.copyWith(
-                        color: isDark ? MyColors.darkTextSecondary : null,
-                      ),
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.symmetric(vertical: 18.h),
+                      isDark: isDark,
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -140,9 +163,8 @@ class _AddWordBottomSheetState extends State<AddWordBottomSheet> {
                 // Persian Translation Input
                 Container(
                   decoration: BoxDecoration(
-                    color: isDark
-                        ? MyColors.loginInputBackgroundDark
-                        : MyColors.inputBackground,
+                    color:
+                        isDark ? Colors.transparent : MyColors.inputBackground,
                     borderRadius: BorderRadius.circular(16.r),
                   ),
                   child: TextFormField(
@@ -151,13 +173,9 @@ class _AddWordBottomSheetState extends State<AddWordBottomSheet> {
                     style: MyTextStyle.textMatn15.copyWith(
                       color: isDark ? MyColors.darkTextPrimary : null,
                     ),
-                    decoration: InputDecoration(
+                    decoration: _buildInputDecoration(
                       hintText: 'معنی واژه را وارد کنید',
-                      hintStyle: MyTextStyle.textHint.copyWith(
-                        color: isDark ? MyColors.darkTextSecondary : null,
-                      ),
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.symmetric(vertical: 18.h),
+                      isDark: isDark,
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {

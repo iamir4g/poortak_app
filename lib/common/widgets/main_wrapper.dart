@@ -11,7 +11,9 @@ import 'package:poortak/common/widgets/bottom_nav.dart';
 import 'package:poortak/common/widgets/custom_drawer.dart';
 import 'package:poortak/common/widgets/logout_confirmation_modal.dart';
 import 'package:poortak/common/widgets/exit_confirmation_modal.dart';
+import 'package:poortak/common/services/payment_deep_link_service.dart';
 import 'package:poortak/common/services/auth_navigation_manager.dart';
+import 'package:poortak/common/services/otp_login_session_manager.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/kavoosh_main_screen.dart';
@@ -98,10 +100,37 @@ class _MainWrapperState extends State<MainWrapper> {
         }
       }
       _handleAuthNavigation();
+      _showPendingPaymentResultIfNeeded();
     });
 
     // Initialize deep link handling for when app is already running
     _initDeepLinks();
+  }
+
+  void _showPendingPaymentResultIfNeeded() {
+    final pending = locator<PaymentDeepLinkService>().takePendingResult();
+    if (pending == null) return;
+    _openPaymentResultScreen(pending);
+  }
+
+  void _openPaymentResultScreen(PaymentDeepLinkData data) {
+    if (!mounted) return;
+
+    Navigator.pushNamed(
+      context,
+      PaymentResultScreen.routeName,
+      arguments: {
+        "status": data.ok,
+        "ref": data.ref,
+      },
+    ).then((_) async {
+      if (!mounted || data.ok != 1) return;
+      try {
+        await locator<ShoppingCartBloc>().clearAfterSuccessfulPayment();
+      } catch (e) {
+        log("⚠️ MainWrapper: Failed to refresh cart after payment: $e");
+      }
+    });
   }
 
   Future<void> _initDeepLinks() async {
@@ -119,32 +148,19 @@ class _MainWrapperState extends State<MainWrapper> {
     );
   }
 
-  void _handleIncomingLink(Uri uri) {
+  Future<void> _handleIncomingLink(Uri uri) async {
     log("📌 MainWrapper: Deep Link received: $uri");
-    log("📌 MainWrapper: URI scheme: ${uri.scheme}");
-    log("📌 MainWrapper: URI host: ${uri.host}");
-    log("📌 MainWrapper: URI query parameters: ${uri.queryParameters}");
 
-    if (uri.scheme == "return" && uri.host == "poortak") {
-      final okParam = uri.queryParameters["ok"];
-      if (okParam != null) {
-        log("📌 MainWrapper: Valid deep link detected, navigating to PaymentResultScreen");
-
-        // Navigate to payment result screen for both success and failure
-        Navigator.pushNamed(
-          context,
-          PaymentResultScreen.routeName,
-          arguments: {
-            "status": int.parse(okParam),
-            "ref": uri.queryParameters["ref"],
-          },
-        );
-      } else {
-        log("📌 MainWrapper: Deep link missing 'ok' parameter");
-      }
-    } else {
-      log("📌 MainWrapper: Deep link does not match expected format");
+    final paymentData = await locator<PaymentDeepLinkService>().tryConsume(uri);
+    if (paymentData == null) {
+      log("📌 MainWrapper: Deep link ignored (already handled or invalid)");
+      return;
     }
+
+    log("📌 MainWrapper: Navigating to PaymentResultScreen");
+    if (!mounted) return;
+
+    _openPaymentResultScreen(paymentData);
   }
 
   @override
@@ -200,6 +216,21 @@ class _MainWrapperState extends State<MainWrapper> {
     return '';
   }
 
+  void _refreshShoppingCartIfNeeded(int index) {
+    if (index != 2) return;
+
+    try {
+      final cartBloc = locator<ShoppingCartBloc>();
+      if (prefsOperator.isLoggedIn()) {
+        cartBloc.add(GetCartEvent());
+      } else {
+        cartBloc.add(GetLocalCartEvent());
+      }
+    } catch (e) {
+      log("⚠️ Failed to refresh shopping cart: $e");
+    }
+  }
+
   void _animateToTab(int index) {
     if (!mounted || index == currentPageIndex) return;
 
@@ -210,18 +241,19 @@ class _MainWrapperState extends State<MainWrapper> {
     setState(() {
       currentPageIndex = index;
     });
+    _refreshShoppingCartIfNeeded(index);
 
     controller
         .animateToPage(
-          index,
-          duration: _tabAnimationDuration,
-          curve: _tabAnimationCurve,
-        )
+      index,
+      duration: _tabAnimationDuration,
+      curve: _tabAnimationCurve,
+    )
         .whenComplete(() {
-          if (!mounted) return;
-          _isProgrammaticNavigation = false;
-          _targetPageIndex = null;
-        });
+      if (!mounted) return;
+      _isProgrammaticNavigation = false;
+      _targetPageIndex = null;
+    });
   }
 
   void _onPageChanged(int index) {
@@ -235,12 +267,16 @@ class _MainWrapperState extends State<MainWrapper> {
         currentPageIndex = index;
       });
     }
+    _refreshShoppingCartIfNeeded(index);
   }
 
   void _logout() async {
     // Clear user data from preferences
+    OtpLoginSessionManager().clearSession();
     await prefsOperator.logout();
-    locator<IknowAccessBloc>().add(ClearIknowAccessEvent());
+    final accessBloc = locator<IknowAccessBloc>();
+    accessBloc.add(ClearIknowAccessEvent());
+    accessBloc.add(FetchIknowAccessEvent(forceRefresh: true));
 
     // Clear shopping cart (both local and remote)
     try {
@@ -392,7 +428,7 @@ class _MainWrapperState extends State<MainWrapper> {
                                   PopupMenuItem(
                                     value: 'logout',
                                     child: Text(
-                                      'خروج از ناحیه کاربری',
+                                      'خروج از حساب کاربری',
                                       style: MyTextStyle.textMatn13.copyWith(
                                         color: themeState.isDark
                                             ? MyColors.darkTextPrimary

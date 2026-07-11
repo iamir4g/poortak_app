@@ -31,3 +31,16 @@ class DictionaryError extends DictionaryState {
 }
 
 class DictionaryEmpty extends DictionaryState {}
+
+class DictionarySuggestionsLoaded extends DictionaryState {
+  final String query;
+  final List<DictionarySuggestion> suggestions;
+
+  const DictionarySuggestionsLoaded({
+    required this.query,
+    required this.suggestions,
+  });
+
+  @override
+  List<Object> get props => [query, suggestions];
+}

@@ -85,6 +85,7 @@ class ShoppingCartRepository {
             'name': cartItem.source.name,
             'description': cartItem.source.description,
             'thumbnail': cartItem.source.thumbnail,
+            'videoThumbnail': cartItem.source.videoThumbnail,
             'isDemo': cartItem.source.isDemo,
             'price': cartItem.source.price,
             'video': cartItem.source.video,
@@ -161,6 +162,21 @@ class ShoppingCartRepository {
   }
 
   Future<ShoppingCart> clearCart() async {
+    log("🗑️ Clearing cart...");
+    final isLoggedIn = _prefsOperator.isLoggedIn();
+
+    if (isLoggedIn) {
+      try {
+        log("📤 Calling API to clear cart on server...");
+        await _apiProvider.clearCart();
+        log("✅ Server cart cleared successfully");
+      } catch (e) {
+        // Cart may already be empty after successful checkout.
+        log("⚠️ Failed to clear cart on server (may already be empty): $e");
+      }
+    }
+
+    await clearLocalCart();
     _cart = ShoppingCart();
     return _cart;
   }

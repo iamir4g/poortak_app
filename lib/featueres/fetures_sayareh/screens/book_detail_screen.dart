@@ -13,7 +13,9 @@ import 'package:poortak/featueres/feature_shopping_cart/data/data_source/shoppin
 import 'package:poortak/featueres/feature_shopping_cart/data/models/cart_enum.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
+import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/iknow_access_bloc/iknow_access_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/single_book_bloc/single_book_cubit.dart';
+import 'package:poortak/featueres/fetures_sayareh/utils/book_pdf_playback_resolver.dart';
 import 'package:poortak/locator.dart';
 import 'package:poortak/common/widgets/main_wrapper.dart';
 import 'package:poortak/config/myTextStyle.dart';
@@ -36,6 +38,7 @@ class _BookDetailScreenState extends State<BookDetailScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    locator<IknowAccessBloc>().add(FetchIknowAccessEvent());
   }
 
   @override
@@ -101,38 +104,45 @@ class _BookDetailScreenState extends State<BookDetailScreen>
           ],
         ),
         body: SafeArea(
-          child: BlocBuilder<SingleBookCubit, SingleBookState>(
-            builder: (context, state) {
-              if (state.singleBookDataStatus is SingleBookDataLoading) {
-                return Center(child: DotLoadingWidget(size: 50.r));
-              }
+          child: BlocBuilder<IknowAccessBloc, IknowAccessState>(
+            bloc: locator<IknowAccessBloc>(),
+            builder: (context, accessState) {
+              return BlocBuilder<SingleBookCubit, SingleBookState>(
+                builder: (context, state) {
+                  if (state.singleBookDataStatus is SingleBookDataLoading) {
+                    return Center(child: DotLoadingWidget(size: 50.r));
+                  }
 
-              if (state.singleBookDataStatus is SingleBookDataCompleted) {
-                final bookData =
-                    (state.singleBookDataStatus as SingleBookDataCompleted)
-                        .data
-                        .data;
-                return _buildContent(context, bookData);
-              }
+                  if (state.singleBookDataStatus is SingleBookDataCompleted) {
+                    final bookData =
+                        (state.singleBookDataStatus as SingleBookDataCompleted)
+                            .data
+                            .data;
+                    return _buildContent(context, bookData);
+                  }
 
-              if (state.singleBookDataStatus is SingleBookDataError) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text('خطا در دریافت اطلاعات'),
-                      ElevatedButton(
-                        onPressed: () {
-                          context.read<SingleBookCubit>().fetchBookById(bookId);
-                        },
-                        child: const Text('تلاش دوباره'),
+                  if (state.singleBookDataStatus is SingleBookDataError) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text('خطا در دریافت اطلاعات'),
+                          ElevatedButton(
+                            onPressed: () {
+                              context
+                                  .read<SingleBookCubit>()
+                                  .fetchBookById(bookId);
+                            },
+                            child: const Text('تلاش دوباره'),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                );
-              }
+                    );
+                  }
 
-              return const SizedBox();
+                  return const SizedBox();
+                },
+              );
             },
           ),
         ),
@@ -141,15 +151,20 @@ class _BookDetailScreenState extends State<BookDetailScreen>
   }
 
   Widget _buildContent(BuildContext context, dynamic bookData) {
-    // bookData is likely of type BookData from SingleBookModel
-    // I need to check the fields. Based on user log:
-    // id, title, description, price, author, publisher, pageCount, publishDate, isDemo, trialFile, purchased
-
-    final bool isPurchased = bookData.purchased ?? false;
+    final bool isLoggedIn = locator<PrefsOperator>().isLoggedIn();
+    final bool purchased = bookData.purchased ?? false;
+    final bool hasBookAccess =
+        isLoggedIn && locator<IknowAccessBloc>().hasBookAccess(bookData.id);
     final bool hasDemo = bookData.isDemo ?? false;
+    final bool hasFullAccess = isLoggedIn &&
+        BookPdfPlaybackResolver.canDecryptFullBook(
+          hasBookAccess: hasBookAccess,
+          purchasedFromApi: purchased,
+          isDemo: hasDemo,
+        );
     final String? trialFile = bookData.trialFile;
     final bool showSampleButton =
-        hasDemo && trialFile != null && trialFile.isNotEmpty;
+        trialFile != null && trialFile.isNotEmpty && !hasFullAccess;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Column(
@@ -218,7 +233,7 @@ class _BookDetailScreenState extends State<BookDetailScreen>
                 ),
                 // const SizedBox(height: 2),
                 // Price
-                if (!isPurchased) ...[
+                if (!hasFullAccess) ...[
                   Divider(
                     height: Dimens.nh(32),
                     color: isDark ? MyColors.darkBorder : MyColors.dividerGray,
@@ -354,7 +369,7 @@ class _BookDetailScreenState extends State<BookDetailScreen>
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (showSampleButton && !isPurchased) ...[
+              if (showSampleButton) ...[
                 SizedBox(
                   width: double.infinity,
                   height: Dimens.buttonHeight,
@@ -365,6 +380,7 @@ class _BookDetailScreenState extends State<BookDetailScreen>
                         '/pdf_reader_screen',
                         arguments: {
                           'bookId': bookData.id,
+                          'isTrialRead': true,
                         },
                       );
                     },
@@ -378,9 +394,10 @@ class _BookDetailScreenState extends State<BookDetailScreen>
                     ),
                     child: Text(
                       "خواندن نمونه",
-                      style: TextStyle(
-                        color:
-                            isDark ? MyColors.darkTextSecondary : Colors.grey,
+                      style: MyTextStyle.textMatn14Bold.copyWith(
+                        color: isDark
+                            ? MyColors.darkTextSecondary
+                            : MyColors.text4,
                       ),
                     ),
                   ),
@@ -390,14 +407,15 @@ class _BookDetailScreenState extends State<BookDetailScreen>
               PrimaryButton(
                 width: double.infinity,
                 height: Dimens.buttonHeight,
-                lable: isPurchased ? "خواندن کتاب" : "خرید کتاب",
+                lable: hasFullAccess ? "خواندن کتاب" : "خرید کتاب",
                 onPressed: () {
-                  if (isPurchased) {
+                  if (hasFullAccess) {
                     Navigator.pushNamed(
                       context,
                       '/pdf_reader_screen',
                       arguments: {
                         'bookId': bookData.id,
+                        'isTrialRead': false,
                       },
                     );
                   } else {

@@ -38,9 +38,10 @@ class ProfileRepository {
     }
   }
 
-  Future<DataState<AuthLoginOtpModel>> callLoginWithOtp(String otp) async {
+  Future<DataState<AuthLoginOtpModel>> callLoginWithOtp(
+      String otp, String mobile) async {
     try {
-      final response = await profileApiProvider.callLoginWithOtp(otp);
+      final response = await profileApiProvider.callLoginWithOtp(otp, mobile);
       log("Login Response: ${response.data}");
 
       if ((response.statusCode == 200 || response.statusCode == 201) &&
@@ -109,6 +110,46 @@ class ProfileRepository {
       log("Payment History Error: $e");
       return DataFailed(e.toString());
     }
+  }
+
+  Future<DataState<Datum>> fetchPaymentByRef(String ref) async {
+    try {
+      final response = await profileApiProvider.callGetPaymentById(ref);
+      if ((response.statusCode == 200 || response.statusCode == 201) &&
+          response.data['ok'] == true) {
+        final data = response.data['data'];
+        if (data is Map<String, dynamic>) {
+          return DataSuccess(Datum.fromJson(data));
+        }
+        if (data is List && data.isNotEmpty) {
+          return DataSuccess(Datum.fromJson(data.first));
+        }
+      }
+    } catch (e) {
+      log("Fetch payment by id failed, trying referenceId filter: $e");
+    }
+
+    final historyResult = await callPaymentHistory(
+      params: PaymentHistoryParams(referenceId: ref, size: 1),
+    );
+    if (historyResult is DataSuccess &&
+        historyResult.data?.data != null &&
+        historyResult.data!.data!.isNotEmpty) {
+      return DataSuccess(historyResult.data!.data!.first);
+    }
+
+    final recentHistory = await callPaymentHistory(
+      params: const PaymentHistoryParams(size: 20),
+    );
+    if (recentHistory is DataSuccess) {
+      for (final payment in recentHistory.data?.data ?? <Datum>[]) {
+        if (payment.id == ref) {
+          return DataSuccess(payment);
+        }
+      }
+    }
+
+    return DataFailed("خطا در دریافت اطلاعات پرداخت");
   }
 
   Future<DataState<UpdateProfileModel>> callPutUserProfile(

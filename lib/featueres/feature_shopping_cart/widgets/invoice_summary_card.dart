@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:persian_tools/persian_tools.dart';
+import 'package:poortak/common/utils/money_utils.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
@@ -41,7 +41,6 @@ class InvoiceSummaryCard extends StatelessWidget {
       child: Container(
         width: double.infinity,
         constraints: BoxConstraints(maxWidth: Dimens.nw(360.0)),
-        height: Dimens.nh(140.0),
         padding: EdgeInsets.symmetric(
           horizontal: Dimens.medium,
           vertical: Dimens.medium,
@@ -53,7 +52,7 @@ class InvoiceSummaryCard extends StatelessWidget {
         child: Column(
           children: [
             Padding(
-              padding: EdgeInsetsGeometry.symmetric(
+              padding: EdgeInsets.symmetric(
                 horizontal: Dimens.medium,
               ),
               child: _InvoiceRow(
@@ -76,7 +75,7 @@ class InvoiceSummaryCard extends StatelessWidget {
             ),
             SizedBox(height: Dimens.nh(12)),
             Padding(
-              padding: EdgeInsetsGeometry.symmetric(
+              padding: EdgeInsets.symmetric(
                 horizontal: Dimens.medium,
               ),
               child: _InvoiceRow(
@@ -150,7 +149,7 @@ class _InvoiceRow extends StatelessWidget {
           text: TextSpan(
             style: amountStyle.copyWith(height: 1.0),
             children: [
-              TextSpan(text: amount.addComma),
+              TextSpan(text: MoneyUtils.formatTomanDisplay(amount)),
               TextSpan(text: ' $unit', style: unitStyle.copyWith(height: 1.0)),
             ],
           ),

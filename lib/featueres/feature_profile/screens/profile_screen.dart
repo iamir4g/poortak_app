@@ -21,7 +21,10 @@ class ProfileScreen extends StatefulWidget {
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _ProfileScreenState extends State<ProfileScreen>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
   final PrefsOperator prefsOperator = locator<PrefsOperator>();
   final StorageService storageService = locator<StorageService>();
   bool isLoggedIn = false;
@@ -82,6 +85,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final backgroundColor =
         isDark ? MyColors.profileBackgroundDark : MyColors.background3;

@@ -1,7 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
+import 'package:poortak/common/services/answer_feedback_sound_service.dart';
+import 'package:poortak/common/services/haptic_service.dart';
+import 'package:poortak/common/utils/bidi_text_helper.dart';
 import 'package:poortak/common/utils/font_size_helper.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_answer_bloc/quiz_answer_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_result_bloc/quiz_result_bloc.dart';
@@ -86,15 +92,15 @@ class _QuizScreenState extends State<QuizScreen> {
       showSecondButton: true,
       barrierDismissible: false,
       onButtonPressed: () {
-        _isExitDialogOpen = false;
         Navigator.of(context, rootNavigator: true).pop();
       },
       onSecondButtonPressed: () {
-        _isExitDialogOpen = false;
         Navigator.of(context, rootNavigator: true).pop();
         _leaveQuiz();
       },
-    );
+    ).whenComplete(() {
+      _isExitDialogOpen = false;
+    });
   }
 
   @override
@@ -105,72 +111,55 @@ class _QuizScreenState extends State<QuizScreen> {
     final headerBackgroundColor =
         isDark ? MyColors.darkBackgroundSecondary : Colors.white;
     final primaryTextColor =
-        isDark ? MyColors.profileTextPrimaryDark : MyColors.text2;
+        isDark ? MyColors.darkTextPrimary : MyColors.textMatn1;
     return PopScope(
       canPop: _canPop,
       onPopInvokedWithResult: (didPop, result) {
         if (didPop) return;
+        if (_isExitDialogOpen) {
+          Navigator.of(context, rootNavigator: true).maybePop();
+          return;
+        }
         _showExitModal();
       },
       child: Scaffold(
         backgroundColor: pageBackgroundColor,
-        body: SafeArea(
-          child: Column(
-            children: [
-              // Custom Header (copied from FirstQuizScreen)
-              Stack(
-                children: [
-                  Container(
-                    width: double.infinity,
-                    height: 80,
-                    decoration: BoxDecoration(
-                      color: headerBackgroundColor,
-                      borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(33.5),
-                        bottomRight: Radius.circular(33.5),
-                      ),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Color(0x0D000000),
-                          blurRadius: 1,
-                          offset: Offset(0, 1),
-                        ),
-                      ],
-                    ),
-                    child: Padding(
-                      padding:
-                          const EdgeInsets.only(top: 24, left: 16, right: 16),
-                      child: Row(
-                        children: [
-                          const Spacer(),
-                          // Text(
-                          //   widget.title,
-                          //   style: MyTextStyle.textHeader16Bold,
-                          // ),
-                          const Spacer(flex: 2),
-                          GestureDetector(
-                            onTap: _showExitModal,
-                            child: Container(
-                              width: 34,
-                              height: 34,
-                              decoration: BoxDecoration(
-                                color: headerBackgroundColor,
-                                borderRadius: BorderRadius.circular(17),
-                              ),
-                              child: Icon(
-                                Icons.arrow_forward,
-                                color: primaryTextColor,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
+        appBar: AppBar(
+          elevation: 0,
+          scrolledUnderElevation: 0,
+          shadowColor: Colors.transparent,
+          surfaceTintColor: Colors.transparent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(30.r),
+            ),
+          ),
+          flexibleSpace: Container(
+            decoration: MyColors.headerDecoration(
+              backgroundColor: headerBackgroundColor,
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(30.r),
               ),
-              Expanded(
-                child: BlocListener<QuizAnswerBloc, QuizAnswerState>(
+            ),
+          ),
+          backgroundColor: Colors.transparent,
+          foregroundColor: primaryTextColor,
+          automaticallyImplyLeading: false,
+          actions: [
+            IconButton(
+              onPressed: _showExitModal,
+              icon: Icon(Icons.arrow_forward, color: primaryTextColor),
+            ),
+          ],
+          title: Text(
+            widget.title,
+            style: MyTextStyle.textHeader16Bold.copyWith(
+              color: primaryTextColor,
+            ),
+          ),
+        ),
+        body: SafeArea(
+          child: BlocListener<QuizAnswerBloc, QuizAnswerState>(
                   listener: (context, answerState) {
                     if (answerState is QuizAnswerError) {
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -186,6 +175,12 @@ class _QuizScreenState extends State<QuizScreen> {
                             quizId: widget.quizId,
                           ));
                     } else if (answerState is QuizAnswerLoaded) {
+                      unawaited(
+                        AnswerFeedbackSoundService.play(answerState.isCorrect),
+                      );
+                      if (!answerState.isCorrect) {
+                        unawaited(HapticService.wrongAnswerFeedback());
+                      }
                       // If nextQuestion is null, quiz is finished
                       if (answerState.nextQuestion == null) {
                         context.read<QuizResultBloc>().add(FetchQuizResultEvent(
@@ -244,10 +239,9 @@ class _QuizScreenState extends State<QuizScreen> {
                             children: [
                               const SizedBox(height: 32),
                               // Question Text
-                              Text(
-                                questionData.title,
+                              BidiText(
+                                text: questionData.title,
                                 textAlign: TextAlign.center,
-                                textDirection: TextDirection.ltr,
                                 style: FontSizeHelper.getContentTextStyle(
                                   context,
                                   baseFontSize: 16.0,
@@ -339,8 +333,8 @@ class _QuizScreenState extends State<QuizScreen> {
                                         ),
                                       ],
                                     ),
-                                    child: Text(
-                                      answerState.explanation!,
+                                    child: BidiText(
+                                      text: answerState.explanation!,
                                       style:
                                           MyTextStyle.textMatn12W500.copyWith(
                                         color: isDark
@@ -389,6 +383,7 @@ class _QuizScreenState extends State<QuizScreen> {
                                       ),
                                       textAlign: TextAlign.center,
                                     ),
+                                    SizedBox(height: 12.h),
                                   ],
                                 )),
                               // Button logic
@@ -518,9 +513,6 @@ class _QuizScreenState extends State<QuizScreen> {
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
         ),
       ),
     );
