@@ -45,7 +45,6 @@ class ConversationMessageBubble extends StatelessWidget {
     required String assetPath,
     required Color backgroundColor,
   }) {
-
     return SizedBox(
       width: Dimens.nw(50),
       height: Dimens.nh(50),
@@ -114,6 +113,37 @@ class ConversationMessageBubble extends StatelessWidget {
             ],
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildTranslationText({
+    required BuildContext context,
+    required Color translationColor,
+  }) {
+    final translationSentences = _splitIntoSentences(message.translation);
+
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Text.rich(
+        textDirection: TextDirection.rtl,
+        textAlign: TextAlign.start,
+        TextSpan(
+          children: [
+            for (var index = 0; index < translationSentences.length; index++)
+              TextSpan(
+                text: translationSentences[index],
+                style: FontSizeHelper.getContentTextStyle(
+                  context,
+                  baseFontSize: 12.0.sp,
+                  color: translationColor.withValues(
+                    alpha: _sentenceOpacity(index),
+                  ),
+                ),
+              ),
+          ],
+        ),
+        softWrap: true,
       ),
     );
   }
@@ -201,15 +231,9 @@ class ConversationMessageBubble extends StatelessWidget {
                               ),
                               if (showTranslations) ...[
                                 SizedBox(height: 4.h),
-                                Text(
-                                  message.translation,
-                                  style: FontSizeHelper.getContentTextStyle(
-                                    context,
-                                    baseFontSize: 12.0.sp,
-                                    color: translationColor,
-                                  ),
-                                  softWrap: true,
-                                  textDirection: TextDirection.ltr,
+                                _buildTranslationText(
+                                  context: context,
+                                  translationColor: translationColor,
                                 ),
                               ],
                             ],
@@ -245,15 +269,9 @@ class ConversationMessageBubble extends StatelessWidget {
                               ),
                               if (showTranslations) ...[
                                 SizedBox(height: 4.h),
-                                Text(
-                                  message.translation,
-                                  style: FontSizeHelper.getContentTextStyle(
-                                    context,
-                                    baseFontSize: 12.0.sp,
-                                    color: translationColor,
-                                  ),
-                                  softWrap: true,
-                                  textDirection: TextDirection.ltr,
+                                _buildTranslationText(
+                                  context: context,
+                                  translationColor: translationColor,
                                 ),
                               ],
                             ],
