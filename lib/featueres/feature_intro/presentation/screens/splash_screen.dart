@@ -11,6 +11,7 @@ import 'package:poortak/common/utils/svg_embedded_png.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/common/services/payment_deep_link_service.dart';
 import 'package:poortak/common/widgets/main_wrapper.dart';
+import 'package:poortak/config/myColors.dart';
 import 'package:poortak/featueres/feature_intro/presentation/bloc/splash_bloc/splash_cubit.dart';
 import 'package:poortak/featueres/feature_intro/presentation/screens/intro_main_wrapper.dart';
 import 'package:poortak/locator.dart';
@@ -174,28 +175,51 @@ class _SplashScreenState extends State<SplashScreen>
 
                           /// if user is offline
                           if (state.connectionStatus is ConnectionOff) {
-                            return Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Text(
-                                  'به اینترنت متصل نیستید!',
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w500,
-                                      fontFamily: "vazir"),
+                            return Center(
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 16.w,
+                                  vertical: 10.h,
                                 ),
-                                IconButton(
-                                    splashColor: Colors.white,
-                                    onPressed: () {
-                                      /// check that we are online or not
-                                      BlocProvider.of<SplashCubit>(context)
-                                          .checkConnectionEvent();
-                                    },
-                                    icon: const Icon(
-                                      Icons.autorenew,
-                                      color: Colors.white,
-                                    ))
-                              ],
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(16.r),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'به اینترنت متصل نیستید!',
+                                      style: TextStyle(
+                                        color: MyColors.primary,
+                                        fontWeight: FontWeight.w500,
+                                        fontFamily: 'vazir',
+                                        fontSize: 14.sp,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                      textDirection: TextDirection.rtl,
+                                    ),
+                                    SizedBox(width: 4.w),
+                                    IconButton(
+                                      padding: EdgeInsets.zero,
+                                      constraints: const BoxConstraints(),
+                                      splashColor:
+                                          MyColors.primary.withValues(alpha: 0.2),
+                                      onPressed: () {
+                                        /// check that we are online or not
+                                        BlocProvider.of<SplashCubit>(context)
+                                            .checkConnectionEvent();
+                                      },
+                                      icon: Icon(
+                                        Icons.autorenew,
+                                        color: MyColors.primary,
+                                        size: 22.r,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             );
                           }
 
