@@ -30,10 +30,21 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final StorageService storageService = locator<StorageService>();
 
   String? selectedAvatar;
+  String _initialFirstName = '';
+  String _initialLastName = '';
+  String? _initialAvatar;
   // String? selectedAgeGroup;
   bool isLoading = false;
   bool isLoadingAvatars = true;
   List<AvatarWithUrl> avatars = [];
+
+  bool get _hasChanges {
+    final firstNameChanged =
+        _firstNameController.text.trim() != _initialFirstName;
+    final lastNameChanged = _lastNameController.text.trim() != _initialLastName;
+    final avatarChanged = selectedAvatar != _initialAvatar;
+    return firstNameChanged || lastNameChanged || avatarChanged;
+  }
 
   // Age group options
   // final List<String> ageGroups = [
@@ -47,8 +58,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   void initState() {
     super.initState();
+    _firstNameController.addListener(_onFormChanged);
+    _lastNameController.addListener(_onFormChanged);
     _loadUserData();
     _loadAvatars();
+  }
+
+  void _onFormChanged() {
+    if (mounted) setState(() {});
   }
 
   Future<void> _loadUserData() async {
@@ -57,8 +74,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final avatar = await prefsOperator.getUserAvatar();
 
     setState(() {
-      _firstNameController.text = firstName ?? '';
-      _lastNameController.text = lastName ?? '';
+      _initialFirstName = firstName ?? '';
+      _initialLastName = lastName ?? '';
+      _initialAvatar = avatar;
+      _firstNameController.text = _initialFirstName;
+      _lastNameController.text = _initialLastName;
       selectedAvatar = avatar;
     });
   }
@@ -113,31 +133,21 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   void _updateProfile() {
-    if (_formKey.currentState!.validate()) {
-      // if (selectedAgeGroup == null) {
-      //   ScaffoldMessenger.of(context).showSnackBar(
-      //     const SnackBar(
-      //       content: Text('لطفاً رده سنی خود را انتخاب کنید'),
-      //       backgroundColor: Colors.red,
-      //     ),
-      //   );
-      //   return;
-      // }
+    if (!_hasChanges || isLoading) return;
 
-      setState(() {
-        isLoading = true;
-      });
+    setState(() {
+      isLoading = true;
+    });
 
-      final updateParams = UpdateProfileParams.only(
-        firstName: _firstNameController.text.trim(),
-        lastName: _lastNameController.text.trim(),
-        // ageGroup: selectedAgeGroup!,
-        avatar: selectedAvatar ?? '',
-      );
+    final updateParams = UpdateProfileParams.only(
+      firstName: _firstNameController.text.trim(),
+      lastName: _lastNameController.text.trim(),
+      // ageGroup: selectedAgeGroup!,
+      avatar: selectedAvatar ?? '',
+    );
 
-      final profileBloc = locator<ProfileBloc>();
-      profileBloc.add(UpdateProfileEvent(updateProfileParams: updateParams));
-    }
+    final profileBloc = locator<ProfileBloc>();
+    profileBloc.add(UpdateProfileEvent(updateProfileParams: updateParams));
   }
 
   @override
@@ -249,30 +259,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
                               SizedBox(height: 20.h),
 
-                              // First name field
+                              // First name field (optional)
                               _buildTextField(
                                 controller: _firstNameController,
                                 label: 'نام:',
-                                validator: (value) {
-                                  if (value == null || value.trim().isEmpty) {
-                                    return 'لطفاً نام خود را وارد کنید';
-                                  }
-                                  return null;
-                                },
                               ),
 
                               SizedBox(height: 7.h),
 
-                              // Last name field
+                              // Last name field (optional)
                               _buildTextField(
                                 controller: _lastNameController,
                                 label: 'نام خانوادگی:',
-                                validator: (value) {
-                                  if (value == null || value.trim().isEmpty) {
-                                    return 'لطفاً نام خانوادگی خود را وارد کنید';
-                                  }
-                                  return null;
-                                },
                               ),
 
                               SizedBox(height: 7.h),
@@ -282,18 +280,21 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
                               SizedBox(height: 40.h),
 
-                              // Confirm button
+                              // Confirm button — active when any field changed
                               Center(
                                 child: SizedBox(
                                   width: 154.w,
                                   height: 64.h,
                                   child: ElevatedButton(
-                                    onPressed:
-                                        isLoading ? null : _updateProfile,
+                                    onPressed: (!isLoading && _hasChanges)
+                                        ? _updateProfile
+                                        : null,
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: isDark
+                                      backgroundColor: _hasChanges
                                           ? MyColors.primary
                                           : const Color(0xFFC2C9D6),
+                                      disabledBackgroundColor:
+                                          const Color(0xFFC2C9D6),
                                       shape: RoundedRectangleBorder(
                                         borderRadius:
                                             BorderRadius.circular(20.r),
@@ -304,10 +305,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                         ? SizedBox(
                                             width: 20.r,
                                             height: 20.r,
-                                            child: CircularProgressIndicator(
-                                              color: isDark
-                                                  ? MyColors.loginButtonText
-                                                  : Colors.white,
+                                            child:
+                                                const CircularProgressIndicator(
+                                              color: Colors.white,
                                               strokeWidth: 2,
                                             ),
                                           )
@@ -315,9 +315,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                             'تأیید',
                                             style: MyTextStyle.textMatn18Bold
                                                 .copyWith(
-                                              color: isDark
-                                                  ? MyColors.loginButtonText
-                                                  : Colors.white,
+                                              color: Colors.white,
                                             ),
                                           ),
                                   ),
@@ -498,7 +496,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             setState(() {
               selectedAvatar = avatar.fileKey;
             });
-            Navigator.of(context).pop(); // Close modal after selection
+            Navigator.of(context).pop();
           },
           child: Container(
             margin: EdgeInsets.all(8.r),
