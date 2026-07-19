@@ -39,7 +39,7 @@ class Data {
   String id;
   String? avatar;
   String? email;
-  String firstName;
+  String? firstName;
   String? lastName;
   String phone;
   String? phoneVerifiedAt;
@@ -60,7 +60,7 @@ class Data {
     required this.id,
     this.avatar,
     this.email,
-    required this.firstName,
+    this.firstName,
     this.lastName,
     required this.phone,
     this.phoneVerifiedAt,
@@ -84,7 +84,7 @@ class Data {
         email: json["email"],
         firstName: json["firstName"],
         lastName: json["lastName"],
-        phone: json["phone"],
+        phone: json["phone"] ?? '',
         phoneVerifiedAt: json["phoneVerifiedAt"],
         verifyCode: json["verifyCode"],
         ageGroup: json["ageGroup"],
@@ -93,8 +93,10 @@ class Data {
         city: json["city"],
         address: json["address"],
         postalCode: json["postalCode"],
-        birthdate: json["birthdate"],
-        rate: json["rate"],
+        birthdate: json["birthdate"] != null
+            ? DateTime.tryParse(json["birthdate"].toString())
+            : null,
+        rate: json["rate"] ?? 0,
         createdAt: DateTime.parse(json["createdAt"]),
         updatedAt: DateTime.parse(json["updatedAt"]),
         disabledAt: json["disabledAt"] != null
