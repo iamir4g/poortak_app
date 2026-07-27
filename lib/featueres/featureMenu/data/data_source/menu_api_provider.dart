@@ -10,4 +10,9 @@ class MenuApiProvider {
   Future<Response> callGetFaq() async {
     return dio.get("${Constants.baseUrl}constants/faq");
   }
+
+  /// api/v1/constants/contact-us-info
+  Future<Response> callGetContactUsInfo() async {
+    return dio.get("${Constants.baseUrl}constants/contact-us-info");
+  }
 }

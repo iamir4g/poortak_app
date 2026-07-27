@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/common/widgets/dot_loading_widget.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
+import 'package:poortak/featueres/featureMenu/data/models/contact_us_model.dart';
+import 'package:poortak/featueres/featureMenu/presentation/bloc/contact_us_bloc/contact_us_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ContactUsScreen extends StatefulWidget {
@@ -13,6 +17,32 @@ class ContactUsScreen extends StatefulWidget {
 }
 
 class _ContactUsScreenState extends State<ContactUsScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.read<ContactUsBloc>().add(const GetContactUsInfoEvent());
+      }
+    });
+  }
+
+  String _websiteUrl(String value) {
+    final trimmed = value.trim();
+    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+      return trimmed;
+    }
+    return 'https://$trimmed';
+  }
+
+  String _websiteDisplay(String value) {
+    final trimmed = value.trim();
+    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+      return trimmed;
+    }
+    return 'https://$trimmed';
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -34,42 +64,106 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
     return Scaffold(
       backgroundColor: backgroundColor,
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              _buildHeaderSection(
-                headerBackgroundColor: headerBackgroundColor,
-                titleStyle: titleStyle,
-                iconColor: titleColor,
+        child: BlocBuilder<ContactUsBloc, ContactUsState>(
+          builder: (context, state) {
+            if (state is ContactUsLoading || state is ContactUsInitial) {
+              return Column(
+                children: [
+                  _buildHeaderSection(
+                    headerBackgroundColor: headerBackgroundColor,
+                    titleStyle: titleStyle,
+                    iconColor: titleColor,
+                  ),
+                  const Expanded(child: Center(child: DotLoadingWidget())),
+                ],
+              );
+            }
+
+            if (state is ContactUsError) {
+              return Column(
+                children: [
+                  _buildHeaderSection(
+                    headerBackgroundColor: headerBackgroundColor,
+                    titleStyle: titleStyle,
+                    iconColor: titleColor,
+                  ),
+                  Expanded(
+                    child: Center(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 24.w),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              state.message,
+                              style: MyTextStyle.textMatn14Bold.copyWith(
+                                color: MyColors.error,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            SizedBox(height: 16.h),
+                            TextButton(
+                              onPressed: () {
+                                context
+                                    .read<ContactUsBloc>()
+                                    .add(const GetContactUsInfoEvent());
+                              },
+                              child: const Text('تلاش مجدد'),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            }
+
+            final info = state is ContactUsSuccess
+                ? state.info
+                : const ContactUsInfo();
+
+            return SingleChildScrollView(
+              child: Column(
+                children: [
+                  _buildHeaderSection(
+                    headerBackgroundColor: headerBackgroundColor,
+                    titleStyle: titleStyle,
+                    iconColor: titleColor,
+                  ),
+                  SizedBox(height: 15.h),
+                  _buildContactInfoSection(
+                    info: info,
+                    cardBackgroundColor: cardBackgroundColor,
+                    titleStyle: titleStyle,
+                    descriptionStyle: descriptionStyle,
+                  ),
+                  _buildWebsiteInfoSection(
+                    info: info,
+                    cardBackgroundColor: cardBackgroundColor,
+                    titleStyle: titleStyle,
+                    descriptionStyle: descriptionStyle,
+                  ),
+                  _buildEmailSection(
+                    info: info,
+                    cardBackgroundColor: cardBackgroundColor,
+                    titleStyle: titleStyle,
+                    descriptionStyle: descriptionStyle,
+                  ),
+                  SizedBox(height: 20.h),
+                  SizedBox(
+                    height: 187.h,
+                    width: 350.w,
+                    child: Image.asset(
+                      "assets/images/contactUs/Poortak_Phone.png",
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  SizedBox(height: 20.h),
+                ],
               ),
-              SizedBox(height: 15.h),
-              _buildContactInfoSection(
-                cardBackgroundColor: cardBackgroundColor,
-                titleStyle: titleStyle,
-                descriptionStyle: descriptionStyle,
-              ),
-              _buildWebsiteInfoSection(
-                cardBackgroundColor: cardBackgroundColor,
-                titleStyle: titleStyle,
-                descriptionStyle: descriptionStyle,
-              ),
-              _buildEmailSection(
-                cardBackgroundColor: cardBackgroundColor,
-                titleStyle: titleStyle,
-                descriptionStyle: descriptionStyle,
-              ),
-              SizedBox(height: 20.h),
-              SizedBox(
-                height: 187.h,
-                width: 350.w,
-                child: Image.asset(
-                  "assets/images/contactUs/Poortak_Phone.png",
-                  fit: BoxFit.cover,
-                ),
-              ),
-              SizedBox(height: 20.h),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );
@@ -120,10 +214,14 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
   }
 
   Widget _buildContactInfoSection({
+    required ContactUsInfo info,
     required Color cardBackgroundColor,
     required TextStyle titleStyle,
     required TextStyle descriptionStyle,
   }) {
+    final address = info.address ?? '';
+    final telephones = info.telephones;
+
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 15.w, vertical: 4.h),
       padding: EdgeInsets.all(24.r),
@@ -150,34 +248,62 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
             style: titleStyle,
           ),
           SizedBox(height: 24.h),
-          Text(
-            "تهران، خیابان انقلاب، خیابان 12 فروردین، پاساژ ناشران فروشگاه انتشارات تاجیک",
-            style: descriptionStyle,
-          ),
-          SizedBox(height: 16.h),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
+          if (address.isNotEmpty)
+            Text(
+              address,
+              style: descriptionStyle,
+            ),
+          if (telephones.isNotEmpty) ...[
+            SizedBox(height: 16.h),
+            if (telephones.length == 1)
               Text(
-                "021-66953621",
+                telephones.first,
                 style: descriptionStyle,
+                textDirection: TextDirection.ltr,
+              )
+            else
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    telephones[0],
+                    style: descriptionStyle,
+                    textDirection: TextDirection.ltr,
+                  ),
+                  Text(
+                    telephones[1],
+                    style: descriptionStyle,
+                    textDirection: TextDirection.ltr,
+                  ),
+                ],
               ),
-              Text(
-                "021-66953620",
-                style: descriptionStyle,
-              ),
+            if (telephones.length > 2) ...[
+              SizedBox(height: 12.h),
+              ...telephones.skip(2).map(
+                    (phone) => Padding(
+                      padding: EdgeInsets.only(bottom: 8.h),
+                      child: Text(
+                        phone,
+                        style: descriptionStyle,
+                        textDirection: TextDirection.ltr,
+                      ),
+                    ),
+                  ),
             ],
-          ),
+          ],
         ],
       ),
     );
   }
 
   Widget _buildWebsiteInfoSection({
+    required ContactUsInfo info,
     required Color cardBackgroundColor,
     required TextStyle titleStyle,
     required TextStyle descriptionStyle,
   }) {
+    final websites = info.websites;
+
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 15.w, vertical: 4.h),
       padding: EdgeInsets.all(24.r),
@@ -209,13 +335,19 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
             ],
           ),
           SizedBox(height: 20.h),
-          InkWell(
-            onTap: () {
-              launchUrl(Uri.parse("https://poortak.ir"));
-            },
-            child: Text(
-              "https://poortak.ir",
-              style: descriptionStyle,
+          ...websites.map(
+            (website) => Padding(
+              padding: EdgeInsets.only(bottom: 12.h),
+              child: InkWell(
+                onTap: () {
+                  launchUrl(Uri.parse(_websiteUrl(website)));
+                },
+                child: Text(
+                  _websiteDisplay(website),
+                  style: descriptionStyle,
+                  textDirection: TextDirection.ltr,
+                ),
+              ),
             ),
           ),
         ],
@@ -224,10 +356,14 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
   }
 
   Widget _buildEmailSection({
+    required ContactUsInfo info,
     required Color cardBackgroundColor,
     required TextStyle titleStyle,
     required TextStyle descriptionStyle,
   }) {
+    final emails =
+        info.emails.isNotEmpty ? info.emails : const ['info@poortak.ir'];
+
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 15.w, vertical: 4.h),
       padding: EdgeInsets.all(24.r),
@@ -259,13 +395,19 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
             ],
           ),
           SizedBox(height: 20.h),
-          InkWell(
-            onTap: () {
-              launchUrl(Uri.parse("mailto:info@poortak.ir"));
-            },
-            child: Text(
-              "info@poortak.ir",
-              style: descriptionStyle,
+          ...emails.map(
+            (email) => Padding(
+              padding: EdgeInsets.only(bottom: 12.h),
+              child: InkWell(
+                onTap: () {
+                  launchUrl(Uri.parse("mailto:$email"));
+                },
+                child: Text(
+                  email,
+                  style: descriptionStyle,
+                  textDirection: TextDirection.ltr,
+                ),
+              ),
             ),
           ),
         ],

@@ -7,6 +7,7 @@ import 'package:poortak/common/widgets/main_wrapper.dart';
 import 'package:poortak/config/my_theme.dart';
 import 'package:poortak/featueres/featureMenu/screens/aboutUs_screen.dart';
 import 'package:poortak/featueres/featureMenu/screens/contactUs_screen.dart';
+import 'package:poortak/featueres/featureMenu/presentation/bloc/contact_us_bloc/contact_us_bloc.dart';
 import 'package:poortak/featueres/featureMenu/screens/faq_screen.dart';
 import 'package:poortak/featueres/featureMenu/presentation/bloc/faq_bloc/faq_bloc.dart';
 import 'package:poortak/featueres/featureMenu/screens/settings_screen.dart';
@@ -191,7 +192,10 @@ void main() async {
                   supportedLocales: const [Locale("en", ""), Locale("fa", "")],
                   routes: {
                     AboutUsScreen.routeName: (context) => AboutUsScreen(),
-                    ContactUsScreen.routeName: (context) => ContactUsScreen(),
+                    ContactUsScreen.routeName: (context) => BlocProvider(
+                          create: (context) => locator<ContactUsBloc>(),
+                          child: const ContactUsScreen(),
+                        ),
                     SettingsScreen.routeName: (context) => SettingsScreen(),
                     FAQScreen.routeName: (context) => BlocProvider(
                           create: (context) => locator<FaqBloc>(),

@@ -41,7 +41,9 @@ import 'package:poortak/featueres/feature_kavoosh/presentation/bloc/categories_b
 import 'package:poortak/featueres/featureMenu/data/data_source/menu_api_provider.dart';
 import 'package:poortak/featueres/featureMenu/repositories/menu_repository.dart';
 import 'package:poortak/featueres/featureMenu/presentation/bloc/faq_bloc/faq_bloc.dart';
+import 'package:poortak/featueres/featureMenu/presentation/bloc/contact_us_bloc/contact_us_bloc.dart';
 import 'package:poortak/common/bloc/connectivity_cubit/connectivity_cubit.dart';
+
 import 'package:poortak/common/bloc/video_download_cubit/video_download_cubit.dart';
 import 'package:poortak/common/services/payment_deep_link_service.dart';
 import 'package:poortak/common/services/video_download_service.dart';
@@ -150,6 +152,8 @@ Future<void> initLocator() async {
       () => CategoriesBloc(repository: locator()));
   locator.registerFactory<FaqBloc>(
       () => FaqBloc(menuRepository: locator()));
+  locator.registerFactory<ContactUsBloc>(
+      () => ContactUsBloc(menuRepository: locator()));
 
   // Register ShoppingCartBloc
   locator.registerSingleton<ShoppingCartBloc>(
