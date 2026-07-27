@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/common/widgets/dot_loading_widget.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
-import 'package:poortak/featueres/featureMenu/models/faq_model.dart';
+import 'package:poortak/featueres/featureMenu/data/models/faq_model.dart';
+import 'package:poortak/featueres/featureMenu/presentation/bloc/faq_bloc/faq_bloc.dart';
 
 class FAQScreen extends StatefulWidget {
   static const String routeName = "/faq";
@@ -13,94 +16,12 @@ class FAQScreen extends StatefulWidget {
 }
 
 class _FAQScreenState extends State<FAQScreen> {
-  FAQCategory _selectedCategory = FAQCategory.all;
-  final List<FAQItem> _faqItems = [
-    FAQItem(
-      id: '1',
-      question: 'بهترین ترتیب برای مطالعه هر بخش چیست؟',
-      answer:
-          'برای بهترین نتیجه، ابتدا مفاهیم پایه را مطالعه کنید، سپس به سراغ تمرینات بروید و در نهایت آزمون‌ها را انجام دهید.',
-      category: FAQCategory.lessons,
-    ),
-    FAQItem(
-      id: '2',
-      question: 'آیا می توان درس را دوباره مرور کرد؟',
-      answer:
-          'بله، شما می‌توانید هر درس را چندین بار مرور کنید تا کاملاً بر آن مسلط شوید.',
-      category: FAQCategory.lessons,
-    ),
-    FAQItem(
-      id: '3',
-      question: 'چگونه می‌توانم درس‌ها را خریداری کنم؟',
-      answer:
-          'برای خرید درس‌ها، به بخش فروشگاه بروید، درس مورد نظر را انتخاب کرده و با روش‌های مختلف پرداخت خریداری کنید.',
-      category: FAQCategory.payment,
-    ),
-    FAQItem(
-      id: '4',
-      question: 'چرا برخی از کتاب‌های کاوش قفل هستند؟',
-      answer:
-          'این کتاب‌ها باید خریداری شوند. پس از خرید، قفل آن‌ها باز می‌شود و می‌توانید مطالعه کنید.',
-      category: FAQCategory.payment,
-    ),
-    FAQItem(
-      id: '5',
-      question: 'امتیازات من کجا نمایش داده می‌شود؟',
-      answer: 'امتیازات شما در پروفایل شخصی و بخش پیشرفت قابل مشاهده است.',
-      category: FAQCategory.general,
-    ),
-    FAQItem(
-      id: '6',
-      question: 'آیا می‌توانم از امتیازاتم برای خرید استفاده کنم؟',
-      answer:
-          'بله، امتیازات شما می‌تواند برای تخفیف در خرید درس‌های جدید استفاده شود.',
-      category: FAQCategory.payment,
-    ),
-    FAQItem(
-      id: '7',
-      question: 'چگونه با پشتیبانی تماس بگیرم؟',
-      answer:
-          'از طریق بخش تماس با ما در تنظیمات یا ایمیل پشتیبانی می‌توانید با ما در ارتباط باشید.',
-      category: FAQCategory.general,
-    ),
-    FAQItem(
-      id: '8',
-      question: 'زمان پاسخگویی پشتیبانی چقدر است؟',
-      answer:
-          'تیم پشتیبانی ما در کمتر از 24 ساعت به درخواست‌های شما پاسخ می‌دهد.',
-      category: FAQCategory.general,
-    ),
-  ];
-
-  List<FAQItem> get _filteredFAQItems {
-    if (_selectedCategory == FAQCategory.all) {
-      return _faqItems;
-    }
-    return _faqItems
-        .where((item) => item.category == _selectedCategory)
-        .toList();
-  }
-
-  void _toggleFAQExpansion(String id) {
-    setState(() {
-      for (int i = 0; i < _faqItems.length; i++) {
-        if (_faqItems[i].id == id) {
-          _faqItems[i] = _faqItems[i].copyWith(
-            isExpanded: !_faqItems[i].isExpanded,
-          );
-        } else {
-          _faqItems[i] = _faqItems[i].copyWith(isExpanded: false);
-        }
-      }
-    });
-  }
-
-  void _selectCategory(FAQCategory category) {
-    setState(() {
-      _selectedCategory = category;
-      // Close all expanded items when changing category
-      for (int i = 0; i < _faqItems.length; i++) {
-        _faqItems[i] = _faqItems[i].copyWith(isExpanded: false);
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.read<FaqBloc>().add(const GetFaqEvent());
       }
     });
   }
@@ -129,17 +50,67 @@ class _FAQScreenState extends State<FAQScreen> {
         child: Column(
           children: [
             _buildHeader(headerBackgroundColor, primaryTextColor),
-            _buildCategoryFilters(
-              chipBorderColor: chipBorderColor,
-              inactiveChipBackground: inactiveChipBackground,
-              primaryTextColor: primaryTextColor,
-              secondaryTextColor: secondaryTextColor,
-            ),
             Expanded(
-              child: _buildFAQList(
-                cardBackgroundColor: cardBackgroundColor,
-                primaryTextColor: primaryTextColor,
-                secondaryTextColor: secondaryTextColor,
+              child: BlocBuilder<FaqBloc, FaqState>(
+                builder: (context, state) {
+                  if (state is FaqLoading || state is FaqInitial) {
+                    return const Center(child: DotLoadingWidget());
+                  }
+
+                  if (state is FaqError) {
+                    return Center(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 24.w),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              state.message,
+                              style: MyTextStyle.textMatn14Bold.copyWith(
+                                color: MyColors.error,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            SizedBox(height: 16.h),
+                            TextButton(
+                              onPressed: () {
+                                context
+                                    .read<FaqBloc>()
+                                    .add(const GetFaqEvent());
+                              },
+                              child: const Text('تلاش مجدد'),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }
+
+                  if (state is FaqSuccess) {
+                    return Column(
+                      children: [
+                        _buildCategoryFilters(
+                          categories: state.categories,
+                          selectedCategory: state.selectedCategory,
+                          chipBorderColor: chipBorderColor,
+                          inactiveChipBackground: inactiveChipBackground,
+                          primaryTextColor: primaryTextColor,
+                          secondaryTextColor: secondaryTextColor,
+                        ),
+                        Expanded(
+                          child: _buildFAQList(
+                            items: state.filteredItems,
+                            cardBackgroundColor: cardBackgroundColor,
+                            primaryTextColor: primaryTextColor,
+                            secondaryTextColor: secondaryTextColor,
+                          ),
+                        ),
+                      ],
+                    );
+                  }
+
+                  return const SizedBox.shrink();
+                },
               ),
             ),
           ],
@@ -191,23 +162,32 @@ class _FAQScreenState extends State<FAQScreen> {
   }
 
   Widget _buildCategoryFilters({
+    required List<String> categories,
+    required String? selectedCategory,
     required Color chipBorderColor,
     required Color inactiveChipBackground,
     required Color primaryTextColor,
     required Color secondaryTextColor,
   }) {
+    final chips = <String?>[null, ...categories];
+
     return Container(
       padding: EdgeInsets.symmetric(vertical: 16.h),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         padding: EdgeInsets.symmetric(horizontal: 25.w),
         child: Row(
-          children: FAQCategory.values.map((category) {
-            final isActive = _selectedCategory == category;
+          children: chips.map((category) {
+            final isActive = selectedCategory == category;
+            final label = category ?? 'همه ی بخش ها';
             return Padding(
-              padding: EdgeInsets.only(right: 8.w),
+              padding: EdgeInsetsDirectional.only(end: 8.w),
               child: GestureDetector(
-                onTap: () => _selectCategory(category),
+                onTap: () {
+                  context.read<FaqBloc>().add(
+                        SelectFaqCategoryEvent(category: category),
+                      );
+                },
                 child: Container(
                   height: 33.h,
                   padding: EdgeInsets.symmetric(horizontal: 16.w),
@@ -221,7 +201,7 @@ class _FAQScreenState extends State<FAQScreen> {
                   ),
                   child: Center(
                     child: Text(
-                      category.displayName,
+                      label,
                       style: MyTextStyle.textMatn12W500.copyWith(
                         color: isActive
                             ? MyColors.background
@@ -239,15 +219,27 @@ class _FAQScreenState extends State<FAQScreen> {
   }
 
   Widget _buildFAQList({
+    required List<FAQItem> items,
     required Color cardBackgroundColor,
     required Color primaryTextColor,
     required Color secondaryTextColor,
   }) {
+    if (items.isEmpty) {
+      return Center(
+        child: Text(
+          'سوالی یافت نشد',
+          style: MyTextStyle.textMatn14Bold.copyWith(
+            color: secondaryTextColor,
+          ),
+        ),
+      );
+    }
+
     return ListView.builder(
       padding: EdgeInsets.symmetric(horizontal: 25.w),
-      itemCount: _filteredFAQItems.length,
+      itemCount: items.length,
       itemBuilder: (context, index) {
-        final faqItem = _filteredFAQItems[index];
+        final faqItem = items[index];
         return _buildFAQCard(
           faqItem,
           cardBackgroundColor: cardBackgroundColor,
@@ -276,7 +268,11 @@ class _FAQScreenState extends State<FAQScreen> {
       child: Column(
         children: [
           InkWell(
-            onTap: () => _toggleFAQExpansion(faqItem.id),
+            onTap: () {
+              context.read<FaqBloc>().add(
+                    ToggleFaqExpansionEvent(id: faqItem.id),
+                  );
+            },
             child: Container(
               height: 80.h,
               padding: EdgeInsets.symmetric(horizontal: 20.w),

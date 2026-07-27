@@ -38,6 +38,9 @@ import 'package:poortak/featueres/feature_match/repositories/match_repository.da
 import 'package:poortak/featueres/feature_kavoosh/data/data_source/kavoosh_api_provider.dart';
 import 'package:poortak/featueres/feature_kavoosh/repositories/kavoosh_repository.dart';
 import 'package:poortak/featueres/feature_kavoosh/presentation/bloc/categories_bloc/categories_bloc.dart';
+import 'package:poortak/featueres/featureMenu/data/data_source/menu_api_provider.dart';
+import 'package:poortak/featueres/featureMenu/repositories/menu_repository.dart';
+import 'package:poortak/featueres/featureMenu/presentation/bloc/faq_bloc/faq_bloc.dart';
 import 'package:poortak/common/bloc/connectivity_cubit/connectivity_cubit.dart';
 import 'package:poortak/common/bloc/video_download_cubit/video_download_cubit.dart';
 import 'package:poortak/common/services/payment_deep_link_service.dart';
@@ -112,6 +115,8 @@ Future<void> initLocator() async {
   locator.registerSingleton<MatchApiProvider>(MatchApiProvider(locator()));
   locator.registerSingleton<KavooshApiProvider>(
       KavooshApiProvider(dio: locator()));
+  locator
+      .registerSingleton<MenuApiProvider>(MenuApiProvider(dio: locator()));
 
   //repository
   locator.registerSingleton<SayarehRepository>(SayarehRepository(locator()));
@@ -122,6 +127,7 @@ Future<void> initLocator() async {
   locator.registerSingleton<LitnerRepository>(LitnerRepository(locator()));
   locator.registerSingleton<MatchRepository>(MatchRepository(locator()));
   locator.registerSingleton<KavooshRepository>(KavooshRepository(locator()));
+  locator.registerSingleton<MenuRepository>(MenuRepository(locator()));
   locator.registerSingleton<DictionaryRepository>(
       DictionaryRepository(dio: locator()));
   locator.registerSingleton<BlocStorageBloc>(
@@ -142,6 +148,8 @@ Future<void> initLocator() async {
       () => DictionaryBloc(repository: locator()));
   locator.registerFactory<CategoriesBloc>(
       () => CategoriesBloc(repository: locator()));
+  locator.registerFactory<FaqBloc>(
+      () => FaqBloc(menuRepository: locator()));
 
   // Register ShoppingCartBloc
   locator.registerSingleton<ShoppingCartBloc>(
