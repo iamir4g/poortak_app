@@ -148,6 +148,13 @@ class _SplashScreenState extends State<SplashScreen>
                                   fontWeight: FontWeight.w900,
                                   color: Colors.white,
                                   height: 1.4,
+                                  shadows: [
+                                    Shadow(
+                                      color: MyColors.shadow,
+                                      offset: const Offset(0, 1),
+                                      blurRadius: 4,
+                                    ),
+                                  ],
                                 ),
                                 textAlign: TextAlign.center,
                                 textDirection: TextDirection.rtl,
