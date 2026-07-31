@@ -88,9 +88,12 @@ extension ConversationSpeaker on Datum {
   static const robotAvatarPath = 'assets/lottie/talking-robot.json';
 
   /// talking-robot.json → صدای آقا
-  bool get isMaleSpeaker => voice == 'male';
+  bool get isMaleSpeaker {
+    final v = voice.toLowerCase().trim();
+    return v == 'male' || v == 'm' || v == 'man' || v.contains('robot');
+  }
 
-  /// Talking_maya avatar.json → صدای خانم
+  /// Talking_maya avatar.json → صدای خانم (هر چیزی غیر از male)
   bool get isFemaleSpeaker => !isMaleSpeaker;
 
   String get conversationAvatarPath =>

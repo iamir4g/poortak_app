@@ -119,9 +119,8 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
               );
             }
 
-            final info = state is ContactUsSuccess
-                ? state.info
-                : const ContactUsInfo();
+            final info =
+                state is ContactUsSuccess ? state.info : const ContactUsInfo();
 
             return SingleChildScrollView(
               child: Column(

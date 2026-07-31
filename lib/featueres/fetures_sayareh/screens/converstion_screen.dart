@@ -318,13 +318,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
   /// پخش متن با صدای متناسب آواتار پیام
   Future<void> _speakWithAvatarVoice(String text, Datum message) async {
     await ttsService.stop();
-    if (message.isMaleSpeaker) {
-      await ttsService.setMaleVoice();
-    } else {
-      await ttsService.setFemaleVoice();
-    }
-    await Future.delayed(const Duration(milliseconds: 100));
-    await ttsService.speak(text);
+    // voice را صریحاً به speak بده تا بعد از stop/retry هم جنسیت ثابت بماند
+    await ttsService.speak(text, voice: message.playbackVoice);
   }
 
   /// پخش یک متن با صدای مشخص شده

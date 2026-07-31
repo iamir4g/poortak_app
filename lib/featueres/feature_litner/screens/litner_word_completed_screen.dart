@@ -378,7 +378,8 @@ class _LitnerWordCompletedScreenState extends State<LitnerWordCompletedScreen> {
                                                     const BoxConstraints(),
                                                 onPressed: () {
                                                   locator<TTSService>()
-                                                      .speak(word.word);
+                                                      .speak(word.word,
+                                                          voice: 'male');
                                                 },
                                               ),
                                               SizedBox(width: 8.w),

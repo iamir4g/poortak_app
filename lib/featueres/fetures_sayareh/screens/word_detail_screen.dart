@@ -118,7 +118,8 @@ class _WordDetailView extends StatelessWidget {
                                 fontWeight: FontWeight.w700,
                                 color: const Color(0xFF29303D))),
                         IconButton(
-                          onPressed: () => locator<TTSService>().speak(word),
+                          onPressed: () =>
+                              locator<TTSService>().speak(word, voice: 'male'),
                           icon: Image.asset(
                             'assets/images/icons/volume.png',
                             width: 22.r,
@@ -198,8 +199,9 @@ class _WordDetailView extends StatelessWidget {
                                               ),
                                               IconButton(
                                                 onPressed: () =>
-                                                    locator<TTSService>()
-                                                        .speak(ex.text),
+                                                    locator<TTSService>().speak(
+                                                        ex.text,
+                                                        voice: 'male'),
                                                 icon: Image.asset(
                                                   'assets/images/icons/volume.png',
                                                   width: 18.r,

@@ -395,7 +395,8 @@ class _DictionaryContentState extends State<_DictionaryContent> {
                   IconButton(
                     onPressed: () {
                       _dismissKeyboard();
-                      locator<TTSService>().speak(entry.word, speechRate: 0.25);
+                      locator<TTSService>()
+                          .speak(entry.word, voice: 'male', speechRate: 0.25);
                     },
                     icon: Icon(
                       Icons.volume_up_rounded,
@@ -492,7 +493,8 @@ class _DictionaryContentState extends State<_DictionaryContent> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
-                    onPressed: () => locator<TTSService>().speak(word),
+                    onPressed: () =>
+                        locator<TTSService>().speak(word, voice: 'male'),
                     icon: Icon(
                       Icons.volume_up_rounded,
                       size: 22,
@@ -546,7 +548,8 @@ class _DictionaryContentState extends State<_DictionaryContent> {
                     ),
                   ),
                   IconButton(
-                    onPressed: () => locator<TTSService>().speak(text),
+                    onPressed: () =>
+                        locator<TTSService>().speak(text, voice: 'male'),
                     icon: Icon(
                       Icons.volume_up_rounded,
                       size: 18,
