@@ -6,7 +6,7 @@ import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/l10n/app_localizations.dart';
 // import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:poortak/common/services/tts_service.dart';
+import 'package:poortak/common/services/tts_client.dart';
 import 'package:poortak/common/widgets/step_progress.dart';
 import 'package:flutter_flip_card/flutter_flip_card.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -39,7 +39,7 @@ class _LitnerWordBoxView extends StatefulWidget {
 
 class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
   final FlipCardController _flipController = FlipCardController();
-  final TTSService ttsService = locator<TTSService>();
+  final TtsClient ttsService = locator<TtsClient>();
   bool isBack = false; // Track if the card is showing its back
 
   @override

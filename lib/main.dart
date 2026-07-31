@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:poortak/common/blocs/bottom_nav_cubit/bottom_nav_cubit.dart';
-import 'package:poortak/common/services/tts_service.dart';
+import 'package:poortak/common/config/env.dart';
+import 'package:poortak/common/config/tts_config.dart';
+import 'package:poortak/common/services/tts_client.dart';
 import 'package:poortak/common/widgets/main_wrapper.dart';
 import 'package:poortak/config/my_theme.dart';
 import 'package:poortak/featueres/featureMenu/screens/aboutUs_screen.dart';
@@ -131,6 +133,9 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // runApp(const MyApp());
 
+  // Load Talkbot token etc. from .env (optional if missing)
+  await Env.load(fileNames: const ['.env', '.env.example']);
+
   await initLocator();
 
   // Request storage permission at app startup
@@ -150,7 +155,8 @@ void main() async {
     }
   }
 
-  await locator<TTSService>().initialize();
+  debugPrint('TTS provider: ${TtsConfig.provider.name}');
+  await locator<TtsClient>().initialize();
   await ReminderNotificationService.initialize();
   _loadInitialShoppingCart();
   runApp(MultiBlocProvider(

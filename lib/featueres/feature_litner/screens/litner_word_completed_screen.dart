@@ -7,7 +7,7 @@ import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_event.
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_state.dart';
 import 'package:poortak/featueres/feature_litner/data/models/list_words_model.dart';
 import 'package:poortak/locator.dart';
-import 'package:poortak/common/services/tts_service.dart';
+import 'package:poortak/common/services/tts_client.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/config/dimens.dart';
 import 'dart:async';
@@ -377,7 +377,7 @@ class _LitnerWordCompletedScreenState extends State<LitnerWordCompletedScreen> {
                                                 constraints:
                                                     const BoxConstraints(),
                                                 onPressed: () {
-                                                  locator<TTSService>()
+                                                  locator<TtsClient>()
                                                       .speak(word.word,
                                                           voice: 'male');
                                                 },

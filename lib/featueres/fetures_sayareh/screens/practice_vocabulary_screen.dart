@@ -8,7 +8,7 @@ import 'package:poortak/common/widgets/step_progress.dart';
 import 'package:poortak/common/services/answer_feedback_sound_service.dart';
 import 'package:poortak/common/services/haptic_service.dart';
 import 'package:poortak/common/services/storage_service.dart';
-import 'package:poortak/common/services/tts_service.dart';
+import 'package:poortak/common/services/tts_client.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/common/widgets/reusable_modal.dart';
 import 'package:poortak/config/dimens.dart';
@@ -38,7 +38,7 @@ class PracticeVocabularyScreen extends StatefulWidget {
 }
 
 class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
-  final TTSService ttsService = locator<TTSService>();
+  final TtsClient ttsService = locator<TtsClient>();
   final StorageService storageService = locator<StorageService>();
   final PrefsOperator prefsOperator = locator<PrefsOperator>();
   final LitnerResultToastController _litnerToastController =

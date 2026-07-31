@@ -16,7 +16,7 @@ import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/vocabulary_b
 import 'package:poortak/featueres/fetures_sayareh/screens/practice_vocabulary_screen.dart';
 import 'package:poortak/locator.dart';
 import 'package:poortak/common/services/storage_service.dart';
-import 'package:poortak/common/services/tts_service.dart';
+import 'package:poortak/common/services/tts_client.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/featueres/fetures_sayareh/widgets/vocabulary_bottom_controls.dart';
@@ -39,7 +39,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
   String? currentImageUrl;
   bool isCurrentImageReady = false;
   final Map<String, String> imageUrlCache = {};
-  final TTSService ttsService = locator<TTSService>();
+  final TtsClient ttsService = locator<TtsClient>();
   final StorageService storageService = locator<StorageService>();
   final PrefsOperator prefsOperator = locator<PrefsOperator>();
   final LitnerResultToastController _litnerToastController =

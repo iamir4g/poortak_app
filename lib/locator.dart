@@ -5,6 +5,10 @@ import 'package:poortak/featueres/fetures_sayareh/repositories/dictionary_reposi
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/dictionary_bloc/dictionary_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:poortak/common/services/storage_service.dart';
+import 'package:poortak/common/config/tts_config.dart';
+import 'package:poortak/common/services/device_tts_client.dart';
+import 'package:poortak/common/services/talkbot_tts_service.dart';
+import 'package:poortak/common/services/tts_client.dart';
 import 'package:poortak/common/services/tts_service.dart';
 import 'package:poortak/common/services/auth_interceptor.dart';
 import 'package:poortak/common/services/auth_service.dart';
@@ -99,8 +103,14 @@ Future<void> initLocator() async {
   // Register StorageService
   locator.registerSingleton<StorageService>(StorageService(dio: locator()));
 
-  // Register TTSService
-  locator.registerSingleton<TTSService>(TTSService());
+  // Register TTS: device (flutter_tts) or Talkbot — switch in TtsConfig.provider
+  final deviceTts = TTSService();
+  locator.registerSingleton<TTSService>(deviceTts);
+
+  final TtsClient ttsClient = TtsConfig.useTalkbot
+      ? TalkbotTtsService()
+      : DeviceTtsClient(deviceTts);
+  locator.registerSingleton<TtsClient>(ttsClient);
 
   // Register AuthService
   locator.registerSingleton<AuthService>(AuthService(dio: locator()));

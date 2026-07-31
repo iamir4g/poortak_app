@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:poortak/common/services/storage_service.dart';
-import 'package:poortak/common/services/tts_service.dart';
+import 'package:poortak/common/services/tts_client.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/practice_vocabulary_bloc/practice_vocabulary_bloc.dart';
@@ -28,7 +28,7 @@ class ReviewedVocabulariesScreen extends StatefulWidget {
 
 class _ReviewedVocabulariesScreenState
     extends State<ReviewedVocabulariesScreen> {
-  final TTSService ttsService = locator<TTSService>();
+  final TtsClient ttsService = locator<TtsClient>();
   final StorageService storageService = locator<StorageService>();
 
   @override

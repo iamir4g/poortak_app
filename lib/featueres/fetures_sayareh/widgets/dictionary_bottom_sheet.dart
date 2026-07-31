@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lottie/lottie.dart';
-import 'package:poortak/common/services/tts_service.dart';
+import 'package:poortak/common/services/tts_client.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/dictionary_bloc/dictionary_bloc.dart';
@@ -395,7 +395,7 @@ class _DictionaryContentState extends State<_DictionaryContent> {
                   IconButton(
                     onPressed: () {
                       _dismissKeyboard();
-                      locator<TTSService>()
+                      locator<TtsClient>()
                           .speak(entry.word, voice: 'male', speechRate: 0.25);
                     },
                     icon: Icon(
@@ -494,7 +494,7 @@ class _DictionaryContentState extends State<_DictionaryContent> {
                 children: [
                   IconButton(
                     onPressed: () =>
-                        locator<TTSService>().speak(word, voice: 'male'),
+                        locator<TtsClient>().speak(word, voice: 'male'),
                     icon: Icon(
                       Icons.volume_up_rounded,
                       size: 22,
@@ -549,7 +549,7 @@ class _DictionaryContentState extends State<_DictionaryContent> {
                   ),
                   IconButton(
                     onPressed: () =>
-                        locator<TTSService>().speak(text, voice: 'male'),
+                        locator<TtsClient>().speak(text, voice: 'male'),
                     icon: Icon(
                       Icons.volume_up_rounded,
                       size: 18,

@@ -7,7 +7,7 @@ import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/locator.dart';
-import 'package:poortak/common/services/tts_service.dart';
+import 'package:poortak/common/services/tts_client.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/conversation_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/converstion_bloc/converstion_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/widgets/conversation_message_bubble.dart';
@@ -29,7 +29,7 @@ class ConversationScreen extends StatefulWidget {
 
 class _ConversationScreenState extends State<ConversationScreen> {
   // سرویس TTS برای پخش صوتی متن‌ها
-  final TTSService ttsService = locator<TTSService>();
+  final TtsClient ttsService = locator<TtsClient>();
 
   late ConverstionBloc _converstionBloc;
 
@@ -260,6 +260,27 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
           currentSentenceIndexNotifier.value = j;
           final sentence = _currentMessageSentences[j];
+
+          // Prefetch جمله بعدی تا تأخیر شبکه کمتر حس شود
+          if (j + 1 < _currentMessageSentences.length) {
+            unawaited(
+              ttsService.prefetch(
+                _currentMessageSentences[j + 1],
+                voice: message.playbackVoice,
+              ),
+            );
+          } else if (i + 1 < messages.length) {
+            final nextMessage = messages[i + 1];
+            final nextSentences = _splitIntoSentences(nextMessage.text);
+            if (nextSentences.isNotEmpty) {
+              unawaited(
+                ttsService.prefetch(
+                  nextSentences.first,
+                  voice: nextMessage.playbackVoice,
+                ),
+              );
+            }
+          }
 
           // ذخیره وضعیت پخش در صورت رسیدن به حد نصاب
           _messagesPlayedSinceLastSave++;

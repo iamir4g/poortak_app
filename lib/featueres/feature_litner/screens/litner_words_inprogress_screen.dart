@@ -10,7 +10,7 @@ import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_state.
 import '../widgets/add_word_bottom_sheet.dart';
 import 'package:poortak/featueres/feature_litner/data/models/list_words_model.dart';
 import 'package:poortak/locator.dart';
-import 'package:poortak/common/services/tts_service.dart';
+import 'package:poortak/common/services/tts_client.dart';
 import 'dart:async';
 
 class LitnerWordsInprogressScreen extends StatefulWidget {
@@ -380,7 +380,7 @@ class _LitnerWordsInprogressScreenState
                                             padding: EdgeInsets.zero,
                                             constraints: const BoxConstraints(),
                                             onPressed: () {
-                                              locator<TTSService>()
+                                              locator<TtsClient>()
                                                   .speak(word.word,
                                                       voice: 'male');
                                             },

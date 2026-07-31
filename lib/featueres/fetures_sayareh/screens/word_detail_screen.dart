@@ -7,7 +7,7 @@ import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/dictionary_b
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/dictionary_bloc/dictionary_event.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/dictionary_bloc/dictionary_state.dart';
 import 'package:poortak/locator.dart';
-import 'package:poortak/common/services/tts_service.dart';
+import 'package:poortak/common/services/tts_client.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_bloc.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_event.dart';
@@ -119,7 +119,7 @@ class _WordDetailView extends StatelessWidget {
                                 color: const Color(0xFF29303D))),
                         IconButton(
                           onPressed: () =>
-                              locator<TTSService>().speak(word, voice: 'male'),
+                              locator<TtsClient>().speak(word, voice: 'male'),
                           icon: Image.asset(
                             'assets/images/icons/volume.png',
                             width: 22.r,
@@ -199,7 +199,7 @@ class _WordDetailView extends StatelessWidget {
                                               ),
                                               IconButton(
                                                 onPressed: () =>
-                                                    locator<TTSService>().speak(
+                                                    locator<TtsClient>().speak(
                                                         ex.text,
                                                         voice: 'male'),
                                                 icon: Image.asset(
