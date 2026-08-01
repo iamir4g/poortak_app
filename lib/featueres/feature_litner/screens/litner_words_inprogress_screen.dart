@@ -11,6 +11,7 @@ import '../widgets/add_word_bottom_sheet.dart';
 import 'package:poortak/featueres/feature_litner/data/models/list_words_model.dart';
 import 'package:poortak/locator.dart';
 import 'package:poortak/common/services/tts_client.dart';
+import 'package:poortak/common/widgets/tts_volume_icon.dart';
 import 'dart:async';
 
 class LitnerWordsInprogressScreen extends StatefulWidget {
@@ -368,13 +369,11 @@ class _LitnerWordsInprogressScreenState
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           IconButton(
-                                            icon: Image.asset(
-                                              isDark
+                                            icon: TtsVolumeIcon(
+                                              size: 18.r,
+                                              assetPath: isDark
                                                   ? 'assets/images/icons/volume_dark.png'
                                                   : 'assets/images/icons/volume.png',
-                                              width: 18.r,
-                                              height: 18.r,
-                                              fit: BoxFit.contain,
                                             ),
                                             splashRadius: 18.r,
                                             padding: EdgeInsets.zero,

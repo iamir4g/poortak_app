@@ -8,6 +8,7 @@ import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_state.
 import 'package:poortak/featueres/feature_litner/data/models/list_words_model.dart';
 import 'package:poortak/locator.dart';
 import 'package:poortak/common/services/tts_client.dart';
+import 'package:poortak/common/widgets/tts_volume_icon.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/config/dimens.dart';
 import 'dart:async';
@@ -366,11 +367,10 @@ class _LitnerWordCompletedScreenState extends State<LitnerWordCompletedScreen> {
                                             mainAxisAlignment: MainAxisAlignment.end,
                                             children: [
                                               IconButton(
-                                                icon: Image.asset(
-                                                  'assets/images/icons/volume.png',
-                                                  width: 18.r,
-                                                  height: 18.r,
-                                                  fit: BoxFit.contain,
+                                                icon: TtsVolumeIcon(
+                                                  size: 18.r,
+                                                  assetPath:
+                                                      'assets/images/icons/volume.png',
                                                 ),
                                                 splashRadius: 18.r,
                                                 padding: EdgeInsets.zero,

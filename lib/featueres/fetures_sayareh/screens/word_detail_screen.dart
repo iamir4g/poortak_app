@@ -8,6 +8,7 @@ import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/dictionary_b
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/dictionary_bloc/dictionary_state.dart';
 import 'package:poortak/locator.dart';
 import 'package:poortak/common/services/tts_client.dart';
+import 'package:poortak/common/widgets/tts_volume_icon.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_bloc.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_event.dart';
@@ -120,11 +121,9 @@ class _WordDetailView extends StatelessWidget {
                         IconButton(
                           onPressed: () =>
                               locator<TtsClient>().speak(word, voice: 'male'),
-                          icon: Image.asset(
-                            'assets/images/icons/volume.png',
-                            width: 22.r,
-                            height: 22.r,
-                            fit: BoxFit.contain,
+                          icon: TtsVolumeIcon(
+                            size: 22.r,
+                            assetPath: 'assets/images/icons/volume.png',
                           ),
                         ),
                       ],
@@ -202,11 +201,10 @@ class _WordDetailView extends StatelessWidget {
                                                     locator<TtsClient>().speak(
                                                         ex.text,
                                                         voice: 'male'),
-                                                icon: Image.asset(
-                                                  'assets/images/icons/volume.png',
-                                                  width: 18.r,
-                                                  height: 18.r,
-                                                  fit: BoxFit.contain,
+                                                icon: TtsVolumeIcon(
+                                                  size: 18.r,
+                                                  assetPath:
+                                                      'assets/images/icons/volume.png',
                                                 ),
                                               ),
                                             ],

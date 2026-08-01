@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/common/services/tts_client.dart';
+import 'package:poortak/common/widgets/tts_volume_icon.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/practice_vocabulary_bloc/practice_vocabulary_bloc.dart';
@@ -308,11 +309,9 @@ class _ReviewedVocabulariesScreenState
                                       ),
                                       child: IconButton(
                                         onPressed: () => _readWord(word.word),
-                                        icon: Image.asset(
-                                          volumeIconPath,
-                                          width: 28.r,
-                                          height: 28.r,
-                                          fit: BoxFit.contain,
+                                        icon: TtsVolumeIcon(
+                                          size: 28.r,
+                                          assetPath: volumeIconPath,
                                         ),
                                         iconSize: 28.r,
                                       ),

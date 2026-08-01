@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lottie/lottie.dart';
 import 'package:poortak/common/services/tts_client.dart';
+import 'package:poortak/common/widgets/tts_volume_icon.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/dictionary_bloc/dictionary_bloc.dart';
@@ -398,10 +399,10 @@ class _DictionaryContentState extends State<_DictionaryContent> {
                       locator<TtsClient>()
                           .speak(entry.word, voice: 'male', speechRate: 0.25);
                     },
-                    icon: Icon(
-                      Icons.volume_up_rounded,
-                      color: hintColor,
+                    icon: TtsVolumeIcon(
                       size: 20,
+                      iconData: Icons.volume_up_rounded,
+                      color: hintColor,
                     ),
                   ),
                   BlocBuilder<LitnerBloc, LitnerState>(
@@ -495,9 +496,9 @@ class _DictionaryContentState extends State<_DictionaryContent> {
                   IconButton(
                     onPressed: () =>
                         locator<TtsClient>().speak(word, voice: 'male'),
-                    icon: Icon(
-                      Icons.volume_up_rounded,
+                    icon: TtsVolumeIcon(
                       size: 22,
+                      iconData: Icons.volume_up_rounded,
                       color: hintColor,
                     ),
                   ),
@@ -550,9 +551,9 @@ class _DictionaryContentState extends State<_DictionaryContent> {
                   IconButton(
                     onPressed: () =>
                         locator<TtsClient>().speak(text, voice: 'male'),
-                    icon: Icon(
-                      Icons.volume_up_rounded,
+                    icon: TtsVolumeIcon(
                       size: 18,
+                      iconData: Icons.volume_up_rounded,
                       color: hintColor,
                     ),
                   ),

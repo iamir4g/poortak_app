@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/common/widgets/pressable_circle.dart';
+import 'package:poortak/common/widgets/tts_volume_icon.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
@@ -60,11 +61,9 @@ class VocabularyBottomControls extends StatelessWidget {
           backgroundColor: circleBg,
           pressedBackgroundColor: circleBgPressed,
           onTap: onReadWord,
-          child: Image.asset(
-            volumeIconPath,
-            width: Dimens.nr(28),
-            height: Dimens.nr(28),
-            fit: BoxFit.contain,
+          child: TtsVolumeIcon(
+            size: Dimens.nr(28),
+            assetPath: volumeIconPath,
           ),
         ),
         LitnerAddButton(

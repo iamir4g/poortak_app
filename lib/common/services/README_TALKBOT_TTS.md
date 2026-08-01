@@ -44,5 +44,8 @@ TALKBOT_API_TOKEN=sk-...
 ## سرعت و کش
 
 - سرعت پخش: `TtsConfig.talkbotPlaybackRate` (پیش‌فرض `0.78`)
-- کش دیسک: `ApplicationSupport/talkbot_tts_cache` — بار دوم همان جمله بدون شبکه پخش می‌شود
-- در مکالمه، جمله بعدی با `prefetch` از قبل دانلود می‌شود
+- کش دیسک: `ApplicationSupport/talkbot_tts_cache`
+- پیش‌کش کل مکالمه: `TalkbotTtsPrefetchUtil.warmUpConversationMessages(...)`
+  - فقط وقتی `TtsConfig.provider == talkbot` کار می‌کند
+  - با موتور دستگاه هیچ اثری ندارد
+  - جملات را موازی (concurrency=3) می‌گیرد تا موقع پخش پشت API نمانیم

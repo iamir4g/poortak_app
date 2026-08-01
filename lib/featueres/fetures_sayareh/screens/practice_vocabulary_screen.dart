@@ -9,6 +9,7 @@ import 'package:poortak/common/services/answer_feedback_sound_service.dart';
 import 'package:poortak/common/services/haptic_service.dart';
 import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/common/services/tts_client.dart';
+import 'package:poortak/common/widgets/tts_volume_icon.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/common/widgets/reusable_modal.dart';
 import 'package:poortak/config/dimens.dart';
@@ -570,11 +571,9 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
                                                 circleBgPressed,
                                             onTap: () =>
                                                 _readWord(correctWord.word),
-                                            child: Image.asset(
-                                              volumeIconPath,
-                                              width: Dimens.nr(28),
-                                              height: Dimens.nr(28),
-                                              fit: BoxFit.contain,
+                                            child: TtsVolumeIcon(
+                                              size: Dimens.nr(28),
+                                              assetPath: volumeIconPath,
                                             ),
                                           ),
                                           SizedBox(width: 20.w),

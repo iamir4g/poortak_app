@@ -7,7 +7,9 @@ import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/locator.dart';
+import 'package:poortak/common/config/tts_config.dart';
 import 'package:poortak/common/services/tts_client.dart';
+import 'package:poortak/common/utils/talkbot_tts_prefetch_util.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/conversation_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/converstion_bloc/converstion_bloc.dart';
 import 'package:poortak/featueres/fetures_sayareh/widgets/conversation_message_bubble.dart';
@@ -60,6 +62,19 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
   // تایمر برای جلوگیری از ارسال درخواست‌های تکراری و پشت سر هم
   Timer? _savePlaybackDebounceTimer;
+
+  /// یک‌بار به‌ازای هر conversationId پیش‌کش Talkbot را شروع می‌کند
+  String? _prefetchStartedForId;
+
+  void _warmTalkbotVoicesIfNeeded(List<Datum> messages) {
+    if (_prefetchStartedForId == widget.conversationId) return;
+    _prefetchStartedForId = widget.conversationId;
+    // بعد از فریم اول UI تا لود لیست بلاک نشود
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      TalkbotTtsPrefetchUtil.warmUpConversationMessages(messages);
+    });
+  }
 
   @override
   void initState() {
@@ -164,6 +179,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
   @override
   void dispose() {
     // توقف پخش در صورت خروج از صفحه
+    TalkbotTtsPrefetchUtil.cancel();
     ttsService.stop();
     _converstionBloc.close();
     isPlayingNotifier.dispose();
@@ -260,27 +276,6 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
           currentSentenceIndexNotifier.value = j;
           final sentence = _currentMessageSentences[j];
-
-          // Prefetch جمله بعدی تا تأخیر شبکه کمتر حس شود
-          if (j + 1 < _currentMessageSentences.length) {
-            unawaited(
-              ttsService.prefetch(
-                _currentMessageSentences[j + 1],
-                voice: message.playbackVoice,
-              ),
-            );
-          } else if (i + 1 < messages.length) {
-            final nextMessage = messages[i + 1];
-            final nextSentences = _splitIntoSentences(nextMessage.text);
-            if (nextSentences.isNotEmpty) {
-              unawaited(
-                ttsService.prefetch(
-                  nextSentences.first,
-                  voice: nextMessage.playbackVoice,
-                ),
-              );
-            }
-          }
 
           // ذخیره وضعیت پخش در صورت رسیدن به حد نصاب
           _messagesPlayedSinceLastSave++;
@@ -507,39 +502,61 @@ class _ConversationScreenState extends State<ConversationScreen> {
                       ValueListenableBuilder<bool>(
                         valueListenable: isPlayingNotifier,
                         builder: (context, isPlaying, _) {
-                          final bgColor = isPlaying
-                              ? MyColors.primary
-                              : (isDark
-                                  ? MyColors.conversationPlayPauseDarkPaused
-                                  : MyColors.gray);
-                          final icon =
-                              isPlaying ? Icons.pause : Icons.play_arrow;
-                          final iconFg = isPlaying
-                              ? Colors.white
-                              : (isDark ? Colors.white : MyColors.text2);
+                          return ValueListenableBuilder<bool>(
+                            valueListenable: ttsService.isBusy,
+                            builder: (context, busy, _) {
+                              final bgColor = isPlaying
+                                  ? MyColors.primary
+                                  : (isDark
+                                      ? MyColors
+                                          .conversationPlayPauseDarkPaused
+                                      : MyColors.gray);
+                              final iconFg = isPlaying
+                                  ? Colors.white
+                                  : (isDark ? Colors.white : MyColors.text2);
+                              final showLoader = TtsConfig.useTalkbot &&
+                                  busy &&
+                                  isPlaying;
 
-                          return SizedBox(
-                            width: 60.r,
-                            height: 60.r,
-                            child: Material(
-                              color: bgColor,
-                              shape: const CircleBorder(),
-                              child: InkWell(
-                                customBorder: const CircleBorder(),
-                                onTap: () {
-                                  if (sortedMessages != null) {
-                                    playAllConversations(sortedMessages!);
-                                  }
-                                },
-                                child: Center(
-                                  child: Icon(
-                                    icon,
-                                    size: 34.r,
-                                    color: iconFg,
+                              return SizedBox(
+                                width: 60.r,
+                                height: 60.r,
+                                child: Material(
+                                  color: bgColor,
+                                  shape: const CircleBorder(),
+                                  child: InkWell(
+                                    customBorder: const CircleBorder(),
+                                    onTap: () {
+                                      if (sortedMessages != null) {
+                                        playAllConversations(
+                                            sortedMessages!);
+                                      }
+                                    },
+                                    child: Center(
+                                      child: showLoader
+                                          ? SizedBox(
+                                              width: 26.r,
+                                              height: 26.r,
+                                              child:
+                                                  CircularProgressIndicator(
+                                                strokeWidth: 2.5,
+                                                valueColor:
+                                                    AlwaysStoppedAnimation<
+                                                        Color>(iconFg),
+                                              ),
+                                            )
+                                          : Icon(
+                                              isPlaying
+                                                  ? Icons.pause
+                                                  : Icons.play_arrow,
+                                              size: 34.r,
+                                              color: iconFg,
+                                            ),
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ),
+                              );
+                            },
                           );
                         },
                       ),
@@ -618,25 +635,28 @@ class _ConversationScreenState extends State<ConversationScreen> {
           top: false,
           child: BlocListener<ConverstionBloc, ConverstionState>(
             listener: (context, state) {
-              if (state is ConverstionSuccess &&
-                  state.lastConversationId != null) {
-                // ابتدا پیام‌ها را استخراج و مرتب می‌کنیم تا بتوانیم ایندکس را پیدا کنیم
+              if (state is ConverstionSuccess) {
                 final messages = List<Datum>.from(state.data.data)
                   ..sort((a, b) => a.order.compareTo(b.order));
 
-                final index = messages
-                    .indexWhere((m) => m.id == state.lastConversationId);
+                // به‌محض دیدن کل مکالمه، ویس‌ها را جلو جلو بگیر (فقط Talkbot)
+                _warmTalkbotVoicesIfNeeded(messages);
 
-                if (index != -1) {
-                  currentPlayingIndexNotifier.value = index;
-                  _resetScrollTracking();
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    _scrollToCurrentSentence(
-                      index,
-                      currentSentenceIndexNotifier.value,
-                      force: true,
-                    );
-                  });
+                if (state.lastConversationId != null) {
+                  final index = messages
+                      .indexWhere((m) => m.id == state.lastConversationId);
+
+                  if (index != -1) {
+                    currentPlayingIndexNotifier.value = index;
+                    _resetScrollTracking();
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      _scrollToCurrentSentence(
+                        index,
+                        currentSentenceIndexNotifier.value,
+                        force: true,
+                      );
+                    });
+                  }
                 }
               }
             },
@@ -670,6 +690,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                   // مرتب‌سازی پیام‌ها بر اساس order
                   sortedMessages = state.data.data
                     ..sort((a, b) => a.order.compareTo(b.order));
+                  _warmTalkbotVoicesIfNeeded(sortedMessages!);
                   return _buildConversationList(context, state.data);
                 }
 

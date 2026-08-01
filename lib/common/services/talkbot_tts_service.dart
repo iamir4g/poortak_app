@@ -22,7 +22,7 @@ import 'package:poortak/common/config/tts_config.dart';
 import 'package:poortak/common/services/tts_client.dart';
 import 'package:poortak/common/services/tts_service.dart';
 
-class TalkbotTtsService implements TtsClient {
+class TalkbotTtsService extends TtsClient {
   TalkbotTtsService({Dio? dio, AudioPlayer? player})
       : _dio = dio ??
             Dio(
@@ -48,6 +48,18 @@ class TalkbotTtsService implements TtsClient {
 
   /// In-flight downloads so parallel prefetch/speak share one network call.
   final Map<String, Future<File>> _inflight = {};
+
+  int _busyDepth = 0;
+
+  void _retainBusy() {
+    _busyDepth++;
+    setBusy(true);
+  }
+
+  void _releaseBusy() {
+    if (_busyDepth > 0) _busyDepth--;
+    setBusy(_busyDepth > 0);
+  }
 
   @override
   Future<void> initialize() async {
@@ -111,6 +123,9 @@ class TalkbotTtsService implements TtsClient {
     final sanitized = TTSService.sanitizeForSpeech(text);
     if (sanitized.isEmpty) return Future.value();
 
+    // فوری لودینگ را روشن کن تا کاربر قبل از رسیدن نوبت صف هم بازخورد ببیند
+    _retainBusy();
+
     final run = _speakQueue.then(
       (_) => _speakInternal(sanitized, voice: voice, speechRate: speechRate),
     );
@@ -154,6 +169,7 @@ class TalkbotTtsService implements TtsClient {
     }
 
     final rate = _resolvePlaybackRate(speechRate);
+    var released = false;
 
     try {
       final sw = Stopwatch()..start();
@@ -165,10 +181,15 @@ class TalkbotTtsService implements TtsClient {
 
       if (_stopRequested) return;
 
+      // آماده‌سازی تمام شد — پخش شروع می‌شود
+      _releaseBusy();
+      released = true;
       await _playFile(file, rate);
     } catch (e, st) {
       debugPrint('Talkbot TTS speak error: $e\n$st');
       rethrow;
+    } finally {
+      if (!released) _releaseBusy();
     }
   }
 
@@ -362,6 +383,8 @@ class TalkbotTtsService implements TtsClient {
   Future<void> stop() async {
     _stopRequested = true;
     _playbackGeneration++;
+    _busyDepth = 0;
+    setBusy(false);
     final c = _playbackCompleter;
     if (c != null && !c.isCompleted) c.complete();
     await _player.stop();

@@ -1,11 +1,17 @@
 /// Shared TTS contract used by UI call sites.
 ///
 /// Implementations:
-/// - [TTSService] via [DeviceTtsClient] (flutter_tts)
-/// - [TalkbotTtsService] (Talkbot Azure API)
+/// - [DeviceTtsClient] (flutter_tts)
+/// - [TalkbotTtsService] (Talkbot API)
 library;
 
+import 'package:flutter/foundation.dart';
+
 abstract class TtsClient {
+  /// True while online TTS is preparing audio (download/synthesize).
+  /// Device engine keeps this false.
+  final ValueNotifier<bool> isBusy = ValueNotifier<bool>(false);
+
   Future<void> initialize();
 
   Future<void> speak(String text, {String? voice, double? speechRate});
@@ -20,4 +26,11 @@ abstract class TtsClient {
   Future<void> setFemaleVoice();
 
   Future<void> setVoice(String voice);
+
+  @protected
+  void setBusy(bool value) {
+    if (isBusy.value != value) {
+      isBusy.value = value;
+    }
+  }
 }

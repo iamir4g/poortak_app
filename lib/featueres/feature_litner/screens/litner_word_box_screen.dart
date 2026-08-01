@@ -7,6 +7,7 @@ import 'package:poortak/config/myColors.dart';
 import 'package:poortak/l10n/app_localizations.dart';
 // import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:poortak/common/services/tts_client.dart';
+import 'package:poortak/common/widgets/tts_volume_icon.dart';
 import 'package:poortak/common/widgets/step_progress.dart';
 import 'package:flutter_flip_card/flutter_flip_card.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -319,11 +320,9 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
                 SizedBox(width: Dimens.small.w),
                 GestureDetector(
                   onTap: () => ttsService.speak(englishWord, voice: 'male'),
-                  child: Image.asset(
-                    'assets/images/icons/volume.png',
-                    width: 28.r,
-                    height: 28.r,
-                    fit: BoxFit.contain,
+                  child: TtsVolumeIcon(
+                    size: 28.r,
+                    assetPath: 'assets/images/icons/volume.png',
                   ),
                 ),
               ],
@@ -384,17 +383,10 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
                   SizedBox(width: Dimens.small.w),
                   GestureDetector(
                     onTap: () => ttsService.speak(englishWord, voice: 'male'),
-                    child: ColorFiltered(
-                      colorFilter: const ColorFilter.mode(
-                        Colors.white,
-                        BlendMode.srcIn,
-                      ),
-                      child: Image.asset(
-                        'assets/images/icons/volume.png',
-                        width: 28.r,
-                        height: 28.r,
-                        fit: BoxFit.contain,
-                      ),
+                    child: TtsVolumeIcon(
+                      size: 28.r,
+                      assetPath: 'assets/images/icons/volume.png',
+                      color: Colors.white,
                     ),
                   ),
                 ],
