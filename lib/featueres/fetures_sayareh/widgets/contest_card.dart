@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poortak/common/utils/svg_embedded_png.dart';
-import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 
@@ -22,77 +21,83 @@ class ContestCard extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.circular(20.r),
+        borderRadius: BorderRadius.circular(16.r),
         onTap: onTap,
         child: Container(
           width: double.infinity,
-          height: Dimens.nh(104.0),
-          margin: EdgeInsets.symmetric(
-            horizontal: Dimens.medium,
-            vertical: Dimens.nh(8),
-          ),
-          padding: EdgeInsets.all(16.r),
+          margin: EdgeInsets.symmetric(horizontal: 16.w),
+          padding: EdgeInsetsDirectional.fromSTEB(14.w, 14.h, 16.w, 14.h),
           decoration: BoxDecoration(
             color: isDark ? Theme.of(context).cardColor : null,
-            gradient: isDark ? null : MyColors.contestCardGradient,
-            borderRadius: BorderRadius.circular(20.r),
+            gradient: isDark ? null : MyColors.sayarehHomeContestGradient,
+            borderRadius: BorderRadius.circular(16.r),
             boxShadow: [
               BoxShadow(
                 color: Theme.of(context).brightness == Brightness.dark
                     ? Colors.black.withValues(alpha: 0.3)
-                    : Colors.grey.withValues(alpha: 0.1),
-                spreadRadius: 1.r,
-                blurRadius: 3.r,
-                offset: Offset(0, 1.h),
+                    : Colors.black.withValues(alpha: 0.08),
+                blurRadius: 8.r,
+                offset: Offset(0, 2.h),
               ),
             ],
           ),
           child: Row(
             children: [
+              Container(
+                width: 64.r,
+                height: 64.r,
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? const Color(0xFF11131C)
+                      : Colors.white.withValues(alpha: 0.18),
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: _GiftBoxAsset(size: 34.r),
+                ),
+              ),
+              SizedBox(width: 12.w),
               Expanded(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
                       'مسابقه پورتک',
-                      style: TextStyle(
-                        color: isDark
-                            ? const Color(0xFFFFFFFF)
-                            : MyColors.textMatn1,
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w600,
-                        height: 1.0,
+                      textAlign: TextAlign.right,
+                      style: MyTextStyle.textMatn16Bold.copyWith(
+                        color: Colors.white,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    SizedBox(height: 8.h),
+                    SizedBox(height: 6.h),
                     Text(
                       'در مسابقه ماهانه پورتک شرکت کنید و جایزه ببرید.',
+                      textAlign: TextAlign.right,
                       style: MyTextStyle.description10Medium.copyWith(
-                        color: isDark
-                            ? MyColors.loginTextSecondaryDark
-                            : MyColors.text4,
+                        color: Colors.white.withValues(alpha: 0.9),
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
+                    SizedBox(height: 10.h),
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 12.w,
+                        vertical: 6.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20.r),
+                      ),
+                      child: Text(
+                        'شرکت می‌کنم',
+                        style: MyTextStyle.textMatn12Bold.copyWith(
+                          color: MyColors.sayarehHomeContestEnd,
+                        ),
+                      ),
+                    ),
                   ],
-                ),
-              ),
-              SizedBox(width: 8.w),
-              Container(
-                width: 70.r,
-                height: 70.r,
-                decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF11131C) : MyColors.background,
-                  shape: BoxShape.circle,
-                ),
-                child: Center(
-                  child: _GiftBoxAsset(
-                    size: 40.r,
-                  ),
                 ),
               ),
             ],

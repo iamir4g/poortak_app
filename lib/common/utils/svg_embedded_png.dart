@@ -100,14 +100,14 @@ Widget buildImageFromAssetOrEmbeddedSvg(
         final Widget child;
         if (hasSanitizedSvg) {
           child = SvgPicture.string(
-            sanitizedSvg!,
+            sanitizedSvg,
             width: width,
             height: height,
             fit: fit,
           );
         } else if (hasEmbeddedRaster) {
           child = Image.memory(
-            bytes!,
+            bytes,
             width: width,
             height: height,
             fit: fit,

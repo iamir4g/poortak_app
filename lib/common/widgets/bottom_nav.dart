@@ -316,72 +316,90 @@ class BottomNav extends StatelessWidget {
         final isSelected = state == index;
         final unselectedColor = themeState.isDark
             ? MyColors.darkTextSecondary
-            : Colors.grey;
+            : MyColors.text5;
+        final selectedColor = MyColors.sayarehHomePurple;
 
         return Expanded(
           child: Material(
             color: Colors.transparent,
             child: InkWell(
               onTap: () => onTabSelected(index),
-              splashColor: MyColors.primary.withOpacity(0.08),
-              highlightColor: MyColors.primary.withOpacity(0.04),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    height: Dimens.iconMedium + 4.h,
-                    child: Center(
-                      child: AnimatedScale(
-                        scale: isSelected ? 1.05 : 1.0,
-                        duration: _navAnimationDuration,
-                        curve: Curves.easeOutCubic,
-                        child: TweenAnimationBuilder<Color?>(
-                          tween: ColorTween(
-                            end:
-                                isSelected ? MyColors.primary : unselectedColor,
-                          ),
+              splashColor: MyColors.sayarehHomePurple.withValues(alpha: 0.08),
+              highlightColor:
+                  MyColors.sayarehHomePurple.withValues(alpha: 0.04),
+              borderRadius: BorderRadius.circular(20.r),
+              child: AnimatedContainer(
+                duration: _navAnimationDuration,
+                curve: Curves.easeOutCubic,
+                margin: EdgeInsets.symmetric(horizontal: 4.w, vertical: 4.h),
+                padding: EdgeInsets.symmetric(vertical: 4.h),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? (themeState.isDark
+                          ? MyColors.sayarehHomePurple.withValues(alpha: 0.22)
+                          : MyColors.sayarehHomeNavPill)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(20.r),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      height: Dimens.iconMedium + 4.h,
+                      child: Center(
+                        child: AnimatedScale(
+                          scale: isSelected ? 1.05 : 1.0,
                           duration: _navAnimationDuration,
                           curve: Curves.easeOutCubic,
-                          builder: (context, color, child) {
-                            return _buildIcon(
-                              context: context,
-                              index: index,
-                              state: state,
-                              icon: icon,
-                              isSelected: isSelected,
-                              themeState: themeState,
-                              iconColor: color ?? unselectedColor,
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 18.h,
-                    child: Center(
-                      child: AnimatedOpacity(
-                        opacity: isSelected ? 1.0 : 0.0,
-                        duration: _navAnimationDuration,
-                        curve: Curves.easeOutCubic,
-                        child: Text(
-                          label,
-                          style: TextStyle(
-                            fontFamily: 'IRANSans',
-                            fontWeight: FontWeight.bold,
-                            fontSize: 9.sp,
-                            height: 1.2,
-                            color: MyColors.primary,
+                          child: TweenAnimationBuilder<Color?>(
+                            tween: ColorTween(
+                              end: isSelected ? selectedColor : unselectedColor,
+                            ),
+                            duration: _navAnimationDuration,
+                            curve: Curves.easeOutCubic,
+                            builder: (context, color, child) {
+                              return _buildIcon(
+                                context: context,
+                                index: index,
+                                state: state,
+                                icon: icon,
+                                isSelected: isSelected,
+                                themeState: themeState,
+                                iconColor: color ?? unselectedColor,
+                              );
+                            },
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.center,
                         ),
                       ),
                     ),
-                  ),
-                ],
+                    SizedBox(
+                      height: 18.h,
+                      child: Center(
+                        child: AnimatedOpacity(
+                          opacity: isSelected ? 1.0 : 0.85,
+                          duration: _navAnimationDuration,
+                          curve: Curves.easeOutCubic,
+                          child: Text(
+                            label,
+                            style: isSelected
+                                ? MyTextStyle.sayarehHomeNavLabel
+                                : TextStyle(
+                                    fontFamily: 'IRANSans',
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 9.sp,
+                                    height: 1.2,
+                                    color: unselectedColor,
+                                  ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

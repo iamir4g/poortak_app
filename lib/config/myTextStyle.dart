@@ -357,4 +357,84 @@ class MyTextStyle {
         letterSpacing: 0.0,
         color: MyColors.text3,
       );
+
+  // Sayareh home redesign (Figma)
+  static TextStyle get sayarehHomeGreeting => TextStyle(
+        fontFamily: "IRANSans",
+        fontSize: 20.sp,
+        fontWeight: FontWeight.w900,
+        height: 1.0,
+        color: MyColors.sayarehHomePurple,
+      );
+
+  static TextStyle get sayarehHomeHeroTitle => TextStyle(
+        fontFamily: "IRANSans",
+        fontSize: 13.sp,
+        fontWeight: FontWeight.w700,
+        height: 1.0,
+        color: MyColors.text1,
+      );
+
+  static TextStyle get sayarehHomeHeroSubtitle => TextStyle(
+        fontFamily: "IRANSans",
+        fontSize: 12.sp,
+        fontWeight: FontWeight.w500,
+        height: 1.2,
+        color: MyColors.text3,
+      );
+
+  static TextStyle get sayarehHomeCtaText => TextStyle(
+        fontFamily: "IRANSans",
+        fontSize: 14.sp,
+        fontWeight: FontWeight.w700,
+        height: 1.0,
+        color: Colors.white,
+        shadows: const [
+          Shadow(
+            color: Color(0xFF693EC3),
+            offset: Offset(0, 2),
+            blurRadius: 4,
+          ),
+        ],
+      );
+
+  static TextStyle get sayarehHomeSectionTitle => TextStyle(
+        fontFamily: "IRANSans",
+        fontSize: 14.sp,
+        fontWeight: FontWeight.w700,
+        height: 1.0,
+        color: MyColors.text1,
+      );
+
+  static TextStyle get sayarehHomeViewAll => TextStyle(
+        fontFamily: "IRANSans",
+        fontSize: 12.sp,
+        fontWeight: FontWeight.w500,
+        height: 1.0,
+        color: MyColors.sayarehHomePurple,
+      );
+
+  static TextStyle get sayarehHomeMoreButton => TextStyle(
+        fontFamily: "IRANSans",
+        fontSize: 14.sp,
+        fontWeight: FontWeight.w700,
+        height: 1.0,
+        color: MyColors.text2,
+      );
+
+  static TextStyle get sayarehHomeHeaderStat => TextStyle(
+        fontFamily: "IRANSans",
+        fontSize: 12.sp,
+        fontWeight: FontWeight.w700,
+        height: 1.0,
+        color: MyColors.text1,
+      );
+
+  static TextStyle get sayarehHomeNavLabel => TextStyle(
+        fontFamily: "IRANSans",
+        fontSize: 10.sp,
+        fontWeight: FontWeight.w700,
+        height: 1.2,
+        color: MyColors.sayarehHomePurple,
+      );
 }

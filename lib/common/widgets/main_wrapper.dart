@@ -400,11 +400,15 @@ class _MainWrapperState extends State<MainWrapper> {
                     key: _scaffoldKey,
                     backgroundColor: themeState.isDark
                         ? MyColors.darkBackground
-                        : Colors.white,
+                        : (currentPageIndex == 0
+                            ? MyColors.sayarehHomeBgStart
+                            : Colors.white),
                     resizeToAvoidBottomInset: false,
                     extendBodyBehindAppBar: false,
                     drawerScrimColor: Colors.black54,
-                    appBar: AppBar(
+                    appBar: currentPageIndex == 0
+                        ? null
+                        : AppBar(
                       backgroundColor: themeState.isDark
                           ? MyColors.darkBackground
                           : MyColors.background,

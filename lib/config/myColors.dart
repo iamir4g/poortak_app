@@ -247,4 +247,52 @@ class MyColors {
   static const Color inactiveTabBackground = Color(0xFF9498AC);
   static const Color dividerGray = gray;
   static const Color modalButtonPressedLight = Color(0xFFCEDEF8);
+
+  // Sayareh home redesign (Figma)
+  static const Color sayarehHomePurple = Color(0xFF5526B4);
+  static const Color sayarehHomeCtaStart = Color(0xFF9864EB);
+  static const Color sayarehHomeCtaEnd = Color(0xFF7548D3);
+  static const Color sayarehHomeCardBg = Color(0xFFFBFAFF);
+  static const Color sayarehHomeHeroStart = Color(0xFFFFF7F1);
+  static const Color sayarehHomeHeroEnd = Color(0xFFFFE2CE);
+  static const Color sayarehHomeBgStart = Color(0xFFFDF7FC);
+  static const Color sayarehHomeBgEnd = Color(0xFFF2ECFD);
+  static const Color sayarehHomeNavPill = Color(0xFFEDE4FF);
+  static const Color sayarehHomeEpisodeActiveBadge = Color(0xFF6FC845);
+  static const Color sayarehHomeBundleStart = Color(0xFF7B4FE0);
+  static const Color sayarehHomeBundleEnd = Color(0xFF5A2FC4);
+  static const Color sayarehHomeContestStart = Color(0xFF4A83E4);
+  static const Color sayarehHomeContestEnd = Color(0xFF2E5FBF);
+  static const Color sayarehHomeRoadmapActive = Color(0xFF9864EB);
+  static const Color sayarehHomeRoadmapInactive = Color(0xFFC2C9D6);
+
+  static const LinearGradient sayarehHomeScreenGradient = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [sayarehHomeBgStart, sayarehHomeBgEnd],
+  );
+
+  static const LinearGradient sayarehHomeHeroGradient = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [sayarehHomeHeroStart, sayarehHomeHeroEnd],
+  );
+
+  static const LinearGradient sayarehHomeCtaGradient = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [sayarehHomeCtaStart, sayarehHomeCtaEnd],
+  );
+
+  static const LinearGradient sayarehHomeBundleGradient = LinearGradient(
+    begin: Alignment.centerRight,
+    end: Alignment.centerLeft,
+    colors: [sayarehHomeBundleStart, sayarehHomeBundleEnd],
+  );
+
+  static const LinearGradient sayarehHomeContestGradient = LinearGradient(
+    begin: Alignment.centerRight,
+    end: Alignment.centerLeft,
+    colors: [sayarehHomeContestStart, sayarehHomeContestEnd],
+  );
 }
