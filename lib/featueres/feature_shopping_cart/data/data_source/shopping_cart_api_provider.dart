@@ -58,4 +58,14 @@ class ShoppingCartApiProvider {
     log("✅ Checkout Cart Response: ${response.data}");
     return response;
   }
+
+  Future<Response> applyReferrerCode(String referrerCode) async {
+    log("🎟️ Applying referrer code via API...");
+    final response = await _authService.post(
+      "${Constants.baseUrl}cart/referrer",
+      data: {"referrerCode": referrerCode},
+    );
+    log("✅ Apply Referrer Code Response: ${response.data}");
+    return response;
+  }
 }

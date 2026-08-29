@@ -17,6 +17,7 @@ import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shoppi
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_state.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/data_source/shopping_cart_api_provider.dart';
+import 'package:poortak/featueres/feature_shopping_cart/repositories/shopping_cart_repository.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/iknow_summary_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_home_model.dart';
 import 'package:poortak/featueres/fetures_sayareh/data/models/single_book_model.dart';
@@ -24,6 +25,7 @@ import 'package:poortak/featueres/fetures_sayareh/repositories/sayareh_repositor
 import 'package:poortak/common/services/getImageUrl_service.dart';
 import 'package:poortak/featueres/feature_shopping_cart/widgets/cart_summary_section.dart';
 import 'package:poortak/featueres/feature_shopping_cart/widgets/cart_item_card.dart';
+import 'package:poortak/featueres/feature_shopping_cart/widgets/referral_code_card.dart';
 import 'package:poortak/featueres/feature_shopping_cart/utils/cart_item_pricing.dart';
 import 'package:poortak/l10n/app_localizations.dart';
 import 'package:poortak/locator.dart';
@@ -122,6 +124,26 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
         Navigator.pushNamed(context, LoginScreen.routeName);
       },
     );
+  }
+
+  Future<void> _submitReferralCode(String code) async {
+    if (!locator<PrefsOperator>().isLoggedIn()) {
+      _promptLogin();
+      throw ReferralCodeSubmitAborted();
+    }
+
+    try {
+      await locator<ShoppingCartRepository>().applyReferrerCode(code);
+    } on UnauthorisedException {
+      if (mounted) {
+        _promptLogin();
+      }
+      throw ReferralCodeSubmitAborted();
+    }
+
+    if (!mounted) return;
+
+    context.read<ShoppingCartBloc>().add(GetCartEvent());
   }
 
   @override
@@ -600,9 +622,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                     subTotal: totals.subTotal,
                     discount: totals.discount,
                     payable: totals.payable,
-                    onReferralSubmit: (code) {
-                      log("🎟️ Referral code submitted: $code");
-                    },
+                    onReferralSubmit: _submitReferralCode,
                   );
                 }
                 final item = cart.items[index];
@@ -791,9 +811,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                           subTotal: totalPrice,
                           discount: 0,
                           payable: totalPrice,
-                          onReferralSubmit: (code) {
-                            log("🎟️ Referral code submitted: $code");
-                          },
+                          onReferralSubmit: _submitReferralCode,
                         ),
                       );
                     },

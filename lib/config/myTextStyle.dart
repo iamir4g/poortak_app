@@ -284,6 +284,56 @@ class MyTextStyle {
         height: 1.0,
       );
 
+  static TextStyle referralCodeTitle14MediumFor(bool isDark) => TextStyle(
+        fontFamily: "IranSans",
+        fontSize: 14.sp,
+        fontWeight: FontWeight.w500,
+        color: isDark ? MyColors.darkTextPrimary : MyColors.textMatn1,
+        height: 1.0,
+      );
+
+  static TextStyle referralCodeHint14RegularFor(bool isDark) => TextStyle(
+        fontFamily: "IranSans",
+        fontSize: 14.sp,
+        fontWeight: FontWeight.w400,
+        color: isDark ? MyColors.darkTextSecondary : MyColors.text6,
+        height: 1.0,
+      );
+
+  static TextStyle referralCodeValue14MediumFor(bool isDark) => TextStyle(
+        fontFamily: "IranSans",
+        fontSize: 14.sp,
+        fontWeight: FontWeight.w500,
+        color: isDark ? MyColors.darkTextPrimary : MyColors.textMatn1,
+        height: 1.0,
+      );
+
+  static TextStyle referralCodeButton12BoldFor(Color color) => TextStyle(
+        fontFamily: "IranSans",
+        fontSize: 12.sp,
+        fontWeight: FontWeight.w700,
+        color: color,
+        height: 1.0,
+      );
+
+  static TextStyle referralCodeFeedbackSuccess12MediumFor(bool isDark) =>
+      TextStyle(
+        fontFamily: "IranSans",
+        fontSize: 12.sp,
+        fontWeight: FontWeight.w500,
+        color: isDark ? MyColors.referralSuccessDark : MyColors.referralSuccessLight,
+        height: 1.0,
+      );
+
+  static TextStyle referralCodeFeedbackError12MediumFor(bool isDark) =>
+      TextStyle(
+        fontFamily: "IranSans",
+        fontSize: 12.sp,
+        fontWeight: FontWeight.w500,
+        color: isDark ? MyColors.referralErrorDark : MyColors.referralErrorLight,
+        height: 1.0,
+      );
+
   static TextStyle get paymentSecurityTitle13Medium => TextStyle(
         fontFamily: "IRANSans",
         fontSize: 13.sp,

@@ -239,6 +239,17 @@ class MyColors {
   static const Color cartCoinBadgeDark = darkBackgroundSecondary;
   static const Color cartImageFrameDark = termsBackgroundDark;
 
+  // Referral code card
+  static const Color referralButtonDisabledLight = Color(0xFFE5E5EA);
+  static const Color referralButtonDisabledDark = Color(0xFF545878);
+  static const Color referralButtonDisabledTextLight = text4;
+  static const Color referralButtonDisabledTextDark = darkTextSecondary;
+  static const Color referralSuccessLight = Color(0xFF6FC845);
+  static const Color referralSuccessDark = Color(0xFF6EC644);
+  static const Color referralErrorLight = Color(0xFFE96217);
+  static const Color referralErrorDark = Color(0xFFE96216);
+  static const Color referralInputBorderDark = Color(0xFF696E96);
+
   // New colors for AddWordBottomSheet
   static const Color inputBackground = Color(0xFFF7F7FB);
   static const Color textHint = Color(0xFFBDBDBD);
