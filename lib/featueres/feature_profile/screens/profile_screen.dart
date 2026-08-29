@@ -9,6 +9,7 @@ import 'package:poortak/featueres/feature_profile/screens/main_points_screen.dar
 import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/payment_history_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/edit_profile_screen.dart';
+import 'package:poortak/common/widgets/adaptive_safe_area.dart';
 import 'package:poortak/common/widgets/custom_concave_clipper.dart';
 import 'package:poortak/featueres/feature_profile/widgets/profile_action_card.dart';
 import 'package:poortak/locator.dart';
@@ -93,10 +94,9 @@ class _ProfileScreenState extends State<ProfileScreen>
       return const LoginScreen();
     }
 
-    return Scaffold(
-      backgroundColor: backgroundColor,
-      body: SafeArea(
-        child: Stack(
+    final embedded = MainWrapperScope.isEmbeddedInMainWrapper(context);
+    final body = AdaptiveSafeArea(
+      child: Stack(
           children: [
             // Left and right brand secondary strips
             Row(
@@ -318,7 +318,15 @@ class _ProfileScreenState extends State<ProfileScreen>
             ),
           ],
         ),
-      ),
+    );
+
+    if (embedded) {
+      return ColoredBox(color: backgroundColor, child: body);
+    }
+
+    return Scaffold(
+      backgroundColor: backgroundColor,
+      body: body,
     );
   }
 }

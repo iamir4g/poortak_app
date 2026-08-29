@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:poortak/common/widgets/adaptive_safe_area.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/common/widgets/reusable_modal.dart';
@@ -108,7 +109,7 @@ class _SayarehScreenState extends State<SayarehScreen> {
                             stops: [0.1, 0.54, 1.0],
                           ),
                   ),
-                  child: SafeArea(
+                  child: AdaptiveSafeArea(
                       child: Center(child: DotLoadingWidget(size: 100.r))),
                 );
               }
@@ -145,25 +146,19 @@ class _SayarehScreenState extends State<SayarehScreen> {
                                       stops: [0.1, 0.54, 1.0],
                                     ),
                         ),
-                        child: SafeArea(
+                        child: AdaptiveSafeArea(
                           child: Column(
                             children: [
-                              SizedBox(
-                                height: Dimens.nh(28.0),
-                              ),
+                              SizedBox(height: Dimens.nh(8.0)),
                               Text(
-                                l10n?.sayareh ?? "",
+                                l10n?.sayareh ?? '',
                                 style: MyTextStyle.sayarehHeader12Bold.copyWith(
                                   color: isDark
                                       ? const Color(0xFFFFFFFF)
                                       : MyTextStyle.sayarehHeader12Bold.color,
                                 ),
                               ),
-                              SizedBox(
-                                height: Dimens.nh(14.0),
-                              ),
-                              // Sayareh List Section
-
+                              SizedBox(height: Dimens.nh(12.0)),
                               ListView.separated(
                                 shrinkWrap: true,
                                 padding: EdgeInsets.zero,
@@ -349,7 +344,7 @@ class _SayarehScreenState extends State<SayarehScreen> {
                             stops: [0.1, 0.54, 1.0],
                           ),
                   ),
-                  child: SafeArea(
+                  child: AdaptiveSafeArea(
                     child: Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,

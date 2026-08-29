@@ -5,18 +5,17 @@ import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
+import 'package:poortak/common/widgets/main_tab_header.dart';
+import 'package:poortak/common/widgets/adaptive_safe_area.dart';
 import 'package:poortak/common/widgets/bottom_nav.dart';
 import 'package:poortak/common/widgets/custom_drawer.dart';
-import 'package:poortak/common/widgets/poortak_app_bar.dart';
 import 'package:poortak/common/widgets/logout_confirmation_modal.dart';
 import 'package:poortak/common/widgets/exit_confirmation_modal.dart';
 import 'package:poortak/common/services/payment_deep_link_service.dart';
 import 'package:poortak/common/services/auth_navigation_manager.dart';
 import 'package:poortak/common/services/otp_login_session_manager.dart';
 import 'package:poortak/config/myColors.dart';
-import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/kavoosh_main_screen.dart';
 import 'package:poortak/featueres/feature_litner/screens/litner_main_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/profile_screen.dart';
@@ -198,23 +197,6 @@ class _MainWrapperState extends State<MainWrapper> {
       }
       _authNavigationManager.clearPendingRequest();
     });
-  }
-
-  String getTitle(int index) {
-    switch (index) {
-      case 0:
-        return 'کتاب های سیاره آی نو';
-      case 1:
-        return 'کاووش';
-      case 2:
-        return 'سبد خرید';
-      case 3:
-        return 'لایتنر';
-      case 4:
-        return 'پروفایل';
-    }
-
-    return '';
   }
 
   void _refreshShoppingCartIfNeeded(int index) {
@@ -403,71 +385,40 @@ class _MainWrapperState extends State<MainWrapper> {
                         ? MyColors.darkBackground
                         : Colors.white,
                     resizeToAvoidBottomInset: false,
-                    extendBodyBehindAppBar: false,
                     drawerScrimColor: Colors.black54,
-                    appBar: PoortakAppBar(
-                      showBackButton: false,
-                      leading: currentPageIndex == 0
-                          ? IconButton(
-                              icon: Icon(
-                                Icons.menu,
-                                color: themeState.isDark
-                                    ? MyColors.darkTextPrimary
-                                    : MyColors.textMatn1,
-                              ),
-                              onPressed: () =>
-                                  _scaffoldKey.currentState?.openDrawer(),
-                            )
-                          : null,
-                      backgroundColor: themeState.isDark
-                          ? MyColors.darkBackground
-                          : MyColors.background,
-                      foregroundColor: themeState.isDark
-                          ? MyColors.darkTextPrimary
-                          : MyColors.textMatn1,
-                      actions: [
-                        (currentPageIndex == 4 && prefsOperator.isLoggedIn())
-                            ? PopupMenuButton<String>(
-                                icon: Icon(Icons.more_vert,
-                                    color: themeState.isDark
-                                        ? MyColors.darkTextPrimary
-                                        : const Color(0xFF3D495C)),
-                                onSelected: (value) {
-                                  if (value == 'logout') {
-                                    _showLogoutConfirmation();
-                                  }
-                                },
-                                itemBuilder: (context) => [
-                                  PopupMenuItem(
-                                    value: 'logout',
-                                    child: Text(
-                                      'خروج از حساب کاربری',
-                                      style: MyTextStyle.textMatn13.copyWith(
-                                        color: themeState.isDark
-                                            ? MyColors.darkTextPrimary
-                                            : MyColors.textMatn1,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
+                    drawer: const CustomDrawer(),
+                    body: Column(
+                      children: [
+                        MainTabHeader(
+                          currentPageIndex: currentPageIndex,
+                          isDark: themeState.isDark,
+                          onMenuPressed: () =>
+                              _scaffoldKey.currentState?.openDrawer(),
+                          showLogoutMenu: currentPageIndex == 4 &&
+                              prefsOperator.isLoggedIn(),
+                          onLogout: _showLogoutConfirmation,
+                        ),
+                        Expanded(
+                          child: state is PermissionLoading
+                              ? const Center(
+                                  child: CircularProgressIndicator(),
+                                )
+                              : MainWrapperScope(
+                                  isEmbedded: true,
+                                  child: PageView(
+                                    controller: controller,
+                                    physics: const ClampingScrollPhysics(),
+                                    onPageChanged: _onPageChanged,
+                                    children: topLevelScreens,
                                   ),
-                                ],
-                              )
-                            : const SizedBox.shrink(),
+                                ),
+                        ),
+                        BottomNav(
+                          controller: controller,
+                          onTabSelected: _animateToTab,
+                        ),
                       ],
                     ),
-                    drawer: const CustomDrawer(),
-                    bottomNavigationBar: BottomNav(
-                      controller: controller,
-                      onTabSelected: _animateToTab,
-                    ),
-                    body: state is PermissionLoading
-                        ? const Center(child: CircularProgressIndicator())
-                        : PageView(
-                            controller: controller,
-                            physics: const ClampingScrollPhysics(),
-                            onPageChanged: _onPageChanged,
-                            children: topLevelScreens,
-                          ),
                   ),
                 );
               },

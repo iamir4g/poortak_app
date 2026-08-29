@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:poortak/common/widgets/adaptive_safe_area.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/common/widgets/primaryButton.dart';
@@ -68,64 +69,52 @@ class _LitnerMainScreenState extends State<LitnerMainScreen> with RouteAware {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return BlocListener<BottomNavCubit, int>(
-      listener: (context, selectedIndex) async {
-        if (selectedIndex == 3) {
-          final litnerBloc = context.read<LitnerBloc>();
-          await _checkLoginStatus();
-          if (!mounted) return;
-          if (isLoggedIn) {
-            litnerBloc.add(FetchOverviewLitnerEvent());
-          }
-        }
-      },
-      child: Scaffold(
-        backgroundColor:
-            isDark ? MyColors.darkBackground : MyColors.background3,
-        body: SafeArea(
-          child: Stack(
-            children: [
-              if (!isLoggedIn)
-                Padding(
-                  padding: EdgeInsets.all(Dimens.medium),
-                  child: Center(
-                      child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.all(Dimens.small),
-                        child: Text(
-                          l10n!.you_are_not_logged_in_litner,
-                          style: MyTextStyle.textCenter16.copyWith(
-                            color: isDark
-                                ? MyColors.darkTextPrimary
-                                : MyColors.textMatn1,
-                          ),
-                          textAlign: TextAlign.center,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      PrimaryButton(
-                        lable: l10n.login,
-                        onPressed: () {
-                          goToLoginAndReturn(returnTabIndex: 3);
-                        },
-                      ),
-                    ],
-                  )),
-                )
-              else
-                // Main content
-                SingleChildScrollView(
+    final backgroundColor =
+        isDark ? MyColors.darkBackground : MyColors.background3;
+    final embedded = MainWrapperScope.isEmbeddedInMainWrapper(context);
+
+    final body = AdaptiveSafeArea(
+      child: Stack(
+        children: [
+          if (!isLoggedIn)
+            Padding(
+              padding: EdgeInsets.all(Dimens.medium),
+              child: Center(
                   child: Column(
-                    children: [
-                      SizedBox(height: Dimens.large),
-                      // Cards
-                      Padding(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: Dimens.nw(20.0)),
-                        child: BlocBuilder<LitnerBloc, LitnerState>(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.all(Dimens.small),
+                    child: Text(
+                      l10n!.you_are_not_logged_in_litner,
+                      style: MyTextStyle.textCenter16.copyWith(
+                        color: isDark
+                            ? MyColors.darkTextPrimary
+                            : MyColors.textMatn1,
+                      ),
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  PrimaryButton(
+                    lable: l10n.login,
+                    onPressed: () {
+                      goToLoginAndReturn(returnTabIndex: 3);
+                    },
+                  ),
+                ],
+              )),
+            )
+          else
+            SingleChildScrollView(
+              child: Column(
+                children: [
+                  SizedBox(height: embedded ? Dimens.small : Dimens.large),
+                  Padding(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: Dimens.nw(20.0)),
+                    child: BlocBuilder<LitnerBloc, LitnerState>(
                           builder: (context, state) {
                             int inProgress = 0;
                             int completed = 0;
@@ -198,10 +187,26 @@ class _LitnerMainScreenState extends State<LitnerMainScreen> with RouteAware {
                     ],
                   ),
                 ),
-            ],
-          ),
-        ),
+        ],
       ),
+    );
+
+    final shell = embedded
+        ? ColoredBox(color: backgroundColor, child: body)
+        : Scaffold(backgroundColor: backgroundColor, body: body);
+
+    return BlocListener<BottomNavCubit, int>(
+      listener: (context, selectedIndex) async {
+        if (selectedIndex == 3) {
+          final litnerBloc = context.read<LitnerBloc>();
+          await _checkLoginStatus();
+          if (!mounted) return;
+          if (isLoggedIn) {
+            litnerBloc.add(FetchOverviewLitnerEvent());
+          }
+        }
+      },
+      child: shell,
     );
   }
 }

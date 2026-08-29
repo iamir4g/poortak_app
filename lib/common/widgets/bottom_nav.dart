@@ -1,3 +1,5 @@
+import 'dart:io' show Platform;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -59,6 +61,18 @@ class BottomNav extends StatelessWidget {
     );
   }
 
+  double _bottomInset(BuildContext context) {
+    final inset = MediaQuery.viewPaddingOf(context).bottom;
+    if (Platform.isIOS && inset > 0) {
+      return 6;
+    }
+    return inset;
+  }
+
+  double _navBarHeight() {
+    return Platform.isIOS ? 52.0 : Dimens.bottomNavHeight;
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ThemeCubit, ThemeState>(
@@ -75,76 +89,64 @@ class BottomNav extends StatelessWidget {
                 color: themeState.isDark
                     ? Colors.black.withValues(alpha: 0.3)
                     : const Color(0xFF92A2BE).withValues(alpha: 0.12),
-                offset: Offset(0, -7.h),
-                blurRadius: 13.r,
+                offset: Offset(0, -4.h),
+                blurRadius: 10.r,
                 spreadRadius: 0,
               ),
             ],
           ),
-          child: Padding(
-            padding:
-                EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
-            child: Container(
-              height: Dimens.bottomNavHeight,
-              padding: EdgeInsets.symmetric(vertical: 6.h),
-              child: BlocBuilder<BottomNavCubit, int>(
-                builder: (context, state) {
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      _buildNavItem(
-                        context: context,
-                        state: state,
-                        index: 0,
-                        icon: "mage:video-player",
-                        label: 'سیاره آینو',
-                        onTabSelected: onTabSelected,
-                      ),
-                      _buildNavItem(
-                        context: context,
-                        state: state,
-                        index: 1,
-                        icon: "mage:search", //mdi:text-box-search-outline
-                        label: 'کاوش',
-                        onTabSelected: onTabSelected,
-                        // useCustomIcon: false,
-                      ),
-                      _buildNavItem(
-                        context: context,
-                        state: state,
-                        index: 2,
-                        label: 'سبد خرید',
-                        icon:
-                            "hugeicons:shopping-cart-02", //"mage:shopping-cart",
-                        onTabSelected: onTabSelected,
-                        // useCustomIcon: false,
-                        // materialIcon: Icons.shopping_cart_outlined,
-                      ),
-                      _buildNavItem(
-                        context: context,
-                        state: state,
-                        index: 3,
-                        label: 'لایتنر',
-                        icon: "hugeicons:book-open-02", //"mage:book",
-                        onTabSelected: onTabSelected,
-                        // useCustomIcon: false,
-                        // materialIcon: Icons.folder_outlined,
-                      ),
-                      _buildNavItem(
-                        context: context,
-                        state: state,
-                        index: 4,
-                        label: 'پروفایل',
-                        onTabSelected: onTabSelected,
-                        icon: "mynaui:user-square", //"mage:user",
-                        // useCustomIcon: false,
-                        // materialIcon: Icons.account_box_outlined,
-                      ),
-                    ],
-                  );
-                },
-              ),
+          padding: EdgeInsets.only(bottom: _bottomInset(context)),
+          child: SizedBox(
+            height: _navBarHeight(),
+            child: BlocBuilder<BottomNavCubit, int>(
+              builder: (context, state) {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    _buildNavItem(
+                      context: context,
+                      state: state,
+                      index: 0,
+                      icon: "mage:video-player",
+                      label: 'سیاره آینو',
+                      onTabSelected: onTabSelected,
+                    ),
+                    _buildNavItem(
+                      context: context,
+                      state: state,
+                      index: 1,
+                      icon: "mage:search",
+                      label: 'کاوش',
+                      onTabSelected: onTabSelected,
+                    ),
+                    _buildNavItem(
+                      context: context,
+                      state: state,
+                      index: 2,
+                      label: 'سبد خرید',
+                      icon: "hugeicons:shopping-cart-02",
+                      onTabSelected: onTabSelected,
+                    ),
+                    _buildNavItem(
+                      context: context,
+                      state: state,
+                      index: 3,
+                      label: 'لایتنر',
+                      icon: "hugeicons:book-open-02",
+                      onTabSelected: onTabSelected,
+                    ),
+                    _buildNavItem(
+                      context: context,
+                      state: state,
+                      index: 4,
+                      label: 'پروفایل',
+                      onTabSelected: onTabSelected,
+                      icon: "mynaui:user-square",
+                    ),
+                  ],
+                );
+              },
             ),
           ),
         );
@@ -326,61 +328,49 @@ class BottomNav extends StatelessWidget {
               splashColor: MyColors.primary.withOpacity(0.08),
               highlightColor: MyColors.primary.withOpacity(0.04),
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  SizedBox(
-                    height: Dimens.iconMedium + 4.h,
-                    child: Center(
-                      child: AnimatedScale(
-                        scale: isSelected ? 1.05 : 1.0,
-                        duration: _navAnimationDuration,
-                        curve: Curves.easeOutCubic,
-                        child: TweenAnimationBuilder<Color?>(
-                          tween: ColorTween(
-                            end:
-                                isSelected ? MyColors.primary : unselectedColor,
-                          ),
-                          duration: _navAnimationDuration,
-                          curve: Curves.easeOutCubic,
-                          builder: (context, color, child) {
-                            return _buildIcon(
-                              context: context,
-                              index: index,
-                              state: state,
-                              icon: icon,
-                              isSelected: isSelected,
-                              themeState: themeState,
-                              iconColor: color ?? unselectedColor,
-                            );
-                          },
-                        ),
+                  AnimatedScale(
+                    scale: isSelected ? 1.05 : 1.0,
+                    duration: _navAnimationDuration,
+                    curve: Curves.easeOutCubic,
+                    child: TweenAnimationBuilder<Color?>(
+                      tween: ColorTween(
+                        end: isSelected ? MyColors.primary : unselectedColor,
                       ),
+                      duration: _navAnimationDuration,
+                      curve: Curves.easeOutCubic,
+                      builder: (context, color, child) {
+                        return _buildIcon(
+                          context: context,
+                          index: index,
+                          state: state,
+                          icon: icon,
+                          isSelected: isSelected,
+                          themeState: themeState,
+                          iconColor: color ?? unselectedColor,
+                        );
+                      },
                     ),
                   ),
-                  SizedBox(
-                    height: 18.h,
-                    child: Center(
-                      child: AnimatedOpacity(
-                        opacity: isSelected ? 1.0 : 0.0,
-                        duration: _navAnimationDuration,
-                        curve: Curves.easeOutCubic,
-                        child: Text(
-                          label,
-                          style: TextStyle(
-                            fontFamily: 'IRANSans',
-                            fontWeight: FontWeight.bold,
-                            fontSize: 9.sp,
-                            height: 1.2,
-                            color: MyColors.primary,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.center,
-                        ),
+                  if (isSelected) ...[
+                    SizedBox(height: 2.h),
+                    Text(
+                      label,
+                      style: TextStyle(
+                        fontFamily: 'IRANSans',
+                        fontWeight: FontWeight.bold,
+                        fontSize: 8.sp,
+                        height: 1.1,
+                        color: MyColors.primary,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
                     ),
-                  ),
+                  ],
                 ],
               ),
             ),
