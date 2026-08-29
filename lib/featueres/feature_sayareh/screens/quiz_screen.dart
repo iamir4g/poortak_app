@@ -277,247 +277,279 @@ class _QuizScreenState extends State<QuizScreen> {
                                   },
                                 ),
                                 const SizedBox(height: 24),
-                        if (answerState is QuizAnswerLoaded &&
-                            !answerState.isCorrect &&
-                            answerState.explanation != null)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 16.0),
-                            child: Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 16, horizontal: 16),
-                              decoration: BoxDecoration(
-                                color: isDark
-                                    ? MyColors.termsBackgroundDark
-                                    : MyColors.cardBackground1,
-                                borderRadius: BorderRadius.circular(16),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.03),
-                                    blurRadius: 4,
-                                    offset: Offset(0, 2),
-                                  ),
-                                ],
-                              ),
-                              child: BidiText(
-                                text: answerState.explanation!,
-                                forceEnglishDigits: true,
-                                style: MyTextStyle.textMatn12W500.copyWith(
-                                  color: isDark
-                                      ? MyColors.profileTextPrimaryDark
-                                      : MyColors.textMatn1,
-                                  fontSize: 13,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          )
-                        else if (answerState is QuizAnswerLoaded &&
-                            answerState.isCorrect)
-                          (Column(
-                            children: [
-                              Container(
-                                width: 54,
-                                height: 54,
-                                decoration: BoxDecoration(
-                                  color: isDark
-                                      ? MyColors.quizAnswerCorrectBackgroundDark
-                                      : MyColors
-                                          .quizAnswerCorrectBackgroundLight,
-                                  borderRadius: BorderRadius.circular(50),
-                                ),
-                                child: Icon(
-                                  Icons.check_circle,
-                                  color: isDark
-                                      ? MyColors.quizAnswerCorrectTextDark
-                                      : MyColors.quizAnswerCorrectBorderLight,
-                                  size: 40,
-                                ),
-                              ),
-                              const SizedBox(height: 12),
-                              Text(
-                                'آفرین درست گفتی!🥳',
-                                style: TextStyle(
-                                  fontFamily: 'IRANSans',
-                                  fontWeight: FontWeight.w300,
-                                  fontSize: 12,
-                                  color: isDark
-                                      ? MyColors.quizAnswerCorrectTextDark
-                                      : MyColors.text2,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                              SizedBox(height: 12.h),
-                            ],
-                          )),
-                        // Button logic
-                        if (selectedAnswerId != null &&
-                            answerState is! QuizAnswerLoaded)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 24.0),
-                            child: Center(
-                              child: SizedBox(
-                                width: 176,
-                                height: 54,
-                                child: ElevatedButton(
-                                  onPressed: answerState is QuizAnswerLoading
-                                      ? null
-                                      : () {
-                                          context.read<QuizAnswerBloc>().add(
-                                                SubmitAnswerEvent(
-                                                  courseId: widget.courseId,
-                                                  quizId: widget.quizId,
-                                                  questionId: questionData.id,
-                                                  answerId: selectedAnswerId!,
+                                if (answerState is QuizAnswerLoaded &&
+                                    !answerState.isCorrect &&
+                                    answerState.explanation != null)
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.only(bottom: 16.0),
+                                    child: Container(
+                                      width: double.infinity,
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 16, horizontal: 16),
+                                      decoration: BoxDecoration(
+                                        color: isDark
+                                            ? MyColors.termsBackgroundDark
+                                            : MyColors.cardBackground1,
+                                        borderRadius: BorderRadius.circular(16),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black
+                                                .withValues(alpha: 0.03),
+                                            blurRadius: 4,
+                                            offset: Offset(0, 2),
+                                          ),
+                                        ],
+                                      ),
+                                      child: BidiText(
+                                        text: answerState.explanation!,
+                                        style:
+                                            MyTextStyle.textMatn12W500.copyWith(
+                                          color: isDark
+                                              ? MyColors.profileTextPrimaryDark
+                                              : MyColors.textMatn1,
+                                          fontSize: 13,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                  )
+                                else if (answerState is QuizAnswerLoaded &&
+                                    answerState.isCorrect)
+                                  (Column(
+                                    children: [
+                                      Container(
+                                        width: 54,
+                                        height: 54,
+                                        decoration: BoxDecoration(
+                                          color: isDark
+                                              ? MyColors
+                                                  .quizAnswerCorrectBackgroundDark
+                                              : MyColors
+                                                  .quizAnswerCorrectBackgroundLight,
+                                          borderRadius:
+                                              BorderRadius.circular(50),
+                                        ),
+                                        child: Icon(
+                                          Icons.check_circle,
+                                          color: isDark
+                                              ? MyColors
+                                                  .quizAnswerCorrectTextDark
+                                              : MyColors
+                                                  .quizAnswerCorrectBorderLight,
+                                          size: 40,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 12),
+                                      Text(
+                                        'آفرین درست گفتی!🥳',
+                                        style: TextStyle(
+                                          fontFamily: 'IRANSans',
+                                          fontWeight: FontWeight.w300,
+                                          fontSize: 12,
+                                          color: isDark
+                                              ? MyColors
+                                                  .quizAnswerCorrectTextDark
+                                              : MyColors.text2,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      SizedBox(height: 12.h),
+                                    ],
+                                  )),
+                                // Button logic
+                                if (selectedAnswerId != null &&
+                                    answerState is! QuizAnswerLoaded)
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.only(bottom: 24.0),
+                                    child: Center(
+                                      child: SizedBox(
+                                        width: 176,
+                                        height: 54,
+                                        child: ElevatedButton(
+                                          onPressed: answerState
+                                                  is QuizAnswerLoading
+                                              ? null
+                                              : () {
+                                                  context
+                                                      .read<QuizAnswerBloc>()
+                                                      .add(
+                                                        SubmitAnswerEvent(
+                                                          courseId:
+                                                              widget.courseId,
+                                                          quizId: widget.quizId,
+                                                          questionId:
+                                                              questionData.id,
+                                                          answerId:
+                                                              selectedAnswerId!,
+                                                        ),
+                                                      );
+                                                },
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: MyColors.primary,
+                                            foregroundColor: Theme.of(context)
+                                                .colorScheme
+                                                .onPrimary,
+                                            disabledForegroundColor:
+                                                Theme.of(context)
+                                                    .colorScheme
+                                                    .onPrimary
+                                                    .withValues(alpha: 0.5),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(30),
+                                            ),
+                                            elevation: 0,
+                                            padding: EdgeInsets.zero,
+                                          ),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                "بررسی پاسخ",
+                                                style:
+                                                    MyTextStyle.textMatnBtnFor(
+                                                            context)
+                                                        .copyWith(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w700,
                                                 ),
-                                              );
-                                        },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: MyColors.primary,
-                                    foregroundColor:
-                                        Theme.of(context).colorScheme.onPrimary,
-                                    disabledForegroundColor: Theme.of(context)
-                                        .colorScheme
-                                        .onPrimary
-                                        .withValues(alpha: 0.5),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(30),
-                                    ),
-                                    elevation: 0,
-                                    padding: EdgeInsets.zero,
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        "بررسی پاسخ",
-                                        style:
-                                            MyTextStyle.textMatnBtnFor(context)
-                                                .copyWith(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w700,
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Icon(Icons.arrow_forward_ios,
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .onPrimary,
+                                                  size: 18),
+                                            ],
+                                          ),
                                         ),
                                       ),
-                                      const SizedBox(width: 8),
-                                      Icon(Icons.arrow_forward_ios,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onPrimary,
-                                          size: 18),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          )
-                        else if (answerState is QuizAnswerLoaded &&
-                            !answerState.isLastQuestion)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 24.0),
-                            child: Center(
-                              child: SizedBox(
-                                width: 176,
-                                height: 54,
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      currentQuestion =
-                                          answerState.nextQuestion!;
-                                      selectedAnswerId = null;
-                                      isSelected = false;
-                                      isCorrectAnswer = false;
-                                      isWrongSelected = false;
-                                    });
-                                    context
-                                        .read<QuizAnswerBloc>()
-                                        .add(const ResetQuizAnswerEvent());
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFFFF9F29),
-                                    foregroundColor:
-                                        Theme.of(context).colorScheme.onPrimary,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(30),
                                     ),
-                                    elevation: 0,
-                                    padding: EdgeInsets.zero,
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        "بعدی",
-                                        style:
-                                            MyTextStyle.textMatnBtnFor(context)
-                                                .copyWith(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w700,
+                                  )
+                                else if (answerState is QuizAnswerLoaded &&
+                                    !answerState.isLastQuestion)
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.only(bottom: 24.0),
+                                    child: Center(
+                                      child: SizedBox(
+                                        width: 176,
+                                        height: 54,
+                                        child: ElevatedButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              currentQuestion =
+                                                  answerState.nextQuestion!;
+                                              selectedAnswerId = null;
+                                              isSelected = false;
+                                              isCorrectAnswer = false;
+                                              isWrongSelected = false;
+                                            });
+                                            context.read<QuizAnswerBloc>().add(
+                                                const ResetQuizAnswerEvent());
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor:
+                                                const Color(0xFFFF9F29),
+                                            foregroundColor: Theme.of(context)
+                                                .colorScheme
+                                                .onPrimary,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(30),
+                                            ),
+                                            elevation: 0,
+                                            padding: EdgeInsets.zero,
+                                          ),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                "بعدی",
+                                                style:
+                                                    MyTextStyle.textMatnBtnFor(
+                                                            context)
+                                                        .copyWith(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w700,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Icon(Icons.arrow_forward_ios,
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .onPrimary,
+                                                  size: 18),
+                                            ],
+                                          ),
                                         ),
                                       ),
-                                      const SizedBox(width: 8),
-                                      Icon(Icons.arrow_forward_ios,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onPrimary,
-                                          size: 18),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          )
-                        else if (answerState is QuizAnswerLoaded &&
-                            answerState.isLastQuestion)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 24.0),
-                            child: Center(
-                              child: SizedBox(
-                                width: 176,
-                                height: 54,
-                                child: ElevatedButton(
-                                  onPressed: resultState is QuizResultLoading
-                                      ? null
-                                      : _fetchQuizResult,
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFFFF9F29),
-                                    foregroundColor:
-                                        Theme.of(context).colorScheme.onPrimary,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(30),
                                     ),
-                                    elevation: 0,
-                                    padding: EdgeInsets.zero,
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        "مشاهده نتیجه",
-                                        style:
-                                            MyTextStyle.textMatnBtnFor(context)
-                                                .copyWith(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w700,
+                                  )
+                                else if (answerState is QuizAnswerLoaded &&
+                                    answerState.isLastQuestion)
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.only(bottom: 24.0),
+                                    child: Center(
+                                      child: SizedBox(
+                                        width: 176,
+                                        height: 54,
+                                        child: ElevatedButton(
+                                          onPressed:
+                                              resultState is QuizResultLoading
+                                                  ? null
+                                                  : _fetchQuizResult,
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor:
+                                                const Color(0xFFFF9F29),
+                                            foregroundColor: Theme.of(context)
+                                                .colorScheme
+                                                .onPrimary,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(30),
+                                            ),
+                                            elevation: 0,
+                                            padding: EdgeInsets.zero,
+                                          ),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                "مشاهده نتیجه",
+                                                style:
+                                                    MyTextStyle.textMatnBtnFor(
+                                                            context)
+                                                        .copyWith(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w700,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Icon(Icons.arrow_forward_ios,
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .onPrimary,
+                                                  size: 18),
+                                            ],
+                                          ),
                                         ),
                                       ),
-                                      const SizedBox(width: 8),
-                                      Icon(Icons.arrow_forward_ios,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onPrimary,
-                                          size: 18),
-                                    ],
+                                    ),
                                   ),
-                                ),
-                              ),
-                            ),
-                          ),
                               ],
                             ),
                           );
                         },
                       ),
-                      if (resultState is QuizResultLoading && _hasRequestedResult)
+                      if (resultState is QuizResultLoading &&
+                          _hasRequestedResult)
                         Positioned.fill(
                           child: ColoredBox(
                             color: Colors.black.withValues(alpha: 0.25),

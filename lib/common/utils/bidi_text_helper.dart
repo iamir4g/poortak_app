@@ -37,7 +37,24 @@ class BidiTextHelper {
 
     for (final match in _ltrRun.allMatches(text)) {
       buffer.write(text.substring(lastEnd, match.start));
-      buffer.write('\u2066${match.group(0)}\u2069');
+      final raw = match.group(0)!;
+      final core = raw.trim();
+
+      // Keep whitespace outside LTR isolates so spaces between English and
+      // Persian (e.g. "jam یعنی") are preserved when rendered RTL.
+      final leadingSpaces = raw.length - raw.trimLeft().length;
+      final trailingSpaces = raw.length - raw.trimRight().length;
+
+      if (leadingSpaces > 0) {
+        buffer.write(raw.substring(0, leadingSpaces));
+      }
+      if (core.isNotEmpty) {
+        buffer.write('\u2066$core\u2069');
+      }
+      if (trailingSpaces > 0) {
+        buffer.write(raw.substring(raw.length - trailingSpaces));
+      }
+
       lastEnd = match.end;
     }
     buffer.write(text.substring(lastEnd));
