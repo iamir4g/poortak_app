@@ -264,4 +264,38 @@ class MyColors {
   static const Color inactiveTabBackground = Color(0xFF9498AC);
   static const Color dividerGray = gray;
   static const Color modalButtonPressedLight = Color(0xFFCEDEF8);
+
+  // Score guide (How to get points)
+  static const Color scoreGuideMembershipCardLight = Color(0xFFFDF4F2);
+  static const Color scoreGuidePurchaseCardLight = Color(0xFFE9EFFF);
+  static const Color scoreGuidePackageCardLight = Color(0xFFFFF9EB);
+  static const Color scoreGuideInviteCardLight = Color(0xFFF2FDF7);
+  static const Color scoreGuideInviteButtonLight = Color(0xFF59E59A);
+  static const Color scoreGuidePointsBadgeLight = Color(0xFFFFE8CC);
+  static const Color scoreGuidePointsBadgeDark = Color(0xFF4A4035);
+  static const Color scoreGuidePointsBadgeTextLight = Color(0xFF28303D);
+
+  static Color scoreGuidePageBackground(bool isDark) =>
+      isDark ? profileBackgroundDark : background;
+
+  static Color scoreGuideTitleColor(bool isDark) =>
+      isDark ? profileTextPrimaryDark : text1;
+
+  static Color scoreGuideBodyColor(bool isDark) =>
+      isDark ? profileTextPrimaryDark : text2;
+
+  static Color scoreGuideAppBarForeground(bool isDark) =>
+      isDark ? profileTextPrimaryDark : text2;
+
+  static Color scoreGuideCardBackground(bool isDark, Color lightColor) =>
+      isDark ? darkCardBackground : lightColor;
+
+  static Color scoreGuideInviteButtonBackground(bool isDark) =>
+      isDark ? referralButtonDisabledDark : scoreGuideInviteButtonLight;
+
+  static Color scoreGuidePointsBadgeBackground(bool isDark) =>
+      isDark ? scoreGuidePointsBadgeDark : scoreGuidePointsBadgeLight;
+
+  static Color scoreGuidePointsBadgeTextColor(bool isDark) =>
+      isDark ? profileTextPrimaryDark : scoreGuidePointsBadgeTextLight;
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
 import 'package:poortak/common/widgets/poortak_app_bar.dart';
+import 'package:poortak/featueres/feature_profile/screens/how_to_get_points_screen.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 
@@ -133,34 +134,36 @@ class _MainPointsScreenState extends State<MainPointsScreen> {
   }
 
   Widget _buildWaysToEarnSection() {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 30.w),
-      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFFDB80),
-        borderRadius: BorderRadius.circular(20.r),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Star icon
-          SizedBox(
-            width: 36.r,
-            height: 34.r,
-            child: Image.asset(
-              'assets/images/points/star_icon.png',
-              fit: BoxFit.contain,
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(context, HowToGetPointsScreen.routeName);
+      },
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: 30.w),
+        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
+        decoration: BoxDecoration(
+          color: const Color(0xFFFFDB80),
+          borderRadius: BorderRadius.circular(20.r),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: 36.r,
+              height: 34.r,
+              child: Image.asset(
+                'assets/images/points/star_icon.png',
+                fit: BoxFit.contain,
+              ),
             ),
-          ),
-
-          SizedBox(width: 12.w),
-
-          Text(
-            "روش های کسب امتیاز",
-            textAlign: TextAlign.center,
-            style: MyTextStyle.textMatn15,
-          ),
-        ],
+            SizedBox(width: 12.w),
+            Text(
+              'روش های کسب امتیاز',
+              textAlign: TextAlign.center,
+              style: MyTextStyle.textMatn15,
+            ),
+          ],
+        ),
       ),
     );
   }

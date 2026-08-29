@@ -44,8 +44,7 @@ class LitnerCard extends StatelessWidget {
                 width: Dimens.nr(79.0),
                 height: Dimens.nr(79.0),
                 decoration: BoxDecoration(
-                  color:
-                      isDark ? MyColors.darkBackgroundSecondary : Colors.white,
+                  color: isDark ? MyColors.loginButtonText : Colors.white,
                   shape: BoxShape.circle,
                 ),
                 child: Center(
@@ -168,8 +167,7 @@ class LitnerTodayCard extends StatelessWidget {
                 width: Dimens.nr(79.0),
                 height: Dimens.nr(79.0),
                 decoration: BoxDecoration(
-                  color:
-                      isDark ? MyColors.darkBackgroundSecondary : Colors.white,
+                  color: isDark ? MyColors.loginButtonText : Colors.white,
                   shape: BoxShape.circle,
                 ),
                 child: Center(

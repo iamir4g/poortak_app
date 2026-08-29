@@ -1,62 +1,75 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
+import 'package:poortak/common/widgets/invite_friends_modal.dart';
 import 'package:poortak/common/widgets/poortak_app_bar.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
-import 'package:poortak/common/widgets/invite_friends_modal.dart';
 
-class HowToGetPointsScreen extends StatefulWidget {
-  static const routeName = "/how_to_get_points_screen";
+class HowToGetPointsScreen extends StatelessWidget {
+  static const routeName = '/how_to_get_points_screen';
 
   const HowToGetPointsScreen({super.key});
 
-  @override
-  State<HowToGetPointsScreen> createState() => _HowToGetPointsScreenState();
-}
-
-class _HowToGetPointsScreenState extends State<HowToGetPointsScreen> {
-  @override
-  void initState() {
-    super.initState();
-    // Status bar is managed centrally in MainWrapper
-  }
+  static const _methods = [
+    _ScoreGuideMethod(
+      title: MyTextStyle.scoreGuideMembershipTitle,
+      points: MyTextStyle.scoreGuideMembershipPoints,
+      description: MyTextStyle.scoreGuideMembershipDescription,
+      lightBackgroundColor: MyColors.scoreGuideMembershipCardLight,
+    ),
+    _ScoreGuideMethod(
+      title: MyTextStyle.scoreGuidePurchaseTitle,
+      points: MyTextStyle.scoreGuidePurchasePoints,
+      description: MyTextStyle.scoreGuidePurchaseDescription,
+      lightBackgroundColor: MyColors.scoreGuidePurchaseCardLight,
+    ),
+    _ScoreGuideMethod(
+      title: MyTextStyle.scoreGuidePackageTitle,
+      points: MyTextStyle.scoreGuidePackagePoints,
+      description: MyTextStyle.scoreGuidePackageDescription,
+      lightBackgroundColor: MyColors.scoreGuidePackageCardLight,
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDarkMode ? MyColors.darkBackground : Colors.white,
+      backgroundColor: MyColors.scoreGuidePageBackground(isDark),
       appBar: PoortakAppBar(
-        title: 'روش های کسب امتیاز',
-        titleStyle: MyTextStyle.textMatn15,
+        title: MyTextStyle.scoreGuideScreenTitle,
+        titleStyle: MyTextStyle.scoreGuideAppBarTitleFor(isDark),
+        foregroundColor: MyColors.scoreGuideAppBarForeground(isDark),
       ),
       body: SafeArea(
         top: false,
-        child: Column(
-          children: [
-            // Content
-            Expanded(
-              child: SingleChildScrollView(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.only(bottom: 24.h),
+          child: Column(
+            children: [
+              SizedBox(height: 20.h),
+              _buildCoinAnimation(),
+              SizedBox(height: 20.h),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
                 child: Column(
                   children: [
-                    SizedBox(height: 20.h),
-
-                    // Coin animation
-                    _buildCoinAnimation(),
-
-                    SizedBox(height: 20.h),
-
-                    // Method cards
-                    _buildMethodCards(isDarkMode),
-
-                    SizedBox(height: 20.h),
+                    for (var i = 0; i < _methods.length; i++) ...[
+                      if (i > 0) SizedBox(height: 13.h),
+                      _MethodCard(
+                        method: _methods[i],
+                        isDark: isDark,
+                      ),
+                    ],
+                    SizedBox(height: 13.h),
+                    _InviteFriendsCard(isDark: isDark),
                   ],
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -74,224 +87,161 @@ class _HowToGetPointsScreenState extends State<HowToGetPointsScreen> {
       ),
     );
   }
+}
 
-  Widget _buildMethodCards(bool isDarkMode) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w),
+class _ScoreGuideMethod {
+  final String title;
+  final String points;
+  final String description;
+  final Color lightBackgroundColor;
+
+  const _ScoreGuideMethod({
+    required this.title,
+    required this.points,
+    required this.description,
+    required this.lightBackgroundColor,
+  });
+}
+
+class _MethodCard extends StatelessWidget {
+  final _ScoreGuideMethod method;
+  final bool isDark;
+
+  const _MethodCard({
+    required this.method,
+    required this.isDark,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: MyColors.scoreGuideCardBackground(isDark, method.lightBackgroundColor),
+        borderRadius: BorderRadius.circular(20.r),
+      ),
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Method 1: App membership
-          _buildMethodCard(
-            isDarkMode: isDarkMode,
-            title: 'عضویت در اپلیکیشن',
-            points: '۵ سکه',
-            description:
-                'با ثبت شماره تماس خود در اپلیکیشن ۵ سکه دریافت میکنید.',
-            backgroundColor: isDarkMode
-                ? MyColors.darkCardBackground
-                : const Color(0xFFFDF4F2),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  method.title,
+                  style: MyTextStyle.scoreGuideCardTitleFor(isDark),
+                  textAlign: TextAlign.right,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              SizedBox(width: 12.w),
+              _PointsBadge(points: method.points, isDark: isDark),
+            ],
           ),
-
-          SizedBox(height: 13.h),
-
-          // Method 2: App purchase
-          _buildMethodCard(
-            isDarkMode: isDarkMode,
-            title: 'خرید از اپلیکیشن',
-            points: '۵ سکه',
-            description: 'با هر خرید از اپلیکیشن ۵ سکه دریافت میکنید.',
-            backgroundColor: isDarkMode
-                ? MyColors.darkCardBackground
-                : const Color(0xFFE9EFFF),
+          SizedBox(height: 8.h),
+          Text(
+            method.description,
+            style: MyTextStyle.scoreGuideCardDescriptionFor(isDark),
+            textAlign: TextAlign.right,
           ),
-
-          SizedBox(height: 13.h),
-
-          // Method 3: Complete package purchase
-          _buildMethodCard(
-            isDarkMode: isDarkMode,
-            title: 'خرید بسته کامل سیاره آی نو',
-            points: '۵۰ سکه',
-            description:
-                'با خرید بسته ی کامل سیاره آی نو ۱۰ سکه دریافت میکنید.',
-            backgroundColor: isDarkMode
-                ? MyColors.darkCardBackground
-                : const Color(0xFFFFF9EB),
-          ),
-
-          SizedBox(height: 13.h),
-
-          // Method 4: Invite friends
-          _buildInviteFriendsCard(isDarkMode),
         ],
       ),
     );
   }
+}
 
-  Widget _buildMethodCard({
-    required bool isDarkMode,
-    required String title,
-    required String points,
-    required String description,
-    required Color backgroundColor,
-  }) {
+class _InviteFriendsCard extends StatelessWidget {
+  final bool isDark;
+
+  const _InviteFriendsCard({required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: backgroundColor,
+        color: MyColors.scoreGuideCardBackground(
+          isDark,
+          MyColors.scoreGuideInviteCardLight,
+        ),
         borderRadius: BorderRadius.circular(20.r),
       ),
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // Title
-                Expanded(
-                  child: Text(
-                    title,
-                    style: MyTextStyle.textMatn16.copyWith(
-                      fontWeight: FontWeight.w500,
-                      color: isDarkMode
-                          ? MyColors.darkTextPrimary
-                          : const Color(0xFF29303D),
-                    ),
-                    textAlign: TextAlign.right,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  MyTextStyle.scoreGuideInviteTitle,
+                  style: MyTextStyle.scoreGuideCardTitleFor(isDark),
+                  textAlign: TextAlign.right,
                 ),
-
-                SizedBox(width: 16.w),
-
-                // Points
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-                  child: Text(
-                    points,
-                    style: MyTextStyle.textMatn16.copyWith(
-                      fontWeight: FontWeight.w500,
-                      color: const Color(0xFF29303D),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-
-            SizedBox(height: 8.h),
-
-            // Description
-            Text(
-              description,
-              style: MyTextStyle.textMatn10W300.copyWith(
-                color: isDarkMode
-                    ? MyColors.darkTextPrimary
-                    : const Color(0xFF3D495C),
-                height: 1.4,
               ),
-              textAlign: TextAlign.right,
+              SizedBox(width: 12.w),
+              _PointsBadge(
+                points: MyTextStyle.scoreGuideInvitePoints,
+                isDark: isDark,
+              ),
+            ],
+          ),
+          SizedBox(height: 8.h),
+          Text(
+            MyTextStyle.scoreGuideInviteDescription,
+            style: MyTextStyle.scoreGuideCardDescriptionFor(isDark),
+            textAlign: TextAlign.right,
+          ),
+          SizedBox(height: 16.h),
+          Center(
+            child: SizedBox(
+              width: 254.w,
+              height: 60.h,
+              child: ElevatedButton(
+                onPressed: () => InviteFriendsModal.show(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor:
+                      MyColors.scoreGuideInviteButtonBackground(isDark),
+                  disabledBackgroundColor: MyColors.scoreGuideInviteButtonLight,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.r),
+                  ),
+                ),
+                child: Text(
+                  MyTextStyle.scoreGuideInviteButton,
+                  style: MyTextStyle.scoreGuideInviteButtonFor(isDark),
+                ),
+              ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
+}
 
-  Widget _buildInviteFriendsCard(bool isDarkMode) {
+class _PointsBadge extends StatelessWidget {
+  final String points;
+  final bool isDark;
+
+  const _PointsBadge({
+    required this.points,
+    required this.isDark,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      width: 360.w,
-      height: 193.h,
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
       decoration: BoxDecoration(
-        color:
-            isDarkMode ? MyColors.darkCardBackground : const Color(0xFFF2FDF7),
-        borderRadius: BorderRadius.circular(20.r),
+        color: MyColors.scoreGuidePointsBadgeBackground(isDark),
+        borderRadius: BorderRadius.circular(10.r),
       ),
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // Title
-                Expanded(
-                  child: Text(
-                    'دعوت از دوستان',
-                    style: MyTextStyle.textMatn16.copyWith(
-                      fontWeight: FontWeight.w500,
-                      color: isDarkMode
-                          ? MyColors.darkTextPrimary
-                          : const Color(0xFF29303D),
-                    ),
-                    textAlign: TextAlign.right,
-                  ),
-                ),
-
-                SizedBox(width: 16.w),
-
-                // Points
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-                  child: Text(
-                    '۱۰ سکه',
-                    style: MyTextStyle.textMatn16.copyWith(
-                      fontWeight: FontWeight.w500,
-                      color: const Color(0xFF29303D),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-
-            SizedBox(height: 8.h),
-
-            // Description
-            Text(
-              'با ارائه کد معرف به دوستان خود با ورود هریک به اپلیکیشن و انجام خرید، هر کدام ۱۰ امتیاز به دست می آورید.',
-              style: MyTextStyle.textMatn10W300.copyWith(
-                color: isDarkMode
-                    ? MyColors.darkTextPrimary
-                    : const Color(0xFF3D495C),
-                height: 1.4,
-              ),
-              textAlign: TextAlign.right,
-            ),
-
-            SizedBox(height: 16.h),
-
-            // Button inside the card
-            Center(
-              child: GestureDetector(
-                onTap: () {
-                  InviteFriendsModal.show(context);
-                },
-                child: Container(
-                  width: 254.w,
-                  height: 60.h,
-                  decoration: ShapeDecoration(
-                    color: const Color(0xFF59E59A),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20.r),
-                    ),
-                  ),
-                  child: Center(
-                    child: Text(
-                      'دعوت از دوستان',
-                      style: MyTextStyle.textMatn15.copyWith(
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
+      child: Text(
+        points,
+        style: MyTextStyle.scoreGuidePointsBadgeFor(isDark),
       ),
     );
   }

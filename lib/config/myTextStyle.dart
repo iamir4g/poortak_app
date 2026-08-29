@@ -414,4 +414,49 @@ class MyTextStyle {
         letterSpacing: 0.0,
         color: MyColors.text3,
       );
+
+  // Score guide (How to get points)
+  static const String scoreGuideScreenTitle = 'روش های کسب امتیاز';
+  static const String scoreGuideMembershipTitle = 'عضویت در اپلیکیشن';
+  static const String scoreGuideMembershipPoints = '۵ سکه';
+  static const String scoreGuideMembershipDescription =
+      'با ثبت شماره تماس خود در اپلیکیشن ۵ سکه دریافت میکنید.';
+  static const String scoreGuidePurchaseTitle = 'خرید از اپلیکیشن';
+  static const String scoreGuidePurchasePoints = '۵ سکه';
+  static const String scoreGuidePurchaseDescription =
+      'با هر خرید از اپلیکیشن ۵ سکه دریافت میکنید.';
+  static const String scoreGuidePackageTitle = 'خرید بسته کامل سیاره آی نو';
+  static const String scoreGuidePackagePoints = '۵۰ سکه';
+  static const String scoreGuidePackageDescription =
+      'با خرید بسته ی کامل سیاره آی نو ۱۰ سکه دریافت میکنید.';
+  static const String scoreGuideInviteTitle = 'دعوت از دوستان';
+  static const String scoreGuideInvitePoints = '۱۰ سکه';
+  static const String scoreGuideInviteDescription =
+      'با ارائه کد معرف به دوستان خود با ورود هریک به اپلیکیشن و انجام خرید، هر کدام ۱۰ امتیاز به دست می آورید.';
+  static const String scoreGuideInviteButton = 'دعوت از دوستان';
+
+  static TextStyle scoreGuideAppBarTitleFor(bool isDark) => textMatn15.copyWith(
+        color: MyColors.scoreGuideAppBarForeground(isDark),
+      );
+
+  static TextStyle scoreGuideCardTitleFor(bool isDark) => textMatn16.copyWith(
+        fontWeight: FontWeight.w500,
+        color: MyColors.scoreGuideTitleColor(isDark),
+      );
+
+  static TextStyle scoreGuideCardDescriptionFor(bool isDark) =>
+      textMatn10W300.copyWith(
+        color: MyColors.scoreGuideBodyColor(isDark),
+        height: 1.4,
+      );
+
+  static TextStyle scoreGuidePointsBadgeFor(bool isDark) => textMatn16.copyWith(
+        fontWeight: FontWeight.w500,
+        color: MyColors.scoreGuidePointsBadgeTextColor(isDark),
+      );
+
+  static TextStyle scoreGuideInviteButtonFor(bool isDark) => textMatn15.copyWith(
+        color: MyColors.textLight,
+        fontWeight: FontWeight.w500,
+      );
 }

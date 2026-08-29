@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/common/widgets/poortak_app_bar.dart';
+import 'package:poortak/featueres/feature_profile/screens/how_to_get_points_screen.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 
@@ -274,7 +275,7 @@ class _PrizeScreenState extends State<PrizeScreen> {
           GestureDetector(
             onTap: () {
               // Navigate to how to get points screen
-              Navigator.pushNamed(context, '/how_to_get_points_screen');
+              Navigator.pushNamed(context, HowToGetPointsScreen.routeName);
             },
             child: Container(
               width: 254.w,

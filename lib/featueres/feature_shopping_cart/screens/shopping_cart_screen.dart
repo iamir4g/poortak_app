@@ -6,6 +6,7 @@ import 'package:lottie/lottie.dart';
 import 'package:poortak/common/widgets/dot_loading_widget.dart';
 import 'package:poortak/common/widgets/primaryButton.dart';
 import 'package:poortak/common/widgets/reusable_modal.dart';
+import 'package:poortak/featueres/feature_profile/screens/how_to_get_points_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
 
 import 'package:poortak/common/resources/data_state.dart';
@@ -451,22 +452,30 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
           // Progress bar section
           Row(
             children: [
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: Dimens.nw(12),
-                  vertical: Dimens.nh(8),
-                ),
-                decoration: BoxDecoration(
-                  border: Border.all(color: MyColors.text6),
-                  borderRadius: BorderRadius.circular(Dimens.nr(22)),
-                ),
-                child: Center(
-                  child: Text(
-                    'راهنما ؟',
-                    style: TextStyle(
-                      fontSize: Dimens.nsp(14),
-                      fontWeight: FontWeight.bold,
-                      color: MyColors.text6,
+              GestureDetector(
+                onTap: () {
+                  Navigator.pushNamed(
+                    context,
+                    HowToGetPointsScreen.routeName,
+                  );
+                },
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: Dimens.nw(12),
+                    vertical: Dimens.nh(8),
+                  ),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: MyColors.text6),
+                    borderRadius: BorderRadius.circular(Dimens.nr(22)),
+                  ),
+                  child: Center(
+                    child: Text(
+                      'راهنما ؟',
+                      style: TextStyle(
+                        fontSize: Dimens.nsp(14),
+                        fontWeight: FontWeight.bold,
+                        color: MyColors.text6,
+                      ),
                     ),
                   ),
                 ),
