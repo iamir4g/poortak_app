@@ -4,9 +4,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/common/widgets/dot_loading_widget.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
+import 'package:poortak/common/utils/url_launcher_utils.dart';
 import 'package:poortak/featueres/featureMenu/data/models/contact_us_model.dart';
 import 'package:poortak/featueres/featureMenu/presentation/bloc/contact_us_bloc/contact_us_bloc.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class ContactUsScreen extends StatefulWidget {
   static const String routeName = "/contact-us";
@@ -27,20 +27,45 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
     });
   }
 
-  String _websiteUrl(String value) {
-    final trimmed = value.trim();
-    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
-      return trimmed;
-    }
-    return 'https://$trimmed';
+  String _websiteUrl(String value) => normalizeWebsiteUrl(value);
+
+  String _websiteDisplay(String value) => normalizeWebsiteUrl(value);
+
+  TextStyle _contactBodyStyle(TextStyle baseStyle) {
+    return baseStyle.copyWith(height: 1.6);
   }
 
-  String _websiteDisplay(String value) {
-    final trimmed = value.trim();
-    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
-      return trimmed;
+  TextStyle _linkStyle(TextStyle baseStyle) {
+    return baseStyle.copyWith(
+      color: MyColors.secondary,
+      decoration: TextDecoration.underline,
+      decorationColor: MyColors.secondary,
+      height: 1.6,
+    );
+  }
+
+  Future<void> _openWebsite(String website) async {
+    final launched = await launchExternalUri(Uri.parse(_websiteUrl(website)));
+    if (!launched && mounted) {
+      _showLaunchError('امکان باز کردن لینک وجود ندارد');
     }
-    return 'https://$trimmed';
+  }
+
+  Future<void> _openEmail(String email) async {
+    final launched =
+        await launchExternalUri(Uri.parse('mailto:${email.trim()}'));
+    if (!launched && mounted) {
+      _showLaunchError('امکان باز کردن ایمیل وجود ندارد');
+    }
+  }
+
+  void _showLaunchError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: const Duration(seconds: 2),
+      ),
+    );
   }
 
   @override
@@ -220,6 +245,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
   }) {
     final address = info.address ?? '';
     final telephones = info.telephones;
+    final bodyStyle = _contactBodyStyle(descriptionStyle);
 
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 15.w, vertical: 4.h),
@@ -250,14 +276,14 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
           if (address.isNotEmpty)
             Text(
               address,
-              style: descriptionStyle,
+              style: bodyStyle,
             ),
           if (telephones.isNotEmpty) ...[
             SizedBox(height: 16.h),
             if (telephones.length == 1)
               Text(
                 telephones.first,
-                style: descriptionStyle,
+                style: bodyStyle,
                 textDirection: TextDirection.ltr,
               )
             else
@@ -266,12 +292,12 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                 children: [
                   Text(
                     telephones[0],
-                    style: descriptionStyle,
+                    style: bodyStyle,
                     textDirection: TextDirection.ltr,
                   ),
                   Text(
                     telephones[1],
-                    style: descriptionStyle,
+                    style: bodyStyle,
                     textDirection: TextDirection.ltr,
                   ),
                 ],
@@ -283,7 +309,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                       padding: EdgeInsets.only(bottom: 8.h),
                       child: Text(
                         phone,
-                        style: descriptionStyle,
+                        style: bodyStyle,
                         textDirection: TextDirection.ltr,
                       ),
                     ),
@@ -337,14 +363,20 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
           ...websites.map(
             (website) => Padding(
               padding: EdgeInsets.only(bottom: 12.h),
-              child: InkWell(
-                onTap: () {
-                  launchUrl(Uri.parse(_websiteUrl(website)));
-                },
-                child: Text(
-                  _websiteDisplay(website),
-                  style: descriptionStyle,
-                  textDirection: TextDirection.ltr,
+              child: Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: InkWell(
+                  onTap: () => _openWebsite(website),
+                  borderRadius: BorderRadius.circular(4.r),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 2.h),
+                    child: Text(
+                      _websiteDisplay(website),
+                      style: _linkStyle(descriptionStyle),
+                      textDirection: TextDirection.ltr,
+                      textAlign: TextAlign.start,
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -397,14 +429,20 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
           ...emails.map(
             (email) => Padding(
               padding: EdgeInsets.only(bottom: 12.h),
-              child: InkWell(
-                onTap: () {
-                  launchUrl(Uri.parse("mailto:$email"));
-                },
-                child: Text(
-                  email,
-                  style: descriptionStyle,
-                  textDirection: TextDirection.ltr,
+              child: Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: InkWell(
+                  onTap: () => _openEmail(email),
+                  borderRadius: BorderRadius.circular(4.r),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 2.h),
+                    child: Text(
+                      email,
+                      style: _linkStyle(descriptionStyle),
+                      textDirection: TextDirection.ltr,
+                      textAlign: TextAlign.start,
+                    ),
+                  ),
                 ),
               ),
             ),
