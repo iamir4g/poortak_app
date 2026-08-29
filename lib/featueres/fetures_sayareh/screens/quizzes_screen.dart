@@ -179,7 +179,7 @@ class QuizItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final cardBackgroundColor =
-        isDark ? MyColors.darkCardBackground : MyColors.background;
+        isDark ? MyColors.sayarehItemCardBackgroundDark : MyColors.background;
     final descriptionColor =
         isDark ? MyColors.darkTextSecondary : MyColors.text4;
     final titleColor = isDark ? MyColors.darkTextPrimary : MyColors.textMatn1;

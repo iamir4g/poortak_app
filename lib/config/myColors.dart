@@ -111,6 +111,8 @@ class MyColors {
       Color(0xFF2C2E3F); // Secondary dark background
   static const Color darkCardBackground =
       Color(0xFF3B3D54); // Card/component background
+  static const Color sayarehItemCardBackgroundDark =
+      darkBackgroundSecondary; // Quiz, lesson & book list items (#2C2E3F)
   static const Color darkBorder = Color(0xFF696E96); // Border/divider color
 
   // Dark Mode Text Colors

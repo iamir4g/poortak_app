@@ -159,7 +159,7 @@ class _LitnerWordsInprogressScreenState
         ),
         backgroundColor: MyColors.brandPrimary,
         onPressed: _showAddWordBottomSheet,
-        child: const Icon(Icons.add, color: Colors.white),
+        child: Icon(Icons.add, color: isDark ? Colors.black : Colors.white),
       ),
       body: SafeArea(
         child: BlocConsumer<LitnerBloc, LitnerState>(
@@ -337,12 +337,6 @@ class _LitnerWordsInprogressScreenState
                                   constraints: BoxConstraints(minHeight: 48.h),
                                   padding: EdgeInsets.symmetric(
                                       vertical: 4.h, horizontal: 8.w),
-                                  decoration: BoxDecoration(
-                                    color: isDark
-                                        ? MyColors.termsBackgroundDark
-                                        : Colors.white,
-                                    borderRadius: BorderRadius.circular(8.r),
-                                  ),
                                   child: Row(
                                     children: [
                                       Expanded(
@@ -380,9 +374,9 @@ class _LitnerWordsInprogressScreenState
                                             padding: EdgeInsets.zero,
                                             constraints: const BoxConstraints(),
                                             onPressed: () {
-                                              locator<TTSService>()
-                                                  .speak(word.word,
-                                                      voice: 'male');
+                                              locator<TTSService>().speak(
+                                                  word.word,
+                                                  voice: 'male');
                                             },
                                           ),
                                           SizedBox(width: 4.w),

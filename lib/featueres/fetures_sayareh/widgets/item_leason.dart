@@ -80,7 +80,9 @@ class ItemLeason extends StatelessWidget {
         height: Dimens.nh(104.0),
         padding: EdgeInsets.all(16.r),
         decoration: BoxDecoration(
-          color: isDark ? Theme.of(context).cardColor : MyColors.background,
+          color: isDark
+              ? MyColors.sayarehItemCardBackgroundDark
+              : MyColors.background,
           borderRadius: BorderRadius.circular(40.r),
         ),
         child: Row(
