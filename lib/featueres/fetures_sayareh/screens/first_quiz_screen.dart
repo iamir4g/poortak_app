@@ -15,6 +15,7 @@ import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/quiz_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/quizzes_screen.dart';
 import 'package:poortak/featueres/fetures_sayareh/widgets/item_question.dart';
+import 'package:poortak/common/widgets/poortak_app_bar.dart';
 import 'package:poortak/common/widgets/reusable_modal.dart';
 import 'package:poortak/locator.dart';
 import 'package:poortak/featueres/fetures_sayareh/repositories/sayareh_repository.dart';
@@ -115,8 +116,6 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final pageBackgroundColor =
         isDark ? MyColors.profileBackgroundDark : Colors.white;
-    final headerBackgroundColor =
-        isDark ? MyColors.darkBackgroundSecondary : Colors.white;
     final primaryTextColor =
         isDark ? MyColors.darkTextPrimary : MyColors.textMatn1;
 
@@ -132,39 +131,9 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
       },
       child: Scaffold(
       backgroundColor: pageBackgroundColor,
-      appBar: AppBar(
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        shadowColor: Colors.transparent,
-        surfaceTintColor: Colors.transparent,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(30.r),
-          ),
-        ),
-        flexibleSpace: Container(
-          decoration: MyColors.headerDecoration(
-            backgroundColor: headerBackgroundColor,
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(30.r),
-            ),
-          ),
-        ),
-        backgroundColor: Colors.transparent,
-        foregroundColor: primaryTextColor,
-        automaticallyImplyLeading: false,
-        actions: [
-          IconButton(
-            onPressed: _showExitModal,
-            icon: Icon(Icons.arrow_forward, color: primaryTextColor),
-          ),
-        ],
-        title: Text(
-          widget.title,
-          style: MyTextStyle.textHeader16Bold.copyWith(
-            color: primaryTextColor,
-          ),
-        ),
+      appBar: PoortakAppBar(
+        title: widget.title,
+        onBackPressed: _showExitModal,
       ),
       body: SafeArea(
         child: BlocConsumer<QuizStartBloc, QuizStartState>(

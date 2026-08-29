@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/common/widgets/dot_loading_widget.dart';
+import 'package:poortak/common/widgets/poortak_app_bar.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/featureMenu/data/models/faq_model.dart';
@@ -46,10 +47,16 @@ class _FAQScreenState extends State<FAQScreen> {
 
     return Scaffold(
       backgroundColor: backgroundColor,
+      appBar: PoortakAppBar(
+        title: 'سوالات رایج',
+        backgroundColor: headerBackgroundColor,
+        foregroundColor: primaryTextColor,
+        centerTitle: true,
+      ),
       body: SafeArea(
+        top: false,
         child: Column(
           children: [
-            _buildHeader(headerBackgroundColor, primaryTextColor),
             Expanded(
               child: BlocBuilder<FaqBloc, FaqState>(
                 builder: (context, state) {
@@ -115,48 +122,6 @@ class _FAQScreenState extends State<FAQScreen> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildHeader(Color headerBackgroundColor, Color primaryTextColor) {
-    return Container(
-      height: 57.h,
-      decoration: BoxDecoration(
-        color: headerBackgroundColor,
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(33.5.r),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0x0D000000),
-            blurRadius: 1.r,
-            offset: Offset(0, 1.h),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Center(
-              child: Text(
-                'سوالات رایج',
-                style: MyTextStyle.textHeader16Bold.copyWith(
-                  color: primaryTextColor,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ),
-          IconButton(
-            onPressed: () => Navigator.of(context).pop(),
-            icon: Icon(
-              Icons.arrow_forward,
-              color: primaryTextColor,
-              size: 24.r,
-            ),
-          ),
-        ],
       ),
     );
   }

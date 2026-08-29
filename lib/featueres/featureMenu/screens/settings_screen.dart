@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/common/bloc/settings_cubit/settings_cubit.dart';
+import 'package:poortak/common/widgets/poortak_app_bar.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 
@@ -30,12 +31,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
       builder: (context, state) {
         return Scaffold(
           backgroundColor: backgroundColor,
+          appBar: PoortakAppBar(
+            title: 'تنظیمات',
+            centerTitle: true,
+            foregroundColor: primaryTextColor,
+            titleStyle: MyTextStyle.textHeader16Bold.copyWith(fontSize: 20.sp),
+          ),
           body: SafeArea(
+            top: false,
             child: Column(
               children: [
-                // Header
-                _buildHeader(primaryTextColor),
-
                 // Settings Sections
                 Expanded(
                   child: SingleChildScrollView(
@@ -178,34 +183,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         );
       },
-    );
-  }
-
-  Widget _buildHeader(Color primaryTextColor) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
-      child: Row(
-        children: [
-          IconButton(
-            onPressed: () => Navigator.pop(context),
-            icon: Icon(Icons.arrow_back_ios,
-                size: 24.r, color: primaryTextColor),
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(),
-          ),
-          Expanded(
-            child: Text(
-              "تنظیمات",
-              textAlign: TextAlign.center,
-              style: MyTextStyle.textHeader16Bold.copyWith(
-                fontSize: 20.sp,
-                color: primaryTextColor,
-              ),
-            ),
-          ),
-          SizedBox(width: 24.r), // Balance the back button
-        ],
-      ),
     );
   }
 

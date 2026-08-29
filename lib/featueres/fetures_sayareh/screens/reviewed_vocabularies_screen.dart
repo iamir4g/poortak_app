@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:poortak/common/widgets/poortak_app_bar.dart';
 import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/common/services/tts_service.dart';
 import 'package:poortak/config/myColors.dart';
@@ -61,8 +62,6 @@ class _ReviewedVocabulariesScreenState
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final pageBackgroundColor =
         isDark ? MyColors.profileBackgroundDark : MyColors.secondaryTint4;
-    final headerBackgroundColor =
-        isDark ? MyColors.profileBackgroundDark : Colors.white;
     final primaryTextColor =
         isDark ? MyColors.profileTextPrimaryDark : MyColors.textMatn1;
     final secondaryTextColor =
@@ -89,39 +88,10 @@ class _ReviewedVocabulariesScreenState
 
     return Scaffold(
       backgroundColor: pageBackgroundColor,
-      appBar: AppBar(
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        shadowColor: Colors.transparent,
-        surfaceTintColor: Colors.transparent,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(30.r),
-          ),
-        ),
-        flexibleSpace: Container(
-          decoration: MyColors.headerDecoration(
-            backgroundColor: headerBackgroundColor,
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(30.r),
-            ),
-          ),
-        ),
-        backgroundColor: Colors.transparent,
+      appBar: PoortakAppBar(
+        title: 'واژگان مرور شده',
         foregroundColor: primaryTextColor,
-        automaticallyImplyLeading: false,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.arrow_forward, color: primaryTextColor),
-            onPressed: () => LessonScreen.popBackToLesson(context),
-          ),
-        ],
-        title: Text(
-          'واژگان مرور شده',
-          style: MyTextStyle.textHeader16Bold.copyWith(
-            color: primaryTextColor,
-          ),
-        ),
+        onBackPressed: () => LessonScreen.popBackToLesson(context),
       ),
       body: SafeArea(
         child: Column(

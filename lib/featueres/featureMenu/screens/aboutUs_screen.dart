@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/common/widgets/poortak_app_bar.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 
@@ -22,61 +23,15 @@ class AboutUsScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: backgroundColor,
+      appBar: PoortakAppBar(
+        title: 'درباره ی ما',
+        backgroundColor: headerBackgroundColor,
+        foregroundColor: primaryTextColor,
+        centerTitle: true,
+      ),
       body: SafeArea(
-        child: Column(
-          children: [
-            Container(
-              height: 57.h,
-              decoration: BoxDecoration(
-                color: headerBackgroundColor,
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(33.5.r),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0x0D000000),
-                    offset: Offset(0, 1.h),
-                    blurRadius: 1.r,
-                  ),
-                ],
-              ),
-              child: Stack(
-                children: [
-                  Positioned(
-                    left: 16.w,
-                    top: 0,
-                    bottom: 0,
-                    child: Center(
-                      child: IconButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        icon: Icon(
-                          Icons.arrow_forward,
-                          color: primaryTextColor,
-                          size: 24.r,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    top: 0,
-                    bottom: 0,
-                    child: Center(
-                      child: Text(
-                        'درباره ی ما',
-                        style: MyTextStyle.textHeader16Bold.copyWith(
-                          color: primaryTextColor,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: SingleChildScrollView(
+        top: false,
+        child: SingleChildScrollView(
                 padding: EdgeInsets.symmetric(horizontal: 20.w),
                 child: Column(
                   children: [
@@ -168,9 +123,6 @@ class AboutUsScreen extends StatelessWidget {
                     SizedBox(height: 30.h),
                   ],
                 ),
-              ),
-            ),
-          ],
         ),
       ),
     );

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/common/widgets/dot_loading_widget.dart';
+import 'package:poortak/common/widgets/poortak_app_bar.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/common/utils/url_launcher_utils.dart';
@@ -88,59 +89,48 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
 
     return Scaffold(
       backgroundColor: backgroundColor,
+      appBar: PoortakAppBar(
+        title: 'تماس با ما',
+        titleStyle: MyTextStyle.contactTitle18Light,
+        foregroundColor: titleColor,
+        backgroundColor: headerBackgroundColor,
+        borderRadius: 40,
+        centerTitle: true,
+      ),
       body: SafeArea(
+        top: false,
         child: BlocBuilder<ContactUsBloc, ContactUsState>(
           builder: (context, state) {
             if (state is ContactUsLoading || state is ContactUsInitial) {
-              return Column(
-                children: [
-                  _buildHeaderSection(
-                    headerBackgroundColor: headerBackgroundColor,
-                    titleStyle: titleStyle,
-                    iconColor: titleColor,
-                  ),
-                  const Expanded(child: Center(child: DotLoadingWidget())),
-                ],
-              );
+              return const Center(child: DotLoadingWidget());
             }
 
             if (state is ContactUsError) {
-              return Column(
-                children: [
-                  _buildHeaderSection(
-                    headerBackgroundColor: headerBackgroundColor,
-                    titleStyle: titleStyle,
-                    iconColor: titleColor,
-                  ),
-                  Expanded(
-                    child: Center(
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 24.w),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              state.message,
-                              style: MyTextStyle.textMatn14Bold.copyWith(
-                                color: MyColors.error,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            SizedBox(height: 16.h),
-                            TextButton(
-                              onPressed: () {
-                                context
-                                    .read<ContactUsBloc>()
-                                    .add(const GetContactUsInfoEvent());
-                              },
-                              child: const Text('تلاش مجدد'),
-                            ),
-                          ],
+              return Center(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 24.w),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        state.message,
+                        style: MyTextStyle.textMatn14Bold.copyWith(
+                          color: MyColors.error,
                         ),
+                        textAlign: TextAlign.center,
                       ),
-                    ),
+                      SizedBox(height: 16.h),
+                      TextButton(
+                        onPressed: () {
+                          context
+                              .read<ContactUsBloc>()
+                              .add(const GetContactUsInfoEvent());
+                        },
+                        child: const Text('تلاش مجدد'),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               );
             }
 
@@ -150,11 +140,6 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
             return SingleChildScrollView(
               child: Column(
                 children: [
-                  _buildHeaderSection(
-                    headerBackgroundColor: headerBackgroundColor,
-                    titleStyle: titleStyle,
-                    iconColor: titleColor,
-                  ),
                   SizedBox(height: 15.h),
                   _buildContactInfoSection(
                     info: info,
@@ -188,50 +173,6 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
               ),
             );
           },
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeaderSection({
-    required Color headerBackgroundColor,
-    required TextStyle titleStyle,
-    required Color iconColor,
-  }) {
-    return Container(
-      height: 57.h,
-      decoration: BoxDecoration(
-        color: headerBackgroundColor,
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(40.r),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0x0D000000),
-            blurRadius: 1.r,
-            offset: Offset(0, 2.h),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 24.w),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'تماس با ما',
-              style: titleStyle,
-              textAlign: TextAlign.center,
-            ),
-            IconButton(
-              onPressed: () => Navigator.pop(context),
-              icon: Icon(
-                Icons.arrow_forward,
-                color: iconColor,
-                size: 24.w,
-              ),
-            ),
-          ],
         ),
       ),
     );

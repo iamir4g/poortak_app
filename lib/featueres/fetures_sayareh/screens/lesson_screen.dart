@@ -21,6 +21,7 @@ import 'package:poortak/featueres/fetures_sayareh/widgets/dictionary_bottom_shee
 import 'package:poortak/locator.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/common/services/getImageUrl_service.dart';
+import 'package:poortak/common/widgets/poortak_app_bar.dart';
 import 'package:poortak/common/widgets/reusable_modal.dart';
 import 'package:poortak/common/utils/svg_embedded_png.dart';
 import 'package:poortak/config/dimens.dart';
@@ -413,66 +414,27 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
         backgroundColor: Theme.of(context).brightness == Brightness.dark
             ? MyColors.profileBackgroundDark
             : MyColors.background3,
-        appBar: PreferredSize(
-          preferredSize: Size.fromHeight(Dimens.nh(57)),
-          child: SafeArea(
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: Dimens.medium),
-              height: Dimens.nh(57),
-              decoration: BoxDecoration(
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? MyColors.darkBackgroundSecondary
-                    : Colors.white,
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(Dimens.nr(33.5)),
+        appBar: PoortakAppBar(
+          titleWidget: BlocBuilder<LessonBloc, LessonState>(
+            builder: (context, state) {
+              final isDark =
+                  Theme.of(context).brightness == Brightness.dark;
+              return Text(
+                state is LessonSuccess ? state.lesson.name : widget.title,
+                style: MyTextStyle.textHeader16Bold.copyWith(
+                  fontSize: Dimens.nsp(16),
+                  color: isDark
+                      ? MyColors.profileTextPrimaryDark
+                      : MyColors.text2,
                 ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
-                    offset: const Offset(0, 1),
-                    blurRadius: Dimens.nr(1),
-                  ),
-                ],
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  BlocBuilder<LessonBloc, LessonState>(
-                    builder: (context, state) {
-                      final isDark =
-                          Theme.of(context).brightness == Brightness.dark;
-                      return Text(
-                        state is LessonSuccess
-                            ? state.lesson.name
-                            : widget.title,
-                        textAlign: TextAlign.start,
-                        style: MyTextStyle.textHeader16Bold.copyWith(
-                          fontSize: Dimens.nsp(16),
-                          color: isDark
-                              ? MyColors.profileTextPrimaryDark
-                              : MyColors.text2,
-                        ),
-                      );
-                    },
-                  ),
-                  SizedBox(
-                    width: Dimens.nw(40),
-                    height: Dimens.nh(40),
-                    child: IconButton(
-                      onPressed: () => Navigator.pop(context),
-                      icon: Icon(
-                        Icons.arrow_forward,
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? MyColors.profileTextPrimaryDark
-                            : MyColors.text2,
-                        size: Dimens.nsp(28),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              );
+            },
           ),
+          foregroundColor: Theme.of(context).brightness == Brightness.dark
+              ? MyColors.profileTextPrimaryDark
+              : MyColors.text2,
         ),
         body: SafeArea(child: _buildContent(context)),
       ),

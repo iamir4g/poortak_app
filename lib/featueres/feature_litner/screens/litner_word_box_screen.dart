@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:poortak/common/widgets/poortak_app_bar.dart';
 import 'package:poortak/common/widgets/primaryButton.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
@@ -73,31 +74,7 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
     return Scaffold(
       backgroundColor:
           isDark ? MyColors.profileBackgroundDark : MyColors.background,
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        backgroundColor: isDark
-            ? MyColors.profileHeaderDark
-            : Theme.of(context).appBarTheme.backgroundColor,
-        actions: [
-          IconButton(
-            onPressed: () => Navigator.of(context).pop(),
-            icon: Icon(
-              Icons.arrow_forward,
-              color: isDark ? MyColors.darkTextPrimary : null,
-            ),
-          ),
-        ],
-        title: Flexible(
-          child: Text(
-            l10n!.litner_review,
-            style: MyTextStyle.textHeader16Bold.copyWith(
-              color: isDark ? MyColors.darkTextPrimary : MyColors.textMatn1,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-      ),
+      appBar: PoortakAppBar(title: l10n!.litner_review),
       body: SafeArea(
         child: BlocConsumer<LitnerReviewCubit, LitnerReviewState>(
           listener: (context, state) {

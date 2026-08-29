@@ -5,6 +5,7 @@ import 'package:poortak/common/utils/date_util.dart';
 import 'package:poortak/common/utils/digit_utils.dart';
 import 'package:poortak/common/widgets/dot_loading_widget.dart';
 import 'package:poortak/common/widgets/main_wrapper.dart';
+import 'package:poortak/common/widgets/poortak_app_bar.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_profile/data/models/payment_history_model.dart';
@@ -132,20 +133,12 @@ class _PaymentResultScreenState extends State<PaymentResultScreen> {
       },
       child: Scaffold(
       backgroundColor: MyColors.background1,
-      appBar: AppBar(
-        title: Text(
-          "رسید نهایی",
-          style: MyTextStyle.textHeader16Bold.copyWith(
-            color: MyColors.textLight,
-          ),
-        ),
+      appBar: PoortakAppBar(
+        title: 'رسید نهایی',
         backgroundColor: isSuccess ? MyColors.success : MyColors.error,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: MyColors.textLight, size: 24.sp),
-          onPressed:
-              (_isClearingCart || _isNavigatingBack) ? null : _goToMain,
-        ),
+        foregroundColor: MyColors.textLight,
+        onBackPressed: _goToMain,
+        backButtonEnabled: !_isClearingCart && !_isNavigatingBack,
       ),
       body: SafeArea(
         child: SingleChildScrollView(

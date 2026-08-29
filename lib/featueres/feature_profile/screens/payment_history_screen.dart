@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/common/utils/date_util.dart';
 import 'package:poortak/common/utils/digit_utils.dart';
+import 'package:poortak/common/widgets/poortak_app_bar.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_profile/presentation/bloc/payment_history_bloc/payment_history_bloc.dart';
@@ -45,63 +46,11 @@ class _PaymentHistoryScreenState extends State<PaymentHistoryScreen> {
     return Scaffold(
       backgroundColor:
           isDark ? MyColors.profileBackgroundDark : MyColors.background3,
+      appBar: const PoortakAppBar(title: 'تاریخچه خرید'),
       body: SafeArea(
+        top: false,
         child: Column(
           children: [
-            // Header
-            Container(
-              height: 57.h,
-              width: double.infinity,
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
-              decoration: BoxDecoration(
-                color: isDark
-                    ? MyColors.paymentHistoryScreenHeaderDark
-                    : Colors.white,
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(33.5.r),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0x0D000000),
-                    offset: Offset(0, 1.h),
-                    blurRadius: 1.r,
-                  ),
-                ],
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // Title
-                  Text(
-                    'تاریخچه خرید',
-                    style: MyTextStyle.textHeader16Bold.copyWith(
-                      color: isDark
-                          ? MyColors.profileTextPrimaryDark
-                          : MyColors.textMatn1,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-
-                  // Back Button
-                  Container(
-                    width: 50.r,
-                    height: 50.r,
-                    margin: EdgeInsets.only(left: 16.w),
-                    child: IconButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      icon: Icon(
-                        Icons.arrow_forward,
-                        color: isDark
-                            ? MyColors.profileTextPrimaryDark
-                            : MyColors.textMatn1,
-                        size: 20.r,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
             // Content
             Expanded(
               child: BlocProvider.value(

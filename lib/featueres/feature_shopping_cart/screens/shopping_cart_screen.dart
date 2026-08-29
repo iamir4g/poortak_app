@@ -563,6 +563,15 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        SizedBox(
+                          width: Dimens.nw(138),
+                          height: Dimens.nh(117),
+                          child: buildImageFromAssetOrEmbeddedSvg(
+                            'assets/images/cart/shopping_cart.svg',
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                        SizedBox(height: Dimens.nh(20)),
                         Text(
                           'سبد خرید شما خالی است!',
                           style: TextStyle(
@@ -573,15 +582,6 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                                 : const Color(0xFF3D495C),
                           ),
                           textAlign: TextAlign.center,
-                        ),
-                        SizedBox(height: Dimens.nh(20)),
-                        SizedBox(
-                          width: Dimens.nw(138),
-                          height: Dimens.nh(117),
-                          child: buildImageFromAssetOrEmbeddedSvg(
-                            'assets/images/cart/shopping_cart.svg',
-                            fit: BoxFit.contain,
-                          ),
                         ),
                       ],
                     ),

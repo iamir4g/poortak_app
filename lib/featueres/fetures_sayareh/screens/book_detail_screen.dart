@@ -5,6 +5,7 @@ import 'package:poortak/common/services/getImageUrl_service.dart';
 import 'package:poortak/common/utils/money_utils.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/common/widgets/dot_loading_widget.dart';
+import 'package:poortak/common/widgets/poortak_app_bar.dart';
 import 'package:poortak/common/widgets/primaryButton.dart';
 import 'package:poortak/common/widgets/reusable_modal.dart';
 import 'package:poortak/config/dimens.dart';
@@ -55,7 +56,7 @@ class _BookDetailScreenState extends State<BookDetailScreen>
 
     if (bookId == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('خطا')),
+        appBar: const PoortakAppBar(title: 'خطا'),
         body: const Center(child: Text('شناسه کتاب یافت نشد')),
       );
     }
@@ -77,11 +78,7 @@ class _BookDetailScreenState extends State<BookDetailScreen>
         backgroundColor: Theme.of(context).brightness == Brightness.dark
             ? MyColors.darkBackground
             : Colors.white,
-        appBar: AppBar(
-          backgroundColor: Theme.of(context).brightness == Brightness.dark
-              ? MyColors.darkBackgroundSecondary
-              : Colors.white,
-          elevation: 0,
+        appBar: PoortakAppBar(
           leading: IconButton(
             icon: Icon(
               Icons.bookmark_border,
@@ -91,17 +88,6 @@ class _BookDetailScreenState extends State<BookDetailScreen>
             ),
             onPressed: () {},
           ),
-          actions: [
-            IconButton(
-              icon: Icon(
-                Icons.arrow_forward,
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? MyColors.darkTextPrimary
-                    : Colors.black,
-              ),
-              onPressed: () => Navigator.of(context).pop(),
-            )
-          ],
         ),
         body: SafeArea(
           child: BlocBuilder<IknowAccessBloc, IknowAccessState>(

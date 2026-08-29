@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
+import 'package:poortak/common/widgets/poortak_app_bar.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/common/widgets/invite_friends_modal.dart';
@@ -27,12 +28,14 @@ class _HowToGetPointsScreenState extends State<HowToGetPointsScreen> {
 
     return Scaffold(
       backgroundColor: isDarkMode ? MyColors.darkBackground : Colors.white,
+      appBar: PoortakAppBar(
+        title: 'روش های کسب امتیاز',
+        titleStyle: MyTextStyle.textMatn15,
+      ),
       body: SafeArea(
+        top: false,
         child: Column(
           children: [
-            // Header
-            _buildHeader(isDarkMode),
-
             // Content
             Expanded(
               child: SingleChildScrollView(
@@ -55,59 +58,6 @@ class _HowToGetPointsScreenState extends State<HowToGetPointsScreen> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildHeader(bool isDarkMode) {
-    return Container(
-      height: 57.h,
-      width: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: 16.w),
-      decoration: BoxDecoration(
-        color: isDarkMode ? MyColors.darkBackgroundSecondary : Colors.white,
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(33.5.r),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0x0D000000),
-            offset: Offset(0, 1.h),
-            blurRadius: 1.r,
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // Title
-          Text(
-            'روش های کسب امتیاز',
-            style: MyTextStyle.textMatn15.copyWith(
-              color: isDarkMode
-                  ? MyColors.darkTextPrimary
-                  : const Color(0xFF29303D),
-            ),
-            textAlign: TextAlign.center,
-          ),
-
-          // Back Button
-          Container(
-            width: 50.r,
-            height: 50.r,
-            margin: EdgeInsets.only(left: 16.w),
-            child: IconButton(
-              onPressed: () => Navigator.of(context).pop(),
-              icon: Icon(
-                Icons.arrow_forward,
-                color: isDarkMode
-                    ? MyColors.darkTextPrimary
-                    : const Color(0xFF3D495C),
-                size: 20.r,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

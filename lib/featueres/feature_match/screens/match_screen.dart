@@ -2,6 +2,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poortak/common/utils/svg_embedded_png.dart';
+import 'package:poortak/common/widgets/poortak_app_bar.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
@@ -60,6 +61,11 @@ class _MatchScreenState extends State<MatchScreen> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
+      appBar: PoortakAppBar(
+        title: 'شرکت در مسابقه',
+        foregroundColor:
+            isDark ? MyColors.darkTextPrimary : MyColors.textMatn2,
+      ),
       body: Container(
         decoration: BoxDecoration(
           gradient: isDark
@@ -83,6 +89,7 @@ class _MatchScreenState extends State<MatchScreen> {
                 ),
         ),
         child: SafeArea(
+          top: false,
           child: BlocListener<MatchBloc, MatchState>(
             listener: (context, state) {
               if (state is MatchSuccess) {
@@ -110,9 +117,6 @@ class _MatchScreenState extends State<MatchScreen> {
               builder: (context, state) {
                 return Column(
                   children: [
-                    // Header
-                    _buildHeader(),
-
                     // Main content
                     Expanded(
                       child: SingleChildScrollView(
@@ -144,65 +148,6 @@ class _MatchScreenState extends State<MatchScreen> {
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Container(
-      padding: EdgeInsets.fromLTRB(
-        Dimens.medium,
-        0,
-        Dimens.nw(32),
-        0,
-      ),
-      height: Dimens.nh(57),
-      decoration: BoxDecoration(
-        color: isDark ? MyColors.darkBackgroundSecondary : Colors.white,
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(Dimens.nr(33.5)),
-        ),
-        boxShadow: isDark
-            ? null
-            : [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  offset: Offset(0, Dimens.nh(1)),
-                  blurRadius: Dimens.nr(1),
-                ),
-              ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // Title
-          Flexible(
-            child: Text(
-              'شرکت در مسابقه',
-              textAlign: TextAlign.center,
-              style: MyTextStyle.textHeader16Bold.copyWith(
-                color: isDark ? MyColors.darkTextPrimary : MyColors.textMatn2,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-
-          // Back button
-          SizedBox(
-            width: Dimens.nw(40),
-            height: Dimens.nh(40),
-            child: IconButton(
-              onPressed: () => Navigator.pop(context),
-              icon: Icon(
-                Icons.arrow_forward,
-                color: isDark ? MyColors.darkTextPrimary : MyColors.textMatn1,
-                size: Dimens.nr(28),
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

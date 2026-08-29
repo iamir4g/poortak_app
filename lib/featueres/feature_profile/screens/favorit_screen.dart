@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/common/widgets/poortak_app_bar.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 
@@ -22,12 +23,14 @@ class _FavoritScreenState extends State<FavoritScreen> {
     return Scaffold(
       backgroundColor:
           isDarkMode ? MyColors.darkBackground : MyColors.background3,
+      appBar: PoortakAppBar(
+        title: 'علاقه مندی ها',
+        foregroundColor: isDarkMode ? Colors.white : MyColors.textMatn1,
+      ),
       body: SafeArea(
+        top: false,
         child: Column(
           children: [
-            // Header
-            _buildHeader(isDarkMode),
-
             // Content
             Expanded(
               child: hasFavorites
@@ -36,68 +39,6 @@ class _FavoritScreenState extends State<FavoritScreen> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildHeader(bool isDarkMode) {
-    return Container(
-      height: 57.h,
-      margin: EdgeInsets.only(top: 22.h),
-      child: Stack(
-        children: [
-          // Header Background
-          Container(
-            height: 57.h,
-            decoration: BoxDecoration(
-              color:
-                  isDarkMode ? MyColors.darkBackgroundSecondary : Colors.white,
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(33.5.r),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  offset: Offset(0, 1.h),
-                  blurRadius: 1.r,
-                ),
-              ],
-            ),
-          ),
-
-          // Title
-          Positioned(
-            right: 32.w,
-            top: 16.h,
-            child: Text(
-              'علاقه مندی ها',
-              style: MyTextStyle.textHeader16Bold.copyWith(
-                color: isDarkMode ? Colors.white : MyColors.textMatn1,
-              ),
-            ),
-          ),
-
-          // Back Button
-          Positioned(
-            left: 16.w,
-            top: 11.h,
-            child: GestureDetector(
-              onTap: () => Navigator.pop(context),
-              child: Container(
-                width: 35.r,
-                height: 35.r,
-                decoration: const BoxDecoration(
-                  color: Colors.transparent,
-                ),
-                child: Icon(
-                  Icons.arrow_forward_ios,
-                  color: isDarkMode ? Colors.white : MyColors.textMatn1,
-                  size: 20.r,
-                ),
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

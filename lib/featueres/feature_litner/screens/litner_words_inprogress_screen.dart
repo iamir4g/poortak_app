@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:poortak/common/widgets/poortak_app_bar.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/config/dimens.dart';
@@ -137,20 +138,7 @@ class _LitnerWordsInprogressScreenState
     return Scaffold(
       backgroundColor:
           isDark ? MyColors.profileBackgroundDark : const Color(0xFFFFFFFF),
-      appBar: AppBar(
-        backgroundColor:
-            isDark ? MyColors.profileHeaderDark : const Color(0xFFFFFFFF),
-        title: Flexible(
-          child: Text(
-            'لغات در حال یادگیری',
-            style: MyTextStyle.textHeader16Bold.copyWith(
-              color: isDark ? MyColors.darkTextPrimary : MyColors.textMatn1,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-      ),
+      appBar: const PoortakAppBar(title: 'لغات در حال یادگیری'),
       floatingActionButtonLocation: FloatingActionButtonLocation.miniStartFloat,
       floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
       floatingActionButton: FloatingActionButton(

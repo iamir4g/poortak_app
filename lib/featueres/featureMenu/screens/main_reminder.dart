@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poortak/common/bloc/theme_cubit/theme_cubit.dart';
+import 'package:poortak/common/widgets/poortak_app_bar.dart';
 import 'package:poortak/common/services/reminder_notification_service.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
@@ -58,67 +59,18 @@ class _ReminderScreenState extends State<ReminderScreen> {
 
         return Scaffold(
           backgroundColor: backgroundColor,
+          appBar: PoortakAppBar(
+            title: 'یادآور مطالعه',
+            backgroundColor: cardBackground,
+            foregroundColor: themeState.isDark
+                ? MyColors.darkTextPrimary
+                : MyColors.textCancelButton,
+            centerTitle: true,
+          ),
           body: SafeArea(
+            top: false,
             child: Column(
-              children: [
-                // Header
-                Container(
-                  height: 57.h,
-                  decoration: BoxDecoration(
-                    color: cardBackground,
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(33.5.r),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.05),
-                        offset: Offset(0, 1.h),
-                        blurRadius: 1.r,
-                      ),
-                    ],
-                  ),
-                  child: Stack(
-                    children: [
-                      // Back button
-                      Positioned(
-                        left: 16.w,
-                        top: 0,
-                        bottom: 0,
-                        child: Center(
-                          child: IconButton(
-                            onPressed: () => Navigator.of(context).pop(),
-                            icon: Icon(
-                              Icons.arrow_forward,
-                              color: themeState.isDark
-                                  ? MyColors.darkTextPrimary
-                                  : MyColors.textMatn1,
-                              size: 24.r,
-                            ),
-                          ),
-                        ),
-                      ),
-                      // Title
-                      Positioned(
-                        left: 0,
-                        right: 0,
-                        top: 0,
-                        bottom: 0,
-                        child: Center(
-                          child: Text(
-                            'یادآور مطالعه',
-                            style: MyTextStyle.textHeader16Bold.copyWith(
-                              color: themeState.isDark
-                                  ? MyColors.darkTextPrimary
-                                  : MyColors.textCancelButton,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                // Reminders List
+              children: [                // Reminders List
                 Expanded(
                   child: _reminders.isEmpty
                       ? Center(

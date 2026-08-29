@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
+import 'package:poortak/common/widgets/poortak_app_bar.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 
@@ -25,61 +26,16 @@ class _MainPointsScreenState extends State<MainPointsScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       backgroundColor: isDark ? MyColors.profileBackgroundDark : Colors.white,
+      appBar: PoortakAppBar(
+        title: 'امتیازات',
+        foregroundColor: isDark
+            ? MyColors.profileTextPrimaryDark
+            : const Color(0xFF3D495C),
+      ),
       body: SafeArea(
+        top: false,
         child: Column(
           children: [
-            // Header
-            Container(
-              height: 57.h,
-              width: double.infinity,
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
-              decoration: BoxDecoration(
-                color: isDark ? MyColors.darkBackgroundSecondary : Colors.white,
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(33.5.r),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0x0D000000),
-                    offset: Offset(0, 1.h),
-                    blurRadius: 1.r,
-                  ),
-                ],
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // Title
-                  Text(
-                    'امتیازات',
-                    style: MyTextStyle.textHeader16Bold.copyWith(
-                      color: isDark
-                          ? MyColors.profileTextPrimaryDark
-                          : const Color(0xFF3D495C),
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-
-                  // Back Button
-                  Container(
-                    width: 50.r,
-                    height: 50.r,
-                    margin: EdgeInsets.only(left: 16.w),
-                    child: IconButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      icon: Icon(
-                        Icons.arrow_forward,
-                        color: isDark
-                            ? MyColors.profileTextPrimaryDark
-                            : const Color(0xFF3D495C),
-                        size: 20.r,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
             // Content
             Expanded(
               child: SingleChildScrollView(

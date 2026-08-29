@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/common/widgets/poortak_app_bar.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 
@@ -11,6 +12,11 @@ class LeaderboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: PoortakAppBar(
+        title: 'اسامی برندگان مسابقه',
+        foregroundColor: MyColors.textMatn2,
+        centerTitle: true,
+      ),
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -23,11 +29,9 @@ class LeaderboardScreen extends StatelessWidget {
           ),
         ),
         child: SafeArea(
+          top: false,
           child: Column(
             children: [
-              // Header
-              _buildHeader(context),
-
               // Leaderboard List
               Expanded(
                 child: _buildLeaderboardList(),
@@ -35,57 +39,6 @@ class LeaderboardScreen extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildHeader(BuildContext context) {
-    return Container(
-      height: 57.h,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(33.5.r),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            offset: Offset(0, 1.h),
-            blurRadius: 1.r,
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          // Back button
-          Container(
-            width: 40.w,
-            height: 40.h,
-            margin: EdgeInsets.only(left: 16.w),
-            child: IconButton(
-              onPressed: () => Navigator.pop(context),
-              icon: Icon(
-                Icons.arrow_back_ios,
-                color: MyColors.textMatn1,
-                size: 20.r,
-              ),
-            ),
-          ),
-
-          // Title
-          Expanded(
-            child: Text(
-              'اسامی برندگان مسابقه',
-              textAlign: TextAlign.center,
-              style: MyTextStyle.textHeader16Bold.copyWith(
-                color: MyColors.textMatn2,
-              ),
-            ),
-          ),
-
-          // Spacer for balance
-          SizedBox(width: 40.w),
-        ],
       ),
     );
   }

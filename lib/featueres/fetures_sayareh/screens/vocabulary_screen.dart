@@ -5,6 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:poortak/common/widgets/poortak_app_bar.dart';
 import 'package:poortak/common/widgets/step_progress.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/config/myColors.dart';
@@ -221,8 +222,6 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final pageBackgroundColor =
         isDark ? MyColors.darkBackground : MyColors.background;
-    final headerBackgroundColor =
-        isDark ? MyColors.darkBackgroundSecondary : Colors.white;
     final primaryTextColor =
         isDark ? MyColors.darkTextPrimary : MyColors.textMatn1;
     final secondaryTextColor =
@@ -263,44 +262,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
         },
         child: Scaffold(
           backgroundColor: pageBackgroundColor,
-          appBar: AppBar(
-            elevation: 0,
-            scrolledUnderElevation: 0,
-            shadowColor: Colors.transparent,
-            surfaceTintColor: Colors.transparent,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(30.r),
-              ),
-            ),
-            flexibleSpace: Container(
-              decoration: MyColors.headerDecoration(
-                backgroundColor: headerBackgroundColor,
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(30.r),
-                ),
-              ),
-            ),
-            backgroundColor: Colors.transparent,
-            foregroundColor: primaryTextColor,
-            automaticallyImplyLeading: false,
-            actions: [
-              IconButton(
-                onPressed: () => Navigator.of(context).pop(), //_showExitModal,
-                icon: Icon(Icons.arrow_forward, color: primaryTextColor),
-              ),
-            ],
-            title: Text(
-              'واژگان',
-              style: MyTextStyle.textHeader16Bold.copyWith(
-                color: primaryTextColor,
-              ),
-            ),
-            // leading: IconButton(
-            //   icon: const Icon(Icons.arrow_back),
-            //   onPressed: _showExitModal,
-            // ),
-          ),
+          appBar: const PoortakAppBar(title: 'واژگان'),
           body: SafeArea(
             child: BlocBuilder<VocabularyBloc, VocabularyState>(
               builder: (context, state) {

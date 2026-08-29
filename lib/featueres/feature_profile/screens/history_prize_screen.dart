@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/common/widgets/poortak_app_bar.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_profile/data/models/prize_history_model.dart';
@@ -114,13 +115,12 @@ class _HistoryPrizeScreenState extends State<HistoryPrizeScreen> {
 
     return Scaffold(
       backgroundColor: isDarkMode ? MyColors.darkBackground : Colors.white,
+      appBar: const PoortakAppBar(title: 'تاریخچه امتیاز'),
       body: SafeArea(
+        top: false,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Header
-            _buildHeader(isDarkMode),
-
             // Total Points Section
             _buildTotalPointsSection(isDarkMode, totalAmount),
 
@@ -130,59 +130,6 @@ class _HistoryPrizeScreenState extends State<HistoryPrizeScreen> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildHeader(bool isDarkMode) {
-    return Container(
-      height: 57.h,
-      width: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: 16.w),
-      decoration: BoxDecoration(
-        color: isDarkMode ? MyColors.darkBackgroundSecondary : Colors.white,
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(33.5.r),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0x0D000000),
-            offset: Offset(0, 1.h),
-            blurRadius: 1.r,
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // Title
-          Text(
-            'تاریخچه امتیاز',
-            style: MyTextStyle.textHeader16Bold.copyWith(
-              color: isDarkMode
-                  ? MyColors.darkTextPrimary
-                  : const Color(0xFF3D495C),
-            ),
-            textAlign: TextAlign.center,
-          ),
-
-          // Back Button
-          Container(
-            width: 50.r,
-            height: 50.r,
-            margin: EdgeInsets.only(left: 16.w),
-            child: IconButton(
-              onPressed: () => Navigator.of(context).pop(),
-              icon: Icon(
-                Icons.arrow_forward,
-                color: isDarkMode
-                    ? MyColors.darkTextPrimary
-                    : const Color(0xFF3D495C),
-                size: 20.r,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

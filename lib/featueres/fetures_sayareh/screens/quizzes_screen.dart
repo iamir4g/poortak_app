@@ -5,7 +5,7 @@ import 'package:poortak/common/utils/custom_textStyle.dart';
 import 'package:poortak/common/utils/svg_embedded_png.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
-import 'package:poortak/config/myTextStyle.dart';
+import 'package:poortak/common/widgets/poortak_app_bar.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quizes_cubit/cubit/quizes_cubit.dart';
 import 'package:poortak/featueres/fetures_sayareh/screens/first_quiz_screen.dart';
@@ -50,47 +50,10 @@ class _QuizzesScreenState extends State<QuizzesScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final backgroundColor =
         isDark ? MyColors.darkBackground : MyColors.background1;
-    final headerBackgroundColor =
-        isDark ? MyColors.darkBackgroundSecondary : Colors.white;
-    final primaryTextColor =
-        isDark ? MyColors.darkTextPrimary : MyColors.textMatn1;
 
     return Scaffold(
       backgroundColor: backgroundColor,
-      appBar: AppBar(
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        shadowColor: Colors.transparent,
-        surfaceTintColor: Colors.transparent,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(30.r),
-          ),
-        ),
-        flexibleSpace: Container(
-          decoration: MyColors.headerDecoration(
-            backgroundColor: headerBackgroundColor,
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(30.r),
-            ),
-          ),
-        ),
-        backgroundColor: Colors.transparent,
-        foregroundColor: primaryTextColor,
-        automaticallyImplyLeading: false,
-        actions: [
-          IconButton(
-            onPressed: () => Navigator.of(context).pop(),
-            icon: Icon(Icons.arrow_forward, color: primaryTextColor),
-          ),
-        ],
-        title: Text(
-          'آزمون ها',
-          style: MyTextStyle.textHeader16Bold.copyWith(
-            color: primaryTextColor,
-          ),
-        ),
-      ),
+      appBar: const PoortakAppBar(title: 'آزمون ها'),
       body: SafeArea(
         child: BlocBuilder<QuizesCubit, QuizesState>(
           bloc: _quizesCubit,

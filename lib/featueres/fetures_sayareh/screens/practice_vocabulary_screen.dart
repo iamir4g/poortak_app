@@ -10,6 +10,7 @@ import 'package:poortak/common/services/haptic_service.dart';
 import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/common/services/tts_service.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
+import 'package:poortak/common/widgets/poortak_app_bar.dart';
 import 'package:poortak/common/widgets/reusable_modal.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
@@ -316,8 +317,6 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
             final isDark = Theme.of(context).brightness == Brightness.dark;
             final pageBackgroundColor =
                 isDark ? MyColors.profileBackgroundDark : MyColors.background;
-            final headerBackgroundColor =
-                isDark ? MyColors.profileBackgroundDark : MyColors.background;
             final primaryTextColor =
                 isDark ? MyColors.profileTextPrimaryDark : MyColors.textMatn1;
             final secondaryTextColor =
@@ -352,40 +351,10 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
               },
               child: Scaffold(
                 backgroundColor: pageBackgroundColor,
-                appBar: AppBar(
-                  elevation: 0,
-                  scrolledUnderElevation: 0,
-                  shadowColor: Colors.transparent,
-                  surfaceTintColor: Colors.transparent,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(30.r),
-                    ),
-                  ),
-                  flexibleSpace: Container(
-                    decoration: MyColors.headerDecoration(
-                      backgroundColor: headerBackgroundColor,
-                      borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(30.r),
-                      ),
-                    ),
-                  ),
-                  backgroundColor: Colors.transparent,
+                appBar: PoortakAppBar(
+                  title: 'تمرین واژگان',
                   foregroundColor: primaryTextColor,
-                  automaticallyImplyLeading: false,
-                  actions: [
-                    IconButton(
-                      iconSize: 24.r,
-                      icon: Icon(Icons.arrow_forward, color: primaryTextColor),
-                      onPressed: () => _handleExitAttempt(state),
-                    ),
-                  ],
-                  title: Text(
-                    'تمرین واژگان',
-                    style: MyTextStyle.textHeader16Bold.copyWith(
-                      color: primaryTextColor,
-                    ),
-                  ),
+                  onBackPressed: () => _handleExitAttempt(state),
                 ),
                 body: SafeArea(
                   child: Builder(

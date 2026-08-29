@@ -9,6 +9,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/common/widgets/bottom_nav.dart';
 import 'package:poortak/common/widgets/custom_drawer.dart';
+import 'package:poortak/common/widgets/poortak_app_bar.dart';
 import 'package:poortak/common/widgets/logout_confirmation_modal.dart';
 import 'package:poortak/common/widgets/exit_confirmation_modal.dart';
 import 'package:poortak/common/services/payment_deep_link_service.dart';
@@ -404,14 +405,14 @@ class _MainWrapperState extends State<MainWrapper> {
                     resizeToAvoidBottomInset: false,
                     extendBodyBehindAppBar: false,
                     drawerScrimColor: Colors.black54,
-                    appBar: AppBar(
+                    appBar: PoortakAppBar(
+                      showBackButton: false,
                       backgroundColor: themeState.isDark
                           ? MyColors.darkBackground
                           : MyColors.background,
                       foregroundColor: themeState.isDark
                           ? MyColors.darkTextPrimary
                           : MyColors.textMatn1,
-                      elevation: 0,
                       actions: [
                         (currentPageIndex == 4 && prefsOperator.isLoggedIn())
                             ? PopupMenuButton<String>(
@@ -441,31 +442,6 @@ class _MainWrapperState extends State<MainWrapper> {
                               )
                             : const SizedBox.shrink(),
                       ],
-                      flexibleSpace: Container(
-                        decoration: BoxDecoration(
-                          color: themeState.isDark
-                              ? MyColors.darkBackground
-                              : Colors.white,
-                          borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(33.5.r),
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: themeState.isDark
-                                  ? Colors.black.withValues(alpha: 0.3)
-                                  : const Color.fromRGBO(0, 0, 0, 0.05),
-                              offset: Offset(0, 1.h),
-                              blurRadius: 1.r,
-                              spreadRadius: 0,
-                            ),
-                          ],
-                        ),
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(33.5.r),
-                        ),
-                      ),
                     ),
                     drawer: const CustomDrawer(),
                     bottomNavigationBar: BottomNav(

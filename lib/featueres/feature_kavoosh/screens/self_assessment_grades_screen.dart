@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/common/widgets/poortak_app_bar.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_kavoosh/widgets/self_assessment_grade_card.dart';
@@ -33,58 +34,10 @@ class SelfAssessmentGradesScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: isDark ? MyColors.darkBackground : MyColors.background3,
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(57.h),
-        child: SafeArea(
-          child: Container(
-            padding: EdgeInsets.fromLTRB(16.w, 0, 32.w, 0),
-            height: 57.h,
-            decoration: BoxDecoration(
-              color: isDark ? MyColors.darkBackgroundSecondary : Colors.white,
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(33.5.r),
-              ),
-              boxShadow: isDark
-                  ? null
-                  : [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.05),
-                        offset: Offset(0, 1.h),
-                        blurRadius: 1.r,
-                      ),
-                    ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Flexible(
-                  child: Text(
-                    'آزمون $subjectTitle',
-                    style: MyTextStyle.textHeader16Bold.copyWith(
-                      color: isDark ? MyColors.darkTextPrimary : null,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                SizedBox(
-                  width: 40.w,
-                  height: 40.h,
-                  child: IconButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    icon: Icon(
-                      Icons.arrow_forward,
-                      color: isDark
-                          ? MyColors.darkTextPrimary
-                          : const Color(0xFF29303D),
-                      size: 28.sp,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+      appBar: PoortakAppBar(
+        title: 'آزمون $subjectTitle',
+        foregroundColor:
+            isDark ? MyColors.darkTextPrimary : const Color(0xFF29303D),
       ),
       body: ListView.builder(
         padding: EdgeInsets.all(16.r),

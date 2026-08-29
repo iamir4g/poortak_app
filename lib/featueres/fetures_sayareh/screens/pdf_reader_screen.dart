@@ -12,6 +12,7 @@ import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/iknow_access
 import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/single_book_bloc/single_book_cubit.dart';
 import 'package:poortak/featueres/fetures_sayareh/utils/book_pdf_playback_resolver.dart';
 import 'package:poortak/common/widgets/dot_loading_widget.dart';
+import 'package:poortak/common/widgets/poortak_app_bar.dart';
 
 class PdfReaderScreen extends StatefulWidget {
   static const routeName = "/pdf_reader_screen";
@@ -26,44 +27,23 @@ class _PdfReaderScreenState extends State<PdfReaderScreen> {
   bool _isDark(BuildContext context) =>
       Theme.of(context).brightness == Brightness.dark;
 
-  Color _appBarBackground(BuildContext context) => _isDark(context)
-      ? MyColors.darkBackgroundSecondary
-      : Theme.of(context).colorScheme.inversePrimary;
-
-  Color _primaryTextColor(BuildContext context) => _isDark(context)
-      ? MyColors.darkTextPrimary
-      : MyColors.textMatn1;
+  PreferredSizeWidget _buildAppBar(
+    BuildContext context, {
+    required String title,
+    bool showBack = true,
+  }) {
+    return PoortakAppBar(
+      title: title,
+      showBackButton: showBack,
+      titleStyle: MyTextStyle.textMatn14BoldFor(context),
+    );
+  }
 
   BoxDecoration _screenDecoration(BuildContext context) => BoxDecoration(
         gradient: _isDark(context)
             ? MyColors.sayarehScreenGradientDark
             : MyColors.sayarehScreenGradientLight,
       );
-
-  PreferredSizeWidget _buildAppBar(
-    BuildContext context, {
-    required String title,
-    bool showBack = true,
-  }) {
-    final primaryTextColor = _primaryTextColor(context);
-    return AppBar(
-      title: Text(
-        title,
-        style: MyTextStyle.textMatn14BoldFor(context),
-      ),
-      automaticallyImplyLeading: false,
-      backgroundColor: _appBarBackground(context),
-      foregroundColor: primaryTextColor,
-      iconTheme: IconThemeData(color: primaryTextColor),
-      actions: [
-        if (showBack)
-          IconButton(
-            icon: Icon(Icons.arrow_forward, color: primaryTextColor),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-      ],
-    );
-  }
 
   Widget _buildScreenBody(BuildContext context, {required Widget child}) {
     return Container(

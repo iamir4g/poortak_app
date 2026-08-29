@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:poortak/common/widgets/poortak_app_bar.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
@@ -409,8 +410,6 @@ class _ConversationScreenState extends State<ConversationScreen> {
     final pageBackgroundColor = isDark
         ? MyColors.profileBackgroundDark
         : MyColors.conversationScreenBackgroundLight;
-    final headerBackgroundColor =
-        isDark ? MyColors.darkBackgroundSecondary : Colors.white;
     final primaryTextColor =
         isDark ? MyColors.profileTextPrimaryDark : MyColors.textMatn1;
     final iconColor =
@@ -421,40 +420,9 @@ class _ConversationScreenState extends State<ConversationScreen> {
       value: _converstionBloc,
       child: Scaffold(
         backgroundColor: pageBackgroundColor,
-        // نوار بالای صفحه با عنوان "مکالمه"
-        appBar: AppBar(
-          elevation: 0,
-          scrolledUnderElevation: 0,
-          shadowColor: Colors.transparent,
-          surfaceTintColor: Colors.transparent,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(30.r),
-            ),
-          ),
-          flexibleSpace: Container(
-            decoration: MyColors.headerDecoration(
-              backgroundColor: headerBackgroundColor,
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(30.r),
-              ),
-            ),
-          ),
-          backgroundColor: Colors.transparent,
+        appBar: PoortakAppBar(
+          title: 'مکالمه',
           foregroundColor: primaryTextColor,
-          automaticallyImplyLeading: false,
-          actions: [
-            IconButton(
-              onPressed: () => Navigator.of(context).pop(),
-              icon: Icon(Icons.arrow_forward, color: primaryTextColor),
-            ),
-          ],
-          title: Text(
-            'مکالمه',
-            style: MyTextStyle.textHeader16Bold.copyWith(
-              color: primaryTextColor,
-            ),
-          ),
         ),
         // نوار پایین صفحه شامل دکمه‌های پخش و نمایش ترجمه
         bottomNavigationBar: Container(
