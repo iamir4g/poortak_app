@@ -407,6 +407,18 @@ class _MainWrapperState extends State<MainWrapper> {
                     drawerScrimColor: Colors.black54,
                     appBar: PoortakAppBar(
                       showBackButton: false,
+                      leading: currentPageIndex == 0
+                          ? IconButton(
+                              icon: Icon(
+                                Icons.menu,
+                                color: themeState.isDark
+                                    ? MyColors.darkTextPrimary
+                                    : MyColors.textMatn1,
+                              ),
+                              onPressed: () =>
+                                  _scaffoldKey.currentState?.openDrawer(),
+                            )
+                          : null,
                       backgroundColor: themeState.isDark
                           ? MyColors.darkBackground
                           : MyColors.background,
