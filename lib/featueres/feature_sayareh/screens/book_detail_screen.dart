@@ -371,19 +371,26 @@ class _BookDetailScreenState extends State<BookDetailScreen>
                       );
                     },
                     style: OutlinedButton.styleFrom(
+                      backgroundColor:
+                          MyColors.bookSampleButtonBackgroundColor(isDark),
+                      foregroundColor:
+                          MyColors.bookSampleButtonTextColor(isDark),
                       side: BorderSide(
-                        color: isDark ? MyColors.darkBorder : Colors.grey,
+                        color: MyColors.bookSampleButtonBorderColor(isDark),
+                        width: 1,
                       ),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(Dimens.nr(12)),
+                        borderRadius: BorderRadius.circular(Dimens.radiusMedium),
                       ),
+                      elevation: 0,
+                      padding: EdgeInsets.zero,
                     ),
                     child: Text(
                       "خواندن نمونه",
-                      style: MyTextStyle.textMatn14Bold.copyWith(
-                        color: isDark
-                            ? MyColors.darkTextSecondary
-                            : MyColors.text4,
+                      style: MyTextStyle.textHeader16Bold.copyWith(
+                        color: MyColors.bookSampleButtonTextColor(isDark),
+                        fontSize: Dimens.nsp(16),
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ),
@@ -393,6 +400,7 @@ class _BookDetailScreenState extends State<BookDetailScreen>
               PrimaryButton(
                 width: double.infinity,
                 height: Dimens.buttonHeight,
+                backgroundColor: MyColors.secondary,
                 lable: hasFullAccess ? "خواندن کتاب" : "خرید کتاب",
                 onPressed: () {
                   if (hasFullAccess) {

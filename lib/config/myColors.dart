@@ -143,6 +143,17 @@ class MyColors {
   /// Text on primary (orange) filled buttons — dark in dark mode, white in light.
   static Color primaryButtonTextColor(bool isDark) =>
       isDark ? loginButtonText : textLight;
+
+  /// Book detail — «خواندن نمونه» outlined button (Figma 488-7070 / 764-10266).
+  static Color bookSampleButtonBorderColor(bool isDark) =>
+      isDark ? darkBorder : secondary;
+
+  static Color bookSampleButtonTextColor(bool isDark) =>
+      isDark ? darkTextPrimary : secondary;
+
+  static Color bookSampleButtonBackgroundColor(bool isDark) =>
+      isDark ? textInputBackgroundDark : background;
+
   static const Color termsBackgroundDark = Color(0xFF282A39);
   static const Color textInputBackgroundDark = Color(0xFF35374B);
   // Sayareh / reader screen gradients

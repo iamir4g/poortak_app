@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poortak/common/widgets/custom_pdfReader.dart';
+import 'package:poortak/common/services/screen_security_service.dart';
 import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
@@ -55,7 +56,14 @@ class _PdfReaderScreenState extends State<PdfReaderScreen> {
   @override
   void initState() {
     super.initState();
+    ScreenSecurityService.setEnabled(true);
     locator<IknowAccessBloc>().add(FetchIknowAccessEvent(forceRefresh: true));
+  }
+
+  @override
+  void dispose() {
+    ScreenSecurityService.setEnabled(false);
+    super.dispose();
   }
 
   @override
