@@ -83,7 +83,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
       title: '',
       message: 'لطفا ابتدا وارد حساب کاربری خود شوید',
       type: ModalType.info,
-      buttonText: 'ورود',
+      buttonText: 'ورود به حساب کاربری',
       onButtonPressed: () {
         Navigator.of(context).pop();
         Navigator.pushNamed(context, LoginScreen.routeName);

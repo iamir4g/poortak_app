@@ -68,6 +68,9 @@ void main() {
     await tester.pump();
 
     expect(find.text('سوال تستی'), findsOneWidget);
+    expect(find.text('مسابقه تستی'), findsOneWidget);
+    expect(find.textContaining('زمان باقی مانده ارسال پاسخ برای مسابقه تستی'),
+        findsOneWidget);
     expect(find.byType(CircularProgressIndicator), findsNothing);
   });
 

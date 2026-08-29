@@ -28,6 +28,14 @@ class _MatchScreenState extends State<MatchScreen> {
   int hoursRemaining = 0;
   Match? currentMatch;
 
+  String get _matchDisplayName {
+    final name = currentMatch?.data.match.name.trim();
+    if (name != null && name.isNotEmpty) {
+      return name;
+    }
+    return 'سوال این ماه';
+  }
+
   @override
   void initState() {
     super.initState();
@@ -122,7 +130,7 @@ class _MatchScreenState extends State<MatchScreen> {
                             // Description text
                             _buildDescriptionText(),
 
-                            SizedBox(height: Dimens.nh(40)),
+                            SizedBox(height: Dimens.nh(30)),
                           ],
                         ),
                       ),
@@ -398,15 +406,14 @@ class _MatchScreenState extends State<MatchScreen> {
           ),
         ),
 
-        // "سوال این ماه" label centered above the main container
+        // Match name label centered above the main container
         Positioned(
           top: 0,
           left: 0,
           right: 0,
           child: Center(
             child: Container(
-              width: Dimens.nw(112),
-              height: Dimens.nh(33),
+              constraints: BoxConstraints(minWidth: Dimens.nw(112)),
               padding: EdgeInsets.symmetric(
                 horizontal: Dimens.medium,
                 vertical: Dimens.nh(8),
@@ -417,14 +424,14 @@ class _MatchScreenState extends State<MatchScreen> {
                     : const Color(0xFFF2F2FE),
                 borderRadius: BorderRadius.circular(Dimens.nr(15)),
               ),
-              child: Center(
-                child: Text(
-                  'سوال این ماه',
-                  style: MyTextStyle.textMatn14Bold.copyWith(
-                    fontWeight: FontWeight.w300,
-                    color:
-                        isDark ? MyColors.darkTextPrimary : MyColors.textMatn1,
-                  ),
+              child: Text(
+                _matchDisplayName,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: MyTextStyle.textMatn14Bold.copyWith(
+                  fontWeight: FontWeight.w300,
+                  color:
+                      isDark ? MyColors.darkTextPrimary : MyColors.textMatn1,
                 ),
               ),
             ),
@@ -464,7 +471,6 @@ class _MatchScreenState extends State<MatchScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       width: double.infinity,
-      height: Dimens.nh(100),
       padding: EdgeInsets.symmetric(
         vertical: Dimens.nh(12),
         horizontal: Dimens.medium,
@@ -477,105 +483,46 @@ class _MatchScreenState extends State<MatchScreen> {
         ),
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Description text
-          Text(
-            'زمان باقی مانده ارسال پاسخ برای سوال این ماه :',
-            style: MyTextStyle.textMatn10W300.copyWith(
-              fontWeight: FontWeight.w500,
-              color: isDark ? MyColors.darkTextSecondary : MyColors.text3,
+          Expanded(
+            child: Text(
+              'زمان باقی مانده ارسال پاسخ برای $_matchDisplayName :',
+              style: MyTextStyle.textMatn10W300.copyWith(
+                fontWeight: FontWeight.w500,
+                color: isDark ? MyColors.darkTextSecondary : MyColors.text3,
+              ),
             ),
           ),
+          SizedBox(width: Dimens.nw(8)),
           Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Countdown boxes
               Row(
+                mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Days box
-                  Container(
-                    width: Dimens.nw(50),
-                    height: Dimens.nh(50),
-                    decoration: BoxDecoration(
-                      color: isDark
-                          ? MyColors.termsBackgroundDark
-                          : const Color(0xFFF2F5FA),
-                      borderRadius: BorderRadius.circular(Dimens.nr(5)),
-                      border: Border.all(
-                        color: isDark
-                            ? MyColors.darkBorder
-                            : MyColors.text4.withValues(alpha: 0.3),
-                        width: Dimens.nw(1),
-                      ),
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          '$hoursRemaining',
-                          style: MyTextStyle.text24Correct.copyWith(
-                            color: isDark
-                                ? MyColors.darkTextPrimary
-                                : MyColors.text2,
-                          ),
-                        ),
-                      ],
-                    ),
+                  _buildCountdownBox(
+                    isDark: isDark,
+                    value: '$hoursRemaining',
                   ),
-
                   SizedBox(width: Dimens.small),
-
-                  // Colon
                   Text(
                     ':',
                     style: MyTextStyle.text24Correct.copyWith(
                       color: isDark ? MyColors.darkTextPrimary : MyColors.text2,
                     ),
                   ),
-
                   SizedBox(width: Dimens.small),
-
-                  // Hours box
-                  Container(
-                    width: Dimens.nw(50),
-                    height: Dimens.nh(50),
-                    decoration: BoxDecoration(
-                      color: isDark
-                          ? MyColors.termsBackgroundDark
-                          : const Color(0xFFF2F5FA),
-                      borderRadius: BorderRadius.circular(Dimens.nr(5)),
-                      border: Border.all(
-                        color: isDark
-                            ? MyColors.darkBorder
-                            : MyColors.text4.withValues(alpha: 0.3),
-                        width: Dimens.nw(1),
-                      ),
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          '$daysRemaining',
-                          style: MyTextStyle.text24Correct.copyWith(
-                            // fontWeight: FontWeight.bold,
-                            color: isDark
-                                ? MyColors.darkTextPrimary
-                                : MyColors.text2,
-                          ),
-                        ),
-                      ],
-                    ),
+                  _buildCountdownBox(
+                    isDark: isDark,
+                    value: '$daysRemaining',
                   ),
                 ],
               ),
-
-              SizedBox(height: Dimens.nh(6)),
-
-              // Labels
+              SizedBox(height: Dimens.nh(4)),
               Row(
+                mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
@@ -597,11 +544,37 @@ class _MatchScreenState extends State<MatchScreen> {
                   ),
                 ],
               ),
-
-              SizedBox(height: Dimens.nh(6)),
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildCountdownBox({
+    required bool isDark,
+    required String value,
+  }) {
+    return Container(
+      width: Dimens.nw(50),
+      height: Dimens.nh(50),
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: isDark ? MyColors.termsBackgroundDark : const Color(0xFFF2F5FA),
+        borderRadius: BorderRadius.circular(Dimens.nr(5)),
+        border: Border.all(
+          color: isDark
+              ? MyColors.darkBorder
+              : MyColors.text4.withValues(alpha: 0.3),
+          width: Dimens.nw(1),
+        ),
+      ),
+      child: Text(
+        value,
+        style: MyTextStyle.text24Correct.copyWith(
+          color: isDark ? MyColors.darkTextPrimary : MyColors.text2,
+          height: 1.0,
+        ),
       ),
     );
   }

@@ -118,7 +118,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
       title: '',
       message: 'لطفا ابتدا وارد حساب کاربری خود شوید',
       type: ModalType.info,
-      buttonText: 'ورود',
+      buttonText: 'ورود به حساب کاربری',
       onButtonPressed: () {
         Navigator.of(context).pop();
         Navigator.pushNamed(context, LoginScreen.routeName);
