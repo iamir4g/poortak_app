@@ -30,9 +30,24 @@ class DialogCart extends StatefulWidget {
   State<DialogCart> createState() => _DialogCartState();
 }
 
-class _DialogCartState extends State<DialogCart> {
+class _DialogCartState extends State<DialogCart>
+    with SingleTickerProviderStateMixin {
   final PrefsOperator _prefsOperator = locator<PrefsOperator>();
   static const String _bundleName = "مجموعه کامل سیاره آی نو";
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(() => setState(() {}));
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
   Widget _buildCartFooter(bool isDark) {
     return Container(
@@ -49,21 +64,142 @@ class _DialogCartState extends State<DialogCart> {
           ),
         ),
       ),
+      padding: EdgeInsets.symmetric(horizontal: Dimens.nw(16)),
       child: Row(
+        textDirection: TextDirection.rtl,
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Image.asset("assets/images/cart/subtract.png"),
-          Expanded(
+          Image.asset(
+            "assets/images/cart/subtract.png",
+            width: Dimens.nw(50),
+            height: Dimens.nh(72),
+            fit: BoxFit.contain,
+          ),
+          // SizedBox(width: Dimens.nw(8)),
+          Flexible(
             child: Text(
               "جهت کسب اطلاعات بیشتر به وبسایت پورتک به نشانی www.poortak.ir مراجه کنید.",
               style: MyTextStyle.textMatn11.copyWith(
-                color: isDark
-                    ? MyColors.darkTextSecondary
-                    : MyColors.textMatn1,
+                color: isDark ? MyColors.darkTextSecondary : MyColors.textMatn1,
               ),
               textAlign: TextAlign.center,
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildLessonVideoThumbnail({
+    required bool isDark,
+    required Color imageFrameColor,
+  }) {
+    final videoThumbnail = widget.item.videoThumbnail.trim();
+
+    return Stack(
+      alignment: Alignment.center,
+      clipBehavior: Clip.none,
+      children: [
+        Container(
+          width: Dimens.nw(286.0),
+          height: Dimens.nh(177.0),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(Dimens.nr(27.0))),
+            color: imageFrameColor,
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.all(
+              Radius.circular(Dimens.nr(27.0)),
+            ),
+            child: videoThumbnail.isEmpty
+                ? Image.asset(
+                    "assets/images/cart/single_lesson.png",
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: double.infinity,
+                  )
+                : FutureBuilder<String>(
+                    future: GetImageUrlService().getImageUrl(videoThumbnail),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      if (snapshot.hasError ||
+                          !snapshot.hasData ||
+                          snapshot.data!.isEmpty) {
+                        return Image.asset(
+                          "assets/images/cart/single_lesson.png",
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: double.infinity,
+                        );
+                      }
+                      return Image.network(
+                        snapshot.data!,
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                        height: double.infinity,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Image.asset(
+                            "assets/images/cart/single_lesson.png",
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            height: double.infinity,
+                          );
+                        },
+                      );
+                    },
+                  ),
+          ),
+        ),
+        Positioned(
+          bottom: Dimens.nh(5),
+          right: Dimens.small,
+          child: SvgPicture.asset(
+            'assets/images/icons/carbon--play-outline.svg',
+            width: Dimens.nw(18.0),
+            height: Dimens.nh(18.0),
+            fit: BoxFit.contain,
+            colorFilter: const ColorFilter.mode(
+              MyColors.textLight,
+              BlendMode.srcIn,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBundleTabLabel({
+    required bool isDark,
+    required bool isSelected,
+  }) {
+    final baseStyle = MyTextStyle.tabLabel16.copyWith(
+      fontSize: Dimens.nsp(14.0),
+      color: isSelected
+          ? MyColors.textLight
+          : (isDark
+              ? MyColors.cartTabUnselectedTextDark
+              : MyColors.textSecondary),
+    );
+
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      child: Text.rich(
+        TextSpan(
+          style: baseStyle,
+          children: [
+            const TextSpan(text: 'خرید مجموعه '),
+            TextSpan(
+              text: '%',
+              style: baseStyle.copyWith(
+                color: isSelected ? MyColors.textLight : MyColors.primary,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -103,9 +239,7 @@ class _DialogCartState extends State<DialogCart> {
               Text(
                 coinLabel,
                 style: MyTextStyle.textMatn9.copyWith(
-                  color: isDark
-                      ? MyColors.darkTextPrimary
-                      : MyColors.textMatn1,
+                  color: isDark ? MyColors.darkTextPrimary : MyColors.textMatn1,
                 ),
               ),
             ],
@@ -118,8 +252,7 @@ class _DialogCartState extends State<DialogCart> {
   ButtonStyle _cartButtonStyle(bool isDark) {
     return ElevatedButton.styleFrom(
       backgroundColor: isDark ? MyColors.primary : MyColors.secondary,
-      foregroundColor:
-          isDark ? MyColors.loginButtonText : MyColors.textLight,
+      foregroundColor: isDark ? MyColors.loginButtonText : MyColors.textLight,
       elevation: 0,
       shadowColor: Colors.transparent,
       shape: RoundedRectangleBorder(
@@ -325,385 +458,303 @@ class _DialogCartState extends State<DialogCart> {
     final imageFrameColor =
         isDark ? MyColors.cartImageFrameDark : MyColors.background;
     return Dialog(
-        backgroundColor:
-            isDark ? MyColors.cartDialogBackgroundDark : MyColors.background,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(Dimens.nr(25.0)),
-        ),
-        child: ConstrainedBox(
-          constraints: BoxConstraints(maxHeight: Dimens.nh(700.0)),
-          child: DefaultTabController(
-            length: 2,
-            child: Column(
-              children: [
-                SizedBox(
-                  height: Dimens.nh(18.0),
-                ),
-                Padding(
-                    padding: EdgeInsets.symmetric(horizontal: Dimens.medium),
-                    child: SizedBox(
-                      height: Dimens.nh(40.0),
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
+      backgroundColor:
+          isDark ? MyColors.cartDialogBackgroundDark : MyColors.background,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(Dimens.nr(25.0)),
+      ),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxHeight: Dimens.nh(700.0)),
+        child: Column(
+          children: [
+            SizedBox(
+              height: Dimens.nh(18.0),
+            ),
+            Padding(
+                padding: EdgeInsets.symmetric(horizontal: Dimens.medium),
+                child: SizedBox(
+                  height: Dimens.nh(40.0),
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? MyColors.cartTabBarBackgroundDark
+                          : MyColors.background3,
+                      borderRadius: BorderRadius.circular(Dimens.nr(20.0)),
+                    ),
+                    child: TabBar(
+                        controller: _tabController,
+                        isScrollable: false,
+                        dividerHeight: 0.0,
+                        labelStyle: MyTextStyle.tabLabel16
+                            .copyWith(fontSize: Dimens.nsp(14.0)),
+                        labelPadding:
+                            EdgeInsets.symmetric(horizontal: Dimens.nw(4.0)),
+                        indicatorColor: Colors.transparent,
+                        labelColor: MyColors.textLight,
+                        unselectedLabelColor: isDark
+                            ? MyColors.cartTabUnselectedTextDark
+                            : MyColors.textSecondary,
+                        indicator: BoxDecoration(
                           color: isDark
-                              ? MyColors.cartTabBarBackgroundDark
-                              : MyColors.background3,
+                              ? MyColors.cartTabSelectedDark
+                              : MyColors.text1,
                           borderRadius: BorderRadius.circular(Dimens.nr(20.0)),
                         ),
-                        child: TabBar(
-                            isScrollable: false,
-                            dividerHeight: 0.0,
-                            labelStyle: MyTextStyle.tabLabel16
-                                .copyWith(fontSize: Dimens.nsp(14.0)),
-                            labelPadding: EdgeInsets.symmetric(
-                                horizontal: Dimens.nw(4.0)),
-                            indicatorColor: Colors.transparent,
-                            labelColor: MyColors.textLight,
-                            unselectedLabelColor: isDark
-                                ? MyColors.cartTabUnselectedTextDark
-                                : MyColors.textSecondary,
-                            indicator: BoxDecoration(
-                              color: isDark
-                                  ? MyColors.cartTabSelectedDark
-                                  : MyColors.text1,
-                              borderRadius:
-                                  BorderRadius.circular(Dimens.nr(20.0)),
+                        indicatorSize: TabBarIndicatorSize.tab,
+                        tabs: [
+                          Tab(
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                "خرید تکی",
+                              ),
                             ),
-                            indicatorSize: TabBarIndicatorSize.tab,
-                            tabs: [
-                              Tab(
-                                child: FittedBox(
-                                  fit: BoxFit.scaleDown,
-                                  child: Text(
-                                    "خرید تکی",
-                                  ),
-                                ),
-                              ),
-                              Tab(
-                                child: FittedBox(
-                                  fit: BoxFit.scaleDown,
-                                  child: Text(
-                                    "خرید مجموعه %",
-                                  ),
-                                ),
-                              ),
-                            ]),
-                      ),
-                    )),
-                SizedBox(
-                  height: Dimens.nh(16.0),
-                ),
-                Expanded(
-                  child: TabBarView(
-                    children: [
-                      CustomScrollView(
-                        slivers: [
-                          SliverToBoxAdapter(
-                            child: Padding(
-                              padding: EdgeInsets.fromLTRB(
-                                Dimens.medium,
-                                Dimens.medium,
-                                Dimens.medium,
-                                0,
-                              ),
-                              child: Column(
+                          ),
+                          Tab(
+                            child: _buildBundleTabLabel(
+                              isDark: isDark,
+                              isSelected: _tabController.index == 1,
+                            ),
+                          ),
+                        ]),
+                  ),
+                )),
+            SizedBox(
+              height: Dimens.nh(16.0),
+            ),
+            Expanded(
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  CustomScrollView(
+                    slivers: [
+                      SliverToBoxAdapter(
+                        child: Padding(
+                          padding: EdgeInsets.fromLTRB(
+                            Dimens.medium,
+                            Dimens.medium,
+                            Dimens.medium,
+                            0,
+                          ),
+                          child: Column(
+                            children: [
+                              Stack(
+                                clipBehavior: Clip.none,
+                                alignment: Alignment.center,
                                 children: [
-                                  Stack(
-                                    children: [
-                                      Container(
-                                        width: Dimens.nw(286.0),
-                                        height: Dimens.nh(177.0),
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(Dimens.nr(27.0))),
-                                          color: imageFrameColor,
-                                        ),
-                                        child: ClipRRect(
-                                          borderRadius: BorderRadius.all(
-                                            Radius.circular(Dimens.nr(27.0)),
-                                          ),
-                                          child: FutureBuilder<String>(
-                                            future: GetImageUrlService()
-                                                .getImageUrl(
-                                                    widget.item
-                                                        .videoThumbnailOrThumbnail),
-                                            builder: (context, snapshot) {
-                                              if (snapshot.connectionState ==
-                                                  ConnectionState.waiting) {
-                                                return const Center(
-                                                  child:
-                                                      CircularProgressIndicator(),
-                                                );
-                                              }
-                                              if (snapshot.hasError ||
-                                                  !snapshot.hasData ||
-                                                  snapshot.data!.isEmpty) {
-                                                return Image.asset(
-                                                  "assets/images/cart/single_lesson.png",
-                                                  fit: BoxFit.cover,
-                                                );
-                                              }
-                                              return Image.network(
-                                                snapshot.data!,
-                                                fit: BoxFit.cover,
-                                                errorBuilder: (context, error,
-                                                    stackTrace) {
-                                                  return Image.asset(
-                                                    "assets/images/cart/single_lesson.png",
-                                                    fit: BoxFit.cover,
-                                                  );
-                                                },
-                                              );
-                                            },
-                                          ),
-                                        ),
-                                      ),
-                                      Positioned(
-                                          bottom: Dimens.nh(5),
-                                          right: Dimens.small,
-                                          child: SvgPicture.asset(
-                                            'assets/images/icons/carbon--play-outline.svg',
-                                            width: Dimens.nw(18.0),
-                                            height: Dimens.nh(18.0),
-                                            fit: BoxFit.contain,
-                                            colorFilter: const ColorFilter.mode(
-                                              MyColors.textLight,
-                                              BlendMode.srcIn,
-                                            ),
-                                          )),
-                                      Positioned(
-                                        bottom: Dimens.nh(5.0),
-                                        left: Dimens.small,
-                                        child: _buildCoinBadge(
-                                          isDark: isDark,
-                                          coinAmount: "+5",
-                                          coinLabel: l10n.coin_with_buy,
-                                        ),
-                                      ),
-                                    ],
+                                  _buildLessonVideoThumbnail(
+                                    isDark: isDark,
+                                    imageFrameColor: imageFrameColor,
                                   ),
-                                  SizedBox(
-                                    height: Dimens.nh(26.0),
-                                  ),
-                                  Center(
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Image.asset(
-                                          'assets/images/lock_image.png',
-                                          width: Dimens.nw(18.0),
-                                          height: Dimens.nh(18.0),
-                                          fit: BoxFit.contain,
-                                        ),
-                                        SizedBox(
-                                          width: Dimens.nw(4.0),
-                                        ),
-                                        Text(
-                                          "${widget.item.name} انیمیشن سیاره آی‌نو",
-                                          style: MyTextStyle.textMatn12W500
-                                              .copyWith(color: primaryTextColor),
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                        SizedBox(
-                                          width: Dimens.nw(14.0),
-                                        ),
-                                        if (widget.item.description.isNotEmpty)
-                                          ...[],
-                                      ],
+                                  Positioned(
+                                    bottom: Dimens.nh(5.0),
+                                    left: Dimens.small,
+                                    child: _buildCoinBadge(
+                                      isDark: isDark,
+                                      coinAmount: "+5",
+                                      coinLabel: l10n.coin_with_buy,
                                     ),
                                   ),
-                                  SizedBox(
-                                    height: Dimens.nh(18.0),
-                                  ),
-                                  Container(
-                                      height: Dimens.nh(54.0),
-                                      decoration: BoxDecoration(
-                                        color: isDark
-                                            ? MyColors.cartPriceCardDark
-                                            : MyColors.cardBackground1,
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(Dimens.nr(10.0))),
+                                ],
+                              ),
+                              SizedBox(
+                                height: Dimens.nh(26.0),
+                              ),
+                              Center(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
+                                  textDirection: TextDirection.rtl,
+                                  children: [
+                                    Image.asset(
+                                      'assets/images/lock_image.png',
+                                      width: Dimens.nw(18.0),
+                                      height: Dimens.nh(18.0),
+                                      fit: BoxFit.contain,
+                                    ),
+                                    SizedBox(
+                                      width: Dimens.nw(4.0),
+                                    ),
+                                    Flexible(
+                                      child: Text(
+                                        widget.item.name,
+                                        style: MyTextStyle.textMatn12W500
+                                            .copyWith(color: primaryTextColor),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        textAlign: TextAlign.center,
                                       ),
-                                      child: Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: Dimens.medium),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(
+                                height: Dimens.nh(18.0),
+                              ),
+                              Container(
+                                  height: Dimens.nh(54.0),
+                                  decoration: BoxDecoration(
+                                    color: isDark
+                                        ? MyColors.cartPriceCardDark
+                                        : MyColors.cardBackground1,
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(Dimens.nr(10.0))),
+                                  ),
+                                  child: Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: Dimens.medium),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          l10n.price,
+                                          style: TextStyle(
+                                            fontFamily: "IRANSans",
+                                            fontSize: Dimens.nsp(15.0),
+                                            fontWeight: FontWeight.w300,
+                                            fontStyle: FontStyle.normal,
+                                            height: 1.0,
+                                            letterSpacing: 0.0,
+                                            color: secondaryTextColor,
+                                          ),
+                                        ),
+                                        Row(
                                           children: [
                                             Text(
-                                              l10n.price,
+                                              "${MoneyUtils.formatTomanFromRial(widget.item.price)} ",
                                               style: TextStyle(
                                                 fontFamily: "IRANSans",
-                                                fontSize: Dimens.nsp(15.0),
+                                                fontSize: Dimens.nsp(16.0),
                                                 fontWeight: FontWeight.w300,
                                                 fontStyle: FontStyle.normal,
                                                 height: 1.0,
                                                 letterSpacing: 0.0,
-                                                color: secondaryTextColor,
+                                                color: primaryTextColor,
                                               ),
+                                              textAlign: TextAlign.center,
                                             ),
-                                            Row(
-                                              children: [
-                                                Text(
-                                                  "${MoneyUtils.formatTomanFromRial(widget.item.price)} ",
-                                                  style: TextStyle(
-                                                    fontFamily: "IRANSans",
-                                                    fontSize: Dimens.nsp(16.0),
-                                                    fontWeight: FontWeight.w300,
-                                                    fontStyle: FontStyle.normal,
-                                                    height: 1.0,
-                                                    letterSpacing: 0.0,
-                                                    color: primaryTextColor,
-                                                  ),
-                                                  textAlign: TextAlign.center,
-                                                ),
-                                                Text(
-                                                  l10n.toman,
-                                                  style: MyTextStyle.textMatn13
-                                                      .copyWith(
-                                                          color:
-                                                              primaryTextColor),
-                                                )
-                                              ],
+                                            Text(
+                                              l10n.toman,
+                                              style: MyTextStyle.textMatn13
+                                                  .copyWith(
+                                                      color: primaryTextColor),
                                             )
                                           ],
-                                        ),
-                                      )),
-                                  SizedBox(
-                                    height: Dimens.nh(20.0),
-                                  ),
-                                  SizedBox(
-                                    width: Dimens.nw(286.0),
-                                    height: Dimens.nh(65.0),
-                                    child: ElevatedButton(
-                                      onPressed: () {
-                                        _addItemToCart(
-                                          CartType.IKnowCourse.name,
-                                          widget.item.id,
-                                          widget.item.name,
-                                        );
-                                      },
-                                      style: _cartButtonStyle(isDark),
-                                      child: Text(
-                                        l10n.add_to_cart,
-                                        style: MyTextStyle.textMatnBtn.copyWith(
-                                          color: isDark
-                                              ? MyColors.loginButtonText
-                                              : MyColors.textLight,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: Dimens.nh(20.0),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          SliverFillRemaining(
-                            hasScrollBody: false,
-                            child: Align(
-                              alignment: Alignment.bottomCenter,
-                              child: _buildCartFooter(isDark),
-                            ),
-                          ),
-                        ],
-                      ),
-                      CustomScrollView(
-                        slivers: [
-                          SliverToBoxAdapter(
-                            child: summaryData == null
-                                ? Padding(
-                                    padding: EdgeInsets.all(Dimens.large),
-                                    child: Column(
-                                      children: [
-                                        SizedBox(height: Dimens.nh(40.0)),
-                                        const CircularProgressIndicator(),
-                                        SizedBox(height: Dimens.nh(16.0)),
-                                        Text(
-                                          "اطلاعات خرید مجموعه در حال بارگذاری است",
-                                          style: MyTextStyle.textMatn12W500
-                                              .copyWith(color: primaryTextColor),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                        SizedBox(height: Dimens.nh(24.0)),
+                                        )
                                       ],
                                     ),
-                                  )
-                                : Builder(
-                                    builder: (context) {
-                                      final sortedCourses =
-                                          _sortedCourses(summaryData);
-                                      final sortedBooks =
-                                          _sortedBooks(summaryData);
-                                      final subtotal =
-                                          _calculateBundleSubtotal(summaryData);
-                                      final discountAmount =
-                                          _calculateDiscountAmount(summaryData);
-                                      final payableAmount =
-                                          _calculatePayableAmount(summaryData);
-                                      final settings =
-                                          summaryData.data.settings;
-                                      final isPercentDiscount =
-                                          settings.discountType.toLowerCase() ==
-                                              "percent";
+                                  )),
+                              SizedBox(
+                                height: Dimens.nh(20.0),
+                              ),
+                              SizedBox(
+                                width: Dimens.nw(286.0),
+                                height: Dimens.nh(65.0),
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    _addItemToCart(
+                                      CartType.IKnowCourse.name,
+                                      widget.item.id,
+                                      widget.item.name,
+                                    );
+                                  },
+                                  style: _cartButtonStyle(isDark),
+                                  child: Text(
+                                    l10n.add_to_cart,
+                                    style: MyTextStyle.textMatnBtn.copyWith(
+                                      color: isDark
+                                          ? MyColors.loginButtonText
+                                          : MyColors.textLight,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                height: Dimens.nh(20.0),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SliverFillRemaining(
+                        hasScrollBody: false,
+                        child: Align(
+                          alignment: Alignment.bottomCenter,
+                          child: _buildCartFooter(isDark),
+                        ),
+                      ),
+                    ],
+                  ),
+                  CustomScrollView(
+                    slivers: [
+                      SliverToBoxAdapter(
+                        child: summaryData == null
+                            ? Padding(
+                                padding: EdgeInsets.all(Dimens.large),
+                                child: Column(
+                                  children: [
+                                    SizedBox(height: Dimens.nh(40.0)),
+                                    const CircularProgressIndicator(),
+                                    SizedBox(height: Dimens.nh(16.0)),
+                                    Text(
+                                      "اطلاعات خرید مجموعه در حال بارگذاری است",
+                                      style: MyTextStyle.textMatn12W500
+                                          .copyWith(color: primaryTextColor),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    SizedBox(height: Dimens.nh(24.0)),
+                                  ],
+                                ),
+                              )
+                            : Builder(
+                                builder: (context) {
+                                  final sortedCourses =
+                                      _sortedCourses(summaryData);
+                                  final sortedBooks = _sortedBooks(summaryData);
+                                  final subtotal =
+                                      _calculateBundleSubtotal(summaryData);
+                                  final discountAmount =
+                                      _calculateDiscountAmount(summaryData);
+                                  final payableAmount =
+                                      _calculatePayableAmount(summaryData);
+                                  final settings = summaryData.data.settings;
+                                  final isPercentDiscount =
+                                      settings.discountType.toLowerCase() ==
+                                          "percent";
 
-                                      return Column(
+                                  return Column(
+                                    children: [
+                                      SizedBox(
+                                        height: Dimens.nh(16.0),
+                                      ),
+                                      Stack(
                                         children: [
-                                          SizedBox(
-                                            height: Dimens.nh(16.0),
-                                          ),
-                                          Stack(
-                                            children: [
-                                              Container(
-                                                width: Dimens.nw(286.0),
-                                                height: Dimens.nh(177.0),
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.all(
-                                                    Radius.circular(
-                                                        Dimens.nr(27.0)),
-                                                  ),
-                                                  color: imageFrameColor,
-                                                ),
-                                                child: Image.asset(
-                                                  "assets/images/cart/bundle_lesson.png",
-                                                  fit: BoxFit.cover,
-                                                ),
+                                          Container(
+                                            width: Dimens.nw(286.0),
+                                            height: Dimens.nh(177.0),
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.all(
+                                                Radius.circular(
+                                                    Dimens.nr(27.0)),
                                               ),
-                                              Positioned(
-                                                  bottom: Dimens.nh(35.0),
-                                                  right: Dimens.small,
-                                                  child: SizedBox(
-                                                    width: Dimens.nw(30.0),
-                                                    height: Dimens.nh(30.0),
-                                                    child: Transform.scale(
-                                                      scale: 1.12,
-                                                      child: SvgPicture.asset(
-                                                        'assets/images/icons/arcticons--pdf-viewer.svg',
-                                                        width: Dimens.nw(30.0),
-                                                        height: Dimens.nh(30.0),
-                                                        colorFilter:
-                                                            const ColorFilter
-                                                                .mode(
-                                                          MyColors.textLight,
-                                                          BlendMode.srcIn,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  )),
-                                              Positioned(
-                                                bottom: Dimens.nh(5.0),
-                                                right: Dimens.small,
-                                                child: SizedBox(
-                                                  width: Dimens.nw(30.0),
-                                                  height: Dimens.nh(30.0),
+                                              color: imageFrameColor,
+                                            ),
+                                            child: Image.asset(
+                                              "assets/images/cart/bundle_lesson.png",
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                          Positioned(
+                                              bottom: Dimens.nh(35.0),
+                                              right: Dimens.small,
+                                              child: SizedBox(
+                                                width: Dimens.nw(30.0),
+                                                height: Dimens.nh(30.0),
+                                                child: Transform.scale(
+                                                  scale: 1.12,
                                                   child: SvgPicture.asset(
-                                                    'assets/images/icons/carbon--play-outline.svg',
+                                                    'assets/images/icons/arcticons--pdf-viewer.svg',
                                                     width: Dimens.nw(30.0),
                                                     height: Dimens.nh(30.0),
                                                     colorFilter:
@@ -713,382 +764,385 @@ class _DialogCartState extends State<DialogCart> {
                                                     ),
                                                   ),
                                                 ),
-                                              ),
-                                              Positioned(
-                                                bottom: Dimens.nh(5.0),
-                                                left: Dimens.small,
-                                                child: _buildCoinBadge(
-                                                  isDark: isDark,
-                                                  coinAmount: "+50",
-                                                  coinLabel: l10n.coin_with_buy,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          SizedBox(
-                                            height: Dimens.nh(26.0),
-                                          ),
-                                          Container(
-                                            decoration: BoxDecoration(
-                                                color: isDark
-                                                    ? MyColors
-                                                        .cartBundleSectionDark
-                                                    : MyColors.background1),
-                                            child: Column(
-                                              children: [
-                                                SizedBox(
-                                                  height: Dimens.nh(16.0),
-                                                ),
-                                                Center(
-                                                  child: Text(
-                                                    _bundleName,
-                                                    style: MyTextStyle
-                                                        .textMatn14Bold
-                                                        .copyWith(
-                                                            color:
-                                                                primaryTextColor),
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                  height: Dimens.nh(18.0),
-                                                ),
-                                                SizedBox(
-                                                  width: Dimens.nw(248.0),
-                                                  child: ListView.separated(
-                                                    shrinkWrap: true,
-                                                    physics:
-                                                        const NeverScrollableScrollPhysics(),
-                                                    itemCount:
-                                                        sortedCourses.length,
-                                                    separatorBuilder:
-                                                        (context, index) {
-                                                      return SizedBox(
-                                                          height:
-                                                              Dimens.nh(6.0));
-                                                    },
-                                                    itemBuilder:
-                                                        (context, index) {
-                                                      final course =
-                                                          sortedCourses[index];
-                                                      return ItemMultiCard(
-                                                        title: course.name,
-                                                        price: course.price,
-                                                      );
-                                                    },
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                  height: Dimens.nh(20.0),
-                                                ),
-                                                Center(
-                                                  child: Text(
-                                                    "کتاب های الکترونیکی",
-                                                    style: MyTextStyle
-                                                        .textMatn14Bold
-                                                        .copyWith(
-                                                            color:
-                                                                primaryTextColor),
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                  height: Dimens.nh(16.0),
-                                                ),
-                                                SizedBox(
-                                                  width: Dimens.nw(248.0),
-                                                  child: ListView.separated(
-                                                    shrinkWrap: true,
-                                                    physics:
-                                                        const NeverScrollableScrollPhysics(),
-                                                    itemCount:
-                                                        sortedBooks.length,
-                                                    separatorBuilder:
-                                                        (context, index) {
-                                                      return SizedBox(
-                                                          height:
-                                                              Dimens.nh(6.0));
-                                                    },
-                                                    itemBuilder:
-                                                        (context, index) {
-                                                      final book =
-                                                          sortedBooks[index];
-                                                      return ItemMultiCard(
-                                                        title: book.title,
-                                                        price: book.price,
-                                                      );
-                                                    },
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                  height: Dimens.nh(14.0),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            height: Dimens.nh(16.0),
-                                          ),
-                                          Padding(
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: Dimens.medium),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              children: [
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceAround,
-                                                  children: [
-                                                    Text(
-                                                      "جمع دروس و کتاب ها",
-                                                      style: MyTextStyle
-                                                          .textMatn12W300
-                                                          .copyWith(
-                                                              color:
-                                                                  secondaryTextColor),
-                                                    ),
-                                                    Row(
-                                                      children: [
-                                                        Text(
-                                                          "${subtotal.toString().addComma} ",
-                                                          style: MyTextStyle
-                                                              .textMatn14Bold
-                                                              .copyWith(
-                                                                  color:
-                                                                      primaryTextColor),
-                                                        ),
-                                                        Text(
-                                                          l10n.toman,
-                                                          style: MyTextStyle
-                                                              .textMatn10W300
-                                                              .copyWith(
-                                                                  color:
-                                                                      primaryTextColor),
-                                                        )
-                                                      ],
-                                                    )
-                                                  ],
-                                                ),
-                                                SizedBox(
-                                                  height: Dimens.nh(16.0),
-                                                ),
-                                                Container(
-                                                  width: Dimens.nw(286.0),
-                                                  height: Dimens.nh(42.0),
-                                                  decoration: ShapeDecoration(
-                                                    color: isDark
-                                                        ? MyColors
-                                                            .cartDiscountBackgroundDark
-                                                        : MyColors
-                                                            .discountBackground,
-                                                    shape:
-                                                        RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              Dimens.nr(10.0)),
-                                                    ),
-                                                  ),
-                                                  child: Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceAround,
-                                                    children: [
-                                                      Text(
-                                                        "تخفیف",
-                                                        style: MyTextStyle
-                                                            .textMatn12W300
-                                                            .copyWith(
-                                                                color:
-                                                                    secondaryTextColor),
-                                                      ),
-                                                      Row(
-                                                        children: [
-                                                          if (isPercentDiscount)
-                                                            Container(
-                                                              width: Dimens.nw(
-                                                                  40.0),
-                                                              height: Dimens.nh(
-                                                                  17.84),
-                                                              alignment:
-                                                                  Alignment
-                                                                      .center,
-                                                              decoration:
-                                                                  ShapeDecoration(
-                                                                color: MyColors
-                                                                    .darkErrorLight,
-                                                                shape:
-                                                                    RoundedRectangleBorder(
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              Dimens.nr(11.50)),
-                                                                ),
-                                                              ),
-                                                              child: Text(
-                                                                "${settings.discountAmount}%",
-                                                                style: MyTextStyle
-                                                                    .textMatn10W300
-                                                                    .copyWith(
-                                                                        color: MyColors
-                                                                            .textLight),
-                                                              ),
-                                                            ),
-                                                          if (isPercentDiscount)
-                                                            SizedBox(
-                                                                width:
-                                                                    Dimens.nw(
-                                                                        4.0)),
-                                                          Text(
-                                                            discountAmount
-                                                                .toString()
-                                                                .addComma,
-                                                            style: MyTextStyle
-                                                                .textMatn12W300
-                                                                .copyWith(
-                                                                    color: isDark
-                                                                        ? MyColors
-                                                                            .darkTextAccent
-                                                                        : primaryTextColor),
-                                                          ),
-                                                          SizedBox(
-                                                            width:
-                                                                Dimens.nw(4.0),
-                                                          ),
-                                                          Text(
-                                                            l10n.toman,
-                                                            style: MyTextStyle
-                                                                .textMatn10W300
-                                                                .copyWith(
-                                                                    color: isDark
-                                                                        ? MyColors
-                                                                            .darkTextAccent
-                                                                        : primaryTextColor),
-                                                          ),
-                                                        ],
-                                                      )
-                                                    ],
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                  height: Dimens.nh(16.0),
-                                                ),
-                                                Container(
-                                                  width: Dimens.nw(286.0),
-                                                  height: Dimens.nh(54.0),
-                                                  decoration: ShapeDecoration(
-                                                    color: isDark
-                                                        ? MyColors
-                                                            .cartPayableBackgroundDark
-                                                        : MyColors.background2,
-                                                    shape:
-                                                        RoundedRectangleBorder(
-                                                      side: BorderSide(
-                                                        width: Dimens.nw(2.0),
-                                                        color: MyColors.primary,
-                                                      ),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              Dimens.nr(10.0)),
-                                                    ),
-                                                  ),
-                                                  child: Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceAround,
-                                                    children: [
-                                                      Text(
-                                                        "مبلغ قابل پرداخت",
-                                                        style: MyTextStyle
-                                                            .textMatn12W300
-                                                            .copyWith(
-                                                                color:
-                                                                    secondaryTextColor),
-                                                      ),
-                                                      Row(
-                                                        children: [
-                                                          Text(
-                                                            payableAmount
-                                                                .toString()
-                                                                .addComma,
-                                                            style: MyTextStyle
-                                                                .textMatn14Bold
-                                                                .copyWith(
-                                                                    color:
-                                                                        primaryTextColor),
-                                                          ),
-                                                          SizedBox(
-                                                            width:
-                                                                Dimens.nw(4.0),
-                                                          ),
-                                                          Text(
-                                                            l10n.toman,
-                                                            style: MyTextStyle
-                                                                .textMatn10W300
-                                                                .copyWith(
-                                                                    color:
-                                                                        primaryTextColor),
-                                                          )
-                                                        ],
-                                                      )
-                                                    ],
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                  height: Dimens.nh(16.0),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            width: Dimens.nw(286.0),
-                                            height: Dimens.nh(65.0),
-                                            child: ElevatedButton(
-                                              onPressed: () {
-                                                if (settings.id.isEmpty) {
-                                                  return;
-                                                }
-                                                _addItemToCart(
-                                                  CartType.IKnow.name,
-                                                  settings.id,
-                                                  _bundleName,
-                                                );
-                                              },
-                                              style: _cartButtonStyle(isDark),
-                                              child: Text(
-                                                l10n.add_to_cart,
-                                                style:
-                                                    MyTextStyle.textMatnBtn
-                                                        .copyWith(
-                                                  color: isDark
-                                                      ? MyColors.loginButtonText
-                                                      : MyColors.textLight,
+                                              )),
+                                          Positioned(
+                                            bottom: Dimens.nh(5.0),
+                                            right: Dimens.small,
+                                            child: SizedBox(
+                                              width: Dimens.nw(30.0),
+                                              height: Dimens.nh(30.0),
+                                              child: SvgPicture.asset(
+                                                'assets/images/icons/carbon--play-outline.svg',
+                                                width: Dimens.nw(30.0),
+                                                height: Dimens.nh(30.0),
+                                                colorFilter:
+                                                    const ColorFilter.mode(
+                                                  MyColors.textLight,
+                                                  BlendMode.srcIn,
                                                 ),
                                               ),
                                             ),
                                           ),
-                                          SizedBox(
-                                            height: Dimens.nh(20.0),
+                                          Positioned(
+                                            bottom: Dimens.nh(5.0),
+                                            left: Dimens.small,
+                                            child: _buildCoinBadge(
+                                              isDark: isDark,
+                                              coinAmount: "+50",
+                                              coinLabel: l10n.coin_with_buy,
+                                            ),
                                           ),
                                         ],
-                                      );
-                                    },
-                                  ),
-                          ),
-                          SliverFillRemaining(
-                            hasScrollBody: false,
-                            child: Align(
-                              alignment: Alignment.bottomCenter,
-                              child: _buildCartFooter(isDark),
-                            ),
-                          ),
-                        ],
+                                      ),
+                                      SizedBox(
+                                        height: Dimens.nh(26.0),
+                                      ),
+                                      Container(
+                                        decoration: BoxDecoration(
+                                            color: isDark
+                                                ? MyColors.cartBundleSectionDark
+                                                : MyColors.background1),
+                                        child: Column(
+                                          children: [
+                                            SizedBox(
+                                              height: Dimens.nh(16.0),
+                                            ),
+                                            Center(
+                                              child: Text(
+                                                _bundleName,
+                                                style: MyTextStyle
+                                                    .textMatn14Bold
+                                                    .copyWith(
+                                                        color:
+                                                            primaryTextColor),
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              height: Dimens.nh(18.0),
+                                            ),
+                                            SizedBox(
+                                              width: Dimens.nw(248.0),
+                                              child: ListView.separated(
+                                                shrinkWrap: true,
+                                                physics:
+                                                    const NeverScrollableScrollPhysics(),
+                                                itemCount: sortedCourses.length,
+                                                separatorBuilder:
+                                                    (context, index) {
+                                                  return SizedBox(
+                                                      height: Dimens.nh(6.0));
+                                                },
+                                                itemBuilder: (context, index) {
+                                                  final course =
+                                                      sortedCourses[index];
+                                                  return ItemMultiCard(
+                                                    title: course.name,
+                                                    price: course.price,
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              height: Dimens.nh(20.0),
+                                            ),
+                                            Center(
+                                              child: Text(
+                                                "کتاب های الکترونیکی",
+                                                style: MyTextStyle
+                                                    .textMatn14Bold
+                                                    .copyWith(
+                                                        color:
+                                                            primaryTextColor),
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              height: Dimens.nh(16.0),
+                                            ),
+                                            SizedBox(
+                                              width: Dimens.nw(248.0),
+                                              child: ListView.separated(
+                                                shrinkWrap: true,
+                                                physics:
+                                                    const NeverScrollableScrollPhysics(),
+                                                itemCount: sortedBooks.length,
+                                                separatorBuilder:
+                                                    (context, index) {
+                                                  return SizedBox(
+                                                      height: Dimens.nh(6.0));
+                                                },
+                                                itemBuilder: (context, index) {
+                                                  final book =
+                                                      sortedBooks[index];
+                                                  return ItemMultiCard(
+                                                    title: book.title,
+                                                    price: book.price,
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              height: Dimens.nh(14.0),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: Dimens.nh(16.0),
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: Dimens.medium),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceAround,
+                                              children: [
+                                                Text(
+                                                  "جمع دروس و کتاب ها",
+                                                  style: MyTextStyle
+                                                      .textMatn12W300
+                                                      .copyWith(
+                                                          color:
+                                                              secondaryTextColor),
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    Text(
+                                                      "${subtotal.toString().addComma} ",
+                                                      style: MyTextStyle
+                                                          .textMatn14Bold
+                                                          .copyWith(
+                                                              color:
+                                                                  primaryTextColor),
+                                                    ),
+                                                    Text(
+                                                      l10n.toman,
+                                                      style: MyTextStyle
+                                                          .textMatn10W300
+                                                          .copyWith(
+                                                              color:
+                                                                  primaryTextColor),
+                                                    )
+                                                  ],
+                                                )
+                                              ],
+                                            ),
+                                            SizedBox(
+                                              height: Dimens.nh(16.0),
+                                            ),
+                                            Container(
+                                              width: Dimens.nw(286.0),
+                                              height: Dimens.nh(42.0),
+                                              decoration: ShapeDecoration(
+                                                color: isDark
+                                                    ? MyColors
+                                                        .cartDiscountBackgroundDark
+                                                    : MyColors
+                                                        .discountBackground,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          Dimens.nr(10.0)),
+                                                ),
+                                              ),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceAround,
+                                                children: [
+                                                  Text(
+                                                    "تخفیف",
+                                                    style: MyTextStyle
+                                                        .textMatn12W300
+                                                        .copyWith(
+                                                            color:
+                                                                secondaryTextColor),
+                                                  ),
+                                                  Row(
+                                                    children: [
+                                                      if (isPercentDiscount)
+                                                        Container(
+                                                          width:
+                                                              Dimens.nw(40.0),
+                                                          height:
+                                                              Dimens.nh(17.84),
+                                                          alignment:
+                                                              Alignment.center,
+                                                          decoration:
+                                                              ShapeDecoration(
+                                                            color: MyColors
+                                                                .darkErrorLight,
+                                                            shape:
+                                                                RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius.circular(
+                                                                      Dimens.nr(
+                                                                          11.50)),
+                                                            ),
+                                                          ),
+                                                          child: Text(
+                                                            "${settings.discountAmount}%",
+                                                            style: MyTextStyle
+                                                                .textMatn10W300
+                                                                .copyWith(
+                                                                    color: MyColors
+                                                                        .textLight),
+                                                          ),
+                                                        ),
+                                                      if (isPercentDiscount)
+                                                        SizedBox(
+                                                            width:
+                                                                Dimens.nw(4.0)),
+                                                      Text(
+                                                        discountAmount
+                                                            .toString()
+                                                            .addComma,
+                                                        style: MyTextStyle
+                                                            .textMatn12W300
+                                                            .copyWith(
+                                                                color: isDark
+                                                                    ? MyColors
+                                                                        .darkTextAccent
+                                                                    : primaryTextColor),
+                                                      ),
+                                                      SizedBox(
+                                                        width: Dimens.nw(4.0),
+                                                      ),
+                                                      Text(
+                                                        l10n.toman,
+                                                        style: MyTextStyle
+                                                            .textMatn10W300
+                                                            .copyWith(
+                                                                color: isDark
+                                                                    ? MyColors
+                                                                        .darkTextAccent
+                                                                    : primaryTextColor),
+                                                      ),
+                                                    ],
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              height: Dimens.nh(16.0),
+                                            ),
+                                            Container(
+                                              width: Dimens.nw(286.0),
+                                              height: Dimens.nh(54.0),
+                                              decoration: ShapeDecoration(
+                                                color: isDark
+                                                    ? MyColors
+                                                        .cartPayableBackgroundDark
+                                                    : MyColors.background2,
+                                                shape: RoundedRectangleBorder(
+                                                  side: BorderSide(
+                                                    width: Dimens.nw(2.0),
+                                                    color: MyColors.primary,
+                                                  ),
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          Dimens.nr(10.0)),
+                                                ),
+                                              ),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceAround,
+                                                children: [
+                                                  Text(
+                                                    "مبلغ قابل پرداخت",
+                                                    style: MyTextStyle
+                                                        .textMatn12W300
+                                                        .copyWith(
+                                                            color:
+                                                                secondaryTextColor),
+                                                  ),
+                                                  Row(
+                                                    children: [
+                                                      Text(
+                                                        payableAmount
+                                                            .toString()
+                                                            .addComma,
+                                                        style: MyTextStyle
+                                                            .textMatn14Bold
+                                                            .copyWith(
+                                                                color:
+                                                                    primaryTextColor),
+                                                      ),
+                                                      SizedBox(
+                                                        width: Dimens.nw(4.0),
+                                                      ),
+                                                      Text(
+                                                        l10n.toman,
+                                                        style: MyTextStyle
+                                                            .textMatn10W300
+                                                            .copyWith(
+                                                                color:
+                                                                    primaryTextColor),
+                                                      )
+                                                    ],
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              height: Dimens.nh(16.0),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: Dimens.nw(286.0),
+                                        height: Dimens.nh(65.0),
+                                        child: ElevatedButton(
+                                          onPressed: () {
+                                            if (settings.id.isEmpty) {
+                                              return;
+                                            }
+                                            _addItemToCart(
+                                              CartType.IKnow.name,
+                                              settings.id,
+                                              _bundleName,
+                                            );
+                                          },
+                                          style: _cartButtonStyle(isDark),
+                                          child: Text(
+                                            l10n.add_to_cart,
+                                            style: MyTextStyle.textMatnBtn
+                                                .copyWith(
+                                              color: isDark
+                                                  ? MyColors.loginButtonText
+                                                  : MyColors.textLight,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: Dimens.nh(20.0),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              ),
+                      ),
+                      SliverFillRemaining(
+                        hasScrollBody: false,
+                        child: Align(
+                          alignment: Alignment.bottomCenter,
+                          child: _buildCartFooter(isDark),
+                        ),
                       ),
                     ],
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ));
+          ],
+        ),
+      ),
+    );
   }
 }
