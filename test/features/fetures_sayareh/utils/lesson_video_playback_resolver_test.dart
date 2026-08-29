@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_home_model.dart';
-import 'package:poortak/featueres/fetures_sayareh/utils/lesson_video_playback_resolver.dart';
+import 'package:poortak/featueres/feature_sayareh/data/models/sayareh_home_model.dart';
+import 'package:poortak/featueres/feature_sayareh/utils/lesson_video_playback_resolver.dart';
 
 void main() {
   const lessonId = 'bed262ab-3b12-49d6-9613-52ec4737327c';

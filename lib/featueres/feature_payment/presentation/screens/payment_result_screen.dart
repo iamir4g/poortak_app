@@ -11,7 +11,7 @@ import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_profile/data/models/payment_history_model.dart';
 import 'package:poortak/featueres/feature_profile/repositories/profile_repository.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
-import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/iknow_access_bloc/iknow_access_bloc.dart';
+import 'package:poortak/featueres/feature_sayareh/presentation/bloc/iknow_access_bloc/iknow_access_bloc.dart';
 import 'package:poortak/locator.dart';
 
 class PaymentResultScreen extends StatefulWidget {
@@ -92,8 +92,7 @@ class _PaymentResultScreenState extends State<PaymentResultScreen> {
     if (!mounted) return;
 
     Navigator.of(context).popUntil(
-      (route) =>
-          route.settings.name == MainWrapper.routeName || route.isFirst,
+      (route) => route.settings.name == MainWrapper.routeName || route.isFirst,
     );
   }
 
@@ -132,198 +131,200 @@ class _PaymentResultScreenState extends State<PaymentResultScreen> {
         }
       },
       child: Scaffold(
-      backgroundColor: MyColors.background1,
-      appBar: PoortakAppBar(
-        title: 'رسید نهایی',
-        backgroundColor: isSuccess ? MyColors.success : MyColors.error,
-        foregroundColor: MyColors.textLight,
-        onBackPressed: _goToMain,
-        backButtonEnabled: !_isClearingCart && !_isNavigatingBack,
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.all(20.0.r),
-          child: Column(
-            children: [
-              SizedBox(height: 40.h),
-              Container(
-                width: 120.w,
-                height: 120.h,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: (isSuccess ? MyColors.success : MyColors.error)
-                      .withValues(alpha: 0.1),
-                  border: Border.all(
-                    color: isSuccess ? MyColors.success : MyColors.error,
-                    width: 3.w,
-                  ),
-                ),
-                child: Icon(
-                  isSuccess ? Icons.check_circle : Icons.cancel,
-                  size: 80.sp,
-                  color: isSuccess ? MyColors.success : MyColors.error,
-                ),
-              ),
-              SizedBox(height: 30.h),
-              Text(
-                isSuccess
-                    ? 'پرداخت با موفقیت انجام شد'
-                    : 'پرداخت با خطا مواجه شد',
-                style: MyTextStyle.textMatn18Bold.copyWith(
-                  fontSize: 22.sp,
-                  color: isSuccess ? MyColors.success : MyColors.error,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: 10.h),
-              if (_getTrackingCode() != null)
-                Text(
-                  'کد پیگیری: ${_getTrackingCode()}',
-                  style: MyTextStyle.textMatn14Bold.copyWith(
-                    fontWeight: FontWeight.normal,
-                    color: MyColors.textSecondary,
-                  ),
-                ),
-              SizedBox(height: 40.h),
-              if (_isLoadingPayment)
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 24.h),
-                  child: DotLoadingWidget(size: 48.r),
-                )
-              else
+        backgroundColor: MyColors.background1,
+        appBar: PoortakAppBar(
+          title: 'رسید نهایی',
+          backgroundColor: isSuccess ? MyColors.success : MyColors.error,
+          foregroundColor: MyColors.textLight,
+          onBackPressed: _goToMain,
+          backButtonEnabled: !_isClearingCart && !_isNavigatingBack,
+        ),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.all(20.0.r),
+            child: Column(
+              children: [
+                SizedBox(height: 40.h),
                 Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.all(20.r),
+                  width: 120.w,
+                  height: 120.h,
                   decoration: BoxDecoration(
-                    color: MyColors.background,
-                    borderRadius: BorderRadius.circular(12.r),
-                    boxShadow: [
-                      BoxShadow(
-                        color: MyColors.shadow,
-                        spreadRadius: 1,
-                        blurRadius: 10.r,
-                        offset: Offset(0, 2.h),
-                      ),
-                    ],
+                    shape: BoxShape.circle,
+                    color: (isSuccess ? MyColors.success : MyColors.error)
+                        .withValues(alpha: 0.1),
+                    border: Border.all(
+                      color: isSuccess ? MyColors.success : MyColors.error,
+                      width: 3.w,
+                    ),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Icon(
+                    isSuccess ? Icons.check_circle : Icons.cancel,
+                    size: 80.sp,
+                    color: isSuccess ? MyColors.success : MyColors.error,
+                  ),
+                ),
+                SizedBox(height: 30.h),
+                Text(
+                  isSuccess
+                      ? 'پرداخت با موفقیت انجام شد'
+                      : 'پرداخت با خطا مواجه شد',
+                  style: MyTextStyle.textMatn18Bold.copyWith(
+                    fontSize: 22.sp,
+                    color: isSuccess ? MyColors.success : MyColors.error,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 10.h),
+                if (_getTrackingCode() != null)
+                  Text(
+                    'کد پیگیری: ${_getTrackingCode()}',
+                    style: MyTextStyle.textMatn14Bold.copyWith(
+                      fontWeight: FontWeight.normal,
+                      color: MyColors.textSecondary,
+                    ),
+                  ),
+                SizedBox(height: 40.h),
+                if (_isLoadingPayment)
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: 24.h),
+                    child: DotLoadingWidget(size: 48.r),
+                  )
+                else
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.all(20.r),
+                    decoration: BoxDecoration(
+                      color: MyColors.background,
+                      borderRadius: BorderRadius.circular(12.r),
+                      boxShadow: [
+                        BoxShadow(
+                          color: MyColors.shadow,
+                          spreadRadius: 1,
+                          blurRadius: 10.r,
+                          offset: Offset(0, 2.h),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Center(
+                          child: Text(
+                            'جزئیات پرداخت',
+                            style: MyTextStyle.textMatn16Bold.copyWith(
+                              color: MyColors.textMatn2,
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 20.h),
+                        if (_paymentError != null)
+                          Text(
+                            _paymentError!,
+                            style: MyTextStyle.textMatn14Bold.copyWith(
+                              color: MyColors.textSecondary,
+                            ),
+                            textAlign: TextAlign.center,
+                          )
+                        else ...[
+                          _buildDetailRow('محصول', _getProductTitle()),
+                          _buildDetailRow(
+                              'کد پیگیری', _getTrackingCode() ?? '—'),
+                          _buildDetailRow('مبلغ', _getAmount()),
+                          _buildDetailRow('روش پرداخت', _getPaymentMethod()),
+                          if (_getCardPan() != null)
+                            _buildDetailRow('شماره کارت', _getCardPan()!),
+                          _buildDetailRow('وضعیت', _getStatusText()),
+                          _buildDetailRow('تاریخ و زمان', _getDateTime()),
+                        ],
+                      ],
+                    ),
+                  ),
+                SizedBox(height: 30.h),
+                if (isSuccess) ...[
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50.h,
+                    child: ElevatedButton(
+                      onPressed: (_isClearingCart || _isNavigatingBack)
+                          ? null
+                          : _goToMain,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: MyColors.success,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.r),
+                        ),
+                      ),
+                      child: _isClearingCart
+                          ? SizedBox(
+                              width: 24.w,
+                              height: 24.h,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.w,
+                                color: MyColors.textLight,
+                              ),
+                            )
+                          : Text(
+                              'بازگشت به صفحه اصلی',
+                              style: MyTextStyle.textMatnBtn,
+                            ),
+                    ),
+                  ),
+                ] else ...[
+                  SizedBox(height: 15.h),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50.h,
+                    child: OutlinedButton(
+                      onPressed: _goToMain,
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: MyColors.divider),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.r),
+                        ),
+                      ),
+                      child: Text(
+                        'بازگشت به صفحه اصلی',
+                        style: MyTextStyle.textMatn16Bold.copyWith(
+                          color: MyColors.textSecondary,
+                          fontSize: 16.sp,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+                SizedBox(height: 20.h),
+                Container(
+                  padding: EdgeInsets.all(15.r),
+                  decoration: BoxDecoration(
+                    color: MyColors.secondaryTint4,
+                    borderRadius: BorderRadius.circular(8.r),
+                    border: Border.all(color: MyColors.secondaryTint2),
+                  ),
+                  child: Row(
                     children: [
-                      Center(
+                      Icon(Icons.info_outline,
+                          color: MyColors.secondary, size: 20.sp),
+                      SizedBox(width: 10.w),
+                      Expanded(
                         child: Text(
-                          'جزئیات پرداخت',
-                          style: MyTextStyle.textMatn16Bold.copyWith(
-                            color: MyColors.textMatn2,
+                          isSuccess
+                              ? 'دسترسی به محصولات خریداری‌شده برای شما فعال شد'
+                              : 'لطفا در صورت کسر وجه با پشتیبانی تماس بگیرید',
+                          style: MyTextStyle.textMatn14Bold.copyWith(
+                            fontWeight: FontWeight.normal,
+                            color: MyColors.secondaryShade2,
+                            fontSize: 14.sp,
                           ),
                         ),
                       ),
-                      SizedBox(height: 20.h),
-                      if (_paymentError != null)
-                        Text(
-                          _paymentError!,
-                          style: MyTextStyle.textMatn14Bold.copyWith(
-                            color: MyColors.textSecondary,
-                          ),
-                          textAlign: TextAlign.center,
-                        )
-                      else ...[
-                        _buildDetailRow('محصول', _getProductTitle()),
-                        _buildDetailRow('کد پیگیری', _getTrackingCode() ?? '—'),
-                        _buildDetailRow('مبلغ', _getAmount()),
-                        _buildDetailRow('روش پرداخت', _getPaymentMethod()),
-                        if (_getCardPan() != null)
-                          _buildDetailRow('شماره کارت', _getCardPan()!),
-                        _buildDetailRow('وضعیت', _getStatusText()),
-                        _buildDetailRow('تاریخ و زمان', _getDateTime()),
-                      ],
                     ],
-                  ),
-                ),
-              SizedBox(height: 30.h),
-              if (isSuccess) ...[
-                SizedBox(
-                  width: double.infinity,
-                  height: 50.h,
-                  child: ElevatedButton(
-                    onPressed:
-                        (_isClearingCart || _isNavigatingBack) ? null : _goToMain,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: MyColors.success,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.r),
-                      ),
-                    ),
-                    child: _isClearingCart
-                        ? SizedBox(
-                            width: 24.w,
-                            height: 24.h,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2.w,
-                              color: MyColors.textLight,
-                            ),
-                          )
-                        : Text(
-                            'بازگشت به صفحه اصلی',
-                            style: MyTextStyle.textMatnBtn,
-                          ),
-                  ),
-                ),
-              ] else ...[
-                SizedBox(height: 15.h),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50.h,
-                  child: OutlinedButton(
-                    onPressed: _goToMain,
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: MyColors.divider),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.r),
-                      ),
-                    ),
-                    child: Text(
-                      'بازگشت به صفحه اصلی',
-                      style: MyTextStyle.textMatn16Bold.copyWith(
-                        color: MyColors.textSecondary,
-                        fontSize: 16.sp,
-                      ),
-                    ),
                   ),
                 ),
               ],
-              SizedBox(height: 20.h),
-              Container(
-                padding: EdgeInsets.all(15.r),
-                decoration: BoxDecoration(
-                  color: MyColors.secondaryTint4,
-                  borderRadius: BorderRadius.circular(8.r),
-                  border: Border.all(color: MyColors.secondaryTint2),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.info_outline,
-                        color: MyColors.secondary, size: 20.sp),
-                    SizedBox(width: 10.w),
-                    Expanded(
-                      child: Text(
-                        isSuccess
-                            ? 'دسترسی به محصولات خریداری‌شده برای شما فعال شد'
-                            : 'لطفا در صورت کسر وجه با پشتیبانی تماس بگیرید',
-                        style: MyTextStyle.textMatn14Bold.copyWith(
-                          fontWeight: FontWeight.normal,
-                          color: MyColors.secondaryShade2,
-                          fontSize: 14.sp,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),
-    ),
     );
   }
 
@@ -442,7 +443,8 @@ class _PaymentResultScreenState extends State<PaymentResultScreen> {
     dateTime ??= _payment?.createdAt;
 
     if (dateTime != null) {
-      final date = DateUtil.formatPersianDateWithDigits(dateTime, separator: '/');
+      final date =
+          DateUtil.formatPersianDateWithDigits(dateTime, separator: '/');
       final time =
           '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
       return '$date ${toPersianDigits(time)}';
