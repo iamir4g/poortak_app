@@ -52,13 +52,12 @@ class ReusableModal extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final modalBackgroundColor = isDarkMode
-        ? MyColors.darkBackgroundSecondary
-        : Colors.white;
+    final modalBackgroundColor =
+        isDarkMode ? MyColors.darkBackgroundSecondary : Colors.white;
     final titleColor =
         isDarkMode ? MyColors.darkTextPrimary : MyColors.textMatn1;
     final messageColor =
-        isDarkMode ? MyColors.darkTextSecondary : const Color(0xFF3D495C);
+        isDarkMode ? MyColors.background : const Color(0xFF3D495C);
     final closeButtonBackground = isDarkMode
         ? MyColors.paymentHistoryCardHeaderDark
         : const Color(0xFFF6F9FE);
@@ -149,6 +148,8 @@ class ReusableModal extends StatelessWidget {
                                     () => Navigator.of(context).pop(),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: MyColors.primary,
+                                  foregroundColor:
+                                      Theme.of(context).colorScheme.onPrimary,
                                   padding:
                                       EdgeInsets.symmetric(horizontal: 8.w),
                                   shape: RoundedRectangleBorder(
@@ -162,8 +163,9 @@ class ReusableModal extends StatelessWidget {
                                     buttonText,
                                     maxLines: 1,
                                     style: MyTextStyle.textMatn14Bold.copyWith(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w500,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimary,
                                     ),
                                   ),
                                 ),
@@ -181,7 +183,9 @@ class ReusableModal extends StatelessWidget {
                                 onPressed: onSecondButtonPressed ??
                                     () => Navigator.of(context).pop(),
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.transparent,
+                                  backgroundColor: isDarkMode
+                                      ? MyColors.referralButtonDisabledDark
+                                      : Colors.transparent,
                                   padding:
                                       EdgeInsets.symmetric(horizontal: 8.w),
                                   side: BorderSide(
@@ -204,7 +208,6 @@ class ReusableModal extends StatelessWidget {
                                       color: isDarkMode
                                           ? MyColors.darkTextPrimary
                                           : MyColors.primary,
-                                      fontWeight: FontWeight.w500,
                                     ),
                                   ),
                                 ),
@@ -225,6 +228,8 @@ class ReusableModal extends StatelessWidget {
                               () => Navigator.of(context).pop(),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: MyColors.primary,
+                            foregroundColor:
+                                Theme.of(context).colorScheme.onPrimary,
                             padding: EdgeInsets.symmetric(horizontal: 12.w),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20.r),
@@ -237,7 +242,7 @@ class ReusableModal extends StatelessWidget {
                               buttonText,
                               maxLines: 1,
                               style: MyTextStyle.textMatn16Bold.copyWith(
-                                color: Colors.white,
+                                color: Theme.of(context).colorScheme.onPrimary,
                               ),
                             ),
                           ),

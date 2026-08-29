@@ -416,6 +416,14 @@ class _QuizScreenState extends State<QuizScreen> {
                                               },
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor: MyColors.primary,
+                                          foregroundColor: Theme.of(context)
+                                              .colorScheme
+                                              .onPrimary,
+                                          disabledForegroundColor:
+                                              Theme.of(context)
+                                                  .colorScheme
+                                                  .onPrimary
+                                                  .withValues(alpha: 0.5),
                                           shape: RoundedRectangleBorder(
                                             borderRadius:
                                                 BorderRadius.circular(30),
@@ -429,7 +437,8 @@ class _QuizScreenState extends State<QuizScreen> {
                                           children: [
                                             Text(
                                               "بررسی پاسخ",
-                                              style: MyTextStyle.textMatnBtn
+                                              style: MyTextStyle.textMatnBtnFor(
+                                                      context)
                                                   .copyWith(
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.w700,
@@ -437,7 +446,10 @@ class _QuizScreenState extends State<QuizScreen> {
                                             ),
                                             const SizedBox(width: 8),
                                             Icon(Icons.arrow_forward_ios,
-                                                color: Colors.white, size: 18),
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onPrimary,
+                                                size: 18),
                                           ],
                                         ),
                                       ),
@@ -478,6 +490,9 @@ class _QuizScreenState extends State<QuizScreen> {
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor:
                                               const Color(0xFFFF9F29),
+                                          foregroundColor: Theme.of(context)
+                                              .colorScheme
+                                              .onPrimary,
                                           shape: RoundedRectangleBorder(
                                             borderRadius:
                                                 BorderRadius.circular(30),
@@ -491,7 +506,8 @@ class _QuizScreenState extends State<QuizScreen> {
                                           children: [
                                             Text(
                                               "بعدی",
-                                              style: MyTextStyle.textMatnBtn
+                                              style: MyTextStyle.textMatnBtnFor(
+                                                      context)
                                                   .copyWith(
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.w700,
@@ -499,7 +515,10 @@ class _QuizScreenState extends State<QuizScreen> {
                                             ),
                                             const SizedBox(width: 8),
                                             Icon(Icons.arrow_forward_ios,
-                                                color: Colors.white, size: 18),
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onPrimary,
+                                                size: 18),
                                           ],
                                         ),
                                       ),

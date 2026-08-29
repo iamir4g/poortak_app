@@ -454,6 +454,14 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                                               },
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor: MyColors.primary,
+                                          foregroundColor: Theme.of(context)
+                                              .colorScheme
+                                              .onPrimary,
+                                          disabledForegroundColor:
+                                              Theme.of(context)
+                                                  .colorScheme
+                                                  .onPrimary
+                                                  .withValues(alpha: 0.5),
                                           shape: RoundedRectangleBorder(
                                             borderRadius:
                                                 BorderRadius.circular(30.r),
@@ -467,7 +475,8 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                                           children: [
                                             Text(
                                               "بررسی پاسخ",
-                                              style: MyTextStyle.textMatnBtn
+                                              style: MyTextStyle.textMatnBtnFor(
+                                                      context)
                                                   .copyWith(
                                                 fontSize: 14.sp,
                                                 fontWeight: FontWeight.w700,
@@ -475,7 +484,9 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                                             ),
                                             SizedBox(width: 8.w),
                                             Icon(Icons.arrow_forward_ios,
-                                                color: Colors.white,
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onPrimary,
                                                 size: 18.r),
                                           ],
                                         ),
@@ -510,6 +521,9 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                                             : null,
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor: MyColors.primary,
+                                          foregroundColor: Theme.of(context)
+                                              .colorScheme
+                                              .onPrimary,
                                           shape: RoundedRectangleBorder(
                                             borderRadius:
                                                 BorderRadius.circular(30.r),
@@ -523,7 +537,8 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                                           children: [
                                             Text(
                                               "بعدی",
-                                              style: MyTextStyle.textMatnBtn
+                                              style: MyTextStyle.textMatnBtnFor(
+                                                      context)
                                                   .copyWith(
                                                 fontSize: 14.sp,
                                                 fontWeight: FontWeight.w700,
@@ -531,7 +546,9 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                                             ),
                                             SizedBox(width: 8.w),
                                             Icon(Icons.arrow_forward_ios,
-                                                color: Colors.white,
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onPrimary,
                                                 size: 18.r),
                                           ],
                                         ),

@@ -137,6 +137,10 @@ class MyColors {
   static const Color loginTextPrimaryDark = Color(0xFFFFFFFF);
   static const Color loginTextSecondaryDark = Color(0xFF838697);
   static const Color loginButtonText = Color(0xFF171926);
+
+  /// Text on primary (orange) filled buttons — dark in dark mode, white in light.
+  static Color primaryButtonTextColor(bool isDark) =>
+      isDark ? loginButtonText : textLight;
   static const Color termsBackgroundDark = Color(0xFF282A39);
   static const Color textInputBackgroundDark = Color(0xFF35374B);
   // Sayareh / reader screen gradients

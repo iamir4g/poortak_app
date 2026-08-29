@@ -194,6 +194,13 @@ class MyTextStyle {
         fontFamily: "IRANSans",
         fontWeight: FontWeight.bold,
       );
+
+  static TextStyle textMatnBtnFor(BuildContext context) => TextStyle(
+        color: Theme.of(context).colorScheme.onPrimary,
+        fontSize: 16.sp,
+        fontFamily: "IRANSans",
+        fontWeight: FontWeight.bold,
+      );
   static TextStyle get textMatn13PrimaryShade1 => TextStyle(
       fontFamily: "IranSans",
       fontSize: 13.sp,

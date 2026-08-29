@@ -187,6 +187,26 @@ class MyThemes {
     );
   }
 
+  static ButtonStyle _primaryElevatedButtonStyle({
+    required Color foregroundColor,
+  }) {
+    return ButtonStyle(
+      backgroundColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.disabled)) {
+          return MyColors.primary.withValues(alpha: 0.5);
+        }
+        return MyColors.primary;
+      }),
+      foregroundColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.disabled)) {
+          return foregroundColor.withValues(alpha: 0.5);
+        }
+        return foregroundColor;
+      }),
+      overlayColor: _overlayWithoutHover,
+    );
+  }
+
   static ThemeData get darkTheme => ThemeData(
         textTheme: TextTheme(
           titleLarge: TextStyle(
@@ -254,7 +274,7 @@ class MyThemes {
           secondary: MyColors.secondary,
           surface: MyColors.darkCardBackground,
           error: MyColors.darkError,
-          onPrimary: MyColors.darkTextPrimary,
+          onPrimary: MyColors.loginButtonText,
           onSecondary: MyColors.darkTextPrimary,
           onSurface: MyColors.darkTextPrimary,
           onError: MyColors.darkTextPrimary,
@@ -270,9 +290,8 @@ class MyThemes {
           elevation: 2,
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
-          style: _buttonStyleWithoutHover(
-            backgroundColor: MyColors.primary,
-            foregroundColor: MyColors.darkTextPrimary,
+          style: _primaryElevatedButtonStyle(
+            foregroundColor: MyColors.loginButtonText,
           ),
         ),
         textButtonTheme: TextButtonThemeData(
@@ -287,7 +306,9 @@ class MyThemes {
           style: _buttonStyleWithoutHover(),
         ),
         filledButtonTheme: FilledButtonThemeData(
-          style: _buttonStyleWithoutHover(),
+          style: _primaryElevatedButtonStyle(
+            foregroundColor: MyColors.loginButtonText,
+          ),
         ),
         extensions: const <ThemeExtension<dynamic>>[
           LoginTheme.dark,
@@ -378,8 +399,7 @@ class MyThemes {
           elevation: 2,
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
-          style: _buttonStyleWithoutHover(
-            backgroundColor: MyColors.primary,
+          style: _primaryElevatedButtonStyle(
             foregroundColor: MyColors.textLight,
           ),
         ),
@@ -395,7 +415,9 @@ class MyThemes {
           style: _buttonStyleWithoutHover(),
         ),
         filledButtonTheme: FilledButtonThemeData(
-          style: _buttonStyleWithoutHover(),
+          style: _primaryElevatedButtonStyle(
+            foregroundColor: MyColors.textLight,
+          ),
         ),
         extensions: const <ThemeExtension<dynamic>>[
           LoginTheme.light,
