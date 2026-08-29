@@ -390,7 +390,6 @@ class _MainWrapperState extends State<MainWrapper> {
                     body: Column(
                       children: [
                         MainTabHeader(
-                          currentPageIndex: currentPageIndex,
                           isDark: themeState.isDark,
                           onMenuPressed: () =>
                               _scaffoldKey.currentState?.openDrawer(),
