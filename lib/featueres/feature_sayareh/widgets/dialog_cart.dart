@@ -39,7 +39,7 @@ class _DialogCartState extends State<DialogCart>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 2, vsync: this, initialIndex: 1);
     _tabController.addListener(() => setState(() {}));
   }
 
@@ -51,7 +51,7 @@ class _DialogCartState extends State<DialogCart>
 
   Widget _buildCartFooter(bool isDark) {
     return Container(
-      width: Dimens.nw(360.0),
+      width: double.infinity,
       height: Dimens.nh(112.0),
       decoration: ShapeDecoration(
         color: isDark
@@ -458,12 +458,15 @@ class _DialogCartState extends State<DialogCart>
     final imageFrameColor =
         isDark ? MyColors.cartImageFrameDark : MyColors.background;
     return Dialog(
+      clipBehavior: Clip.antiAlias,
       backgroundColor:
           isDark ? MyColors.cartDialogBackgroundDark : MyColors.background,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(Dimens.nr(25.0)),
       ),
-      child: ConstrainedBox(
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(Dimens.nr(25.0)),
+        child: ConstrainedBox(
         constraints: BoxConstraints(maxHeight: Dimens.nh(700.0)),
         child: Column(
           children: [
@@ -729,6 +732,7 @@ class _DialogCartState extends State<DialogCart>
                                         height: Dimens.nh(16.0),
                                       ),
                                       Stack(
+                                        clipBehavior: Clip.none,
                                         children: [
                                           Container(
                                             width: Dimens.nw(286.0),
@@ -740,9 +744,17 @@ class _DialogCartState extends State<DialogCart>
                                               ),
                                               color: imageFrameColor,
                                             ),
-                                            child: Image.asset(
-                                              "assets/images/cart/bundle_lesson.png",
-                                              fit: BoxFit.cover,
+                                            child: ClipRRect(
+                                              borderRadius: BorderRadius.all(
+                                                Radius.circular(
+                                                    Dimens.nr(27.0)),
+                                              ),
+                                              child: Image.asset(
+                                                "assets/images/cart/bundle_lesson.png",
+                                                fit: BoxFit.cover,
+                                                width: double.infinity,
+                                                height: double.infinity,
+                                              ),
                                             ),
                                           ),
                                           Positioned(
@@ -799,9 +811,16 @@ class _DialogCartState extends State<DialogCart>
                                       ),
                                       Container(
                                         decoration: BoxDecoration(
-                                            color: isDark
-                                                ? MyColors.cartBundleSectionDark
-                                                : MyColors.background1),
+                                          color: isDark
+                                              ? MyColors.cartBundleSectionDark
+                                              : MyColors.background1,
+                                          borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(
+                                                Dimens.nr(27.0)),
+                                            topRight: Radius.circular(
+                                                Dimens.nr(27.0)),
+                                          ),
+                                        ),
                                         child: Column(
                                           children: [
                                             SizedBox(
@@ -1142,6 +1161,7 @@ class _DialogCartState extends State<DialogCart>
             ),
           ],
         ),
+      ),
       ),
     );
   }
