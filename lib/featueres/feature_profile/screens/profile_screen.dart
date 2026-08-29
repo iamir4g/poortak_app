@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/common/blocs/bottom_nav_cubit/bottom_nav_cubit.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/config/myColors.dart';
@@ -43,21 +45,22 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   Future<void> _checkLoginStatus() async {
     final loggedIn = await prefsOperator.getLoggedIn();
+    if (!mounted) return;
+
     if (loggedIn) {
-      // Load user profile data
       final firstName = await prefsOperator.getUserFirstName();
       final lastName = await prefsOperator.getUserLastName();
       final avatar = await prefsOperator.getUserAvatar();
       final mobile = await prefsOperator.getUserName();
 
-      // Convert avatar ID to URL if exists
       String? avatarUrl;
       if (avatar != null && avatar.isNotEmpty) {
         avatarUrl = await storageService.callGetDownloadPublicUrl(avatar);
       }
 
+      if (!mounted) return;
       setState(() {
-        isLoggedIn = loggedIn;
+        isLoggedIn = true;
         userFirstName = firstName;
         userLastName = lastName;
         userAvatar = avatar;
@@ -66,10 +69,14 @@ class _ProfileScreenState extends State<ProfileScreen>
       });
     } else {
       setState(() {
-        isLoggedIn = loggedIn;
+        isLoggedIn = false;
+        userFirstName = null;
+        userLastName = null;
+        userAvatar = null;
+        userAvatarUrl = null;
+        userMobile = null;
       });
     }
-    print("token: ${await prefsOperator.getAccessToken()}");
   }
 
   String _getDisplayName() {
@@ -87,6 +94,18 @@ class _ProfileScreenState extends State<ProfileScreen>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+
+    return BlocListener<BottomNavCubit, int>(
+      listener: (context, selectedIndex) {
+        if (selectedIndex == 4) {
+          _checkLoginStatus();
+        }
+      },
+      child: _buildProfileContent(context),
+    );
+  }
+
+  Widget _buildProfileContent(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final backgroundColor =
         isDark ? MyColors.profileBackgroundDark : MyColors.background3;

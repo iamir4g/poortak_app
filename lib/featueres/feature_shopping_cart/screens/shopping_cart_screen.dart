@@ -13,16 +13,19 @@ import 'package:poortak/common/resources/data_state.dart';
 import 'package:poortak/common/utils/svg_embedded_png.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
+import 'package:poortak/featueres/feature_profile/presentation/bloc/user_points_total_bloc/user_points_total_bloc.dart';
+import 'package:poortak/featueres/feature_profile/presentation/bloc/user_points_total_bloc/user_points_total_event.dart';
+import 'package:poortak/featueres/feature_profile/presentation/bloc/user_points_total_bloc/user_points_total_state.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/models/shopping_cart_model.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_state.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/data_source/shopping_cart_api_provider.dart';
 import 'package:poortak/featueres/feature_shopping_cart/repositories/shopping_cart_repository.dart';
-import 'package:poortak/featueres/fetures_sayareh/data/models/iknow_summary_model.dart';
-import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_home_model.dart';
-import 'package:poortak/featueres/fetures_sayareh/data/models/single_book_model.dart';
-import 'package:poortak/featueres/fetures_sayareh/repositories/sayareh_repository.dart';
+import 'package:poortak/featueres/feature_sayareh/data/models/iknow_summary_model.dart';
+import 'package:poortak/featueres/feature_sayareh/data/models/sayareh_home_model.dart';
+import 'package:poortak/featueres/feature_sayareh/data/models/single_book_model.dart';
+import 'package:poortak/featueres/feature_sayareh/repositories/sayareh_repository.dart';
 import 'package:poortak/common/services/getImageUrl_service.dart';
 import 'package:poortak/featueres/feature_shopping_cart/widgets/cart_summary_section.dart';
 import 'package:poortak/featueres/feature_shopping_cart/widgets/cart_item_card.dart';
@@ -267,9 +270,9 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
     log("   User logged in: $isLoggedIn");
 
     if (isLoggedIn) {
-      // User is logged in - get cart from server
       log("📤 Loading cart from server...");
       bloc.add(GetCartEvent());
+      locator<UserPointsTotalBloc>().add(LoadUserPointsTotalEvent());
     } else {
       // User is not logged in - get local cart
       log("📱 Loading local cart...");
@@ -374,9 +377,10 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
     return resolvedItems.fold<int>(0, (sum, item) => sum + item.price);
   }
 
-  // Build header section with points
   Widget _buildPointsHeader() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isLoggedIn = locator<PrefsOperator>().isLoggedIn();
+
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: Dimens.nw(32),
@@ -392,48 +396,27 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Points section with star animation
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              // Star animation
-              SizedBox(
-                width: Dimens.nw(90),
-                height: Dimens.nh(90),
-                child: Lottie.asset(
-                  'assets/images/cart/star.json',
-                  fit: BoxFit.cover,
+          if (isLoggedIn) ...[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                SizedBox(
+                  width: Dimens.nw(90),
+                  height: Dimens.nh(90),
+                  child: Lottie.asset(
+                    'assets/images/cart/star.json',
+                    fit: BoxFit.cover,
+                  ),
                 ),
-              ),
-              // SizedBox(width: Dimens.nw(8)),
-              Expanded(
-                child: Wrap(
-                  alignment: WrapAlignment.start,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  spacing: Dimens.nw(8),
-                  runSpacing: Dimens.nh(4),
-                  children: [
-                    Text(
-                      'مجموع امتیاز های شما : ',
-                      style: TextStyle(
-                        fontSize: Dimens.nsp(16),
-                        fontWeight: FontWeight.w500,
-                        color: isDark
-                            ? MyColors.darkTextPrimary
-                            : const Color(0xFF29303D),
-                      ),
-                    ),
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: Dimens.nw(12), vertical: Dimens.nh(6)),
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? MyColors.primary.withValues(alpha: 0.18)
-                            : const Color(0xFFFFE8CC),
-                        borderRadius: BorderRadius.circular(Dimens.nr(10)),
-                      ),
-                      child: Text(
-                        '۲۰۰ سکه',
+                Expanded(
+                  child: Wrap(
+                    alignment: WrapAlignment.start,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: Dimens.nw(8),
+                    runSpacing: Dimens.nh(4),
+                    children: [
+                      Text(
+                        'مجموع امتیاز های شما : ',
                         style: TextStyle(
                           fontSize: Dimens.nsp(16),
                           fontWeight: FontWeight.w500,
@@ -442,14 +425,50 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                               : const Color(0xFF29303D),
                         ),
                       ),
-                    ),
-                  ],
+                      BlocBuilder<UserPointsTotalBloc, UserPointsTotalState>(
+                        builder: (context, state) {
+                          final pointsText = switch (state) {
+                            UserPointsTotalSuccess(:final data) =>
+                              data.remainingDisplay,
+                            UserPointsTotalLoading() ||
+                            UserPointsTotalInitial() =>
+                              '...',
+                            UserPointsTotalError() => '—',
+                            UserPointsTotalState() => '...',
+                          };
+
+                          return Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: Dimens.nw(12),
+                              vertical: Dimens.nh(6),
+                            ),
+                            decoration: BoxDecoration(
+                              color: isDark
+                                  ? MyColors.primary.withValues(alpha: 0.18)
+                                  : const Color(0xFFFFE8CC),
+                              borderRadius:
+                                  BorderRadius.circular(Dimens.nr(10)),
+                            ),
+                            child: Text(
+                              pointsText,
+                              style: TextStyle(
+                                fontSize: Dimens.nsp(16),
+                                fontWeight: FontWeight.w500,
+                                color: isDark
+                                    ? MyColors.darkTextPrimary
+                                    : const Color(0xFF29303D),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-          SizedBox(height: Dimens.nh(12)),
-          // Progress bar section
+              ],
+            ),
+            SizedBox(height: Dimens.nh(12)),
+          ],
           Row(
             children: [
               GestureDetector(

@@ -19,10 +19,10 @@ import 'package:poortak/config/myColors.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/kavoosh_main_screen.dart';
 import 'package:poortak/featueres/feature_litner/screens/litner_main_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/profile_screen.dart';
-import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/bloc_storage_bloc.dart';
-import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/iknow_access_bloc/iknow_access_bloc.dart';
-import 'package:poortak/featueres/fetures_sayareh/repositories/sayareh_repository.dart';
-import 'package:poortak/featueres/fetures_sayareh/screens/sayareh_screen.dart';
+import 'package:poortak/featueres/feature_sayareh/presentation/bloc/bloc_storage_bloc.dart';
+import 'package:poortak/featueres/feature_sayareh/presentation/bloc/iknow_access_bloc/iknow_access_bloc.dart';
+import 'package:poortak/featueres/feature_sayareh/repositories/sayareh_repository.dart';
+import 'package:poortak/featueres/feature_sayareh/screens/sayareh_screen.dart';
 import 'package:poortak/featueres/feature_shopping_cart/screens/shopping_cart_screen.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
@@ -79,17 +79,7 @@ class _MainWrapperState extends State<MainWrapper> {
     _authNavigationListener = _handleAuthNavigation;
     _authNavigationManager.addListener(_authNavigationListener);
 
-    // تنظیم status bar برای MainWrapper
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      SystemChrome.setSystemUIOverlayStyle(
-        const SystemUiOverlayStyle(
-          statusBarColor: MyColors.primary,
-          statusBarIconBrightness: Brightness.dark,
-          statusBarBrightness: Brightness.light,
-        ),
-      );
-
-      // Update BottomNavCubit if initialIndex is provided
       if (widget.initialIndex != null) {
         try {
           context
@@ -295,6 +285,20 @@ class _MainWrapperState extends State<MainWrapper> {
     );
   }
 
+  void _applyStatusBarStyle(bool isDark) {
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+        statusBarColor: isDark ? MyColors.darkBackground : MyColors.background,
+        statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+        statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
+        systemNavigationBarColor:
+            isDark ? MyColors.darkBackground : Colors.white,
+        systemNavigationBarIconBrightness:
+            isDark ? Brightness.light : Brightness.dark,
+      ),
+    );
+  }
+
   Future<bool> _onWillPop() async {
     // First, check if drawer is open
     if (_scaffoldKey.currentState?.isDrawerOpen ?? false) {
@@ -372,6 +376,8 @@ class _MainWrapperState extends State<MainWrapper> {
 
             return BlocBuilder<ThemeCubit, ThemeState>(
               builder: (context, themeState) {
+                _applyStatusBarStyle(themeState.isDark);
+
                 return PopScope(
                   canPop: false,
                   onPopInvoked: (didPop) async {

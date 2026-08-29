@@ -127,4 +127,14 @@ class ProfileApiProvider {
     log("User Points Total Response: ${response.data}");
     return response;
   }
+
+  /// Get user points history
+  /// api/v1/user/points
+  dynamic callGetUserPoints() async {
+    final response = await _authService.get(
+      "${Constants.baseUrl}user/points",
+    );
+    log("User Points History Response: ${response.data}");
+    return response;
+  }
 }

@@ -1,0 +1,422 @@
+import 'dart:developer';
+import 'package:dio/dio.dart';
+import 'package:poortak/common/error_handling/app_exception.dart';
+import 'package:poortak/common/error_handling/check_exception.dart';
+import 'package:poortak/common/resources/data_state.dart';
+import 'package:poortak/featueres/feature_sayareh/data/data_source/sayareh_api_provider.dart';
+import 'package:poortak/featueres/feature_sayareh/data/models/answer_question_model.dart';
+import 'package:poortak/featueres/feature_sayareh/data/models/book_list_model.dart';
+import 'package:poortak/featueres/feature_sayareh/data/models/single_book_model.dart';
+import 'package:poortak/featueres/feature_sayareh/data/models/conversation_model.dart';
+import 'package:poortak/featueres/feature_sayareh/data/models/practice_vocabulary_model.dart';
+import 'package:poortak/featueres/feature_sayareh/data/models/quiz_question_model.dart';
+import 'package:poortak/featueres/feature_sayareh/data/models/quizzes_list_model.dart';
+import 'package:poortak/featueres/feature_sayareh/data/models/result_question_model.dart';
+import 'package:poortak/featueres/feature_sayareh/data/models/course_progress_model.dart';
+import 'package:poortak/featueres/feature_sayareh/data/models/all_courses_progress_model.dart';
+import 'package:poortak/featueres/feature_sayareh/data/models/iknow_access_model.dart';
+import 'package:poortak/featueres/feature_sayareh/data/models/iknow_summary_model.dart';
+import 'package:poortak/featueres/feature_sayareh/data/models/sayareh_home_model.dart';
+import 'package:poortak/featueres/feature_sayareh/data/models/sayareh_storage_test_model.dart';
+import 'package:poortak/featueres/feature_sayareh/data/models/vocabulary_model.dart';
+
+class SayarehRepository {
+  SayarehApiProvider sayarehApiProvider;
+
+  SayarehRepository(this.sayarehApiProvider);
+
+  String _extractErrorMessage(
+    dynamic responseData, {
+    required String fallbackMessage,
+  }) {
+    if (responseData is Map<String, dynamic>) {
+      final message = responseData['message'];
+      if (message is String && message.trim().isNotEmpty) {
+        return message;
+      }
+
+      final error = responseData['error'];
+      if (error is String && error.trim().isNotEmpty) {
+        return error;
+      }
+    }
+
+    return fallbackMessage;
+  }
+
+  Future<DataState<SayarehHomeModel>> fetchAllCourses() async {
+    // Response response = await sayarehApiProvider.callSayarehApi();
+    try {
+      Response response = await sayarehApiProvider.callGetAllCourses();
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = SayarehHomeModel.fromJson(response.data);
+        return DataSuccess(data);
+      } else {
+        return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
+      }
+    } on AppException catch (e) {
+      return CheckExceptions.getError<SayarehHomeModel>(e);
+    }
+    //return SayarehState(sayarehDataStatus: SayarehDataSuccess(response));
+  }
+
+  Future<DataState<GetBookListModel>> fetchBookList() async {
+    try {
+      Response response = await sayarehApiProvider.callGetBookList();
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = GetBookListModel.fromJson(response.data);
+        return DataSuccess(data);
+      } else {
+        return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
+      }
+    } on AppException catch (e) {
+      return CheckExceptions.getError<GetBookListModel>(e);
+    }
+  }
+
+  Future<DataState<IKnowSummaryModel>> fetchIknowSummary() async {
+    try {
+      Response response = await sayarehApiProvider.callGetIknowSummary();
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = IKnowSummaryModel.fromJson(response.data);
+        return DataSuccess(data);
+      } else {
+        return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
+      }
+    } on AppException catch (e) {
+      return CheckExceptions.getError<IKnowSummaryModel>(e);
+    }
+  }
+
+  Future<DataState<SingleBookModel>> fetchBookById(String bookId) async {
+    try {
+      Response response = await sayarehApiProvider.callGetBookById(bookId);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = SingleBookModel.fromJson(response.data);
+        return DataSuccess(data);
+      } else {
+        return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
+      }
+    } on AppException catch (e) {
+      return CheckExceptions.getError<SingleBookModel>(e);
+    }
+  }
+
+  Future<DataState<Lesson>> fetchCourseById(String id) async {
+    try {
+      Response response = await sayarehApiProvider.callGetCourseById(id);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = Lesson.fromJson(response.data['data']);
+        return DataSuccess(data);
+      } else {
+        return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
+      }
+    } on AppException catch (e) {
+      return CheckExceptions.getError<Lesson>(e);
+    }
+  }
+
+  Future<DataState<ConversationModel>> fetchSayarehConversation(
+      String id) async {
+    try {
+      Response response = await sayarehApiProvider.callGetConversation(id);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = ConversationModel.fromJson(response.data);
+        return DataSuccess(data);
+      } else {
+        return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
+      }
+    } on AppException catch (e) {
+      return CheckExceptions.getError<ConversationModel>(e);
+    }
+  }
+
+  Future<DataState<String?>> fetchConversationPlayback(String courseId) async {
+    try {
+      Response response =
+          await sayarehApiProvider.callGetConversationPlayback(courseId);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final conversationId = response.data['data']?['iKnowConversationId'];
+        return DataSuccess(conversationId);
+      } else {
+        return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
+      }
+    } on AppException catch (e) {
+      return CheckExceptions.getError<String?>(e);
+    }
+  }
+
+  Future<DataState<void>> saveConversationPlayback(
+      String courseId, String conversationId) async {
+    try {
+      Response response = await sayarehApiProvider.callPostConversationPlayback(
+          courseId, conversationId);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return DataSuccess(null);
+      } else {
+        return DataFailed(response.data['message'] ?? "خطا در ذخیره اطلاعات");
+      }
+    } on AppException catch (e) {
+      return CheckExceptions.getError<void>(e);
+    }
+  }
+
+  Future<DataState<CourseProgressModel>> fetchCourseProgress(
+      String courseId) async {
+    try {
+      Response response =
+          await sayarehApiProvider.callGetCourseProgress(courseId);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = CourseProgressModel.fromJson(response.data);
+        return DataSuccess(data);
+      } else {
+        return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
+      }
+    } on AppException catch (e) {
+      return CheckExceptions.getError<CourseProgressModel>(e);
+    }
+  }
+
+  Future<DataState<AllCoursesProgressModel>> fetchAllCoursesProgress() async {
+    try {
+      Response response = await sayarehApiProvider.callGetAllCoursesProgress();
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = AllCoursesProgressModel.fromJson(response.data);
+        return DataSuccess(data);
+      } else {
+        return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
+      }
+    } on AppException catch (e) {
+      return CheckExceptions.getError<AllCoursesProgressModel>(e);
+    }
+  }
+
+  Future<DataState<void>> resetCourseProgress(String courseId) async {
+    try {
+      Response response =
+          await sayarehApiProvider.callDeleteCourseProgress(courseId);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return DataSuccess(null);
+      } else {
+        return DataFailed(response.data['message'] ?? "خطا در حذف اطلاعات");
+      }
+    } on AppException catch (e) {
+      return CheckExceptions.getError<void>(e);
+    }
+  }
+
+  Future<DataState<VocabularyModel>> fetchVocabulary(String id) async {
+    try {
+      Response response = await sayarehApiProvider.callGetVocabulary(id);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = VocabularyModel.fromJson(response.data);
+        return DataSuccess(data);
+      } else {
+        return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
+      }
+    } on AppException catch (e) {
+      return CheckExceptions.getError<VocabularyModel>(e);
+    }
+  }
+
+  Future<DataState<PracticeVocabularyModel>> fetchPracticeVocabulary(
+      String id, List<String>? previousVocabularyIds) async {
+    try {
+      Response response = await sayarehApiProvider.callPostPracticeVocabulary(
+          id, previousVocabularyIds);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        if (response.data['data'] == null) {
+          return DataSuccess(null);
+        }
+        final data = PracticeVocabularyModel.fromJson(response.data);
+        return DataSuccess(data);
+      } else {
+        return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
+      }
+    } on AppException catch (e) {
+      return CheckExceptions.getError<PracticeVocabularyModel>(e);
+    }
+  }
+
+  Future<DataState<void>> submitVocabulary(
+    String courseId,
+    String vocabularyId,
+    String answer,
+    List<String> previousVocabularyIds,
+  ) async {
+    try {
+      Response response = await sayarehApiProvider.callPostSubmitVocabulary(
+        courseId,
+        vocabularyId,
+        answer,
+        previousVocabularyIds,
+      );
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return DataSuccess(null);
+      } else {
+        return DataFailed(response.data['message'] ?? "خطا در ارسال اطلاعات");
+      }
+    } on DioException catch (e) {
+      log("submitVocabulary failed: status=${e.response?.statusCode}, body=${e.response?.data}");
+      return DataFailed(
+        _extractErrorMessage(
+          e.response?.data,
+          fallbackMessage: "خطا در ثبت پاسخ لغت",
+        ),
+      );
+    } on AppException catch (e) {
+      return CheckExceptions.getError<void>(e);
+    }
+  }
+
+  Future<DataState<QuizesList>> fetchQuizzes(String id) async {
+    try {
+      Response response = await sayarehApiProvider.callGetQuizzes(id);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = QuizesList.fromJson(response.data);
+        return DataSuccess(data);
+      } else {
+        return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
+      }
+    } on AppException catch (e) {
+      return CheckExceptions.getError<QuizesList>(e);
+    }
+  }
+
+  Future<DataState<QuizesQuestion>> fetchStartQuizQuestion(
+      String courseId, String quizId) async {
+    try {
+      Response response =
+          await sayarehApiProvider.callGetStartQuizById(courseId, quizId);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = QuizesQuestion.fromJson(response.data);
+        return DataSuccess(data);
+      } else {
+        return DataFailed<QuizesQuestion>(
+            response.data['message'] ?? "خطا در دریافت اطلاعات");
+      }
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 422) {
+        return const DataFailed<QuizesQuestion>(
+          "شما قبلا این آزمون را گذرانده اید.",
+        );
+      }
+
+      return DataFailed<QuizesQuestion>(
+        _extractErrorMessage(
+          e.response?.data,
+          fallbackMessage: "خطا در دریافت اطلاعات",
+        ),
+      );
+    } on AppException catch (e) {
+      return DataFailed<QuizesQuestion>(e.message);
+    } catch (e) {
+      return DataFailed<QuizesQuestion>(e.toString());
+    }
+  }
+
+  Future<DataState<AnswerQuestion>> fetchAnswerQuestion(String courseId,
+      String quizId, String questionId, String answerId) async {
+    log("=== fetchAnswerQuestion START ===");
+    log("courseId: $courseId");
+    log("quizId: $quizId");
+    log("questionId: $questionId");
+    log("answerId: $answerId");
+    try {
+      Response response = await sayarehApiProvider.callPostAnswerQuestion(
+          courseId, quizId, questionId, answerId);
+      log("Response status code: ${response.statusCode}");
+      log("Raw response data: ${response.data}");
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        log("Attempting to parse response data...");
+        final data = AnswerQuestion.fromJson(response.data);
+        log("Successfully parsed response data");
+        log("Returning DataSuccess with parsed data");
+        return DataSuccess(data);
+      } else {
+        log("Error response: ${response.data}");
+        return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
+      }
+    } on AppException catch (e) {
+      log("AppException caught: $e");
+      return CheckExceptions.getError<AnswerQuestion>(e);
+    } catch (e) {
+      log("Unexpected error: $e");
+      return DataFailed(e.toString());
+    } finally {
+      log("=== fetchAnswerQuestion END ===");
+    }
+  }
+
+  Future<DataState<ResultQuestion>> fetchResultQuestion(
+      String courseId, String quizId) async {
+    log("Result Question Course ID: $courseId");
+    log("Result Question Quiz ID: $quizId");
+    try {
+      Response response =
+          await sayarehApiProvider.callGetResultQuestion(courseId, quizId);
+      log("Result Question Response: ${response.data}");
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        if (response.data == null) {
+          return DataSuccess(null);
+        }
+        final data = ResultQuestion.fromJson(response.data);
+        return DataSuccess(data);
+      } else {
+        return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
+      }
+    } on AppException catch (e) {
+      return CheckExceptions.getError<ResultQuestion>(e);
+    }
+  }
+
+  Future<DataState<void>> deleteQuizResult(
+      String courseId, String quizId) async {
+    try {
+      Response response =
+          await sayarehApiProvider.callDeleteQuizResult(courseId, quizId);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return DataSuccess(null);
+      } else {
+        return DataFailed(response.data['message'] ?? "خطا در حذف اطلاعات");
+      }
+    } on AppException catch (e) {
+      return CheckExceptions.getError<void>(e);
+    } catch (_) {
+      // No saved result to delete (e.g. 404) — treat as success for exit flow.
+      return DataSuccess(null);
+    }
+  }
+
+  Future<DataState<SayarehStorageTest>> fetchSayarehStorage() async {
+    try {
+      Response response = await sayarehApiProvider.callSayarehStorageApi();
+      // final data = response.data;
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        log("Sayareh Storage Response: ${response.data}");
+        final data = SayarehStorageTest.fromJson(response.data);
+
+        return DataSuccess(data);
+      } else {
+        return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
+      }
+    } on AppException catch (e) {
+      return CheckExceptions.getError<SayarehStorageTest>(e);
+    }
+  }
+
+  Future<DataState<IknowAccess>> fetchIknowAccess() async {
+    try {
+      Response response = await sayarehApiProvider.callGetIknowAccess();
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = IknowAccess.fromJson(response.data);
+        return DataSuccess(data);
+      } else {
+        return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
+      }
+    } on AppException catch (e) {
+      return CheckExceptions.getError<IknowAccess>(e);
+    }
+  }
+}

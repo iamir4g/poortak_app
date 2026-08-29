@@ -5,13 +5,13 @@ import 'package:poortak/common/blocs/bottom_nav_cubit/bottom_nav_cubit.dart';
 import 'package:poortak/common/services/tts_service.dart';
 import 'package:poortak/common/widgets/main_wrapper.dart';
 import 'package:poortak/config/my_theme.dart';
-import 'package:poortak/featueres/featureMenu/screens/aboutUs_screen.dart';
-import 'package:poortak/featueres/featureMenu/screens/contactUs_screen.dart';
-import 'package:poortak/featueres/featureMenu/presentation/bloc/contact_us_bloc/contact_us_bloc.dart';
-import 'package:poortak/featueres/featureMenu/screens/faq_screen.dart';
-import 'package:poortak/featueres/featureMenu/presentation/bloc/faq_bloc/faq_bloc.dart';
-import 'package:poortak/featueres/featureMenu/screens/settings_screen.dart';
-import 'package:poortak/featueres/featureMenu/screens/main_reminder.dart';
+import 'package:poortak/featueres/feature_Menu/screens/aboutUs_screen.dart';
+import 'package:poortak/featueres/feature_Menu/screens/contactUs_screen.dart';
+import 'package:poortak/featueres/feature_Menu/presentation/bloc/contact_us_bloc/contact_us_bloc.dart';
+import 'package:poortak/featueres/feature_Menu/screens/faq_screen.dart';
+import 'package:poortak/featueres/feature_Menu/presentation/bloc/faq_bloc/faq_bloc.dart';
+import 'package:poortak/featueres/feature_Menu/screens/settings_screen.dart';
+import 'package:poortak/featueres/feature_Menu/screens/main_reminder.dart';
 import 'package:poortak/featueres/feature_intro/presentation/screens/splash_screen.dart';
 import 'package:poortak/featueres/feature_match/screens/main_match_screen.dart';
 import 'package:poortak/featueres/feature_match/screens/match_screen.dart';
@@ -31,7 +31,7 @@ import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_bloc.d
 import 'package:poortak/featueres/feature_litner/screens/litner_word_completed_screen.dart';
 import 'package:poortak/featueres/feature_litner/screens/litner_word_box_screen.dart';
 import 'package:poortak/featueres/feature_litner/screens/litner_words_inprogress_screen.dart';
-import 'package:poortak/featueres/fetures_sayareh/screens/word_detail_screen.dart';
+import 'package:poortak/featueres/feature_sayareh/screens/word_detail_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/favorit_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/main_points_screen.dart';
@@ -40,39 +40,41 @@ import 'package:poortak/featueres/feature_profile/screens/prize_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/how_to_get_points_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/profile_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/edit_profile_screen.dart';
-import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/lesson_bloc/lesson_bloc.dart';
-import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/practice_vocabulary_bloc/practice_vocabulary_bloc.dart';
-import 'package:poortak/featueres/fetures_sayareh/screens/converstion_screen.dart';
-import 'package:poortak/featueres/fetures_sayareh/screens/lesson_screen.dart';
-import 'package:poortak/featueres/fetures_sayareh/screens/practice_vocabulary_screen.dart';
-import 'package:poortak/featueres/fetures_sayareh/screens/reviewed_vocabularies_screen.dart';
-import 'package:poortak/featueres/fetures_sayareh/screens/quiz_screen.dart';
-import 'package:poortak/featueres/fetures_sayareh/screens/quizzes_screen.dart';
-import 'package:poortak/featueres/fetures_sayareh/screens/vocabulary_screen.dart';
+import 'package:poortak/featueres/feature_sayareh/presentation/bloc/lesson_bloc/lesson_bloc.dart';
+import 'package:poortak/featueres/feature_sayareh/presentation/bloc/practice_vocabulary_bloc/practice_vocabulary_bloc.dart';
+import 'package:poortak/featueres/feature_sayareh/screens/converstion_screen.dart';
+import 'package:poortak/featueres/feature_sayareh/screens/lesson_screen.dart';
+import 'package:poortak/featueres/feature_sayareh/screens/practice_vocabulary_screen.dart';
+import 'package:poortak/featueres/feature_sayareh/screens/reviewed_vocabularies_screen.dart';
+import 'package:poortak/featueres/feature_sayareh/screens/quiz_screen.dart';
+import 'package:poortak/featueres/feature_sayareh/screens/quizzes_screen.dart';
+import 'package:poortak/featueres/feature_sayareh/screens/vocabulary_screen.dart';
 import 'package:poortak/featueres/feature_intro/presentation/bloc/splash_bloc/splash_cubit.dart';
 import 'package:poortak/featueres/feature_intro/presentation/screens/intro_main_wrapper.dart';
+import 'package:poortak/featueres/feature_profile/presentation/bloc/user_points_total_bloc/user_points_total_bloc.dart';
+import 'package:poortak/featueres/feature_profile/presentation/bloc/user_points_total_bloc/user_points_total_event.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
-import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/sayareh_bloc/sayareh_cubit.dart';
+import 'package:poortak/featueres/feature_sayareh/presentation/bloc/sayareh_bloc/sayareh_cubit.dart';
 import 'package:poortak/common/bloc/video_download_cubit/video_download_cubit.dart';
 import 'package:poortak/locator.dart';
 import 'package:poortak/test_screen.dart';
 import 'package:poortak/l10n/app_localizations.dart';
-import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quizes_cubit/cubit/quizes_cubit.dart';
-import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_start_bloc/quiz_start_bloc.dart';
-import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_answer_bloc/quiz_answer_bloc.dart';
-import 'package:poortak/featueres/fetures_sayareh/screens/first_quiz_screen.dart';
-import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_result_bloc/quiz_result_bloc.dart';
+import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quizes_cubit/cubit/quizes_cubit.dart';
+import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_start_bloc/quiz_start_bloc.dart';
+import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_answer_bloc/quiz_answer_bloc.dart';
+import 'package:poortak/featueres/feature_sayareh/screens/first_quiz_screen.dart';
+import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_result_bloc/quiz_result_bloc.dart';
 // For RouteAware
 import 'package:poortak/common/bloc/theme_cubit/theme_cubit.dart';
 import 'package:poortak/common/bloc/settings_cubit/settings_cubit.dart';
 import 'package:poortak/common/bloc/connectivity_cubit/connectivity_cubit.dart';
 import 'package:poortak/common/widgets/connectivity_listener.dart';
 import 'package:poortak/featueres/feature_match/presentation/bloc/match_bloc/match_bloc.dart';
-import 'package:poortak/featueres/fetures_sayareh/screens/pdf_reader_screen.dart';
-import 'package:poortak/featueres/fetures_sayareh/screens/book_detail_screen.dart';
-import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/single_book_bloc/single_book_cubit.dart';
+import 'package:poortak/featueres/feature_sayareh/screens/pdf_reader_screen.dart';
+import 'package:poortak/featueres/feature_sayareh/screens/book_detail_screen.dart';
+import 'package:poortak/featueres/feature_sayareh/presentation/bloc/single_book_bloc/single_book_cubit.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:poortak/common/services/reminder_notification_service.dart';
 import 'dart:io' show Platform;
@@ -122,6 +124,7 @@ void _loadInitialShoppingCart() {
   final prefsOperator = locator<PrefsOperator>();
   if (prefsOperator.isLoggedIn()) {
     bloc.add(GetCartEvent());
+    locator<UserPointsTotalBloc>().add(LoadUserPointsTotalEvent());
   } else {
     bloc.add(GetLocalCartEvent());
   }
@@ -163,6 +166,9 @@ void main() async {
         BlocProvider(create: (_) => locator<VideoDownloadCubit>()),
         BlocProvider.value(
           value: locator<ShoppingCartBloc>(),
+        ),
+        BlocProvider.value(
+          value: locator<UserPointsTotalBloc>(),
         ),
         BlocProvider(create: (_) => locator<LitnerBloc>()),
       ],

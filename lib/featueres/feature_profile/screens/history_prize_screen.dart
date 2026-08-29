@@ -1,12 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/common/utils/date_util.dart';
+import 'package:poortak/common/utils/digit_utils.dart';
 import 'package:poortak/common/widgets/poortak_app_bar.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_profile/data/models/prize_history_model.dart';
+import 'package:poortak/featueres/feature_profile/presentation/bloc/prize_history_bloc/prize_history_bloc.dart';
+import 'package:poortak/featueres/feature_profile/presentation/bloc/prize_history_bloc/prize_history_event.dart';
+import 'package:poortak/featueres/feature_profile/presentation/bloc/user_points_total_bloc/user_points_total_bloc.dart';
+import 'package:poortak/featueres/feature_profile/presentation/bloc/user_points_total_bloc/user_points_total_event.dart';
+import 'package:poortak/featueres/feature_profile/presentation/bloc/user_points_total_bloc/user_points_total_state.dart';
+import 'package:poortak/featueres/feature_profile/presentation/bloc/prize_history_bloc/prize_history_state.dart';
+import 'package:poortak/featueres/feature_profile/repositories/profile_repository.dart';
 import 'package:poortak/featueres/feature_profile/widgets/prize_history_item.dart';
 import 'package:poortak/featueres/feature_profile/widgets/date_separator.dart';
-import 'package:poortak/common/utils/date_util.dart';
+import 'package:poortak/locator.dart';
 
 class HistoryPrizeScreen extends StatefulWidget {
   static const routeName = "/history_prize_screen";
@@ -18,33 +28,38 @@ class HistoryPrizeScreen extends StatefulWidget {
 }
 
 class _HistoryPrizeScreenState extends State<HistoryPrizeScreen> {
+  late PrizeHistoryBloc _prizeHistoryBloc;
+
   @override
   void initState() {
     super.initState();
-    // Status bar is managed centrally in MainWrapper
+    _prizeHistoryBloc = PrizeHistoryBloc(
+      repository: locator<ProfileRepository>(),
+    );
+    _prizeHistoryBloc.add(LoadPrizeHistoryEvent());
+    locator<UserPointsTotalBloc>().add(LoadUserPointsTotalEvent());
   }
 
-  /// Helper method to format date for display
+  @override
+  void dispose() {
+    _prizeHistoryBloc.close();
+    super.dispose();
+  }
+
   String _formatDateForDisplay(DateTime dateTime) {
     return DateUtil.toPersianMonthYear(dateTime);
   }
 
-  /// Helper method to group history items by date
   List<PrizeHistoryGroup> _groupHistoryByDate(List<PrizeHistoryModel> items) {
     final Map<String, List<PrizeHistoryModel>> grouped = {};
 
     for (final item in items) {
       final dateKey = _formatDateForDisplay(item.createdAt);
-      if (grouped[dateKey] == null) {
-        grouped[dateKey] = [];
-      }
-      grouped[dateKey]!.add(item);
+      grouped.putIfAbsent(dateKey, () => []).add(item);
     }
 
-    // Sort dates in descending order (newest first)
     final sortedDates = grouped.keys.toList()
       ..sort((a, b) {
-        // Simple sorting by year and month
         final aParts = a.split(' ');
         final bParts = b.split(' ');
         if (aParts.length == 2 && bParts.length == 2) {
@@ -52,7 +67,6 @@ class _HistoryPrizeScreenState extends State<HistoryPrizeScreen> {
           final bYear = int.tryParse(bParts[1]) ?? 0;
           if (aYear != bYear) return bYear.compareTo(aYear);
 
-          // Compare months using DateUtil
           final aMonthIndex = DateUtil.persianMonths.indexOf(aParts[0]);
           final bMonthIndex = DateUtil.persianMonths.indexOf(bParts[0]);
           return bMonthIndex.compareTo(aMonthIndex);
@@ -72,69 +86,96 @@ class _HistoryPrizeScreenState extends State<HistoryPrizeScreen> {
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
-    // Sample data - in real app this would come from API/state management
-    final sampleResponse = PrizeHistoryResponse(
-      ok: true,
-      meta: {},
-      data: [
-        PrizeHistoryModel(
-          id: "dfbdad42-e930-42d4-8833-bfd553430d7a",
-          amount: 4,
-          runningAmount: 4,
-          description: "",
-          type: "همینجوری",
-          userId: "ddda7ab9-c2b9-4abf-99cc-95eb51f15f9b",
-          createdAt: DateTime.parse("2025-10-11T17:38:32.093Z"),
-          updatedAt: DateTime.parse("2025-10-11T17:38:32.093Z"),
-        ),
-        PrizeHistoryModel(
-          id: "e713a2a3-baf6-4471-ad2b-a66d5ff6e7cf",
-          amount: 1,
-          runningAmount: 1,
-          description: "",
-          type: "پسر خوبی بوده",
-          userId: "ddda7ab9-c2b9-4abf-99cc-95eb51f15f9b",
-          createdAt: DateTime.parse("2025-10-06T21:00:41.418Z"),
-          updatedAt: DateTime.parse("2025-10-06T21:00:41.418Z"),
-        ),
-        PrizeHistoryModel(
-          id: "63c44cde-b191-497e-9d01-886b4cd350d8",
-          amount: 3,
-          runningAmount: 3,
-          description: "",
-          type: "لاگین کرده",
-          userId: "ddda7ab9-c2b9-4abf-99cc-95eb51f15f9b",
-          createdAt: DateTime.parse("2025-10-06T21:00:24.589Z"),
-          updatedAt: DateTime.parse("2025-10-06T21:00:24.589Z"),
-        ),
-      ],
-    );
-
-    final totalAmount = sampleResponse.totalAmount;
-    final historyGroups = _groupHistoryByDate(sampleResponse.data);
-
     return Scaffold(
       backgroundColor: isDarkMode ? MyColors.darkBackground : Colors.white,
       appBar: const PoortakAppBar(title: 'تاریخچه امتیاز'),
       body: SafeArea(
         top: false,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // Total Points Section
-            _buildTotalPointsSection(isDarkMode, totalAmount),
+        child: BlocBuilder<UserPointsTotalBloc, UserPointsTotalState>(
+          builder: (context, pointsState) {
+            final totalAdded = pointsState is UserPointsTotalSuccess
+                ? pointsState.data.added
+                : null;
 
-            // History List
-            Expanded(
-              child: _buildHistoryList(historyGroups),
-            ),
-          ],
+            return BlocProvider.value(
+              value: _prizeHistoryBloc,
+              child: BlocBuilder<PrizeHistoryBloc, PrizeHistoryState>(
+                builder: (context, state) {
+                  if (state is PrizeHistoryLoading ||
+                      state is PrizeHistoryRefreshing) {
+                    return Column(
+                      children: [
+                        _buildTotalPointsSection(isDarkMode, totalAdded),
+                        const Expanded(
+                            child: Center(child: CircularProgressIndicator())),
+                      ],
+                    );
+                  }
+
+                  if (state is PrizeHistoryError) {
+                    return Column(
+                      children: [
+                        _buildTotalPointsSection(isDarkMode, totalAdded),
+                        Expanded(child: _buildErrorState(state.message)),
+                      ],
+                    );
+                  }
+
+                  if (state is PrizeHistoryEmpty) {
+                    return Column(
+                      children: [
+                        _buildTotalPointsSection(isDarkMode, totalAdded),
+                        Expanded(child: _buildEmptyState(state.message)),
+                      ],
+                    );
+                  }
+
+                  if (state is PrizeHistorySuccess) {
+                    final historyGroups =
+                        _groupHistoryByDate(state.prizeHistoryResponse.data);
+
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        _buildTotalPointsSection(isDarkMode, totalAdded),
+                        Expanded(
+                          child: RefreshIndicator(
+                            onRefresh: () async {
+                              _prizeHistoryBloc.add(RefreshPrizeHistoryEvent());
+                              locator<UserPointsTotalBloc>()
+                                  .add(RefreshUserPointsTotalEvent());
+                              await Future.wait([
+                                _prizeHistoryBloc.stream.firstWhere(
+                                  (s) =>
+                                      s is PrizeHistorySuccess ||
+                                      s is PrizeHistoryEmpty ||
+                                      s is PrizeHistoryError,
+                                ),
+                                locator<UserPointsTotalBloc>().stream.firstWhere(
+                                  (s) =>
+                                      s is UserPointsTotalSuccess ||
+                                      s is UserPointsTotalError,
+                                ),
+                              ]);
+                            },
+                            child: _buildHistoryList(historyGroups),
+                          ),
+                        ),
+                      ],
+                    );
+                  }
+
+                  return const SizedBox.shrink();
+                },
+              ),
+            );
+          },
         ),
       ),
     );
   }
 
-  Widget _buildTotalPointsSection(bool isDarkMode, int totalAmount) {
+  Widget _buildTotalPointsSection(bool isDarkMode, int? totalAmount) {
     return Container(
       height: 89.h,
       width: double.infinity,
@@ -142,7 +183,6 @@ class _HistoryPrizeScreenState extends State<HistoryPrizeScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Total points text
           Text(
             'جمع امتیاز ها:',
             style: MyTextStyle.textMatn16.copyWith(
@@ -150,10 +190,7 @@ class _HistoryPrizeScreenState extends State<HistoryPrizeScreen> {
               color: isDarkMode ? MyColors.darkTextPrimary : Colors.black,
             ),
           ),
-
           SizedBox(width: 16.w),
-
-          // Points container
           Container(
             width: 88.w,
             height: 33.h,
@@ -163,7 +200,9 @@ class _HistoryPrizeScreenState extends State<HistoryPrizeScreen> {
             ),
             child: Center(
               child: Text(
-                '$totalAmount سکه',
+                totalAmount == null
+                    ? '...'
+                    : '${toPersianDigits('$totalAmount')} سکه',
                 textAlign: TextAlign.center,
                 style: MyTextStyle.textMatn16.copyWith(
                   color: const Color(0xFF29303D),
@@ -177,8 +216,65 @@ class _HistoryPrizeScreenState extends State<HistoryPrizeScreen> {
     );
   }
 
+  Widget _buildErrorState(String message) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.error_outline,
+            size: 64.r,
+            color: Colors.red,
+          ),
+          SizedBox(height: 16.h),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 24.w),
+            child: Text(
+              message,
+              style: MyTextStyle.textMatn16.copyWith(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? MyColors.darkTextPrimary
+                    : MyColors.textMatn1,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          SizedBox(height: 16.h),
+          ElevatedButton(
+            onPressed: () {
+              _prizeHistoryBloc.add(LoadPrizeHistoryEvent());
+            },
+            child: const Text('تلاش مجدد'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(String message) {
+    return ListView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      children: [
+        SizedBox(height: 80.h),
+        Center(
+          child: Text(
+            message,
+            style: MyTextStyle.textMatn16.copyWith(
+              fontWeight: FontWeight.w300,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? MyColors.darkTextPrimary
+                  : MyColors.textMatn1,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildHistoryList(List<PrizeHistoryGroup> historyGroups) {
     return ListView.builder(
+      physics: const AlwaysScrollableScrollPhysics(),
       padding: EdgeInsets.only(top: 16.h),
       itemCount: historyGroups.length,
       itemBuilder: (context, groupIndex) {
@@ -186,20 +282,15 @@ class _HistoryPrizeScreenState extends State<HistoryPrizeScreen> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Date separator
             DateSeparator(date: group.date),
-
-            // Items for this date
             ...group.items.map((item) => Padding(
                   padding: EdgeInsets.only(bottom: 8.h),
                   child: PrizeHistoryItem(
-                    title: item.type,
+                    title: item.displayTitle,
                     points: item.pointsDisplay,
                     isCompleted: true,
                   ),
                 )),
-
-            // Add some spacing between groups
             if (groupIndex < historyGroups.length - 1) SizedBox(height: 16.h),
           ],
         );
