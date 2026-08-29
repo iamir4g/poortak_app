@@ -98,6 +98,7 @@ class _QuizAnswerItemState extends State<QuizAnswerItem> {
       child: Center(
         child: BidiText(
           text: widget.title,
+          forceEnglishDigits: true,
           style: TextStyle(
             fontFamily: 'IRANSans',
             fontWeight: FontWeight.w500,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:poortak/common/utils/digit_utils.dart';
 
 /// Helpers for rendering mixed Persian (RTL) and English (LTR) strings.
 class BidiTextHelper {
@@ -50,6 +51,7 @@ class BidiText extends StatelessWidget {
   final TextAlign textAlign;
   final int? maxLines;
   final TextOverflow? overflow;
+  final bool forceEnglishDigits;
 
   const BidiText({
     super.key,
@@ -58,18 +60,25 @@ class BidiText extends StatelessWidget {
     this.textAlign = TextAlign.center,
     this.maxLines,
     this.overflow,
+    this.forceEnglishDigits = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    final direction = BidiTextHelper.detectDirection(text);
-    final displayText = BidiTextHelper.prepare(text);
+    final sourceText =
+        forceEnglishDigits ? toEnglishDigits(text) : text;
+    final direction = BidiTextHelper.detectDirection(sourceText);
+    final displayText = BidiTextHelper.prepare(sourceText);
 
     return Directionality(
       textDirection: direction,
       child: Text(
         displayText,
-        style: style,
+        style: forceEnglishDigits
+            ? (style ?? const TextStyle()).copyWith(
+                fontFamilyFallback: const ['sans-serif'],
+              )
+            : style,
         textDirection: direction,
         textAlign: textAlign,
         maxLines: maxLines,

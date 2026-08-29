@@ -247,6 +247,7 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                           // Question Text
                           BidiText(
                             text: state.question.data.title,
+                            forceEnglishDigits: true,
                             textAlign: TextAlign.center,
                             style: MyTextStyle.textHeader16Bold.copyWith(
                               color: isDark
@@ -398,6 +399,7 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                                 ),
                                 child: BidiText(
                                   text: answerState.explanation!,
+                                  forceEnglishDigits: true,
                                   style: MyTextStyle.textMatn12W500.copyWith(
                                     color: isDark
                                         ? MyColors.profileTextPrimaryDark

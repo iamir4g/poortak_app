@@ -5,6 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:poortak/common/utils/digit_utils.dart';
 import 'package:poortak/common/widgets/poortak_app_bar.dart';
 import 'package:poortak/common/widgets/step_progress.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
@@ -384,18 +385,20 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                                   ),
                                   SizedBox(height: Dimens.nh(20)),
                                   Text(
-                                    currentWord.word,
+                                    toEnglishDigits(currentWord.word),
                                     style: MyTextStyle.textMatn18Bold.copyWith(
                                       fontSize: 24.sp,
                                       color: primaryTextColor,
+                                      fontFamilyFallback: const ['sans-serif'],
                                     ),
                                   ),
                                   SizedBox(height: 10.h),
                                   Text(
-                                    currentWord.translation,
+                                    toEnglishDigits(currentWord.translation),
                                     style: MyTextStyle.textMatn16.copyWith(
                                       fontSize: 18.sp,
                                       color: secondaryTextColor,
+                                      fontFamilyFallback: const ['sans-serif'],
                                     ),
                                   ),
                                   SizedBox(height: 20.h),

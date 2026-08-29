@@ -218,6 +218,7 @@ class _QuizScreenState extends State<QuizScreen> {
                                 const SizedBox(height: 32),
                                 BidiText(
                                   text: questionData.title,
+                                  forceEnglishDigits: true,
                                   textAlign: TextAlign.center,
                                   style: FontSizeHelper.getContentTextStyle(
                                     context,
@@ -300,6 +301,7 @@ class _QuizScreenState extends State<QuizScreen> {
                               ),
                               child: BidiText(
                                 text: answerState.explanation!,
+                                forceEnglishDigits: true,
                                 style: MyTextStyle.textMatn12W500.copyWith(
                                   color: isDark
                                       ? MyColors.profileTextPrimaryDark
