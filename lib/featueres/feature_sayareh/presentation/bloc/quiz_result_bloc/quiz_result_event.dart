@@ -20,3 +20,7 @@ class FetchQuizResultEvent extends QuizResultEvent {
   @override
   List<Object> get props => [courseId, quizId];
 }
+
+class ResetQuizResultEvent extends QuizResultEvent {
+  const ResetQuizResultEvent();
+}

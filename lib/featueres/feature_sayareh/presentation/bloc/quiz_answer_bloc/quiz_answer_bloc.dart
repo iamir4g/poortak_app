@@ -45,12 +45,6 @@ class QuizAnswerBloc extends Bloc<QuizAnswerEvent, QuizAnswerState> {
               "خطا در دریافت داده از سرور. لطفا دوباره تلاش کنید."));
           return;
         }
-        if (result.data!.data.nextQuestion == null) {
-          log("nextQuestion is null, emitting QuizAnswerComplete");
-          emit(QuizAnswerComplete());
-          return;
-        }
-
         log("Result data exists: ${result.data}");
         log("Checking nextQuestion...");
 
@@ -82,20 +76,18 @@ class QuizAnswerBloc extends Bloc<QuizAnswerEvent, QuizAnswerState> {
           log("No next question in response data");
         }
 
-        // If there's no next question, emit QuizAnswerComplete
-        if (nextQuestion == null) {
-          log("nextQuestion is null, emitting QuizAnswerComplete");
-          emit(QuizAnswerComplete());
-          return;
-        }
+        final isLastQuestion = nextQuestion == null;
+        log(isLastQuestion
+            ? "Last question answered, emitting QuizAnswerLoaded"
+            : "Emitting QuizAnswerLoaded with nextQuestion");
 
-        log("Emitting QuizAnswerLoaded with nextQuestion");
         emit(QuizAnswerLoaded(
           isCorrect: result.data!.data.correct,
           explanation: result.data!.data.question.explanation?.toString(),
           nextQuestion: nextQuestion,
           correctAnswerId: result.data!.data.correctAnswer.id,
           selectedAnswerId: event.answerId,
+          isLastQuestion: isLastQuestion,
         ));
       } else if (result is DataFailed) {
         log("Result is DataFailed: ${result.error}");

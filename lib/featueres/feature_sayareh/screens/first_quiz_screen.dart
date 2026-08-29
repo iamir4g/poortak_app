@@ -12,6 +12,8 @@ import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_start_bloc/quiz_start_bloc.dart';
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_answer_bloc/quiz_answer_bloc.dart';
 import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
+import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_result_bloc/quiz_result_bloc.dart';
+import 'package:poortak/featueres/feature_sayareh/widgets/quiz_result_modal.dart';
 import 'package:poortak/featueres/feature_sayareh/screens/quiz_screen.dart';
 import 'package:poortak/featueres/feature_sayareh/screens/quizzes_screen.dart';
 import 'package:poortak/featueres/feature_sayareh/widgets/item_question.dart';
@@ -40,6 +42,36 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
   String? selectedAnswerId;
   bool _isExitDialogOpen = false;
   bool _canPop = false;
+  bool _isResultModalOpen = false;
+  bool _hasRequestedResult = false;
+
+  void _fetchQuizResult() {
+    setState(() => _hasRequestedResult = true);
+    context.read<QuizResultBloc>().add(FetchQuizResultEvent(
+          courseId: widget.courseId,
+          quizId: widget.quizId,
+        ));
+  }
+
+  void _showQuizResultModal(QuizResultLoaded state) {
+    if (_isResultModalOpen || !mounted) return;
+    _isResultModalOpen = true;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      useRootNavigator: true,
+      builder: (dialogContext) => QuizResultModal(
+        totalQuestions: state.totalQuestions,
+        correctAnswers: state.correctAnswers,
+        score: state.score,
+        courseId: widget.courseId,
+        quizId: widget.quizId,
+      ),
+    ).whenComplete(() {
+      _isResultModalOpen = false;
+    });
+  }
 
   @override
   void initState() {
@@ -136,7 +168,25 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
           onBackPressed: _showExitModal,
         ),
         body: SafeArea(
-          child: BlocConsumer<QuizStartBloc, QuizStartState>(
+          child: BlocListener<QuizResultBloc, QuizResultState>(
+            listenWhen: (previous, current) =>
+                current is QuizResultLoaded || current is QuizResultError,
+            listener: (context, state) {
+              if (state is QuizResultError) {
+                setState(() => _hasRequestedResult = false);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(state.message),
+                    duration: const Duration(seconds: 2),
+                    backgroundColor: MyColors.error,
+                  ),
+                );
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              } else if (state is QuizResultLoaded && _hasRequestedResult) {
+                _showQuizResultModal(state);
+              }
+            },
+            child: BlocConsumer<QuizStartBloc, QuizStartState>(
             listener: (context, state) {
               if (state is QuizStartError) {
                 if (state.message.contains('Please login') ||
@@ -166,6 +216,12 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                         ),
                       );
                     } else if (answerState is QuizAnswerLoaded) {
+                      if (answerState.isLastQuestion) {
+                        context
+                            .read<QuizResultBloc>()
+                            .add(const ResetQuizResultEvent());
+                      }
+                      setState(() {});
                       unawaited(
                         AnswerFeedbackSoundService.play(
                           answerState.isCorrect,
@@ -177,7 +233,11 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                     }
                   },
                   builder: (context, answerState) {
-                    return Padding(
+                    return BlocBuilder<QuizResultBloc, QuizResultState>(
+                      builder: (context, resultState) {
+                        return Stack(
+                          children: [
+                            SingleChildScrollView(
                       padding: EdgeInsets.symmetric(
                           horizontal: 24.w, vertical: 16.h),
                       child: Column(
@@ -273,17 +333,19 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                             itemCount: state.question.data.answers.length,
                             itemBuilder: (context, index) {
                               final answer = state.question.data.answers[index];
-                              final isSelected = selectedAnswerId == answer.id;
-                              // Determine if the answer is correct based on the correctAnswerId
-                              bool isCorrectAnswer = false;
-                              bool isWrongSelected = false;
+                              final feedbackAnswerId =
+                                  answerState is QuizAnswerLoaded
+                                      ? answerState.selectedAnswerId
+                                      : selectedAnswerId;
+                              final isAnswerSelected =
+                                  feedbackAnswerId == answer.id;
+                              var isCorrectAnswer = false;
+                              var isWrongSelected = false;
                               if (answerState is QuizAnswerLoaded) {
                                 isCorrectAnswer =
                                     answer.id == answerState.correctAnswerId;
-                                log("selectedAnswerId: $selectedAnswerId");
-                                // Use isCorrect from the response to determine if the selected answer is wrong
                                 isWrongSelected =
-                                    isSelected && !answerState.isCorrect;
+                                    isAnswerSelected && !answerState.isCorrect;
                               }
                               return InkWell(
                                 onTap: answerState is QuizAnswerLoading ||
@@ -295,18 +357,19 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                                         });
                                       },
                                 child: QuizAnswerItem(
+                                  key: ValueKey(answer.id),
                                   title: answer.title,
                                   id: answer.id,
-                                  isSelected: isSelected,
+                                  isSelected: isAnswerSelected,
                                   isCorrect: isCorrectAnswer,
                                   isWrongSelected: isWrongSelected,
-                                  selectedAnswerId: selectedAnswerId ?? "",
+                                  selectedAnswerId: feedbackAnswerId ?? "",
                                   showFeedback: answerState is QuizAnswerLoaded,
                                 ),
                               );
                             },
                           ),
-                          const Spacer(),
+                          SizedBox(height: 24.h),
                           // Explanation just above the button
                           if (answerState is QuizAnswerLoaded &&
                               !answerState.isCorrect &&
@@ -451,7 +514,8 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                                 ),
                               ),
                             ),
-                          if (answerState is QuizAnswerLoaded)
+                          if (answerState is QuizAnswerLoaded &&
+                              !answerState.isLastQuestion)
                             Padding(
                               padding: EdgeInsets.only(bottom: 24.0.h),
                               child: Center(
@@ -459,21 +523,19 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                                   width: 176.w,
                                   height: 54.h,
                                   child: ElevatedButton(
-                                    onPressed: answerState.nextQuestion != null
-                                        ? () {
-                                            Navigator.pushReplacementNamed(
-                                              context,
-                                              QuizScreen.routeName,
-                                              arguments: {
-                                                'quizId': widget.quizId,
-                                                'courseId': widget.courseId,
-                                                'title': widget.title,
-                                                'initialQuestion':
-                                                    answerState.nextQuestion,
-                                              },
-                                            );
-                                          }
-                                        : null,
+                                    onPressed: () {
+                                      Navigator.pushReplacementNamed(
+                                        context,
+                                        QuizScreen.routeName,
+                                        arguments: {
+                                          'quizId': widget.quizId,
+                                          'courseId': widget.courseId,
+                                          'title': widget.title,
+                                          'initialQuestion':
+                                              answerState.nextQuestion,
+                                        },
+                                      );
+                                    },
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: MyColors.primary,
                                       foregroundColor: Theme.of(context)
@@ -511,8 +573,75 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                                 ),
                               ),
                             ),
+                          if (answerState is QuizAnswerLoaded &&
+                              answerState.isLastQuestion)
+                            Padding(
+                              padding: EdgeInsets.only(bottom: 24.0.h),
+                              child: Center(
+                                child: SizedBox(
+                                  width: 176.w,
+                                  height: 54.h,
+                                  child: ElevatedButton(
+                                    onPressed: resultState is QuizResultLoading
+                                        ? null
+                                        : _fetchQuizResult,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFFFF9F29),
+                                      foregroundColor: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimary,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(30.r),
+                                      ),
+                                      elevation: 0,
+                                      padding: EdgeInsets.zero,
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          "مشاهده نتیجه",
+                                          style: MyTextStyle.textMatnBtnFor(
+                                                  context)
+                                              .copyWith(
+                                            fontSize: 14.sp,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                        SizedBox(width: 8.w),
+                                        Icon(Icons.arrow_forward_ios,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onPrimary,
+                                            size: 18.r),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
                         ],
                       ),
+                    ),
+                            if (resultState is QuizResultLoading &&
+                                _hasRequestedResult)
+                              Positioned.fill(
+                                child: ColoredBox(
+                                  color: Colors.black.withValues(alpha: 0.25),
+                                  child: const Center(
+                                    child: CircularProgressIndicator(
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        MyColors.primary,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                          ],
+                        );
+                      },
                     );
                   },
                 );
@@ -534,6 +663,7 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
               }
               return const SizedBox();
             },
+          ),
           ),
         ),
       ),

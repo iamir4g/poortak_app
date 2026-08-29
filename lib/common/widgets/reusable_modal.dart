@@ -338,6 +338,7 @@ class ReusableModal extends StatelessWidget {
                       color: isDarkMode
                           ? MyColors.darkTextSecondary
                           : MyColors.text3,
+                      height: 2.0,
                     ),
                     textAlign: TextAlign.center,
                   ),

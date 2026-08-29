@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
+import 'package:poortak/common/utils/digit_utils.dart';
 import 'package:lottie/lottie.dart';
 import 'package:poortak/featueres/feature_sayareh/screens/quizzes_screen.dart';
 import 'package:poortak/locator.dart';
@@ -91,7 +92,7 @@ class QuizResultModal extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  '${correctPercent.toStringAsFixed(0)}%',
+                  '${toPersianDigits(correctPercent.toStringAsFixed(0))}٪',
                   style: MyTextStyle.textHeader16Bold.copyWith(
                     color: secondaryTextColor,
                     fontWeight: FontWeight.w500,
@@ -130,7 +131,7 @@ class QuizResultModal extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  '${wrongPercent.toStringAsFixed(0)}%',
+                  '${toPersianDigits(wrongPercent.toStringAsFixed(0))}٪',
                   style: MyTextStyle.textHeader16Bold.copyWith(
                     color: secondaryTextColor,
                     fontWeight: FontWeight.w500,

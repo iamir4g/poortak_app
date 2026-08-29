@@ -47,6 +47,36 @@ class _QuizScreenState extends State<QuizScreen> {
   late QuizesQuestion currentQuestion;
   bool _isExitDialogOpen = false;
   bool _canPop = false;
+  bool _isResultModalOpen = false;
+  bool _hasRequestedResult = false;
+
+  void _fetchQuizResult() {
+    setState(() => _hasRequestedResult = true);
+    context.read<QuizResultBloc>().add(FetchQuizResultEvent(
+          courseId: widget.courseId,
+          quizId: widget.quizId,
+        ));
+  }
+
+  void _showQuizResultModal(QuizResultLoaded state) {
+    if (_isResultModalOpen || !mounted) return;
+    _isResultModalOpen = true;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      useRootNavigator: true,
+      builder: (dialogContext) => QuizResultModal(
+        totalQuestions: state.totalQuestions,
+        correctAnswers: state.correctAnswers,
+        score: state.score,
+        courseId: widget.courseId,
+        quizId: widget.quizId,
+      ),
+    ).whenComplete(() {
+      _isResultModalOpen = false;
+    });
+  }
 
   @override
   void initState() {
@@ -137,32 +167,27 @@ class _QuizScreenState extends State<QuizScreen> {
                     duration: const Duration(seconds: 2),
                   ),
                 );
-              } else if (answerState is QuizAnswerComplete) {
-                // Optionally show a loading indicator or a message
-                context.read<QuizResultBloc>().add(FetchQuizResultEvent(
-                      courseId: widget.courseId,
-                      quizId: widget.quizId,
-                    ));
               } else if (answerState is QuizAnswerLoaded) {
+                if (answerState.isLastQuestion) {
+                  context
+                      .read<QuizResultBloc>()
+                      .add(const ResetQuizResultEvent());
+                }
+                setState(() {});
                 unawaited(
                   AnswerFeedbackSoundService.play(answerState.isCorrect),
                 );
                 if (!answerState.isCorrect) {
                   unawaited(HapticService.wrongAnswerFeedback());
                 }
-                // If nextQuestion is null, quiz is finished
-                if (answerState.nextQuestion == null) {
-                  context.read<QuizResultBloc>().add(FetchQuizResultEvent(
-                        courseId: widget.courseId,
-                        quizId: widget.quizId,
-                      ));
-                }
-                // Don't auto-advance here. Wait for user to click "Next".
               }
             },
             child: BlocListener<QuizResultBloc, QuizResultState>(
+              listenWhen: (previous, current) =>
+                  current is QuizResultLoaded || current is QuizResultError,
               listener: (context, state) {
                 if (state is QuizResultError) {
+                  setState(() => _hasRequestedResult = false);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(state.message),
@@ -170,110 +195,87 @@ class _QuizScreenState extends State<QuizScreen> {
                       backgroundColor: MyColors.error,
                     ),
                   );
-                  // Navigate back to quiz list on error
                   Navigator.of(context).popUntil((route) => route.isFirst);
-                } else if (state is QuizResultLoaded) {
-                  showDialog(
-                    context: context,
-                    barrierDismissible: false,
-                    builder: (context) => QuizResultModal(
-                      totalQuestions: state.totalQuestions,
-                      correctAnswers: state.correctAnswers,
-                      score: state.score,
-                      courseId: widget.courseId,
-                      quizId: widget.quizId,
-                    ),
-                  );
+                } else if (state is QuizResultLoaded && _hasRequestedResult) {
+                  _showQuizResultModal(state);
                 }
               },
-              child: BlocBuilder<QuizAnswerBloc, QuizAnswerState>(
-                builder: (context, answerState) {
-                  if (answerState is QuizAnswerComplete) {
-                    // Optionally show a loading indicator or a message
-                    return const Center(
-                      child: CircularProgressIndicator(
-                        valueColor:
-                            AlwaysStoppedAnimation<Color>(MyColors.primary),
-                      ),
-                    );
-                  }
-                  // Use currentQuestion for rendering
-                  final questionData = currentQuestion.data;
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 24, vertical: 16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        const SizedBox(height: 32),
-                        // Question Text
-                        BidiText(
-                          text: questionData.title,
-                          textAlign: TextAlign.center,
-                          style: FontSizeHelper.getContentTextStyle(
-                            context,
-                            baseFontSize: 16.0,
-                            fontWeight: FontWeight.bold,
-                            color: isDark
-                                ? MyColors.profileTextPrimaryDark
-                                : MyColors.textMatn1,
-                          ),
-                        ),
-                        const SizedBox(height: 32),
-                        // const SizedBox(height: 32),
-                        // Answer Options
-                        ListView.separated(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          separatorBuilder: (context, index) =>
-                              const SizedBox(height: 16),
-                          itemCount: questionData.answers.length,
-                          itemBuilder: (context, index) {
-                            final answer = questionData.answers[index];
-                            isSelected = selectedAnswerId == answer.id;
-                            if (answerState is QuizAnswerLoaded) {
-                              // Always highlight the correct answer
-                              if (answer.id == answerState.correctAnswerId) {
-                                isCorrectAnswer = true;
-                                isWrongSelected = false;
-                              }
-                              // Highlight the selected answer as wrong if it's incorrect
-                              else if (answer.id ==
-                                      answerState.selectedAnswerId &&
-                                  !answerState.isCorrect) {
-                                isCorrectAnswer = false;
-                                isWrongSelected = true;
-                              } else {
-                                isCorrectAnswer = false;
-                                isWrongSelected = false;
-                              }
-                            } else {
-                              isCorrectAnswer = false;
-                              isWrongSelected = false;
-                            }
-                            return InkWell(
-                              onTap: answerState is QuizAnswerLoading ||
-                                      answerState is QuizAnswerLoaded
-                                  ? null
-                                  : () {
-                                      setState(() {
-                                        selectedAnswerId = answer.id;
-                                      });
-                                    },
-                              child: QuizAnswerItem(
-                                title: answer.title,
-                                id: answer.id,
-                                isSelected: isSelected,
-                                isCorrect: isCorrectAnswer,
-                                isWrongSelected: isWrongSelected,
-                                selectedAnswerId: selectedAnswerId ?? "",
-                                showFeedback: answerState is QuizAnswerLoaded,
-                              ),
-                            );
-                          },
-                        ),
-                        const Spacer(),
-                        // Explanation just above the button
+              child: BlocBuilder<QuizResultBloc, QuizResultState>(
+                builder: (context, resultState) {
+                  return Stack(
+                    children: [
+                      BlocBuilder<QuizAnswerBloc, QuizAnswerState>(
+                        builder: (context, answerState) {
+                          final questionData = currentQuestion.data;
+                          return SingleChildScrollView(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 16,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                const SizedBox(height: 32),
+                                BidiText(
+                                  text: questionData.title,
+                                  textAlign: TextAlign.center,
+                                  style: FontSizeHelper.getContentTextStyle(
+                                    context,
+                                    baseFontSize: 16.0,
+                                    fontWeight: FontWeight.bold,
+                                    color: isDark
+                                        ? MyColors.profileTextPrimaryDark
+                                        : MyColors.textMatn1,
+                                  ),
+                                ),
+                                const SizedBox(height: 32),
+                                ListView.separated(
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  separatorBuilder: (context, index) =>
+                                      const SizedBox(height: 16),
+                                  itemCount: questionData.answers.length,
+                                  itemBuilder: (context, index) {
+                                    final answer = questionData.answers[index];
+                                    final feedbackAnswerId =
+                                        answerState is QuizAnswerLoaded
+                                            ? answerState.selectedAnswerId
+                                            : selectedAnswerId;
+                                    final isAnswerSelected =
+                                        feedbackAnswerId == answer.id;
+                                    var isCorrectAnswer = false;
+                                    var isWrongSelected = false;
+                                    if (answerState is QuizAnswerLoaded) {
+                                      isCorrectAnswer = answer.id ==
+                                          answerState.correctAnswerId;
+                                      isWrongSelected = isAnswerSelected &&
+                                          !answerState.isCorrect;
+                                    }
+                                    return InkWell(
+                                      onTap: answerState is QuizAnswerLoading ||
+                                              answerState is QuizAnswerLoaded
+                                          ? null
+                                          : () {
+                                              setState(() {
+                                                selectedAnswerId = answer.id;
+                                              });
+                                            },
+                                      child: QuizAnswerItem(
+                                        key: ValueKey(answer.id),
+                                        title: answer.title,
+                                        id: answer.id,
+                                        isSelected: isAnswerSelected,
+                                        isCorrect: isCorrectAnswer,
+                                        isWrongSelected: isWrongSelected,
+                                        selectedAnswerId:
+                                            feedbackAnswerId ?? "",
+                                        showFeedback:
+                                            answerState is QuizAnswerLoaded,
+                                      ),
+                                    );
+                                  },
+                                ),
+                                const SizedBox(height: 24),
                         if (answerState is QuizAnswerLoaded &&
                             !answerState.isCorrect &&
                             answerState.explanation != null)
@@ -283,7 +285,6 @@ class _QuizScreenState extends State<QuizScreen> {
                               width: double.infinity,
                               padding: const EdgeInsets.symmetric(
                                   vertical: 16, horizontal: 16),
-                              margin: const EdgeInsets.symmetric(horizontal: 0),
                               decoration: BoxDecoration(
                                 color: isDark
                                     ? MyColors.termsBackgroundDark
@@ -407,7 +408,8 @@ class _QuizScreenState extends State<QuizScreen> {
                               ),
                             ),
                           )
-                        else if (answerState is QuizAnswerLoaded)
+                        else if (answerState is QuizAnswerLoaded &&
+                            !answerState.isLastQuestion)
                           Padding(
                             padding: const EdgeInsets.only(bottom: 24.0),
                             child: Center(
@@ -416,27 +418,17 @@ class _QuizScreenState extends State<QuizScreen> {
                                 height: 54,
                                 child: ElevatedButton(
                                   onPressed: () {
-                                    if (answerState.nextQuestion != null) {
-                                      setState(() {
-                                        currentQuestion =
-                                            answerState.nextQuestion!;
-                                        selectedAnswerId = null;
-                                        isSelected = false;
-                                        isCorrectAnswer = false;
-                                        isWrongSelected = false;
-                                      });
-                                      context
-                                          .read<QuizAnswerBloc>()
-                                          .add(const ResetQuizAnswerEvent());
-                                    } else {
-                                      // Handle end of quiz if needed, though listener handles it
-                                      context.read<QuizResultBloc>().add(
-                                            FetchQuizResultEvent(
-                                              courseId: widget.courseId,
-                                              quizId: widget.quizId,
-                                            ),
-                                          );
-                                    }
+                                    setState(() {
+                                      currentQuestion =
+                                          answerState.nextQuestion!;
+                                      selectedAnswerId = null;
+                                      isSelected = false;
+                                      isCorrectAnswer = false;
+                                      isWrongSelected = false;
+                                    });
+                                    context
+                                        .read<QuizAnswerBloc>()
+                                        .add(const ResetQuizAnswerEvent());
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: const Color(0xFFFF9F29),
@@ -471,9 +463,72 @@ class _QuizScreenState extends State<QuizScreen> {
                                 ),
                               ),
                             ),
+                          )
+                        else if (answerState is QuizAnswerLoaded &&
+                            answerState.isLastQuestion)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 24.0),
+                            child: Center(
+                              child: SizedBox(
+                                width: 176,
+                                height: 54,
+                                child: ElevatedButton(
+                                  onPressed: resultState is QuizResultLoading
+                                      ? null
+                                      : _fetchQuizResult,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFFFF9F29),
+                                    foregroundColor:
+                                        Theme.of(context).colorScheme.onPrimary,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(30),
+                                    ),
+                                    elevation: 0,
+                                    padding: EdgeInsets.zero,
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        "مشاهده نتیجه",
+                                        style:
+                                            MyTextStyle.textMatnBtnFor(context)
+                                                .copyWith(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Icon(Icons.arrow_forward_ios,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onPrimary,
+                                          size: 18),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
                           ),
-                      ],
-                    ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                      if (resultState is QuizResultLoading && _hasRequestedResult)
+                        Positioned.fill(
+                          child: ColoredBox(
+                            color: Colors.black.withValues(alpha: 0.25),
+                            child: const Center(
+                              child: CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  MyColors.primary,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
                   );
                 },
               ),

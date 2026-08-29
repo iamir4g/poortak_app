@@ -12,6 +12,9 @@ class QuizResultBloc extends Bloc<QuizResultEvent, QuizResultState> {
 
   QuizResultBloc(this.repository) : super(QuizResultInitial()) {
     on<FetchQuizResultEvent>(_onFetchQuizResult);
+    on<ResetQuizResultEvent>(
+      (event, emit) => emit(QuizResultInitial()),
+    );
   }
 
   Future<void> _onFetchQuizResult(

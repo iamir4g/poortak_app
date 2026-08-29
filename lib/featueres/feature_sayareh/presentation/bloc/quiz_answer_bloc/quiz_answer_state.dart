@@ -17,6 +17,7 @@ class QuizAnswerLoaded extends QuizAnswerState {
   final question.QuizesQuestion? nextQuestion;
   final String correctAnswerId;
   final String selectedAnswerId;
+  final bool isLastQuestion;
 
   const QuizAnswerLoaded({
     required this.isCorrect,
@@ -24,14 +25,19 @@ class QuizAnswerLoaded extends QuizAnswerState {
     this.nextQuestion,
     required this.correctAnswerId,
     required this.selectedAnswerId,
+    this.isLastQuestion = false,
   });
 
   @override
-  List<Object?> get props =>
-      [isCorrect, explanation, nextQuestion, correctAnswerId, selectedAnswerId];
+  List<Object?> get props => [
+        isCorrect,
+        explanation,
+        nextQuestion,
+        correctAnswerId,
+        selectedAnswerId,
+        isLastQuestion,
+      ];
 }
-
-class QuizAnswerComplete extends QuizAnswerState {}
 
 class QuizAnswerError extends QuizAnswerState {
   final String message;

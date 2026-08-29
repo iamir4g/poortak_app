@@ -39,7 +39,9 @@ class _QuizAnswerItemState extends State<QuizAnswerItem> {
     super.didUpdateWidget(oldWidget);
     if (widget.showFeedback != oldWidget.showFeedback ||
         widget.isSelected != oldWidget.isSelected ||
-        widget.isCorrect != oldWidget.isCorrect) {
+        widget.isCorrect != oldWidget.isCorrect ||
+        widget.isWrongSelected != oldWidget.isWrongSelected ||
+        widget.selectedAnswerId != oldWidget.selectedAnswerId) {
       _updateAppearance();
     }
   }
