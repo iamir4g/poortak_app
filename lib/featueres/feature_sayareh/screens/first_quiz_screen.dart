@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,6 +15,7 @@ import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_result_
 import 'package:poortak/featueres/feature_sayareh/widgets/quiz_result_modal.dart';
 import 'package:poortak/featueres/feature_sayareh/screens/quiz_screen.dart';
 import 'package:poortak/featueres/feature_sayareh/screens/quizzes_screen.dart';
+import 'package:poortak/featueres/feature_sayareh/widgets/quiz_question_layout.dart';
 import 'package:poortak/featueres/feature_sayareh/widgets/item_question.dart';
 import 'package:poortak/common/widgets/poortak_app_bar.dart';
 import 'package:poortak/common/widgets/reusable_modal.dart';
@@ -143,13 +143,114 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
     });
   }
 
+  Widget? _buildFirstQuizBottomButton({
+    required BuildContext context,
+    required QuizAnswerState answerState,
+    required QuizResultState resultState,
+    required bool isDark,
+    required String questionId,
+  }) {
+    if (selectedAnswerId != null && answerState is! QuizAnswerLoaded) {
+      return _buildQuizActionButton(
+        context: context,
+        label: 'بررسی پاسخ',
+        backgroundColor: MyColors.primary,
+        onPressed: answerState is QuizAnswerLoading
+            ? null
+            : () {
+                context.read<QuizAnswerBloc>().add(
+                      SubmitAnswerEvent(
+                        courseId: widget.courseId,
+                        quizId: widget.quizId,
+                        questionId: questionId,
+                        answerId: selectedAnswerId!,
+                      ),
+                    );
+              },
+      );
+    }
+
+    if (answerState is QuizAnswerLoaded && !answerState.isLastQuestion) {
+      return _buildQuizActionButton(
+        context: context,
+        label: 'بعدی',
+        backgroundColor: MyColors.primary,
+        onPressed: () {
+          Navigator.pushReplacementNamed(
+            context,
+            QuizScreen.routeName,
+            arguments: {
+              'quizId': widget.quizId,
+              'courseId': widget.courseId,
+              'title': widget.title,
+              'initialQuestion': answerState.nextQuestion,
+            },
+          );
+        },
+      );
+    }
+
+    if (answerState is QuizAnswerLoaded && answerState.isLastQuestion) {
+      return _buildQuizActionButton(
+        context: context,
+        label: 'مشاهده نتیجه',
+        backgroundColor: MyColors.primary,
+        onPressed: resultState is QuizResultLoading ? null : _fetchQuizResult,
+      );
+    }
+
+    return null;
+  }
+
+  Widget _buildQuizActionButton({
+    required BuildContext context,
+    required String label,
+    required Color backgroundColor,
+    required VoidCallback? onPressed,
+  }) {
+    return SizedBox(
+      width: 176.w,
+      height: 54.h,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: backgroundColor,
+          foregroundColor: Theme.of(context).colorScheme.onPrimary,
+          disabledForegroundColor:
+              Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.5),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30.r),
+          ),
+          elevation: 0,
+          padding: EdgeInsets.zero,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              label,
+              style: MyTextStyle.textMatnBtnFor(context).copyWith(
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            SizedBox(width: 8.w),
+            Icon(
+              Icons.arrow_forward_ios,
+              color: Theme.of(context).colorScheme.onPrimary,
+              size: 18.r,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final pageBackgroundColor =
         isDark ? MyColors.profileBackgroundDark : Colors.white;
-    final primaryTextColor =
-        isDark ? MyColors.darkTextPrimary : MyColors.textMatn1;
 
     return PopScope(
       canPop: _canPop,
@@ -237,410 +338,88 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                         builder: (context, resultState) {
                           return Stack(
                             children: [
-                              Column(
-                                children: [
-                                  Expanded(
-                                    child: Padding(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 24.w,
-                                      ),
-                                      child: Column(
-                                        children: [
-                                          SizedBox(height: 32.h),
-                                          BidiText(
-                                            text: state.question.data.title,
-                                            forceEnglishDigits: true,
-                                            textAlign: TextAlign.center,
-                                            style: MyTextStyle.textHeader16Bold
-                                                .copyWith(
-                                              color: isDark
-                                                  ? MyColors
-                                                      .profileTextPrimaryDark
-                                                  : MyColors.textMatn1,
-                                            ),
-                                          ),
-                                          Expanded(
-                                            child: Center(
-                                              child: SingleChildScrollView(
-                                                padding: EdgeInsets.symmetric(
-                                                  vertical: 32.h,
-                                                ),
-                                                child: QuizAnswerOptionsList(
-                                                  answerCount: state.question
-                                                      .data.answers.length,
-                                                  itemBuilder: (
-                                                    index, {
-                                                    required height,
-                                                    required large,
-                                                  }) {
-                                                    final answer = state
-                                                        .question
-                                                        .data
-                                                        .answers[index];
-                                                    final feedbackAnswerId =
-                                                        answerState
-                                                                is QuizAnswerLoaded
-                                                            ? answerState
-                                                                .selectedAnswerId
-                                                            : selectedAnswerId;
-                                                    final isAnswerSelected =
-                                                        feedbackAnswerId ==
-                                                            answer.id;
-                                                    var isCorrectAnswer = false;
-                                                    var isWrongSelected = false;
-                                                    if (answerState
-                                                        is QuizAnswerLoaded) {
-                                                      isCorrectAnswer =
-                                                          answer.id ==
-                                                              answerState
-                                                                  .correctAnswerId;
-                                                      isWrongSelected =
-                                                          isAnswerSelected &&
-                                                              !answerState
-                                                                  .isCorrect;
-                                                    }
-                                                    return InkWell(
-                                                      onTap: answerState
-                                                                  is QuizAnswerLoading ||
-                                                              answerState
-                                                                  is QuizAnswerLoaded
-                                                          ? null
-                                                          : () {
-                                                              setState(() {
-                                                                selectedAnswerId =
-                                                                    answer.id;
-                                                              });
-                                                            },
-                                                      child: QuizAnswerItem(
-                                                        key: ValueKey(
-                                                            answer.id),
-                                                        title: answer.title,
-                                                        id: answer.id,
-                                                        isSelected:
-                                                            isAnswerSelected,
-                                                        isCorrect:
-                                                            isCorrectAnswer,
-                                                        isWrongSelected:
-                                                            isWrongSelected,
-                                                        selectedAnswerId:
-                                                            feedbackAnswerId ??
-                                                                "",
-                                                        showFeedback:
-                                                            answerState
-                                                                is QuizAnswerLoaded,
-                                                        height: height,
-                                                        large: large,
-                                                      ),
-                                                    );
-                                                  },
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
+                              QuizQuestionLayout(
+                                question: BidiText(
+                                  text: state.question.data.title,
+                                  forceEnglishDigits: true,
+                                  textAlign: TextAlign.center,
+                                  style: MyTextStyle.textHeader16Bold.copyWith(
+                                    color: isDark
+                                        ? MyColors.profileTextPrimaryDark
+                                        : MyColors.textMatn1,
                                   ),
-                                  Padding(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 24.w,
-                                    ),
-                                    child: Column(
-                                      children: [
-                                    if (answerState is QuizAnswerLoaded &&
-                                        !answerState.isCorrect &&
-                                        answerState.explanation != null)
-                                      Padding(
-                                        padding:
-                                            EdgeInsets.only(bottom: 16.0.h),
-                                        child: Container(
-                                          width: double.infinity,
-                                          padding: EdgeInsets.symmetric(
-                                              vertical: 16.h, horizontal: 16.w),
-                                          margin: const EdgeInsets.symmetric(
-                                              horizontal: 0),
-                                          decoration: BoxDecoration(
-                                            color: isDark
-                                                ? MyColors.termsBackgroundDark
-                                                : MyColors.cardBackground1,
-                                            borderRadius:
-                                                BorderRadius.circular(16.r),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Colors.black
-                                                    .withValues(alpha: 0.03),
-                                                blurRadius: 4,
-                                                offset: Offset(0, 2),
-                                              ),
-                                            ],
-                                          ),
-                                          child: BidiText(
-                                            text: answerState.explanation!,
-                                            style: MyTextStyle.textMatn12W500
-                                                .copyWith(
-                                              color: isDark
-                                                  ? MyColors
-                                                      .profileTextPrimaryDark
-                                                  : MyColors.textMatn1,
-                                              fontSize: 13.sp,
-                                            ),
-                                            textAlign: TextAlign.center,
-                                          ),
-                                        ),
-                                      )
-                                    else if (answerState is QuizAnswerLoaded &&
-                                        answerState.isCorrect)
-                                      (Padding(
-                                          padding:
-                                              EdgeInsets.only(bottom: 16.0.h),
-                                          child: Column(
-                                            children: [
-                                              Container(
-                                                width: 54.w,
-                                                height: 54.h,
-                                                decoration: BoxDecoration(
-                                                  color: isDark
-                                                      ? MyColors
-                                                          .quizAnswerCorrectBackgroundDark
-                                                      : MyColors
-                                                          .quizAnswerCorrectBackgroundLight,
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          50.r),
-                                                ),
-                                                child: Icon(
-                                                  Icons.check_circle,
-                                                  color: isDark
-                                                      ? MyColors
-                                                          .quizAnswerCorrectTextDark
-                                                      : MyColors
-                                                          .quizAnswerCorrectBorderLight,
-                                                  size: 40.r,
-                                                ),
-                                              ),
-                                              SizedBox(height: 12.h),
-                                              Text(
-                                                'آفرین درست گفتی!🥳',
-                                                style: TextStyle(
-                                                  fontFamily: 'IRANSans',
-                                                  fontWeight: FontWeight.w300,
-                                                  fontSize: 12.sp,
-                                                  color: isDark
-                                                      ? MyColors
-                                                          .quizAnswerCorrectTextDark
-                                                      : MyColors.text2,
-                                                ),
-                                                textAlign: TextAlign.center,
-                                              ),
-                                            ],
-                                          ))),
-                                    // Button logic
-                                    if (selectedAnswerId != null &&
-                                        answerState is! QuizAnswerLoaded)
-                                      Padding(
-                                        padding:
-                                            EdgeInsets.only(bottom: 24.0.h),
-                                        child: Center(
-                                          child: SizedBox(
-                                            width: 176.w,
-                                            height: 54.h,
-                                            child: ElevatedButton(
-                                              onPressed: answerState
-                                                      is QuizAnswerLoading
-                                                  ? null
-                                                  : () {
-                                                      context
-                                                          .read<
-                                                              QuizAnswerBloc>()
-                                                          .add(
-                                                            SubmitAnswerEvent(
-                                                              courseId: widget
-                                                                  .courseId,
-                                                              quizId:
-                                                                  widget.quizId,
-                                                              questionId: state
-                                                                  .question
-                                                                  .data
-                                                                  .id,
-                                                              answerId:
-                                                                  selectedAnswerId!,
-                                                            ),
-                                                          );
-                                                    },
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor:
-                                                    MyColors.primary,
-                                                foregroundColor:
-                                                    Theme.of(context)
-                                                        .colorScheme
-                                                        .onPrimary,
-                                                disabledForegroundColor:
-                                                    Theme.of(context)
-                                                        .colorScheme
-                                                        .onPrimary
-                                                        .withValues(alpha: 0.5),
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          30.r),
-                                                ),
-                                                elevation: 0,
-                                                padding: EdgeInsets.zero,
-                                              ),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  Text(
-                                                    "بررسی پاسخ",
-                                                    style: MyTextStyle
-                                                            .textMatnBtnFor(
-                                                                context)
-                                                        .copyWith(
-                                                      fontSize: 14.sp,
-                                                      fontWeight:
-                                                          FontWeight.w700,
-                                                    ),
-                                                  ),
-                                                  SizedBox(width: 8.w),
-                                                  Icon(Icons.arrow_forward_ios,
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .onPrimary,
-                                                      size: 18.r),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
+                                ),
+                                options: QuizAnswerOptionsList(
+                                  answerCount:
+                                      state.question.data.answers.length,
+                                  itemBuilder: (
+                                    index, {
+                                    required height,
+                                    required large,
+                                  }) {
+                                    final answer =
+                                        state.question.data.answers[index];
+                                    final feedbackAnswerId =
+                                        answerState is QuizAnswerLoaded
+                                            ? answerState.selectedAnswerId
+                                            : selectedAnswerId;
+                                    final isAnswerSelected =
+                                        feedbackAnswerId == answer.id;
+                                    var isCorrectAnswer = false;
+                                    var isWrongSelected = false;
+                                    if (answerState is QuizAnswerLoaded) {
+                                      isCorrectAnswer = answer.id ==
+                                          answerState.correctAnswerId;
+                                      isWrongSelected = isAnswerSelected &&
+                                          !answerState.isCorrect;
+                                    }
+                                    return InkWell(
+                                      onTap: answerState is QuizAnswerLoading ||
+                                              answerState is QuizAnswerLoaded
+                                          ? null
+                                          : () {
+                                              setState(() {
+                                                selectedAnswerId = answer.id;
+                                              });
+                                            },
+                                      child: QuizAnswerItem(
+                                        key: ValueKey(answer.id),
+                                        title: answer.title,
+                                        id: answer.id,
+                                        isSelected: isAnswerSelected,
+                                        isCorrect: isCorrectAnswer,
+                                        isWrongSelected: isWrongSelected,
+                                        selectedAnswerId:
+                                            feedbackAnswerId ?? "",
+                                        showFeedback:
+                                            answerState is QuizAnswerLoaded,
+                                        height: height,
+                                        large: large,
                                       ),
-                                    if (answerState is QuizAnswerLoaded &&
-                                        !answerState.isLastQuestion)
-                                      Padding(
-                                        padding:
-                                            EdgeInsets.only(bottom: 24.0.h),
-                                        child: Center(
-                                          child: SizedBox(
-                                            width: 176.w,
-                                            height: 54.h,
-                                            child: ElevatedButton(
-                                              onPressed: () {
-                                                Navigator.pushReplacementNamed(
-                                                  context,
-                                                  QuizScreen.routeName,
-                                                  arguments: {
-                                                    'quizId': widget.quizId,
-                                                    'courseId': widget.courseId,
-                                                    'title': widget.title,
-                                                    'initialQuestion':
-                                                        answerState
-                                                            .nextQuestion,
-                                                  },
-                                                );
-                                              },
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor:
-                                                    MyColors.primary,
-                                                foregroundColor:
-                                                    Theme.of(context)
-                                                        .colorScheme
-                                                        .onPrimary,
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          30.r),
-                                                ),
-                                                elevation: 0,
-                                                padding: EdgeInsets.zero,
-                                              ),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  Text(
-                                                    "بعدی",
-                                                    style: MyTextStyle
-                                                            .textMatnBtnFor(
-                                                                context)
-                                                        .copyWith(
-                                                      fontSize: 14.sp,
-                                                      fontWeight:
-                                                          FontWeight.w700,
-                                                    ),
-                                                  ),
-                                                  SizedBox(width: 8.w),
-                                                  Icon(Icons.arrow_forward_ios,
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .onPrimary,
-                                                      size: 18.r),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    if (answerState is QuizAnswerLoaded &&
-                                        answerState.isLastQuestion)
-                                      Padding(
-                                        padding:
-                                            EdgeInsets.only(bottom: 24.0.h),
-                                        child: Center(
-                                          child: SizedBox(
-                                            width: 176.w,
-                                            height: 54.h,
-                                            child: ElevatedButton(
-                                              onPressed: resultState
-                                                      is QuizResultLoading
-                                                  ? null
-                                                  : _fetchQuizResult,
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor:
-                                                    const Color(0xFFFF9F29),
-                                                foregroundColor:
-                                                    Theme.of(context)
-                                                        .colorScheme
-                                                        .onPrimary,
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          30.r),
-                                                ),
-                                                elevation: 0,
-                                                padding: EdgeInsets.zero,
-                                              ),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  Text(
-                                                    "مشاهده نتیجه",
-                                                    style: MyTextStyle
-                                                            .textMatnBtnFor(
-                                                                context)
-                                                        .copyWith(
-                                                      fontSize: 14.sp,
-                                                      fontWeight:
-                                                          FontWeight.w700,
-                                                    ),
-                                                  ),
-                                                  SizedBox(width: 8.w),
-                                                  Icon(Icons.arrow_forward_ios,
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .onPrimary,
-                                                      size: 18.r),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                        SizedBox(height: 24.h),
-                                      ],
-                                    ),
-                                  ),
-                                ],
+                                    );
+                                  },
+                                ),
+                                feedback: answerState is QuizAnswerLoaded
+                                    ? (!answerState.isCorrect &&
+                                            answerState.explanation != null
+                                        ? buildQuizWrongFeedback(
+                                            isDark: isDark,
+                                            explanation:
+                                                answerState.explanation!,
+                                          )
+                                        : answerState.isCorrect
+                                            ? buildQuizCorrectFeedback(
+                                                isDark: isDark,
+                                              )
+                                            : null)
+                                    : null,
+                                bottomButton: _buildFirstQuizBottomButton(
+                                  context: context,
+                                  answerState: answerState,
+                                  resultState: resultState,
+                                  isDark: isDark,
+                                  questionId: state.question.data.id,
+                                ),
                               ),
                               if (resultState is QuizResultLoading &&
                                   _hasRequestedResult)
