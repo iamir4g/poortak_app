@@ -73,9 +73,15 @@ class ConversationMessageBubble extends StatelessWidget {
   }
 
   double _sentenceOpacity(int index) {
-    if (!isPlaybackActive) return 1.0;
-    if (isCurrentPlaying && index == currentSentenceIndex) return 1.0;
+    if (!isPlaybackActive || !isCurrentPlaying) return 1.0;
+    if (index == currentSentenceIndex) return 1.0;
     return 0.18;
+  }
+
+  /// کاهش opacity برای پیام‌ها و آواتارهای غیرفعال هنگام پخش جمله
+  double get _inactiveMessageOpacity {
+    if (!isPlaybackActive || isCurrentPlaying) return 1.0;
+    return 0.35;
   }
 
   Widget _buildMessageText({
@@ -255,7 +261,7 @@ class ConversationMessageBubble extends StatelessWidget {
             builder: (context, constraints) {
               final bubbleMaxWidth = _bubbleMaxWidth(constraints.maxWidth);
 
-              return Row(
+              final messageRow = Row(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 textDirection: TextDirection.rtl,
@@ -296,6 +302,11 @@ class ConversationMessageBubble extends StatelessWidget {
                           backgroundColor: sideCircleColor,
                         ),
                       ],
+              );
+
+              return Opacity(
+                opacity: _inactiveMessageOpacity,
+                child: messageRow,
               );
             },
           ),
