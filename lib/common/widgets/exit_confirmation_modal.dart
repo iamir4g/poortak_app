@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
+import 'package:poortak/config/myTextStyle.dart';
 
 class ExitConfirmationModal extends StatelessWidget {
   final VoidCallback onExit;
@@ -14,123 +15,113 @@ class ExitConfirmationModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Dialog(
       backgroundColor: Colors.transparent,
       child: Container(
-        width: 350.w,
-        height: 311.h,
+        width: Dimens.nw(350),
+        height: Dimens.nh(311),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20.r),
+          color: isDark ? MyColors.profileHeaderDark : Colors.white,
+          borderRadius: BorderRadius.circular(Dimens.nr(20)),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Exit icon
             Container(
-              width: 80.w,
-              height: 80.h,
+              width: Dimens.nw(80),
+              height: Dimens.nh(80),
               decoration: BoxDecoration(
-                color: MyColors.error.withValues(alpha: 0.1),
+                color: MyColors.primaryTint3,
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.exit_to_app,
-                size: 40.w,
-                color: MyColors.error,
+                size: Dimens.nsp(40),
+                color: MyColors.primary,
               ),
             ),
-
-            SizedBox(height: 20.h),
-
-            // Title
+            SizedBox(height: Dimens.nh(20)),
             Container(
-              width: 250.w,
-              margin: EdgeInsets.only(bottom: 10.h),
+              width: Dimens.nw(250),
+              margin: EdgeInsets.only(bottom: Dimens.nh(10)),
               child: Text(
                 'خروج از برنامه',
-                style: TextStyle(
-                  fontFamily: 'IRANSans',
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16.sp,
-                  color: MyColors.textMatn1,
+                style: MyTextStyle.textMatn16Bold.copyWith(
+                  color: isDark
+                      ? MyColors.profileTextPrimaryDark
+                      : MyColors.textMatn1,
                 ),
                 textAlign: TextAlign.center,
               ),
             ),
-
-            // Message
             Container(
-              width: 250.w,
-              margin: EdgeInsets.only(bottom: 30.h),
+              width: Dimens.nw(250),
+              margin: EdgeInsets.only(bottom: Dimens.nh(30)),
               child: Text(
                 'آیا واقعاً می‌خواهید از برنامه خارج شوید؟',
-                style: TextStyle(
-                  fontFamily: 'IRANSans',
-                  fontWeight: FontWeight.w500,
-                  fontSize: 14.sp,
-                  color: const Color(0xFF3D495C),
+                style: MyTextStyle.modalMessage14Medium.copyWith(
                   height: 1.4,
+                  color: isDark ? MyColors.loginTextSecondaryDark : MyColors.text3,
                 ),
                 textAlign: TextAlign.center,
               ),
             ),
-
-            // Two buttons layout
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                // Exit button (primary)
                 SizedBox(
-                  width: 140.w,
-                  height: 50.h,
+                  width: Dimens.nw(140),
+                  height: Dimens.nh(50),
                   child: ElevatedButton(
                     onPressed: () {
                       Navigator.of(context).pop();
                       onExit();
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: MyColors.error,
+                      backgroundColor: MyColors.primary,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20.r),
+                        borderRadius: BorderRadius.circular(Dimens.nr(20)),
                       ),
                       elevation: 0,
                     ),
                     child: Text(
                       'خروج',
-                      style: TextStyle(
-                        fontFamily: 'IRANSans',
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16.sp,
-                        color: Colors.white,
+                      style: MyTextStyle.textMatnBtn.copyWith(
+                        fontSize: Dimens.nsp(16),
+                        color: MyColors.primaryButtonTextColor(isDark),
                       ),
                     ),
                   ),
                 ),
-
-                // Stay button (secondary)
                 SizedBox(
-                  width: 140.w,
-                  height: 50.h,
+                  width: Dimens.nw(140),
+                  height: Dimens.nh(50),
                   child: OutlinedButton(
                     onPressed: () {
                       Navigator.of(context).pop();
                       onStay();
                     },
                     style: OutlinedButton.styleFrom(
-                      side:
-                          const BorderSide(color: Color(0xFF3D495C), width: 1),
+                      side: BorderSide(
+                        color: isDark
+                            ? MyColors.profileTextPrimaryDark
+                            : MyColors.text2,
+                        width: 1,
+                      ),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20.r),
+                        borderRadius: BorderRadius.circular(Dimens.nr(20)),
                       ),
                     ),
                     child: Text(
                       'بمانم',
-                      style: TextStyle(
-                        fontFamily: 'IRANSans',
+                      style: MyTextStyle.textMatnBtn.copyWith(
                         fontWeight: FontWeight.w500,
-                        fontSize: 16.sp,
-                        color: const Color(0xFF3D495C),
+                        fontSize: Dimens.nsp(16),
+                        color: isDark
+                            ? MyColors.profileTextPrimaryDark
+                            : MyColors.text2,
                       ),
                     ),
                   ),
