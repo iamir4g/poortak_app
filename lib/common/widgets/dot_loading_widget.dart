@@ -65,7 +65,7 @@ class _DotLoadingWidgetState extends State<DotLoadingWidget>
   Widget build(BuildContext context) {
     final dotSize = widget.size ?? 6;
     final spacing = dotSize * 0.55;
-    final color = widget.color ?? MyColors.primary;
+    final color = widget.color ?? MyColors.secondary;
 
     return Directionality(
       textDirection: TextDirection.ltr,
