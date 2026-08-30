@@ -115,7 +115,7 @@ class _PdfReaderScreenState extends State<PdfReaderScreen> {
                   body: _buildScreenBody(
                     context,
                     child: Center(
-                      child: DotLoadingWidget(size: Dimens.nr(100)),
+                      child: DotLoadingWidget(),
                     ),
                   ),
                 );
@@ -132,7 +132,7 @@ class _PdfReaderScreenState extends State<PdfReaderScreen> {
                     body: _buildScreenBody(
                       context,
                       child: Center(
-                        child: DotLoadingWidget(size: Dimens.nr(100)),
+                        child: DotLoadingWidget(),
                       ),
                     ),
                   );

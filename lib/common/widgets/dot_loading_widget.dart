@@ -3,7 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:poortak/config/myColors.dart';
 
-/// Leap-frog loader adapted from https://uiverse.io/dovatgabriel/pretty-crab-95
+/// Compact three-dot loading indicator.
 class DotLoadingWidget extends StatefulWidget {
   final double? size;
   final Color? color;
@@ -13,7 +13,7 @@ class DotLoadingWidget extends StatefulWidget {
     super.key,
     this.size,
     this.color,
-    this.speed = const Duration(milliseconds: 2000),
+    this.speed = const Duration(milliseconds: 900),
   });
 
   @override
@@ -23,17 +23,15 @@ class DotLoadingWidget extends StatefulWidget {
 class _DotLoadingWidgetState extends State<DotLoadingWidget>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  late Animation<double> _animation;
 
-  static const List<double> _baseOffsetFactors = [0.0, 0.4, 0.8];
-  static const List<double> _phaseOffsets = [0.0, 2 / 3, 1 / 3];
+  static const int _dotCount = 3;
+  static const List<double> _phaseOffsets = [0.0, 0.33, 0.66];
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: widget.speed);
-    _animation = CurvedAnimation(parent: _controller, curve: Curves.ease);
-    _controller.repeat();
+    _controller = AnimationController(vsync: this, duration: widget.speed)
+      ..repeat();
   }
 
   @override
@@ -53,100 +51,56 @@ class _DotLoadingWidgetState extends State<DotLoadingWidget>
     super.dispose();
   }
 
-  ({double translateX, double rotation}) _leapFrogTransform(
-    double progress,
-    double uibSize,
-  ) {
-    if (progress >= 0.99999) {
-      return (translateX: 0, rotation: 0);
-    }
-
-    const firstSegment = 1 / 3;
-    const secondSegment = 2 / 3;
-
-    if (progress < firstSegment) {
-      final local = progress / firstSegment;
-      return (translateX: 0, rotation: local * math.pi);
-    }
-
-    if (progress < secondSegment) {
-      final local = (progress - firstSegment) / firstSegment;
-      return (translateX: -0.4 * uibSize * local, rotation: math.pi);
-    }
-
-    final local = (progress - secondSegment) / (0.99999 - secondSegment);
-    return (
-      translateX: -0.4 * uibSize - (0.4 * uibSize * local),
-      rotation: math.pi,
-    );
+  double _dotScale(double progress) {
+    final wave = math.sin(progress * math.pi * 2);
+    return 0.55 + (wave + 1) * 0.225;
   }
 
-  Matrix4 _buildDotTransform({
-    required double baseOffset,
-    required double translateX,
-    required double rotation,
-    required double uibSize,
-  }) {
-    final originX = uibSize / 2;
-    final originY = uibSize / 2;
-
-    return Matrix4.identity()
-      ..translate(baseOffset + translateX, 0)
-      ..translate(originX, originY)
-      ..rotateZ(rotation)
-      ..translate(-originX, -originY);
+  double _dotOpacity(double progress) {
+    final wave = math.sin(progress * math.pi * 2);
+    return 0.35 + (wave + 1) * 0.325;
   }
 
   @override
   Widget build(BuildContext context) {
-    final uibSize = widget.size ?? 40;
-    final dotSize = uibSize * 0.22;
+    final dotSize = widget.size ?? 6;
+    final spacing = dotSize * 0.55;
     final color = widget.color ?? MyColors.primary;
 
     return Directionality(
       textDirection: TextDirection.ltr,
       child: Center(
-        child: SizedBox(
-          width: uibSize,
-          height: uibSize,
-          child: AnimatedBuilder(
-            animation: _animation,
-            builder: (context, child) {
-              return Stack(
-                clipBehavior: Clip.none,
-                children: List.generate(3, (index) {
-                  final progress =
-                      (_animation.value + _phaseOffsets[index]) % 1.0;
-                  final motion = _leapFrogTransform(progress, uibSize);
-                  final baseOffset = _baseOffsetFactors[index] * uibSize;
+        child: AnimatedBuilder(
+          animation: _controller,
+          builder: (context, child) {
+            return Row(
+              mainAxisSize: MainAxisSize.min,
+              children: List.generate(_dotCount, (index) {
+                final progress =
+                    (_controller.value + _phaseOffsets[index]) % 1.0;
+                final scale = _dotScale(progress);
+                final opacity = _dotOpacity(progress);
 
-                  return Transform(
-                    transform: _buildDotTransform(
-                      baseOffset: baseOffset,
-                      translateX: motion.translateX,
-                      rotation: motion.rotation,
-                      uibSize: uibSize,
-                    ),
-                    child: SizedBox(
-                      width: uibSize,
-                      height: uibSize,
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Container(
-                          width: dotSize,
-                          height: dotSize,
-                          decoration: BoxDecoration(
-                            color: color,
-                            shape: BoxShape.circle,
-                          ),
+                return Padding(
+                  padding: EdgeInsets.symmetric(horizontal: spacing / 2),
+                  child: Opacity(
+                    opacity: opacity,
+                    child: Transform.scale(
+                      scale: scale,
+                      child: Container(
+                        width: dotSize,
+                        height: dotSize,
+                        decoration: BoxDecoration(
+                          color: color,
+                          shape: BoxShape.circle,
                         ),
                       ),
                     ),
-                  );
-                }),
-              );
-            },
-          ),
+                  ),
+                );
+              }),
+            );
+          },
         ),
       ),
     );

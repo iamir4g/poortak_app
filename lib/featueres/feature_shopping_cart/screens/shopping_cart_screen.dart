@@ -556,7 +556,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                 ],
               ),
       ),
-      child: Center(child: DotLoadingWidget(size: Dimens.nr(100))),
+      child: Center(child: DotLoadingWidget()),
     );
   }
 

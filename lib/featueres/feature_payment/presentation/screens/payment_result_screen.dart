@@ -187,7 +187,7 @@ class _PaymentResultScreenState extends State<PaymentResultScreen> {
                 if (_isLoadingPayment)
                   Padding(
                     padding: EdgeInsets.symmetric(vertical: 24.h),
-                    child: DotLoadingWidget(size: 48.r),
+                    child: DotLoadingWidget(size: 8.r),
                   )
                 else
                   Container(

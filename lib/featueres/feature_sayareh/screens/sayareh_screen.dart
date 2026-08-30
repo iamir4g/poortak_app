@@ -110,7 +110,7 @@ class _SayarehScreenState extends State<SayarehScreen> {
                           ),
                   ),
                   child: AdaptiveSafeArea(
-                      child: Center(child: DotLoadingWidget(size: 100.r))),
+                      child: Center(child: DotLoadingWidget(size: 8.r))),
                 );
               }
 

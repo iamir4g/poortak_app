@@ -96,7 +96,7 @@ class _BookDetailScreenState extends State<BookDetailScreen>
               return BlocBuilder<SingleBookCubit, SingleBookState>(
                 builder: (context, state) {
                   if (state.singleBookDataStatus is SingleBookDataLoading) {
-                    return Center(child: DotLoadingWidget(size: 50.r));
+                    return const Center(child: DotLoadingWidget());
                   }
 
                   if (state.singleBookDataStatus is SingleBookDataCompleted) {
