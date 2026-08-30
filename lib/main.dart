@@ -98,7 +98,6 @@ void _loadInitialShoppingCart() {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // runApp(const MyApp());
 
   await initLocator();
 

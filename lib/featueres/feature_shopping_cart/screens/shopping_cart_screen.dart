@@ -378,8 +378,12 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
   }
 
   Widget _buildPointsHeader() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final isLoggedIn = locator<PrefsOperator>().isLoggedIn();
+    if (!isLoggedIn) {
+      return const SizedBox.shrink();
+    }
+
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
       padding: EdgeInsets.symmetric(
@@ -396,26 +400,13 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (isLoggedIn) ...[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                SizedBox(
-                  width: Dimens.nw(90),
-                  height: Dimens.nh(90),
-                  child: Lottie.asset(
-                    'assets/images/cart/star.json',
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                Expanded(
-                  child: Wrap(
-                    alignment: WrapAlignment.start,
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    spacing: Dimens.nw(8),
-                    runSpacing: Dimens.nh(4),
-                    children: [
-                      Text(
+          Row(
+            children: [
+              Expanded(
+                child: Row(
+                  children: [
+                    Flexible(
+                      child: Text(
                         'مجموع امتیاز های شما : ',
                         style: TextStyle(
                           fontSize: Dimens.nsp(16),
@@ -424,51 +415,61 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                               ? MyColors.darkTextPrimary
                               : const Color(0xFF29303D),
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      BlocBuilder<UserPointsTotalBloc, UserPointsTotalState>(
-                        builder: (context, state) {
-                          final pointsText = switch (state) {
-                            UserPointsTotalSuccess(:final data) =>
-                              data.remainingDisplay,
-                            UserPointsTotalLoading() ||
-                            UserPointsTotalInitial() =>
-                              '...',
-                            UserPointsTotalError() => '—',
-                            UserPointsTotalState() => '...',
-                          };
+                    ),
+                    BlocBuilder<UserPointsTotalBloc, UserPointsTotalState>(
+                      builder: (context, state) {
+                        final pointsText = switch (state) {
+                          UserPointsTotalSuccess(:final data) =>
+                            data.remainingDisplay,
+                          UserPointsTotalLoading() ||
+                          UserPointsTotalInitial() =>
+                            '...',
+                          UserPointsTotalError() => '—',
+                          UserPointsTotalState() => '...',
+                        };
 
-                          return Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: Dimens.nw(12),
-                              vertical: Dimens.nh(6),
-                            ),
-                            decoration: BoxDecoration(
+                        return Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: Dimens.nw(12),
+                            vertical: Dimens.nh(6),
+                          ),
+                          decoration: BoxDecoration(
+                            color: isDark
+                                ? MyColors.primary.withValues(alpha: 0.18)
+                                : const Color(0xFFFFE8CC),
+                            borderRadius:
+                                BorderRadius.circular(Dimens.nr(10)),
+                          ),
+                          child: Text(
+                            pointsText,
+                            style: TextStyle(
+                              fontSize: Dimens.nsp(16),
+                              fontWeight: FontWeight.w500,
                               color: isDark
-                                  ? MyColors.primary.withValues(alpha: 0.18)
-                                  : const Color(0xFFFFE8CC),
-                              borderRadius:
-                                  BorderRadius.circular(Dimens.nr(10)),
+                                  ? MyColors.darkTextPrimary
+                                  : const Color(0xFF29303D),
                             ),
-                            child: Text(
-                              pointsText,
-                              style: TextStyle(
-                                fontSize: Dimens.nsp(16),
-                                fontWeight: FontWeight.w500,
-                                color: isDark
-                                    ? MyColors.darkTextPrimary
-                                    : const Color(0xFF29303D),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            SizedBox(height: Dimens.nh(12)),
-          ],
+              ),
+              SizedBox(
+                width: Dimens.nw(56),
+                height: Dimens.nh(56),
+                child: Lottie.asset(
+                  'assets/images/cart/star.json',
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: Dimens.nh(12)),
           Row(
             children: [
               GestureDetector(
