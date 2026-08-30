@@ -1,7 +1,54 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/common/utils/bidi_text_helper.dart';
+import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
+import 'package:poortak/config/myTextStyle.dart';
+
+class QuizAnswerOptionsList extends StatelessWidget {
+  final int answerCount;
+  final Widget Function(int index, {required double height, required bool large})
+      itemBuilder;
+
+  const QuizAnswerOptionsList({
+    super.key,
+    required this.answerCount,
+    required this.itemBuilder,
+  });
+
+  bool get _isLargeLayout => answerCount <= 2;
+
+  double _optionHeight() => _isLargeLayout ? Dimens.nh(88) : Dimens.nh(68);
+
+  double _maxWidth(BuildContext context) {
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    if (_isLargeLayout) {
+      return (screenWidth * 0.88).clamp(Dimens.nw(280), Dimens.nw(360));
+    }
+    return screenWidth - Dimens.large * 2;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final optionHeight = _optionHeight();
+    final large = _isLargeLayout;
+
+    return Center(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: _maxWidth(context)),
+        child: ListView.separated(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: answerCount,
+          separatorBuilder: (_, __) =>
+              SizedBox(height: large ? Dimens.nh(20) : Dimens.medium),
+          itemBuilder: (context, index) =>
+              itemBuilder(index, height: optionHeight, large: large),
+        ),
+      ),
+    );
+  }
+}
 
 class QuizAnswerItem extends StatefulWidget {
   final String title;
@@ -11,6 +58,8 @@ class QuizAnswerItem extends StatefulWidget {
   final bool showFeedback;
   final bool isWrongSelected;
   final String selectedAnswerId;
+  final double? height;
+  final bool large;
 
   const QuizAnswerItem({
     super.key,
@@ -21,6 +70,8 @@ class QuizAnswerItem extends StatefulWidget {
     this.showFeedback = false,
     this.isWrongSelected = false,
     this.selectedAnswerId = "",
+    this.height,
+    this.large = false,
   });
 
   @override
@@ -86,23 +137,22 @@ class _QuizAnswerItemState extends State<QuizAnswerItem> {
     }
     return Container(
       width: double.infinity,
-      height: 68.h,
+      height: widget.height ?? Dimens.nh(68),
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(22.r),
+        borderRadius: BorderRadius.circular(Dimens.nr(22)),
         border: Border.all(
           color: borderColor,
-          width: 2.w,
+          width: 2,
         ),
       ),
       child: Center(
         child: BidiText(
           text: widget.title,
           forceEnglishDigits: true,
-          style: TextStyle(
-            fontFamily: 'IRANSans',
+          style: MyTextStyle.textMatn14Bold.copyWith(
+            fontSize: widget.large ? Dimens.nsp(16) : Dimens.nsp(14),
             fontWeight: FontWeight.w500,
-            fontSize: 14.sp,
             color: textColor,
           ),
           textAlign: TextAlign.center,

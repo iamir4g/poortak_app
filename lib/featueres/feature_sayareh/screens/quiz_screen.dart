@@ -202,81 +202,108 @@ class _QuizScreenState extends State<QuizScreen> {
               },
               child: BlocBuilder<QuizResultBloc, QuizResultState>(
                 builder: (context, resultState) {
-                  return Stack(
+                  return BlocBuilder<QuizAnswerBloc, QuizAnswerState>(
+                    builder: (context, answerState) {
+                      final questionData = currentQuestion.data;
+                      return Stack(
                     children: [
-                      BlocBuilder<QuizAnswerBloc, QuizAnswerState>(
-                        builder: (context, answerState) {
-                          final questionData = currentQuestion.data;
-                          return SingleChildScrollView(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 24,
-                              vertical: 16,
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                const SizedBox(height: 32),
-                                BidiText(
-                                  text: questionData.title,
-                                  forceEnglishDigits: true,
-                                  textAlign: TextAlign.center,
-                                  style: FontSizeHelper.getContentTextStyle(
-                                    context,
-                                    baseFontSize: 16.0,
-                                    fontWeight: FontWeight.bold,
-                                    color: isDark
-                                        ? MyColors.profileTextPrimaryDark
-                                        : MyColors.textMatn1,
+                      Column(
+                        children: [
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                              ),
+                              child: Column(
+                                children: [
+                                  const SizedBox(height: 32),
+                                  BidiText(
+                                    text: questionData.title,
+                                    forceEnglishDigits: true,
+                                    textAlign: TextAlign.center,
+                                    style: FontSizeHelper.getContentTextStyle(
+                                      context,
+                                      baseFontSize: 16.0,
+                                      fontWeight: FontWeight.bold,
+                                      color: isDark
+                                          ? MyColors.profileTextPrimaryDark
+                                          : MyColors.textMatn1,
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(height: 32),
-                                ListView.separated(
-                                  shrinkWrap: true,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  separatorBuilder: (context, index) =>
-                                      const SizedBox(height: 16),
-                                  itemCount: questionData.answers.length,
-                                  itemBuilder: (context, index) {
-                                    final answer = questionData.answers[index];
-                                    final feedbackAnswerId =
-                                        answerState is QuizAnswerLoaded
-                                            ? answerState.selectedAnswerId
-                                            : selectedAnswerId;
-                                    final isAnswerSelected =
-                                        feedbackAnswerId == answer.id;
-                                    var isCorrectAnswer = false;
-                                    var isWrongSelected = false;
-                                    if (answerState is QuizAnswerLoaded) {
-                                      isCorrectAnswer = answer.id ==
-                                          answerState.correctAnswerId;
-                                      isWrongSelected = isAnswerSelected &&
-                                          !answerState.isCorrect;
-                                    }
-                                    return InkWell(
-                                      onTap: answerState is QuizAnswerLoading ||
-                                              answerState is QuizAnswerLoaded
-                                          ? null
-                                          : () {
-                                              setState(() {
-                                                selectedAnswerId = answer.id;
-                                              });
-                                            },
-                                      child: QuizAnswerItem(
-                                        key: ValueKey(answer.id),
-                                        title: answer.title,
-                                        id: answer.id,
-                                        isSelected: isAnswerSelected,
-                                        isCorrect: isCorrectAnswer,
-                                        isWrongSelected: isWrongSelected,
-                                        selectedAnswerId:
-                                            feedbackAnswerId ?? "",
-                                        showFeedback:
-                                            answerState is QuizAnswerLoaded,
+                                  Expanded(
+                                    child: Center(
+                                      child: SingleChildScrollView(
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 32,
+                                        ),
+                                        child: QuizAnswerOptionsList(
+                                          answerCount:
+                                              questionData.answers.length,
+                                          itemBuilder: (
+                                            index, {
+                                            required height,
+                                            required large,
+                                          }) {
+                                            final answer =
+                                                questionData.answers[index];
+                                            final feedbackAnswerId =
+                                                answerState is QuizAnswerLoaded
+                                                    ? answerState
+                                                        .selectedAnswerId
+                                                    : selectedAnswerId;
+                                            final isAnswerSelected =
+                                                feedbackAnswerId == answer.id;
+                                            var isCorrectAnswer = false;
+                                            var isWrongSelected = false;
+                                            if (answerState
+                                                is QuizAnswerLoaded) {
+                                              isCorrectAnswer = answer.id ==
+                                                  answerState.correctAnswerId;
+                                              isWrongSelected =
+                                                  isAnswerSelected &&
+                                                      !answerState.isCorrect;
+                                            }
+                                            return InkWell(
+                                              onTap: answerState
+                                                          is QuizAnswerLoading ||
+                                                      answerState
+                                                          is QuizAnswerLoaded
+                                                  ? null
+                                                  : () {
+                                                      setState(() {
+                                                        selectedAnswerId =
+                                                            answer.id;
+                                                      });
+                                                    },
+                                              child: QuizAnswerItem(
+                                                key: ValueKey(answer.id),
+                                                title: answer.title,
+                                                id: answer.id,
+                                                isSelected: isAnswerSelected,
+                                                isCorrect: isCorrectAnswer,
+                                                isWrongSelected:
+                                                    isWrongSelected,
+                                                selectedAnswerId:
+                                                    feedbackAnswerId ?? "",
+                                                showFeedback: answerState
+                                                    is QuizAnswerLoaded,
+                                                height: height,
+                                                large: large,
+                                              ),
+                                            );
+                                          },
+                                        ),
                                       ),
-                                    );
-                                  },
-                                ),
-                                const SizedBox(height: 24),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 24),
+                            child: Column(
+                              children: [
                                 if (answerState is QuizAnswerLoaded &&
                                     !answerState.isCorrect &&
                                     answerState.explanation != null)
@@ -543,10 +570,11 @@ class _QuizScreenState extends State<QuizScreen> {
                                       ),
                                     ),
                                   ),
+                                const SizedBox(height: 24),
                               ],
                             ),
-                          );
-                        },
+                          ),
+                        ],
                       ),
                       if (resultState is QuizResultLoading &&
                           _hasRequestedResult)
@@ -563,6 +591,8 @@ class _QuizScreenState extends State<QuizScreen> {
                           ),
                         ),
                     ],
+                  );
+                    },
                   );
                 },
               ),

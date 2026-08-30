@@ -237,150 +237,116 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                         builder: (context, resultState) {
                           return Stack(
                             children: [
-                              SingleChildScrollView(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 24.w, vertical: 16.h),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    SizedBox(height: 32.h),
-                                    // Question Text
-                                    BidiText(
-                                      text: state.question.data.title,
-                                      forceEnglishDigits: true,
-                                      textAlign: TextAlign.center,
-                                      style:
-                                          MyTextStyle.textHeader16Bold.copyWith(
-                                        color: isDark
-                                            ? MyColors.profileTextPrimaryDark
-                                            : MyColors.textMatn1,
+                              Column(
+                                children: [
+                                  Expanded(
+                                    child: Padding(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 24.w,
+                                      ),
+                                      child: Column(
+                                        children: [
+                                          SizedBox(height: 32.h),
+                                          BidiText(
+                                            text: state.question.data.title,
+                                            forceEnglishDigits: true,
+                                            textAlign: TextAlign.center,
+                                            style: MyTextStyle.textHeader16Bold
+                                                .copyWith(
+                                              color: isDark
+                                                  ? MyColors
+                                                      .profileTextPrimaryDark
+                                                  : MyColors.textMatn1,
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: Center(
+                                              child: SingleChildScrollView(
+                                                padding: EdgeInsets.symmetric(
+                                                  vertical: 32.h,
+                                                ),
+                                                child: QuizAnswerOptionsList(
+                                                  answerCount: state.question
+                                                      .data.answers.length,
+                                                  itemBuilder: (
+                                                    index, {
+                                                    required height,
+                                                    required large,
+                                                  }) {
+                                                    final answer = state
+                                                        .question
+                                                        .data
+                                                        .answers[index];
+                                                    final feedbackAnswerId =
+                                                        answerState
+                                                                is QuizAnswerLoaded
+                                                            ? answerState
+                                                                .selectedAnswerId
+                                                            : selectedAnswerId;
+                                                    final isAnswerSelected =
+                                                        feedbackAnswerId ==
+                                                            answer.id;
+                                                    var isCorrectAnswer = false;
+                                                    var isWrongSelected = false;
+                                                    if (answerState
+                                                        is QuizAnswerLoaded) {
+                                                      isCorrectAnswer =
+                                                          answer.id ==
+                                                              answerState
+                                                                  .correctAnswerId;
+                                                      isWrongSelected =
+                                                          isAnswerSelected &&
+                                                              !answerState
+                                                                  .isCorrect;
+                                                    }
+                                                    return InkWell(
+                                                      onTap: answerState
+                                                                  is QuizAnswerLoading ||
+                                                              answerState
+                                                                  is QuizAnswerLoaded
+                                                          ? null
+                                                          : () {
+                                                              setState(() {
+                                                                selectedAnswerId =
+                                                                    answer.id;
+                                                              });
+                                                            },
+                                                      child: QuizAnswerItem(
+                                                        key: ValueKey(
+                                                            answer.id),
+                                                        title: answer.title,
+                                                        id: answer.id,
+                                                        isSelected:
+                                                            isAnswerSelected,
+                                                        isCorrect:
+                                                            isCorrectAnswer,
+                                                        isWrongSelected:
+                                                            isWrongSelected,
+                                                        selectedAnswerId:
+                                                            feedbackAnswerId ??
+                                                                "",
+                                                        showFeedback:
+                                                            answerState
+                                                                is QuizAnswerLoaded,
+                                                        height: height,
+                                                        large: large,
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
-
-                                    SizedBox(height: 32.h),
-                                    // Feedback after answer submission
-                                    // if (answerState is QuizAnswerLoaded)
-                                    //   Padding(
-                                    //     padding: const EdgeInsets.only(bottom: 24.0),
-                                    //     child: Column(
-                                    //       children: [
-                                    //         if (answerState.isCorrect)
-                                    //           Column(
-                                    //             children: [
-                                    //               Container(
-                                    //                 width: 54,
-                                    //                 height: 54,
-                                    //                 decoration: BoxDecoration(
-                                    //                   color: const Color(0xFFEDFAEB),
-                                    //                   borderRadius:
-                                    //                       BorderRadius.circular(50),
-                                    //                 ),
-                                    //                 child: const Icon(
-                                    //                     Icons.check_circle,
-                                    //                     color: Color(0xFF6FC845),
-                                    //                     size: 40),
-                                    //               ),
-                                    //               const SizedBox(height: 12),
-                                    //               Text(
-                                    //                 'آفرین درست گفتی!🥳',
-                                    //                 style: TextStyle(
-                                    //                   fontFamily: 'IRANSans',
-                                    //                   fontWeight: FontWeight.w300,
-                                    //                   fontSize: 12,
-                                    //                   color: Color(0xFF3D495C),
-                                    //                 ),
-                                    //                 textAlign: TextAlign.center,
-                                    //               ),
-                                    //             ],
-                                    //           )
-                                    //         else
-                                    //           Column(
-                                    //             children: [
-                                    //               Container(
-                                    //                 width: 54,
-                                    //                 height: 54,
-                                    //                 decoration: BoxDecoration(
-                                    //                   color: const Color(0xFFFDEFE8),
-                                    //                   borderRadius:
-                                    //                       BorderRadius.circular(50),
-                                    //                 ),
-                                    //                 child: const Icon(Icons.cancel,
-                                    //                     color: Color(0xFFE96217),
-                                    //                     size: 40),
-                                    //               ),
-                                    //               const SizedBox(height: 12),
-                                    //               Text(
-                                    //                 'پاسخ اشتباه بود!',
-                                    //                 style: TextStyle(
-                                    //                   fontFamily: 'IRANSans',
-                                    //                   fontWeight: FontWeight.w300,
-                                    //                   fontSize: 12,
-                                    //                   color: Color(0xFFE96217),
-                                    //                 ),
-                                    //                 textAlign: TextAlign.center,
-                                    //               ),
-                                    //             ],
-                                    //           ),
-                                    //       ],
-                                    //     ),
-                                    //   ),
-                                    const SizedBox(height: 32),
-
-                                    // Answer Options
-                                    ListView.separated(
-                                      shrinkWrap: true,
-                                      physics:
-                                          const NeverScrollableScrollPhysics(),
-                                      separatorBuilder: (context, index) =>
-                                          SizedBox(height: 16.h),
-                                      itemCount:
-                                          state.question.data.answers.length,
-                                      itemBuilder: (context, index) {
-                                        final answer =
-                                            state.question.data.answers[index];
-                                        final feedbackAnswerId =
-                                            answerState is QuizAnswerLoaded
-                                                ? answerState.selectedAnswerId
-                                                : selectedAnswerId;
-                                        final isAnswerSelected =
-                                            feedbackAnswerId == answer.id;
-                                        var isCorrectAnswer = false;
-                                        var isWrongSelected = false;
-                                        if (answerState is QuizAnswerLoaded) {
-                                          isCorrectAnswer = answer.id ==
-                                              answerState.correctAnswerId;
-                                          isWrongSelected = isAnswerSelected &&
-                                              !answerState.isCorrect;
-                                        }
-                                        return InkWell(
-                                          onTap: answerState
-                                                      is QuizAnswerLoading ||
-                                                  answerState
-                                                      is QuizAnswerLoaded
-                                              ? null
-                                              : () {
-                                                  setState(() {
-                                                    selectedAnswerId =
-                                                        answer.id;
-                                                  });
-                                                },
-                                          child: QuizAnswerItem(
-                                            key: ValueKey(answer.id),
-                                            title: answer.title,
-                                            id: answer.id,
-                                            isSelected: isAnswerSelected,
-                                            isCorrect: isCorrectAnswer,
-                                            isWrongSelected: isWrongSelected,
-                                            selectedAnswerId:
-                                                feedbackAnswerId ?? "",
-                                            showFeedback:
-                                                answerState is QuizAnswerLoaded,
-                                          ),
-                                        );
-                                      },
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 24.w,
                                     ),
-                                    SizedBox(height: 24.h),
-                                    // Explanation just above the button
+                                    child: Column(
+                                      children: [
                                     if (answerState is QuizAnswerLoaded &&
                                         !answerState.isCorrect &&
                                         answerState.explanation != null)
@@ -670,8 +636,11 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                                           ),
                                         ),
                                       ),
-                                  ],
-                                ),
+                                        SizedBox(height: 24.h),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ),
                               if (resultState is QuizResultLoading &&
                                   _hasRequestedResult)
