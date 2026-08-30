@@ -85,40 +85,6 @@ final RouteObserver<ModalRoute<void>> routeObserver =
     RouteObserver<ModalRoute<void>>();
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
-/// Request storage permission with user-friendly explanation
-Future<void> _requestStoragePermission() async {
-  try {
-    if (Platform.isAndroid) {
-      // Check if permission is already granted
-      if (await Permission.storage.isGranted ||
-          await Permission.manageExternalStorage.isGranted) {
-        return;
-      }
-
-      // Request storage permission
-      // The rationale message will be shown automatically by the system
-      // based on the permission description in AndroidManifest.xml
-      final status = await Permission.storage.request();
-
-      // If storage permission is denied, try manageExternalStorage for Android 11+
-      if (!status.isGranted) {
-        await Permission.manageExternalStorage.request();
-      }
-    } else if (Platform.isIOS) {
-      // For iOS, check if permission is already granted
-      final status = await Permission.storage.status;
-      if (!status.isGranted) {
-        // Request permission
-        // The explanation will be shown from Info.plist
-        await Permission.storage.request();
-      }
-    }
-  } catch (e) {
-    debugPrint('Error requesting storage permission: $e');
-    // Continue app execution even if permission request fails
-  }
-}
-
 void _loadInitialShoppingCart() {
   final bloc = locator<ShoppingCartBloc>();
   final prefsOperator = locator<PrefsOperator>();
@@ -135,9 +101,6 @@ void main() async {
   // runApp(const MyApp());
 
   await initLocator();
-
-  // Request storage permission at app startup
-  await _requestStoragePermission();
 
   // Request notification and alarm permissions
   if (Platform.isAndroid) {

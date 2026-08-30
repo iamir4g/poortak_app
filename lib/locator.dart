@@ -27,7 +27,6 @@ import 'package:poortak/featueres/feature_shopping_cart/repositories/shopping_ca
 import 'package:poortak/featueres/feature_shopping_cart/data/data_source/shopping_cart_api_provider.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:poortak/common/bloc/permission/permission_bloc.dart';
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_start_bloc/quiz_start_bloc.dart';
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_answer_bloc/quiz_answer_bloc.dart';
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_result_bloc/quiz_result_bloc.dart';
@@ -160,9 +159,6 @@ Future<void> initLocator() async {
   // Register ShoppingCartBloc
   locator.registerSingleton<ShoppingCartBloc>(
       ShoppingCartBloc(repository: locator()));
-
-  // Register PermissionBloc
-  locator.registerSingleton<PermissionBloc>(PermissionBloc());
 
   // Register Quiz Blocs
   locator.registerFactory<QuizStartBloc>(() => QuizStartBloc(locator()));

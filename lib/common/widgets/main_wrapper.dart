@@ -28,7 +28,6 @@ import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shoppi
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
 import 'package:poortak/featueres/feature_payment/presentation/screens/payment_result_screen.dart';
 import 'package:poortak/locator.dart';
-import 'package:poortak/common/bloc/permission/permission_bloc.dart';
 import 'package:poortak/common/bloc/theme_cubit/theme_cubit.dart';
 import 'package:poortak/common/blocs/bottom_nav_cubit/bottom_nav_cubit.dart';
 
@@ -338,98 +337,59 @@ class _MainWrapperState extends State<MainWrapper> {
             sayarehRepository: locator<SayarehRepository>(),
           ),
         ),
-        BlocProvider(
-          create: (context) => locator<PermissionBloc>(),
-        ),
         // BlocProvider(
         //   create: (context) => locator<LitnerBloc>(),
         // ),
       ],
-      child: BlocListener<PermissionBloc, PermissionState>(
-        listener: (context, state) {
-          if (state is PermissionError) {
-            log(state.message);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('خطا در دسترسی به حافظه: ${state.message}'),
-                backgroundColor: Colors.red,
-                duration: const Duration(seconds: 2),
-              ),
-            );
-          } else if (state is PermissionDenied) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text(
-                    'برای استفاده از برنامه نیاز به دسترسی به حافظه دارید'),
-                backgroundColor: Colors.red,
-                duration: Duration(seconds: 2),
-              ),
-            );
-          }
-        },
-        child: BlocBuilder<PermissionBloc, PermissionState>(
-          builder: (context, state) {
-            if (state is PermissionInitial) {
-              // Check permissions when the app starts
-              context.read<PermissionBloc>().add(CheckStoragePermissionEvent());
-            }
+      child: BlocBuilder<ThemeCubit, ThemeState>(
+        builder: (context, themeState) {
+          _applyStatusBarStyle(themeState.isDark);
 
-            return BlocBuilder<ThemeCubit, ThemeState>(
-              builder: (context, themeState) {
-                _applyStatusBarStyle(themeState.isDark);
-
-                return PopScope(
-                  canPop: false,
-                  onPopInvoked: (didPop) async {
-                    if (!didPop) {
-                      await _onWillPop();
-                    }
-                  },
-                  child: Scaffold(
-                    key: _scaffoldKey,
-                    backgroundColor: themeState.isDark
-                        ? MyColors.darkBackground
-                        : Colors.white,
-                    resizeToAvoidBottomInset: false,
-                    drawerScrimColor: Colors.black54,
-                    drawer: const CustomDrawer(),
-                    body: Column(
-                      children: [
-                        MainTabHeader(
-                          isDark: themeState.isDark,
-                          onMenuPressed: () =>
-                              _scaffoldKey.currentState?.openDrawer(),
-                          showLogoutMenu: currentPageIndex == 4 &&
-                              prefsOperator.isLoggedIn(),
-                          onLogout: _showLogoutConfirmation,
-                        ),
-                        Expanded(
-                          child: state is PermissionLoading
-                              ? const Center(
-                                  child: CircularProgressIndicator(),
-                                )
-                              : MainWrapperScope(
-                                  isEmbedded: true,
-                                  child: PageView(
-                                    controller: controller,
-                                    physics: const ClampingScrollPhysics(),
-                                    onPageChanged: _onPageChanged,
-                                    children: topLevelScreens,
-                                  ),
-                                ),
-                        ),
-                        BottomNav(
-                          controller: controller,
-                          onTabSelected: _animateToTab,
-                        ),
-                      ],
+          return PopScope(
+            canPop: false,
+            onPopInvoked: (didPop) async {
+              if (!didPop) {
+                await _onWillPop();
+              }
+            },
+            child: Scaffold(
+              key: _scaffoldKey,
+              backgroundColor: themeState.isDark
+                  ? MyColors.darkBackground
+                  : Colors.white,
+              resizeToAvoidBottomInset: false,
+              drawerScrimColor: Colors.black54,
+              drawer: const CustomDrawer(),
+              body: Column(
+                children: [
+                  MainTabHeader(
+                    isDark: themeState.isDark,
+                    onMenuPressed: () =>
+                        _scaffoldKey.currentState?.openDrawer(),
+                    showLogoutMenu: currentPageIndex == 4 &&
+                        prefsOperator.isLoggedIn(),
+                    onLogout: _showLogoutConfirmation,
+                  ),
+                  Expanded(
+                    child: MainWrapperScope(
+                      isEmbedded: true,
+                      child: PageView(
+                        controller: controller,
+                        physics: const ClampingScrollPhysics(),
+                        onPageChanged: _onPageChanged,
+                        children: topLevelScreens,
+                      ),
                     ),
                   ),
-                );
-              },
-            );
-          },
-        ),
+                  BottomNav(
+                    controller: controller,
+                    onTabSelected: _animateToTab,
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }
