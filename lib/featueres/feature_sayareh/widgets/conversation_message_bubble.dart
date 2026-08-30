@@ -148,6 +148,59 @@ class ConversationMessageBubble extends StatelessWidget {
     );
   }
 
+  double _bubbleMaxWidth(double rowMaxWidth) {
+    // Small safety margin avoids sub-pixel RenderFlex overflow on some devices.
+    return (rowMaxWidth - Dimens.nw(50) - Dimens.small - 2)
+        .clamp(0.0, double.infinity);
+  }
+
+  Widget _buildBubble({
+    required double maxWidth,
+    required Color bubbleColor,
+    required BorderRadius borderRadius,
+    required BuildContext context,
+    required List<String> sentences,
+    required Color baseTextColor,
+    required Color translationColor,
+  }) {
+    return ConstrainedBox(
+      constraints: BoxConstraints(
+        maxWidth: maxWidth,
+        minHeight: Dimens.nh(49),
+      ),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: bubbleColor,
+          borderRadius: borderRadius,
+        ),
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: Dimens.nw(14),
+            vertical: Dimens.nh(10),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildMessageText(
+                context: context,
+                sentences: sentences,
+                baseTextColor: baseTextColor,
+              ),
+              if (showTranslations) ...[
+                SizedBox(height: 4.h),
+                _buildTranslationText(
+                  context: context,
+                  translationColor: translationColor,
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -194,97 +247,57 @@ class ConversationMessageBubble extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 6.h, horizontal: 16.w),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            textDirection: TextDirection.rtl,
-            children: isFirstPerson
-                ? [
-                    _sideAvatar(
-                      assetPath: avatarPath,
-                      backgroundColor: sideCircleColor,
-                    ),
-                    SizedBox(width: Dimens.nw(8)),
-                    ConstrainedBox(
-                      constraints: BoxConstraints(
-                        maxWidth: Dimens.nw(207),
-                        minHeight: Dimens.nh(49),
-                      ),
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          color: bubbleColor,
-                          borderRadius: bubbleRadiusLeftPerson,
+          padding: EdgeInsets.symmetric(
+            vertical: Dimens.nh(6),
+            horizontal: Dimens.medium,
+          ),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final bubbleMaxWidth = _bubbleMaxWidth(constraints.maxWidth);
+
+              return Row(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                textDirection: TextDirection.rtl,
+                children: isFirstPerson
+                    ? [
+                        _sideAvatar(
+                          assetPath: avatarPath,
+                          backgroundColor: sideCircleColor,
                         ),
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: Dimens.nw(14),
-                            vertical: Dimens.nh(10),
-                          ),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _buildMessageText(
-                                context: context,
-                                sentences: sentences,
-                                baseTextColor: baseTextColor,
-                              ),
-                              if (showTranslations) ...[
-                                SizedBox(height: 4.h),
-                                _buildTranslationText(
-                                  context: context,
-                                  translationColor: translationColor,
-                                ),
-                              ],
-                            ],
+                        SizedBox(width: Dimens.small),
+                        Flexible(
+                          child: _buildBubble(
+                            maxWidth: bubbleMaxWidth,
+                            bubbleColor: bubbleColor,
+                            borderRadius: bubbleRadiusLeftPerson,
+                            context: context,
+                            sentences: sentences,
+                            baseTextColor: baseTextColor,
+                            translationColor: translationColor,
                           ),
                         ),
-                      ),
-                    ),
-                  ]
-                : [
-                    ConstrainedBox(
-                      constraints: BoxConstraints(
-                        maxWidth: Dimens.nw(207),
-                        minHeight: Dimens.nh(49),
-                      ),
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          color: bubbleColor,
-                          borderRadius: bubbleRadiusRightPerson,
-                        ),
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: Dimens.nw(14),
-                            vertical: Dimens.nh(10),
-                          ),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _buildMessageText(
-                                context: context,
-                                sentences: sentences,
-                                baseTextColor: baseTextColor,
-                              ),
-                              if (showTranslations) ...[
-                                SizedBox(height: 4.h),
-                                _buildTranslationText(
-                                  context: context,
-                                  translationColor: translationColor,
-                                ),
-                              ],
-                            ],
+                      ]
+                    : [
+                        Flexible(
+                          child: _buildBubble(
+                            maxWidth: bubbleMaxWidth,
+                            bubbleColor: bubbleColor,
+                            borderRadius: bubbleRadiusRightPerson,
+                            context: context,
+                            sentences: sentences,
+                            baseTextColor: baseTextColor,
+                            translationColor: translationColor,
                           ),
                         ),
-                      ),
-                    ),
-                    SizedBox(width: Dimens.nw(8)),
-                    _sideAvatar(
-                      assetPath: avatarPath,
-                      backgroundColor: sideCircleColor,
-                    ),
-                  ],
+                        SizedBox(width: Dimens.small),
+                        _sideAvatar(
+                          assetPath: avatarPath,
+                          backgroundColor: sideCircleColor,
+                        ),
+                      ],
+              );
+            },
           ),
         ),
       ),
