@@ -5,8 +5,9 @@ import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
+import 'package:poortak/common/widgets/main_tab_header.dart';
+import 'package:poortak/common/widgets/adaptive_safe_area.dart';
 import 'package:poortak/common/widgets/bottom_nav.dart';
 import 'package:poortak/common/widgets/custom_drawer.dart';
 import 'package:poortak/common/widgets/logout_confirmation_modal.dart';
@@ -15,14 +16,13 @@ import 'package:poortak/common/services/payment_deep_link_service.dart';
 import 'package:poortak/common/services/auth_navigation_manager.dart';
 import 'package:poortak/common/services/otp_login_session_manager.dart';
 import 'package:poortak/config/myColors.dart';
-import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/kavoosh_main_screen.dart';
 import 'package:poortak/featueres/feature_litner/screens/litner_main_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/profile_screen.dart';
-import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/bloc_storage_bloc.dart';
-import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/iknow_access_bloc/iknow_access_bloc.dart';
-import 'package:poortak/featueres/fetures_sayareh/repositories/sayareh_repository.dart';
-import 'package:poortak/featueres/fetures_sayareh/screens/sayareh_screen.dart';
+import 'package:poortak/featueres/feature_sayareh/presentation/bloc/bloc_storage_bloc.dart';
+import 'package:poortak/featueres/feature_sayareh/presentation/bloc/iknow_access_bloc/iknow_access_bloc.dart';
+import 'package:poortak/featueres/feature_sayareh/repositories/sayareh_repository.dart';
+import 'package:poortak/featueres/feature_sayareh/screens/sayareh_screen.dart';
 import 'package:poortak/featueres/feature_shopping_cart/screens/shopping_cart_screen.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
@@ -79,17 +79,7 @@ class _MainWrapperState extends State<MainWrapper> {
     _authNavigationListener = _handleAuthNavigation;
     _authNavigationManager.addListener(_authNavigationListener);
 
-    // تنظیم status bar برای MainWrapper
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      SystemChrome.setSystemUIOverlayStyle(
-        const SystemUiOverlayStyle(
-          statusBarColor: MyColors.primary,
-          statusBarIconBrightness: Brightness.dark,
-          statusBarBrightness: Brightness.light,
-        ),
-      );
-
-      // Update BottomNavCubit if initialIndex is provided
       if (widget.initialIndex != null) {
         try {
           context
@@ -199,23 +189,6 @@ class _MainWrapperState extends State<MainWrapper> {
     });
   }
 
-  String getTitle(int index) {
-    switch (index) {
-      case 0:
-        return 'کتاب های سیاره آی نو';
-      case 1:
-        return 'کاووش';
-      case 2:
-        return 'سبد خرید';
-      case 3:
-        return 'لایتنر';
-      case 4:
-        return 'پروفایل';
-    }
-
-    return '';
-  }
-
   void _refreshShoppingCartIfNeeded(int index) {
     if (index != 2) return;
 
@@ -312,6 +285,20 @@ class _MainWrapperState extends State<MainWrapper> {
     );
   }
 
+  void _applyStatusBarStyle(bool isDark) {
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+        statusBarColor: isDark ? MyColors.darkBackground : MyColors.background,
+        statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+        statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
+        systemNavigationBarColor:
+            isDark ? MyColors.darkBackground : Colors.white,
+        systemNavigationBarIconBrightness:
+            isDark ? Brightness.light : Brightness.dark,
+      ),
+    );
+  }
+
   Future<bool> _onWillPop() async {
     // First, check if drawer is open
     if (_scaffoldKey.currentState?.isDrawerOpen ?? false) {
@@ -389,6 +376,8 @@ class _MainWrapperState extends State<MainWrapper> {
 
             return BlocBuilder<ThemeCubit, ThemeState>(
               builder: (context, themeState) {
+                _applyStatusBarStyle(themeState.isDark);
+
                 return PopScope(
                   canPop: false,
                   onPopInvoked: (didPop) async {
@@ -402,84 +391,39 @@ class _MainWrapperState extends State<MainWrapper> {
                         ? MyColors.darkBackground
                         : Colors.white,
                     resizeToAvoidBottomInset: false,
-                    extendBodyBehindAppBar: false,
                     drawerScrimColor: Colors.black54,
-                    appBar: AppBar(
-                      backgroundColor: themeState.isDark
-                          ? MyColors.darkBackground
-                          : MyColors.background,
-                      foregroundColor: themeState.isDark
-                          ? MyColors.darkTextPrimary
-                          : MyColors.textMatn1,
-                      elevation: 0,
-                      actions: [
-                        (currentPageIndex == 4 && prefsOperator.isLoggedIn())
-                            ? PopupMenuButton<String>(
-                                icon: Icon(Icons.more_vert,
-                                    color: themeState.isDark
-                                        ? MyColors.darkTextPrimary
-                                        : const Color(0xFF3D495C)),
-                                onSelected: (value) {
-                                  if (value == 'logout') {
-                                    _showLogoutConfirmation();
-                                  }
-                                },
-                                itemBuilder: (context) => [
-                                  PopupMenuItem(
-                                    value: 'logout',
-                                    child: Text(
-                                      'خروج از حساب کاربری',
-                                      style: MyTextStyle.textMatn13.copyWith(
-                                        color: themeState.isDark
-                                            ? MyColors.darkTextPrimary
-                                            : MyColors.textMatn1,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              )
-                            : const SizedBox.shrink(),
-                      ],
-                      flexibleSpace: Container(
-                        decoration: BoxDecoration(
-                          color: themeState.isDark
-                              ? MyColors.darkBackground
-                              : Colors.white,
-                          borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(33.5.r),
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: themeState.isDark
-                                  ? Colors.black.withValues(alpha: 0.3)
-                                  : const Color.fromRGBO(0, 0, 0, 0.05),
-                              offset: Offset(0, 1.h),
-                              blurRadius: 1.r,
-                              spreadRadius: 0,
-                            ),
-                          ],
-                        ),
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(33.5.r),
-                        ),
-                      ),
-                    ),
                     drawer: const CustomDrawer(),
-                    bottomNavigationBar: BottomNav(
-                      controller: controller,
-                      onTabSelected: _animateToTab,
+                    body: Column(
+                      children: [
+                        MainTabHeader(
+                          isDark: themeState.isDark,
+                          onMenuPressed: () =>
+                              _scaffoldKey.currentState?.openDrawer(),
+                          showLogoutMenu: currentPageIndex == 4 &&
+                              prefsOperator.isLoggedIn(),
+                          onLogout: _showLogoutConfirmation,
+                        ),
+                        Expanded(
+                          child: state is PermissionLoading
+                              ? const Center(
+                                  child: CircularProgressIndicator(),
+                                )
+                              : MainWrapperScope(
+                                  isEmbedded: true,
+                                  child: PageView(
+                                    controller: controller,
+                                    physics: const ClampingScrollPhysics(),
+                                    onPageChanged: _onPageChanged,
+                                    children: topLevelScreens,
+                                  ),
+                                ),
+                        ),
+                        BottomNav(
+                          controller: controller,
+                          onTabSelected: _animateToTab,
+                        ),
+                      ],
                     ),
-                    body: state is PermissionLoading
-                        ? const Center(child: CircularProgressIndicator())
-                        : PageView(
-                            controller: controller,
-                            physics: const ClampingScrollPhysics(),
-                            onPageChanged: _onPageChanged,
-                            children: topLevelScreens,
-                          ),
                   ),
                 );
               },

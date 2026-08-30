@@ -8,6 +8,7 @@ import 'package:poortak/featueres/feature_profile/data/models/request_otp_model.
 import 'package:poortak/featueres/feature_profile/data/models/me_profile_model.dart';
 import 'package:poortak/featueres/feature_profile/data/models/update_profile_model.dart';
 import 'package:poortak/featueres/feature_profile/data/models/update_profile_params.dart';
+import 'package:poortak/featueres/feature_profile/data/models/prize_history_model.dart';
 import 'package:poortak/featueres/feature_profile/data/models/user_points_total_model.dart';
 import 'dart:developer';
 
@@ -191,6 +192,27 @@ class ProfileRepository {
       }
     } catch (e) {
       log("Get Me Profile Error: $e");
+      return DataFailed(e.toString());
+    }
+  }
+
+  Future<DataState<PrizeHistoryResponse>> callGetUserPointsHistory() async {
+    try {
+      final response = await profileApiProvider.callGetUserPoints();
+      log("User Points History Response: ${response.data}");
+      if ((response.statusCode == 200 || response.statusCode == 201) &&
+          response.data['ok'] == true) {
+        final PrizeHistoryResponse prizeHistoryResponse =
+            PrizeHistoryResponse.fromJson(response.data);
+        log("User Points History Success - Parsed Model: ${prizeHistoryResponse.data.length} items");
+        return DataSuccess(prizeHistoryResponse);
+      } else {
+        log("User Points History Error - Status: ${response.statusCode}, Data: ${response.data}");
+        return DataFailed(
+            response.data['message'] ?? "خطا در دریافت تاریخچه امتیاز");
+      }
+    } catch (e) {
+      log("User Points History Error: $e");
       return DataFailed(e.toString());
     }
   }

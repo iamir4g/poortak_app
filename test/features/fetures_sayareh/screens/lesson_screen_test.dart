@@ -13,11 +13,11 @@ import 'package:poortak/common/bloc/video_download_cubit/video_download_cubit.da
 import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/common/services/video_download_service.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
-import 'package:poortak/featueres/fetures_sayareh/data/models/course_progress_model.dart';
-import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_home_model.dart';
-import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/iknow_access_bloc/iknow_access_bloc.dart';
-import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/lesson_bloc/lesson_bloc.dart';
-import 'package:poortak/featueres/fetures_sayareh/screens/lesson_screen.dart';
+import 'package:poortak/featueres/feature_sayareh/data/models/course_progress_model.dart';
+import 'package:poortak/featueres/feature_sayareh/data/models/sayareh_home_model.dart';
+import 'package:poortak/featueres/feature_sayareh/presentation/bloc/iknow_access_bloc/iknow_access_bloc.dart';
+import 'package:poortak/featueres/feature_sayareh/presentation/bloc/lesson_bloc/lesson_bloc.dart';
+import 'package:poortak/featueres/feature_sayareh/screens/lesson_screen.dart';
 import 'package:poortak/l10n/app_localizations.dart';
 import 'package:poortak/main.dart' show routeObserver;
 
@@ -175,8 +175,7 @@ void main() {
           autoStart: any(named: 'autoStart'),
         )).thenAnswer((_) async {});
 
-    when(() => mockVideoDownloadService.cancelDownload(any()))
-        .thenReturn(null);
+    when(() => mockVideoDownloadService.cancelDownload(any())).thenReturn(null);
   });
 
   Widget createWidgetUnderTest({bool purchased = false}) {
@@ -215,7 +214,8 @@ void main() {
     );
   }
 
-  Future<void> pumpLessonSuccess(WidgetTester tester, {bool purchased = false}) async {
+  Future<void> pumpLessonSuccess(WidgetTester tester,
+      {bool purchased = false}) async {
     final successState =
         LessonSuccess(lesson: mockLesson, progress: mockCourseProgress);
 
@@ -231,7 +231,8 @@ void main() {
   }
 
   group('LessonScreen video download integration', () {
-    testWidgets('بدون لاگین: تریلر از storage/public دانلود می‌شود', (tester) async {
+    testWidgets('بدون لاگین: تریلر از storage/public دانلود می‌شود',
+        (tester) async {
       when(() => mockPrefsOperator.isLoggedIn()).thenReturn(false);
 
       await pumpLessonSuccess(tester);
@@ -260,7 +261,8 @@ void main() {
     testWidgets('با لاگین و بدون خرید: تریلر از storage/public دانلود می‌شود',
         (tester) async {
       when(() => mockPrefsOperator.isLoggedIn()).thenReturn(true);
-      when(() => mockIknowAccessBloc.hasCourseAccess(lessonId)).thenReturn(false);
+      when(() => mockIknowAccessBloc.hasCourseAccess(lessonId))
+          .thenReturn(false);
 
       await pumpLessonSuccess(tester);
 

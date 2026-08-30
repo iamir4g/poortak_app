@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/common/widgets/poortak_app_bar.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
@@ -156,8 +157,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final pageBackgroundColor =
         isDark ? MyColors.profileBackgroundDark : MyColors.background3;
-    final topStatusBarColor =
-        isDark ? MyColors.profileBackgroundDark : const Color(0xFFFFF8E4);
     final contentBackgroundColor =
         isDark ? MyColors.profileHeaderDark : Colors.white;
     final primaryTextColor =
@@ -165,7 +164,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     return Scaffold(
       backgroundColor: pageBackgroundColor,
+      appBar: PoortakAppBar(
+        title: 'ویرایش پروفایل',
+        backgroundColor: contentBackgroundColor,
+        foregroundColor: primaryTextColor,
+      ),
       body: SafeArea(
+        top: false,
         child: BlocListener<ProfileBloc, ProfileState>(
           bloc: profileBloc,
           listener: (context, state) {
@@ -197,141 +202,112 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               );
             }
           },
-          child: Stack(
-            children: [
-              // Status bar area
-              Container(
-                height: 22.h,
-                color: topStatusBarColor,
-              ),
+          child: Container(
+            color: contentBackgroundColor,
+            child: SingleChildScrollView(
+              padding: EdgeInsets.symmetric(horizontal: 22.w),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 27.h),
 
-              // Main content
-              Column(
-                children: [
-                  SizedBox(height: 22.h),
-
-                  // White background with curved bottom
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: contentBackgroundColor,
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(81.r),
+                    // Avatar selection title
+                    Center(
+                      child: Text(
+                        'عکس آواتار خود را انتخاب کنید!',
+                        style: MyTextStyle.textMatn13.copyWith(
+                          fontWeight: FontWeight.w500,
+                          color: primaryTextColor,
                         ),
+                        textAlign: TextAlign.center,
                       ),
-                      child: SingleChildScrollView(
-                        padding: EdgeInsets.symmetric(horizontal: 22.w),
-                        child: Form(
-                          key: _formKey,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SizedBox(height: 27.h),
+                    ),
 
-                              // Avatar selection title
-                              Center(
-                                child: Text(
-                                  'عکس آواتار خود را انتخاب کنید!',
-                                  style: MyTextStyle.textMatn13.copyWith(
-                                    fontWeight: FontWeight.w500,
-                                    color: primaryTextColor,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
+                    SizedBox(height: 20.h),
 
-                              SizedBox(height: 20.h),
+                    // Selected avatar display
+                    _buildSelectedAvatar(),
 
-                              // Selected avatar display
-                              _buildSelectedAvatar(),
+                    SizedBox(height: 20.h),
 
-                              SizedBox(height: 20.h),
+                    // Form title
+                    Text(
+                      'مشخصات خود را وارد کنید:',
+                      style: MyTextStyle.textMatn13.copyWith(
+                        fontWeight: FontWeight.w500,
+                        color: primaryTextColor,
+                      ),
+                      textAlign: TextAlign.right,
+                    ),
 
-                              // Form title
-                              Text(
-                                'مشخصات خود را وارد کنید:',
-                                style: MyTextStyle.textMatn13.copyWith(
-                                  fontWeight: FontWeight.w500,
-                                  color: primaryTextColor,
-                                ),
-                                textAlign: TextAlign.right,
-                              ),
+                    SizedBox(height: 20.h),
 
-                              SizedBox(height: 20.h),
+                    // First name field (optional)
+                    _buildTextField(
+                      controller: _firstNameController,
+                      label: 'نام:',
+                    ),
 
-                              // First name field (optional)
-                              _buildTextField(
-                                controller: _firstNameController,
-                                label: 'نام:',
-                              ),
+                    SizedBox(height: 7.h),
 
-                              SizedBox(height: 7.h),
+                    // Last name field (optional)
+                    _buildTextField(
+                      controller: _lastNameController,
+                      label: 'نام خانوادگی:',
+                    ),
 
-                              // Last name field (optional)
-                              _buildTextField(
-                                controller: _lastNameController,
-                                label: 'نام خانوادگی:',
-                              ),
+                    SizedBox(height: 7.h),
 
-                              SizedBox(height: 7.h),
+                    // Age group field
+                    // _buildAgeGroupField(),
 
-                              // Age group field
-                              // _buildAgeGroupField(),
+                    SizedBox(height: 40.h),
 
-                              SizedBox(height: 40.h),
-
-                              // Confirm button — active when any field changed
-                              Center(
-                                child: SizedBox(
-                                  width: 154.w,
-                                  height: 64.h,
-                                  child: ElevatedButton(
-                                    onPressed: (!isLoading && _hasChanges)
-                                        ? _updateProfile
-                                        : null,
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: _hasChanges
-                                          ? MyColors.primary
-                                          : const Color(0xFFC2C9D6),
-                                      disabledBackgroundColor:
-                                          const Color(0xFFC2C9D6),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(20.r),
-                                      ),
-                                      elevation: 0,
-                                    ),
-                                    child: isLoading
-                                        ? SizedBox(
-                                            width: 20.r,
-                                            height: 20.r,
-                                            child:
-                                                const CircularProgressIndicator(
-                                              color: Colors.white,
-                                              strokeWidth: 2,
-                                            ),
-                                          )
-                                        : Text(
-                                            'تأیید',
-                                            style: MyTextStyle.textMatn18Bold
-                                                .copyWith(
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                  ),
-                                ),
-                              ),
-
-                              SizedBox(height: 40.h),
-                            ],
+                    // Confirm button — active when any field changed
+                    Center(
+                      child: SizedBox(
+                        width: 154.w,
+                        height: 64.h,
+                        child: ElevatedButton(
+                          onPressed: (!isLoading && _hasChanges)
+                              ? _updateProfile
+                              : null,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: _hasChanges
+                                ? MyColors.primary
+                                : const Color(0xFFC2C9D6),
+                            disabledBackgroundColor: const Color(0xFFC2C9D6),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20.r),
+                            ),
+                            elevation: 0,
                           ),
+                          child: isLoading
+                              ? SizedBox(
+                                  width: 20.r,
+                                  height: 20.r,
+                                  child: const CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : Text(
+                                  'تأیید',
+                                  style: MyTextStyle.textMatn18Bold.copyWith(
+                                    color: Colors.white,
+                                  ),
+                                ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+
+                    SizedBox(height: 40.h),
+                  ],
+                ),
               ),
-            ],
+            ),
           ),
         ),
       ),

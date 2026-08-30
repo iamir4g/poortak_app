@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:poortak/featueres/fetures_sayareh/data/models/practice_vocabulary_model.dart';
+import 'package:poortak/featueres/feature_sayareh/data/models/practice_vocabulary_model.dart';
 
 void main() {
   group('PracticeVocabularyModel', () {

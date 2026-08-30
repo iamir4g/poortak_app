@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
+import 'package:poortak/common/widgets/poortak_app_bar.dart';
+import 'package:poortak/featueres/feature_profile/presentation/bloc/user_points_total_bloc/user_points_total_bloc.dart';
+import 'package:poortak/featueres/feature_profile/presentation/bloc/user_points_total_bloc/user_points_total_event.dart';
+import 'package:poortak/featueres/feature_profile/presentation/bloc/user_points_total_bloc/user_points_total_state.dart';
+import 'package:poortak/featueres/feature_profile/screens/how_to_get_points_screen.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
+import 'package:poortak/locator.dart';
 
 class MainPointsScreen extends StatefulWidget {
   static const routeName = "/main_points_screen";
@@ -17,7 +24,7 @@ class _MainPointsScreenState extends State<MainPointsScreen> {
   @override
   void initState() {
     super.initState();
-    // Status bar is managed centrally in MainWrapper
+    locator<UserPointsTotalBloc>().add(LoadUserPointsTotalEvent());
   }
 
   @override
@@ -25,73 +32,22 @@ class _MainPointsScreenState extends State<MainPointsScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       backgroundColor: isDark ? MyColors.profileBackgroundDark : Colors.white,
+      appBar: PoortakAppBar(
+        title: 'امتیازات',
+        foregroundColor: isDark
+            ? MyColors.profileTextPrimaryDark
+            : const Color(0xFF3D495C),
+      ),
       body: SafeArea(
+        top: false,
         child: Column(
           children: [
-            // Header
-            Container(
-              height: 57.h,
-              width: double.infinity,
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
-              decoration: BoxDecoration(
-                color: isDark ? MyColors.darkBackgroundSecondary : Colors.white,
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(33.5.r),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0x0D000000),
-                    offset: Offset(0, 1.h),
-                    blurRadius: 1.r,
-                  ),
-                ],
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // Title
-                  Text(
-                    'امتیازات',
-                    style: MyTextStyle.textHeader16Bold.copyWith(
-                      color: isDark
-                          ? MyColors.profileTextPrimaryDark
-                          : const Color(0xFF3D495C),
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-
-                  // Back Button
-                  Container(
-                    width: 50.r,
-                    height: 50.r,
-                    margin: EdgeInsets.only(left: 16.w),
-                    child: IconButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      icon: Icon(
-                        Icons.arrow_forward,
-                        color: isDark
-                            ? MyColors.profileTextPrimaryDark
-                            : const Color(0xFF3D495C),
-                        size: 20.r,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Content
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    // Points earned section
                     _buildPointsEarnedSection(),
-
-                    // Points history card
                     _buildPointsHistoryCard(),
-
-                    // Discounts and rewards card
                     _buildDiscountsCard(),
                   ],
                 ),
@@ -112,7 +68,6 @@ class _MainPointsScreenState extends State<MainPointsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Points earned text and container
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 24.w),
             child: Row(
@@ -144,32 +99,42 @@ class _MainPointsScreenState extends State<MainPointsScreen> {
                   ),
                 ),
                 SizedBox(width: 16.w),
-                // 200 coins container
-                Container(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFFE8CC),
-                    borderRadius: BorderRadius.circular(10.r),
-                  ),
-                  child: Center(
-                    child: Text(
-                      "۲۰۰ سکه",
-                      textAlign: TextAlign.center,
-                      style: MyTextStyle.textMatn16Bold.copyWith(
-                        color: isDark
-                            ? MyColors.profileTextPrimaryDark
-                            : const Color(0xFF28303D),
+                BlocBuilder<UserPointsTotalBloc, UserPointsTotalState>(
+                  builder: (context, state) {
+                    final pointsText = switch (state) {
+                      UserPointsTotalSuccess(:final data) => data.addedDisplay,
+                      UserPointsTotalLoading() ||
+                      UserPointsTotalInitial() =>
+                        '...',
+                      UserPointsTotalError() => '—',
+                      UserPointsTotalState() => '...',
+                    };
+
+                    return Container(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 16.w, vertical: 8.h),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFE8CC),
+                        borderRadius: BorderRadius.circular(10.r),
                       ),
-                    ),
-                  ),
+                      child: Center(
+                        child: Text(
+                          pointsText,
+                          textAlign: TextAlign.center,
+                          style: MyTextStyle.textMatn16Bold.copyWith(
+                            color: isDark
+                                ? MyColors.profileTextPrimaryDark
+                                : const Color(0xFF28303D),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ],
             ),
           ),
-
           SizedBox(height: 20.h),
-          // Ways to earn points section
           _buildWaysToEarnSection(),
         ],
       ),
@@ -177,34 +142,36 @@ class _MainPointsScreenState extends State<MainPointsScreen> {
   }
 
   Widget _buildWaysToEarnSection() {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 30.w),
-      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFFDB80),
-        borderRadius: BorderRadius.circular(20.r),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Star icon
-          SizedBox(
-            width: 36.r,
-            height: 34.r,
-            child: Image.asset(
-              'assets/images/points/star_icon.png',
-              fit: BoxFit.contain,
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(context, HowToGetPointsScreen.routeName);
+      },
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: 30.w),
+        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
+        decoration: BoxDecoration(
+          color: const Color(0xFFFFDB80),
+          borderRadius: BorderRadius.circular(20.r),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: 36.r,
+              height: 34.r,
+              child: Image.asset(
+                'assets/images/points/star_icon.png',
+                fit: BoxFit.contain,
+              ),
             ),
-          ),
-
-          SizedBox(width: 12.w),
-
-          Text(
-            "روش های کسب امتیاز",
-            textAlign: TextAlign.center,
-            style: MyTextStyle.textMatn15,
-          ),
-        ],
+            SizedBox(width: 12.w),
+            Text(
+              'روش های کسب امتیاز',
+              textAlign: TextAlign.center,
+              style: MyTextStyle.textMatn15,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -234,7 +201,6 @@ class _MainPointsScreenState extends State<MainPointsScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // Text content
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -263,7 +229,6 @@ class _MainPointsScreenState extends State<MainPointsScreen> {
               ),
             ),
             SizedBox(width: 16.w),
-            // Calendar animation placeholder
             SizedBox(
               width: 80.r,
               height: 80.r,
@@ -303,7 +268,6 @@ class _MainPointsScreenState extends State<MainPointsScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // Text content
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -332,7 +296,6 @@ class _MainPointsScreenState extends State<MainPointsScreen> {
               ),
             ),
             SizedBox(width: 16.w),
-            // Prize animation placeholder with background circle
             Container(
               width: 70.r,
               height: 70.r,

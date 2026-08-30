@@ -16,10 +16,10 @@ import 'package:poortak/featueres/feature_litner/data/models/create_word_model.d
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_bloc.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_event.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_state.dart';
-import 'package:poortak/featueres/fetures_sayareh/data/models/vocabulary_model.dart'
+import 'package:poortak/featueres/feature_sayareh/data/models/vocabulary_model.dart'
     as vocabulary_model;
-import 'package:poortak/featueres/fetures_sayareh/repositories/sayareh_repository.dart';
-import 'package:poortak/featueres/fetures_sayareh/screens/vocabulary_screen.dart';
+import 'package:poortak/featueres/feature_sayareh/repositories/sayareh_repository.dart';
+import 'package:poortak/featueres/feature_sayareh/screens/vocabulary_screen.dart';
 import 'package:poortak/l10n/app_localizations.dart';
 
 // Mocks

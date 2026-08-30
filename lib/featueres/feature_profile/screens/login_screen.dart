@@ -20,7 +20,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/featueres/feature_profile/presentation/bloc/profile_bloc.dart';
 import 'package:poortak/featueres/feature_profile/presentation/bloc/profile_event.dart';
 import 'package:poortak/featueres/feature_profile/presentation/bloc/profile_state.dart';
-import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/iknow_access_bloc/iknow_access_bloc.dart';
+import 'package:poortak/featueres/feature_sayareh/presentation/bloc/iknow_access_bloc/iknow_access_bloc.dart';
 import 'package:poortak/locator.dart';
 import 'package:smart_auth/smart_auth.dart';
 
@@ -209,8 +209,9 @@ class _LoginScreenState extends State<LoginScreen> {
   String _displayMobileForOtpMessage(String? digits) {
     if (digits == null || digits.isEmpty) return '09';
     final mobile = toEnglishDigits(digits);
-    final suffix =
-        mobile.length == 10 && mobile.startsWith('9') ? mobile.substring(1) : mobile;
+    final suffix = mobile.length == 10 && mobile.startsWith('9')
+        ? mobile.substring(1)
+        : mobile;
     return '09${toPersianDigits(suffix)}';
   }
 
@@ -622,8 +623,7 @@ class _LoginScreenState extends State<LoginScreen> {
           );
         } else if (state is ProfileSuccessRequestOtp) {
           log("success request otp - length: ${state.data.data.result.otpLength}");
-          final feedbackMessage =
-              state.data.message ?? 'کد تایید ارسال شد';
+          final feedbackMessage = state.data.message ?? 'کد تایید ارسال شد';
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(

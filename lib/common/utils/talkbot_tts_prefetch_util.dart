@@ -10,7 +10,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:poortak/common/config/tts_config.dart';
 import 'package:poortak/common/services/tts_client.dart';
-import 'package:poortak/featueres/fetures_sayareh/data/models/conversation_model.dart';
+import 'package:poortak/featueres/feature_sayareh/data/models/conversation_model.dart';
 import 'package:poortak/locator.dart';
 
 /// یک واحد متن + صدای مورد نیاز برای کش کردن.

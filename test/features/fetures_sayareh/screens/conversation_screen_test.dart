@@ -7,9 +7,9 @@ import 'package:mocktail/mocktail.dart';
 import 'package:poortak/common/bloc/settings_cubit/settings_cubit.dart';
 import 'package:poortak/common/resources/data_state.dart';
 import 'package:poortak/common/services/tts_service.dart';
-import 'package:poortak/featueres/fetures_sayareh/data/models/conversation_model.dart';
-import 'package:poortak/featueres/fetures_sayareh/repositories/sayareh_repository.dart';
-import 'package:poortak/featueres/fetures_sayareh/screens/converstion_screen.dart';
+import 'package:poortak/featueres/feature_sayareh/data/models/conversation_model.dart';
+import 'package:poortak/featueres/feature_sayareh/repositories/sayareh_repository.dart';
+import 'package:poortak/featueres/feature_sayareh/screens/converstion_screen.dart';
 import 'package:poortak/l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 

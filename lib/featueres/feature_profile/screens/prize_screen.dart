@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/common/widgets/poortak_app_bar.dart';
+import 'package:poortak/featueres/feature_profile/screens/how_to_get_points_screen.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 
@@ -25,12 +27,11 @@ class _PrizeScreenState extends State<PrizeScreen> {
 
     return Scaffold(
       backgroundColor: isDarkMode ? MyColors.darkBackground : Colors.white,
+      appBar: const PoortakAppBar(title: 'جوایز ها'),
       body: SafeArea(
+        top: false,
         child: Column(
           children: [
-            // Header
-            _buildHeader(isDarkMode),
-
             // Content
             Expanded(
               child: SingleChildScrollView(
@@ -56,59 +57,6 @@ class _PrizeScreenState extends State<PrizeScreen> {
             _buildBottomButton(),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildHeader(bool isDarkMode) {
-    return Container(
-      height: 57.h,
-      width: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: 16.w),
-      decoration: BoxDecoration(
-        color: isDarkMode ? MyColors.darkBackgroundSecondary : Colors.white,
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(33.5.r),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0x0D000000),
-            offset: Offset(0, 1.h),
-            blurRadius: 1.r,
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // Title
-          Text(
-            'جوایز ها',
-            style: MyTextStyle.textHeader16Bold.copyWith(
-              color: isDarkMode
-                  ? MyColors.darkTextPrimary
-                  : const Color(0xFF3D495C),
-            ),
-            textAlign: TextAlign.center,
-          ),
-
-          // Back Button
-          Container(
-            width: 50.r,
-            height: 50.r,
-            margin: EdgeInsets.only(left: 16.w),
-            child: IconButton(
-              onPressed: () => Navigator.of(context).pop(),
-              icon: Icon(
-                Icons.arrow_forward,
-                color: isDarkMode
-                    ? MyColors.darkTextPrimary
-                    : const Color(0xFF3D495C),
-                size: 20.r,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -327,7 +275,7 @@ class _PrizeScreenState extends State<PrizeScreen> {
           GestureDetector(
             onTap: () {
               // Navigate to how to get points screen
-              Navigator.pushNamed(context, '/how_to_get_points_screen');
+              Navigator.pushNamed(context, HowToGetPointsScreen.routeName);
             },
             child: Container(
               width: 254.w,

@@ -23,6 +23,7 @@ class PrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final onPrimary = Theme.of(context).colorScheme.onPrimary;
     return SizedBox(
       width: width,
       height: height,
@@ -30,7 +31,7 @@ class PrimaryButton extends StatelessWidget {
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: backgroundColor ?? MyColors.primary,
-          foregroundColor: foregroundColor ?? MyColors.textLight,
+          foregroundColor: foregroundColor ?? onPrimary,
           elevation: 0,
           shadowColor: Colors.transparent,
           shape: RoundedRectangleBorder(
@@ -39,7 +40,7 @@ class PrimaryButton extends StatelessWidget {
         ),
         child: Text(
           lable,
-          style: MyTextStyle.textMatnBtn.copyWith(
+          style: MyTextStyle.textMatnBtnFor(context).copyWith(
             fontSize: 16.sp,
             fontWeight: FontWeight.w600,
           ),

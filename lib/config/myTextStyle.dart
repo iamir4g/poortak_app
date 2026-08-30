@@ -194,6 +194,13 @@ class MyTextStyle {
         fontFamily: "IRANSans",
         fontWeight: FontWeight.bold,
       );
+
+  static TextStyle textMatnBtnFor(BuildContext context) => TextStyle(
+        color: Theme.of(context).colorScheme.onPrimary,
+        fontSize: 16.sp,
+        fontFamily: "IRANSans",
+        fontWeight: FontWeight.bold,
+      );
   static TextStyle get textMatn13PrimaryShade1 => TextStyle(
       fontFamily: "IranSans",
       fontSize: 13.sp,
@@ -284,6 +291,56 @@ class MyTextStyle {
         height: 1.0,
       );
 
+  static TextStyle referralCodeTitle14MediumFor(bool isDark) => TextStyle(
+        fontFamily: "IranSans",
+        fontSize: 14.sp,
+        fontWeight: FontWeight.w500,
+        color: isDark ? MyColors.darkTextPrimary : MyColors.textMatn1,
+        height: 1.0,
+      );
+
+  static TextStyle referralCodeHint14RegularFor(bool isDark) => TextStyle(
+        fontFamily: "IranSans",
+        fontSize: 14.sp,
+        fontWeight: FontWeight.w400,
+        color: isDark ? MyColors.darkTextSecondary : MyColors.text6,
+        height: 1.0,
+      );
+
+  static TextStyle referralCodeValue14MediumFor(bool isDark) => TextStyle(
+        fontFamily: "IranSans",
+        fontSize: 14.sp,
+        fontWeight: FontWeight.w500,
+        color: isDark ? MyColors.darkTextPrimary : MyColors.textMatn1,
+        height: 1.0,
+      );
+
+  static TextStyle referralCodeButton12BoldFor(Color color) => TextStyle(
+        fontFamily: "IranSans",
+        fontSize: 12.sp,
+        fontWeight: FontWeight.w700,
+        color: color,
+        height: 1.0,
+      );
+
+  static TextStyle referralCodeFeedbackSuccess12MediumFor(bool isDark) =>
+      TextStyle(
+        fontFamily: "IranSans",
+        fontSize: 12.sp,
+        fontWeight: FontWeight.w500,
+        color: isDark ? MyColors.referralSuccessDark : MyColors.referralSuccessLight,
+        height: 1.0,
+      );
+
+  static TextStyle referralCodeFeedbackError12MediumFor(bool isDark) =>
+      TextStyle(
+        fontFamily: "IranSans",
+        fontSize: 12.sp,
+        fontWeight: FontWeight.w500,
+        color: isDark ? MyColors.referralErrorDark : MyColors.referralErrorLight,
+        height: 1.0,
+      );
+
   static TextStyle get paymentSecurityTitle13Medium => TextStyle(
         fontFamily: "IRANSans",
         fontSize: 13.sp,
@@ -356,5 +413,50 @@ class MyTextStyle {
         height: 1.0,
         letterSpacing: 0.0,
         color: MyColors.text3,
+      );
+
+  // Score guide (How to get points)
+  static const String scoreGuideScreenTitle = 'روش های کسب امتیاز';
+  static const String scoreGuideMembershipTitle = 'عضویت در اپلیکیشن';
+  static const String scoreGuideMembershipPoints = '۵ سکه';
+  static const String scoreGuideMembershipDescription =
+      'با ثبت شماره تماس خود در اپلیکیشن ۵ سکه دریافت میکنید.';
+  static const String scoreGuidePurchaseTitle = 'خرید از اپلیکیشن';
+  static const String scoreGuidePurchasePoints = '۵ سکه';
+  static const String scoreGuidePurchaseDescription =
+      'با هر خرید از اپلیکیشن ۵ سکه دریافت میکنید.';
+  static const String scoreGuidePackageTitle = 'خرید بسته کامل سیاره آی نو';
+  static const String scoreGuidePackagePoints = '۵۰ سکه';
+  static const String scoreGuidePackageDescription =
+      'با خرید بسته ی کامل سیاره آی نو ۱۰ سکه دریافت میکنید.';
+  static const String scoreGuideInviteTitle = 'دعوت از دوستان';
+  static const String scoreGuideInvitePoints = '۱۰ سکه';
+  static const String scoreGuideInviteDescription =
+      'با ارائه کد معرف به دوستان خود با ورود هریک به اپلیکیشن و انجام خرید، هر کدام ۱۰ امتیاز به دست می آورید.';
+  static const String scoreGuideInviteButton = 'دعوت از دوستان';
+
+  static TextStyle scoreGuideAppBarTitleFor(bool isDark) => textMatn15.copyWith(
+        color: MyColors.scoreGuideAppBarForeground(isDark),
+      );
+
+  static TextStyle scoreGuideCardTitleFor(bool isDark) => textMatn16.copyWith(
+        fontWeight: FontWeight.w500,
+        color: MyColors.scoreGuideTitleColor(isDark),
+      );
+
+  static TextStyle scoreGuideCardDescriptionFor(bool isDark) =>
+      textMatn10W300.copyWith(
+        color: MyColors.scoreGuideBodyColor(isDark),
+        height: 1.4,
+      );
+
+  static TextStyle scoreGuidePointsBadgeFor(bool isDark) => textMatn16.copyWith(
+        fontWeight: FontWeight.w500,
+        color: MyColors.scoreGuidePointsBadgeTextColor(isDark),
+      );
+
+  static TextStyle scoreGuideInviteButtonFor(bool isDark) => textMatn15.copyWith(
+        color: MyColors.textLight,
+        fontWeight: FontWeight.w500,
       );
 }

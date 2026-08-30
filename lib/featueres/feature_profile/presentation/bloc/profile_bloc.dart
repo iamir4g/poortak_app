@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poortak/common/resources/data_state.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/featueres/feature_profile/repositories/profile_repository.dart';
+import 'package:poortak/featueres/feature_profile/presentation/bloc/user_points_total_bloc/user_points_total_bloc.dart';
+import 'package:poortak/featueres/feature_profile/presentation/bloc/user_points_total_bloc/user_points_total_event.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
 import 'package:poortak/locator.dart';
@@ -74,6 +76,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           // Sync local cart data to server after successful login with delay
           log("🛒 Starting cart sync process...");
           await _syncLocalCartToServerWithDelay();
+
+          locator<UserPointsTotalBloc>().add(LoadUserPointsTotalEvent());
 
           log("🎉 Login process completed successfully!");
           emit(ProfileSuccessLogin(loginData));

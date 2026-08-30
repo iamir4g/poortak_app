@@ -13,15 +13,15 @@ import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shoppi
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_state.dart';
 import 'package:poortak/featueres/feature_shopping_cart/repositories/shopping_cart_repository.dart';
-import 'package:poortak/featueres/fetures_sayareh/data/models/all_courses_progress_model.dart'
+import 'package:poortak/featueres/feature_sayareh/data/models/all_courses_progress_model.dart'
     as progress_model;
-import 'package:poortak/featueres/fetures_sayareh/data/models/book_list_model.dart'
+import 'package:poortak/featueres/feature_sayareh/data/models/book_list_model.dart'
     as book_model;
-import 'package:poortak/featueres/fetures_sayareh/data/models/sayareh_home_model.dart'
+import 'package:poortak/featueres/feature_sayareh/data/models/sayareh_home_model.dart'
     as home_model;
-import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/iknow_access_bloc/iknow_access_bloc.dart';
-import 'package:poortak/featueres/fetures_sayareh/repositories/sayareh_repository.dart';
-import 'package:poortak/featueres/fetures_sayareh/screens/sayareh_screen.dart';
+import 'package:poortak/featueres/feature_sayareh/presentation/bloc/iknow_access_bloc/iknow_access_bloc.dart';
+import 'package:poortak/featueres/feature_sayareh/repositories/sayareh_repository.dart';
+import 'package:poortak/featueres/feature_sayareh/screens/sayareh_screen.dart';
 import 'package:poortak/l10n/app_localizations.dart';
 
 // Mocks

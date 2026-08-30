@@ -1,3 +1,5 @@
+import 'package:poortak/common/utils/digit_utils.dart';
+
 class UserPointsTotalModel {
   final bool ok;
   final dynamic meta;
@@ -52,5 +54,9 @@ class UserPointsTotalData {
       'deducted': deducted,
     };
   }
+
+  String get addedDisplay => '${toPersianDigits('$added')} سکه';
+
+  String get remainingDisplay => '${toPersianDigits('$remaining')} سکه';
 }
 

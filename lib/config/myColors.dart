@@ -111,6 +111,8 @@ class MyColors {
       Color(0xFF2C2E3F); // Secondary dark background
   static const Color darkCardBackground =
       Color(0xFF3B3D54); // Card/component background
+  static const Color sayarehItemCardBackgroundDark =
+      darkBackgroundSecondary; // Quiz, lesson & book list items (#2C2E3F)
   static const Color darkBorder = Color(0xFF696E96); // Border/divider color
 
   // Dark Mode Text Colors
@@ -137,6 +139,21 @@ class MyColors {
   static const Color loginTextPrimaryDark = Color(0xFFFFFFFF);
   static const Color loginTextSecondaryDark = Color(0xFF838697);
   static const Color loginButtonText = Color(0xFF171926);
+
+  /// Text on primary (orange) filled buttons — dark in dark mode, white in light.
+  static Color primaryButtonTextColor(bool isDark) =>
+      isDark ? loginButtonText : textLight;
+
+  /// Book detail — «خواندن نمونه» outlined button (Figma 488-7070 / 764-10266).
+  static Color bookSampleButtonBorderColor(bool isDark) =>
+      isDark ? darkBorder : secondary;
+
+  static Color bookSampleButtonTextColor(bool isDark) =>
+      isDark ? darkTextPrimary : secondary;
+
+  static Color bookSampleButtonBackgroundColor(bool isDark) =>
+      isDark ? textInputBackgroundDark : background;
+
   static const Color termsBackgroundDark = Color(0xFF282A39);
   static const Color textInputBackgroundDark = Color(0xFF35374B);
   // Sayareh / reader screen gradients
@@ -239,6 +256,17 @@ class MyColors {
   static const Color cartCoinBadgeDark = darkBackgroundSecondary;
   static const Color cartImageFrameDark = termsBackgroundDark;
 
+  // Referral code card
+  static const Color referralButtonDisabledLight = Color(0xFFE5E5EA);
+  static const Color referralButtonDisabledDark = Color(0xFF545878);
+  static const Color referralButtonDisabledTextLight = text4;
+  static const Color referralButtonDisabledTextDark = darkTextSecondary;
+  static const Color referralSuccessLight = Color(0xFF6FC845);
+  static const Color referralSuccessDark = Color(0xFF6EC644);
+  static const Color referralErrorLight = Color(0xFFE96217);
+  static const Color referralErrorDark = Color(0xFFE96216);
+  static const Color referralInputBorderDark = Color(0xFF696E96);
+
   // New colors for AddWordBottomSheet
   static const Color inputBackground = Color(0xFFF7F7FB);
   static const Color textHint = Color(0xFFBDBDBD);
@@ -247,4 +275,38 @@ class MyColors {
   static const Color inactiveTabBackground = Color(0xFF9498AC);
   static const Color dividerGray = gray;
   static const Color modalButtonPressedLight = Color(0xFFCEDEF8);
+
+  // Score guide (How to get points)
+  static const Color scoreGuideMembershipCardLight = Color(0xFFFDF4F2);
+  static const Color scoreGuidePurchaseCardLight = Color(0xFFE9EFFF);
+  static const Color scoreGuidePackageCardLight = Color(0xFFFFF9EB);
+  static const Color scoreGuideInviteCardLight = Color(0xFFF2FDF7);
+  static const Color scoreGuideInviteButtonLight = Color(0xFF59E59A);
+  static const Color scoreGuidePointsBadgeLight = Color(0xFFFFE8CC);
+  static const Color scoreGuidePointsBadgeDark = Color(0xFF4A4035);
+  static const Color scoreGuidePointsBadgeTextLight = Color(0xFF28303D);
+
+  static Color scoreGuidePageBackground(bool isDark) =>
+      isDark ? profileBackgroundDark : background;
+
+  static Color scoreGuideTitleColor(bool isDark) =>
+      isDark ? profileTextPrimaryDark : text1;
+
+  static Color scoreGuideBodyColor(bool isDark) =>
+      isDark ? profileTextPrimaryDark : text2;
+
+  static Color scoreGuideAppBarForeground(bool isDark) =>
+      isDark ? profileTextPrimaryDark : text2;
+
+  static Color scoreGuideCardBackground(bool isDark, Color lightColor) =>
+      isDark ? darkCardBackground : lightColor;
+
+  static Color scoreGuideInviteButtonBackground(bool isDark) =>
+      isDark ? referralButtonDisabledDark : scoreGuideInviteButtonLight;
+
+  static Color scoreGuidePointsBadgeBackground(bool isDark) =>
+      isDark ? scoreGuidePointsBadgeDark : scoreGuidePointsBadgeLight;
+
+  static Color scoreGuidePointsBadgeTextColor(bool isDark) =>
+      isDark ? profileTextPrimaryDark : scoreGuidePointsBadgeTextLight;
 }

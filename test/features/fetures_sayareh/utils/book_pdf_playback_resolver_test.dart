@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:poortak/featueres/fetures_sayareh/data/models/single_book_model.dart';
-import 'package:poortak/featueres/fetures_sayareh/utils/book_pdf_playback_resolver.dart';
+import 'package:poortak/featueres/feature_sayareh/data/models/single_book_model.dart';
+import 'package:poortak/featueres/feature_sayareh/utils/book_pdf_playback_resolver.dart';
 
 void main() {
   const bookId = '30086bbe-2bc6-4c4b-9266-01bc290c4e51';

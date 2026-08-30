@@ -1,3 +1,5 @@
+import 'package:poortak/common/utils/digit_utils.dart';
+
 class PrizeHistoryModel {
   final String id;
   final int amount;
@@ -47,8 +49,19 @@ class PrizeHistoryModel {
     };
   }
 
+  String get displayTitle {
+    if (description.isNotEmpty) return description;
+    return _typeLabels[type] ?? type;
+  }
+
   // Helper method to get points display text
-  String get pointsDisplay => '$amount سکه';
+  String get pointsDisplay => '${toPersianDigits('$amount')} سکه';
+
+  static const Map<String, String> _typeLabels = {
+    'REGISTRATION': 'عضویت در اپلیکیشن پورتک',
+    'PURCHASE_PRODUCT': 'خرید از پورتک',
+    'PURCHASE_IKNOW_PACKAGE': 'خرید پکیج سیاره آی‌نو',
+  };
 }
 
 class PrizeHistoryGroup {

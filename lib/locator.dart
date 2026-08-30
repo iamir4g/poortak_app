@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'dart:io';
-import 'package:poortak/featueres/fetures_sayareh/repositories/dictionary_repository.dart';
-import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/dictionary_bloc/dictionary_bloc.dart';
+import 'package:poortak/featueres/feature_sayareh/repositories/dictionary_repository.dart';
+import 'package:poortak/featueres/feature_sayareh/presentation/bloc/dictionary_bloc/dictionary_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/common/config/tts_config.dart';
@@ -16,24 +16,25 @@ import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/featueres/feature_litner/data/data_source/litner_api_provider.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_bloc.dart';
 import 'package:poortak/featueres/feature_litner/repositories/litner_repository.dart';
-import 'package:poortak/featueres/fetures_sayareh/data/data_source/sayareh_api_provider.dart';
-import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/bloc_storage_bloc.dart';
-import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/converstion_bloc/converstion_bloc.dart';
-import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/iknow_access_bloc/iknow_access_bloc.dart';
-import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/lesson_bloc/lesson_bloc.dart';
-import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/vocabulary_bloc/vocabulary_bloc.dart';
-import 'package:poortak/featueres/fetures_sayareh/repositories/sayareh_repository.dart';
+import 'package:poortak/featueres/feature_sayareh/data/data_source/sayareh_api_provider.dart';
+import 'package:poortak/featueres/feature_sayareh/presentation/bloc/bloc_storage_bloc.dart';
+import 'package:poortak/featueres/feature_sayareh/presentation/bloc/converstion_bloc/converstion_bloc.dart';
+import 'package:poortak/featueres/feature_sayareh/presentation/bloc/iknow_access_bloc/iknow_access_bloc.dart';
+import 'package:poortak/featueres/feature_sayareh/presentation/bloc/lesson_bloc/lesson_bloc.dart';
+import 'package:poortak/featueres/feature_sayareh/presentation/bloc/vocabulary_bloc/vocabulary_bloc.dart';
+import 'package:poortak/featueres/feature_sayareh/repositories/sayareh_repository.dart';
 import 'package:poortak/featueres/feature_profile/data/data_sorce/profile_api_provider.dart';
 import 'package:poortak/featueres/feature_profile/repositories/profile_repository.dart';
 import 'package:poortak/featueres/feature_profile/presentation/bloc/profile_bloc.dart';
+import 'package:poortak/featueres/feature_profile/presentation/bloc/user_points_total_bloc/user_points_total_bloc.dart';
 import 'package:poortak/featueres/feature_shopping_cart/repositories/shopping_cart_repository.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/data_source/shopping_cart_api_provider.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:poortak/common/bloc/permission/permission_bloc.dart';
-import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_start_bloc/quiz_start_bloc.dart';
-import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_answer_bloc/quiz_answer_bloc.dart';
-import 'package:poortak/featueres/fetures_sayareh/presentation/bloc/quiz_result_bloc/quiz_result_bloc.dart';
+import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_start_bloc/quiz_start_bloc.dart';
+import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_answer_bloc/quiz_answer_bloc.dart';
+import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_result_bloc/quiz_result_bloc.dart';
 import 'package:poortak/common/bloc/theme_cubit/theme_cubit.dart';
 import 'package:poortak/common/bloc/settings_cubit/settings_cubit.dart';
 import 'package:poortak/featueres/feature_match/presentation/bloc/match_bloc/match_bloc.dart';
@@ -42,10 +43,10 @@ import 'package:poortak/featueres/feature_match/repositories/match_repository.da
 import 'package:poortak/featueres/feature_kavoosh/data/data_source/kavoosh_api_provider.dart';
 import 'package:poortak/featueres/feature_kavoosh/repositories/kavoosh_repository.dart';
 import 'package:poortak/featueres/feature_kavoosh/presentation/bloc/categories_bloc/categories_bloc.dart';
-import 'package:poortak/featueres/featureMenu/data/data_source/menu_api_provider.dart';
-import 'package:poortak/featueres/featureMenu/repositories/menu_repository.dart';
-import 'package:poortak/featueres/featureMenu/presentation/bloc/faq_bloc/faq_bloc.dart';
-import 'package:poortak/featueres/featureMenu/presentation/bloc/contact_us_bloc/contact_us_bloc.dart';
+import 'package:poortak/featueres/feature_Menu/data/data_source/menu_api_provider.dart';
+import 'package:poortak/featueres/feature_Menu/repositories/menu_repository.dart';
+import 'package:poortak/featueres/feature_Menu/presentation/bloc/faq_bloc/faq_bloc.dart';
+import 'package:poortak/featueres/feature_Menu/presentation/bloc/contact_us_bloc/contact_us_bloc.dart';
 import 'package:poortak/common/bloc/connectivity_cubit/connectivity_cubit.dart';
 
 import 'package:poortak/common/bloc/video_download_cubit/video_download_cubit.dart';
@@ -127,8 +128,7 @@ Future<void> initLocator() async {
   locator.registerSingleton<MatchApiProvider>(MatchApiProvider(locator()));
   locator.registerSingleton<KavooshApiProvider>(
       KavooshApiProvider(dio: locator()));
-  locator
-      .registerSingleton<MenuApiProvider>(MenuApiProvider(dio: locator()));
+  locator.registerSingleton<MenuApiProvider>(MenuApiProvider(dio: locator()));
 
   //repository
   locator.registerSingleton<SayarehRepository>(SayarehRepository(locator()));
@@ -136,6 +136,9 @@ Future<void> initLocator() async {
       ShoppingCartRepository(apiProvider: locator()));
   locator.registerSingleton<ProfileRepository>(ProfileRepository(locator()));
   locator.registerSingleton<ProfileBloc>(ProfileBloc(repository: locator()));
+  locator.registerSingleton<UserPointsTotalBloc>(
+    UserPointsTotalBloc(repository: locator()),
+  );
   locator.registerSingleton<LitnerRepository>(LitnerRepository(locator()));
   locator.registerSingleton<MatchRepository>(MatchRepository(locator()));
   locator.registerSingleton<KavooshRepository>(KavooshRepository(locator()));
@@ -160,8 +163,7 @@ Future<void> initLocator() async {
       () => DictionaryBloc(repository: locator()));
   locator.registerFactory<CategoriesBloc>(
       () => CategoriesBloc(repository: locator()));
-  locator.registerFactory<FaqBloc>(
-      () => FaqBloc(menuRepository: locator()));
+  locator.registerFactory<FaqBloc>(() => FaqBloc(menuRepository: locator()));
   locator.registerFactory<ContactUsBloc>(
       () => ContactUsBloc(menuRepository: locator()));
 

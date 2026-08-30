@@ -198,6 +198,17 @@ class ShoppingCartRepository {
     await _prefsOperator.clearLocalCart();
   }
 
+  Future<ShoppingCart> applyReferrerCode(String referrerCode) async {
+    log("🎟️ Applying referrer code: $referrerCode");
+    try {
+      await _apiProvider.applyReferrerCode(referrerCode);
+      return await getCart();
+    } catch (e) {
+      log("❌ Error applying referrer code: $e");
+      rethrow;
+    }
+  }
+
   Future<String> checkoutCart() async {
     log("💳 Checking out cart...");
     try {

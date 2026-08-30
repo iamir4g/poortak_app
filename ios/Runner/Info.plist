@@ -54,5 +54,12 @@
 	<string>دسترسی برای ذخیره برخی از ویدو ها و فایل ها است</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>دسترسی برای ذخیره برخی از ویدو ها و فایل ها است</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>https</string>
+		<string>http</string>
+		<string>mailto</string>
+		<string>tel</string>
+	</array>
 </dict>
 </plist>

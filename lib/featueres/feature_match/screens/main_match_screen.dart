@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:poortak/common/widgets/poortak_app_bar.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
@@ -14,6 +15,11 @@ class MainMatchScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
+      appBar: PoortakAppBar(
+        title: 'مسابقه پورتک',
+        foregroundColor:
+            isDark ? MyColors.darkTextPrimary : MyColors.textMatn2,
+      ),
       body: Container(
         decoration: BoxDecoration(
           gradient: isDark
@@ -37,67 +43,9 @@ class MainMatchScreen extends StatelessWidget {
                 ),
         ),
         child: SafeArea(
+          top: false,
           child: Column(
             children: [
-              // Header
-              Container(
-                height: Dimens.nh(57),
-                width: double.infinity,
-                padding: EdgeInsets.symmetric(horizontal: Dimens.medium),
-                decoration: BoxDecoration(
-                  color:
-                      isDark ? MyColors.darkBackgroundSecondary : Colors.white,
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(Dimens.nr(33.5)),
-                  ),
-                  boxShadow: isDark
-                      ? null
-                      : [
-                          BoxShadow(
-                            color: const Color(0x0D000000),
-                            offset: Offset(0, Dimens.nh(1)),
-                            blurRadius: Dimens.nr(1),
-                          ),
-                        ],
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // Title
-                    Flexible(
-                      child: Text(
-                        'مسابقه پورتک',
-                        style: MyTextStyle.textHeader16Bold.copyWith(
-                          color: isDark
-                              ? MyColors.darkTextPrimary
-                              : MyColors.textMatn2,
-                        ),
-                        textAlign: TextAlign.center,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-
-                    // Back Button
-                    Container(
-                      width: Dimens.nw(50),
-                      height: Dimens.nh(50),
-                      margin: EdgeInsets.only(left: Dimens.medium),
-                      child: IconButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        icon: Icon(
-                          Icons.arrow_forward,
-                          color: isDark
-                              ? MyColors.darkTextPrimary
-                              : MyColors.textMatn1,
-                          size: Dimens.nr(20),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
               // Content
               Expanded(
                 child: SingleChildScrollView(

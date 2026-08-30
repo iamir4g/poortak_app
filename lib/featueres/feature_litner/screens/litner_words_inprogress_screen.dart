@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:poortak/common/widgets/poortak_app_bar.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/config/dimens.dart';
@@ -138,20 +139,7 @@ class _LitnerWordsInprogressScreenState
     return Scaffold(
       backgroundColor:
           isDark ? MyColors.profileBackgroundDark : const Color(0xFFFFFFFF),
-      appBar: AppBar(
-        backgroundColor:
-            isDark ? MyColors.profileHeaderDark : const Color(0xFFFFFFFF),
-        title: Flexible(
-          child: Text(
-            'لغات در حال یادگیری',
-            style: MyTextStyle.textHeader16Bold.copyWith(
-              color: isDark ? MyColors.darkTextPrimary : MyColors.textMatn1,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-      ),
+      appBar: const PoortakAppBar(title: 'لغات در حال یادگیری'),
       floatingActionButtonLocation: FloatingActionButtonLocation.miniStartFloat,
       floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
       floatingActionButton: FloatingActionButton(
@@ -160,7 +148,7 @@ class _LitnerWordsInprogressScreenState
         ),
         backgroundColor: MyColors.brandPrimary,
         onPressed: _showAddWordBottomSheet,
-        child: const Icon(Icons.add, color: Colors.white),
+        child: Icon(Icons.add, color: isDark ? Colors.black : Colors.white),
       ),
       body: SafeArea(
         child: BlocConsumer<LitnerBloc, LitnerState>(
@@ -338,12 +326,6 @@ class _LitnerWordsInprogressScreenState
                                   constraints: BoxConstraints(minHeight: 48.h),
                                   padding: EdgeInsets.symmetric(
                                       vertical: 4.h, horizontal: 8.w),
-                                  decoration: BoxDecoration(
-                                    color: isDark
-                                        ? MyColors.termsBackgroundDark
-                                        : Colors.white,
-                                    borderRadius: BorderRadius.circular(8.r),
-                                  ),
                                   child: Row(
                                     children: [
                                       Expanded(
@@ -379,9 +361,9 @@ class _LitnerWordsInprogressScreenState
                                             padding: EdgeInsets.zero,
                                             constraints: const BoxConstraints(),
                                             onPressed: () {
-                                              locator<TtsClient>()
-                                                  .speak(word.word,
-                                                      voice: 'male');
+                                              locator<TtsClient>().speak(
+                                                  word.word,
+                                                  voice: 'male');
                                             },
                                           ),
                                           SizedBox(width: 4.w),

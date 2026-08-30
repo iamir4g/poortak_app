@@ -97,6 +97,12 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
 
+dependency_overrides:
+  # Workaround: path_provider_foundation 2.6.0 FFI fails to load objective_c on iOS.
+  # See: https://github.com/flutter/flutter/issues/186794
+  path_provider_foundation: 2.5.1
+  objective_c: 9.3.0
+
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 

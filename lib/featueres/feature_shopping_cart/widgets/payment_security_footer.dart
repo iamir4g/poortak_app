@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:poortak/common/utils/svg_embedded_png.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
@@ -12,20 +11,11 @@ class PaymentSecurityFooter extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
-      margin: EdgeInsets.fromLTRB(
-        Dimens.nw(10),
-        0,
-        Dimens.nw(10),
-        Dimens.nh(0),
-      ),
+      margin: EdgeInsets.symmetric(horizontal: Dimens.nw(10)),
       padding: EdgeInsets.symmetric(
         horizontal: Dimens.nw(14),
-        vertical: Dimens.nh(12),
+        vertical: Dimens.nh(8),
       ),
-      decoration: BoxDecoration(
-          // color: isDark ? MyColors.termsBackgroundDark : Colors.white,
-          // borderRadius: BorderRadius.circular(Dimens.nr(12)),
-          ),
       child: Row(
         textDirection: TextDirection.rtl,
         children: [
@@ -57,9 +47,8 @@ class PaymentSecurityFooter extends StatelessWidget {
               ],
             ),
           ),
-          // SizedBox(width: Dimens.nw(12)),
-          buildImageFromAssetOrEmbeddedSvg(
-            'assets/images/enamad.svg',
+          Image.asset(
+            'assets/images/enamad.png',
             width: Dimens.nw(80),
             height: Dimens.nh(80),
             fit: BoxFit.contain,

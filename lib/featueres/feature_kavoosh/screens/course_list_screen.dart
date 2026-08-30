@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:poortak/common/widgets/poortak_app_bar.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/common/utils/date_util.dart';
@@ -123,61 +124,10 @@ class _CourseListScreenState extends State<CourseListScreen> {
         child: Scaffold(
           backgroundColor:
               isDark ? MyColors.darkBackground : MyColors.background1,
-          appBar: PreferredSize(
-            preferredSize: Size.fromHeight(57.h),
-            child: SafeArea(
-              child: Container(
-                padding: EdgeInsets.fromLTRB(16.w, 0, 32.w, 0),
-                height: 57.h,
-                decoration: BoxDecoration(
-                  color:
-                      isDark ? MyColors.darkBackgroundSecondary : Colors.white,
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(33.5.r),
-                  ),
-                  boxShadow: isDark
-                      ? null
-                      : [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.05),
-                            offset: Offset(0, 1.h),
-                            blurRadius: 1.r,
-                          ),
-                        ],
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Flexible(
-                      child: Text(
-                        widget.title,
-                        style: MyTextStyle.textHeader16Bold.copyWith(
-                          color: isDark
-                              ? MyColors.darkTextPrimary
-                              : MyColors.textMatn2,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    SizedBox(
-                      width: 40.w,
-                      height: 40.h,
-                      child: IconButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        icon: Icon(
-                          Icons.arrow_forward,
-                          color: isDark
-                              ? MyColors.darkTextPrimary
-                              : MyColors.textMatn2,
-                          size: 28.r,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+          appBar: PoortakAppBar(
+            title: widget.title,
+            foregroundColor:
+                isDark ? MyColors.darkTextPrimary : MyColors.textMatn2,
           ),
           body: Column(
             children: [

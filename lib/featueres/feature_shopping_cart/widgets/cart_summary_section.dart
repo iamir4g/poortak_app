@@ -8,7 +8,7 @@ class CartSummarySection extends StatelessWidget {
   final int subTotal;
   final int discount;
   final int payable;
-  final ValueChanged<String>? onReferralSubmit;
+  final Future<void> Function(String code)? onReferralSubmit;
 
   const CartSummarySection({
     super.key,
@@ -29,12 +29,10 @@ class CartSummarySection extends StatelessWidget {
           payable: payable,
         ),
         SizedBox(height: Dimens.nh(12)),
-        Padding(
-          padding: EdgeInsets.only(bottom: Dimens.nh(8)),
-          child: ReferralCodeCard(
-            onSubmit: onReferralSubmit,
-          ),
+        ReferralCodeCard(
+          onSubmit: onReferralSubmit,
         ),
+        SizedBox(height: Dimens.nh(4)),
         const PaymentSecurityFooter(),
       ],
     );

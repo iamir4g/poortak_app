@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:poortak/common/widgets/poortak_app_bar.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_bloc.dart';
@@ -125,27 +126,10 @@ class _LitnerWordCompletedScreenState extends State<LitnerWordCompletedScreen> {
     return Scaffold(
       backgroundColor:
           isDark ? MyColors.profileBackgroundDark : const Color(0xFFF6F9FE),
-      appBar: AppBar(
+      appBar: PoortakAppBar(
+        title: 'آموخته شده ها',
         backgroundColor:
             isDark ? MyColors.profileHeaderDark : const Color(0xFFF6F9FE),
-        elevation: 0,
-        title: Flexible(
-          child: Text(
-            'آموخته شده ها',
-            style: MyTextStyle.textHeader16Bold.copyWith(
-              color: isDark ? MyColors.darkTextPrimary : MyColors.textMatn1,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios_new,
-            color: isDark ? MyColors.darkTextPrimary : const Color(0xFF3D495C),
-          ),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
       ),
       body: SafeArea(
         child: BlocConsumer<LitnerBloc, LitnerState>(

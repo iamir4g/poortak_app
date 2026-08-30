@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:poortak/common/widgets/adaptive_safe_area.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/educational_videos_screen.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/ebooks_screen.dart';
@@ -24,71 +25,71 @@ class _KavooshMainScreenState extends State<KavooshMainScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Scaffold(
-      backgroundColor: isDark ? MyColors.darkBackground : MyColors.background3,
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Content
-            Expanded(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(
-                    horizontal: Dimens.medium, vertical: Dimens.nw(20.0)),
-                child: Column(
-                  children: [
-                    // Educational Videos Card
-                    _buildContentCard(
-                      title: 'ویدئو های آموزشی',
-                      subtitle: 'ویدئو های آموزشی برای پایه های تحصیلی',
-                      gradientColors: const [
-                        Color(0xFFFFFDCC),
-                        Color(0xFFFFF3D6),
-                      ],
-                      onTap: () {
-                        Navigator.pushNamed(
-                            context, EducationalVideosScreen.routeName);
-                      },
-                    ),
-
-                    SizedBox(height: Dimens.nh(13.0)),
-
-                    // E-Books Card
-                    _buildContentCard(
-                      title: 'کتاب الکترونیکی',
-                      subtitle:
-                          'کتاب های آموزشی الکترونیکی برای پایه های تحصیلی',
-                      gradientColors: const [
-                        Color(0xFFFBEBDF),
-                        Color(0xFFFFDBDB),
-                      ],
-                      onTap: () {
-                        Navigator.pushNamed(context, EBooksScreen.routeName);
-                      },
-                    ),
-
-                    SizedBox(height: Dimens.nh(13.0)),
-
-                    // Self-Assessment Card
-                    _buildContentCard(
-                      title: 'خود سنجی',
-                      subtitle: 'آزمون دروس پایه های تحصیلی',
-                      gradientColors: const [
-                        Color(0xFFD9FFFA),
-                        Color(0xFFD9FFEA),
-                      ],
-                      onTap: () {
-                        Navigator.pushNamed(
-                            context, SelfAssessmentScreen.routeName);
-                      },
-                      showComingSoonBadge: false,
-                    ),
-                  ],
-                ),
+    final backgroundColor =
+        isDark ? MyColors.darkBackground : MyColors.background3;
+    final content = AdaptiveSafeArea(
+      child: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.symmetric(
+                  horizontal: Dimens.medium, vertical: Dimens.nw(12.0)),
+              child: Column(
+                children: [
+                  _buildContentCard(
+                    title: 'ویدئو های آموزشی',
+                    subtitle: 'ویدئو های آموزشی برای پایه های تحصیلی',
+                    gradientColors: const [
+                      Color(0xFFFFFDCC),
+                      Color(0xFFFFF3D6),
+                    ],
+                    onTap: () {
+                      Navigator.pushNamed(
+                          context, EducationalVideosScreen.routeName);
+                    },
+                  ),
+                  SizedBox(height: Dimens.nh(13.0)),
+                  _buildContentCard(
+                    title: 'کتاب الکترونیکی',
+                    subtitle:
+                        'کتاب های آموزشی الکترونیکی برای پایه های تحصیلی',
+                    gradientColors: const [
+                      Color(0xFFFBEBDF),
+                      Color(0xFFFFDBDB),
+                    ],
+                    onTap: () {
+                      Navigator.pushNamed(context, EBooksScreen.routeName);
+                    },
+                  ),
+                  SizedBox(height: Dimens.nh(13.0)),
+                  _buildContentCard(
+                    title: 'خود سنجی',
+                    subtitle: 'آزمون دروس پایه های تحصیلی',
+                    gradientColors: const [
+                      Color(0xFFD9FFFA),
+                      Color(0xFFD9FFEA),
+                    ],
+                    onTap: () {
+                      Navigator.pushNamed(
+                          context, SelfAssessmentScreen.routeName);
+                    },
+                    showComingSoonBadge: false,
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
+    );
+
+    if (MainWrapperScope.isEmbeddedInMainWrapper(context)) {
+      return ColoredBox(color: backgroundColor, child: content);
+    }
+
+    return Scaffold(
+      backgroundColor: backgroundColor,
+      body: content,
     );
   }
 
