@@ -42,6 +42,7 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
   final FlipCardController _flipController = FlipCardController();
   final TTSService ttsService = locator<TTSService>();
   bool isBack = false; // Track if the card is showing its back
+  bool _isTransitioning = false;
 
   @override
   void initState() {
@@ -65,6 +66,29 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
     setState(() {
       isBack = false;
     });
+  }
+
+  Future<void> _handleReviewChoice(String wordId, bool success) async {
+    if (_isTransitioning) return;
+    _isTransitioning = true;
+
+    setState(() {
+      isBack = false;
+    });
+
+    if (_flipController.state?.isFront == false) {
+      await _flipController.flipcard();
+    }
+
+    if (!mounted) return;
+
+    await context.read<LitnerReviewCubit>().submitReviewAndNext(wordId, success);
+
+    if (mounted) {
+      setState(() {
+        _isTransitioning = false;
+      });
+    }
   }
 
   @override
@@ -185,6 +209,7 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
                     SizedBox(height: 64.h),
                     Center(
                       child: FlipCard(
+                        key: ValueKey(word.id),
                         controller: _flipController,
                         rotateSide: RotateSide.right,
                         axis: FlipAxis.vertical,
@@ -211,17 +236,9 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
                               textColor: isDark
                                   ? MyColors.darkTextPrimary
                                   : const Color(0xFF3A465A),
-                              onTap: () {
-                                setState(() {
-                                  isBack = false;
-                                  if (_flipController.state?.isFront == false) {
-                                    _flipController.flipcard();
-                                  }
-                                });
-                                context
-                                    .read<LitnerReviewCubit>()
-                                    .submitReviewAndNext(word.id, true);
-                              },
+                              onTap: _isTransitioning
+                                  ? null
+                                  : () => _handleReviewChoice(word.id, true),
                             ),
                             litnerChoiceButton(
                               circleColor: const Color(0xFFFDEAEA), // light red
@@ -232,17 +249,9 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
                               textColor: isDark
                                   ? MyColors.darkTextPrimary
                                   : const Color(0xFF3A465A),
-                              onTap: () {
-                                setState(() {
-                                  isBack = false;
-                                  if (_flipController.state?.isFront == false) {
-                                    _flipController.flipcard();
-                                  }
-                                });
-                                context
-                                    .read<LitnerReviewCubit>()
-                                    .submitReviewAndNext(word.id, false);
-                              },
+                              onTap: _isTransitioning
+                                  ? null
+                                  : () => _handleReviewChoice(word.id, false),
                             ),
                           ],
                         ),
