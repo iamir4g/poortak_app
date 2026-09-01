@@ -1,0 +1,10 @@
+// Optional: Google Maven mirror for environments where dl.google.com is unreachable.
+// Copy to gradle/init.gradle (not committed) — loaded automatically by gradlew if present.
+
+beforeSettings { settings ->
+    settings.dependencyResolutionManagement {
+        repositories {
+            maven { url = uri("https://maven.aliyun.com/repository/google") }
+        }
+    }
+}

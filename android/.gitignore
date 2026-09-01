@@ -6,6 +6,13 @@ gradle-wrapper.jar
 /local.properties
 GeneratedPluginRegistrant.java
 
+# Machine-specific Gradle config (each developer keeps their own copy)
+gradle.local.properties
+gradle/init.gradle
+
+# Build output
+/build/
+
 # Remember to never publicly share your keystore.
 # See https://flutter.dev/to/reference-keystore
 key.properties
