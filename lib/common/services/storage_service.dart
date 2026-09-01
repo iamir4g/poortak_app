@@ -89,7 +89,6 @@ class StorageService {
     // log("Download URL Response: ${response.data}");
     return GetDownloadUrl.fromJson(response.data);
   }
-  // 'https://api.poortak.ir/api/v1/storage/key/{fileId}'
 
   void _logDecryptKeyDebug(String message) {
     log('[BookDecrypt] $message', name: 'StorageService');
@@ -208,8 +207,6 @@ class StorageService {
   }
 
   String getDownloadPublicUrl(String key) {
-    // For public downloads, the API returns the image binary data directly
-    // We need to construct the URL manually since the response is binary
     return "${Constants.baseUrl}storage/public/$key";
   }
 

@@ -17,6 +17,12 @@
 # Keep your app's main classes
 -keep class com.example.poortak.** { *; }
 
+# Cafe Bazaar / Poolakey
+-keep class com.farsitel.bazaar.** { *; }
+-keep class ir.cafebazaar.poolakey.** { *; }
+-dontwarn com.farsitel.bazaar.**
+-dontwarn ir.cafebazaar.poolakey.**
+
 # Keep model classes (if you have any)
 -keep class * extends java.io.Serializable { *; }
 

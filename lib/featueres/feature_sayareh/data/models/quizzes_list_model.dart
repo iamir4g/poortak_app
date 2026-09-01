@@ -54,6 +54,16 @@ class Datum {
     required this.iKnowUserQuizProgresses,
   });
 
+  /// Best known score from user progresses, or null if never attempted.
+  int? get userScore {
+    if (iKnowUserQuizProgresses.isEmpty) return null;
+    var best = iKnowUserQuizProgresses.first.score;
+    for (final item in iKnowUserQuizProgresses.skip(1)) {
+      if (item.score > best) best = item.score;
+    }
+    return best;
+  }
+
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
         id: json["id"] ?? "",
         title: json["title"] ?? "",
@@ -63,7 +73,9 @@ class Datum {
         updatedAt: DateTime.parse(json["updatedAt"]),
         iKnowCourseId: json["iKnowCourseId"] ?? "",
         iKnowUserQuizProgresses: (json["iKnowUserQuizProgresses"] as List?)
-                ?.map((x) => IKnowUserQuizProgress.fromJson(x))
+                ?.map((x) => IKnowUserQuizProgress.fromJson(
+                      (x as Map).cast<String, dynamic>(),
+                    ))
                 .toList() ??
             [],
       );
@@ -98,11 +110,11 @@ class IKnowUserQuizProgress {
 
   factory IKnowUserQuizProgress.fromJson(Map<String, dynamic> json) =>
       IKnowUserQuizProgress(
-        id: json["id"] ?? "",
-        score: json["score"] ?? 0,
-        completed: json["completed"] ?? false,
-        quizId: json["quizId"] ?? "",
-        userId: json["userId"] ?? "",
+        id: json["id"]?.toString() ?? "",
+        score: _asInt(json["score"]),
+        completed: json["completed"] == true,
+        quizId: json["quizId"]?.toString() ?? "",
+        userId: json["userId"]?.toString() ?? "",
       );
 
   Map<String, dynamic> toJson() => {
@@ -112,6 +124,12 @@ class IKnowUserQuizProgress {
         "quizId": quizId,
         "userId": userId,
       };
+
+  static int _asInt(dynamic value) {
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    return int.tryParse(value?.toString() ?? '') ?? 0;
+  }
 }
 
 class Meta {

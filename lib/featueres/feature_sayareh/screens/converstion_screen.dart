@@ -43,6 +43,9 @@ class _ConversationScreenState extends State<ConversationScreen> {
   // ایندکس جمله فعلی داخل پیام (برای تکنیک Shadowing)
   final ValueNotifier<int> currentSentenceIndexNotifier = ValueNotifier(0);
 
+  // بعد از اسkip جلو/عقب، جمله فعلی را حتی بدون پخش مشخص کن
+  final ValueNotifier<bool> _sentenceFocusNotifier = ValueNotifier(false);
+
   // لیست پیام‌های مرتب شده بر اساس order
   List<Datum>? sortedMessages;
 
@@ -52,15 +55,9 @@ class _ConversationScreenState extends State<ConversationScreen> {
   // مشخص می‌کند که آیا ترجمه‌ها باید نمایش داده شوند
   final ValueNotifier<bool> showTranslationsNotifier = ValueNotifier(false);
 
-  // شمارنده برای ارسال دوره‌ای وضعیت پخش به سرور
-  int _messagesPlayedSinceLastSave = 0;
-  static const int _saveInterval = 3;
-
   // شناسه جلسه پخش برای جلوگیری از تداخل پخش‌ها
   int _playbackSessionId = 0;
-
-  // تایمر برای جلوگیری از ارسال درخواست‌های تکراری و پشت سر هم
-  Timer? _savePlaybackDebounceTimer;
+  int _speakTapId = 0;
 
   @override
   void initState() {
@@ -171,29 +168,22 @@ class _ConversationScreenState extends State<ConversationScreen> {
     currentPlayingIndexNotifier.dispose();
     currentSentenceIndexNotifier.dispose();
     showTranslationsNotifier.dispose();
-    _savePlaybackDebounceTimer?.cancel();
+    _sentenceFocusNotifier.dispose();
     _scrollController.dispose();
     super.dispose();
   }
 
-  /// ذخیره وضعیت پخش در سرور
+  /// ذخیره وضعیت پخش در سرور — همان لحظه، بدون debounce
   void _savePlayback(String conversationId) {
-    // اگر تایمری فعال است، آن را کنسل کن
-    if (_savePlaybackDebounceTimer?.isActive ?? false) {
-      _savePlaybackDebounceTimer!.cancel();
-    }
-
-    // ایجاد تایمر جدید
-    _savePlaybackDebounceTimer = Timer(const Duration(milliseconds: 1000), () {
-      if (mounted) {
-        _converstionBloc.add(
-          SaveConversationPlaybackEvent(
-            courseId: widget.conversationId,
-            conversationId: conversationId,
-          ),
-        );
-      }
-    });
+    debugPrint(
+      '🌐 [PLAYBACK] save conversationId=$conversationId courseId=${widget.conversationId}',
+    );
+    _converstionBloc.add(
+      SaveConversationPlaybackEvent(
+        courseId: widget.conversationId,
+        conversationId: conversationId,
+      ),
+    );
   }
 
   /// تجزیه متن به جملات جداگانه
@@ -249,30 +239,29 @@ class _ConversationScreenState extends State<ConversationScreen> {
         // تجزیه پیام فعلی به جملات
         _currentMessageSentences = _splitIntoSentences(message.text);
 
+        var messageFinished = true;
+
         // پخش جملات پیام فعلی
         for (var j = currentSentenceIndexNotifier.value;
             j < _currentMessageSentences.length;
             j++) {
-          if (!mounted) break;
+          if (!mounted) {
+            messageFinished = false;
+            break;
+          }
           // بررسی حیاتی قبل از هر مرحله
           if (!isPlayingNotifier.value || _playbackSessionId != mySessionId) {
+            messageFinished = false;
             break;
           }
 
           currentSentenceIndexNotifier.value = j;
           final sentence = _currentMessageSentences[j];
 
-          // ذخیره وضعیت پخش در صورت رسیدن به حد نصاب
-          _messagesPlayedSinceLastSave++;
-          if (_messagesPlayedSinceLastSave >= _saveInterval) {
-            _savePlayback(message.id);
-            _messagesPlayedSinceLastSave = 0;
-          }
-
           // پخش جمله با صدای متناسب آواتار (ربات=آقا، مایا=خانم)
           try {
-            if (!isPlayingNotifier.value ||
-                _playbackSessionId != mySessionId) {
+            if (!isPlayingNotifier.value || _playbackSessionId != mySessionId) {
+              messageFinished = false;
               break;
             }
             await _speakWithAvatarVoice(sentence, message);
@@ -282,6 +271,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
           // توقف بین جملات برای تکنیک Shadowing
           if (!isPlayingNotifier.value || _playbackSessionId != mySessionId) {
+            messageFinished = false;
             break;
           }
 
@@ -291,14 +281,17 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
           // بررسی مجدد بعد از تاخیر
           if (!isPlayingNotifier.value || _playbackSessionId != mySessionId) {
+            messageFinished = false;
             break;
           }
         }
 
-        // اگر پخش پیام تمام شد و کاربر متوقف نکرده بود، ایندکس جمله را صفر کن
+        // فقط وقتی کل پیام واقعاً پخش شد ذخیره کن؛ اسkip جلو/عقب ریکوئست نمی‌زند
         if (mounted &&
             isPlayingNotifier.value &&
-            _playbackSessionId == mySessionId) {
+            _playbackSessionId == mySessionId &&
+            messageFinished) {
+          _savePlayback(message.id);
           currentSentenceIndexNotifier.value = 0;
         } else {
           // اگر کاربر متوقف کرده، ایندکس فعلی را حفظ کن تا دفعه بعد از همین‌جا ادامه دهد
@@ -332,10 +325,11 @@ class _ConversationScreenState extends State<ConversationScreen> {
       isPlayingNotifier.value = false;
     }
 
-    // ذخیره وضعیت پخش به عنوان آخرین متن پخش شده
-    _savePlayback(conversationId);
-
+    final int tapId = ++_speakTapId;
     await _speakWithAvatarVoice(text, message);
+    if (mounted && tapId == _speakTapId) {
+      _savePlayback(conversationId);
+    }
   }
 
   /// رفتن به جمله بعدی
@@ -365,6 +359,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
       currentSentenceIndexNotifier.value,
       force: true,
     );
+    _sentenceFocusNotifier.value = true;
 
     if (wasPlaying) {
       playAllConversations(sortedMessages!);
@@ -398,6 +393,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
       currentSentenceIndexNotifier.value,
       force: true,
     );
+    _sentenceFocusNotifier.value = true;
 
     if (wasPlaying) {
       playAllConversations(sortedMessages!);
@@ -638,52 +634,60 @@ class _ConversationScreenState extends State<ConversationScreen> {
         return ValueListenableBuilder<bool>(
           valueListenable: isPlayingNotifier,
           builder: (context, isPlaybackActive, _) {
-            return ValueListenableBuilder<int>(
-              valueListenable: currentPlayingIndexNotifier,
-              builder: (context, currentPlayingIndex, _) {
+            return ValueListenableBuilder<bool>(
+              valueListenable: _sentenceFocusNotifier,
+              builder: (context, sentenceFocus, _) {
+                final highlightCurrentSentence =
+                    isPlaybackActive || sentenceFocus;
                 return ValueListenableBuilder<int>(
-                  valueListenable: currentSentenceIndexNotifier,
-                  builder: (context, currentSentenceIndex, _) {
-                    if (isPlaybackActive) {
-                      _scrollToCurrentSentence(
-                        currentPlayingIndex,
-                        currentSentenceIndex,
-                      );
-                    }
+                  valueListenable: currentPlayingIndexNotifier,
+                  builder: (context, currentPlayingIndex, _) {
+                    return ValueListenableBuilder<int>(
+                      valueListenable: currentSentenceIndexNotifier,
+                      builder: (context, currentSentenceIndex, _) {
+                        if (highlightCurrentSentence) {
+                          _scrollToCurrentSentence(
+                            currentPlayingIndex,
+                            currentSentenceIndex,
+                          );
+                        }
 
-                    return ListView.builder(
-                      controller: _scrollController,
-                      itemCount: sortedMessages?.length ?? 0,
-                      itemBuilder: (context, index) {
-                        final message = sortedMessages![index];
-                        final sentenceCount =
-                            _splitIntoSentences(message.text).length;
-                        final sentenceKeys = _getSentenceKeysForMessage(
-                          index,
-                          sentenceCount,
-                        );
+                        return ListView.builder(
+                          controller: _scrollController,
+                          itemCount: sortedMessages?.length ?? 0,
+                          itemBuilder: (context, index) {
+                            final message = sortedMessages![index];
+                            final sentenceCount =
+                                _splitIntoSentences(message.text).length;
+                            final sentenceKeys = _getSentenceKeysForMessage(
+                              index,
+                              sentenceCount,
+                            );
 
-                        _itemKeys[index] ??= GlobalKey();
+                            _itemKeys[index] ??= GlobalKey();
 
-                        final isCurrentPlaying = sortedMessages != null &&
-                            currentPlayingIndex < sortedMessages!.length &&
-                            sortedMessages![currentPlayingIndex].id ==
-                                message.id;
+                            final isCurrentPlaying = sortedMessages != null &&
+                                currentPlayingIndex < sortedMessages!.length &&
+                                sortedMessages![currentPlayingIndex].id ==
+                                    message.id;
 
-                        return ConversationMessageBubble(
-                          key: _itemKeys[index],
-                          message: message,
-                          isCurrentPlaying: isCurrentPlaying,
-                          isPlaybackActive: isPlaybackActive,
-                          currentSentenceIndex:
-                              isCurrentPlaying ? currentSentenceIndex : 0,
-                          sentenceKeys: sentenceKeys,
-                          showTranslations: showTranslations,
-                          onTap: () {
-                            speakText(
-                              message.text,
-                              message,
-                              message.id,
+                            return ConversationMessageBubble(
+                              key: _itemKeys[index],
+                              message: message,
+                              isCurrentPlaying: isCurrentPlaying,
+                              isPlaybackActive: highlightCurrentSentence,
+                              currentSentenceIndex: isCurrentPlaying
+                                  ? currentSentenceIndex
+                                  : 0,
+                              sentenceKeys: sentenceKeys,
+                              showTranslations: showTranslations,
+                              onTap: () {
+                                speakText(
+                                  message.text,
+                                  message,
+                                  message.id,
+                                );
+                              },
                             );
                           },
                         );

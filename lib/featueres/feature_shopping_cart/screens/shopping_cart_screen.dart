@@ -39,6 +39,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:poortak/common/utils/money_utils.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/common/error_handling/app_exception.dart';
+import 'package:poortak/common/bloc/in_app_purchase_bloc/in_app_purchase_bloc.dart';
+import 'package:poortak/config/app_flavor.dart';
 import 'dart:developer';
 
 class _LocalCartDisplayItem {
@@ -47,6 +49,7 @@ class _LocalCartDisplayItem {
   final int price;
   final String? thumbnailId;
   final String type;
+  final String? bazaarSku;
 
   const _LocalCartDisplayItem({
     required this.title,
@@ -54,6 +57,7 @@ class _LocalCartDisplayItem {
     required this.price,
     required this.type,
     this.thumbnailId,
+    this.bazaarSku,
   });
 }
 
@@ -128,6 +132,86 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
         Navigator.pushNamed(context, LoginScreen.routeName);
       },
     );
+  }
+
+  Future<void> _handlePayNow(
+    List<String> bazaarSkus, {
+    String? payload,
+  }) async {
+    if (!locator<PrefsOperator>().isLoggedIn()) {
+      _promptLogin();
+      return;
+    }
+
+    if (context.read<InAppPurchaseBloc>().state is InAppPurchasePurchasing) {
+      return;
+    }
+
+    debugPrint(
+      '🛒 PayNow channel=${AppFlavor.paymentChannel} '
+      'flavor=${AppFlavor.appFlavor} '
+      'useBazaarIap=${AppFlavor.useBazaarIap} '
+      'skus=$bazaarSkus',
+    );
+
+    if (AppFlavor.useBazaarIap) {
+      final skus = bazaarSkus
+          .map((sku) => sku.trim())
+          .where((sku) => sku.isNotEmpty)
+          .toList();
+      if (skus.isEmpty) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'شناسه محصول بازار (SKU) برای این آیتم‌ها تنظیم نشده',
+            ),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 2),
+          ),
+        );
+        return;
+      }
+
+      debugPrint('🛒 Bazaar purchase, skipping IPG checkout. SKUs=$skus');
+      context.read<InAppPurchaseBloc>().add(
+            PurchaseProductsEvent(
+              productIds: skus,
+              payload: payload,
+            ),
+          );
+      return;
+    }
+
+    try {
+      final apiProvider = locator<ShoppingCartApiProvider>();
+      final response = await apiProvider.checkoutCart();
+
+      log("✅ Checkout response: ${response.data}");
+
+      final url = response.data['data']['url'] as String;
+      log("🔗 Payment URL: $url");
+
+      await launchUrl(
+        Uri.parse(url),
+        mode: LaunchMode.externalApplication,
+      );
+    } catch (e) {
+      log("❌ Checkout failed: $e");
+      if (mounted) {
+        if (e is UnauthorisedException) {
+          _promptLogin();
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('خطا در پردازش پرداخت: $e'),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 2),
+            ),
+          );
+        }
+      }
+    }
   }
 
   Future<void> _submitReferralCode(String code) async {
@@ -322,6 +406,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
           price: MoneyUtils.parseRialToTomanInt(course.price),
           thumbnailId: course.videoThumbnailOrThumbnail,
           type: itemType,
+          bazaarSku: course.bazaarSku,
         );
       }
     } else if (itemType == 'IKnowBook') {
@@ -335,6 +420,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
           price: MoneyUtils.parseRialToTomanInt(book.price),
           thumbnailId: book.thumbnail,
           type: itemType,
+          bazaarSku: book.bazaarSku,
         );
       }
     } else if (itemType == 'IKnow') {
@@ -346,6 +432,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
               'شامل ${summary.data.courses.length} درس و ${summary.data.books.length} کتاب',
           price: _calculateBundlePayableAmount(summary),
           type: itemType,
+          bazaarSku: summary.data.settings.bazaarSku,
         );
       }
     }
@@ -440,8 +527,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                             color: isDark
                                 ? MyColors.primary.withValues(alpha: 0.18)
                                 : const Color(0xFFFFE8CC),
-                            borderRadius:
-                                BorderRadius.circular(Dimens.nr(10)),
+                            borderRadius: BorderRadius.circular(Dimens.nr(10)),
                           ),
                           child: Text(
                             pointsText,
@@ -704,43 +790,10 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                   backgroundColor:
                       isDark ? MyColors.primary : MyColors.secondary,
                   onPressed: () async {
-                    if (!locator<PrefsOperator>().isLoggedIn()) {
-                      _promptLogin();
-                      return;
-                    }
-                    try {
-                      // Call checkout API directly
-                      final apiProvider = locator<ShoppingCartApiProvider>();
-                      final response = await apiProvider.checkoutCart();
-
-                      log("✅ Checkout response: ${response.data}");
-
-                      // Parse response and get URL
-                      final url = response.data['data']['url'] as String;
-                      log("🔗 Payment URL: $url");
-
-                      // Launch payment URL immediately without showing SnackBar
-                      // to avoid showing "در حال پردازش..." when user returns
-                      await launchUrl(
-                        Uri.parse(url),
-                        mode: LaunchMode.externalApplication,
-                      );
-                    } catch (e) {
-                      log("❌ Checkout failed: $e");
-                      if (mounted) {
-                        if (e is UnauthorisedException) {
-                          _promptLogin();
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('خطا در پردازش پرداخت: $e'),
-                              backgroundColor: Colors.red,
-                              duration: const Duration(seconds: 2),
-                            ),
-                          );
-                        }
-                      }
-                    }
+                    await _handlePayNow(
+                      cart.items.map((item) => item.bazaarSku ?? '').toList(),
+                      payload: cart.id,
+                    );
                   },
                 ),
                 // SizedBox(width: double.infinity),
@@ -905,43 +958,14 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                   backgroundColor:
                       isDark ? MyColors.primary : MyColors.secondary,
                   onPressed: () async {
-                    if (!locator<PrefsOperator>().isLoggedIn()) {
-                      _promptLogin();
-                      return;
-                    }
-                    try {
-                      // Call checkout API directly
-                      final apiProvider = locator<ShoppingCartApiProvider>();
-                      final response = await apiProvider.checkoutCart();
-
-                      log("✅ Checkout response: ${response.data}");
-
-                      // Parse response and get URL
-                      final url = response.data['data']['url'] as String;
-                      log("🔗 Payment URL: $url");
-
-                      // Launch payment URL immediately without showing SnackBar
-                      // to avoid showing "در حال پردازش..." when user returns
-                      await launchUrl(
-                        Uri.parse(url),
-                        mode: LaunchMode.externalApplication,
-                      );
-                    } catch (e) {
-                      log("❌ Checkout failed: $e");
-                      if (mounted) {
-                        if (e is UnauthorisedException) {
-                          _promptLogin();
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('خطا در پردازش پرداخت: $e'),
-                              backgroundColor: Colors.red,
-                              duration: const Duration(seconds: 2),
-                            ),
-                          );
-                        }
-                      }
-                    }
+                    final resolvedItems = await Future.wait(
+                      localCartItems.map(_resolveLocalCartItem),
+                    );
+                    await _handlePayNow(
+                      resolvedItems
+                          .map((item) => item.bazaarSku ?? '')
+                          .toList(),
+                    );
                   },
                 ),
                 FutureBuilder<int>(

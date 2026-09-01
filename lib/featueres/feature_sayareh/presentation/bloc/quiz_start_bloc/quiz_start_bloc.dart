@@ -20,10 +20,24 @@ class QuizStartBloc extends Bloc<QuizStartEvent, QuizStartState> {
   ) async {
     emit(QuizStartLoading());
 
-    final result = await _sayarehRepository.fetchStartQuizQuestion(
+    var result = await _sayarehRepository.fetchStartQuizQuestion(
       event.courseId,
       event.quizId,
     );
+
+    // Completed (or previously finished) quizzes return 422 — reset then start fresh
+    // so the user can retake regardless of score (70% or 100%).
+    if (result is DataFailed &&
+        result.errorCode == 'quizAlreadyCompleted') {
+      await _sayarehRepository.deleteQuizResult(
+        event.courseId,
+        event.quizId,
+      );
+      result = await _sayarehRepository.fetchStartQuizQuestion(
+        event.courseId,
+        event.quizId,
+      );
+    }
 
     if (result is DataSuccess && result.data != null) {
       emit(QuizStartLoaded(result.data!));

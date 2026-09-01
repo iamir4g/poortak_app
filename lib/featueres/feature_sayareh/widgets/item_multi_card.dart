@@ -10,18 +10,19 @@ import 'package:persian_tools/persian_tools.dart';
 class ItemMultiCard extends StatelessWidget {
   final String title;
   final String price;
+  final bool isDemo;
   const ItemMultiCard({
     super.key,
     required this.title,
     required this.price,
+    this.isDemo = false,
   });
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor =
-        isDark ? MyColors.darkTextPrimary : MyColors.textMatn1;
+    final textColor = isDark ? MyColors.darkTextPrimary : MyColors.textMatn1;
     final secondaryTextColor =
         isDark ? MyColors.darkTextSecondary : MyColors.textMatn1;
 
@@ -49,19 +50,26 @@ class ItemMultiCard extends StatelessWidget {
                 )
               ],
             ),
-            Row(
-              children: [
-                Text(
-                  convertEnToFa(MoneyUtils.formatTomanFromRial(price)),
-                  style: MyTextStyle.textMatn12W500.copyWith(color: textColor),
-                ),
-                Text(
-                  l10n?.toman ?? "",
-                  style:
-                      MyTextStyle.textMatn12W300.copyWith(color: secondaryTextColor),
-                )
-              ],
-            )
+            isDemo || price == "0"
+                ? Text(
+                    "رایگان",
+                    style:
+                        MyTextStyle.textMatn12W500.copyWith(color: textColor),
+                  )
+                : Row(
+                    children: [
+                      Text(
+                        convertEnToFa(MoneyUtils.formatTomanFromRial(price)),
+                        style: MyTextStyle.textMatn12W500
+                            .copyWith(color: textColor),
+                      ),
+                      Text(
+                        l10n?.toman ?? "",
+                        style: MyTextStyle.textMatn12W300
+                            .copyWith(color: secondaryTextColor),
+                      )
+                    ],
+                  )
           ],
         ),
       ),

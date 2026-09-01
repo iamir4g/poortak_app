@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:poortak/common/services/auth_service.dart';
 import 'package:poortak/config/constants.dart';
 import 'package:poortak/locator.dart';
@@ -89,8 +90,10 @@ class SayarehApiProvider {
     return _retryRequest(() => dio.post(
           "${Constants.baseUrl}iknow/courses/$courseId/vocabulary/$vocabularyId/submit",
           data: {
+            "previousVocabularyIds": previousVocabularyIds
+                .where((id) => id.isNotEmpty)
+                .toList(),
             "answer": answer,
-            "previousVocabularyIds": previousVocabularyIds,
             "vocabularyId": vocabularyId,
           },
         ));
@@ -131,6 +134,17 @@ class SayarehApiProvider {
         ));
   }
 
+  dynamic callGetQuizProgress(String courseId, {String? quizId}) async {
+    final url = "${Constants.baseUrl}iknow/courses/$courseId/quiz/progress";
+    final query = quizId == null || quizId.isEmpty ? null : {'quizId': quizId};
+    debugPrint('📡 [QuizProgress] GET $url');
+    debugPrint('📡 [QuizProgress] query: $query');
+    return _retryRequest(() => _authService.get(
+          url,
+          queryParameters: query,
+        ));
+  }
+
   dynamic callSayarehStorageApi() async {
     return _retryRequest(() => dio.get("${Constants.baseUrl}storage"));
   }
@@ -157,14 +171,18 @@ class SayarehApiProvider {
 
   dynamic callPostConversationPlayback(
       String courseId, String conversationId) async {
-    log("Sayareh save converstion courseId: $courseId, conversationId: $conversationId");
-    return _retryRequest(() => dio.post(
-          "${Constants.baseUrl}iknow/courses/$courseId/conversation/playback",
-          data: {
-            "courseId": courseId,
-            "conversationId": conversationId,
-          },
-        ));
+    final url =
+        "${Constants.baseUrl}iknow/courses/$courseId/conversation/playback";
+    debugPrint(
+      '🌐 [PLAYBACK] POST $url conversationId=$conversationId',
+    );
+    return dio.post(
+      url,
+      data: {
+        "courseId": courseId,
+        "conversationId": conversationId,
+      },
+    );
   }
 
   dynamic callGetCourseProgress(String courseId) async {

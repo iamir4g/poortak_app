@@ -15,7 +15,9 @@ class QuizesCubit extends Cubit<QuizesState> {
         super(QuizesInitial());
 
   Future<void> fetchQuizzes(String courseId) async {
-    emit(QuizesLoading());
+    if (state is! QuizesLoaded) {
+      emit(QuizesLoading());
+    }
     try {
       final result = await _sayarehRepository.fetchQuizzes(courseId);
 

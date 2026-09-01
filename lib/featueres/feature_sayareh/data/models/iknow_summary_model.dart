@@ -72,6 +72,8 @@ class IKnowSummaryCourse {
   String description;
   String price;
   int order;
+  bool isDemo;
+  String? bazaarSku;
 
   IKnowSummaryCourse({
     required this.id,
@@ -79,6 +81,8 @@ class IKnowSummaryCourse {
     required this.description,
     required this.price,
     required this.order,
+    this.isDemo = false,
+    this.bazaarSku,
   });
 
   factory IKnowSummaryCourse.fromJson(Map<String, dynamic> json) =>
@@ -88,6 +92,8 @@ class IKnowSummaryCourse {
         description: json["description"] ?? "",
         price: json["price"] ?? "0",
         order: json["order"] ?? 0,
+        isDemo: json["isDemo"] ?? false,
+        bazaarSku: json["bazaarSku"]?.toString(),
       );
 
   Map<String, dynamic> toJson() => {
@@ -96,6 +102,8 @@ class IKnowSummaryCourse {
         "description": description,
         "price": price,
         "order": order,
+        "isDemo": isDemo,
+        "bazaarSku": bazaarSku,
       };
 }
 
@@ -105,6 +113,8 @@ class IKnowSummaryBook {
   String description;
   int order;
   String price;
+  bool isDemo;
+  String? bazaarSku;
 
   IKnowSummaryBook({
     required this.id,
@@ -112,6 +122,8 @@ class IKnowSummaryBook {
     required this.description,
     required this.order,
     required this.price,
+    this.isDemo = false,
+    this.bazaarSku,
   });
 
   factory IKnowSummaryBook.fromJson(Map<String, dynamic> json) =>
@@ -121,6 +133,8 @@ class IKnowSummaryBook {
         description: json["description"] ?? "",
         order: json["order"] ?? 0,
         price: json["price"] ?? "0",
+        isDemo: json["isDemo"] ?? false,
+        bazaarSku: json["bazaarSku"]?.toString(),
       );
 
   Map<String, dynamic> toJson() => {
@@ -129,6 +143,8 @@ class IKnowSummaryBook {
         "description": description,
         "order": order,
         "price": price,
+        "isDemo": isDemo,
+        "bazaarSku": bazaarSku,
       };
 }
 
@@ -137,12 +153,14 @@ class IKnowSummarySettings {
   String price;
   String discountType;
   String discountAmount;
+  String? bazaarSku;
 
   IKnowSummarySettings({
     required this.id,
     required this.price,
     required this.discountType,
     required this.discountAmount,
+    this.bazaarSku,
   });
 
   factory IKnowSummarySettings.fromJson(Map<String, dynamic> json) =>
@@ -151,6 +169,7 @@ class IKnowSummarySettings {
         price: json["price"] ?? "0",
         discountType: json["discountType"] ?? "",
         discountAmount: json["discountAmount"] ?? "0",
+        bazaarSku: json["bazaarSku"]?.toString(),
       );
 
   Map<String, dynamic> toJson() => {
@@ -158,5 +177,6 @@ class IKnowSummarySettings {
         "price": price,
         "discountType": discountType,
         "discountAmount": discountAmount,
+        "bazaarSku": bazaarSku,
       };
 }

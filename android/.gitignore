@@ -1,11 +1,11 @@
-gradle-wrapper.jar
-/.gradle
-/captures/
-/gradlew
-/gradlew.bat
-/local.properties
-GeneratedPluginRegistrant.java
+# Gradle / Android Studio local cache
+.gradle/
+.kotlin/
+build/
+captures/
+local.properties
 
+<<<<<<< HEAD
 # Machine-specific Gradle config (each developer keeps their own copy)
 gradle.local.properties
 gradle/init.gradle
@@ -15,6 +15,26 @@ gradle/init.gradle
 
 # Remember to never publicly share your keystore.
 # See https://flutter.dev/to/reference-keystore
+=======
+# Native / CMake build cache (machine-specific)
+**/.cxx/
+app/.cxx/
+app/build/
+
+# Flutter-generated registrant
+**/GeneratedPluginRegistrant.java
+
+# Release signing (each developer creates locally)
+>>>>>>> a79f110ddba91455c171ea7b0245f0c16e54d8f3
 key.properties
 **/*.keystore
 **/*.jks
+
+# Flutter wraps Gradle; these are regenerated locally by Flutter/Android Studio
+gradle-wrapper.jar
+gradlew
+gradlew.bat
+
+# IDE
+*.iml
+.idea/

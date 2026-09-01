@@ -15,6 +15,9 @@ final class LessonSuccess extends LessonState {
   final Lesson lesson;
   final CourseProgressData? progress;
   const LessonSuccess({required this.lesson, this.progress});
+
+  @override
+  List<Object> get props => [lesson, progress ?? ''];
 }
 
 final class LessonError extends LessonState {

@@ -30,8 +30,13 @@ import 'package:poortak/featueres/feature_sayareh/widgets/item_question.dart';
 class PracticeVocabularyScreen extends StatefulWidget {
   static const routeName = "/practice_vocabulary_screen";
   final String courseId;
+  final bool restart;
 
-  const PracticeVocabularyScreen({super.key, required this.courseId});
+  const PracticeVocabularyScreen({
+    super.key,
+    required this.courseId,
+    this.restart = false,
+  });
 
   @override
   State<PracticeVocabularyScreen> createState() =>
@@ -50,6 +55,8 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
   List<String> randomizedOptions = [];
   bool _isExitDialogOpen = false;
   bool _hasShownResultModal = false;
+  bool _isAnswering = false;
+  String? _currentDisplayedWordId;
 
   @override
   void initState() {
@@ -78,6 +85,9 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
   }
 
   void _checkAnswer(String word) {
+    if (_isAnswering || showAnswer || selectedWord != null) return;
+    _isAnswering = true;
+
     final currentState = context.read<PracticeVocabularyBloc>().state
         as PracticeVocabularySuccess;
     final correctWord = currentState.practiceVocabulary.data.correctWord;
@@ -122,29 +132,18 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
   }
 
   void _nextQuestion() {
-    setState(() {
-      showAnswer = false;
-      selectedWord = null;
-      randomizedOptions = []; // Clear for next randomization
-    });
-    if (context.read<PracticeVocabularyBloc>().state
-        is PracticeVocabularySuccess) {
-      final currentState = context.read<PracticeVocabularyBloc>().state
-          as PracticeVocabularySuccess;
-      context.read<PracticeVocabularyBloc>().add(
-            PracticeVocabularyFetchEvent(
-              courseId: widget.courseId,
-              previousVocabularyIds: currentState.correctWords,
-            ),
-          );
-    } else {
-      context.read<PracticeVocabularyBloc>().add(
-            PracticeVocabularyFetchEvent(
-              courseId: widget.courseId,
-              previousVocabularyIds: [],
-            ),
-          );
-    }
+    context.read<PracticeVocabularyBloc>().add(
+          const PracticeVocabularyNextEvent(),
+        );
+  }
+
+  void _syncQuestionLocalState(String wordId) {
+    if (_currentDisplayedWordId == wordId) return;
+    _currentDisplayedWordId = wordId;
+    showAnswer = false;
+    selectedWord = null;
+    randomizedOptions = [];
+    _isAnswering = false;
   }
 
   void _readWord(String word) async {
@@ -336,7 +335,10 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
 
             if (state is PracticeVocabularyInitial) {
               context.read<PracticeVocabularyBloc>().add(
-                    PracticeVocabularyFetchEvent(courseId: widget.courseId),
+                    PracticeVocabularyFetchEvent(
+                      courseId: widget.courseId,
+                      startFresh: widget.restart,
+                    ),
                   );
             }
             return PopScope(
@@ -370,6 +372,7 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
                       if (state is PracticeVocabularySuccess) {
                         final correctWord =
                             state.practiceVocabulary.data.correctWord;
+                        _syncQuestionLocalState(correctWord.id);
                         final wrongWord =
                             state.practiceVocabulary.data.wrongWord;
                         final stats = state.practiceVocabulary.data.stats;
@@ -385,6 +388,7 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
                               (word) => Expanded(
                                 child: PressableAnswerOptionButton(
                                   text: word,
+                                  enabled: !showAnswer && selectedWord == null,
                                   onTap: () => _checkAnswer(word),
                                 ),
                               ),

@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:dio/dio.dart';
 import 'package:poortak/common/services/auth_service.dart';
+import 'package:poortak/config/app_flavor.dart';
 import 'package:poortak/config/constants.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/models/cart_enum.dart';
 import 'package:poortak/locator.dart';
@@ -52,11 +53,41 @@ class ShoppingCartApiProvider {
   }
 
   Future<Response> checkoutCart() async {
+    if (AppFlavor.useBazaarIap) {
+      throw StateError(
+        'Android Bazaar builds must use FlutterPoolakey.purchase, not cart/checkout',
+      );
+    }
     log("💳 Checking out cart via API...");
     final response =
         await _authService.post("${Constants.baseUrl}cart/checkout");
     log("✅ Checkout Cart Response: ${response.data}");
     return response;
+  }
+
+  Future<Response> verifyBazaarPurchase({
+    required String productId,
+    required String purchaseToken,
+    String? orderId,
+    String? payload,
+    String? originalJson,
+    String? dataSignature,
+  }) async {
+    log("🛒 Verifying Cafe Bazaar purchase...");
+    return _authService.post(
+      "${Constants.baseUrl}payments/bazaar/verify",
+      data: {
+        "productId": productId,
+        "purchaseToken": purchaseToken,
+        "gateway": "BAZAAR",
+        if (orderId != null && orderId.isNotEmpty) "orderId": orderId,
+        if (payload != null && payload.isNotEmpty) "payload": payload,
+        if (originalJson != null && originalJson.isNotEmpty)
+          "originalJson": originalJson,
+        if (dataSignature != null && dataSignature.isNotEmpty)
+          "dataSignature": dataSignature,
+      },
+    );
   }
 
   Future<Response> applyReferrerCode(String referrerCode) async {

@@ -6,23 +6,17 @@ import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/common/utils/digit_utils.dart';
 import 'package:lottie/lottie.dart';
 import 'package:poortak/featueres/feature_sayareh/screens/quizzes_screen.dart';
-import 'package:poortak/locator.dart';
-import 'package:poortak/featueres/feature_sayareh/repositories/sayareh_repository.dart';
 
 class QuizResultModal extends StatelessWidget {
   final int totalQuestions;
   final int correctAnswers;
   final double score;
-  final String courseId;
-  final String quizId;
 
   const QuizResultModal({
     super.key,
     required this.totalQuestions,
     required this.correctAnswers,
     required this.score,
-    required this.courseId,
-    required this.quizId,
   });
 
   @override
@@ -159,17 +153,9 @@ class QuizResultModal extends StatelessWidget {
               width: double.infinity,
               height: 50.h,
               child: ElevatedButton(
-                onPressed: () async {
-                  try {
-                    await locator<SayarehRepository>()
-                        .deleteQuizResult(courseId, quizId);
-                  } catch (_) {
-                    // Continue navigation even if delete fails.
-                  }
-                  if (context.mounted) {
-                    Navigator.of(context)
-                        .popUntil(ModalRoute.withName(QuizzesScreen.routeName));
-                  }
+                onPressed: () {
+                  Navigator.of(context)
+                      .popUntil(ModalRoute.withName(QuizzesScreen.routeName));
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: MyColors.primary,

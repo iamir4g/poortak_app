@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:poortak/featueres/feature_sayareh/repositories/dictionary_repository.dart';
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/dictionary_bloc/dictionary_bloc.dart';
 import 'package:get_it/get_it.dart';
@@ -29,7 +30,10 @@ import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shoppi
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_start_bloc/quiz_start_bloc.dart';
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_answer_bloc/quiz_answer_bloc.dart';
+import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_progress_bloc/quiz_progress_bloc.dart';
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_result_bloc/quiz_result_bloc.dart';
+import 'package:poortak/common/bloc/in_app_purchase_bloc/in_app_purchase_bloc.dart';
+import 'package:poortak/common/services/cafe_bazaar_purchase_service.dart';
 import 'package:poortak/common/bloc/theme_cubit/theme_cubit.dart';
 import 'package:poortak/common/bloc/settings_cubit/settings_cubit.dart';
 import 'package:poortak/featueres/feature_match/presentation/bloc/match_bloc/match_bloc.dart';
@@ -86,7 +90,32 @@ Future<void> initLocator() async {
         options.headers.remove('Authorization');
       }
 
+      debugPrint('🌐 [REQUEST] ${options.method} ${options.uri}');
+      if (options.data != null) {
+        debugPrint('🌐 [BODY] ${options.data}');
+      }
       return handler.next(options);
+    },
+    onResponse: (response, handler) {
+      debugPrint(
+        '✅ [RESPONSE] ${response.statusCode} ${response.requestOptions.uri}',
+      );
+      if (response.data != null) {
+        debugPrint('✅ [RESPONSE BODY] ${response.data}');
+      }
+      return handler.next(response);
+    },
+    onError: (error, handler) {
+      debugPrint(
+        '❌ [ERROR] ${error.response?.statusCode} ${error.requestOptions.uri}',
+      );
+      if (error.response?.data != null) {
+        debugPrint('❌ [ERROR BODY] ${error.response?.data}');
+      }
+      if (error.requestOptions.data != null) {
+        debugPrint('❌ [ERROR REQUEST BODY] ${error.requestOptions.data}');
+      }
+      return handler.next(error);
     },
   ));
 
@@ -159,10 +188,19 @@ Future<void> initLocator() async {
   // Register ShoppingCartBloc
   locator.registerSingleton<ShoppingCartBloc>(
       ShoppingCartBloc(repository: locator()));
+  locator.registerSingleton<CafeBazaarPurchaseService>(
+      CafeBazaarPurchaseService());
+  locator.registerSingleton<InAppPurchaseBloc>(
+    InAppPurchaseBloc(
+      service: locator(),
+      cartRepository: locator(),
+    ),
+  );
 
   // Register Quiz Blocs
   locator.registerFactory<QuizStartBloc>(() => QuizStartBloc(locator()));
   locator.registerFactory<QuizAnswerBloc>(() => QuizAnswerBloc(locator()));
+  locator.registerFactory<QuizProgressBloc>(() => QuizProgressBloc(locator()));
   locator.registerFactory<QuizResultBloc>(() => QuizResultBloc(locator()));
 
   // Register ThemeCubit

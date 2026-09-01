@@ -18,6 +18,7 @@ class QuizAnswerLoaded extends QuizAnswerState {
   final String correctAnswerId;
   final String selectedAnswerId;
   final bool isLastQuestion;
+  final answer_model.AnswerStats? stats;
 
   const QuizAnswerLoaded({
     required this.isCorrect,
@@ -26,6 +27,7 @@ class QuizAnswerLoaded extends QuizAnswerState {
     required this.correctAnswerId,
     required this.selectedAnswerId,
     this.isLastQuestion = false,
+    this.stats,
   });
 
   @override
@@ -36,14 +38,21 @@ class QuizAnswerLoaded extends QuizAnswerState {
         correctAnswerId,
         selectedAnswerId,
         isLastQuestion,
+        stats?.all,
+        stats?.answered,
+        stats?.correct,
       ];
 }
 
 class QuizAnswerError extends QuizAnswerState {
   final String message;
+  final QuizAnswerFailure failure;
 
-  const QuizAnswerError(this.message);
+  const QuizAnswerError(
+    this.message, {
+    this.failure = QuizAnswerFailure.generic,
+  });
 
   @override
-  List<Object?> get props => [message];
+  List<Object?> get props => [message, failure];
 }

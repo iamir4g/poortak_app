@@ -53,6 +53,7 @@ class SingleBookData {
   DateTime? publishedAt;
   bool? purchased;
   bool? isDemo;
+  String? bazaarSku;
 
   SingleBookData({
     required this.id,
@@ -72,6 +73,7 @@ class SingleBookData {
     this.publishedAt,
     this.purchased,
     this.isDemo,
+    this.bazaarSku,
   });
 
   factory SingleBookData.fromJson(Map<String, dynamic> json) => SingleBookData(
@@ -98,6 +100,7 @@ class SingleBookData {
             : DateTime.parse(json["publishedAt"]),
         purchased: json["purchased"],
         isDemo: json["isDemo"],
+        bazaarSku: json["bazaarSku"]?.toString(),
       );
 
   Map<String, dynamic> toJson() => {
@@ -118,6 +121,7 @@ class SingleBookData {
         "publishedAt": publishedAt?.toIso8601String(),
         "purchased": purchased,
         "isDemo": isDemo,
+        "bazaarSku": bazaarSku,
       };
 }
 

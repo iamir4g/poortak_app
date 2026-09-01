@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:poortak/common/error_handling/app_exception.dart';
 import 'package:poortak/common/error_handling/check_exception.dart';
 import 'package:poortak/common/resources/data_state.dart';
@@ -11,6 +12,7 @@ import 'package:poortak/featueres/feature_sayareh/data/models/conversation_model
 import 'package:poortak/featueres/feature_sayareh/data/models/practice_vocabulary_model.dart';
 import 'package:poortak/featueres/feature_sayareh/data/models/quiz_question_model.dart';
 import 'package:poortak/featueres/feature_sayareh/data/models/quizzes_list_model.dart';
+import 'package:poortak/featueres/feature_sayareh/data/models/quiz_progress_model.dart';
 import 'package:poortak/featueres/feature_sayareh/data/models/result_question_model.dart';
 import 'package:poortak/featueres/feature_sayareh/data/models/course_progress_model.dart';
 import 'package:poortak/featueres/feature_sayareh/data/models/all_courses_progress_model.dart';
@@ -19,6 +21,16 @@ import 'package:poortak/featueres/feature_sayareh/data/models/iknow_summary_mode
 import 'package:poortak/featueres/feature_sayareh/data/models/sayareh_home_model.dart';
 import 'package:poortak/featueres/feature_sayareh/data/models/sayareh_storage_test_model.dart';
 import 'package:poortak/featueres/feature_sayareh/data/models/vocabulary_model.dart';
+
+class SubmitVocabularyResult {
+  final PracticeVocabularyModel? nextPractice;
+  final bool isCompleted;
+
+  const SubmitVocabularyResult({
+    this.nextPractice,
+    this.isCompleted = false,
+  });
+}
 
 class SayarehRepository {
   SayarehApiProvider sayarehApiProvider;
@@ -225,11 +237,7 @@ class SayarehRepository {
       Response response = await sayarehApiProvider.callPostPracticeVocabulary(
           id, previousVocabularyIds);
       if (response.statusCode == 200 || response.statusCode == 201) {
-        if (response.data['data'] == null) {
-          return DataSuccess(null);
-        }
-        final data = PracticeVocabularyModel.fromJson(response.data);
-        return DataSuccess(data);
+        return _mapPracticeResponse(response.data);
       } else {
         return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
       }
@@ -238,7 +246,7 @@ class SayarehRepository {
     }
   }
 
-  Future<DataState<void>> submitVocabulary(
+  Future<DataState<SubmitVocabularyResult>> submitVocabulary(
     String courseId,
     String vocabularyId,
     String answer,
@@ -252,21 +260,111 @@ class SayarehRepository {
         previousVocabularyIds,
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
-        return DataSuccess(null);
+        return _mapSubmitResponse(response.data);
       } else {
         return DataFailed(response.data['message'] ?? "خطا در ارسال اطلاعات");
       }
     } on DioException catch (e) {
       log("submitVocabulary failed: status=${e.response?.statusCode}, body=${e.response?.data}");
-      return DataFailed(
-        _extractErrorMessage(
+      final message = _extractErrorMessage(
+        e.response?.data,
+        fallbackMessage: "خطا در ثبت پاسخ لغت",
+      );
+      if (e.response?.statusCode == 422 &&
+          message.toLowerCase().contains('already submitted')) {
+        return _mapSubmitResponse(
           e.response?.data,
-          fallbackMessage: "خطا در ثبت پاسخ لغت",
+          alreadySubmitted: true,
+        );
+      }
+      return DataFailed(message);
+    } on AppException catch (e) {
+      return CheckExceptions.getError<SubmitVocabularyResult>(e);
+    }
+  }
+
+  DataState<PracticeVocabularyModel> _mapPracticeResponse(dynamic raw) {
+    if (raw is! Map) {
+      return const DataFailed("خطا در دریافت اطلاعات");
+    }
+    final map = Map<String, dynamic>.from(raw);
+    if (map['data'] == null) {
+      return const DataSuccess(null);
+    }
+    try {
+      return DataSuccess(_practiceModelFromJson(map));
+    } catch (_) {
+      return const DataFailed("خطا در دریافت اطلاعات");
+    }
+  }
+
+  DataState<SubmitVocabularyResult> _mapSubmitResponse(
+    dynamic raw, {
+    bool alreadySubmitted = false,
+  }) {
+    if (raw is! Map) {
+      if (alreadySubmitted) {
+        return const DataSuccess(SubmitVocabularyResult());
+      }
+      return const DataFailed("خطا در دریافت سوال بعدی");
+    }
+
+    final map = Map<String, dynamic>.from(raw);
+    final practiceData = _extractPracticeData(map['data']);
+    if (practiceData == null) {
+      if (alreadySubmitted) {
+        return const DataSuccess(SubmitVocabularyResult());
+      }
+      return const DataSuccess(SubmitVocabularyResult(isCompleted: true));
+    }
+
+    try {
+      return DataSuccess(
+        SubmitVocabularyResult(
+          nextPractice: PracticeVocabularyModel.fromJson({
+            'ok': map['ok'] ?? true,
+            'meta': map['meta'] ?? <String, dynamic>{},
+            'data': practiceData,
+          }),
         ),
       );
-    } on AppException catch (e) {
-      return CheckExceptions.getError<void>(e);
+    } catch (_) {
+      if (alreadySubmitted) {
+        return const DataSuccess(SubmitVocabularyResult());
+      }
+      return const DataFailed("خطا در دریافت سوال بعدی");
     }
+  }
+
+  PracticeVocabularyModel _practiceModelFromJson(Map<String, dynamic> map) {
+    final data = map['data'];
+    final practiceData = _extractPracticeData(data);
+    if (practiceData == null) {
+      throw const FormatException('practice data is missing');
+    }
+    return PracticeVocabularyModel.fromJson({
+      'ok': map['ok'] ?? true,
+      'meta': map['meta'] ?? <String, dynamic>{},
+      'data': practiceData,
+    });
+  }
+
+  Map<String, dynamic>? _extractPracticeData(dynamic data) {
+    if (data is! Map) return null;
+    final dataMap = Map<String, dynamic>.from(data);
+    if (dataMap.containsKey('correctWord') &&
+        dataMap.containsKey('wrongWord')) {
+      return dataMap;
+    }
+    for (final key in ['next', 'nextQuestion', 'practice', 'question']) {
+      final nested = dataMap[key];
+      if (nested is Map &&
+          nested.containsKey('correctWord') &&
+          nested.containsKey('wrongWord')) {
+        return Map<String, dynamic>.from(nested);
+      }
+    }
+    return null;
   }
 
   Future<DataState<QuizesList>> fetchQuizzes(String id) async {
@@ -297,8 +395,12 @@ class SayarehRepository {
       }
     } on DioException catch (e) {
       if (e.response?.statusCode == 422) {
-        return const DataFailed<QuizesQuestion>(
-          "شما قبلا این آزمون را گذرانده اید.",
+        return DataFailed<QuizesQuestion>(
+          _extractErrorMessage(
+            e.response?.data,
+            fallbackMessage: "شما قبلا این آزمون را گذرانده اید.",
+          ),
+          errorCode: 'quizAlreadyCompleted',
         );
       }
 
@@ -330,14 +432,56 @@ class SayarehRepository {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         log("Attempting to parse response data...");
-        final data = AnswerQuestion.fromJson(response.data);
+        if (response.data is! Map) {
+          return const DataFailed("خطا در دریافت داده از سرور. لطفا دوباره تلاش کنید.");
+        }
+        final data = AnswerQuestion.fromJson(
+          (response.data as Map).cast<String, dynamic>(),
+        );
         log("Successfully parsed response data");
-        log("Returning DataSuccess with parsed data");
         return DataSuccess(data);
       } else {
         log("Error response: ${response.data}");
-        return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
+        return DataFailed(
+          _extractErrorMessage(
+            response.data,
+            fallbackMessage: "خطا در ثبت پاسخ",
+          ),
+        );
       }
+    } on DioException catch (e) {
+      final status = e.response?.statusCode;
+      log("DioException caught: status=$status body=${e.response?.data}");
+      final message = _extractErrorMessage(
+        e.response?.data,
+        fallbackMessage: "خطا در ثبت پاسخ",
+      );
+
+      if (status == 409) {
+        return DataFailed(
+          message,
+          errorCode: 'questionAlreadyAnswered',
+        );
+      }
+      if (status == 404) {
+        return DataFailed(
+          message,
+          errorCode: 'questionOrAnswerNotFound',
+        );
+      }
+      if (status == 401) {
+        return DataFailed(
+          message,
+          errorCode: 'unauthorized',
+        );
+      }
+      return DataFailed(message);
+    } on UnauthorisedException catch (e) {
+      log("UnauthorisedException caught: $e");
+      return DataFailed(
+        e.message?.toString() ?? 'Session expired. Please login again.',
+        errorCode: 'unauthorized',
+      );
     } on AppException catch (e) {
       log("AppException caught: $e");
       return CheckExceptions.getError<AnswerQuestion>(e);
@@ -371,20 +515,80 @@ class SayarehRepository {
     }
   }
 
+  Future<DataState<QuizProgressModel>> fetchQuizProgress(
+    String courseId, {
+    String? quizId,
+  }) async {
+    debugPrint(
+        '📡 [QuizProgress] fetch start courseId=$courseId quizId=$quizId');
+    try {
+      Response response = await sayarehApiProvider.callGetQuizProgress(
+        courseId,
+        quizId: quizId,
+      );
+      debugPrint('📡 [QuizProgress] status: ${response.statusCode}');
+      debugPrint('📡 [QuizProgress] response: ${response.data}');
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        if (response.data == null) {
+          debugPrint('📡 [QuizProgress] empty body');
+          return DataSuccess(QuizProgressModel.empty());
+        }
+        final data = QuizProgressModel.fromJson(response.data);
+        debugPrint(
+          '📡 [QuizProgress] parsed items=${data.data.length} '
+          'quizIds=${data.data.map((item) => item.quizId).toList()}',
+        );
+        return DataSuccess(data);
+      } else {
+        debugPrint('📡 [QuizProgress] failed body: ${response.data}');
+        return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
+      }
+    } on DioException catch (e) {
+      debugPrint(
+        '📡 [QuizProgress] DioException status=${e.response?.statusCode} '
+        'data=${e.response?.data} message=${e.message}',
+      );
+      if (e.response?.statusCode == 404) {
+        return DataSuccess(QuizProgressModel.empty());
+      }
+      return DataFailed(
+        _extractErrorMessage(
+          e.response?.data,
+          fallbackMessage: "خطا در دریافت پیشرفت آزمون",
+        ),
+      );
+    } on AppException catch (e) {
+      debugPrint('📡 [QuizProgress] AppException: ${e.message}');
+      return CheckExceptions.getError<QuizProgressModel>(e);
+    }
+  }
+
   Future<DataState<void>> deleteQuizResult(
       String courseId, String quizId) async {
     try {
       Response response =
           await sayarehApiProvider.callDeleteQuizResult(courseId, quizId);
-      if (response.statusCode == 200 || response.statusCode == 201) {
+      if (response.statusCode == 200 ||
+          response.statusCode == 201 ||
+          response.statusCode == 204) {
         return DataSuccess(null);
       } else {
         return DataFailed(response.data['message'] ?? "خطا در حذف اطلاعات");
       }
+    } on DioException catch (e) {
+      // No saved result to delete (e.g. 404) — treat as success for restart/exit.
+      if (e.response?.statusCode == 404) {
+        return DataSuccess(null);
+      }
+      return DataFailed(
+        _extractErrorMessage(
+          e.response?.data,
+          fallbackMessage: "خطا در حذف نتیجه آزمون",
+        ),
+      );
     } on AppException catch (e) {
       return CheckExceptions.getError<void>(e);
     } catch (_) {
-      // No saved result to delete (e.g. 404) — treat as success for exit flow.
       return DataSuccess(null);
     }
   }

@@ -3,15 +3,26 @@ part of 'practice_vocabulary_bloc.dart';
 // Model for storing reviewed vocabulary with answer status
 class ReviewedVocabulary extends Equatable {
   final Word word;
-  final bool isCorrect;
+  final bool? isCorrect;
 
   const ReviewedVocabulary({
     required this.word,
-    required this.isCorrect,
+    this.isCorrect,
   });
 
+  Map<String, dynamic> toJson() => {
+        'word': word.toJson(),
+        'isCorrect': isCorrect,
+      };
+
+  factory ReviewedVocabulary.fromJson(Map<String, dynamic> json) =>
+      ReviewedVocabulary(
+        word: Word.fromJson(json['word'] as Map<String, dynamic>),
+        isCorrect: json['isCorrect'] as bool?,
+      );
+
   @override
-  List<Object> get props => [word, isCorrect];
+  List<Object?> get props => [word, isCorrect];
 }
 
 abstract class PracticeVocabularyState extends Equatable {

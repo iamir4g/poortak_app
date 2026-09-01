@@ -77,10 +77,22 @@ class _SayarehScreenState extends State<SayarehScreen> {
           final accessBloc = context.read<IknowAccessBloc>();
           return BlocBuilder<SayarehCubit, SayarehState>(
             buildWhen: (previous, current) {
-              if (previous.sayarehDataStatus == current.sayarehDataStatus) {
-                return false;
+              if (previous.sayarehDataStatus.runtimeType !=
+                  current.sayarehDataStatus.runtimeType) {
+                return true;
               }
-              return true;
+              if (previous.sayarehDataStatus is SayarehDataCompleted &&
+                  current.sayarehDataStatus is SayarehDataCompleted) {
+                final prev =
+                    previous.sayarehDataStatus as SayarehDataCompleted;
+                final curr =
+                    current.sayarehDataStatus as SayarehDataCompleted;
+                return prev.progressData != curr.progressData ||
+                    prev.data != curr.data ||
+                    prev.bookListData != curr.bookListData ||
+                    prev.summaryData != curr.summaryData;
+              }
+              return previous.sayarehDataStatus != current.sayarehDataStatus;
             },
             builder: (context, state) {
               /// loading

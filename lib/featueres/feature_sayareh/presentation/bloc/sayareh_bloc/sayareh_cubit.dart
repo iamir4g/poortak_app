@@ -65,4 +65,31 @@ class SayarehCubit extends Cubit<SayarehState> {
           sayarehDataStatus: SayarehDataError(summaryState.error ?? "")));
     }
   }
+
+  /// Refetch course progress only (no full-screen loading) after returning
+  /// from a lesson.
+  Future<void> refreshCoursesProgress() async {
+    final current = state.sayarehDataStatus;
+    if (current is! SayarehDataCompleted) {
+      callSayarehDataEvent();
+      return;
+    }
+
+    final prefsOperator = locator<PrefsOperator>();
+    if (!prefsOperator.isLoggedIn()) return;
+
+    final progressState = await sayarehRepository.fetchAllCoursesProgress();
+    if (isClosed) return;
+
+    if (progressState is DataSuccess) {
+      emit(state.copyWith(
+        sayarehDataStatus: SayarehDataCompleted(
+          current.data,
+          current.bookListData,
+          current.summaryData,
+          progressData: progressState.data,
+        ),
+      ));
+    }
+  }
 }

@@ -46,9 +46,15 @@ void main() {
       expect(model.data.stats.currentIndex, 0);
     });
 
-    test('currentIndex advances as remaining decreases', () {
-      const stats = PracticeStats(total: 5, test: 5, remaining: 2);
-      expect(stats.currentIndex, 3);
+    test('progressPercent advances from remaining stats', () {
+      const stats = PracticeStats(total: 47, test: 0, remaining: 46);
+      expect(stats.answeredCount, 1);
+      expect(stats.progressPercent, 2);
+    });
+
+    test('progressPercent is 100 when remaining is 0', () {
+      const stats = PracticeStats(total: 47, test: 0, remaining: 0);
+      expect(stats.progressPercent, 100);
     });
   });
 }

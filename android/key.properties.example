@@ -1,4 +1,8 @@
 storePassword=YOUR_STORE_PASSWORD
 keyPassword=YOUR_KEY_PASSWORD
 keyAlias=upload
+<<<<<<< HEAD
 storeFile=../upload-keystore.jks
+=======
+storeFile=upload-keystore.jks
+>>>>>>> a79f110ddba91455c171ea7b0245f0c16e54d8f3
