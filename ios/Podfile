@@ -43,6 +43,14 @@ post_install do |installer|
     # Ensure all pods use iOS 13.0 as the minimum deployment target
     target.build_configurations.each do |config|
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+
+      # Disable unused permission_handler features (no microphone in this app).
+      definitions = config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] || ['$(inherited)']
+      definitions = [definitions] unless definitions.is_a?(Array)
+      unless definitions.any? { |d| d.to_s.include?('PERMISSION_MICROPHONE') }
+        definitions << 'PERMISSION_MICROPHONE=0'
+      end
+      config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] = definitions
     end
   end
 end

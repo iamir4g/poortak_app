@@ -73,3 +73,7 @@ app.*.map.json
 test_deep_link_simple.html
 test_deeplink.html
 test_final.html
+
+# Bazaar bundle signer output
+bazzar bundler/output/
+bazzar bundler/**/*.bin
