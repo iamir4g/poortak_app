@@ -49,7 +49,11 @@ class ItemMultiCard extends StatelessWidget {
               ],
             ),
             price == "0"
-                ? Text("رایگان")
+                ? Text(
+                    "رایگان",
+                    style:
+                        MyTextStyle.textMatn12W500.copyWith(color: textColor),
+                  )
                 : Row(
                     children: [
                       Text(
