@@ -42,6 +42,17 @@ android {
       
     }
 
+    flavorDimensions += "store"
+    productFlavors {
+        ipg {
+            dimension "store"
+            isDefault true
+        }
+        bazaar {
+            dimension "store"
+        }
+    }
+
     signingConfigs {
         release {
             if (keystorePropertiesFile.exists()) {

@@ -59,6 +59,31 @@ class ShoppingCartApiProvider {
     return response;
   }
 
+  Future<Response> verifyBazaarPurchase({
+    required String productId,
+    required String purchaseToken,
+    String? orderId,
+    String? payload,
+    String? originalJson,
+    String? dataSignature,
+  }) async {
+    log("🛒 Verifying Cafe Bazaar purchase...");
+    return _authService.post(
+      "${Constants.baseUrl}payments/bazaar/verify",
+      data: {
+        "productId": productId,
+        "purchaseToken": purchaseToken,
+        "gateway": "BAZAAR",
+        if (orderId != null && orderId.isNotEmpty) "orderId": orderId,
+        if (payload != null && payload.isNotEmpty) "payload": payload,
+        if (originalJson != null && originalJson.isNotEmpty)
+          "originalJson": originalJson,
+        if (dataSignature != null && dataSignature.isNotEmpty)
+          "dataSignature": dataSignature,
+      },
+    );
+  }
+
   Future<Response> applyReferrerCode(String referrerCode) async {
     log("🎟️ Applying referrer code via API...");
     final response = await _authService.post(

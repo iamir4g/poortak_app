@@ -8,7 +8,9 @@ import 'package:poortak/featueres/feature_shopping_cart/data/data_source/shoppin
 import 'package:poortak/common/error_handling/app_exception.dart';
 import 'dart:developer';
 import 'dart:async';
+import 'package:dio/dio.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/models/checkout_cart_model.dart';
+import 'package:poortak/common/models/bazaar_purchase_result.dart';
 
 class ShoppingCartRepository {
   ShoppingCart _cart = ShoppingCart();
@@ -128,18 +130,18 @@ class ShoppingCartRepository {
 
   Future<ShoppingCart> removeFromCart(String itemId) async {
     log("🗑️ Removing item from cart: ItemId=$itemId");
-    
+
     // Check if user is logged in
     final isLoggedIn = _prefsOperator.isLoggedIn();
     log("   User logged in: $isLoggedIn");
-    
+
     if (isLoggedIn) {
       // User is logged in - call API to remove from backend
       try {
         log("📤 Calling API to remove item from backend...");
         await _apiProvider.removeFromCart(itemId);
         log("✅ Item removed from backend successfully");
-        
+
         // Refresh cart from server to get updated state
         log("🔄 Refreshing cart from server...");
         return await getCart();
@@ -227,6 +229,28 @@ class ShoppingCartRepository {
       }
     } catch (e) {
       log("❌ Error during checkout: $e");
+      rethrow;
+    }
+  }
+
+  Future<void> verifyBazaarPurchase(BazaarPurchaseResult purchase) async {
+    if (purchase.purchaseToken.isEmpty) return;
+    try {
+      await _apiProvider.verifyBazaarPurchase(
+        productId: purchase.productId,
+        purchaseToken: purchase.purchaseToken,
+        orderId: purchase.orderId,
+        payload: purchase.payload,
+        originalJson: purchase.originalJson,
+        dataSignature: purchase.dataSignature,
+      );
+      log("✅ Bazaar purchase verified: ${purchase.productId}");
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 404) {
+        log("⚠️ Bazaar verify endpoint is not available yet");
+        return;
+      }
+      log("❌ Bazaar verify failed: $e");
       rethrow;
     }
   }

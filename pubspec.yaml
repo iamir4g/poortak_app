@@ -77,12 +77,12 @@ dependencies:
   openai_tts: ^0.0.3
   wakelock_plus: ^1.4.0
   flutter_screenutil: ^5.9.3
+  flutter_dotenv: ^5.2.1
+  flutter_poolakey: ^2.2.0+1.0.0
   flutter_localizations:
     sdk: flutter
   # برای رمزنگاری و رمزگشایی
   # cryptography: ^2.7.0
-  # برای خواندن فایل .env
-  # dotenv: ^4.2.0
   # برای مدیریت مسیر فایل‌ها به صورت مستقل از پلتفرم
   # path: ^1.9.0
 
@@ -119,6 +119,7 @@ flutter:
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
   assets:
+    - .env
     - assets/images/
     - assets/images/litner/
     - assets/images/kavoosh/
