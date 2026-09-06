@@ -260,12 +260,15 @@ class SayarehRepository {
       }
     } on DioException catch (e) {
       log("submitVocabulary failed: status=${e.response?.statusCode}, body=${e.response?.data}");
-      return DataFailed(
-        _extractErrorMessage(
-          e.response?.data,
-          fallbackMessage: "خطا در ثبت پاسخ لغت",
-        ),
+      final message = _extractErrorMessage(
+        e.response?.data,
+        fallbackMessage: "خطا در ثبت پاسخ لغت",
       );
+      if (e.response?.statusCode == 422 &&
+          message.toLowerCase().contains('already submitted')) {
+        return DataSuccess(null);
+      }
+      return DataFailed(message);
     } on AppException catch (e) {
       return CheckExceptions.getError<void>(e);
     }

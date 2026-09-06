@@ -32,6 +32,14 @@ class LessonBloc extends Bloc<LessonEvent, LessonState> {
           }
         }
 
+        final localVocabularyProgress =
+            prefsOperator.getVocabularyPracticeProgress(event.id);
+        if (progress != null) {
+          if (localVocabularyProgress > progress.vocabulary) {
+            progress.vocabulary = localVocabularyProgress;
+          }
+        }
+
         emit(LessonSuccess(lesson: response.data!, progress: progress));
       } else {
         emit(LessonError(message: response.error ?? "خطا در دریافت اطلاعات"));
@@ -40,6 +48,7 @@ class LessonBloc extends Bloc<LessonEvent, LessonState> {
 
     on<ResetLessonProgressEvent>((event, emit) async {
       emit(LessonLoading());
+      await locator<PrefsOperator>().clearVocabularyPracticeProgress(event.id);
       final response = await sayarehRepository.resetCourseProgress(event.id);
 
       if (response is DataSuccess) {

@@ -306,4 +306,76 @@ class PrefsOperator {
     await sharedPreferences.remove('local_cart_items');
     log("✅ Local cart cleared successfully");
   }
+
+  String _reviewedVocabulariesKey(String courseId) =>
+      'reviewed_vocabularies_$courseId';
+
+  Future<void> saveReviewedVocabulariesJson(
+    String courseId,
+    List<Map<String, dynamic>> items,
+  ) async {
+    await sharedPreferences.setString(
+      _reviewedVocabulariesKey(courseId),
+      jsonEncode(items),
+    );
+  }
+
+  List<Map<String, dynamic>> getReviewedVocabulariesJson(String courseId) {
+    final json = sharedPreferences.getString(_reviewedVocabulariesKey(courseId));
+    if (json == null || json.isEmpty) return [];
+    try {
+      final decoded = jsonDecode(json);
+      if (decoded is! List) return [];
+      return decoded
+          .whereType<Map>()
+          .map((item) => Map<String, dynamic>.from(item))
+          .toList();
+    } catch (_) {
+      return [];
+    }
+  }
+
+  String _previousVocabularyIdsKey(String courseId) =>
+      'previous_vocabulary_ids_$courseId';
+
+  Future<void> savePreviousVocabularyIds(
+    String courseId,
+    List<String> ids,
+  ) async {
+    await sharedPreferences.setStringList(
+      _previousVocabularyIdsKey(courseId),
+      ids,
+    );
+  }
+
+  List<String> getPreviousVocabularyIds(String courseId) {
+    return sharedPreferences.getStringList(_previousVocabularyIdsKey(courseId)) ??
+        [];
+  }
+
+  Future<void> clearPreviousVocabularyIds(String courseId) async {
+    await sharedPreferences.remove(_previousVocabularyIdsKey(courseId));
+  }
+
+  String _vocabularyPracticeProgressKey(String courseId) =>
+      'vocabulary_practice_progress_$courseId';
+
+  Future<void> saveVocabularyPracticeProgress(
+    String courseId,
+    int percent,
+  ) async {
+    await sharedPreferences.setInt(
+      _vocabularyPracticeProgressKey(courseId),
+      percent.clamp(0, 100),
+    );
+  }
+
+  int getVocabularyPracticeProgress(String courseId) {
+    return sharedPreferences.getInt(_vocabularyPracticeProgressKey(courseId)) ??
+        0;
+  }
+
+  Future<void> clearVocabularyPracticeProgress(String courseId) async {
+    await sharedPreferences.remove(_vocabularyPracticeProgressKey(courseId));
+  }
 }

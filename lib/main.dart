@@ -230,7 +230,9 @@ void main() async {
                       final args = ModalRoute.of(context)?.settings.arguments
                           as Map<String, dynamic>;
                       return ReviewedVocabulariesScreen(
-                        reviewedVocabularies: args['reviewedVocabularies'],
+                        reviewedVocabularies: (args['reviewedVocabularies']
+                                as List<ReviewedVocabulary>?) ??
+                            const [],
                         courseId: args['courseId'],
                       );
                     },
