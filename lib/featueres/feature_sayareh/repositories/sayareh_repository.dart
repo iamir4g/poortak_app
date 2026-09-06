@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:poortak/common/error_handling/app_exception.dart';
 import 'package:poortak/common/error_handling/check_exception.dart';
 import 'package:poortak/common/resources/data_state.dart';
@@ -11,6 +12,7 @@ import 'package:poortak/featueres/feature_sayareh/data/models/conversation_model
 import 'package:poortak/featueres/feature_sayareh/data/models/practice_vocabulary_model.dart';
 import 'package:poortak/featueres/feature_sayareh/data/models/quiz_question_model.dart';
 import 'package:poortak/featueres/feature_sayareh/data/models/quizzes_list_model.dart';
+import 'package:poortak/featueres/feature_sayareh/data/models/quiz_progress_model.dart';
 import 'package:poortak/featueres/feature_sayareh/data/models/result_question_model.dart';
 import 'package:poortak/featueres/feature_sayareh/data/models/course_progress_model.dart';
 import 'package:poortak/featueres/feature_sayareh/data/models/all_courses_progress_model.dart';
@@ -368,6 +370,54 @@ class SayarehRepository {
       }
     } on AppException catch (e) {
       return CheckExceptions.getError<ResultQuestion>(e);
+    }
+  }
+
+  Future<DataState<QuizProgressModel>> fetchQuizProgress(
+    String courseId, {
+    String? quizId,
+  }) async {
+    debugPrint(
+        '📡 [QuizProgress] fetch start courseId=$courseId quizId=$quizId');
+    try {
+      Response response = await sayarehApiProvider.callGetQuizProgress(
+        courseId,
+        quizId: quizId,
+      );
+      debugPrint('📡 [QuizProgress] status: ${response.statusCode}');
+      debugPrint('📡 [QuizProgress] response: ${response.data}');
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        if (response.data == null) {
+          debugPrint('📡 [QuizProgress] empty body');
+          return DataSuccess(QuizProgressModel.empty());
+        }
+        final data = QuizProgressModel.fromJson(response.data);
+        debugPrint(
+          '📡 [QuizProgress] parsed items=${data.data.length} '
+          'quizIds=${data.data.map((item) => item.quizId).toList()}',
+        );
+        return DataSuccess(data);
+      } else {
+        debugPrint('📡 [QuizProgress] failed body: ${response.data}');
+        return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
+      }
+    } on DioException catch (e) {
+      debugPrint(
+        '📡 [QuizProgress] DioException status=${e.response?.statusCode} '
+        'data=${e.response?.data} message=${e.message}',
+      );
+      if (e.response?.statusCode == 404) {
+        return DataSuccess(QuizProgressModel.empty());
+      }
+      return DataFailed(
+        _extractErrorMessage(
+          e.response?.data,
+          fallbackMessage: "خطا در دریافت پیشرفت آزمون",
+        ),
+      );
+    } on AppException catch (e) {
+      debugPrint('📡 [QuizProgress] AppException: ${e.message}');
+      return CheckExceptions.getError<QuizProgressModel>(e);
     }
   }
 

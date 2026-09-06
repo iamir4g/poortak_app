@@ -17,6 +17,10 @@ class StepProgress extends StatelessWidget {
         : MyColors.vocabularyProgressFill.withValues(alpha: 0.35);
     final fillColor = MyColors.vocabularyProgressFill;
 
+    final steps = totalSteps <= 0 ? 1 : totalSteps;
+    final index = currentIndex.clamp(0, steps - 1);
+    final widthFactor = ((index + 1) / steps).clamp(0.0, 1.0);
+
     return Container(
       height: 15.h,
       width: 300.w,
@@ -25,7 +29,7 @@ class StepProgress extends StatelessWidget {
         borderRadius: BorderRadius.circular(20.r),
       ),
       child: Stack(
-        alignment: Alignment.centerLeft,
+        alignment: AlignmentDirectional.centerStart,
         children: [
           Container(
             decoration: BoxDecoration(
@@ -34,7 +38,8 @@ class StepProgress extends StatelessWidget {
             ),
           ),
           FractionallySizedBox(
-            widthFactor: (currentIndex + 1) / totalSteps,
+            widthFactor: widthFactor,
+            alignment: AlignmentDirectional.centerStart,
             child: Container(
               decoration: BoxDecoration(
                 color: fillColor,

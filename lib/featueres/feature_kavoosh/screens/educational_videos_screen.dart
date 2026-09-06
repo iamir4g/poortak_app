@@ -220,7 +220,7 @@ class _EducationalVideosScreenState extends State<EducationalVideosScreen> {
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: EdgeInsets.symmetric(horizontal: 16.w),
-            itemCount: 5,
+            itemCount: 2,
             itemBuilder: (context, index) {
               // Alternating background colors for demo
               final colors = [

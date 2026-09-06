@@ -29,6 +29,7 @@ import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shoppi
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_start_bloc/quiz_start_bloc.dart';
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_answer_bloc/quiz_answer_bloc.dart';
+import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_progress_bloc/quiz_progress_bloc.dart';
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_result_bloc/quiz_result_bloc.dart';
 import 'package:poortak/common/bloc/theme_cubit/theme_cubit.dart';
 import 'package:poortak/common/bloc/settings_cubit/settings_cubit.dart';
@@ -163,6 +164,7 @@ Future<void> initLocator() async {
   // Register Quiz Blocs
   locator.registerFactory<QuizStartBloc>(() => QuizStartBloc(locator()));
   locator.registerFactory<QuizAnswerBloc>(() => QuizAnswerBloc(locator()));
+  locator.registerFactory<QuizProgressBloc>(() => QuizProgressBloc(locator()));
   locator.registerFactory<QuizResultBloc>(() => QuizResultBloc(locator()));
 
   // Register ThemeCubit

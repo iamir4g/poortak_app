@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/common/utils/bidi_text_helper.dart';
+import 'package:poortak/common/utils/digit_utils.dart';
+import 'package:poortak/common/widgets/step_progress.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
@@ -10,6 +12,7 @@ import 'package:poortak/config/myTextStyle.dart';
 class QuizQuestionLayout extends StatelessWidget {
   final Widget question;
   final Widget options;
+  final Widget? progress;
   final Widget? feedback;
   final Widget? bottomButton;
   final double horizontalPadding;
@@ -18,6 +21,7 @@ class QuizQuestionLayout extends StatelessWidget {
     super.key,
     required this.question,
     required this.options,
+    this.progress,
     this.feedback,
     this.bottomButton,
     this.horizontalPadding = 24,
@@ -33,6 +37,15 @@ class QuizQuestionLayout extends StatelessWidget {
 
     return Column(
       children: [
+        if (progress != null)
+          Padding(
+            padding: EdgeInsetsDirectional.only(
+              start: horizontal,
+              end: horizontal,
+              top: Dimens.nh(16),
+            ),
+            child: Center(child: progress),
+          ),
         Expanded(
           child: LayoutBuilder(
             builder: (context, constraints) {
@@ -86,6 +99,33 @@ class QuizQuestionLayout extends StatelessWidget {
       ],
     );
   }
+}
+
+Widget buildQuizStepProgress({
+  required BuildContext context,
+  required int currentIndex,
+  required int totalSteps,
+}) {
+  final isDark = Theme.of(context).brightness == Brightness.dark;
+  final displayIndex = (currentIndex + 1).clamp(1, totalSteps);
+
+  return Column(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      StepProgress(
+        currentIndex: currentIndex,
+        totalSteps: totalSteps,
+      ),
+      SizedBox(height: Dimens.nh(8)),
+      Text(
+        '${toPersianDigits('$displayIndex')} از ${toPersianDigits('$totalSteps')}',
+        textAlign: TextAlign.center,
+        style: MyTextStyle.textMatn12W500.copyWith(
+          color: isDark ? MyColors.darkTextSecondary : MyColors.text4,
+        ),
+      ),
+    ],
+  );
 }
 
 Widget buildQuizCorrectFeedback({required bool isDark}) {

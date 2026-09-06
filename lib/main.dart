@@ -64,6 +64,7 @@ import 'package:poortak/l10n/app_localizations.dart';
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quizes_cubit/cubit/quizes_cubit.dart';
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_start_bloc/quiz_start_bloc.dart';
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_answer_bloc/quiz_answer_bloc.dart';
+import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_progress_bloc/quiz_progress_bloc.dart';
 import 'package:poortak/featueres/feature_sayareh/screens/first_quiz_screen.dart';
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_result_bloc/quiz_result_bloc.dart';
 // For RouteAware
@@ -100,6 +101,11 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await initLocator();
+
+  final startupToken = await locator<PrefsOperator>().getUserToken();
+  debugPrint('==================== AUTH TOKEN ====================');
+  debugPrint(startupToken ?? 'null');
+  debugPrint('====================================================');
 
   // Request notification and alarm permissions
   if (Platform.isAndroid) {
@@ -254,6 +260,9 @@ void main() async {
                             create: (context) => QuizAnswerBloc(locator()),
                           ),
                           BlocProvider(
+                            create: (context) => QuizProgressBloc(locator()),
+                          ),
+                          BlocProvider(
                             create: (context) => QuizResultBloc(locator()),
                           ),
                         ],
@@ -274,6 +283,9 @@ void main() async {
                           ),
                           BlocProvider(
                             create: (context) => QuizAnswerBloc(locator()),
+                          ),
+                          BlocProvider(
+                            create: (context) => QuizProgressBloc(locator()),
                           ),
                           BlocProvider(
                             create: (context) => QuizResultBloc(locator()),

@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:poortak/common/services/auth_service.dart';
 import 'package:poortak/config/constants.dart';
 import 'package:poortak/locator.dart';
@@ -128,6 +129,17 @@ class SayarehApiProvider {
   dynamic callDeleteQuizResult(String courseId, String quizId) async {
     return _retryRequest(() => _authService.delete(
           "${Constants.baseUrl}iknow/courses/$courseId/quiz/$quizId/result",
+        ));
+  }
+
+  dynamic callGetQuizProgress(String courseId, {String? quizId}) async {
+    final url = "${Constants.baseUrl}iknow/courses/$courseId/quiz/progress";
+    final query = quizId == null || quizId.isEmpty ? null : {'quizId': quizId};
+    debugPrint('📡 [QuizProgress] GET $url');
+    debugPrint('📡 [QuizProgress] query: $query');
+    return _retryRequest(() => _authService.get(
+          url,
+          queryParameters: query,
         ));
   }
 

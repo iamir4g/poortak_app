@@ -11,6 +11,7 @@ import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_start_bloc/quiz_start_bloc.dart';
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_answer_bloc/quiz_answer_bloc.dart';
 import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
+import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_progress_bloc/quiz_progress_bloc.dart';
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_result_bloc/quiz_result_bloc.dart';
 import 'package:poortak/featueres/feature_sayareh/widgets/quiz_result_modal.dart';
 import 'package:poortak/featueres/feature_sayareh/screens/quiz_screen.dart';
@@ -53,6 +54,27 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
         ));
   }
 
+  void _fetchQuizProgress() {
+    context.read<QuizProgressBloc>().add(
+          FetchQuizProgressEvent(
+            courseId: widget.courseId,
+            quizId: widget.quizId,
+          ),
+        );
+  }
+
+  Widget? _buildQuizProgress(QuizProgressState progressState) {
+    if (progressState is! QuizProgressLoaded ||
+        progressState.totalQuestions <= 0) {
+      return null;
+    }
+    return buildQuizStepProgress(
+      context: context,
+      currentIndex: progressState.stepIndex,
+      totalSteps: progressState.totalQuestions,
+    );
+  }
+
   void _showQuizResultModal(QuizResultLoaded state) {
     if (_isResultModalOpen || !mounted) return;
     _isResultModalOpen = true;
@@ -82,6 +104,7 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
             quizId: widget.quizId,
           ),
         );
+    _fetchQuizProgress();
   }
 
   void _handleAuthError(BuildContext context) {
@@ -289,7 +312,9 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
             },
             child: BlocConsumer<QuizStartBloc, QuizStartState>(
               listener: (context, state) {
-                if (state is QuizStartError) {
+                if (state is QuizStartLoaded) {
+                  _fetchQuizProgress();
+                } else if (state is QuizStartError) {
                   if (state.message.contains('Please login') ||
                       state.message.contains('Session expired')) {
                     _handleAuthError(context);
@@ -322,6 +347,7 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                               .read<QuizResultBloc>()
                               .add(const ResetQuizResultEvent());
                         }
+                        _fetchQuizProgress();
                         setState(() {});
                         unawaited(
                           AnswerFeedbackSoundService.play(
@@ -336,107 +362,118 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                     builder: (context, answerState) {
                       return BlocBuilder<QuizResultBloc, QuizResultState>(
                         builder: (context, resultState) {
-                          return Stack(
-                            children: [
-                              QuizQuestionLayout(
-                                question: BidiText(
-                                  text: state.question.data.title,
-                                  forceEnglishDigits: true,
-                                  textAlign: TextAlign.center,
-                                  style: MyTextStyle.textHeader16Bold.copyWith(
-                                    color: isDark
-                                        ? MyColors.profileTextPrimaryDark
-                                        : MyColors.textMatn1,
-                                  ),
-                                ),
-                                options: QuizAnswerOptionsList(
-                                  answerCount:
-                                      state.question.data.answers.length,
-                                  itemBuilder: (
-                                    index, {
-                                    required height,
-                                    required large,
-                                  }) {
-                                    final answer =
-                                        state.question.data.answers[index];
-                                    final feedbackAnswerId =
-                                        answerState is QuizAnswerLoaded
-                                            ? answerState.selectedAnswerId
-                                            : selectedAnswerId;
-                                    final isAnswerSelected =
-                                        feedbackAnswerId == answer.id;
-                                    var isCorrectAnswer = false;
-                                    var isWrongSelected = false;
-                                    if (answerState is QuizAnswerLoaded) {
-                                      isCorrectAnswer = answer.id ==
-                                          answerState.correctAnswerId;
-                                      isWrongSelected = isAnswerSelected &&
-                                          !answerState.isCorrect;
-                                    }
-                                    return InkWell(
-                                      onTap: answerState is QuizAnswerLoading ||
-                                              answerState is QuizAnswerLoaded
-                                          ? null
-                                          : () {
-                                              setState(() {
-                                                selectedAnswerId = answer.id;
-                                              });
-                                            },
-                                      child: QuizAnswerItem(
-                                        key: ValueKey(answer.id),
-                                        title: answer.title,
-                                        id: answer.id,
-                                        isSelected: isAnswerSelected,
-                                        isCorrect: isCorrectAnswer,
-                                        isWrongSelected: isWrongSelected,
-                                        selectedAnswerId:
-                                            feedbackAnswerId ?? "",
-                                        showFeedback:
-                                            answerState is QuizAnswerLoaded,
-                                        height: height,
-                                        large: large,
+                          return BlocBuilder<QuizProgressBloc,
+                              QuizProgressState>(
+                            builder: (context, progressState) {
+                              return Stack(
+                                children: [
+                                  QuizQuestionLayout(
+                                    progress: _buildQuizProgress(progressState),
+                                    question: BidiText(
+                                      text: state.question.data.title,
+                                      forceEnglishDigits: true,
+                                      textAlign: TextAlign.center,
+                                      style:
+                                          MyTextStyle.textHeader16Bold.copyWith(
+                                        color: isDark
+                                            ? MyColors.profileTextPrimaryDark
+                                            : MyColors.textMatn1,
                                       ),
-                                    );
-                                  },
-                                ),
-                                feedback: answerState is QuizAnswerLoaded
-                                    ? (!answerState.isCorrect &&
-                                            answerState.explanation != null
-                                        ? buildQuizWrongFeedback(
-                                            isDark: isDark,
-                                            explanation:
-                                                answerState.explanation!,
-                                          )
-                                        : answerState.isCorrect
-                                            ? buildQuizCorrectFeedback(
+                                    ),
+                                    options: QuizAnswerOptionsList(
+                                      answerCount:
+                                          state.question.data.answers.length,
+                                      itemBuilder: (
+                                        index, {
+                                        required height,
+                                        required large,
+                                      }) {
+                                        final answer =
+                                            state.question.data.answers[index];
+                                        final feedbackAnswerId =
+                                            answerState is QuizAnswerLoaded
+                                                ? answerState.selectedAnswerId
+                                                : selectedAnswerId;
+                                        final isAnswerSelected =
+                                            feedbackAnswerId == answer.id;
+                                        var isCorrectAnswer = false;
+                                        var isWrongSelected = false;
+                                        if (answerState is QuizAnswerLoaded) {
+                                          isCorrectAnswer = answer.id ==
+                                              answerState.correctAnswerId;
+                                          isWrongSelected = isAnswerSelected &&
+                                              !answerState.isCorrect;
+                                        }
+                                        return InkWell(
+                                          onTap: answerState
+                                                      is QuizAnswerLoading ||
+                                                  answerState
+                                                      is QuizAnswerLoaded
+                                              ? null
+                                              : () {
+                                                  setState(() {
+                                                    selectedAnswerId =
+                                                        answer.id;
+                                                  });
+                                                },
+                                          child: QuizAnswerItem(
+                                            key: ValueKey(answer.id),
+                                            title: answer.title,
+                                            id: answer.id,
+                                            isSelected: isAnswerSelected,
+                                            isCorrect: isCorrectAnswer,
+                                            isWrongSelected: isWrongSelected,
+                                            selectedAnswerId:
+                                                feedbackAnswerId ?? "",
+                                            showFeedback:
+                                                answerState is QuizAnswerLoaded,
+                                            height: height,
+                                            large: large,
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                    feedback: answerState is QuizAnswerLoaded
+                                        ? (!answerState.isCorrect &&
+                                                answerState.explanation != null
+                                            ? buildQuizWrongFeedback(
                                                 isDark: isDark,
+                                                explanation:
+                                                    answerState.explanation!,
                                               )
-                                            : null)
-                                    : null,
-                                bottomButton: _buildFirstQuizBottomButton(
-                                  context: context,
-                                  answerState: answerState,
-                                  resultState: resultState,
-                                  isDark: isDark,
-                                  questionId: state.question.data.id,
-                                ),
-                              ),
-                              if (resultState is QuizResultLoading &&
-                                  _hasRequestedResult)
-                                Positioned.fill(
-                                  child: ColoredBox(
-                                    color: Colors.black.withValues(alpha: 0.25),
-                                    child: const Center(
-                                      child: CircularProgressIndicator(
-                                        valueColor:
-                                            AlwaysStoppedAnimation<Color>(
-                                          MyColors.primary,
+                                            : answerState.isCorrect
+                                                ? buildQuizCorrectFeedback(
+                                                    isDark: isDark,
+                                                  )
+                                                : null)
+                                        : null,
+                                    bottomButton: _buildFirstQuizBottomButton(
+                                      context: context,
+                                      answerState: answerState,
+                                      resultState: resultState,
+                                      isDark: isDark,
+                                      questionId: state.question.data.id,
+                                    ),
+                                  ),
+                                  if (resultState is QuizResultLoading &&
+                                      _hasRequestedResult)
+                                    Positioned.fill(
+                                      child: ColoredBox(
+                                        color: Colors.black
+                                            .withValues(alpha: 0.25),
+                                        child: const Center(
+                                          child: CircularProgressIndicator(
+                                            valueColor:
+                                                AlwaysStoppedAnimation<Color>(
+                                              MyColors.primary,
+                                            ),
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ),
-                            ],
+                                ],
+                              );
+                            },
                           );
                         },
                       );
