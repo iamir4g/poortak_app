@@ -87,18 +87,18 @@ class CafeBazaarPurchaseService {
   }
 
   Future<BazaarPurchaseResult> purchase(
-    String productId, {
+    String sku, {
     String payload = '',
   }) async {
     await ensureConnected();
-    debugPrint('🛒 [Bazaar] purchase productId=$productId');
+    debugPrint('🛒 [Bazaar] purchase sku=$sku');
     final info = await FlutterPoolakey.purchase(
-      productId,
+      sku,
       payload: payload,
     );
     final result = _mapPurchase(info);
     debugPrint(
-      '🛒 [Bazaar] purchase success productId=${result.productId} '
+      '🛒 [Bazaar] purchase success sku=${result.productId} '
       'token=${result.purchaseToken}',
     );
     return result;

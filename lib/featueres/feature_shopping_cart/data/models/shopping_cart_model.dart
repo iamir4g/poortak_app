@@ -21,7 +21,12 @@ class ShoppingCartItem {
     this.source,
   });
 
-  // double get totalPrice => quantity * 100; // Assuming each item costs 100
+  /// Cafe Bazaar in-app product id (SKU from backend), not the backend itemId.
+  String? get bazaarSku {
+    final value = source?['bazaarSku']?.toString().trim();
+    if (value == null || value.isEmpty) return null;
+    return value;
+  }
 }
 
 class ShoppingCart {

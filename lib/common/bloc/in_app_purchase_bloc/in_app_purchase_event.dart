@@ -12,6 +12,7 @@ class ConnectInAppPurchaseEvent extends InAppPurchaseEvent {
 }
 
 class PurchaseProductsEvent extends InAppPurchaseEvent {
+  /// Cafe Bazaar SKUs from backend `bazaarSku`, used as Poolakey PRODUCT_ID.
   final List<String> productIds;
   final String? payload;
 

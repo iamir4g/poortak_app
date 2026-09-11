@@ -54,39 +54,41 @@ class InAppPurchaseBloc extends Bloc<InAppPurchaseEvent, InAppPurchaseState> {
       return;
     }
 
-    final productIds = event.productIds
+    final bazaarSkus = event.productIds
         .map((id) => id.trim())
         .where((id) => id.isNotEmpty)
         .toSet()
         .toList();
-    if (productIds.isEmpty) {
-      emit(const InAppPurchaseError('محصولی برای خرید پیدا نشد'));
+    if (bazaarSkus.isEmpty) {
+      emit(const InAppPurchaseError(
+        'شناسه محصول بازار (SKU) برای این آیتم‌ها تنظیم نشده',
+      ));
       return;
     }
 
-    emit(InAppPurchasePurchasing(productIds.first));
+    emit(InAppPurchasePurchasing(bazaarSkus.first));
     try {
       await _service.ensureConnected();
       final alreadyOwned = await _service.getPurchasedProducts();
       final purchases = <BazaarPurchaseResult>[];
 
-      for (final productId in productIds) {
-        emit(InAppPurchasePurchasing(productId));
+      for (final sku in bazaarSkus) {
+        emit(InAppPurchasePurchasing(sku));
         BazaarPurchaseResult? existing;
         for (final item in alreadyOwned) {
-          if (item.productId == productId) {
+          if (item.productId == sku) {
             existing = item;
             break;
           }
         }
         if (existing != null) {
-          debugPrint('🛒 [Bazaar] already owned: $productId');
+          debugPrint('🛒 [Bazaar] already owned: $sku');
           purchases.add(existing);
           continue;
         }
 
         final result = await _service.purchase(
-          productId,
+          sku,
           payload: event.payload ?? '',
         );
         await _cartRepository.verifyBazaarPurchase(result);

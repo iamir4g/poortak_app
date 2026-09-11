@@ -49,6 +49,7 @@ class _LocalCartDisplayItem {
   final int price;
   final String? thumbnailId;
   final String type;
+  final String? bazaarSku;
 
   const _LocalCartDisplayItem({
     required this.title,
@@ -56,6 +57,7 @@ class _LocalCartDisplayItem {
     required this.price,
     required this.type,
     this.thumbnailId,
+    this.bazaarSku,
   });
 }
 
@@ -132,7 +134,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
     );
   }
 
-  Future<void> _handlePayNow(List<String> productIds) async {
+  Future<void> _handlePayNow(List<String> bazaarSkus) async {
     if (!locator<PrefsOperator>().isLoggedIn()) {
       _promptLogin();
       return;
@@ -143,12 +145,14 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
     }
 
     if (AppFlavor.useBazaarIap) {
-      final ids = productIds.where((id) => id.trim().isNotEmpty).toList();
-      if (ids.isEmpty) {
+      final skus = bazaarSkus.map((sku) => sku.trim()).toList();
+      if (skus.isEmpty || skus.any((sku) => sku.isEmpty)) {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('محصولی برای خرید پیدا نشد'),
+            content: Text(
+              'شناسه محصول بازار (SKU) برای این آیتم‌ها تنظیم نشده',
+            ),
             backgroundColor: Colors.red,
             duration: Duration(seconds: 2),
           ),
@@ -156,7 +160,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
         return;
       }
       context.read<InAppPurchaseBloc>().add(
-            PurchaseProductsEvent(productIds: ids),
+            PurchaseProductsEvent(productIds: skus),
           );
       return;
     }
@@ -384,6 +388,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
           price: MoneyUtils.parseRialToTomanInt(course.price),
           thumbnailId: course.videoThumbnailOrThumbnail,
           type: itemType,
+          bazaarSku: course.bazaarSku,
         );
       }
     } else if (itemType == 'IKnowBook') {
@@ -397,6 +402,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
           price: MoneyUtils.parseRialToTomanInt(book.price),
           thumbnailId: book.thumbnail,
           type: itemType,
+          bazaarSku: book.bazaarSku,
         );
       }
     } else if (itemType == 'IKnow') {
@@ -408,6 +414,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
               'شامل ${summary.data.courses.length} درس و ${summary.data.books.length} کتاب',
           price: _calculateBundlePayableAmount(summary),
           type: itemType,
+          bazaarSku: summary.data.settings.bazaarSku,
         );
       }
     }
@@ -766,10 +773,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                       isDark ? MyColors.primary : MyColors.secondary,
                   onPressed: () async {
                     await _handlePayNow(
-                      cart.items
-                          .map((item) => item.itemId ?? '')
-                          .where((id) => id.isNotEmpty)
-                          .toList(),
+                      cart.items.map((item) => item.bazaarSku ?? '').toList(),
                     );
                   },
                 ),
@@ -935,10 +939,16 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                   backgroundColor:
                       isDark ? MyColors.primary : MyColors.secondary,
                   onPressed: () async {
+                    if (!AppFlavor.useBazaarIap) {
+                      await _handlePayNow(const []);
+                      return;
+                    }
+                    final resolvedItems = await Future.wait(
+                      localCartItems.map(_resolveLocalCartItem),
+                    );
                     await _handlePayNow(
-                      localCartItems
-                          .map((item) => (item['itemId'] as String?) ?? '')
-                          .where((id) => id.isNotEmpty)
+                      resolvedItems
+                          .map((item) => item.bazaarSku ?? '')
                           .toList(),
                     );
                   },
