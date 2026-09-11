@@ -10,6 +10,7 @@ import 'package:poortak/featueres/feature_sayareh/presentation/bloc/lesson_bloc/
 import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
 import 'package:poortak/featueres/feature_sayareh/screens/converstion_screen.dart';
 import 'package:poortak/featueres/feature_sayareh/screens/quizzes_screen.dart';
+import 'package:poortak/featueres/feature_sayareh/screens/reviewed_vocabularies_screen.dart';
 import 'package:poortak/featueres/feature_sayareh/screens/vocabulary_screen.dart';
 import 'package:poortak/featueres/feature_sayareh/widgets/custom_video_player.dart';
 import 'package:poortak/featueres/feature_sayareh/widgets/dialog_cart.dart';
@@ -77,6 +78,13 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
   bool get hasAccess => _hasFullVideoAccess();
 
   bool get _isFirstLesson => widget.index == 0;
+
+  int get _vocabularyProgress {
+    final server = _progress?.vocabulary ?? 0;
+    final local =
+        locator<PrefsOperator>().getVocabularyPracticeProgress(widget.lessonId);
+    return server >= local ? server : local;
+  }
 
   void _promptLogin() {
     ReusableModal.show(
@@ -352,7 +360,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
 
               if (state.progress != null) {
                 final p = state.progress!;
-                final isCompleted = p.vocabulary == 100 &&
+                final isCompleted = _vocabularyProgress == 100 &&
                     p.conversation == 100 &&
                     p.quiz == 100;
 
@@ -549,7 +557,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
   Widget _buildVideoSection() {
     // Check if completed
     if (_progress != null &&
-        _progress!.vocabulary == 100 &&
+        _vocabularyProgress == 100 &&
         _progress!.conversation == 100 &&
         _progress!.quiz == 100) {
       return _buildCompletionHeader();
@@ -652,7 +660,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
       iconPath: "assets/images/points/words_icon.png",
       englishLabel: "vocabulary",
       persianLabel: "واژگان",
-      progress: _progress?.vocabulary,
+      progress: _vocabularyProgress,
       badge: Container(
         width: Dimens.nw(40),
         height: Dimens.nh(15),
@@ -683,8 +691,20 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
           _showPurchaseDialog();
           return;
         }
-        await Navigator.pushNamed(context, VocabularyScreen.routeName,
-            arguments: {"id": widget.lessonId});
+        final hasStartedVocabulary = _vocabularyProgress >= 1;
+        if (hasStartedVocabulary) {
+          await Navigator.pushNamed(
+            context,
+            ReviewedVocabulariesScreen.routeName,
+            arguments: {"courseId": widget.lessonId},
+          );
+        } else {
+          await Navigator.pushNamed(
+            context,
+            VocabularyScreen.routeName,
+            arguments: {"id": widget.lessonId},
+          );
+        }
         if (mounted) {
           context.read<LessonBloc>().add(GetLessonEvenet(id: widget.lessonId));
         }

@@ -50,6 +50,7 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
   List<String> randomizedOptions = [];
   bool _isExitDialogOpen = false;
   bool _hasShownResultModal = false;
+  bool _isAnswering = false;
 
   @override
   void initState() {
@@ -78,6 +79,9 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
   }
 
   void _checkAnswer(String word) {
+    if (_isAnswering || showAnswer || selectedWord != null) return;
+    _isAnswering = true;
+
     final currentState = context.read<PracticeVocabularyBloc>().state
         as PracticeVocabularySuccess;
     final correctWord = currentState.practiceVocabulary.data.correctWord;
@@ -126,6 +130,7 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
       showAnswer = false;
       selectedWord = null;
       randomizedOptions = []; // Clear for next randomization
+      _isAnswering = false;
     });
     if (context.read<PracticeVocabularyBloc>().state
         is PracticeVocabularySuccess) {
@@ -385,6 +390,7 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
                               (word) => Expanded(
                                 child: PressableAnswerOptionButton(
                                   text: word,
+                                  enabled: !showAnswer && selectedWord == null,
                                   onTap: () => _checkAnswer(word),
                                 ),
                               ),

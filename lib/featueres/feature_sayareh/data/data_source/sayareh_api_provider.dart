@@ -90,8 +90,10 @@ class SayarehApiProvider {
     return _retryRequest(() => dio.post(
           "${Constants.baseUrl}iknow/courses/$courseId/vocabulary/$vocabularyId/submit",
           data: {
+            "previousVocabularyIds": previousVocabularyIds
+                .where((id) => id.isNotEmpty)
+                .toList(),
             "answer": answer,
-            "previousVocabularyIds": previousVocabularyIds,
             "vocabularyId": vocabularyId,
           },
         ));

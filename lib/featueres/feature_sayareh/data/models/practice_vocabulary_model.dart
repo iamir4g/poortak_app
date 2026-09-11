@@ -77,6 +77,16 @@ class PracticeStats {
     return (total - remaining).clamp(0, total - 1);
   }
 
+  int get answeredCount {
+    if (total <= 0) return 0;
+    return (total - remaining).clamp(0, total);
+  }
+
+  int get progressPercent {
+    if (total <= 0) return 0;
+    return ((answeredCount / total) * 100).round().clamp(0, 100);
+  }
+
   factory PracticeStats.fromJson(Map<String, dynamic> json) => PracticeStats(
         total: json["total"] ?? 0,
         test: json["test"] ?? 0,

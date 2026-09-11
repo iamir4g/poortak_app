@@ -7,13 +7,16 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="com.farsitel.bazaar.permission.PAY_THROUGH_BAZAAR"/>
 
-    <!-- App only plays TTS/audio; microphone is not used.
-         Remove permissions pulled in by flutter_sound (via openai_tts). -->
+    <!-- Microphone is not used. Strip any plugin-merged recording permissions
+         so Cafe Bazaar / Play Protect do not see RECORD_AUDIO. -->
     <uses-permission
         android:name="android.permission.RECORD_AUDIO"
         tools:node="remove" />
     <uses-permission
-        android:name="Manifest.permission.CAPTURE_AUDIO_OUTPUT"
+        android:name="android.permission.CAPTURE_AUDIO_OUTPUT"
+        tools:node="remove" />
+    <uses-permission
+        android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE"
         tools:node="remove" />
     <application
         android:label="@string/app_name"

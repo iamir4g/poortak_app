@@ -857,6 +857,7 @@ class _DialogCartState extends State<DialogCart>
                                                   return ItemMultiCard(
                                                     title: course.name,
                                                     price: course.price,
+                                                    isDemo: course.isDemo,
                                                   );
                                                 },
                                               ),
@@ -895,6 +896,7 @@ class _DialogCartState extends State<DialogCart>
                                                   return ItemMultiCard(
                                                     title: book.title,
                                                     price: book.price,
+                                                    isDemo: book.isDemo,
                                                   );
                                                 },
                                               ),

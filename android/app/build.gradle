@@ -71,10 +71,14 @@ android {
             signingConfig = signingConfigs.debug
         }
         release {
-            signingConfig = keystorePropertiesFile.exists()
-                    ? signingConfigs.release
-                    : signingConfigs.debug
-            
+            if (!keystorePropertiesFile.exists()) {
+                throw new GradleException(
+                    "Missing android/key.properties. Release APKs must use the upload keystore; " +
+                    "debug signing is flagged by Play Protect as an unknown developer."
+                )
+            }
+            signingConfig = signingConfigs.release
+
             // Enable code shrinking, obfuscation, and optimization
             minifyEnabled true
             shrinkResources true
