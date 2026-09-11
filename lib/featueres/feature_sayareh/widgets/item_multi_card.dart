@@ -10,10 +10,12 @@ import 'package:persian_tools/persian_tools.dart';
 class ItemMultiCard extends StatelessWidget {
   final String title;
   final String price;
+  final bool isDemo;
   const ItemMultiCard({
     super.key,
     required this.title,
     required this.price,
+    this.isDemo = false,
   });
 
   @override
@@ -48,7 +50,7 @@ class ItemMultiCard extends StatelessWidget {
                 )
               ],
             ),
-            price == "0"
+            isDemo || price == "0"
                 ? Text(
                     "رایگان",
                     style:

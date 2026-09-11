@@ -57,6 +57,7 @@ class BookList {
   DateTime? publishedAt;
   bool purchased;
   bool isDemo;
+  String? bazaarSku;
 
   BookList({
     required this.id,
@@ -76,6 +77,7 @@ class BookList {
     this.publishedAt,
     required this.purchased,
     this.isDemo = false,
+    this.bazaarSku,
   });
 
   factory BookList.fromJson(Map<String, dynamic> json) => BookList(
@@ -102,6 +104,7 @@ class BookList {
             : DateTime.parse(json["publishedAt"]),
         purchased: json["purchased"] ?? false,
         isDemo: json["isDemo"] ?? false,
+        bazaarSku: json["bazaarSku"]?.toString(),
       );
 
   Map<String, dynamic> toJson() => {
@@ -122,6 +125,7 @@ class BookList {
         "publishedAt": publishedAt?.toIso8601String(),
         "purchased": purchased,
         "isDemo": isDemo,
+        "bazaarSku": bazaarSku,
       };
 }
 

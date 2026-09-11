@@ -87,6 +87,7 @@ class ShoppingCartRepository {
             'thumbnail': cartItem.source.thumbnail,
             'videoThumbnail': cartItem.source.videoThumbnail,
             'isDemo': cartItem.source.isDemo,
+            'bazaarSku': cartItem.source.bazaarSku,
             'price': cartItem.source.price,
             'video': cartItem.source.video,
             'trailerVideo': cartItem.source.trailerVideo,
