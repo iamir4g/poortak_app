@@ -134,7 +134,10 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
     );
   }
 
-  Future<void> _handlePayNow(List<String> bazaarSkus) async {
+  Future<void> _handlePayNow(
+    List<String> bazaarSkus, {
+    String? payload,
+  }) async {
     if (!locator<PrefsOperator>().isLoggedIn()) {
       _promptLogin();
       return;
@@ -144,9 +147,19 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
       return;
     }
 
+    debugPrint(
+      '🛒 PayNow channel=${AppFlavor.paymentChannel} '
+      'flavor=${AppFlavor.appFlavor} '
+      'useBazaarIap=${AppFlavor.useBazaarIap} '
+      'skus=$bazaarSkus',
+    );
+
     if (AppFlavor.useBazaarIap) {
-      final skus = bazaarSkus.map((sku) => sku.trim()).toList();
-      if (skus.isEmpty || skus.any((sku) => sku.isEmpty)) {
+      final skus = bazaarSkus
+          .map((sku) => sku.trim())
+          .where((sku) => sku.isNotEmpty)
+          .toList();
+      if (skus.isEmpty) {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -159,8 +172,13 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
         );
         return;
       }
+
+      debugPrint('🛒 Bazaar purchase, skipping IPG checkout. SKUs=$skus');
       context.read<InAppPurchaseBloc>().add(
-            PurchaseProductsEvent(productIds: skus),
+            PurchaseProductsEvent(
+              productIds: skus,
+              payload: payload,
+            ),
           );
       return;
     }
@@ -774,6 +792,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                   onPressed: () async {
                     await _handlePayNow(
                       cart.items.map((item) => item.bazaarSku ?? '').toList(),
+                      payload: cart.id,
                     );
                   },
                 ),
@@ -939,10 +958,6 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                   backgroundColor:
                       isDark ? MyColors.primary : MyColors.secondary,
                   onPressed: () async {
-                    if (!AppFlavor.useBazaarIap) {
-                      await _handlePayNow(const []);
-                      return;
-                    }
                     final resolvedItems = await Future.wait(
                       localCartItems.map(_resolveLocalCartItem),
                     );

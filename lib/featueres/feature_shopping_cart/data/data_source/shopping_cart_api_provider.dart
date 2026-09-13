@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:dio/dio.dart';
 import 'package:poortak/common/services/auth_service.dart';
+import 'package:poortak/config/app_flavor.dart';
 import 'package:poortak/config/constants.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/models/cart_enum.dart';
 import 'package:poortak/locator.dart';
@@ -52,6 +53,11 @@ class ShoppingCartApiProvider {
   }
 
   Future<Response> checkoutCart() async {
+    if (AppFlavor.useBazaarIap) {
+      throw StateError(
+        'Android Bazaar builds must use FlutterPoolakey.purchase, not cart/checkout',
+      );
+    }
     log("💳 Checking out cart via API...");
     final response =
         await _authService.post("${Constants.baseUrl}cart/checkout");

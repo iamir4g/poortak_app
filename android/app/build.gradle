@@ -46,10 +46,10 @@ android {
     productFlavors {
         ipg {
             dimension "store"
-            isDefault true
         }
         bazaar {
             dimension "store"
+            isDefault true
         }
     }
 

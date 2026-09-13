@@ -81,6 +81,7 @@ import 'package:poortak/common/services/reminder_notification_service.dart';
 import 'dart:io' show Platform;
 
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/config/app_flavor.dart';
 import 'package:poortak/config/env.dart';
 import 'package:poortak/common/bloc/in_app_purchase_bloc/in_app_purchase_bloc.dart';
 import 'package:poortak/common/widgets/in_app_purchase_listener.dart';
@@ -105,6 +106,13 @@ void main() async {
 
   await Env.load();
   await initLocator();
+
+  debugPrint(
+    '🛒 [Bazaar] android=${Platform.isAndroid} '
+    'useBazaarIap=${AppFlavor.useBazaarIap} '
+    'flavor=${AppFlavor.appFlavor} '
+    'channel=${AppFlavor.paymentChannel}',
+  );
 
   final startupToken = await locator<PrefsOperator>().getUserToken();
   debugPrint('==================== AUTH TOKEN ====================');
