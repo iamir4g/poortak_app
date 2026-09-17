@@ -171,14 +171,18 @@ class SayarehApiProvider {
 
   dynamic callPostConversationPlayback(
       String courseId, String conversationId) async {
-    log("Sayareh save converstion courseId: $courseId, conversationId: $conversationId");
-    return _retryRequest(() => dio.post(
-          "${Constants.baseUrl}iknow/courses/$courseId/conversation/playback",
-          data: {
-            "courseId": courseId,
-            "conversationId": conversationId,
-          },
-        ));
+    final url =
+        "${Constants.baseUrl}iknow/courses/$courseId/conversation/playback";
+    debugPrint(
+      '🌐 [PLAYBACK] POST $url conversationId=$conversationId',
+    );
+    return dio.post(
+      url,
+      data: {
+        "courseId": courseId,
+        "conversationId": conversationId,
+      },
+    );
   }
 
   dynamic callGetCourseProgress(String courseId) async {

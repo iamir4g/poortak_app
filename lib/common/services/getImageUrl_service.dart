@@ -15,7 +15,7 @@ class GetImageUrlService {
       final imageUrl =
           await _storageService.callGetDownloadPublicUrl(thumbnailId);
       _imageUrls[thumbnailId] = imageUrl;
-      print("Image URL received: $imageUrl");
+      print("🌐 [IMAGE] $imageUrl");
       return imageUrl;
     } catch (e) {
       print('Error getting image URL: $e');

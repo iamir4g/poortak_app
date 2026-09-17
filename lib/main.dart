@@ -82,6 +82,7 @@ import 'dart:io' show Platform;
 
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/config/app_flavor.dart';
+import 'package:poortak/config/constants.dart';
 import 'package:poortak/config/env.dart';
 import 'package:poortak/common/bloc/in_app_purchase_bloc/in_app_purchase_bloc.dart';
 import 'package:poortak/common/widgets/in_app_purchase_listener.dart';
@@ -113,6 +114,7 @@ void main() async {
     'flavor=${AppFlavor.appFlavor} '
     'channel=${AppFlavor.paymentChannel}',
   );
+  debugPrint('🌐 API baseUrl=${Constants.baseUrl}');
 
   final startupToken = await locator<PrefsOperator>().getUserToken();
   debugPrint('==================== AUTH TOKEN ====================');

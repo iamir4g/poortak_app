@@ -19,7 +19,7 @@ class AuthInterceptor extends QueuedInterceptor {
   bool _isRefreshing = false;
   Completer<void>? _refreshCompleter;
 
-  static const _refreshUrl = '${Constants.baseUrl}auth/refresh';
+  static String get _refreshUrl => '${Constants.baseUrl}auth/refresh';
 
   @override
   Future<void> onError(
