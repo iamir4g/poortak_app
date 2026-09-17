@@ -326,6 +326,15 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
   }
 
   @override
+  void didPopNext() {
+    super.didPopNext();
+    if (!mounted || _isDisposed) return;
+    context.read<LessonBloc>().add(
+          RefreshLessonProgressEvent(id: widget.lessonId),
+        );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return MultiBlocListener(
       listeners: [

@@ -38,6 +38,24 @@ class LessonBloc extends Bloc<LessonEvent, LessonState> {
       }
     });
 
+    on<RefreshLessonProgressEvent>((event, emit) async {
+      if (!locator<PrefsOperator>().isLoggedIn()) return;
+
+      final current = state;
+      final progressResponse =
+          await sayarehRepository.fetchCourseProgress(event.id);
+      if (progressResponse is! DataSuccess || progressResponse.data == null) {
+        return;
+      }
+
+      if (current is LessonSuccess) {
+        emit(LessonSuccess(
+          lesson: current.lesson,
+          progress: progressResponse.data!.data,
+        ));
+      }
+    });
+
     on<ResetLessonProgressEvent>((event, emit) async {
       emit(LessonLoading());
       await locator<PrefsOperator>()
