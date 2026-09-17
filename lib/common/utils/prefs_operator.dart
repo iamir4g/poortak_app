@@ -357,6 +357,18 @@ class PrefsOperator {
     await sharedPreferences.remove(_previousVocabularyIdsKey(courseId));
   }
 
+  Future<void> clearReviewedVocabularies(String courseId) async {
+    await sharedPreferences.remove(_reviewedVocabulariesKey(courseId));
+  }
+
+  Future<void> clearVocabularyPracticeLocalState(String courseId) async {
+    await Future.wait([
+      clearPreviousVocabularyIds(courseId),
+      clearReviewedVocabularies(courseId),
+      clearVocabularyPracticeProgress(courseId),
+    ]);
+  }
+
   String _vocabularyPracticeProgressKey(String courseId) =>
       'vocabulary_practice_progress_$courseId';
 

@@ -40,7 +40,8 @@ class LessonBloc extends Bloc<LessonEvent, LessonState> {
 
     on<ResetLessonProgressEvent>((event, emit) async {
       emit(LessonLoading());
-      await locator<PrefsOperator>().clearVocabularyPracticeProgress(event.id);
+      await locator<PrefsOperator>()
+          .clearVocabularyPracticeLocalState(event.id);
       final response = await sayarehRepository.resetCourseProgress(event.id);
 
       if (response is DataSuccess) {
