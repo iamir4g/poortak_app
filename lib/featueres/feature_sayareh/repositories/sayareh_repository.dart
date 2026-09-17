@@ -22,6 +22,16 @@ import 'package:poortak/featueres/feature_sayareh/data/models/sayareh_home_model
 import 'package:poortak/featueres/feature_sayareh/data/models/sayareh_storage_test_model.dart';
 import 'package:poortak/featueres/feature_sayareh/data/models/vocabulary_model.dart';
 
+class SubmitVocabularyResult {
+  final PracticeVocabularyModel? nextPractice;
+  final bool isCompleted;
+
+  const SubmitVocabularyResult({
+    this.nextPractice,
+    this.isCompleted = false,
+  });
+}
+
 class SayarehRepository {
   SayarehApiProvider sayarehApiProvider;
 
@@ -227,11 +237,7 @@ class SayarehRepository {
       Response response = await sayarehApiProvider.callPostPracticeVocabulary(
           id, previousVocabularyIds);
       if (response.statusCode == 200 || response.statusCode == 201) {
-        if (response.data['data'] == null) {
-          return DataSuccess(null);
-        }
-        final data = PracticeVocabularyModel.fromJson(response.data);
-        return DataSuccess(data);
+        return _mapPracticeResponse(response.data);
       } else {
         return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
       }
@@ -240,7 +246,7 @@ class SayarehRepository {
     }
   }
 
-  Future<DataState<void>> submitVocabulary(
+  Future<DataState<SubmitVocabularyResult>> submitVocabulary(
     String courseId,
     String vocabularyId,
     String answer,
@@ -254,7 +260,7 @@ class SayarehRepository {
         previousVocabularyIds,
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
-        return DataSuccess(null);
+        return _mapSubmitResponse(response.data);
       } else {
         return DataFailed(response.data['message'] ?? "خطا در ارسال اطلاعات");
       }
@@ -266,12 +272,99 @@ class SayarehRepository {
       );
       if (e.response?.statusCode == 422 &&
           message.toLowerCase().contains('already submitted')) {
-        return DataSuccess(null);
+        return _mapSubmitResponse(
+          e.response?.data,
+          alreadySubmitted: true,
+        );
       }
       return DataFailed(message);
     } on AppException catch (e) {
-      return CheckExceptions.getError<void>(e);
+      return CheckExceptions.getError<SubmitVocabularyResult>(e);
     }
+  }
+
+  DataState<PracticeVocabularyModel> _mapPracticeResponse(dynamic raw) {
+    if (raw is! Map) {
+      return const DataFailed("خطا در دریافت اطلاعات");
+    }
+    final map = Map<String, dynamic>.from(raw);
+    if (map['data'] == null) {
+      return const DataSuccess(null);
+    }
+    try {
+      return DataSuccess(_practiceModelFromJson(map));
+    } catch (_) {
+      return const DataFailed("خطا در دریافت اطلاعات");
+    }
+  }
+
+  DataState<SubmitVocabularyResult> _mapSubmitResponse(
+    dynamic raw, {
+    bool alreadySubmitted = false,
+  }) {
+    if (raw is! Map) {
+      if (alreadySubmitted) {
+        return const DataSuccess(SubmitVocabularyResult());
+      }
+      return const DataFailed("خطا در دریافت سوال بعدی");
+    }
+
+    final map = Map<String, dynamic>.from(raw);
+    final practiceData = _extractPracticeData(map['data']);
+    if (practiceData == null) {
+      if (alreadySubmitted) {
+        return const DataSuccess(SubmitVocabularyResult());
+      }
+      return const DataSuccess(SubmitVocabularyResult(isCompleted: true));
+    }
+
+    try {
+      return DataSuccess(
+        SubmitVocabularyResult(
+          nextPractice: PracticeVocabularyModel.fromJson({
+            'ok': map['ok'] ?? true,
+            'meta': map['meta'] ?? <String, dynamic>{},
+            'data': practiceData,
+          }),
+        ),
+      );
+    } catch (_) {
+      if (alreadySubmitted) {
+        return const DataSuccess(SubmitVocabularyResult());
+      }
+      return const DataFailed("خطا در دریافت سوال بعدی");
+    }
+  }
+
+  PracticeVocabularyModel _practiceModelFromJson(Map<String, dynamic> map) {
+    final data = map['data'];
+    final practiceData = _extractPracticeData(data);
+    if (practiceData == null) {
+      throw const FormatException('practice data is missing');
+    }
+    return PracticeVocabularyModel.fromJson({
+      'ok': map['ok'] ?? true,
+      'meta': map['meta'] ?? <String, dynamic>{},
+      'data': practiceData,
+    });
+  }
+
+  Map<String, dynamic>? _extractPracticeData(dynamic data) {
+    if (data is! Map) return null;
+    final dataMap = Map<String, dynamic>.from(data);
+    if (dataMap.containsKey('correctWord') &&
+        dataMap.containsKey('wrongWord')) {
+      return dataMap;
+    }
+    for (final key in ['next', 'nextQuestion', 'practice', 'question']) {
+      final nested = dataMap[key];
+      if (nested is Map &&
+          nested.containsKey('correctWord') &&
+          nested.containsKey('wrongWord')) {
+        return Map<String, dynamic>.from(nested);
+      }
+    }
+    return null;
   }
 
   Future<DataState<QuizesList>> fetchQuizzes(String id) async {

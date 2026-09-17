@@ -60,3 +60,7 @@ final class PracticeVocabularySubmitEvent extends PracticeVocabularyEvent {
   List<Object> get props =>
       [courseId, vocabularyId, answer, previousVocabularyIds];
 }
+
+final class PracticeVocabularyNextEvent extends PracticeVocabularyEvent {
+  const PracticeVocabularyNextEvent();
+}

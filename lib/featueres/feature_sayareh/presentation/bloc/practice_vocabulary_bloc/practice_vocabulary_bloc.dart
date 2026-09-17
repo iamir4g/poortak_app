@@ -20,11 +20,17 @@ class PracticeVocabularyBloc
   String? _currentCourseId;
   List<String> _previousVocabularyIds = [];
   final Set<String> _submittedVocabularyIds = {};
+  PracticeVocabularyModel? _pendingNextPractice;
+  bool _pendingCompleted = false;
+  bool _isSubmitting = false;
+  bool _advanceRequested = false;
+  String? _submitError;
 
   PracticeVocabularyBloc({required this.sayarehRepository})
       : super(PracticeVocabularyInitial()) {
     on<PracticeVocabularyFetchEvent>((event, emit) async {
       _currentCourseId = event.courseId;
+      _clearPendingPractice();
       _previousVocabularyIds = _mergeVocabularyIds(
         _storedPreviousVocabularyIds(event.courseId),
         event.previousVocabularyIds,
@@ -146,6 +152,7 @@ class PracticeVocabularyBloc
       _accumulatedCorrectCount = 0;
       _accumulatedWrongCount = 0;
       _submittedVocabularyIds.clear();
+      _clearPendingPractice();
       emit(PracticeVocabularyInitial());
     });
 
@@ -154,6 +161,11 @@ class PracticeVocabularyBloc
           !_submittedVocabularyIds.add(event.vocabularyId)) {
         return;
       }
+
+      _isSubmitting = true;
+      _submitError = null;
+      _pendingNextPractice = null;
+      _pendingCompleted = false;
 
       final previousForApi = _mergeVocabularyIds(
         _previousVocabularyIds,
@@ -173,10 +185,107 @@ class PracticeVocabularyBloc
       );
       await _persistPreviousVocabularyIds();
 
+      _isSubmitting = false;
+
       if (response is DataFailed) {
         print('DEBUG: Submit vocabulary failed: ${response.error}');
+        _submitError = response.error ?? "خطا در ثبت پاسخ لغت";
+        if (_advanceRequested) {
+          _advanceRequested = false;
+          emit(PracticeVocabularyError(message: _submitError!));
+        }
+        return;
+      }
+
+      final submitResult = response.data;
+      if (submitResult?.nextPractice != null) {
+        _pendingNextPractice = submitResult!.nextPractice;
+        await _persistVocabularyProgress(
+          _pendingNextPractice!.data.stats.progressPercent,
+        );
+      } else if (submitResult?.isCompleted == true) {
+        _pendingCompleted = true;
+        await _persistReviewedVocabularies(replace: true);
+        await _persistVocabularyProgress(100);
+      }
+
+      if (_advanceRequested) {
+        _advanceRequested = false;
+        await _emitPendingNext(emit);
       }
     });
+
+    on<PracticeVocabularyNextEvent>((event, emit) async {
+      if (_pendingNextPractice != null || _pendingCompleted) {
+        await _emitPendingNext(emit);
+        return;
+      }
+
+      if (_submitError != null) {
+        emit(PracticeVocabularyError(message: _submitError!));
+        return;
+      }
+
+      if (_isSubmitting) {
+        _advanceRequested = true;
+        emit(PracticeVocabularyLoading());
+        return;
+      }
+
+      emit(const PracticeVocabularyError(
+        message: "سوال بعدی هنوز آماده نیست",
+      ));
+    });
+  }
+
+  void _clearPendingPractice() {
+    _pendingNextPractice = null;
+    _pendingCompleted = false;
+    _isSubmitting = false;
+    _advanceRequested = false;
+    _submitError = null;
+  }
+
+  Future<void> _emitPendingNext(Emitter<PracticeVocabularyState> emit) async {
+    if (_pendingCompleted) {
+      _pendingCompleted = false;
+      _pendingNextPractice = null;
+      await _emitCompleted(emit);
+      return;
+    }
+
+    final nextPractice = _pendingNextPractice;
+    if (nextPractice == null) {
+      emit(const PracticeVocabularyError(
+        message: "سوال بعدی هنوز آماده نیست",
+      ));
+      return;
+    }
+
+    _pendingNextPractice = null;
+    emit(PracticeVocabularySuccess(
+      practiceVocabulary: nextPractice,
+      correctWords: _previousVocabularyIds,
+      reviewedVocabularies: _accumulatedReviewed,
+      correctAnswersCount: _accumulatedCorrectCount,
+      wrongAnswersCount: _accumulatedWrongCount,
+    ));
+  }
+
+  Future<void> _emitCompleted(Emitter<PracticeVocabularyState> emit) async {
+    final totalQuestions = _accumulatedCorrectCount + _accumulatedWrongCount;
+    print('DEBUG: Practice completed');
+    print('DEBUG: Total questions: $totalQuestions');
+    print('DEBUG: Correct answers: $_accumulatedCorrectCount');
+    print('DEBUG: Wrong answers: $_accumulatedWrongCount');
+    print(
+        'DEBUG: Reviewed vocabularies count: ${_accumulatedReviewed.length}');
+    emit(PracticeVocabularyCompleted(
+      reviewedVocabularies: _accumulatedReviewed,
+      correctAnswersCount: _accumulatedCorrectCount,
+      wrongAnswersCount: _accumulatedWrongCount,
+      totalQuestions: totalQuestions,
+    ));
   }
 
   Future<void> _persistReviewedVocabularies({bool replace = false}) async {
