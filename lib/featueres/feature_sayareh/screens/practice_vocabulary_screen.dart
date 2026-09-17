@@ -30,8 +30,13 @@ import 'package:poortak/featueres/feature_sayareh/widgets/item_question.dart';
 class PracticeVocabularyScreen extends StatefulWidget {
   static const routeName = "/practice_vocabulary_screen";
   final String courseId;
+  final bool restart;
 
-  const PracticeVocabularyScreen({super.key, required this.courseId});
+  const PracticeVocabularyScreen({
+    super.key,
+    required this.courseId,
+    this.restart = false,
+  });
 
   @override
   State<PracticeVocabularyScreen> createState() =>
@@ -330,7 +335,10 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
 
             if (state is PracticeVocabularyInitial) {
               context.read<PracticeVocabularyBloc>().add(
-                    PracticeVocabularyFetchEvent(courseId: widget.courseId),
+                    PracticeVocabularyFetchEvent(
+                      courseId: widget.courseId,
+                      startFresh: widget.restart,
+                    ),
                   );
             }
             return PopScope(

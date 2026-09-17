@@ -31,13 +31,17 @@ class PracticeVocabularyBloc
     on<PracticeVocabularyFetchEvent>((event, emit) async {
       _currentCourseId = event.courseId;
       _clearPendingPractice();
-      _previousVocabularyIds = _mergeVocabularyIds(
-        _storedPreviousVocabularyIds(event.courseId),
-        event.previousVocabularyIds,
-      );
-      _submittedVocabularyIds.addAll(_previousVocabularyIds);
-      if (_accumulatedReviewed.isEmpty) {
-        _restoreReviewedVocabularies(event.courseId);
+      if (event.startFresh) {
+        await _resetLocalPracticeSession(event.courseId);
+      } else {
+        _previousVocabularyIds = _mergeVocabularyIds(
+          _storedPreviousVocabularyIds(event.courseId),
+          event.previousVocabularyIds,
+        );
+        _submittedVocabularyIds.addAll(_previousVocabularyIds);
+        if (_accumulatedReviewed.isEmpty) {
+          _restoreReviewedVocabularies(event.courseId);
+        }
       }
       await _persistPreviousVocabularyIds();
       emit(PracticeVocabularyLoading());
@@ -144,11 +148,7 @@ class PracticeVocabularyBloc
     });
 
     on<PracticeVocabularyResetEvent>((event, emit) async {
-      _accumulatedReviewed = [];
-      _accumulatedCorrectCount = 0;
-      _accumulatedWrongCount = 0;
-      _submittedVocabularyIds.clear();
-      _clearPendingPractice();
+      await _resetLocalPracticeSession(_currentCourseId);
       emit(PracticeVocabularyInitial());
     });
 
@@ -236,6 +236,17 @@ class PracticeVocabularyBloc
     _isSubmitting = false;
     _advanceRequested = false;
     _submitError = null;
+  }
+
+  Future<void> _resetLocalPracticeSession(String? courseId) async {
+    _accumulatedReviewed = [];
+    _accumulatedCorrectCount = 0;
+    _accumulatedWrongCount = 0;
+    _previousVocabularyIds = [];
+    _submittedVocabularyIds.clear();
+    _clearPendingPractice();
+    if (courseId == null || courseId.isEmpty) return;
+    await _prefs.clearVocabularyPracticeLocalState(courseId);
   }
 
   Future<void> _emitPendingNext(Emitter<PracticeVocabularyState> emit) async {

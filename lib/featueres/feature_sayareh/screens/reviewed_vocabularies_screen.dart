@@ -449,7 +449,10 @@ class _ReviewedVocabulariesScreenState
                           Navigator.pushReplacementNamed(
                             context,
                             PracticeVocabularyScreen.routeName,
-                            arguments: {'courseId': widget.courseId},
+                            arguments: {
+                              'courseId': widget.courseId,
+                              'restart': true,
+                            },
                           );
                         },
                         style: ElevatedButton.styleFrom(

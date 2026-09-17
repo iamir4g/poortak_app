@@ -247,7 +247,9 @@ void main() async {
                           create: (context) => PracticeVocabularyBloc(
                               sayarehRepository: locator()),
                           child: PracticeVocabularyScreen(
-                              courseId: args['courseId']),
+                            courseId: args['courseId'],
+                            restart: args['restart'] == true,
+                          ),
                         );
                       },
                       ReviewedVocabulariesScreen.routeName: (context) {

@@ -91,18 +91,30 @@ Future<void> initLocator() async {
       }
 
       debugPrint('🌐 [REQUEST] ${options.method} ${options.uri}');
+      if (options.data != null) {
+        debugPrint('🌐 [BODY] ${options.data}');
+      }
       return handler.next(options);
     },
     onResponse: (response, handler) {
       debugPrint(
         '✅ [RESPONSE] ${response.statusCode} ${response.requestOptions.uri}',
       );
+      if (response.data != null) {
+        debugPrint('✅ [RESPONSE BODY] ${response.data}');
+      }
       return handler.next(response);
     },
     onError: (error, handler) {
       debugPrint(
         '❌ [ERROR] ${error.response?.statusCode} ${error.requestOptions.uri}',
       );
+      if (error.response?.data != null) {
+        debugPrint('❌ [ERROR BODY] ${error.response?.data}');
+      }
+      if (error.requestOptions.data != null) {
+        debugPrint('❌ [ERROR REQUEST BODY] ${error.requestOptions.data}');
+      }
       return handler.next(error);
     },
   ));

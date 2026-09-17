@@ -10,13 +10,15 @@ sealed class PracticeVocabularyEvent extends Equatable {
 final class PracticeVocabularyFetchEvent extends PracticeVocabularyEvent {
   final String courseId;
   final List<String> previousVocabularyIds;
+  final bool startFresh;
   const PracticeVocabularyFetchEvent({
     required this.courseId,
     this.previousVocabularyIds = const [],
+    this.startFresh = false,
   });
 
   @override
-  List<Object> get props => [courseId, previousVocabularyIds];
+  List<Object> get props => [courseId, previousVocabularyIds, startFresh];
 }
 
 final class PracticeVocabularySaveCorrectEvent extends PracticeVocabularyEvent {
