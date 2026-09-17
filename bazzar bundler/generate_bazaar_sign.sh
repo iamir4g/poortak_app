@@ -7,7 +7,7 @@ PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 BUNDLE_SIGNER_JAR="${SCRIPT_DIR}/bundlesigner-0.1.13.jar"
 KEY_PROPERTIES="${PROJECT_ROOT}/android/key.properties"
 KEYSTORE="${PROJECT_ROOT}/android/upload-keystore.jks"
-AAB="${1:-${PROJECT_ROOT}/build/app/outputs/bundle/release/app-release.aab}"
+AAB="${1:-${PROJECT_ROOT}/build/app/outputs/bundle/bazaarRelease/app-bazaar-release.aab}"
 OUTPUT_DIR="${SCRIPT_DIR}/output"
 
 if [[ ! -f "${BUNDLE_SIGNER_JAR}" ]]; then
@@ -28,7 +28,7 @@ fi
 
 if [[ ! -f "${AAB}" ]]; then
   echo "AAB not found: ${AAB}"
-  echo "Build it first: flutter build appbundle --release"
+  echo "Build it first: flutter build appbundle --release --flavor bazaar"
   exit 1
 fi
 
