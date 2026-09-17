@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:poortak/common/widgets/adaptive_safe_area.dart';
 import 'package:poortak/config/dimens.dart';
-import 'package:poortak/featueres/feature_kavoosh/screens/educational_videos_screen.dart';
-import 'package:poortak/featueres/feature_kavoosh/screens/ebooks_screen.dart';
-import 'package:poortak/featueres/feature_kavoosh/screens/self_assessment_screen.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 
@@ -43,10 +40,7 @@ class _KavooshMainScreenState extends State<KavooshMainScreen> {
                       Color(0xFFFFFDCC),
                       Color(0xFFFFF3D6),
                     ],
-                    onTap: () {
-                      Navigator.pushNamed(
-                          context, EducationalVideosScreen.routeName);
-                    },
+                    showComingSoonBadge: true,
                   ),
                   SizedBox(height: Dimens.nh(13.0)),
                   _buildContentCard(
@@ -57,9 +51,7 @@ class _KavooshMainScreenState extends State<KavooshMainScreen> {
                       Color(0xFFFBEBDF),
                       Color(0xFFFFDBDB),
                     ],
-                    onTap: () {
-                      Navigator.pushNamed(context, EBooksScreen.routeName);
-                    },
+                    showComingSoonBadge: true,
                   ),
                   SizedBox(height: Dimens.nh(13.0)),
                   _buildContentCard(
@@ -69,11 +61,7 @@ class _KavooshMainScreenState extends State<KavooshMainScreen> {
                       Color(0xFFD9FFFA),
                       Color(0xFFD9FFEA),
                     ],
-                    onTap: () {
-                      Navigator.pushNamed(
-                          context, SelfAssessmentScreen.routeName);
-                    },
-                    showComingSoonBadge: false,
+                    showComingSoonBadge: true,
                   ),
                 ],
               ),
@@ -97,12 +85,12 @@ class _KavooshMainScreenState extends State<KavooshMainScreen> {
     required String title,
     required String subtitle,
     required List<Color> gradientColors,
-    required VoidCallback onTap,
+    VoidCallback? onTap,
     bool showComingSoonBadge = false,
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
-      onTap: onTap,
+      onTap: showComingSoonBadge ? null : onTap,
       child: Stack(
         children: [
           Container(
