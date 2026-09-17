@@ -79,12 +79,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
 
   bool get _isFirstLesson => widget.index == 0;
 
-  int get _vocabularyProgress {
-    final server = _progress?.vocabulary ?? 0;
-    final local =
-        locator<PrefsOperator>().getVocabularyPracticeProgress(widget.lessonId);
-    return server >= local ? server : local;
-  }
+  int get _vocabularyProgress => _progress?.vocabulary ?? 0;
 
   void _promptLogin() {
     ReusableModal.show(

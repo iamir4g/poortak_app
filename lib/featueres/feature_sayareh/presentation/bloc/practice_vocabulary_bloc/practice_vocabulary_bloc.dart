@@ -56,9 +56,6 @@ class PracticeVocabularyBloc
             correctAnswersCount: _accumulatedCorrectCount,
             wrongAnswersCount: _accumulatedWrongCount,
           ));
-          await _persistVocabularyProgress(
-            response.data!.data.stats.progressPercent,
-          );
         } else {
           // API returned null, practice completed
           final totalQuestions =
@@ -70,7 +67,6 @@ class PracticeVocabularyBloc
           print(
               'DEBUG: Reviewed vocabularies count: ${_accumulatedReviewed.length}');
           await _persistReviewedVocabularies(replace: true);
-          await _persistVocabularyProgress(100);
           emit(PracticeVocabularyCompleted(
             reviewedVocabularies: _accumulatedReviewed,
             correctAnswersCount: _accumulatedCorrectCount,
@@ -200,13 +196,9 @@ class PracticeVocabularyBloc
       final submitResult = response.data;
       if (submitResult?.nextPractice != null) {
         _pendingNextPractice = submitResult!.nextPractice;
-        await _persistVocabularyProgress(
-          _pendingNextPractice!.data.stats.progressPercent,
-        );
       } else if (submitResult?.isCompleted == true) {
         _pendingCompleted = true;
         await _persistReviewedVocabularies(replace: true);
-        await _persistVocabularyProgress(100);
       }
 
       if (_advanceRequested) {
@@ -366,13 +358,5 @@ class PracticeVocabularyBloc
     final courseId = _currentCourseId;
     if (courseId == null || courseId.isEmpty) return;
     await _prefs.savePreviousVocabularyIds(courseId, _previousVocabularyIds);
-  }
-
-  Future<void> _persistVocabularyProgress(int percent) async {
-    final courseId = _currentCourseId;
-    if (courseId == null || courseId.isEmpty) return;
-    final current = _prefs.getVocabularyPracticeProgress(courseId);
-    if (percent <= current) return;
-    await _prefs.saveVocabularyPracticeProgress(courseId, percent);
   }
 }

@@ -32,14 +32,6 @@ class LessonBloc extends Bloc<LessonEvent, LessonState> {
           }
         }
 
-        final localVocabularyProgress =
-            prefsOperator.getVocabularyPracticeProgress(event.id);
-        if (progress != null) {
-          if (localVocabularyProgress > progress.vocabulary) {
-            progress.vocabulary = localVocabularyProgress;
-          }
-        }
-
         emit(LessonSuccess(lesson: response.data!, progress: progress));
       } else {
         emit(LessonError(message: response.error ?? "خطا در دریافت اطلاعات"));
