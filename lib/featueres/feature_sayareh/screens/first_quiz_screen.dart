@@ -137,8 +137,6 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
         totalQuestions: state.totalQuestions,
         correctAnswers: state.correctAnswers,
         score: state.score,
-        courseId: widget.courseId,
-        quizId: widget.quizId,
       ),
     ).whenComplete(() {
       _isResultModalOpen = false;
