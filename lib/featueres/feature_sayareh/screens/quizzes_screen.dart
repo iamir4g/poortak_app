@@ -11,6 +11,7 @@ import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quizes_cubit/cubit/quizes_cubit.dart';
 import 'package:poortak/featueres/feature_sayareh/screens/first_quiz_screen.dart';
 import 'package:poortak/locator.dart';
+import 'package:poortak/main.dart';
 
 class QuizzesScreen extends StatefulWidget {
   static const routeName = "/quizzes";
@@ -21,7 +22,7 @@ class QuizzesScreen extends StatefulWidget {
   State<QuizzesScreen> createState() => _QuizzesScreenState();
 }
 
-class _QuizzesScreenState extends State<QuizzesScreen> {
+class _QuizzesScreenState extends State<QuizzesScreen> with RouteAware {
   late QuizesCubit _quizesCubit;
 
   @override
@@ -29,6 +30,22 @@ class _QuizzesScreenState extends State<QuizzesScreen> {
     super.initState();
     _quizesCubit = QuizesCubit();
     _checkAuthAndFetchQuizzes();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route is PageRoute) {
+      routeObserver.subscribe(this, route);
+    }
+  }
+
+  @override
+  void didPopNext() {
+    // Fires when returning from FirstQuiz/Quiz (even after pushReplacement).
+    if (!mounted) return;
+    _quizesCubit.fetchQuizzes(widget.courseId);
   }
 
   void _checkAuthAndFetchQuizzes() {
@@ -59,8 +76,8 @@ class _QuizzesScreenState extends State<QuizzesScreen> {
         "title": title,
       },
     );
-    if (!mounted) return;
-    _quizesCubit.fetchQuizzes(widget.courseId);
+    // Refresh is handled by didPopNext so progress updates after the last
+    // question / result modal — not when FirstQuiz is replaced mid-quiz.
   }
 
   @override
@@ -129,6 +146,7 @@ class _QuizzesScreenState extends State<QuizzesScreen> {
 
   @override
   void dispose() {
+    routeObserver.unsubscribe(this);
     _quizesCubit.close();
     super.dispose();
   }

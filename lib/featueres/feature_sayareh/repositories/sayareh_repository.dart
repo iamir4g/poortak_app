@@ -395,8 +395,12 @@ class SayarehRepository {
       }
     } on DioException catch (e) {
       if (e.response?.statusCode == 422) {
-        return const DataFailed<QuizesQuestion>(
-          "شما قبلا این آزمون را گذرانده اید.",
+        return DataFailed<QuizesQuestion>(
+          _extractErrorMessage(
+            e.response?.data,
+            fallbackMessage: "شما قبلا این آزمون را گذرانده اید.",
+          ),
+          errorCode: 'quizAlreadyCompleted',
         );
       }
 
@@ -564,15 +568,27 @@ class SayarehRepository {
     try {
       Response response =
           await sayarehApiProvider.callDeleteQuizResult(courseId, quizId);
-      if (response.statusCode == 200 || response.statusCode == 201) {
+      if (response.statusCode == 200 ||
+          response.statusCode == 201 ||
+          response.statusCode == 204) {
         return DataSuccess(null);
       } else {
         return DataFailed(response.data['message'] ?? "خطا در حذف اطلاعات");
       }
+    } on DioException catch (e) {
+      // No saved result to delete (e.g. 404) — treat as success for restart/exit.
+      if (e.response?.statusCode == 404) {
+        return DataSuccess(null);
+      }
+      return DataFailed(
+        _extractErrorMessage(
+          e.response?.data,
+          fallbackMessage: "خطا در حذف نتیجه آزمون",
+        ),
+      );
     } on AppException catch (e) {
       return CheckExceptions.getError<void>(e);
     } catch (_) {
-      // No saved result to delete (e.g. 404) — treat as success for exit flow.
       return DataSuccess(null);
     }
   }
