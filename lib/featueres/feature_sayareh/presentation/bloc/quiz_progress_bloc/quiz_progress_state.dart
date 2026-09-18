@@ -18,6 +18,9 @@ class QuizProgressLoaded extends QuizProgressState {
 
   int get totalQuestions => progress.totalQuestions;
 
+  /// 1-based current question (`answered` from API).
+  int get currentQuestion => progress.currentQuestion;
+
   int get stepIndex => progress.stepIndex;
 
   @override

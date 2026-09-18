@@ -82,28 +82,28 @@ class QuizProgressBloc extends Bloc<QuizProgressEvent, QuizProgressState> {
         state is QuizProgressLoaded ? (state as QuizProgressLoaded).progress : null;
 
     final lastIndex = event.totalQuestions - 1;
-    // answered is a count; StepProgress display uses 0-based index + 1.
-    // answered=7 → index 6 → «۷ از ۱۰»
-    final zeroBasedIndex = event.answeredQuestions <= 0
-        ? 0
-        : (event.answeredQuestions - 1).clamp(0, lastIndex);
+    // API: all = total, answered = 1-based current question number.
+    final currentQuestion = event.currentQuestion <= 0
+        ? 1
+        : event.currentQuestion.clamp(1, event.totalQuestions);
+    final zeroBasedIndex = (currentQuestion - 1).clamp(0, lastIndex);
 
     final progress = QuizProgressData(
       id: previous?.id ?? '',
       quizId: event.quizId.isNotEmpty ? event.quizId : (previous?.quizId ?? ''),
       userId: previous?.userId ?? '',
       totalQuestions: event.totalQuestions,
-      answeredQuestions: event.answeredQuestions,
+      answeredQuestions: currentQuestion,
       correctAnswers: event.correctAnswers,
       score: previous?.score ?? 0,
-      completed: event.answeredQuestions >= event.totalQuestions,
+      completed: previous?.completed ?? false,
       currentQuestionIndex: zeroBasedIndex,
     );
 
     debugPrint(
       '📡 [QuizProgress] updated from answer stats '
-      'total=${progress.totalQuestions} answered=${progress.answeredQuestions} '
-      'correct=${progress.correctAnswers} stepIndex=${progress.stepIndex}',
+      'all=${progress.totalQuestions} answered=${progress.answeredQuestions} '
+      'currentQuestion=${progress.currentQuestion} stepIndex=${progress.stepIndex}',
     );
     emit(QuizProgressLoaded(progress));
   }

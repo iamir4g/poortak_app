@@ -62,6 +62,8 @@ class QuizProgressData {
   final String quizId;
   final String userId;
   final int totalQuestions;
+
+  /// 1-based current question number from API `answered` (e.g. 7 → «۷ از ۱۰»).
   final int answeredQuestions;
   final int correctAnswers;
   final double score;
@@ -81,40 +83,51 @@ class QuizProgressData {
   });
 
   factory QuizProgressData.fromJson(Map<String, dynamic> json) {
+    final total = _asInt(
+      json['all'] ??
+          json['totalQuestions'] ??
+          json['questionCount'] ??
+          json['questionsCount'] ??
+          json['total'],
+    );
+    final answered = _asInt(
+      json['answered'] ??
+          json['currentQuestion'] ??
+          json['answeredQuestions'] ??
+          json['answeredCount'] ??
+          json['current'],
+    );
+
     return QuizProgressData(
       id: _asString(json['id']),
       quizId: _asString(json['quizId'] ?? json['iKnowQuizId']),
       userId: _asString(json['userId']),
-      totalQuestions: _asInt(
-        json['totalQuestions'] ??
-            json['questionCount'] ??
-            json['questionsCount'] ??
-            json['total'],
-      ),
-      answeredQuestions: _asInt(
-        json['answeredQuestions'] ??
-            json['answeredCount'] ??
-            json['answered'] ??
-            json['current'],
-      ),
+      totalQuestions: total,
+      answeredQuestions: answered,
       correctAnswers: _asInt(json['correctAnswers'] ?? json['correct']),
       score: _asDouble(json['score']),
       completed: json['completed'] == true,
-      currentQuestionIndex: _readCurrentQuestionIndex(json),
+      currentQuestionIndex:
+          _readCurrentQuestionIndex(json) ?? _oneBasedToZeroBased(answered),
     );
   }
 
+  /// 1-based question number for UI («۷ از ۱۰»).
+  int get currentQuestion {
+    if (totalQuestions <= 0) return 1;
+    if (answeredQuestions > 0) {
+      return answeredQuestions.clamp(1, totalQuestions);
+    }
+    return (stepIndex + 1).clamp(1, totalQuestions);
+  }
+
   /// 0-based index for [StepProgress].
-  ///
-  /// Display text uses `stepIndex + 1`, so when [answeredQuestions] is 7
-  /// this must be 6 to show «۷ از ۱۰», not 7 («۸ از ۱۰»).
   int get stepIndex {
     final lastIndex = totalQuestions <= 0 ? 0 : totalQuestions - 1;
     if (currentQuestionIndex != null) {
       return currentQuestionIndex!.clamp(0, lastIndex);
     }
-    if (answeredQuestions <= 0) return 0;
-    return (answeredQuestions - 1).clamp(0, lastIndex);
+    return _oneBasedToZeroBased(answeredQuestions).clamp(0, lastIndex);
   }
 
   static String _asString(dynamic value) => value?.toString() ?? '';
@@ -131,15 +144,17 @@ class QuizProgressData {
     return double.tryParse(value?.toString() ?? '') ?? fallback;
   }
 
+  static int _oneBasedToZeroBased(int oneBased) {
+    if (oneBased <= 0) return 0;
+    return oneBased - 1;
+  }
+
   static int? _readCurrentQuestionIndex(Map<String, dynamic> json) {
     final zeroBased = _asNullableInt(
       json['currentQuestionIndex'] ?? json['currentIndex'],
     );
     if (zeroBased != null) return zeroBased;
-
-    final oneBased = _asNullableInt(json['currentQuestion']);
-    if (oneBased == null) return null;
-    return (oneBased - 1).clamp(0, 1 << 30);
+    return null;
   }
 
   static int? _asNullableInt(dynamic value) {

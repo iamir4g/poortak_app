@@ -73,7 +73,7 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
           UpdateQuizProgressFromStatsEvent(
             quizId: widget.quizId,
             totalQuestions: stats.all,
-            answeredQuestions: stats.answered,
+            currentQuestion: stats.answered,
             correctAnswers: stats.correct,
           ),
         );
@@ -120,7 +120,7 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
     }
     return buildQuizStepProgress(
       context: context,
-      currentIndex: progressState.stepIndex,
+      currentQuestion: progressState.currentQuestion,
       totalSteps: progressState.totalQuestions,
     );
   }

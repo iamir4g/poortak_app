@@ -103,22 +103,25 @@ class QuizQuestionLayout extends StatelessWidget {
 
 Widget buildQuizStepProgress({
   required BuildContext context,
-  required int currentIndex,
+  required int currentQuestion,
   required int totalSteps,
 }) {
   final isDark = Theme.of(context).brightness == Brightness.dark;
-  final displayIndex = (currentIndex + 1).clamp(1, totalSteps);
+  final steps = totalSteps <= 0 ? 1 : totalSteps;
+  // `currentQuestion` is 1-based from API `answered`.
+  final displayIndex = currentQuestion.clamp(1, steps);
+  final currentIndex = displayIndex - 1;
 
   return Column(
     mainAxisSize: MainAxisSize.min,
     children: [
       StepProgress(
         currentIndex: currentIndex,
-        totalSteps: totalSteps,
+        totalSteps: steps,
       ),
       SizedBox(height: Dimens.nh(8)),
       Text(
-        '${toPersianDigits('$displayIndex')} از ${toPersianDigits('$totalSteps')}',
+        '${toPersianDigits('$displayIndex')} از ${toPersianDigits('$steps')}',
         textAlign: TextAlign.center,
         style: MyTextStyle.textMatn12W500.copyWith(
           color: isDark ? MyColors.darkTextSecondary : MyColors.text4,

@@ -86,20 +86,25 @@ class Data {
 }
 
 class AnswerStats {
+  /// Total questions in the quiz (`all`).
   final int all;
+
+  /// 1-based current question number (`answered`) — e.g. 7 means «سوال ۷».
   final int answered;
+
   final int correct;
 
   const AnswerStats({
     required this.all,
     required this.answered,
-    required this.correct,
+    this.correct = 0,
   });
 
   factory AnswerStats.fromJson(Map<String, dynamic> json) => AnswerStats(
         all: _asInt(json["all"] ?? json["total"] ?? json["totalQuestions"]),
         answered: _asInt(
           json["answered"] ??
+              json["currentQuestion"] ??
               json["answeredQuestions"] ??
               json["answeredCount"],
         ),

@@ -21,20 +21,22 @@ class FetchQuizProgressEvent extends QuizProgressEvent {
 }
 
 /// Updates progress locally from submit-answer response stats (no extra fetch).
+///
+/// [totalQuestions] = API `all`, [currentQuestion] = API `answered` (1-based).
 class UpdateQuizProgressFromStatsEvent extends QuizProgressEvent {
   final String quizId;
   final int totalQuestions;
-  final int answeredQuestions;
+  final int currentQuestion;
   final int correctAnswers;
 
   const UpdateQuizProgressFromStatsEvent({
     required this.quizId,
     required this.totalQuestions,
-    required this.answeredQuestions,
-    required this.correctAnswers,
+    required this.currentQuestion,
+    this.correctAnswers = 0,
   });
 
   @override
   List<Object> get props =>
-      [quizId, totalQuestions, answeredQuestions, correctAnswers];
+      [quizId, totalQuestions, currentQuestion, correctAnswers];
 }
