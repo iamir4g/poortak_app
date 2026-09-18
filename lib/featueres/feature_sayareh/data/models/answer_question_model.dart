@@ -90,6 +90,7 @@ class AnswerStats {
   final int all;
 
   /// 1-based current question number (`answered`) — e.g. 7 means «سوال ۷».
+  /// `0` from start means the first question has not been answered yet.
   final int answered;
 
   final int correct;
@@ -100,8 +101,15 @@ class AnswerStats {
     this.correct = 0,
   });
 
+  /// Current question to show in the step progress (1-based).
+  int get currentQuestion {
+    if (all <= 0) return 1;
+    if (answered <= 0) return 1;
+    return answered.clamp(1, all);
+  }
+
   factory AnswerStats.fromJson(Map<String, dynamic> json) => AnswerStats(
-        all: _asInt(json["all"] ?? json["total"] ?? json["totalQuestions"]),
+        all: _parseAll(json["all"] ?? json["total"] ?? json["totalQuestions"]),
         answered: _asInt(
           json["answered"] ??
               json["currentQuestion"] ??
@@ -116,6 +124,22 @@ class AnswerStats {
         "answered": answered,
         "correct": correct,
       };
+
+  /// Supports both `"all": 10` and `"all": { "quizId": 10 }` / map of counts.
+  static int _parseAll(dynamic value) {
+    if (value == null) return 0;
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    if (value is String) return int.tryParse(value) ?? 0;
+    if (value is Map) {
+      for (final entry in value.values) {
+        final n = _asInt(entry);
+        if (n > 0) return n;
+      }
+      return 0;
+    }
+    return 0;
+  }
 
   static int _asInt(dynamic value, [int fallback = 0]) {
     if (value is int) return value;

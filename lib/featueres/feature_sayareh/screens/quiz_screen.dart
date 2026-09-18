@@ -80,7 +80,7 @@ class _QuizScreenState extends State<QuizScreen> {
           UpdateQuizProgressFromStatsEvent(
             quizId: widget.quizId,
             totalQuestions: stats.all,
-            currentQuestion: stats.answered,
+            currentQuestion: stats.currentQuestion,
             correctAnswers: stats.correct,
           ),
         );

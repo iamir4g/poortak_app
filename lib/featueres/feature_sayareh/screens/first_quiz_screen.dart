@@ -8,6 +8,8 @@ import 'package:poortak/common/services/haptic_service.dart';
 import 'package:poortak/common/utils/bidi_text_helper.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
+import 'package:poortak/featueres/feature_sayareh/data/models/answer_question_model.dart'
+    show AnswerStats;
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_start_bloc/quiz_start_bloc.dart';
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_answer_bloc/quiz_answer_bloc.dart';
 import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
@@ -73,7 +75,22 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
           UpdateQuizProgressFromStatsEvent(
             quizId: widget.quizId,
             totalQuestions: stats.all,
-            currentQuestion: stats.answered,
+            currentQuestion: stats.currentQuestion,
+            correctAnswers: stats.correct,
+          ),
+        );
+  }
+
+  void _applyStartStats(AnswerStats? stats) {
+    if (stats == null || stats.all <= 0) {
+      _fetchQuizProgress();
+      return;
+    }
+    context.read<QuizProgressBloc>().add(
+          UpdateQuizProgressFromStatsEvent(
+            quizId: widget.quizId,
+            totalQuestions: stats.all,
+            currentQuestion: stats.currentQuestion,
             correctAnswers: stats.correct,
           ),
         );
@@ -90,7 +107,6 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
             quizId: widget.quizId,
           ),
         );
-    _fetchQuizProgress();
   }
 
   void _resyncAfterAlreadyAnswered() {
@@ -104,7 +120,6 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
             quizId: widget.quizId,
           ),
         );
-    _fetchQuizProgress();
   }
 
   bool _isAuthErrorMessage(String message) {
@@ -152,7 +167,6 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
             quizId: widget.quizId,
           ),
         );
-    _fetchQuizProgress();
   }
 
   void _handleAuthError(BuildContext context) {
@@ -365,7 +379,7 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
             child: BlocConsumer<QuizStartBloc, QuizStartState>(
               listener: (context, state) {
                 if (state is QuizStartLoaded) {
-                  _fetchQuizProgress();
+                  _applyStartStats(state.question.stats);
                 } else if (state is QuizStartError) {
                   if (_isAuthErrorMessage(state.message)) {
                     _handleAuthError(context);

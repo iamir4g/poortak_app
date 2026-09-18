@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poortak/common/services/getImageUrl_service.dart';
@@ -10,6 +11,7 @@ import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_sayareh/data/models/all_courses_progress_model.dart';
 import 'package:poortak/featueres/feature_sayareh/data/models/iknow_summary_model.dart';
 import 'package:poortak/featueres/feature_sayareh/data/models/sayareh_home_model.dart';
+import 'package:poortak/featueres/feature_sayareh/presentation/bloc/sayareh_bloc/sayareh_cubit.dart';
 import 'package:poortak/featueres/feature_sayareh/screens/lesson_screen.dart';
 import 'package:poortak/featueres/feature_sayareh/widgets/dialog_cart.dart';
 
@@ -33,6 +35,17 @@ class ItemLeason extends StatelessWidget {
 
   bool get _isFirstLesson => index == 0;
 
+  Future<void> _openLesson(BuildContext context) async {
+    await Navigator.pushNamed(context, LessonScreen.routeName, arguments: {
+      'index': index,
+      'title': item.name,
+      'lessonId': item.id,
+      'purchased': purchased,
+    });
+    if (!context.mounted) return;
+    context.read<SayarehCubit>().refreshCoursesProgress();
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -49,23 +62,13 @@ class ItemLeason extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         if (_isFirstLesson) {
-          Navigator.pushNamed(context, LessonScreen.routeName, arguments: {
-            'index': index,
-            'title': item.name,
-            'lessonId': item.id,
-            'purchased': purchased,
-          });
+          _openLesson(context);
           return;
         }
 
         final canPreviewTrailer = item.trailerVideo.isNotEmpty;
         if (item.isDemo || purchased || canPreviewTrailer) {
-          Navigator.pushNamed(context, LessonScreen.routeName, arguments: {
-            'index': index,
-            'title': item.name,
-            'lessonId': item.id,
-            'purchased': purchased,
-          });
+          _openLesson(context);
         } else {
           showDialog(
             context: context,

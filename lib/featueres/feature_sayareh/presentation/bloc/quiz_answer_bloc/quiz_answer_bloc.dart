@@ -79,6 +79,7 @@ class QuizAnswerBloc extends Bloc<QuizAnswerEvent, QuizAnswerState> {
                       ))
                   .toList(),
             ),
+            stats: result.data!.data.stats,
           );
           log("Created nextQuestion object: $nextQuestion");
         } else {

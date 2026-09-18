@@ -4,6 +4,9 @@
 
 import 'dart:convert';
 
+import 'package:poortak/featueres/feature_sayareh/data/models/answer_question_model.dart'
+    show AnswerStats;
+
 QuizesQuestion quizesQuestionFromJson(String str) =>
     QuizesQuestion.fromJson(json.decode(str));
 
@@ -13,32 +16,41 @@ class QuizesQuestion {
   bool ok;
   Meta meta;
   Data data;
+  AnswerStats? stats;
 
   QuizesQuestion({
     required this.ok,
     required this.meta,
     required this.data,
+    this.stats,
   });
 
   factory QuizesQuestion.fromJson(Map<String, dynamic> json) {
     final rawData = json["data"];
     final Map<String, dynamic> dataJson =
-        rawData is Map<String, dynamic> ? rawData : <String, dynamic>{};
+        rawData is Map ? rawData.cast<String, dynamic>() : <String, dynamic>{};
 
     final Map<String, dynamic> questionJson = _extractQuestionJson(dataJson);
+    final statsJson = dataJson["stats"] ?? json["stats"];
 
     return QuizesQuestion(
-      ok: json["ok"] ?? false,
+      ok: json["ok"] == true,
       meta:
           Meta.fromJson((json["meta"] as Map?)?.cast<String, dynamic>() ?? {}),
       data: Data.fromJson(questionJson),
+      stats: statsJson is Map
+          ? AnswerStats.fromJson(statsJson.cast<String, dynamic>())
+          : null,
     );
   }
 
   Map<String, dynamic> toJson() => {
         "ok": ok,
         "meta": meta.toJson(),
-        "data": data.toJson(),
+        "data": {
+          "question": data.toJson(),
+          if (stats != null) "stats": stats!.toJson(),
+        },
       };
 
   static Map<String, dynamic> _extractQuestionJson(
@@ -98,9 +110,9 @@ class Data {
   });
 
   factory Data.fromJson(Map<String, dynamic> json) => Data(
-        id: json["id"] ?? "",
-        quizId: json["quizId"] ?? "",
-        title: json["title"] ?? "",
+        id: json["id"]?.toString() ?? "",
+        quizId: json["quizId"]?.toString() ?? "",
+        title: json["title"]?.toString() ?? "",
         explanation: json["explanation"],
         createdAt: DateTime.tryParse((json["createdAt"] ?? "").toString()) ??
             DateTime.fromMillisecondsSinceEpoch(0),
@@ -140,9 +152,9 @@ class Answer {
   });
 
   factory Answer.fromJson(Map<String, dynamic> json) => Answer(
-        id: json["id"] ?? "",
-        title: json["title"] ?? "",
-        questionId: json["questionId"] ?? "",
+        id: json["id"]?.toString() ?? "",
+        title: json["title"]?.toString() ?? "",
+        questionId: json["questionId"]?.toString() ?? "",
       );
 
   Map<String, dynamic> toJson() => {
