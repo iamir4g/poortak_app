@@ -451,12 +451,22 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
     );
   }
 
+  bool get _isLessonCompleted =>
+      _progress != null &&
+      _vocabularyProgress == 100 &&
+      _progress!.conversation == 100 &&
+      _progress!.quiz == 100;
+
   Widget _buildContent(BuildContext context) {
     return SingleChildScrollView(
       padding: EdgeInsets.symmetric(horizontal: Dimens.medium),
       child: Column(
         children: [
           SizedBox(height: Dimens.nh(15)), // Reduced from 28
+          if (_isLessonCompleted) ...[
+            _buildCompletionHeader(),
+            SizedBox(height: Dimens.nh(12)),
+          ],
           _buildVideoSection(),
           SizedBox(height: Dimens.nh(12)), // Reduced from 18
           _buildConversationCard(),
@@ -559,14 +569,6 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
   }
 
   Widget _buildVideoSection() {
-    // Check if completed
-    if (_progress != null &&
-        _vocabularyProgress == 100 &&
-        _progress!.conversation == 100 &&
-        _progress!.quiz == 100) {
-      return _buildCompletionHeader();
-    }
-
     // Listen to download cubit for real-time updates
     return BlocBuilder<VideoDownloadCubit, VideoDownloadState>(
       bloc: _downloadCubit,
