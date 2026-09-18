@@ -11,8 +11,16 @@ part 'quiz_progress_state.dart';
 class QuizProgressBloc extends Bloc<QuizProgressEvent, QuizProgressState> {
   final SayarehRepository repository;
 
-  QuizProgressBloc(this.repository) : super(QuizProgressInitial()) {
+  QuizProgressBloc(
+    this.repository, {
+    QuizProgressData? initialProgress,
+  }) : super(
+          initialProgress != null && initialProgress.totalQuestions > 0
+              ? QuizProgressLoaded(initialProgress)
+              : QuizProgressInitial(),
+        ) {
     on<FetchQuizProgressEvent>(_onFetchQuizProgress);
+    on<UpdateQuizProgressFromStatsEvent>(_onUpdateFromStats);
   }
 
   Future<void> _onFetchQuizProgress(
@@ -62,5 +70,41 @@ class QuizProgressBloc extends Bloc<QuizProgressEvent, QuizProgressState> {
         emit(QuizProgressError(e.toString()));
       }
     }
+  }
+
+  void _onUpdateFromStats(
+    UpdateQuizProgressFromStatsEvent event,
+    Emitter<QuizProgressState> emit,
+  ) {
+    if (event.totalQuestions <= 0) return;
+
+    final previous =
+        state is QuizProgressLoaded ? (state as QuizProgressLoaded).progress : null;
+
+    final lastIndex = event.totalQuestions - 1;
+    // answered is a count; StepProgress display uses 0-based index + 1.
+    // answered=7 → index 6 → «۷ از ۱۰»
+    final zeroBasedIndex = event.answeredQuestions <= 0
+        ? 0
+        : (event.answeredQuestions - 1).clamp(0, lastIndex);
+
+    final progress = QuizProgressData(
+      id: previous?.id ?? '',
+      quizId: event.quizId.isNotEmpty ? event.quizId : (previous?.quizId ?? ''),
+      userId: previous?.userId ?? '',
+      totalQuestions: event.totalQuestions,
+      answeredQuestions: event.answeredQuestions,
+      correctAnswers: event.correctAnswers,
+      score: previous?.score ?? 0,
+      completed: event.answeredQuestions >= event.totalQuestions,
+      currentQuestionIndex: zeroBasedIndex,
+    );
+
+    debugPrint(
+      '📡 [QuizProgress] updated from answer stats '
+      'total=${progress.totalQuestions} answered=${progress.answeredQuestions} '
+      'correct=${progress.correctAnswers} stepIndex=${progress.stepIndex}',
+    );
+    emit(QuizProgressLoaded(progress));
   }
 }

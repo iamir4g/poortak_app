@@ -63,6 +63,56 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
         );
   }
 
+  void _applyAnswerStats(QuizAnswerLoaded answerState) {
+    final stats = answerState.stats;
+    if (stats == null || stats.all <= 0) {
+      _fetchQuizProgress();
+      return;
+    }
+    context.read<QuizProgressBloc>().add(
+          UpdateQuizProgressFromStatsEvent(
+            quizId: widget.quizId,
+            totalQuestions: stats.all,
+            answeredQuestions: stats.answered,
+            correctAnswers: stats.correct,
+          ),
+        );
+  }
+
+  void _reloadQuiz() {
+    setState(() {
+      selectedAnswerId = null;
+    });
+    context.read<QuizAnswerBloc>().add(const ResetQuizAnswerEvent());
+    context.read<QuizStartBloc>().add(
+          StartQuizEvent(
+            courseId: widget.courseId,
+            quizId: widget.quizId,
+          ),
+        );
+    _fetchQuizProgress();
+  }
+
+  void _resyncAfterAlreadyAnswered() {
+    setState(() {
+      selectedAnswerId = null;
+    });
+    context.read<QuizAnswerBloc>().add(const ResetQuizAnswerEvent());
+    context.read<QuizStartBloc>().add(
+          StartQuizEvent(
+            courseId: widget.courseId,
+            quizId: widget.quizId,
+          ),
+        );
+    _fetchQuizProgress();
+  }
+
+  bool _isAuthErrorMessage(String message) {
+    return message.contains('Please login') ||
+        message.contains('Session expired') ||
+        message.contains('Unauthorized');
+  }
+
   Widget? _buildQuizProgress(QuizProgressState progressState) {
     if (progressState is! QuizProgressLoaded ||
         progressState.totalQuestions <= 0) {
@@ -199,6 +249,7 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
         label: 'بعدی',
         backgroundColor: MyColors.primary,
         onPressed: () {
+          final progressState = context.read<QuizProgressBloc>().state;
           Navigator.pushReplacementNamed(
             context,
             QuizScreen.routeName,
@@ -207,6 +258,9 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
               'courseId': widget.courseId,
               'title': widget.title,
               'initialQuestion': answerState.nextQuestion,
+              'quizProgress': progressState is QuizProgressLoaded
+                  ? progressState.progress
+                  : null,
             },
           );
         },
@@ -315,8 +369,7 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                 if (state is QuizStartLoaded) {
                   _fetchQuizProgress();
                 } else if (state is QuizStartError) {
-                  if (state.message.contains('Please login') ||
-                      state.message.contains('Session expired')) {
+                  if (_isAuthErrorMessage(state.message)) {
                     _handleAuthError(context);
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -335,19 +388,50 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                   return BlocConsumer<QuizAnswerBloc, QuizAnswerState>(
                     listener: (context, answerState) {
                       if (answerState is QuizAnswerError) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(answerState.message),
-                            duration: const Duration(seconds: 2),
-                          ),
-                        );
+                        switch (answerState.failure) {
+                          case QuizAnswerFailure.unauthorized:
+                            _handleAuthError(context);
+                            return;
+                          case QuizAnswerFailure.alreadyAnswered:
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(answerState.message),
+                                duration: const Duration(seconds: 2),
+                              ),
+                            );
+                            _resyncAfterAlreadyAnswered();
+                            return;
+                          case QuizAnswerFailure.notFound:
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(answerState.message),
+                                duration: const Duration(seconds: 2),
+                              ),
+                            );
+                            _reloadQuiz();
+                            return;
+                          case QuizAnswerFailure.generic:
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(answerState.message),
+                                duration: const Duration(seconds: 2),
+                              ),
+                            );
+                            setState(() {
+                              selectedAnswerId = null;
+                            });
+                            context
+                                .read<QuizAnswerBloc>()
+                                .add(const ResetQuizAnswerEvent());
+                            return;
+                        }
                       } else if (answerState is QuizAnswerLoaded) {
                         if (answerState.isLastQuestion) {
                           context
                               .read<QuizResultBloc>()
                               .add(const ResetQuizResultEvent());
                         }
-                        _fetchQuizProgress();
+                        _applyAnswerStats(answerState);
                         setState(() {});
                         unawaited(
                           AnswerFeedbackSoundService.play(

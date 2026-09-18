@@ -105,12 +105,16 @@ class QuizProgressData {
   }
 
   /// 0-based index for [StepProgress].
+  ///
+  /// Display text uses `stepIndex + 1`, so when [answeredQuestions] is 7
+  /// this must be 6 to show «۷ از ۱۰», not 7 («۸ از ۱۰»).
   int get stepIndex {
     final lastIndex = totalQuestions <= 0 ? 0 : totalQuestions - 1;
     if (currentQuestionIndex != null) {
       return currentQuestionIndex!.clamp(0, lastIndex);
     }
-    return answeredQuestions.clamp(0, lastIndex);
+    if (answeredQuestions <= 0) return 0;
+    return (answeredQuestions - 1).clamp(0, lastIndex);
   }
 
   static String _asString(dynamic value) => value?.toString() ?? '';

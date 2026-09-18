@@ -65,6 +65,7 @@ import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quizes_cubit
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_start_bloc/quiz_start_bloc.dart';
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_answer_bloc/quiz_answer_bloc.dart';
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_progress_bloc/quiz_progress_bloc.dart';
+import 'package:poortak/featueres/feature_sayareh/data/models/quiz_progress_model.dart';
 import 'package:poortak/featueres/feature_sayareh/screens/first_quiz_screen.dart';
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_result_bloc/quiz_result_bloc.dart';
 // For RouteAware
@@ -304,6 +305,7 @@ void main() async {
                       QuizScreen.routeName: (context) {
                         final args = ModalRoute.of(context)?.settings.arguments
                             as Map<String, dynamic>;
+                        final initialProgress = args['quizProgress'];
                         return MultiBlocProvider(
                           providers: [
                             BlocProvider(
@@ -313,7 +315,13 @@ void main() async {
                               create: (context) => QuizAnswerBloc(locator()),
                             ),
                             BlocProvider(
-                              create: (context) => QuizProgressBloc(locator()),
+                              create: (context) => QuizProgressBloc(
+                                locator(),
+                                initialProgress:
+                                    initialProgress is QuizProgressData
+                                        ? initialProgress
+                                        : null,
+                              ),
                             ),
                             BlocProvider(
                               create: (context) => QuizResultBloc(locator()),

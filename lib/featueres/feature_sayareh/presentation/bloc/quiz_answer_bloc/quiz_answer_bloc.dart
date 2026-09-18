@@ -3,12 +3,21 @@ import 'dart:developer';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poortak/common/resources/data_state.dart';
+import 'package:poortak/featueres/feature_sayareh/data/models/answer_question_model.dart'
+    as answer_model;
 import 'package:poortak/featueres/feature_sayareh/data/models/quiz_question_model.dart'
     as question;
 import 'package:poortak/featueres/feature_sayareh/repositories/sayareh_repository.dart';
 
 part 'quiz_answer_event.dart';
 part 'quiz_answer_state.dart';
+
+enum QuizAnswerFailure {
+  alreadyAnswered,
+  notFound,
+  unauthorized,
+  generic,
+}
 
 class QuizAnswerBloc extends Bloc<QuizAnswerEvent, QuizAnswerState> {
   final SayarehRepository _sayarehRepository;
@@ -40,15 +49,15 @@ class QuizAnswerBloc extends Bloc<QuizAnswerEvent, QuizAnswerState> {
       if (result is DataSuccess) {
         log("Result is DataSuccess");
         if (result.data == null) {
-          log("Result data or data.data is null, emitting QuizAnswerError");
-          emit(QuizAnswerError(
-              "خطا در دریافت داده از سرور. لطفا دوباره تلاش کنید."));
+          log("Result data is null, emitting QuizAnswerError");
+          emit(const QuizAnswerError(
+            "خطا در دریافت داده از سرور. لطفا دوباره تلاش کنید.",
+          ));
           return;
         }
         log("Result data exists: ${result.data}");
         log("Checking nextQuestion...");
 
-        // Convert nextQuestion to QuizesQuestion format if it exists
         question.QuizesQuestion? nextQuestion;
         if (result.data!.data.nextQuestion != null) {
           log("Next question exists in response, creating QuizesQuestion object");
@@ -88,10 +97,14 @@ class QuizAnswerBloc extends Bloc<QuizAnswerEvent, QuizAnswerState> {
           correctAnswerId: result.data!.data.correctAnswer.id,
           selectedAnswerId: event.answerId,
           isLastQuestion: isLastQuestion,
+          stats: result.data!.data.stats,
         ));
       } else if (result is DataFailed) {
-        log("Result is DataFailed: ${result.error}");
-        emit(QuizAnswerError(result.error ?? "خطا در ثبت پاسخ"));
+        log("Result is DataFailed: ${result.error} code=${result.errorCode}");
+        emit(QuizAnswerError(
+          result.error ?? "خطا در ثبت پاسخ",
+          failure: _mapFailure(result.errorCode),
+        ));
       }
     } catch (e, stackTrace) {
       log("Error in _onSubmitAnswer: $e");
@@ -99,6 +112,19 @@ class QuizAnswerBloc extends Bloc<QuizAnswerEvent, QuizAnswerState> {
       emit(QuizAnswerError(e.toString()));
     } finally {
       log("=== _onSubmitAnswer END ===");
+    }
+  }
+
+  QuizAnswerFailure _mapFailure(String? errorCode) {
+    switch (errorCode) {
+      case 'questionAlreadyAnswered':
+        return QuizAnswerFailure.alreadyAnswered;
+      case 'questionOrAnswerNotFound':
+        return QuizAnswerFailure.notFound;
+      case 'unauthorized':
+        return QuizAnswerFailure.unauthorized;
+      default:
+        return QuizAnswerFailure.generic;
     }
   }
 }

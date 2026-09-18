@@ -8,6 +8,7 @@ import 'package:poortak/common/services/answer_feedback_sound_service.dart';
 import 'package:poortak/common/services/haptic_service.dart';
 import 'package:poortak/common/utils/bidi_text_helper.dart';
 import 'package:poortak/common/utils/font_size_helper.dart';
+import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_answer_bloc/quiz_answer_bloc.dart';
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_progress_bloc/quiz_progress_bloc.dart';
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_result_bloc/quiz_result_bloc.dart';
@@ -19,6 +20,7 @@ import 'package:poortak/common/widgets/poortak_app_bar.dart';
 import 'package:poortak/common/widgets/reusable_modal.dart';
 import 'package:poortak/locator.dart';
 import 'package:poortak/featueres/feature_sayareh/repositories/sayareh_repository.dart';
+import 'package:poortak/featueres/feature_sayareh/screens/first_quiz_screen.dart';
 import 'package:poortak/featueres/feature_sayareh/screens/quizzes_screen.dart';
 
 class QuizScreen extends StatefulWidget {
@@ -68,6 +70,55 @@ class _QuizScreenState extends State<QuizScreen> {
         );
   }
 
+  void _applyAnswerStats(QuizAnswerLoaded answerState) {
+    final stats = answerState.stats;
+    if (stats == null || stats.all <= 0) {
+      _fetchQuizProgress();
+      return;
+    }
+    context.read<QuizProgressBloc>().add(
+          UpdateQuizProgressFromStatsEvent(
+            quizId: widget.quizId,
+            totalQuestions: stats.all,
+            answeredQuestions: stats.answered,
+            correctAnswers: stats.correct,
+          ),
+        );
+  }
+
+  void _handleAuthError() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('لطفا ابتدا وارد حساب کاربری خود شوید'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+    Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+  }
+
+  void _restartQuizFromStart() {
+    context.read<QuizAnswerBloc>().add(const ResetQuizAnswerEvent());
+    Navigator.pushReplacementNamed(
+      context,
+      FirstQuizScreen.routeName,
+      arguments: {
+        'quizId': widget.quizId,
+        'courseId': widget.courseId,
+        'title': widget.title,
+      },
+    );
+  }
+
+  void _resetLocalAnswerSelection() {
+    setState(() {
+      selectedAnswerId = null;
+      isSelected = false;
+      isCorrectAnswer = false;
+      isWrongSelected = false;
+    });
+    context.read<QuizAnswerBloc>().add(const ResetQuizAnswerEvent());
+  }
+
   Widget? _buildQuizProgress(QuizProgressState progressState) {
     if (progressState is! QuizProgressLoaded ||
         progressState.totalQuestions <= 0) {
@@ -105,7 +156,15 @@ class _QuizScreenState extends State<QuizScreen> {
     super.initState();
     // Initialize with the provided question
     currentQuestion = widget.initialQuestion;
-    _fetchQuizProgress();
+    // Keep the progress bar continuous when coming from FirstQuizScreen;
+    // only fetch if we were not seeded with the previous screen's state.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final progressState = context.read<QuizProgressBloc>().state;
+      if (progressState is! QuizProgressLoaded) {
+        _fetchQuizProgress();
+      }
+    });
   }
 
   Future<void> _leaveQuiz() async {
@@ -278,19 +337,45 @@ class _QuizScreenState extends State<QuizScreen> {
           child: BlocListener<QuizAnswerBloc, QuizAnswerState>(
             listener: (context, answerState) {
               if (answerState is QuizAnswerError) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(answerState.message),
-                    duration: const Duration(seconds: 2),
-                  ),
-                );
+                switch (answerState.failure) {
+                  case QuizAnswerFailure.unauthorized:
+                    _handleAuthError();
+                    return;
+                  case QuizAnswerFailure.alreadyAnswered:
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(answerState.message),
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+                    _restartQuizFromStart();
+                    return;
+                  case QuizAnswerFailure.notFound:
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(answerState.message),
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+                    _restartQuizFromStart();
+                    return;
+                  case QuizAnswerFailure.generic:
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(answerState.message),
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+                    _resetLocalAnswerSelection();
+                    return;
+                }
               } else if (answerState is QuizAnswerLoaded) {
                 if (answerState.isLastQuestion) {
                   context
                       .read<QuizResultBloc>()
                       .add(const ResetQuizResultEvent());
                 }
-                _fetchQuizProgress();
+                _applyAnswerStats(answerState);
                 setState(() {});
                 unawaited(
                   AnswerFeedbackSoundService.play(answerState.isCorrect),

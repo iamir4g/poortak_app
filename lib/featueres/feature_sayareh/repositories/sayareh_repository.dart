@@ -428,14 +428,56 @@ class SayarehRepository {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         log("Attempting to parse response data...");
-        final data = AnswerQuestion.fromJson(response.data);
+        if (response.data is! Map) {
+          return const DataFailed("خطا در دریافت داده از سرور. لطفا دوباره تلاش کنید.");
+        }
+        final data = AnswerQuestion.fromJson(
+          (response.data as Map).cast<String, dynamic>(),
+        );
         log("Successfully parsed response data");
-        log("Returning DataSuccess with parsed data");
         return DataSuccess(data);
       } else {
         log("Error response: ${response.data}");
-        return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
+        return DataFailed(
+          _extractErrorMessage(
+            response.data,
+            fallbackMessage: "خطا در ثبت پاسخ",
+          ),
+        );
       }
+    } on DioException catch (e) {
+      final status = e.response?.statusCode;
+      log("DioException caught: status=$status body=${e.response?.data}");
+      final message = _extractErrorMessage(
+        e.response?.data,
+        fallbackMessage: "خطا در ثبت پاسخ",
+      );
+
+      if (status == 409) {
+        return DataFailed(
+          message,
+          errorCode: 'questionAlreadyAnswered',
+        );
+      }
+      if (status == 404) {
+        return DataFailed(
+          message,
+          errorCode: 'questionOrAnswerNotFound',
+        );
+      }
+      if (status == 401) {
+        return DataFailed(
+          message,
+          errorCode: 'unauthorized',
+        );
+      }
+      return DataFailed(message);
+    } on UnauthorisedException catch (e) {
+      log("UnauthorisedException caught: $e");
+      return DataFailed(
+        e.message?.toString() ?? 'Session expired. Please login again.',
+        errorCode: 'unauthorized',
+      );
     } on AppException catch (e) {
       log("AppException caught: $e");
       return CheckExceptions.getError<AnswerQuestion>(e);
