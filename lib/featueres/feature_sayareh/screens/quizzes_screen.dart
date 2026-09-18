@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/common/utils/custom_textStyle.dart';
+import 'package:poortak/common/utils/digit_utils.dart';
 import 'package:poortak/common/utils/svg_embedded_png.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
@@ -45,6 +46,23 @@ class _QuizzesScreenState extends State<QuizzesScreen> {
     _quizesCubit.fetchQuizzes(widget.courseId);
   }
 
+  Future<void> _openQuiz({
+    required String quizId,
+    required String title,
+  }) async {
+    await Navigator.pushNamed(
+      context,
+      FirstQuizScreen.routeName,
+      arguments: {
+        "quizId": quizId,
+        "courseId": widget.courseId,
+        "title": title,
+      },
+    );
+    if (!mounted) return;
+    _quizesCubit.fetchQuizzes(widget.courseId);
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -76,23 +94,15 @@ class _QuizzesScreenState extends State<QuizzesScreen> {
                       },
                       itemBuilder: (context, index) {
                         final quiz = state.quizzes.data[index];
-                        return InkWell(
-                          onTap: () {
-                            Navigator.pushNamed(
-                              context,
-                              FirstQuizScreen.routeName,
-                              arguments: {
-                                "quizId": quiz.id,
-                                "courseId": widget.courseId,
-                                "title": quiz.title,
-                              },
-                            );
-                          },
-                          child: QuizItem(
+                        return QuizItem(
+                          title: quiz.title,
+                          image: quiz.thumbnail,
+                          description: quiz.difficulty,
+                          id: quiz.id,
+                          progress: quiz.userScore,
+                          onTap: () => _openQuiz(
+                            quizId: quiz.id,
                             title: quiz.title,
-                            image: quiz.thumbnail,
-                            description: quiz.difficulty,
-                            id: quiz.id,
                           ),
                         );
                       },
@@ -129,6 +139,8 @@ class QuizItem extends StatelessWidget {
   final String image;
   final String description;
   final String id;
+  final int? progress;
+  final VoidCallback onTap;
 
   const QuizItem({
     super.key,
@@ -136,6 +148,8 @@ class QuizItem extends StatelessWidget {
     required this.image,
     required this.description,
     required this.id,
+    required this.onTap,
+    this.progress,
   });
 
   @override
@@ -146,43 +160,101 @@ class QuizItem extends StatelessWidget {
     final descriptionColor =
         isDark ? MyColors.darkTextSecondary : MyColors.text4;
     final titleColor = isDark ? MyColors.darkTextPrimary : MyColors.textMatn1;
+    final width = 350.w;
 
-    return Container(
-      width: 350.w,
-      height: 104.h,
-      decoration: BoxDecoration(
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        width: width,
+        height: 104.h,
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(
           borderRadius: BorderRadius.all(Radius.circular(40.r)),
-          color: cardBackgroundColor),
-      child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 22.h, horizontal: 28.w),
-        child: Row(
+          color: cardBackgroundColor,
+        ),
+        child: Stack(
           children: [
-            buildImageFromAssetOrEmbeddedSvg(
-              "assets/images/points/quiz_icon.png",
-              width: 48.0.r,
-              height: 48.0.r,
-            ),
-            SizedBox(
-              width: 18.w,
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  description,
-                  style: CustomTextStyle.titleLesonText.copyWith(
-                    color: descriptionColor,
+            if (progress != null && progress! > 0 && progress! < 100)
+              Positioned(
+                top: 0,
+                bottom: 0,
+                left: 0,
+                child: Container(
+                  width: width * (progress! / 100),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(40.r),
+                    color: isDark
+                        ? MyColors.lessonCardProgressDark
+                        : MyColors.lessonCardProgressLight,
                   ),
                 ),
-                Text(
-                  title,
-                  style: CustomTextStyle.subTitleLeasonText.copyWith(
-                    color: titleColor,
+              ),
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 22.h, horizontal: 28.w),
+              child: Row(
+                children: [
+                  buildImageFromAssetOrEmbeddedSvg(
+                    "assets/images/points/quiz_icon.png",
+                    width: 48.0.r,
+                    height: 48.0.r,
                   ),
-                )
-              ],
-            )
+                  SizedBox(width: 18.w),
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          description,
+                          style: CustomTextStyle.titleLesonText.copyWith(
+                            color: descriptionColor,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Text(
+                          title,
+                          style: CustomTextStyle.subTitleLeasonText.copyWith(
+                            color: titleColor,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (progress != null && progress! > 0) ...[
+                    SizedBox(width: 8.w),
+                    if (progress == 100)
+                      Container(
+                        width: 32.w,
+                        height: 32.h,
+                        decoration: const BoxDecoration(
+                          color: Color(0xFF4CAF50),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.check,
+                          color: Colors.white,
+                          size: 20.r,
+                        ),
+                      )
+                    else
+                      Text(
+                        "%${toPersianDigits('$progress')}",
+                        style: TextStyle(
+                          fontFamily: 'IranSans',
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.bold,
+                          color: isDark
+                              ? MyColors.profileTextPrimaryDark
+                              : const Color(0xFF53668E),
+                        ),
+                      ),
+                  ],
+                ],
+              ),
+            ),
           ],
         ),
       ),
