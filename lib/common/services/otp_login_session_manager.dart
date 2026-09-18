@@ -1,12 +1,15 @@
 class OtpLoginSession {
   final String mobileDigits;
   final DateTime requestedAt;
+  final int otpLength;
 
   static const int timeoutSeconds = 120;
+  static const int defaultOtpLength = 4;
 
   const OtpLoginSession({
     required this.mobileDigits,
     required this.requestedAt,
+    this.otpLength = defaultOtpLength,
   });
 
   int get remainingSeconds {
@@ -33,10 +36,14 @@ class OtpLoginSessionManager {
 
   String? get pendingMobileDigits => _session?.mobileDigits;
 
-  void startSession(String mobileDigits) {
+  void startSession(
+    String mobileDigits, {
+    int otpLength = OtpLoginSession.defaultOtpLength,
+  }) {
     _session = OtpLoginSession(
       mobileDigits: mobileDigits,
       requestedAt: DateTime.now(),
+      otpLength: otpLength,
     );
   }
 

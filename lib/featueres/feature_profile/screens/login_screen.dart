@@ -37,6 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _otpController = TextEditingController();
   bool showOtpForm = false;
   String? mobileNumber;
+  int _otpLength = OtpLoginSession.defaultOtpLength;
   final FocusNode _mobileFocusNode = FocusNode();
   final FocusNode _otpFocusNode = FocusNode();
   final ScrollController _scrollController = ScrollController();
@@ -68,6 +69,7 @@ class _LoginScreenState extends State<LoginScreen> {
     mobileNumber = session.mobileDigits;
     _mobileController.text = session.mobileDigits;
     showOtpForm = true;
+    _otpLength = _sanitizeOtpLength(session.otpLength);
     _remainingSeconds = session.remainingSeconds;
     _canResend = session.canResend;
 
@@ -117,15 +119,15 @@ class _LoginScreenState extends State<LoginScreen> {
       if (res.hasData) {
         final code = res.data?.code;
         if (code != null) {
+          final otp = normalizeOtpForServer(code, maxLength: _otpLength);
           setState(() {
-            _otpController.text = toPersianDigits(code);
+            _otpController.text = toPersianDigits(otp);
           });
-          // Optional: Auto submit
-          if (mobileNumber != null) {
+          if (mobileNumber != null && otp.length == _otpLength) {
             context.read<ProfileBloc>().add(
                   LoginWithOtpEvent(
                     mobile: _localMobileFromInput(mobileNumber!),
-                    otp: normalizeOtpForServer(code),
+                    otp: otp,
                   ),
                 );
           }
@@ -186,10 +188,22 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _resetTimer() {
     if (mobileNumber != null) {
-      _otpSessionManager.startSession(mobileNumber!);
+      _otpSessionManager.startSession(
+        mobileNumber!,
+        otpLength: _otpLength,
+      );
     }
     _startTimer();
   }
+
+  int _sanitizeOtpLength(int length) {
+    if (length < 3 || length > 8) {
+      return OtpLoginSession.defaultOtpLength;
+    }
+    return length;
+  }
+
+  String _otpHintText() => '-' * _otpLength;
 
   String _formatTime(int seconds) {
     int minutes = seconds ~/ 60;
@@ -547,17 +561,17 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Directionality(
             textDirection: TextDirection.ltr,
             child: TextField(
+              key: ValueKey(_otpLength),
               controller: _otpController,
               focusNode: _otpFocusNode,
               autofillHints: const [AutofillHints.oneTimeCode],
               keyboardType: TextInputType.number,
               textAlign: TextAlign.center,
               inputFormatters: [
-                PersianOtpTextInputFormatter(maxLength: 4),
+                PersianOtpTextInputFormatter(maxLength: _otpLength),
               ],
               onChanged: (value) {
-                // Close keyboard when OTP is complete (4 digits)
-                if (value.length == 4) {
+                if (value.length == _otpLength) {
                   FocusScope.of(context).unfocus();
                 }
               },
@@ -567,7 +581,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 letterSpacing: 2.w,
               ),
               decoration: InputDecoration(
-                hintText: "----",
+                hintText: _otpHintText(),
                 hintStyle: MyTextStyle.textMatn13.copyWith(
                   color: MyColors.text4,
                   fontSize: 22.sp,
@@ -622,7 +636,8 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           );
         } else if (state is ProfileSuccessRequestOtp) {
-          log("success request otp - length: ${state.data.data.result.otpLength}");
+          final otpLength = _sanitizeOtpLength(state.data.data.result.otpLength);
+          log("success request otp - length: $otpLength");
           final feedbackMessage = state.data.message ?? 'کد تایید ارسال شد';
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -640,8 +655,15 @@ class _LoginScreenState extends State<LoginScreen> {
           setState(() {
             showOtpForm = true;
             mobileNumber = _mobileController.text;
+            _otpLength = otpLength;
+            if (_otpController.text.length > otpLength) {
+              _otpController.text = _otpController.text.substring(0, otpLength);
+            }
           });
-          _otpSessionManager.startSession(mobileNumber!);
+          _otpSessionManager.startSession(
+            mobileNumber!,
+            otpLength: otpLength,
+          );
           // Start the timer when OTP is successfully requested
           log("🕐 Starting OTP timer...");
           _startTimer();
@@ -722,13 +744,31 @@ class _LoginScreenState extends State<LoginScreen> {
               borderRadius: BorderRadius.circular(20.r),
               onTap: () {
                 if (showOtpForm) {
-                  if (_otpController.text.isNotEmpty && mobileNumber != null) {
+                  final otp = normalizeOtpForServer(
+                    _otpController.text,
+                    maxLength: _otpLength,
+                  );
+                  if (otp.length == _otpLength && mobileNumber != null) {
                     context.read<ProfileBloc>().add(
                           LoginWithOtpEvent(
                             mobile: _localMobileFromInput(mobileNumber!),
-                            otp: normalizeOtpForServer(_otpController.text),
+                            otp: otp,
                           ),
                         );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          'لطفا کد ${toPersianDigits(_otpLength.toString())} رقمی را کامل وارد کنید',
+                          style: MyTextStyle.textMatn13.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        backgroundColor: MyColors.warning,
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
                   }
                 } else {
                   if (_isValidMobileInput(_mobileController.text)) {
