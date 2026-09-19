@@ -7,6 +7,7 @@ class KavooshApiProvider {
 
   KavooshApiProvider({required this.dio});
 
+  /// GET /categories/nodes/summary?treeType=&parentCategoryId=
   Future<Response> callGetCategoryNodesSummary({
     required KavooshTreeType treeType,
     String? parentCategoryId,
@@ -22,47 +23,58 @@ class KavooshApiProvider {
     );
   }
 
-  Future<Response> callGetCategoryNodeContent({
+  /// GET /categories/nodes/:categoryId
+  Future<Response> callGetCategoryNodeDetail({
     required String categoryId,
   }) {
     return dio.get(
-      "${Constants.baseUrl}categories/nodes/$categoryId/content",
+      "${Constants.baseUrl}categories/nodes/$categoryId",
     );
   }
 
+  /// GET /video-courses/category/:categoryId
   Future<Response> callGetVideoCoursesByCategory({
     required String categoryId,
     int size = 10,
     int page = 1,
     String order = 'asc',
-    String query = '',
+    String? query,
   }) {
+    final queryParameters = <String, dynamic>{
+      'size': size,
+      'page': page,
+      'order': order,
+    };
+    if (query != null && query.isNotEmpty) {
+      queryParameters['query'] = query;
+    }
+
     return dio.get(
       "${Constants.baseUrl}video-courses/category/$categoryId",
-      queryParameters: {
-        'size': size,
-        'page': page,
-        'order': order,
-        'query': query,
-      },
+      queryParameters: queryParameters,
     );
   }
 
+  /// GET /books/category/:categoryId
   Future<Response> callGetBooksByCategory({
     required String categoryId,
     int size = 10,
     int page = 1,
     String order = 'asc',
-    String query = '',
+    String? query,
   }) {
+    final queryParameters = <String, dynamic>{
+      'size': size,
+      'page': page,
+      'order': order,
+    };
+    if (query != null && query.isNotEmpty) {
+      queryParameters['query'] = query;
+    }
+
     return dio.get(
       "${Constants.baseUrl}books/category/$categoryId",
-      queryParameters: {
-        'size': size,
-        'page': page,
-        'order': order,
-        'query': query,
-      },
+      queryParameters: queryParameters,
     );
   }
 }

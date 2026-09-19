@@ -199,6 +199,13 @@ class _EducationalVideosScreenState extends State<EducationalVideosScreen> {
   }
 
   Widget _buildSection(CategoryNodeSummary category) {
+    final children = category.children;
+    final colors = [
+      const Color(0xFFFBEBDF),
+      const Color(0xFFE3F2FD),
+      const Color(0xFFF3E5F5),
+    ];
+
     return Column(
       children: [
         SectionHeader(
@@ -215,27 +222,47 @@ class _EducationalVideosScreenState extends State<EducationalVideosScreen> {
             );
           },
         ),
-        SizedBox(
-          height: 190.h,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.symmetric(horizontal: 16.w),
-            itemCount: 2,
-            itemBuilder: (context, index) {
-              // Alternating background colors for demo
-              final colors = [
-                const Color(0xFFFBEBDF), // Light orange
-                const Color(0xFFE3F2FD), // Light blue
-                const Color(0xFFF3E5F5), // Light purple
-              ];
-              return CourseCard(
-                title: 'ریاضی',
-                backgroundColor: colors[index % colors.length],
-                // imagePath: 'assets/images/placeholder_book.png',
-              );
-            },
+        if (children.isEmpty)
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+            child: Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: Text(
+                '${category.courseCount} دوره',
+                style: MyTextStyle.textMatn12W500.copyWith(
+                  color: MyColors.text4,
+                ),
+              ),
+            ),
+          )
+        else
+          SizedBox(
+            height: 190.h,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              padding: EdgeInsets.symmetric(horizontal: 16.w),
+              itemCount: children.length,
+              itemBuilder: (context, index) {
+                final child = children[index];
+                return CourseCard(
+                  title: child.title,
+                  thumbnailId: child.thumbnailId,
+                  backgroundColor: colors[index % colors.length],
+                  onTap: () {
+                    Navigator.pushNamed(
+                      context,
+                      CourseListScreen.routeName,
+                      arguments: {
+                        'title': child.title,
+                        'categoryId': child.id,
+                        'treeType': KavooshTreeType.video,
+                      },
+                    );
+                  },
+                );
+              },
+            ),
           ),
-        ),
         SizedBox(height: 16.h),
       ],
     );

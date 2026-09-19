@@ -7,7 +7,6 @@ import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_kavoosh/widgets/course_card.dart';
 import 'package:poortak/featueres/feature_kavoosh/widgets/section_header.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/course_list_screen.dart';
-import 'package:poortak/featueres/feature_kavoosh/screens/book_details_screen.dart';
 import 'package:poortak/featueres/feature_kavoosh/data/models/category_nodes_summary_model.dart';
 import 'package:poortak/featueres/feature_kavoosh/data/models/kavoosh_tree_type.dart';
 import 'package:poortak/featueres/feature_kavoosh/presentation/bloc/categories_bloc/categories_bloc.dart';
@@ -199,6 +198,13 @@ class _EBooksScreenState extends State<EBooksScreen> {
   }
 
   Widget _buildSection(CategoryNodeSummary category) {
+    final children = category.children;
+    final colors = [
+      const Color(0xFFFBEBDF),
+      const Color(0xFFE3F2FD),
+      const Color(0xFFF3E5F5),
+    ];
+
     return Column(
       children: [
         SectionHeader(
@@ -216,34 +222,48 @@ class _EBooksScreenState extends State<EBooksScreen> {
             );
           },
         ),
-        SizedBox(
-          height: 190.h,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.symmetric(horizontal: 16.w),
-            itemCount: 5,
-            itemBuilder: (context, index) {
-              // Alternating background colors for demo
-              final colors = [
-                const Color(0xFFFBEBDF), // Light orange
-                const Color(0xFFE3F2FD), // Light blue
-                const Color(0xFFF3E5F5), // Light purple
-              ];
-              return CourseCard(
-                title: 'ریاضی',
-                backgroundColor: colors[index % colors.length],
-                onTap: () {
-                  Navigator.pushNamed(
-                    context,
-                    BookDetailsScreen.routeName,
-                    arguments: {'title': 'ریاضی'},
-                  );
-                },
-                // imagePath: 'assets/images/placeholder_book.png',
-              );
-            },
+        if (children.isEmpty)
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+            child: Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: Text(
+                '${category.bookCount} کتاب',
+                style: MyTextStyle.textMatn12W500.copyWith(
+                  color: MyColors.text4,
+                ),
+              ),
+            ),
+          )
+        else
+          SizedBox(
+            height: 190.h,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              padding: EdgeInsets.symmetric(horizontal: 16.w),
+              itemCount: children.length,
+              itemBuilder: (context, index) {
+                final child = children[index];
+                return CourseCard(
+                  title: child.title,
+                  thumbnailId: child.thumbnailId,
+                  backgroundColor: colors[index % colors.length],
+                  onTap: () {
+                    Navigator.pushNamed(
+                      context,
+                      CourseListScreen.routeName,
+                      arguments: {
+                        'title': child.title,
+                        'type': 'book',
+                        'categoryId': child.id,
+                        'treeType': KavooshTreeType.book,
+                      },
+                    );
+                  },
+                );
+              },
+            ),
           ),
-        ),
         SizedBox(height: 16.h),
       ],
     );

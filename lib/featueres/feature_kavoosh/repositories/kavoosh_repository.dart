@@ -19,46 +19,47 @@ class KavooshRepository {
         parentCategoryId: parentCategoryId,
       );
 
+      if (_isHttpFailure(response.statusCode)) {
+        return DataFailed(_errorMessage(
+          response.data,
+          fallback: "خطا در دریافت دسته‌بندی‌ها",
+        ));
+      }
+
       final data = response.data;
-      if ((response.statusCode == 200 || response.statusCode == 201) &&
-          data is Map<String, dynamic> &&
-          data['ok'] == true) {
+      if (data is Map<String, dynamic> && data['ok'] == true) {
         final parsed = CategoryNodesSummaryResponse.fromJson(data);
         return DataSuccess(parsed.data);
       }
 
-      if (data is Map<String, dynamic>) {
-        return DataFailed(
-            data['message']?.toString() ?? "خطا در دریافت دسته‌بندی‌ها");
-      }
-
-      return const DataFailed("خطا در دریافت دسته‌بندی‌ها");
+      return DataFailed(_errorMessage(
+        data,
+        fallback: "خطا در دریافت دسته‌بندی‌ها",
+      ));
     } on DioException catch (e) {
-      final responseData = e.response?.data;
-      if (responseData is Map<String, dynamic>) {
-        final message = responseData['message']?.toString();
-        if (message != null && message.isNotEmpty) {
-          return DataFailed(message);
-        }
-      }
-      return DataFailed(e.message ?? "خطا در اتصال به سرور");
+      return DataFailed(_dioErrorMessage(e, "خطا در دریافت دسته‌بندی‌ها"));
     } catch (e) {
       return DataFailed(e.toString());
     }
   }
 
-  Future<DataState<CategoryNodeSummary>> fetchCategoryNodeContent({
+  Future<DataState<CategoryNodeSummary>> fetchCategoryNodeDetail({
     required String categoryId,
   }) async {
     try {
-      final response = await apiProvider.callGetCategoryNodeContent(
+      final response = await apiProvider.callGetCategoryNodeDetail(
         categoryId: categoryId,
       );
 
+      if (_isHttpFailure(response.statusCode)) {
+        return DataFailed(_errorMessage(
+          response.data,
+          fallback: "خطا در دریافت جزئیات دسته‌بندی",
+        ));
+      }
+
       final data = response.data;
-      if ((response.statusCode == 200 || response.statusCode == 201) &&
-          data is Map<String, dynamic> &&
-          data['ok'] == true) {
+      if (data is Map<String, dynamic> && data['ok'] == true) {
         final nodeJson = data['data'];
         if (nodeJson is Map<String, dynamic>) {
           return DataSuccess(CategoryNodeSummary.fromJson(nodeJson));
@@ -66,26 +67,19 @@ class KavooshRepository {
         return const DataFailed("فرمت پاسخ سرور نامعتبر است");
       }
 
-      if (data is Map<String, dynamic>) {
-        return DataFailed(
-            data['message']?.toString() ?? "خطا در دریافت محتوای دسته‌بندی");
-      }
-
-      return const DataFailed("خطا در دریافت محتوای دسته‌بندی");
+      return DataFailed(_errorMessage(
+        data,
+        fallback: "خطا در دریافت جزئیات دسته‌بندی",
+      ));
     } on DioException catch (e) {
-      final responseData = e.response?.data;
-      if (responseData is Map<String, dynamic>) {
-        final message = responseData['message']?.toString();
-        if (message != null && message.isNotEmpty) {
-          return DataFailed(message);
-        }
-      }
-      return DataFailed(e.message ?? "خطا در اتصال به سرور");
+      return DataFailed(_dioErrorMessage(e, "خطا در دریافت جزئیات دسته‌بندی"));
     } catch (e) {
       return DataFailed(e.toString());
     }
   }
 
+  /// Paginated courses/books for a category (incl. sub-tree).
+  /// Returns `{ data: List<Map>, meta: { count } }` until typed list models land.
   Future<DataState<Map<String, dynamic>>> fetchCategoryItems({
     required KavooshTreeType treeType,
     required String categoryId,
@@ -114,10 +108,15 @@ class KavooshRepository {
         );
       }
 
+      if (_isHttpFailure(response.statusCode)) {
+        return DataFailed(_errorMessage(
+          response.data,
+          fallback: "خطا در دریافت لیست محتوا",
+        ));
+      }
+
       final data = response.data;
-      if ((response.statusCode == 200 || response.statusCode == 201) &&
-          data is Map<String, dynamic> &&
-          data['ok'] == true) {
+      if (data is Map<String, dynamic> && data['ok'] == true) {
         final items = data['data'];
         final meta = data['meta'];
         return DataSuccess({
@@ -132,23 +131,39 @@ class KavooshRepository {
         });
       }
 
-      if (data is Map<String, dynamic>) {
-        return DataFailed(
-            data['message']?.toString() ?? "خطا در دریافت لیست محتوا");
-      }
-
-      return const DataFailed("خطا در دریافت لیست محتوا");
+      return DataFailed(_errorMessage(
+        data,
+        fallback: "خطا در دریافت لیست محتوا",
+      ));
     } on DioException catch (e) {
-      final responseData = e.response?.data;
-      if (responseData is Map<String, dynamic>) {
-        final message = responseData['message']?.toString();
-        if (message != null && message.isNotEmpty) {
-          return DataFailed(message);
-        }
-      }
-      return DataFailed(e.message ?? "خطا در اتصال به سرور");
+      return DataFailed(_dioErrorMessage(e, "خطا در دریافت لیست محتوا"));
     } catch (e) {
       return DataFailed(e.toString());
     }
+  }
+
+  bool _isHttpFailure(int? statusCode) {
+    return statusCode != null && statusCode >= 400;
+  }
+
+  String _dioErrorMessage(DioException e, String fallback) {
+    final responseData = e.response?.data;
+    if (responseData is Map<String, dynamic>) {
+      final message = responseData['message']?.toString();
+      if (message != null && message.isNotEmpty) {
+        return message;
+      }
+    }
+    return e.message ?? fallback;
+  }
+
+  String _errorMessage(dynamic data, {required String fallback}) {
+    if (data is Map<String, dynamic>) {
+      final message = data['message']?.toString();
+      if (message != null && message.isNotEmpty) {
+        return message;
+      }
+    }
+    return fallback;
   }
 }

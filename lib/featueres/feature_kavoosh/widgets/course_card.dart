@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/common/services/getImageUrl_service.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
@@ -8,6 +9,7 @@ import 'package:poortak/featueres/feature_kavoosh/screens/video_detail_screen.da
 class CourseCard extends StatelessWidget {
   final String title;
   final String? imagePath;
+  final String? thumbnailId;
   final Color? backgroundColor;
   final VoidCallback? onTap;
 
@@ -15,6 +17,7 @@ class CourseCard extends StatelessWidget {
     super.key,
     required this.title,
     this.imagePath,
+    this.thumbnailId,
     this.backgroundColor,
     this.onTap,
   });
@@ -33,15 +36,14 @@ class CourseCard extends StatelessWidget {
           },
       child: Container(
         width: 140.w,
-        margin: EdgeInsets.only(left: Dimens.medium),
+        margin: EdgeInsetsDirectional.only(end: Dimens.medium),
         constraints: BoxConstraints(minHeight: 180.h),
         decoration: BoxDecoration(
           color: isDark
               ? MyColors.termsBackgroundDark
               : (backgroundColor ?? Colors.white),
           borderRadius: BorderRadius.circular(20.r),
-          border:
-              isDark ? Border.all(color: MyColors.darkBorder) : null,
+          border: isDark ? Border.all(color: MyColors.darkBorder) : null,
           boxShadow: isDark
               ? null
               : [
@@ -56,7 +58,6 @@ class CourseCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Image Placeholder
             Container(
               height: 120.h,
               decoration: BoxDecoration(
@@ -65,24 +66,11 @@ class CourseCard extends StatelessWidget {
                     : Colors.grey[200],
                 borderRadius: BorderRadius.all(Radius.circular(20.r)),
               ),
-              child: imagePath != null
-                  ? ClipRRect(
-                      borderRadius: BorderRadius.all(Radius.circular(20.r)),
-                      child: Image.asset(
-                        imagePath!,
-                        fit: BoxFit.cover,
-                      ),
-                    )
-                  : Center(
-                      child:
-                          Icon(Icons.image,
-                              color: isDark
-                                  ? MyColors.darkTextSecondary
-                                  : Colors.grey,
-                              size: 40.r),
-                    ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.all(Radius.circular(20.r)),
+                child: _buildImage(isDark),
+              ),
             ),
-            // Title
             Padding(
               padding: EdgeInsets.all(8.0.r),
               child: Text(
@@ -100,5 +88,36 @@ class CourseCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget _buildImage(bool isDark) {
+    final placeholder = Center(
+      child: Icon(
+        Icons.image,
+        color: isDark ? MyColors.darkTextSecondary : Colors.grey,
+        size: 40.r,
+      ),
+    );
+
+    if (imagePath != null && imagePath!.isNotEmpty) {
+      return Image.asset(imagePath!, fit: BoxFit.cover);
+    }
+
+    if (thumbnailId != null && thumbnailId!.isNotEmpty) {
+      return FutureBuilder<String>(
+        future: GetImageUrlService().getImageUrl(thumbnailId!),
+        builder: (context, snapshot) {
+          final url = snapshot.data;
+          if (url == null || url.isEmpty) return placeholder;
+          return Image.network(
+            url,
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => placeholder,
+          );
+        },
+      );
+    }
+
+    return placeholder;
   }
 }

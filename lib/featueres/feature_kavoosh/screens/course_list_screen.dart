@@ -66,7 +66,7 @@ class _CourseListScreenState extends State<CourseListScreen> {
   void _fetchNodeChildren() {
     if (widget.categoryId.isEmpty) return;
     _bloc.add(
-      FetchCategoryNodeContentEvent(
+      FetchCategoryNodeDetailEvent(
         categoryId: widget.categoryId,
       ),
     );
@@ -97,7 +97,7 @@ class _CourseListScreenState extends State<CourseListScreen> {
       value: _bloc,
       child: BlocListener<CategoriesBloc, CategoriesState>(
         listener: (context, state) {
-          if (state is CategoryNodeContentLoaded) {
+          if (state is CategoryNodeDetailLoaded) {
             setState(() {
               _filterCategories = state.category.children;
               _filters = [

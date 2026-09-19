@@ -12,10 +12,10 @@ class FetchCategoryNodesSummaryEvent extends CategoriesEvent {
   });
 }
 
-class FetchCategoryNodeContentEvent extends CategoriesEvent {
+class FetchCategoryNodeDetailEvent extends CategoriesEvent {
   final String categoryId;
 
-  FetchCategoryNodeContentEvent({
+  FetchCategoryNodeDetailEvent({
     required this.categoryId,
   });
 }

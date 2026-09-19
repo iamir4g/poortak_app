@@ -9,7 +9,7 @@ class CategoriesBloc extends Bloc<CategoriesEvent, CategoriesState> {
 
   CategoriesBloc({required this.repository}) : super(CategoriesInitial()) {
     on<FetchCategoryNodesSummaryEvent>(_onFetchCategoryNodesSummary);
-    on<FetchCategoryNodeContentEvent>(_onFetchCategoryNodeContent);
+    on<FetchCategoryNodeDetailEvent>(_onFetchCategoryNodeDetail);
     on<FetchCategoryItemsEvent>(_onFetchCategoryItems);
   }
 
@@ -31,13 +31,13 @@ class CategoriesBloc extends Bloc<CategoriesEvent, CategoriesState> {
     }
   }
 
-  Future<void> _onFetchCategoryNodeContent(
-    FetchCategoryNodeContentEvent event,
+  Future<void> _onFetchCategoryNodeDetail(
+    FetchCategoryNodeDetailEvent event,
     Emitter<CategoriesState> emit,
   ) async {
     emit(CategoriesLoading());
 
-    final result = await repository.fetchCategoryNodeContent(
+    final result = await repository.fetchCategoryNodeDetail(
       categoryId: event.categoryId,
     );
 
@@ -47,9 +47,9 @@ class CategoriesBloc extends Bloc<CategoriesEvent, CategoriesState> {
         emit(CategoriesError("داده‌ای یافت نشد"));
         return;
       }
-      emit(CategoryNodeContentLoaded(category));
+      emit(CategoryNodeDetailLoaded(category));
     } else if (result is DataFailed) {
-      emit(CategoriesError(result.error ?? "خطا در دریافت محتوای دسته‌بندی"));
+      emit(CategoriesError(result.error ?? "خطا در دریافت جزئیات دسته‌بندی"));
     }
   }
 
@@ -72,9 +72,7 @@ class CategoriesBloc extends Bloc<CategoriesEvent, CategoriesState> {
       final payload = result.data ?? const <String, dynamic>{};
       final meta = payload['meta'];
       final data = payload['data'];
-      final countRaw = meta is Map
-          ? meta['count']
-          : (payload['count'] ?? payload['metaCount']);
+      final countRaw = meta is Map ? meta['count'] : null;
       final count = countRaw is int
           ? countRaw
           : int.tryParse(countRaw?.toString() ?? '') ?? 0;

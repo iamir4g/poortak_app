@@ -12,10 +12,10 @@ class CategoriesLoaded extends CategoriesState {
   CategoriesLoaded(this.categories);
 }
 
-class CategoryNodeContentLoaded extends CategoriesState {
+class CategoryNodeDetailLoaded extends CategoriesState {
   final CategoryNodeSummary category;
 
-  CategoryNodeContentLoaded(this.category);
+  CategoryNodeDetailLoaded(this.category);
 }
 
 class CategoryItemsLoaded extends CategoriesState {
