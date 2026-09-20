@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:poortak/common/widgets/adaptive_safe_area.dart';
 import 'package:poortak/config/dimens.dart';
+import 'package:poortak/featueres/feature_kavoosh/screens/educational_videos_screen.dart';
+import 'package:poortak/featueres/feature_kavoosh/screens/ebooks_screen.dart';
+import 'package:poortak/featueres/feature_kavoosh/screens/self_assessment_screen.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 
@@ -40,7 +43,10 @@ class _KavooshMainScreenState extends State<KavooshMainScreen> {
                       Color(0xFFFFFDCC),
                       Color(0xFFFFF3D6),
                     ],
-                    showComingSoonBadge: true,
+                    onTap: () {
+                      Navigator.pushNamed(
+                          context, EducationalVideosScreen.routeName);
+                    },
                   ),
                   SizedBox(height: Dimens.nh(13.0)),
                   _buildContentCard(
@@ -51,7 +57,9 @@ class _KavooshMainScreenState extends State<KavooshMainScreen> {
                       Color(0xFFFBEBDF),
                       Color(0xFFFFDBDB),
                     ],
-                    showComingSoonBadge: true,
+                    onTap: () {
+                      Navigator.pushNamed(context, EBooksScreen.routeName);
+                    },
                   ),
                   SizedBox(height: Dimens.nh(13.0)),
                   _buildContentCard(
@@ -61,7 +69,10 @@ class _KavooshMainScreenState extends State<KavooshMainScreen> {
                       Color(0xFFD9FFFA),
                       Color(0xFFD9FFEA),
                     ],
-                    showComingSoonBadge: true,
+                    onTap: () {
+                      Navigator.pushNamed(
+                          context, SelfAssessmentScreen.routeName);
+                    },
                   ),
                 ],
               ),
@@ -85,122 +96,88 @@ class _KavooshMainScreenState extends State<KavooshMainScreen> {
     required String title,
     required String subtitle,
     required List<Color> gradientColors,
-    VoidCallback? onTap,
-    bool showComingSoonBadge = false,
+    required VoidCallback onTap,
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
-      onTap: showComingSoonBadge ? null : onTap,
-      child: Stack(
-        children: [
-          Container(
-            constraints: BoxConstraints(minHeight: Dimens.nh(150.0)),
-            decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF212332) : null,
-              gradient: isDark
-                  ? null
-                  : LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: gradientColors,
-                    ),
-              borderRadius: BorderRadius.circular(Dimens.nr(30.0)),
-              border: Border.all(
-                color: isDark ? const Color(0xFF353850) : Colors.white,
-                width: isDark ? Dimens.nw(2.0) : Dimens.nw(5.0),
-              ),
-              boxShadow: isDark
-                  ? null
-                  : const [
-                      BoxShadow(
-                        color: Color(0x1F92A2BE),
-                        blurRadius: 13,
-                        offset: Offset(0, -7),
-                      ),
-                    ],
-            ),
-            child: Padding(
-              padding: EdgeInsets.all(Dimens.nr(20.0)),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          title,
-                          style: MyTextStyle.textMatn17W700.copyWith(
-                            color: isDark
-                                ? MyColors.darkTextPrimary
-                                : MyColors.darkText1,
-                          ),
-                          textAlign: TextAlign.right,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        SizedBox(height: Dimens.tiny),
-                        Text(
-                          subtitle,
-                          style: MyTextStyle.textMatn10W300.copyWith(
-                            fontWeight: FontWeight.w500,
-                            color: isDark
-                                ? MyColors.darkTextSecondary
-                                : MyColors.text3,
-                          ),
-                          textAlign: TextAlign.right,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(width: Dimens.medium),
-                  // Icon placeholder
-                  SizedBox(
-                    width: Dimens.nw(100.0),
-                    child: Align(
-                      alignment: Alignment.center,
-                      child: Image.asset(
-                        _getIconPathForTitle(title),
-                        width: Dimens.nw(100.0),
-                        fit: BoxFit.contain,
-                      ),
-                    ),
+      onTap: onTap,
+      child: Container(
+        constraints: BoxConstraints(minHeight: Dimens.nh(150.0)),
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF212332) : null,
+          gradient: isDark
+              ? null
+              : LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: gradientColors,
+                ),
+          borderRadius: BorderRadius.circular(Dimens.nr(30.0)),
+          border: Border.all(
+            color: isDark ? const Color(0xFF353850) : Colors.white,
+            width: isDark ? Dimens.nw(2.0) : Dimens.nw(5.0),
+          ),
+          boxShadow: isDark
+              ? null
+              : const [
+                  BoxShadow(
+                    color: Color(0x1F92A2BE),
+                    blurRadius: 13,
+                    offset: Offset(0, -7),
                   ),
                 ],
-              ),
-            ),
-          ),
-          // Coming Soon Badge
-          if (showComingSoonBadge)
-            Positioned(
-              top: Dimens.small,
-              right: Dimens.small,
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                    horizontal: Dimens.small, vertical: Dimens.tiny),
-                decoration: BoxDecoration(
-                  color: MyColors.darkError,
-                  borderRadius: BorderRadius.circular(Dimens.radiusMedium),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Color(0x1F000000),
-                      blurRadius: 4,
-                      offset: Offset(0, 2),
+        ),
+        child: Padding(
+          padding: EdgeInsets.all(Dimens.nr(20.0)),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      title,
+                      style: MyTextStyle.textMatn17W700.copyWith(
+                        color: isDark
+                            ? MyColors.darkTextPrimary
+                            : MyColors.darkText1,
+                      ),
+                      textAlign: TextAlign.right,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    SizedBox(height: Dimens.tiny),
+                    Text(
+                      subtitle,
+                      style: MyTextStyle.textMatn10W300.copyWith(
+                        fontWeight: FontWeight.w500,
+                        color: isDark
+                            ? MyColors.darkTextSecondary
+                            : MyColors.text3,
+                      ),
+                      textAlign: TextAlign.right,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
-                child: Text(
-                  'به زودی',
-                  style: MyTextStyle.textMatn10W300.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+              ),
+              SizedBox(width: Dimens.medium),
+              SizedBox(
+                width: Dimens.nw(100.0),
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Image.asset(
+                    _getIconPathForTitle(title),
+                    width: Dimens.nw(100.0),
+                    fit: BoxFit.contain,
                   ),
                 ),
               ),
-            ),
-        ],
+            ],
+          ),
+        ),
       ),
     );
   }
