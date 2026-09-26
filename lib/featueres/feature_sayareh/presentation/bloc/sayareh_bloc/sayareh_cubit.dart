@@ -33,11 +33,21 @@ class SayarehCubit extends Cubit<SayarehState> {
       summaryData = summaryState.data;
     }
 
+    // Progress is optional — a 401 must not leave the screen stuck on loading.
     if (prefsOperator.isLoggedIn()) {
-      DataState progressState =
-          await sayarehRepository.fetchAllCoursesProgress();
-      if (progressState is DataSuccess) {
-        progressData = progressState.data;
+      try {
+        final DataState progressState =
+            await sayarehRepository.fetchAllCoursesProgress();
+        if (progressState is DataSuccess) {
+          progressData = progressState.data;
+        } else if (progressState is DataFailed &&
+            progressState.errorCode == 'unauthorized') {
+          await prefsOperator.logout();
+        }
+      } catch (_) {
+        if (prefsOperator.isLoggedIn()) {
+          await prefsOperator.logout();
+        }
       }
     }
 
@@ -78,16 +88,43 @@ class SayarehCubit extends Cubit<SayarehState> {
     final prefsOperator = locator<PrefsOperator>();
     if (!prefsOperator.isLoggedIn()) return;
 
-    final progressState = await sayarehRepository.fetchAllCoursesProgress();
-    if (isClosed) return;
+    try {
+      final progressState = await sayarehRepository.fetchAllCoursesProgress();
+      if (isClosed) return;
 
-    if (progressState is DataSuccess) {
+      if (progressState is DataSuccess) {
+        emit(state.copyWith(
+          sayarehDataStatus: SayarehDataCompleted(
+            current.data,
+            current.bookListData,
+            current.summaryData,
+            progressData: progressState.data,
+          ),
+        ));
+      } else if (progressState is DataFailed &&
+          progressState.errorCode == 'unauthorized') {
+        await prefsOperator.logout();
+        if (isClosed) return;
+        emit(state.copyWith(
+          sayarehDataStatus: SayarehDataCompleted(
+            current.data,
+            current.bookListData,
+            current.summaryData,
+            progressData: null,
+          ),
+        ));
+      }
+    } catch (_) {
+      if (prefsOperator.isLoggedIn()) {
+        await prefsOperator.logout();
+      }
+      if (isClosed) return;
       emit(state.copyWith(
         sayarehDataStatus: SayarehDataCompleted(
           current.data,
           current.bookListData,
           current.summaryData,
-          progressData: progressState.data,
+          progressData: null,
         ),
       ));
     }

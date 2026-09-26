@@ -11,6 +11,7 @@ class CourseCard extends StatelessWidget {
   final String? imagePath;
   final String? thumbnailId;
   final Color? backgroundColor;
+  final bool showPlayBadge;
   final VoidCallback? onTap;
 
   const CourseCard({
@@ -19,6 +20,7 @@ class CourseCard extends StatelessWidget {
     this.imagePath,
     this.thumbnailId,
     this.backgroundColor,
+    this.showPlayBadge = false,
     this.onTap,
   });
 
@@ -58,17 +60,43 @@ class CourseCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
+            SizedBox(
               height: 120.h,
-              decoration: BoxDecoration(
-                color: isDark
-                    ? MyColors.darkBackgroundSecondary
-                    : Colors.grey[200],
-                borderRadius: BorderRadius.all(Radius.circular(20.r)),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.all(Radius.circular(20.r)),
-                child: _buildImage(isDark),
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? MyColors.darkBackgroundSecondary
+                            : Colors.grey[200],
+                        borderRadius: BorderRadius.all(Radius.circular(20.r)),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.all(Radius.circular(20.r)),
+                        child: _buildImage(isDark),
+                      ),
+                    ),
+                  ),
+                  if (showPlayBadge)
+                    PositionedDirectional(
+                      bottom: 8.h,
+                      end: 8.w,
+                      child: Container(
+                        width: 28.r,
+                        height: 28.r,
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.play_arrow_rounded,
+                          size: 18.r,
+                          color: MyColors.primary,
+                        ),
+                      ),
+                    ),
+                ],
               ),
             ),
             Padding(

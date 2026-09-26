@@ -198,6 +198,22 @@ class SayarehRepository {
       } else {
         return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
       }
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        return DataFailed(
+          _extractErrorMessage(
+            e.response?.data,
+            fallbackMessage: 'Session expired. Please login again.',
+          ),
+          errorCode: 'unauthorized',
+        );
+      }
+      return DataFailed(
+        _extractErrorMessage(
+          e.response?.data,
+          fallbackMessage: e.message ?? "خطا در دریافت اطلاعات",
+        ),
+      );
     } on AppException catch (e) {
       return CheckExceptions.getError<AllCoursesProgressModel>(e);
     }

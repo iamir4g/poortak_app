@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:poortak/common/services/getImageUrl_service.dart';
 import 'package:poortak/common/widgets/poortak_app_bar.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
-import 'package:poortak/featueres/feature_kavoosh/widgets/course_card.dart';
-import 'package:poortak/featueres/feature_kavoosh/widgets/section_header.dart';
-import 'package:poortak/featueres/feature_kavoosh/screens/course_list_screen.dart';
 import 'package:poortak/featueres/feature_kavoosh/data/models/category_nodes_summary_model.dart';
 import 'package:poortak/featueres/feature_kavoosh/data/models/kavoosh_tree_type.dart';
 import 'package:poortak/featueres/feature_kavoosh/presentation/bloc/categories_bloc/categories_bloc.dart';
 import 'package:poortak/featueres/feature_kavoosh/presentation/bloc/categories_bloc/categories_event.dart';
 import 'package:poortak/featueres/feature_kavoosh/presentation/bloc/categories_bloc/categories_state.dart';
+import 'package:poortak/featueres/feature_kavoosh/widgets/category_content_section.dart';
 import 'package:poortak/locator.dart';
 
 class EBooksScreen extends StatefulWidget {
@@ -24,7 +23,19 @@ class EBooksScreen extends StatefulWidget {
 }
 
 class _EBooksScreenState extends State<EBooksScreen> {
-  int _selectedTabIndex = 0; // 0 for Books, 1 for Sample Questions
+  int _selectedTabIndex = 0;
+  List<CategoryNodeSummary> _rootTabs = const [];
+
+  IconData _tabIconFor(CategoryNodeSummary tab) {
+    final title = tab.title;
+    if (title.contains('سوال')) return Icons.quiz_outlined;
+    return Icons.book_outlined;
+  }
+
+  int _defaultTabIndex(List<CategoryNodeSummary> tabs) {
+    final preferred = tabs.indexWhere((e) => e.title.contains('کتاب'));
+    return preferred >= 0 ? preferred : 0;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,137 +57,165 @@ class _EBooksScreenState extends State<EBooksScreen> {
         ),
         body: SafeArea(
           top: false,
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                Container(
-                  height: 200.h,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: isDark
-                        ? MyColors.darkBackgroundSecondary
-                        : const Color(0xFFF9F6C6),
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(0),
-                      bottomRight: Radius.circular(0),
+          child: BlocConsumer<CategoriesBloc, CategoriesState>(
+            listener: (context, state) {
+              if (state is CategoriesLoaded) {
+                setState(() {
+                  final wasEmpty = _rootTabs.isEmpty;
+                  _rootTabs = state.categories;
+                  if (wasEmpty) {
+                    _selectedTabIndex = _defaultTabIndex(_rootTabs);
+                  } else if (_selectedTabIndex >= _rootTabs.length) {
+                    _selectedTabIndex = 0;
+                  }
+                });
+              }
+            },
+            builder: (context, state) {
+              if (state is CategoriesLoading && _rootTabs.isEmpty) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if (state is CategoriesError && _rootTabs.isEmpty) {
+                return Center(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16.w),
+                    child: Text(
+                      state.message,
+                      style: MyTextStyle.textMatn14Bold.copyWith(
+                        color: Colors.red,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
                   ),
-                  child: const Center(),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 16.0.h),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _buildTabItem(0, 'کتاب ها', Icons.book_outlined),
-                      SizedBox(width: 24.w),
-                      _buildTabItem(1, 'نمونه سوالات', Icons.quiz_outlined),
-                    ],
+                );
+              }
+              if (_rootTabs.isEmpty) {
+                return Center(
+                  child: Text(
+                    'دسته‌بندی‌ای یافت نشد',
+                    style: MyTextStyle.textMatn14Bold.copyWith(
+                      color:
+                          isDark ? MyColors.darkTextSecondary : Colors.grey,
+                    ),
                   ),
-                ),
-                Container(
-                  height: 2.h,
-                  width: double.infinity,
-                  color: (isDark ? MyColors.darkBorder : Colors.grey)
-                      .withValues(alpha: 0.35),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          color: _selectedTabIndex == 0
-                              ? MyColors.primary
-                              : Colors.transparent,
+                );
+              }
+
+              final selectedTab = _rootTabs[_selectedTabIndex];
+
+              return SingleChildScrollView(
+                child: Column(
+                  children: [
+                    _buildHeroBackground(selectedTab, isDark),
+                    _buildTabs(isDark),
+                    SizedBox(height: 16.h),
+                    ...selectedTab.children.map(
+                      (section) => CategoryContentSection(
+                        key: ValueKey(section.id),
+                        section: section,
+                        treeType: KavooshTreeType.book,
+                        seeAllTitlePrefix: 'کتاب های',
+                      ),
+                    ),
+                    if (selectedTab.children.isEmpty)
+                      Padding(
+                        padding: EdgeInsets.symmetric(vertical: 32.h),
+                        child: Text(
+                          'زیردسته‌ای یافت نشد',
+                          style: MyTextStyle.textMatn14Bold.copyWith(
+                            color: isDark
+                                ? MyColors.darkTextSecondary
+                                : Colors.grey,
+                          ),
                         ),
                       ),
-                      Expanded(
-                        child: Container(
-                          color: _selectedTabIndex == 1
-                              ? MyColors.primary
-                              : Colors.transparent,
-                        ),
-                      ),
-                    ],
-                  ),
+                    SizedBox(height: 20.h),
+                  ],
                 ),
-                SizedBox(height: 16.h),
-                if (_selectedTabIndex == 0) ...[
-                  BlocBuilder<CategoriesBloc, CategoriesState>(
-                    builder: (context, state) {
-                      if (state is CategoriesLoading) {
-                        return Padding(
-                          padding: EdgeInsets.symmetric(vertical: 24.h),
-                          child: const Center(
-                            child: CircularProgressIndicator(),
-                          ),
-                        );
-                      }
-                      if (state is CategoriesError) {
-                        return Padding(
-                          padding: EdgeInsets.symmetric(vertical: 24.h),
-                          child: Center(
-                            child: Text(
-                              state.message,
-                              style: MyTextStyle.textMatn14Bold.copyWith(
-                                color: Colors.red,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        );
-                      }
-                      if (state is CategoriesLoaded) {
-                        if (state.categories.isEmpty) {
-                          return Padding(
-                            padding: EdgeInsets.symmetric(vertical: 24.h),
-                            child: Center(
-                              child: Text(
-                                'دسته‌بندی‌ای یافت نشد',
-                                style: MyTextStyle.textMatn14Bold.copyWith(
-                                  color: isDark
-                                      ? MyColors.darkTextSecondary
-                                      : Colors.grey,
-                                ),
-                              ),
-                            ),
-                          );
-                        }
-                        return Column(
-                          children: state.categories
-                              .map((category) => _buildSection(category))
-                              .toList(),
-                        );
-                      }
-                      return const SizedBox.shrink();
-                    },
-                  ),
-                ] else ...[
-                  SizedBox(
-                    height: 200.h,
-                    child: const Center(child: Text('نمونه سوالات')),
-                  ),
-                ],
-                SizedBox(height: 20.h),
-              ],
-            ),
+              );
+            },
           ),
         ),
       ),
     );
   }
 
-  Widget _buildTabItem(int index, String title, IconData icon) {
+  Widget _buildHeroBackground(CategoryNodeSummary tab, bool isDark) {
+    final fallbackColor =
+        isDark ? MyColors.darkBackgroundSecondary : const Color(0xFFF9F6C6);
+    final backgroundId = tab.backgroundImageId;
+
+    return SizedBox(
+      height: 200.h,
+      width: double.infinity,
+      child: backgroundId == null || backgroundId.isEmpty
+          ? ColoredBox(color: fallbackColor)
+          : FutureBuilder<String>(
+              future: GetImageUrlService().getImageUrl(backgroundId),
+              builder: (context, snapshot) {
+                final url = snapshot.data;
+                if (url == null || url.isEmpty) {
+                  return ColoredBox(color: fallbackColor);
+                }
+                return Image.network(
+                  url,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  height: 200.h,
+                  errorBuilder: (_, __, ___) =>
+                      ColoredBox(color: fallbackColor),
+                );
+              },
+            ),
+    );
+  }
+
+  Widget _buildTabs(bool isDark) {
+    return Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(vertical: 16.0.h, horizontal: 16.w),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              for (var i = 0; i < _rootTabs.length; i++) ...[
+                if (i > 0) SizedBox(width: 24.w),
+                _buildTabItem(i, _rootTabs[i], isDark),
+              ],
+            ],
+          ),
+        ),
+        Container(
+          height: 2.h,
+          width: double.infinity,
+          color: (isDark ? MyColors.darkBorder : Colors.grey)
+              .withValues(alpha: 0.35),
+          child: Row(
+            children: List.generate(_rootTabs.length, (index) {
+              return Expanded(
+                child: Container(
+                  color: _selectedTabIndex == index
+                      ? MyColors.primary
+                      : Colors.transparent,
+                ),
+              );
+            }),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTabItem(int index, CategoryNodeSummary tab, bool isDark) {
     final isSelected = _selectedTabIndex == index;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
       onTap: () {
-        setState(() {
-          _selectedTabIndex = index;
-        });
+        setState(() => _selectedTabIndex = index);
       },
       child: Row(
         children: [
           Text(
-            title,
+            tab.title,
             style: MyTextStyle.textMatn14Bold.copyWith(
               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               color: isSelected
@@ -186,7 +225,7 @@ class _EBooksScreenState extends State<EBooksScreen> {
           ),
           SizedBox(width: 8.w),
           Icon(
-            icon,
+            _tabIconFor(tab),
             color: isSelected
                 ? MyColors.primary
                 : (isDark ? MyColors.darkTextSecondary : Colors.grey),
@@ -194,78 +233,6 @@ class _EBooksScreenState extends State<EBooksScreen> {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildSection(CategoryNodeSummary category) {
-    final children = category.children;
-    final colors = [
-      const Color(0xFFFBEBDF),
-      const Color(0xFFE3F2FD),
-      const Color(0xFFF3E5F5),
-    ];
-
-    return Column(
-      children: [
-        SectionHeader(
-          title: category.title,
-          onSeeAllTap: () {
-            Navigator.pushNamed(
-              context,
-              CourseListScreen.routeName,
-              arguments: {
-                'title': 'کتاب های ${category.title}',
-                'type': 'book',
-                'categoryId': category.id,
-                'treeType': KavooshTreeType.book,
-              },
-            );
-          },
-        ),
-        if (children.isEmpty)
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-            child: Align(
-              alignment: AlignmentDirectional.centerStart,
-              child: Text(
-                '${category.bookCount} کتاب',
-                style: MyTextStyle.textMatn12W500.copyWith(
-                  color: MyColors.text4,
-                ),
-              ),
-            ),
-          )
-        else
-          SizedBox(
-            height: 190.h,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
-              itemCount: children.length,
-              itemBuilder: (context, index) {
-                final child = children[index];
-                return CourseCard(
-                  title: child.title,
-                  thumbnailId: child.thumbnailId,
-                  backgroundColor: colors[index % colors.length],
-                  onTap: () {
-                    Navigator.pushNamed(
-                      context,
-                      CourseListScreen.routeName,
-                      arguments: {
-                        'title': child.title,
-                        'type': 'book',
-                        'categoryId': child.id,
-                        'treeType': KavooshTreeType.book,
-                      },
-                    );
-                  },
-                );
-              },
-            ),
-          ),
-        SizedBox(height: 16.h),
-      ],
     );
   }
 }

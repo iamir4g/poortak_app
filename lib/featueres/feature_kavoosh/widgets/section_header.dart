@@ -19,14 +19,14 @@ class SectionHeader extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 24.0.w, vertical: 8.0.h),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Flexible(
+          Expanded(
             child: Text(
               title,
               style: MyTextStyle.textMatn16Bold.copyWith(
                 color: isDark ? MyColors.darkTextPrimary : MyColors.textMatn2,
               ),
+              textAlign: TextAlign.start,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
@@ -34,6 +34,11 @@ class SectionHeader extends StatelessWidget {
           SizedBox(width: 8.w),
           TextButton(
             onPressed: onSeeAllTap,
+            style: TextButton.styleFrom(
+              padding: EdgeInsets.symmetric(horizontal: 4.w),
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
             child: Text(
               'همه',
               style: MyTextStyle.textMatn12Bold.copyWith(

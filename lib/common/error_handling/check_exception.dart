@@ -32,7 +32,10 @@ class CheckExceptions {
 
       /// get refresh token and call api again
       case UnauthorisedException:
-        return DataFailed<T>(appException.message);
+        return DataFailed<T>(
+          appException.message,
+          errorCode: 'unauthorized',
+        );
 
       /// server error
       case ServerException:
