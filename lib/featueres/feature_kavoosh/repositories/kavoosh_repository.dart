@@ -2,7 +2,9 @@ import 'package:dio/dio.dart';
 import 'package:poortak/common/resources/data_state.dart';
 import 'package:poortak/featueres/feature_kavoosh/data/data_source/kavoosh_api_provider.dart';
 import 'package:poortak/featueres/feature_kavoosh/data/models/category_nodes_summary_model.dart';
+import 'package:poortak/featueres/feature_kavoosh/data/models/kavoosh_book_detail_model.dart';
 import 'package:poortak/featueres/feature_kavoosh/data/models/kavoosh_tree_type.dart';
+import 'package:poortak/featueres/feature_kavoosh/data/models/video_course_detail_model.dart';
 
 class KavooshRepository {
   final KavooshApiProvider apiProvider;
@@ -79,7 +81,6 @@ class KavooshRepository {
   }
 
   /// Paginated courses/books for a category (incl. sub-tree).
-  /// Returns `{ data: List<Map>, meta: { count } }` until typed list models land.
   Future<DataState<Map<String, dynamic>>> fetchCategoryItems({
     required KavooshTreeType treeType,
     required String categoryId,
@@ -137,6 +138,66 @@ class KavooshRepository {
       ));
     } on DioException catch (e) {
       return DataFailed(_dioErrorMessage(e, "خطا در دریافت لیست محتوا"));
+    } catch (e) {
+      return DataFailed(e.toString());
+    }
+  }
+
+  Future<DataState<VideoCourseDetailResponse>> fetchVideoCourseDetail({
+    required String courseId,
+  }) async {
+    try {
+      final response = await apiProvider.callGetVideoCourseById(
+        courseId: courseId,
+      );
+
+      if (_isHttpFailure(response.statusCode)) {
+        return DataFailed(_errorMessage(
+          response.data,
+          fallback: "خطا در دریافت جزئیات دوره",
+        ));
+      }
+
+      final data = response.data;
+      if (data is Map<String, dynamic> && data['ok'] == true) {
+        return DataSuccess(VideoCourseDetailResponse.fromJson(data));
+      }
+
+      return DataFailed(_errorMessage(
+        data,
+        fallback: "خطا در دریافت جزئیات دوره",
+      ));
+    } on DioException catch (e) {
+      return DataFailed(_dioErrorMessage(e, "خطا در دریافت جزئیات دوره"));
+    } catch (e) {
+      return DataFailed(e.toString());
+    }
+  }
+
+  Future<DataState<KavooshBookDetail>> fetchBookDetail({
+    required String bookId,
+  }) async {
+    try {
+      final response = await apiProvider.callGetBookById(bookId: bookId);
+
+      if (_isHttpFailure(response.statusCode)) {
+        return DataFailed(_errorMessage(
+          response.data,
+          fallback: "خطا در دریافت جزئیات کتاب",
+        ));
+      }
+
+      final data = response.data;
+      if (data is Map<String, dynamic> && data['ok'] == true) {
+        return DataSuccess(KavooshBookDetail.fromJson(data));
+      }
+
+      return DataFailed(_errorMessage(
+        data,
+        fallback: "خطا در دریافت جزئیات کتاب",
+      ));
+    } on DioException catch (e) {
+      return DataFailed(_dioErrorMessage(e, "خطا در دریافت جزئیات کتاب"));
     } catch (e) {
       return DataFailed(e.toString());
     }

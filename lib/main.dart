@@ -382,13 +382,19 @@ void main() async {
                       },
                       VideoDetailScreen.routeName: (context) {
                         final args = ModalRoute.of(context)?.settings.arguments
-                            as Map<String, dynamic>;
-                        return VideoDetailScreen(title: args['title']);
+                            as Map<String, dynamic>?;
+                        return VideoDetailScreen(
+                          courseId: args?['courseId']?.toString() ?? '',
+                          title: args?['title']?.toString(),
+                        );
                       },
                       BookDetailsScreen.routeName: (context) {
                         final args = ModalRoute.of(context)?.settings.arguments
-                            as Map<String, dynamic>;
-                        return BookDetailsScreen(title: args['title']);
+                            as Map<String, dynamic>?;
+                        return BookDetailsScreen(
+                          bookId: args?['bookId']?.toString() ?? '',
+                          title: args?['title']?.toString(),
+                        );
                       },
                       SelfAssessmentScreen.routeName: (context) =>
                           const SelfAssessmentScreen(),

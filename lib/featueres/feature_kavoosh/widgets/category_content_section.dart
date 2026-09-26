@@ -6,7 +6,9 @@ import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_kavoosh/data/models/category_nodes_summary_model.dart';
 import 'package:poortak/featueres/feature_kavoosh/data/models/kavoosh_tree_type.dart';
 import 'package:poortak/featueres/feature_kavoosh/repositories/kavoosh_repository.dart';
+import 'package:poortak/featueres/feature_kavoosh/screens/book_details_screen.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/course_list_screen.dart';
+import 'package:poortak/featueres/feature_kavoosh/screens/video_detail_screen.dart';
 import 'package:poortak/featueres/feature_kavoosh/widgets/course_card.dart';
 import 'package:poortak/featueres/feature_kavoosh/widgets/section_header.dart';
 import 'package:poortak/locator.dart';
@@ -147,6 +149,27 @@ class _CategoryContentSectionState extends State<CategoryContentSection> {
     );
   }
 
+  void _openItemDetail(Map<String, dynamic> item) {
+    final id = item['id']?.toString() ?? '';
+    final title = item['title']?.toString() ?? '';
+    if (id.isEmpty) return;
+
+    if (widget.treeType == KavooshTreeType.book) {
+      Navigator.pushNamed(
+        context,
+        BookDetailsScreen.routeName,
+        arguments: {'bookId': id, 'title': title},
+      );
+      return;
+    }
+
+    Navigator.pushNamed(
+      context,
+      VideoDetailScreen.routeName,
+      arguments: {'courseId': id, 'title': title},
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -199,10 +222,7 @@ class _CategoryContentSectionState extends State<CategoryContentSection> {
                 thumbnailId: item['thumbnailId']?.toString(),
                 backgroundColor: _cardColors[index % _cardColors.length],
                 showPlayBadge: widget.treeType == KavooshTreeType.video,
-                onTap: () => _openCourseList(
-                  categoryId: widget.section.id,
-                  title: item['title']?.toString(),
-                ),
+                onTap: () => _openItemDetail(item),
               );
             },
           )

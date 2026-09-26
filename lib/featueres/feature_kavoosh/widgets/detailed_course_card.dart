@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
-import 'package:poortak/featueres/feature_kavoosh/screens/video_detail_screen.dart';
 
 class DetailedCourseCard extends StatelessWidget {
   final String title;
@@ -29,14 +28,7 @@ class DetailedCourseCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
-      onTap: onTap ??
-          () {
-            Navigator.pushNamed(
-              context,
-              VideoDetailScreen.routeName,
-              arguments: {'title': title},
-            );
-          },
+      onTap: onTap,
       child: Container(
         margin: EdgeInsets.only(
           bottom: Dimens.medium,

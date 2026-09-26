@@ -77,4 +77,22 @@ class KavooshApiProvider {
       queryParameters: queryParameters,
     );
   }
+
+  /// GET /video-courses/:courseId
+  Future<Response> callGetVideoCourseById({
+    required String courseId,
+  }) {
+    return dio.get(
+      "${Constants.baseUrl}video-courses/$courseId",
+    );
+  }
+
+  /// GET /books/:bookId
+  Future<Response> callGetBookById({
+    required String bookId,
+  }) {
+    return dio.get(
+      "${Constants.baseUrl}books/$bookId",
+    );
+  }
 }

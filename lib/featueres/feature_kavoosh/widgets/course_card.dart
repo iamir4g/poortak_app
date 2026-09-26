@@ -4,7 +4,6 @@ import 'package:poortak/common/services/getImageUrl_service.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
-import 'package:poortak/featueres/feature_kavoosh/screens/video_detail_screen.dart';
 
 class CourseCard extends StatelessWidget {
   final String title;
@@ -28,14 +27,7 @@ class CourseCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
-      onTap: onTap ??
-          () {
-            Navigator.pushNamed(
-              context,
-              VideoDetailScreen.routeName,
-              arguments: {'title': title},
-            );
-          },
+      onTap: onTap,
       child: Container(
         width: 140.w,
         margin: EdgeInsetsDirectional.only(end: Dimens.medium),

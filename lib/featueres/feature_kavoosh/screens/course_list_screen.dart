@@ -12,6 +12,7 @@ import 'package:poortak/featueres/feature_kavoosh/presentation/bloc/categories_b
 import 'package:poortak/featueres/feature_kavoosh/presentation/bloc/categories_bloc/categories_state.dart';
 import 'package:poortak/featueres/feature_kavoosh/widgets/detailed_course_card.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/book_details_screen.dart';
+import 'package:poortak/featueres/feature_kavoosh/screens/video_detail_screen.dart';
 import 'package:poortak/locator.dart';
 
 class CourseListScreen extends StatefulWidget {
@@ -275,19 +276,27 @@ class _CourseListScreenState extends State<CourseListScreen> {
 
                         return DetailedCourseCard(
                           title: title,
-                          author: '',
+                          author: item['authorName']?.toString() ?? '',
                           date: date,
                           isPurchased: false,
                           backgroundColor: colors[index % colors.length],
-                          onTap: _effectiveTreeType == KavooshTreeType.book
-                              ? () {
-                                  Navigator.pushNamed(
-                                    context,
-                                    BookDetailsScreen.routeName,
-                                    arguments: {'title': title},
-                                  );
-                                }
-                              : null,
+                          onTap: () {
+                            final id = item['id']?.toString() ?? '';
+                            if (id.isEmpty) return;
+                            if (_effectiveTreeType == KavooshTreeType.book) {
+                              Navigator.pushNamed(
+                                context,
+                                BookDetailsScreen.routeName,
+                                arguments: {'bookId': id, 'title': title},
+                              );
+                              return;
+                            }
+                            Navigator.pushNamed(
+                              context,
+                              VideoDetailScreen.routeName,
+                              arguments: {'courseId': id, 'title': title},
+                            );
+                          },
                         );
                       },
                     );
