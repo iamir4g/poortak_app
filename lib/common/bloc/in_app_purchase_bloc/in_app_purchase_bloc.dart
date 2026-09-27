@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:poortak/common/models/bazaar_checkout_item.dart';
 import 'package:poortak/common/models/bazaar_purchase_result.dart';
 import 'package:poortak/common/services/cafe_bazaar_purchase_service.dart';
 import 'package:poortak/config/app_flavor.dart';
@@ -54,44 +55,58 @@ class InAppPurchaseBloc extends Bloc<InAppPurchaseEvent, InAppPurchaseState> {
       return;
     }
 
-    final bazaarSkus = event.productIds
-        .map((id) => id.trim())
-        .where((id) => id.isNotEmpty)
-        .toSet()
-        .toList();
-    if (bazaarSkus.isEmpty) {
+    final items = <BazaarCheckoutItem>[];
+    final seenSkus = <String>{};
+    for (final item in event.items) {
+      final sku = item.bazaarSku.trim();
+      final type = item.productType.trim();
+      if (sku.isEmpty || type.isEmpty) continue;
+      if (seenSkus.add(sku)) {
+        items.add(BazaarCheckoutItem(bazaarSku: sku, productType: type));
+      }
+    }
+
+    if (items.isEmpty) {
       emit(const InAppPurchaseError(
-        'شناسه محصول بازار (SKU) برای این آیتم‌ها تنظیم نشده',
+        'شناسه یا نوع محصول بازار برای این آیتم‌ها تنظیم نشده',
       ));
       return;
     }
 
-    emit(InAppPurchasePurchasing(bazaarSkus.first));
+    emit(InAppPurchasePurchasing(items.first.bazaarSku));
     try {
       await _service.ensureConnected();
       final alreadyOwned = await _service.getPurchasedProducts();
       final purchases = <BazaarPurchaseResult>[];
 
-      for (final sku in bazaarSkus) {
+      for (final item in items) {
+        final sku = item.bazaarSku;
         emit(InAppPurchasePurchasing(sku));
+
         BazaarPurchaseResult? existing;
-        for (final item in alreadyOwned) {
-          if (item.productId == sku) {
-            existing = item;
+        for (final owned in alreadyOwned) {
+          if (owned.productId == sku) {
+            existing = owned;
             break;
           }
         }
+
+        final BazaarPurchaseResult result;
         if (existing != null) {
-          debugPrint('🛒 [Bazaar] already owned: $sku');
-          purchases.add(existing);
-          continue;
+          debugPrint('🛒 [Bazaar] already owned: $sku — fulfilling via direct');
+          result = existing;
+        } else {
+          result = await _service.purchase(
+            sku,
+            payload: event.payload ?? '',
+          );
         }
 
-        final result = await _service.purchase(
-          sku,
-          payload: event.payload ?? '',
+        await _cartRepository.verifyBazaarPurchase(
+          result,
+          productType: item.productType,
+          referrerCode: event.referrerCode,
         );
-        await _cartRepository.verifyBazaarPurchase(result);
         purchases.add(result);
       }
 

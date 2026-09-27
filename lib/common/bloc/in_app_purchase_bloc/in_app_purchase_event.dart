@@ -12,17 +12,19 @@ class ConnectInAppPurchaseEvent extends InAppPurchaseEvent {
 }
 
 class PurchaseProductsEvent extends InAppPurchaseEvent {
-  /// Cafe Bazaar SKUs from backend `bazaarSku`, used as Poolakey PRODUCT_ID.
-  final List<String> productIds;
+  /// Cafe Bazaar lines: SKU + catalog productType for `payments/direct`.
+  final List<BazaarCheckoutItem> items;
   final String? payload;
+  final String? referrerCode;
 
   const PurchaseProductsEvent({
-    required this.productIds,
+    required this.items,
     this.payload,
+    this.referrerCode,
   });
 
   @override
-  List<Object?> get props => [productIds, payload];
+  List<Object?> get props => [items, payload, referrerCode];
 }
 
 class DisconnectInAppPurchaseEvent extends InAppPurchaseEvent {

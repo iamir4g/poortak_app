@@ -234,24 +234,38 @@ class ShoppingCartRepository {
     }
   }
 
-  Future<void> verifyBazaarPurchase(BazaarPurchaseResult purchase) async {
-    if (purchase.purchaseToken.isEmpty) return;
+  Future<void> verifyBazaarPurchase(
+    BazaarPurchaseResult purchase, {
+    required String productType,
+    String? referrerCode,
+  }) async {
+    if (purchase.purchaseToken.isEmpty) {
+      log("🛒 [Bazaar] verify skipped — empty purchaseToken "
+          "bazaarSku=${purchase.productId}");
+      throw StateError('توکن خرید بازار خالی است');
+    }
+    if (productType.trim().isEmpty) {
+      throw StateError('نوع محصول برای تأیید پرداخت مشخص نیست');
+    }
+    log(
+      "🛒 [Bazaar] verifyBazaarPurchase → payments/direct — "
+      "bazaarSku=${purchase.productId} "
+      "productType=$productType "
+      "purchaseToken=${purchase.purchaseToken} "
+      "orderId=${purchase.orderId} "
+      "referrerCode=$referrerCode",
+    );
     try {
       await _apiProvider.verifyBazaarPurchase(
-        productId: purchase.productId,
+        bazaarSku: purchase.productId,
+        productType: productType.trim(),
         purchaseToken: purchase.purchaseToken,
-        orderId: purchase.orderId,
-        payload: purchase.payload,
-        originalJson: purchase.originalJson,
-        dataSignature: purchase.dataSignature,
+        referrerCode: referrerCode,
       );
-      log("✅ Bazaar purchase verified: ${purchase.productId}");
+      log("✅ [Bazaar] purchase verified: ${purchase.productId}");
     } on DioException catch (e) {
-      if (e.response?.statusCode == 404) {
-        log("⚠️ Bazaar verify endpoint is not available yet");
-        return;
-      }
-      log("❌ Bazaar verify failed: $e");
+      log("❌ [Bazaar] verify failed: $e "
+          "status=${e.response?.statusCode} data=${e.response?.data}");
       rethrow;
     }
   }

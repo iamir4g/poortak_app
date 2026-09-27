@@ -66,28 +66,34 @@ class ShoppingCartApiProvider {
   }
 
   Future<Response> verifyBazaarPurchase({
-    required String productId,
+    required String bazaarSku,
+    required String productType,
     required String purchaseToken,
-    String? orderId,
-    String? payload,
-    String? originalJson,
-    String? dataSignature,
+    String? referrerCode,
   }) async {
-    log("🛒 Verifying Cafe Bazaar purchase...");
-    return _authService.post(
-      "${Constants.baseUrl}payments/bazaar/verify",
-      data: {
-        "productId": productId,
-        "purchaseToken": purchaseToken,
-        "gateway": "BAZAAR",
-        if (orderId != null && orderId.isNotEmpty) "orderId": orderId,
-        if (payload != null && payload.isNotEmpty) "payload": payload,
-        if (originalJson != null && originalJson.isNotEmpty)
-          "originalJson": originalJson,
-        if (dataSignature != null && dataSignature.isNotEmpty)
-          "dataSignature": dataSignature,
-      },
+    final body = <String, dynamic>{
+      "bazaarSku": bazaarSku,
+      "productType": productType,
+      "purchaseToken": purchaseToken,
+      if (referrerCode != null && referrerCode.isNotEmpty)
+        "referrerCode": referrerCode,
+    };
+    log("🛒 [Bazaar] verify request → payments/direct");
+    log(
+      "🛒 [Bazaar] verify body — "
+      "bazaarSku=$bazaarSku "
+      "productType=$productType "
+      "purchaseToken=$purchaseToken "
+      "referrerCode=$referrerCode",
     );
+    log("🛒 [Bazaar] verify full body: $body");
+    final response = await _authService.post(
+      "${Constants.baseUrl}payments/direct",
+      data: body,
+    );
+    log("🛒 [Bazaar] verify response status=${response.statusCode} "
+        "data=${response.data}");
+    return response;
   }
 
   Future<Response> applyReferrerCode(String referrerCode) async {

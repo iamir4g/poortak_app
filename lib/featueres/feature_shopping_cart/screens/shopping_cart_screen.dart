@@ -40,6 +40,7 @@ import 'package:poortak/common/utils/money_utils.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/common/error_handling/app_exception.dart';
 import 'package:poortak/common/bloc/in_app_purchase_bloc/in_app_purchase_bloc.dart';
+import 'package:poortak/common/models/bazaar_checkout_item.dart';
 import 'package:poortak/config/app_flavor.dart';
 import 'dart:developer';
 
@@ -135,8 +136,9 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
   }
 
   Future<void> _handlePayNow(
-    List<String> bazaarSkus, {
+    List<BazaarCheckoutItem> checkoutItems, {
     String? payload,
+    String? referrerCode,
   }) async {
     if (!locator<PrefsOperator>().isLoggedIn()) {
       _promptLogin();
@@ -151,20 +153,23 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
       '🛒 PayNow channel=${AppFlavor.paymentChannel} '
       'flavor=${AppFlavor.appFlavor} '
       'useBazaarIap=${AppFlavor.useBazaarIap} '
-      'skus=$bazaarSkus',
+      'items=$checkoutItems',
     );
 
     if (AppFlavor.useBazaarIap) {
-      final skus = bazaarSkus
-          .map((sku) => sku.trim())
-          .where((sku) => sku.isNotEmpty)
-          .toList();
-      if (skus.isEmpty) {
+      final items = <BazaarCheckoutItem>[];
+      for (final item in checkoutItems) {
+        final sku = item.bazaarSku.trim();
+        final type = item.productType.trim();
+        if (sku.isEmpty || type.isEmpty) continue;
+        items.add(BazaarCheckoutItem(bazaarSku: sku, productType: type));
+      }
+      if (items.isEmpty) {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
-              'شناسه محصول بازار (SKU) برای این آیتم‌ها تنظیم نشده',
+              'شناسه یا نوع محصول بازار برای این آیتم‌ها تنظیم نشده',
             ),
             backgroundColor: Colors.red,
             duration: Duration(seconds: 2),
@@ -173,11 +178,15 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
         return;
       }
 
-      debugPrint('🛒 Bazaar purchase, skipping IPG checkout. SKUs=$skus');
+      debugPrint(
+        '🛒 Bazaar purchase, skipping IPG checkout. '
+        'items=${items.map((e) => '${e.productType}:${e.bazaarSku}').toList()}',
+      );
       context.read<InAppPurchaseBloc>().add(
             PurchaseProductsEvent(
-              productIds: skus,
+              items: items,
               payload: payload,
+              referrerCode: referrerCode,
             ),
           );
       return;
@@ -791,7 +800,14 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                       isDark ? MyColors.primary : MyColors.secondary,
                   onPressed: () async {
                     await _handlePayNow(
-                      cart.items.map((item) => item.bazaarSku ?? '').toList(),
+                      cart.items
+                          .map(
+                            (item) => BazaarCheckoutItem(
+                              bazaarSku: item.bazaarSku ?? '',
+                              productType: item.type ?? '',
+                            ),
+                          )
+                          .toList(),
                       payload: cart.id,
                     );
                   },
@@ -963,7 +979,12 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                     );
                     await _handlePayNow(
                       resolvedItems
-                          .map((item) => item.bazaarSku ?? '')
+                          .map(
+                            (item) => BazaarCheckoutItem(
+                              bazaarSku: item.bazaarSku ?? '',
+                              productType: item.type,
+                            ),
+                          )
                           .toList(),
                     );
                   },
