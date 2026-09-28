@@ -1976,110 +1976,6 @@
         ]
       }
     },
-    "/api/v1/iknow/courses/{courseId}/conversation": {
-      "get": {
-        "description": "Get a list of course conversations by Course ID.",
-        "operationId": "IKnowController_getCourseConversation_v1",
-        "parameters": [
-          {
-            "name": "courseId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "x-lang",
-            "in": "header",
-            "allowEmptyValue": true,
-            "description": "Set the accept language for incoming messages",
-            "schema": {}
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "summary": "List Course Conversation",
-        "tags": [
-          "IKnow"
-        ]
-      }
-    },
-    "/api/v1/iknow/courses/{courseId}/conversation/playback": {
-      "get": {
-        "description": "Get latest conversation playback for the current user.",
-        "operationId": "IKnowController_getCourseConversationPlayback_v1",
-        "parameters": [
-          {
-            "name": "courseId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "x-lang",
-            "in": "header",
-            "allowEmptyValue": true,
-            "description": "Set the accept language for incoming messages",
-            "schema": {}
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "summary": "Find Course Conversation playback",
-        "tags": [
-          "IKnow"
-        ]
-      },
-      "post": {
-        "description": "Save latest conversation playback for the current user.",
-        "operationId": "IKnowController_saveCourseConversationPlayback_v1",
-        "parameters": [
-          {
-            "name": "courseId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "x-lang",
-            "in": "header",
-            "allowEmptyValue": true,
-            "description": "Set the accept language for incoming messages",
-            "schema": {}
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ConversationPlaybackDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": ""
-          }
-        },
-        "summary": "Save Course Conversation playback",
-        "tags": [
-          "IKnow"
-        ]
-      }
-    },
     "/api/v1/iknow/courses/{courseId}/progress": {
       "get": {
         "description": "Get a course progress for the current user.",
@@ -2593,6 +2489,14 @@
             }
           },
           {
+            "name": "word",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "x-lang",
             "in": "header",
             "allowEmptyValue": true,
@@ -2715,187 +2619,6 @@
           }
         },
         "summary": "Update Vocabulary Order",
-        "tags": [
-          "Admin/IKnow"
-        ]
-      }
-    },
-    "/api/admin/iknow/courses/{courseId}/conversation": {
-      "post": {
-        "description": "Create new conversation for a course.",
-        "operationId": "IKnowAdminController_createConversation",
-        "parameters": [
-          {
-            "name": "courseId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "x-lang",
-            "in": "header",
-            "allowEmptyValue": true,
-            "description": "Set the accept language for incoming messages",
-            "schema": {}
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateConversationDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": ""
-          }
-        },
-        "summary": "Create Conversation",
-        "tags": [
-          "Admin/IKnow"
-        ]
-      },
-      "get": {
-        "description": "Get a list of conversation by course ID.",
-        "operationId": "IKnowAdminController_listConversation",
-        "parameters": [
-          {
-            "name": "courseId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "x-lang",
-            "in": "header",
-            "allowEmptyValue": true,
-            "description": "Set the accept language for incoming messages",
-            "schema": {}
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "summary": "List Conversation",
-        "tags": [
-          "Admin/IKnow"
-        ]
-      }
-    },
-    "/api/admin/iknow/courses/{courseId}/conversation/{conversationId}": {
-      "delete": {
-        "description": "Delete a conversation using its ID.",
-        "operationId": "IKnowAdminController_deleteConversation",
-        "parameters": [
-          {
-            "name": "conversationId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "x-lang",
-            "in": "header",
-            "allowEmptyValue": true,
-            "description": "Set the accept language for incoming messages",
-            "schema": {}
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "summary": "Delete Conversation",
-        "tags": [
-          "Admin/IKnow"
-        ]
-      },
-      "patch": {
-        "description": "Update a conversation using its ID.",
-        "operationId": "IKnowAdminController_updateConversation",
-        "parameters": [
-          {
-            "name": "conversationId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "x-lang",
-            "in": "header",
-            "allowEmptyValue": true,
-            "description": "Set the accept language for incoming messages",
-            "schema": {}
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateConversationDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "summary": "Update Conversation",
-        "tags": [
-          "Admin/IKnow"
-        ]
-      }
-    },
-    "/api/admin/iknow/courses/{courseId}/conversation/order": {
-      "patch": {
-        "description": "Update order of conversation.",
-        "operationId": "IKnowAdminController_updateConversationOrder",
-        "parameters": [
-          {
-            "name": "x-lang",
-            "in": "header",
-            "allowEmptyValue": true,
-            "description": "Set the accept language for incoming messages",
-            "schema": {}
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "summary": "Update Conversation Order",
         "tags": [
           "Admin/IKnow"
         ]
@@ -3159,6 +2882,46 @@
         "summary": "Update Settings",
         "tags": [
           "Admin/IKnow"
+        ]
+      }
+    },
+    "/api/v1/iknow/courses/{courseId}/quiz/progress": {
+      "get": {
+        "description": "Get the current user progress in IKnow quiz lessons.",
+        "operationId": "IKnowQuizController_getUserQuizProgress_v1",
+        "parameters": [
+          {
+            "name": "courseId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "quizId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-lang",
+            "in": "header",
+            "allowEmptyValue": true,
+            "description": "Set the accept language for incoming messages",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "User Quiz Progress",
+        "tags": [
+          "IKnow/Quiz"
         ]
       }
     },
@@ -3496,6 +3259,43 @@
         ]
       }
     },
+    "/api/admin/iknow/courses/{courseId}/quiz/order": {
+      "patch": {
+        "description": "Update order of quizzes.",
+        "operationId": "IKnowQuizAdminController_updateQuizOrder",
+        "parameters": [
+          {
+            "name": "x-lang",
+            "in": "header",
+            "allowEmptyValue": true,
+            "description": "Set the accept language for incoming messages",
+            "schema": {}
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Update Quiz Order",
+        "tags": [
+          "Admin/IKnow/Quiz"
+        ]
+      }
+    },
     "/api/admin/iknow/courses/{courseId}/quiz/{quizId}/questions": {
       "post": {
         "description": "Create a quiz question.",
@@ -3660,6 +3460,291 @@
         "summary": "Update Question Order",
         "tags": [
           "Admin/IKnow/Quiz"
+        ]
+      }
+    },
+    "/api/v1/iknow/courses/{courseId}/conversation": {
+      "get": {
+        "description": "Get a list of course conversations by Course ID.",
+        "operationId": "IKnowConversationController_getCourseConversation_v1",
+        "parameters": [
+          {
+            "name": "courseId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-lang",
+            "in": "header",
+            "allowEmptyValue": true,
+            "description": "Set the accept language for incoming messages",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "List Course Conversation",
+        "tags": [
+          "IKnow"
+        ]
+      }
+    },
+    "/api/v1/iknow/courses/{courseId}/conversation/playback": {
+      "get": {
+        "description": "Get latest conversation playback for the current user.",
+        "operationId": "IKnowConversationController_getCourseConversationPlayback_v1",
+        "parameters": [
+          {
+            "name": "courseId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-lang",
+            "in": "header",
+            "allowEmptyValue": true,
+            "description": "Set the accept language for incoming messages",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Find Course Conversation playback",
+        "tags": [
+          "IKnow"
+        ]
+      },
+      "post": {
+        "description": "Save latest conversation playback for the current user.",
+        "operationId": "IKnowConversationController_saveCourseConversationPlayback_v1",
+        "parameters": [
+          {
+            "name": "courseId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-lang",
+            "in": "header",
+            "allowEmptyValue": true,
+            "description": "Set the accept language for incoming messages",
+            "schema": {}
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConversationPlaybackDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Save Course Conversation playback",
+        "tags": [
+          "IKnow"
+        ]
+      }
+    },
+    "/api/admin/iknow/courses/{courseId}/conversation": {
+      "post": {
+        "description": "Create new conversation for a course.",
+        "operationId": "IKnowConversationAdminController_createConversation",
+        "parameters": [
+          {
+            "name": "courseId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-lang",
+            "in": "header",
+            "allowEmptyValue": true,
+            "description": "Set the accept language for incoming messages",
+            "schema": {}
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateConversationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Create Conversation",
+        "tags": [
+          "Admin/IKnow"
+        ]
+      },
+      "get": {
+        "description": "Get a list of conversation by course ID.",
+        "operationId": "IKnowConversationAdminController_listConversation",
+        "parameters": [
+          {
+            "name": "courseId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-lang",
+            "in": "header",
+            "allowEmptyValue": true,
+            "description": "Set the accept language for incoming messages",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "List Conversation",
+        "tags": [
+          "Admin/IKnow"
+        ]
+      }
+    },
+    "/api/admin/iknow/courses/{courseId}/conversation/{conversationId}": {
+      "delete": {
+        "description": "Delete a conversation using its ID.",
+        "operationId": "IKnowConversationAdminController_deleteConversation",
+        "parameters": [
+          {
+            "name": "conversationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-lang",
+            "in": "header",
+            "allowEmptyValue": true,
+            "description": "Set the accept language for incoming messages",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Delete Conversation",
+        "tags": [
+          "Admin/IKnow"
+        ]
+      },
+      "patch": {
+        "description": "Update a conversation using its ID.",
+        "operationId": "IKnowConversationAdminController_updateConversation",
+        "parameters": [
+          {
+            "name": "conversationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-lang",
+            "in": "header",
+            "allowEmptyValue": true,
+            "description": "Set the accept language for incoming messages",
+            "schema": {}
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateConversationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Update Conversation",
+        "tags": [
+          "Admin/IKnow"
+        ]
+      }
+    },
+    "/api/admin/iknow/courses/{courseId}/conversation/order": {
+      "patch": {
+        "description": "Update order of conversation.",
+        "operationId": "IKnowConversationAdminController_updateConversationOrder",
+        "parameters": [
+          {
+            "name": "x-lang",
+            "in": "header",
+            "allowEmptyValue": true,
+            "description": "Set the accept language for incoming messages",
+            "schema": {}
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Update Conversation Order",
+        "tags": [
+          "Admin/IKnow"
         ]
       }
     },
@@ -4193,6 +4278,40 @@
         ]
       }
     },
+    "/api/v1/payments/direct": {
+      "post": {
+        "description": "Verify a completed CafeBazaar in-app purchase and fulfill it.",
+        "operationId": "PaymentController_createDirectPayment_v1",
+        "parameters": [
+          {
+            "name": "x-lang",
+            "in": "header",
+            "allowEmptyValue": true,
+            "description": "Set the accept language for incoming messages",
+            "schema": {}
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDirectPaymentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Create Direct Payment",
+        "tags": [
+          "Payment"
+        ]
+      }
+    },
     "/api/v1/payments/{paymentId}": {
       "get": {
         "description": "Get a payment details using its ID.",
@@ -4242,6 +4361,21 @@
                 "Failed",
                 "Expired",
                 "Refunded"
+              ]
+            }
+          },
+          {
+            "name": "itemType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "IKnow",
+                "IKnowBook",
+                "IKnowCourse",
+                "VideoCourse",
+                "Book"
               ]
             }
           },
@@ -5526,6 +5660,46 @@
         ]
       }
     },
+    "/api/v1/video-courses/{courseId}/lessons/{lessonId}/download": {
+      "get": {
+        "description": "Get the download link for a course lesson the user has access to.",
+        "operationId": "VideoCourseController_downloadLesson_v1",
+        "parameters": [
+          {
+            "name": "courseId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "lessonId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-lang",
+            "in": "header",
+            "allowEmptyValue": true,
+            "description": "Set the accept language for incoming messages",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Download Lesson",
+        "tags": [
+          "Video Course"
+        ]
+      }
+    },
     "/api/admin/video-courses": {
       "post": {
         "description": "Create new course.",
@@ -6027,6 +6201,122 @@
         ]
       }
     },
+    "/api/admin/video-courses/{courseId}/access/grant": {
+      "post": {
+        "description": "Grant a user access to all lessons of a course.",
+        "operationId": "VideoCourseAdminController_grantAccess",
+        "parameters": [
+          {
+            "name": "courseId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-lang",
+            "in": "header",
+            "allowEmptyValue": true,
+            "description": "Set the accept language for incoming messages",
+            "schema": {}
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserAccessDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Grant Course Access",
+        "tags": [
+          "Admin/Video Course"
+        ]
+      }
+    },
+    "/api/admin/video-courses/{courseId}/access/revoke": {
+      "post": {
+        "description": "Revoke a user access to all lessons of a course.",
+        "operationId": "VideoCourseAdminController_revokeAccess",
+        "parameters": [
+          {
+            "name": "courseId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-lang",
+            "in": "header",
+            "allowEmptyValue": true,
+            "description": "Set the accept language for incoming messages",
+            "schema": {}
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserAccessDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Revoke Course Access",
+        "tags": [
+          "Admin/Video Course"
+        ]
+      }
+    },
+    "/api/admin/video-courses/{courseId}/access": {
+      "get": {
+        "description": "List users who have access to a course.",
+        "operationId": "VideoCourseAdminController_listAccess",
+        "parameters": [
+          {
+            "name": "courseId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-lang",
+            "in": "header",
+            "allowEmptyValue": true,
+            "description": "Set the accept language for incoming messages",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "List Course Access",
+        "tags": [
+          "Admin/Video Course"
+        ]
+      }
+    },
     "/api/v1/books/category/{categoryId}": {
       "get": {
         "description": "Paginate books by category ID.",
@@ -6104,7 +6394,7 @@
     },
     "/api/v1/books/{bookId}": {
       "get": {
-        "description": "Find a book along with its lessons using ID.",
+        "description": "Find a book using its ID.",
         "operationId": "BookController_findBookById_v1",
         "parameters": [
           {
@@ -6129,6 +6419,38 @@
           }
         },
         "summary": "Find by ID",
+        "tags": [
+          "Books"
+        ]
+      }
+    },
+    "/api/v1/books/{bookId}/download": {
+      "get": {
+        "description": "Get the download link for a book the user has access to.",
+        "operationId": "BookController_downloadBook_v1",
+        "parameters": [
+          {
+            "name": "bookId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-lang",
+            "in": "header",
+            "allowEmptyValue": true,
+            "description": "Set the accept language for incoming messages",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Download Book",
         "tags": [
           "Books"
         ]
@@ -6316,7 +6638,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateBookDto"
+                "$ref": "#/components/schemas/UpdateBookDto"
               }
             }
           }
@@ -6433,6 +6755,122 @@
           }
         },
         "summary": "Update Book Status",
+        "tags": [
+          "Admin/Books"
+        ]
+      }
+    },
+    "/api/admin/books/{bookId}/access/grant": {
+      "post": {
+        "description": "Grant a user access to a book.",
+        "operationId": "BookAdminController_grantAccess",
+        "parameters": [
+          {
+            "name": "bookId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-lang",
+            "in": "header",
+            "allowEmptyValue": true,
+            "description": "Set the accept language for incoming messages",
+            "schema": {}
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserAccessDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Grant Book Access",
+        "tags": [
+          "Admin/Books"
+        ]
+      }
+    },
+    "/api/admin/books/{bookId}/access/revoke": {
+      "post": {
+        "description": "Revoke a user access to a book.",
+        "operationId": "BookAdminController_revokeAccess",
+        "parameters": [
+          {
+            "name": "bookId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-lang",
+            "in": "header",
+            "allowEmptyValue": true,
+            "description": "Set the accept language for incoming messages",
+            "schema": {}
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserAccessDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Revoke Book Access",
+        "tags": [
+          "Admin/Books"
+        ]
+      }
+    },
+    "/api/admin/books/{bookId}/access": {
+      "get": {
+        "description": "List users who have access to a book.",
+        "operationId": "BookAdminController_listAccess",
+        "parameters": [
+          {
+            "name": "bookId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-lang",
+            "in": "header",
+            "allowEmptyValue": true,
+            "description": "Set the accept language for incoming messages",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "List Book Access",
         "tags": [
           "Admin/Books"
         ]
@@ -7019,21 +7457,6 @@
           "vocabularyId"
         ]
       },
-      "ConversationPlaybackDto": {
-        "type": "object",
-        "properties": {
-          "conversationId": {
-            "type": "string"
-          },
-          "courseId": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "conversationId",
-          "courseId"
-        ]
-      },
       "CreateCourseDto": {
         "type": "object",
         "properties": {
@@ -7064,6 +7487,10 @@
           "categoryId": {
             "type": "string",
             "description": "UUID of the course category."
+          },
+          "bazaarSku": {
+            "type": "string",
+            "description": "Bazaar SKU ID to connect the course to a bazaar pay product."
           }
         },
         "required": [
@@ -7106,6 +7533,10 @@
           "categoryId": {
             "type": "string",
             "description": "UUID of the course category."
+          },
+          "bazaarSku": {
+            "type": "string",
+            "description": "Bazaar SKU ID to connect the course to a bazaar pay product."
           }
         }
       },
@@ -7127,6 +7558,13 @@
           "courseId": {
             "type": "string",
             "description": "The course that word belongs to"
+          },
+          "relatedVocabularyIds": {
+            "description": "List of vocabulary IDs that are related to this word (used as wrong answers in practice)",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         },
         "required": [
@@ -7154,54 +7592,13 @@
           "courseId": {
             "type": "string",
             "description": "The course that word belongs to"
-          }
-        }
-      },
-      "CreateConversationDto": {
-        "type": "object",
-        "properties": {
-          "text": {
-            "type": "string",
-            "description": "A paragraph of conversation"
           },
-          "translation": {
-            "type": "string",
-            "description": "Translation of the paragraph to native language"
-          },
-          "voice": {
-            "type": "string",
-            "description": "Voice actor type."
-          },
-          "courseId": {
-            "type": "string",
-            "description": "The course that word belongs to"
-          }
-        },
-        "required": [
-          "text",
-          "translation",
-          "voice",
-          "courseId"
-        ]
-      },
-      "UpdateConversationDto": {
-        "type": "object",
-        "properties": {
-          "text": {
-            "type": "string",
-            "description": "A paragraph of conversation"
-          },
-          "translation": {
-            "type": "string",
-            "description": "Translation of the paragraph to native language"
-          },
-          "voice": {
-            "type": "string",
-            "description": "Voice actor type."
-          },
-          "courseId": {
-            "type": "string",
-            "description": "The course that word belongs to"
+          "relatedVocabularyIds": {
+            "description": "List of vocabulary IDs that are related to this word (used as wrong answers in practice)",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       },
@@ -7243,6 +7640,10 @@
             "type": "number",
             "description": "User points which will be granted by purchasing this book."
           },
+          "bazaarSku": {
+            "type": "string",
+            "description": "Bazaar SKU ID to connect the book to a bazaar pay product."
+          },
           "price": {
             "type": "number"
           },
@@ -7277,48 +7678,61 @@
         "properties": {
           "title": {
             "type": "string",
-            "description": "Book Name"
+            "description": "Book title."
           },
-          "description": {
+          "authorName": {
             "type": "string",
-            "description": "Book Description"
-          },
-          "thumbnail": {
-            "type": "string",
-            "description": "Book Thumbnail"
-          },
-          "price": {
-            "type": "number",
-            "description": "Book Price"
+            "description": "Author's first name and last name."
           },
           "publisher": {
             "type": "string",
-            "description": "Book Publisher's Name"
-          },
-          "author": {
-            "type": "string",
-            "description": "Book Author's Name"
-          },
-          "pageCount": {
-            "type": "number",
-            "description": "Book Pages Count"
+            "description": "Publisher name."
           },
           "publishDate": {
             "type": "string",
-            "description": "Book Publish Date"
+            "description": "Book's publish date."
           },
-          "file": {
+          "format": {
             "type": "string",
-            "description": "Paid Book file"
+            "description": "File format, e.g. PDF."
           },
-          "trialFile": {
+          "size": {
+            "type": "number",
+            "description": "File Size in bytes, e.g. 24."
+          },
+          "pages": {
+            "type": "number",
+            "description": "Number of pages."
+          },
+          "description": {
+            "type": "string"
+          },
+          "userPointsAfterPurchase": {
+            "type": "number",
+            "description": "User points which will be granted by purchasing this book."
+          },
+          "bazaarSku": {
             "type": "string",
-            "description": "Free Book file"
+            "description": "Bazaar SKU ID to connect the book to a bazaar pay product."
           },
-          "isDemo": {
-            "type": "boolean",
-            "description": "Whether if this book has demo access.",
-            "default": false
+          "price": {
+            "type": "number"
+          },
+          "categoryId": {
+            "type": "string",
+            "description": "Category ID that book belongs to."
+          },
+          "fileId": {
+            "type": "string",
+            "description": "File ID."
+          },
+          "demoFileId": {
+            "type": "string",
+            "description": "Demo file ID."
+          },
+          "thumbnailId": {
+            "type": "string",
+            "description": "Thumbnail file ID."
           }
         }
       },
@@ -7340,6 +7754,10 @@
           "discountAmount": {
             "type": "number",
             "description": "Discount amount."
+          },
+          "bazaarSku": {
+            "type": "string",
+            "description": "Bazaar SKU ID to connect IKnow package to a bazaar pay product"
           }
         },
         "required": [
@@ -7494,6 +7912,69 @@
           "answers"
         ]
       },
+      "ConversationPlaybackDto": {
+        "type": "object",
+        "properties": {
+          "conversationId": {
+            "type": "string"
+          },
+          "courseId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "conversationId",
+          "courseId"
+        ]
+      },
+      "CreateConversationDto": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "A paragraph of conversation"
+          },
+          "translation": {
+            "type": "string",
+            "description": "Translation of the paragraph to native language"
+          },
+          "voice": {
+            "type": "string",
+            "description": "Voice actor type."
+          },
+          "courseId": {
+            "type": "string",
+            "description": "The course that word belongs to"
+          }
+        },
+        "required": [
+          "text",
+          "translation",
+          "voice",
+          "courseId"
+        ]
+      },
+      "UpdateConversationDto": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "A paragraph of conversation"
+          },
+          "translation": {
+            "type": "string",
+            "description": "Translation of the paragraph to native language"
+          },
+          "voice": {
+            "type": "string",
+            "description": "Voice actor type."
+          },
+          "courseId": {
+            "type": "string",
+            "description": "The course that word belongs to"
+          }
+        }
+      },
       "CreateUserWordDto": {
         "type": "object",
         "properties": {
@@ -7535,7 +8016,9 @@
             "enum": [
               "IKnow",
               "IKnowBook",
-              "IKnowCourse"
+              "IKnowCourse",
+              "VideoCourse",
+              "Book"
             ],
             "type": "string"
           },
@@ -7559,6 +8042,39 @@
           "referrerCode"
         ]
       },
+      "CreateDirectPaymentDto": {
+        "type": "object",
+        "properties": {
+          "productType": {
+            "type": "string",
+            "description": "Catalog type of the purchased product. Used to resolve the product.",
+            "enum": [
+              "IKnowBook",
+              "IKnowCourse",
+              "Book",
+              "IKnow",
+              "VideoCourse"
+            ]
+          },
+          "bazaarSku": {
+            "type": "string",
+            "description": "CafeBazaar product id (SKU) of the purchased item."
+          },
+          "purchaseToken": {
+            "type": "string",
+            "description": "Opaque purchase token returned by the CafeBazaar SDK."
+          },
+          "referrerCode": {
+            "type": "string",
+            "description": "Referrer code collected by the app, if any."
+          }
+        },
+        "required": [
+          "productType",
+          "bazaarSku",
+          "purchaseToken"
+        ]
+      },
       "UpdateInternalNoteDto": {
         "type": "object",
         "properties": {
@@ -7576,9 +8092,11 @@
           "itemType": {
             "type": "string",
             "enum": [
-              "IKnow",
               "IKnowBook",
-              "IKnowCourse"
+              "IKnowCourse",
+              "Book",
+              "IKnow",
+              "VideoCourse"
             ]
           },
           "itemId": {
@@ -7701,6 +8219,12 @@
               "VIDEO",
               "BOOK"
             ],
+            "type": "string"
+          },
+          "thumbnailId": {
+            "type": "string"
+          },
+          "backgroundImageId": {
             "type": "string"
           },
           "type": {
@@ -7909,6 +8433,18 @@
             "type": "number"
           }
         }
+      },
+      "UserAccessDto": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "description": "User ID to grant/revoke access to."
+          }
+        },
+        "required": [
+          "userId"
+        ]
       }
     }
   }

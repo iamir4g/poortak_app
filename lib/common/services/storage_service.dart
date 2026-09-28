@@ -10,10 +10,32 @@ import 'package:poortak/locator.dart';
 // import '../models/storage_file.dart';
 import '../models/download_url_response.dart';
 
+/// Which authenticated download API to use for full (non-public) files.
+enum ContentDownloadSource { iknow, kavoosh }
+
 class StorageService {
   final Dio dio;
 
   StorageService({required this.dio});
+
+  String _extractDownloadUrl(dynamic responseData) {
+    // Response structure: {ok: true, meta: {}, data: "url"}
+    if (responseData is Map) {
+      final data = Map<String, dynamic>.from(responseData);
+
+      if (data['data'] is String) {
+        final url = data['data'] as String;
+        log("Extracted URL: $url");
+        return url;
+      }
+
+      if (data['url'] is String) {
+        return data['url'] as String;
+      }
+    }
+
+    return responseData.toString();
+  }
 
   // For course video downloads - uses new API
   Future<String> callDownloadCourseVideo(String courseId) async {
@@ -23,28 +45,27 @@ class StorageService {
       );
 
       log("Course Video Download URL Response: ${response.data}");
-
-      // Response structure: {ok: true, meta: {}, data: "url"}
-      if (response.data is Map) {
-        final data = response.data as Map<String, dynamic>;
-
-        // Check if the response has a data field which contains the URL
-        if (data.containsKey('data') && data['data'] is String) {
-          final url = data['data'] as String;
-          log("Extracted URL: $url");
-          return url;
-        }
-
-        // Check if the response has a url field (fallback)
-        if (data.containsKey('url')) {
-          return data['url'] as String;
-        }
-      }
-
-      // Otherwise return the data as string
-      return response.data.toString();
+      return _extractDownloadUrl(response.data);
     } catch (e) {
       log("Error calling callDownloadCourseVideo: $e");
+      rethrow;
+    }
+  }
+
+  /// Kavoosh video lesson download (requires course + lesson access).
+  Future<String> callDownloadVideoCourseLesson({
+    required String courseId,
+    required String lessonId,
+  }) async {
+    try {
+      final response = await dio.get(
+        "${Constants.baseUrl}video-courses/$courseId/lessons/$lessonId/download",
+      );
+
+      log("Video Course Lesson Download URL Response: ${response.data}");
+      return _extractDownloadUrl(response.data);
+    } catch (e) {
+      log("Error calling callDownloadVideoCourseLesson: $e");
       rethrow;
     }
   }
@@ -56,26 +77,17 @@ class StorageService {
     );
 
     log("Book File Download URL Response: ${response.data}");
+    return _extractDownloadUrl(response.data);
+  }
 
-    // Response structure: {ok: true, meta: {}, data: "url"}
-    if (response.data is Map) {
-      final data = response.data as Map<String, dynamic>;
+  /// Kavoosh book download (requires book access).
+  Future<String> callDownloadKavooshBook(String bookId) async {
+    final response = await dio.get(
+      "${Constants.baseUrl}books/$bookId/download",
+    );
 
-      // Check if the response has a data field which contains the URL
-      if (data.containsKey('data') && data['data'] is String) {
-        final url = data['data'] as String;
-        log("Extracted URL: $url");
-        return url;
-      }
-
-      // Check if the response has a url field (fallback)
-      if (data.containsKey('url')) {
-        return data['url'] as String;
-      }
-    }
-
-    // Otherwise return the data as string
-    return response.data.toString();
+    log("Kavoosh Book Download URL Response: ${response.data}");
+    return _extractDownloadUrl(response.data);
   }
 
   // DEPRECATED: This method is kept for backwards compatibility but should not be used

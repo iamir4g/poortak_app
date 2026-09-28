@@ -1,7 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/common/bloc/video_download_cubit/video_download_cubit.dart';
 import 'package:poortak/common/resources/data_state.dart';
 import 'package:poortak/common/services/getImageUrl_service.dart';
+import 'package:poortak/common/services/storage_service.dart';
+import 'package:poortak/common/services/video_download_service.dart';
 import 'package:poortak/common/utils/digit_utils.dart';
 import 'package:poortak/common/utils/money_utils.dart';
 import 'package:poortak/common/widgets/poortak_app_bar.dart';
@@ -9,7 +15,11 @@ import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_kavoosh/data/models/video_course_detail_model.dart';
 import 'package:poortak/featueres/feature_kavoosh/repositories/kavoosh_repository.dart';
+import 'package:poortak/featueres/feature_kavoosh/utils/kavoosh_video_playback_resolver.dart';
 import 'package:poortak/featueres/feature_kavoosh/widgets/session_item.dart';
+import 'package:poortak/featueres/feature_sayareh/widgets/custom_video_player.dart';
+import 'package:poortak/featueres/feature_sayareh/widgets/video_container_widget.dart';
+import 'package:poortak/featueres/feature_sayareh/widgets/video_progress_bar_widget.dart';
 import 'package:poortak/locator.dart';
 
 class VideoDetailScreen extends StatefulWidget {
@@ -29,17 +39,48 @@ class VideoDetailScreen extends StatefulWidget {
 
 class _VideoDetailScreenState extends State<VideoDetailScreen> {
   final KavooshRepository _repository = locator<KavooshRepository>();
+  final VideoDownloadService _downloadService = locator<VideoDownloadService>();
+  final VideoDownloadCubit _downloadCubit = locator<VideoDownloadCubit>();
+  final GlobalKey<CustomVideoPlayerState> _videoPlayerKey =
+      GlobalKey<CustomVideoPlayerState>();
+
+  StreamSubscription<VideoDownloadState>? _downloadSubscription;
 
   bool _isDescriptionExpanded = false;
   bool _loading = true;
   String? _error;
   VideoCourseDetailResponse? _detail;
   String? _playingLessonId;
+  String? _currentVideoName;
+  String? _localVideoPath;
+  String? _thumbnailUrl;
+  bool _isCheckingFiles = false;
+  bool _isDownloading = false;
+  bool _isDecrypting = false;
+  double _downloadProgress = 0.0;
+  double _decryptionProgress = 0.0;
+  bool _isDisposed = false;
 
   @override
   void initState() {
     super.initState();
+    _downloadSubscription = _downloadCubit.stream.listen((state) {
+      if (_isDisposed || !mounted || _currentVideoName == null) return;
+      if (state is! VideoDownloadLoaded) return;
+      final info = state.downloads[_currentVideoName];
+      if (info != null) {
+        _updateLocalStateFromCubit(info);
+      }
+    });
     _load();
+  }
+
+  @override
+  void dispose() {
+    _isDisposed = true;
+    _downloadSubscription?.cancel();
+    _videoPlayerKey.currentState?.stopVideo();
+    super.dispose();
   }
 
   Future<void> _load() async {
@@ -81,6 +122,157 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
     return '${toPersianDigits('$mins')} دقیقه';
   }
 
+  bool _hasCourseAccess(VideoCourseInfo course) {
+    return KavooshVideoPlaybackResolver.hasFullCourseAccess(
+      purchasedFromApi: course.purchased,
+      hasAccessFromApi: course.hasAccess,
+    );
+  }
+
+  Future<void> _onLessonTap(VideoCourseLesson lesson) async {
+    final detail = _detail;
+    if (detail == null) return;
+
+    final canPlay = KavooshVideoPlaybackResolver.canPlayLesson(
+      lesson: lesson,
+      course: detail.course,
+    );
+
+    if (!canPlay) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('این جلسه پس از خرید دوره در دسترس است'),
+        ),
+      );
+      return;
+    }
+
+    final target = KavooshVideoPlaybackResolver.resolve(
+      lesson: lesson,
+      course: detail.course,
+    );
+
+    if (target == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('فایل ویدئو برای این جلسه موجود نیست')),
+      );
+      return;
+    }
+
+    setState(() => _playingLessonId = lesson.id);
+    await _prepareLessonPlayback(lesson: lesson, target: target);
+  }
+
+  Future<void> _prepareLessonPlayback({
+    required VideoCourseLesson lesson,
+    required KavooshVideoPlaybackTarget target,
+    bool autoStart = false,
+  }) async {
+    final videoId = target.videoId;
+
+    if (_currentVideoName != videoId) {
+      _videoPlayerKey.currentState?.stopVideo();
+      if (!_isDisposed && mounted) {
+        setState(() {
+          _localVideoPath = null;
+          _isCheckingFiles = true;
+          _isDownloading = false;
+          _isDecrypting = false;
+          _downloadProgress = 0.0;
+          _decryptionProgress = 0.0;
+          _thumbnailUrl = null;
+        });
+      }
+      _currentVideoName = videoId;
+      await _loadLessonThumbnail(lesson.thumbnailId);
+    }
+
+    final hasPaidAccess =
+        !target.usePublicUrl && _hasCourseAccess(_detail!.course);
+
+    await _downloadService.checkAndDownloadVideo(
+      videoName: videoId,
+      lessonId: target.lessonId,
+      courseId: target.courseId,
+      downloadSource: ContentDownloadSource.kavoosh,
+      hasAccess: hasPaidAccess,
+      isEncrypted: target.isEncrypted,
+      usePublicUrl: target.usePublicUrl,
+      videoKey: videoId,
+      autoStart: autoStart,
+    );
+  }
+
+  Future<void> _loadLessonThumbnail(String? thumbnailId) async {
+    if (thumbnailId == null || thumbnailId.isEmpty) {
+      if (mounted) setState(() => _thumbnailUrl = null);
+      return;
+    }
+    try {
+      final url = await GetImageUrlService().getImageUrl(thumbnailId);
+      if (!_isDisposed && mounted) {
+        setState(() => _thumbnailUrl = url.isEmpty ? null : url);
+      }
+    } catch (_) {
+      if (!_isDisposed && mounted) {
+        setState(() => _thumbnailUrl = null);
+      }
+    }
+  }
+
+  void _updateLocalStateFromCubit(VideoDownloadInfo downloadInfo) {
+    if (_isDisposed || !mounted) return;
+
+    setState(() {
+      _isCheckingFiles = downloadInfo.isCheckingFiles;
+      _isDownloading = downloadInfo.isDownloading;
+      _downloadProgress = downloadInfo.downloadProgress;
+      _isDecrypting = downloadInfo.isDecrypting;
+      _decryptionProgress = downloadInfo.decryptionProgress;
+      if (downloadInfo.localPath != null) {
+        _localVideoPath = downloadInfo.localPath;
+      }
+    });
+
+    if (downloadInfo.status == DownloadStatus.error &&
+        downloadInfo.error != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(downloadInfo.error!),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+  void _startDownload() {
+    final detail = _detail;
+    final lessonId = _playingLessonId;
+    if (detail == null || lessonId == null) return;
+
+    VideoCourseLesson? lesson;
+    for (final item in detail.lessons) {
+      if (item.id == lessonId) {
+        lesson = item;
+        break;
+      }
+    }
+    if (lesson == null) return;
+
+    final target = KavooshVideoPlaybackResolver.resolve(
+      lesson: lesson,
+      course: detail.course,
+    );
+    if (target == null) return;
+
+    _prepareLessonPlayback(
+      lesson: lesson,
+      target: target,
+      autoStart: true,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -89,6 +281,7 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
     final priceLabel = course == null
         ? ''
         : '${MoneyUtils.formatTomanFromRial(course.price)} تومان';
+    final showCartFab = course == null || !_hasCourseAccess(course);
 
     return Scaffold(
       backgroundColor: isDark ? MyColors.darkBackground : MyColors.background1,
@@ -126,7 +319,7 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
                   padding: EdgeInsets.all(16.r),
                   child: Column(
                     children: [
-                      _buildHero(isDark, course),
+                      _buildPlayerSection(isDark, course),
                       SizedBox(height: 16.h),
                       _buildInfoCard(isDark, course, priceLabel),
                       SizedBox(height: 16.h),
@@ -136,7 +329,7 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
                   ),
                 ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: _detail == null
+      floatingActionButton: !showCartFab
           ? null
           : Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.w),
@@ -168,6 +361,63 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
                 ),
               ),
             ),
+    );
+  }
+
+  Widget _buildPlayerSection(bool isDark, VideoCourseInfo? course) {
+    if (_playingLessonId == null) {
+      return _buildHero(isDark, course);
+    }
+
+    return BlocBuilder<VideoDownloadCubit, VideoDownloadState>(
+      bloc: _downloadCubit,
+      builder: (context, state) {
+        VideoDownloadInfo? downloadInfo;
+        if (_currentVideoName != null && state is VideoDownloadLoaded) {
+          downloadInfo = state.downloads[_currentVideoName];
+        }
+
+        final currentIsCheckingFiles =
+            downloadInfo?.isCheckingFiles ?? _isCheckingFiles;
+        final currentIsDownloading =
+            downloadInfo?.isDownloading ?? _isDownloading;
+        final currentDownloadProgress =
+            downloadInfo?.downloadProgress ?? _downloadProgress;
+        final currentIsDecrypting =
+            downloadInfo?.isDecrypting ?? _isDecrypting;
+        final currentDecryptionProgress =
+            downloadInfo?.decryptionProgress ?? _decryptionProgress;
+        final currentLocalPath = downloadInfo?.localPath ?? _localVideoPath;
+        final hasAccess = course == null ? false : _hasCourseAccess(course);
+
+        return Center(
+          child: Column(
+            children: [
+              VideoContainerWidget(
+                videoPath: currentLocalPath,
+                videoUrl: null,
+                thumbnailUrl: _thumbnailUrl,
+                isCheckingFiles: currentIsCheckingFiles,
+                isDownloading: currentIsDownloading,
+                isDecrypting: currentIsDecrypting,
+                videoPlayerKey: _videoPlayerKey,
+                hasAccess: hasAccess,
+                onVideoEnded: () {},
+                onDownload: _startDownload,
+              ),
+              VideoProgressBarWidget(
+                isVisible: currentIsDownloading,
+                progress: currentDownloadProgress,
+                label: 'در حال دانلود...',
+              ),
+              DecryptionProgressBarWidget(
+                isVisible: currentIsDecrypting,
+                progress: currentDecryptionProgress,
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -451,7 +701,8 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
   }
 
   Widget _buildLessonsCard(bool isDark) {
-    final lessons = _detail?.lessons ?? const [];
+    final detail = _detail;
+    final lessons = detail?.lessons ?? const [];
 
     return Container(
       padding: EdgeInsets.all(16.r),
@@ -482,25 +733,17 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
             )
           : Column(
               children: lessons.map((lesson) {
-                final locked = !lesson.isFree;
+                final locked = detail == null
+                    ? !lesson.isFree
+                    : !KavooshVideoPlaybackResolver.canPlayLesson(
+                        lesson: lesson,
+                        course: detail.course,
+                      );
                 return SessionItem(
                   title: lesson.title,
                   isLocked: locked,
                   isPlaying: _playingLessonId == lesson.id,
-                  onTap: () {
-                    if (locked) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('این جلسه پس از خرید دوره در دسترس است'),
-                        ),
-                      );
-                      return;
-                    }
-                    setState(() => _playingLessonId = lesson.id);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(lesson.title)),
-                    );
-                  },
+                  onTap: () => _onLessonTap(lesson),
                 );
               }).toList(),
             ),

@@ -20,6 +20,7 @@ class CustomPdfReader extends StatefulWidget {
   final bool showDownloadButton;
   final bool autoDownload;
   final bool usePublicUrl;
+  final ContentDownloadSource downloadSource;
   final StorageService storageService;
 
   const CustomPdfReader({
@@ -37,6 +38,7 @@ class CustomPdfReader extends StatefulWidget {
     this.showDownloadButton = true,
     this.autoDownload = false,
     this.usePublicUrl = false,
+    this.downloadSource = ContentDownloadSource.iknow,
   });
 
   @override
@@ -179,6 +181,8 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
       if (widget.usePublicUrl) {
         // Use public URL for trial files (DO NOT TOUCH - this is correct)
         await widget.storageService.callGetDownloadPublicUrl(widget.fileKey!);
+      } else if (widget.downloadSource == ContentDownloadSource.kavoosh) {
+        await widget.storageService.callDownloadKavooshBook(_resolveBookId());
       } else {
         // Use new API endpoint for purchased book files
         await widget.storageService.callDownloadBookFile(_resolveBookId());
@@ -295,6 +299,7 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
         decryptionFileId: _resolveDecryptionFileId(),
         trialStorageKey: widget.trialStorageKey,
         allowTrialFallback: widget.allowTrialFallback,
+        downloadSource: widget.downloadSource,
         onProgress: (progress) {
           setState(() {
             _downloadProgress = progress;
@@ -345,7 +350,7 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
               SnackBar(
                 content: Text('خطا در دانلود: $error'),
                 backgroundColor: Colors.red,
-                duration: const Duration(seconds: 2),
+                duration: Duration(seconds: 2),
               ),
             );
           }

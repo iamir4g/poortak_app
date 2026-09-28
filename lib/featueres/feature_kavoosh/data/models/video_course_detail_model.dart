@@ -38,6 +38,8 @@ class VideoCourseInfo {
   final int totalDuration;
   final String categoryId;
   final int order;
+  final bool purchased;
+  final bool hasAccess;
   final DateTime? publishedAt;
 
   VideoCourseInfo({
@@ -50,6 +52,8 @@ class VideoCourseInfo {
     required this.order,
     this.thumbnailId,
     this.instructorId,
+    this.purchased = false,
+    this.hasAccess = false,
     this.publishedAt,
   });
 
@@ -64,6 +68,8 @@ class VideoCourseInfo {
       totalDuration: _asInt(json['totalDuration']),
       categoryId: json['categoryId']?.toString() ?? '',
       order: _asInt(json['order']),
+      purchased: _asBool(json['purchased']),
+      hasAccess: _asBool(json['hasAccess'] ?? json['access']),
       publishedAt: DateTime.tryParse(json['publishedAt']?.toString() ?? ''),
     );
   }
@@ -110,6 +116,13 @@ class VideoCourseLesson {
 int _asInt(dynamic value) {
   if (value is int) return value;
   return int.tryParse(value?.toString() ?? '') ?? 0;
+}
+
+bool _asBool(dynamic value) {
+  if (value is bool) return value;
+  if (value is num) return value != 0;
+  final text = value?.toString().toLowerCase();
+  return text == 'true' || text == '1';
 }
 
 String? _nullableString(dynamic value) {

@@ -205,6 +205,8 @@ class VideoDownloaderUtil {
     required String lessonId,
     required bool isEncrypted,
     required bool usePublicUrl,
+    String? courseId,
+    ContentDownloadSource downloadSource = ContentDownloadSource.iknow,
     Function(bool)? onDownloading,
     Function(double)? onDownloadProgress,
     Function(bool)? onDecrypting,
@@ -217,7 +219,7 @@ class VideoDownloaderUtil {
     }
 
     print(
-        "Starting download process for key: $key, name: $name, isEncrypted: $isEncrypted, usePublicUrl: $usePublicUrl");
+        "Starting download process for key: $key, name: $name, isEncrypted: $isEncrypted, usePublicUrl: $usePublicUrl, source: $downloadSource");
 
     try {
       // Get the application documents directory
@@ -253,12 +255,25 @@ class VideoDownloaderUtil {
       String downloadUrlString;
       try {
         if (usePublicUrl) {
-          // For trailer videos, use public download URL
+          // For trailer / free videos, use public download URL
           downloadUrlString =
               await storageService.callGetDownloadPublicUrl(key);
           print("Public download URL received: $downloadUrlString");
+        } else if (downloadSource == ContentDownloadSource.kavoosh) {
+          final resolvedCourseId = courseId?.trim() ?? '';
+          if (resolvedCourseId.isEmpty) {
+            onError?.call('شناسه دوره برای دانلود موجود نیست.');
+            return;
+          }
+          downloadUrlString =
+              await storageService.callDownloadVideoCourseLesson(
+            courseId: resolvedCourseId,
+            lessonId: lessonId,
+          );
+          print(
+              "Kavoosh lesson video download URL received: $downloadUrlString");
         } else {
-          // For purchased course videos, use new API endpoint with lessonId
+          // For purchased iknow course videos, use lessonId as course id
           downloadUrlString =
               await storageService.callDownloadCourseVideo(lessonId);
           print("Course video download URL received: $downloadUrlString");

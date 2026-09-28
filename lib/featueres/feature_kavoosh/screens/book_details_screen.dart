@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/common/resources/data_state.dart';
 import 'package:poortak/common/services/getImageUrl_service.dart';
+import 'package:poortak/common/services/screen_security_service.dart';
 import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/common/utils/digit_utils.dart';
 import 'package:poortak/common/utils/money_utils.dart';
@@ -11,6 +12,7 @@ import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_kavoosh/data/models/kavoosh_book_detail_model.dart';
 import 'package:poortak/featueres/feature_kavoosh/repositories/kavoosh_repository.dart';
+import 'package:poortak/featueres/feature_kavoosh/utils/kavoosh_book_pdf_playback_resolver.dart';
 import 'package:poortak/locator.dart';
 
 class BookDetailsScreen extends StatefulWidget {
@@ -88,31 +90,56 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
     return '${toPersianDigits('$kb')} کیلوبایت';
   }
 
-  void _openSample() {
-    final demoFileId = _book?.demoFileId;
-    if (demoFileId == null || demoFileId.isEmpty) {
+  bool get _hasFullAccess {
+    final book = _book;
+    if (book == null) return false;
+    return KavooshBookPdfPlaybackResolver.hasFullBookAccess(
+      purchasedFromApi: book.purchased,
+      hasAccessFromApi: book.hasAccess,
+    );
+  }
+
+  void _openSample() => _openPdf(forceTrial: true);
+
+  void _openFullBook() => _openPdf(forceTrial: false);
+
+  void _openPdf({required bool forceTrial}) {
+    final book = _book;
+    if (book == null) return;
+
+    final target = KavooshBookPdfPlaybackResolver.resolve(
+      book: book,
+      forceTrial: forceTrial,
+    );
+
+    if (target == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('نمونه کتاب در دسترس نیست')),
+        SnackBar(
+          content: Text(
+            forceTrial
+                ? 'نمونه کتاب در دسترس نیست'
+                : 'فایل کتاب در دسترس نیست',
+          ),
+        ),
       );
       return;
     }
 
+    if (!forceTrial && !target.usePublicUrl && target.decryptionFileId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('فایل کامل کتاب موجود نیست')),
+      );
+      return;
+    }
+
+    final titlePrefix = target.usePublicUrl ? 'نمونه ' : '';
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => Scaffold(
-          backgroundColor: MyColors.background1,
-          appBar: PoortakAppBar(
-            title: 'نمونه ${_book?.title ?? ''}',
-            foregroundColor: MyColors.textMatn2,
-          ),
-          body: CustomPdfReader(
-            fileName: _book?.title ?? 'book',
-            fileId: demoFileId,
-            fileKey: demoFileId,
-            usePublicUrl: true,
-            showDownloadButton: false,
-            storageService: locator<StorageService>(),
-          ),
+        builder: (_) => _KavooshPdfReaderPage(
+          title: '$titlePrefix${book.title}',
+          fileName: book.title,
+          target: target,
+          enableScreenSecurity: !target.usePublicUrl,
         ),
       ),
     );
@@ -369,15 +396,18 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
                               width: double.infinity,
                               height: 50.h,
                               child: ElevatedButton(
-                                onPressed: () {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text(
-                                        'افزودن به سبد خرید به‌زودی فعال می‌شود',
-                                      ),
-                                    ),
-                                  );
-                                },
+                                onPressed: _hasFullAccess
+                                    ? _openFullBook
+                                    : () {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                              'افزودن به سبد خرید به‌زودی فعال می‌شود',
+                                            ),
+                                          ),
+                                        );
+                                      },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: isDark
                                       ? MyColors.primary
@@ -387,7 +417,9 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
                                   ),
                                 ),
                                 child: Text(
-                                  'افزودن به سبد خرید',
+                                  _hasFullAccess
+                                      ? 'خواندن کتاب'
+                                      : 'افزودن به سبد خرید',
                                   style:
                                       MyTextStyle.textHeader16Bold.copyWith(
                                     color: Colors.white,
@@ -458,6 +490,68 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _KavooshPdfReaderPage extends StatefulWidget {
+  final String title;
+  final String fileName;
+  final KavooshBookPdfPlaybackTarget target;
+  final bool enableScreenSecurity;
+
+  const _KavooshPdfReaderPage({
+    required this.title,
+    required this.fileName,
+    required this.target,
+    required this.enableScreenSecurity,
+  });
+
+  @override
+  State<_KavooshPdfReaderPage> createState() => _KavooshPdfReaderPageState();
+}
+
+class _KavooshPdfReaderPageState extends State<_KavooshPdfReaderPage> {
+  @override
+  void initState() {
+    super.initState();
+    if (widget.enableScreenSecurity) {
+      ScreenSecurityService.setEnabled(true);
+    }
+  }
+
+  @override
+  void dispose() {
+    if (widget.enableScreenSecurity) {
+      ScreenSecurityService.setEnabled(false);
+    }
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final target = widget.target;
+
+    return Scaffold(
+      backgroundColor: isDark ? MyColors.darkBackground : MyColors.background1,
+      appBar: PoortakAppBar(
+        title: widget.title,
+        foregroundColor:
+            isDark ? MyColors.darkTextPrimary : MyColors.textMatn2,
+      ),
+      body: CustomPdfReader(
+        fileName: widget.fileName,
+        fileId: target.cacheFileId,
+        bookId: target.bookId,
+        fileKey: target.publicStorageKey,
+        decryptionFileId: target.decryptionFileId,
+        usePublicUrl: target.usePublicUrl,
+        autoDownload: true,
+        showDownloadButton: false,
+        downloadSource: ContentDownloadSource.kavoosh,
+        storageService: locator<StorageService>(),
       ),
     );
   }

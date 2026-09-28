@@ -297,6 +297,7 @@ class PdfDownloader {
     String? trialStorageKey,
     bool allowTrialFallback = false,
     bool usePublicUrl = false,
+    ContentDownloadSource downloadSource = ContentDownloadSource.iknow,
     Function(double)? onProgress,
     void Function(bool isDecrypting)? onDecrypting,
     Function(double)? onDecryptionProgress,
@@ -370,8 +371,13 @@ class PdfDownloader {
         if (resolvedBookId.isEmpty) {
           throw Exception('شناسه کتاب برای دانلود موجود نیست.');
         }
-        print("Downloading purchased book with bookId: $resolvedBookId");
-        downloadUrl = await storageService.callDownloadBookFile(resolvedBookId);
+        print(
+          "Downloading purchased book with bookId: $resolvedBookId "
+          "(source: $downloadSource)",
+        );
+        downloadUrl = downloadSource == ContentDownloadSource.kavoosh
+            ? await storageService.callDownloadKavooshBook(resolvedBookId)
+            : await storageService.callDownloadBookFile(resolvedBookId);
         print("Authenticated book download URL received: $downloadUrl");
       }
 
@@ -467,6 +473,7 @@ class PdfDownloader {
                 bookId: resolvedBookId,
                 publicStorageKey: trialKey,
                 usePublicUrl: true,
+                downloadSource: downloadSource,
                 onProgress: onProgress,
                 onDownloadCompleted: onDownloadCompleted,
                 onDownloadError: onDownloadError,

@@ -9,6 +9,8 @@ import 'package:poortak/common/bloc/connectivity_cubit/connectivity_cubit.dart';
 class PausedDownloadInfo {
   final String videoName;
   final String lessonId;
+  final String? courseId;
+  final ContentDownloadSource downloadSource;
   final bool hasAccess;
   final bool isEncrypted;
   final bool usePublicUrl;
@@ -21,6 +23,8 @@ class PausedDownloadInfo {
     required this.hasAccess,
     required this.isEncrypted,
     required this.usePublicUrl,
+    this.courseId,
+    this.downloadSource = ContentDownloadSource.iknow,
     this.videoKey,
     this.downloadProgress = 0.0,
   });
@@ -114,6 +118,8 @@ class VideoDownloadService {
         checkAndDownloadVideo(
           videoName: pausedInfo.videoName,
           lessonId: pausedInfo.lessonId,
+          courseId: pausedInfo.courseId,
+          downloadSource: pausedInfo.downloadSource,
           hasAccess: pausedInfo.hasAccess,
           isEncrypted: pausedInfo.isEncrypted,
           usePublicUrl: pausedInfo.usePublicUrl,
@@ -134,6 +140,8 @@ class VideoDownloadService {
     required bool hasAccess,
     required bool isEncrypted,
     required bool usePublicUrl,
+    String? courseId,
+    ContentDownloadSource downloadSource = ContentDownloadSource.iknow,
     String? videoKey,
     bool autoStart = true,
   }) async {
@@ -153,6 +161,8 @@ class VideoDownloadService {
       _pausedDownloads[videoName] = PausedDownloadInfo(
         videoName: videoName,
         lessonId: lessonId,
+        courseId: courseId,
+        downloadSource: downloadSource,
         hasAccess: effectiveHasAccess,
         isEncrypted: effectiveIsEncrypted,
         usePublicUrl: effectiveUsePublicUrl,
@@ -261,6 +271,8 @@ class VideoDownloadService {
         name: videoName,
         fileId: videoName,
         lessonId: lessonId,
+        courseId: courseId,
+        downloadSource: downloadSource,
         isEncrypted: effectiveIsEncrypted,
         usePublicUrl: effectiveUsePublicUrl,
         onDownloading: (downloading) {
@@ -318,6 +330,8 @@ class VideoDownloadService {
             _pausedDownloads[videoName] = PausedDownloadInfo(
               videoName: videoName,
               lessonId: lessonId,
+              courseId: courseId,
+              downloadSource: downloadSource,
               hasAccess: effectiveHasAccess,
               isEncrypted: effectiveIsEncrypted,
               usePublicUrl: effectiveUsePublicUrl,
@@ -362,6 +376,8 @@ class VideoDownloadService {
         _pausedDownloads[videoName] = PausedDownloadInfo(
           videoName: videoName,
           lessonId: lessonId,
+          courseId: courseId,
+          downloadSource: downloadSource,
           hasAccess: effectiveHasAccess,
           isEncrypted: effectiveIsEncrypted,
           usePublicUrl: effectiveUsePublicUrl,

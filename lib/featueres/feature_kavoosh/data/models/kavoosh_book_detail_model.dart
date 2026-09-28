@@ -12,8 +12,11 @@ class KavooshBookDetail {
   final int order;
   final int userPointsAfterPurchase;
   final String categoryId;
+  final String? fileId;
   final String? demoFileId;
   final String? thumbnailId;
+  final bool purchased;
+  final bool hasAccess;
   final DateTime? publishedAt;
   final KavooshBookCategory? category;
 
@@ -31,8 +34,11 @@ class KavooshBookDetail {
     required this.order,
     required this.userPointsAfterPurchase,
     required this.categoryId,
+    this.fileId,
     this.demoFileId,
     this.thumbnailId,
+    this.purchased = false,
+    this.hasAccess = false,
     this.publishedAt,
     this.category,
   });
@@ -56,8 +62,11 @@ class KavooshBookDetail {
       order: _asInt(data['order']),
       userPointsAfterPurchase: _asInt(data['userPointsAfterPurchase']),
       categoryId: data['categoryId']?.toString() ?? '',
-      demoFileId: _nullableString(data['demoFileId']),
+      fileId: _nullableString(data['fileId'] ?? data['file']),
+      demoFileId: _nullableString(data['demoFileId'] ?? data['trialFile']),
       thumbnailId: _nullableString(data['thumbnailId']),
+      purchased: _asBool(data['purchased']),
+      hasAccess: _asBool(data['hasAccess'] ?? data['access']),
       publishedAt: DateTime.tryParse(data['publishedAt']?.toString() ?? ''),
       category: data['category'] is Map
           ? KavooshBookCategory.fromJson(
@@ -101,6 +110,13 @@ class KavooshBookCategory {
 int _asInt(dynamic value) {
   if (value is int) return value;
   return int.tryParse(value?.toString() ?? '') ?? 0;
+}
+
+bool _asBool(dynamic value) {
+  if (value is bool) return value;
+  if (value is num) return value != 0;
+  final text = value?.toString().toLowerCase();
+  return text == 'true' || text == '1';
 }
 
 String? _nullableString(dynamic value) {
