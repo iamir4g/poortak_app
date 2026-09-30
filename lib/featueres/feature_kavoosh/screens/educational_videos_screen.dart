@@ -92,9 +92,7 @@ class _EducationalVideosScreenState extends State<EducationalVideosScreen> {
                   child: Text(
                     'دسته‌بندی‌ای یافت نشد',
                     style: MyTextStyle.textMatn14Bold.copyWith(
-                      color: isDark
-                          ? MyColors.darkTextSecondary
-                          : Colors.grey,
+                      color: isDark ? MyColors.darkTextSecondary : Colors.grey,
                     ),
                   ),
                 );

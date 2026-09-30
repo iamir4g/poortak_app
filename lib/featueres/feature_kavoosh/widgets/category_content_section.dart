@@ -13,8 +13,8 @@ import 'package:poortak/featueres/feature_kavoosh/widgets/course_card.dart';
 import 'package:poortak/featueres/feature_kavoosh/widgets/section_header.dart';
 import 'package:poortak/locator.dart';
 
-/// Loads a second-level category via Find Category by ID and shows its
-/// sub-categories (or published courses/books when there are no children).
+/// Loads published courses/books for a second-level category (incl. subtree)
+/// and shows a horizontal preview. Subcategories appear as filters on See All.
 class CategoryContentSection extends StatefulWidget {
   final CategoryNodeSummary section;
   final KavooshTreeType treeType;
@@ -32,6 +32,8 @@ class CategoryContentSection extends StatefulWidget {
 }
 
 class _CategoryContentSectionState extends State<CategoryContentSection> {
+  static const _previewSize = 10;
+
   static const _cardColors = [
     Color(0xFFFBEBDF),
     Color(0xFFE8F5E9),
@@ -44,7 +46,6 @@ class _CategoryContentSectionState extends State<CategoryContentSection> {
 
   bool _loading = true;
   String? _error;
-  List<CategoryNodeSummary> _childCategories = const [];
   List<Map<String, dynamic>> _items = const [];
 
   @override
@@ -66,48 +67,13 @@ class _CategoryContentSectionState extends State<CategoryContentSection> {
     setState(() {
       _loading = true;
       _error = null;
-      _childCategories = const [];
       _items = const [];
     });
-
-    final detailResult = await _repository.fetchCategoryNodeDetail(
-      categoryId: widget.section.id,
-    );
-
-    if (!mounted) return;
-
-    if (detailResult is DataFailed) {
-      setState(() {
-        _loading = false;
-        _error = detailResult.error;
-      });
-      return;
-    }
-
-    final detail = (detailResult as DataSuccess<CategoryNodeSummary>).data;
-    final children = detail?.children ?? const <CategoryNodeSummary>[];
-
-    if (children.isNotEmpty) {
-      setState(() {
-        _childCategories = children;
-        _loading = false;
-      });
-      return;
-    }
-
-    final hasContent = widget.treeType == KavooshTreeType.video
-        ? widget.section.courseCount > 0
-        : widget.section.bookCount > 0;
-
-    if (!hasContent) {
-      setState(() => _loading = false);
-      return;
-    }
 
     final itemsResult = await _repository.fetchCategoryItems(
       treeType: widget.treeType,
       categoryId: widget.section.id,
-      size: 10,
+      size: _previewSize,
       page: 1,
     );
 
@@ -135,14 +101,14 @@ class _CategoryContentSectionState extends State<CategoryContentSection> {
     });
   }
 
-  void _openCourseList({String? categoryId, String? title}) {
+  void _openCourseList() {
     Navigator.pushNamed(
       context,
       CourseListScreen.routeName,
       arguments: {
-        'title': title ??
+        'title':
             '${widget.seeAllTitlePrefix} ${widget.section.title}'.trim(),
-        'categoryId': categoryId ?? widget.section.id,
+        'categoryId': widget.section.id,
         'treeType': widget.treeType,
         if (widget.treeType == KavooshTreeType.book) 'type': 'book',
       },
@@ -179,7 +145,7 @@ class _CategoryContentSectionState extends State<CategoryContentSection> {
       children: [
         SectionHeader(
           title: widget.section.title,
-          onSeeAllTap: () => _openCourseList(),
+          onSeeAllTap: _openCourseList,
         ),
         if (_loading)
           SizedBox(
@@ -195,36 +161,24 @@ class _CategoryContentSectionState extends State<CategoryContentSection> {
               textAlign: TextAlign.center,
             ),
           )
-        else if (_childCategories.isNotEmpty)
-          _buildCardsList(
-            itemCount: _childCategories.length,
-            builder: (index) {
-              final child = _childCategories[index];
-              return CourseCard(
-                title: child.title,
-                thumbnailId: child.thumbnailId,
-                backgroundColor: _cardColors[index % _cardColors.length],
-                showPlayBadge: widget.treeType == KavooshTreeType.video,
-                onTap: () => _openCourseList(
-                  categoryId: child.id,
-                  title: child.title,
-                ),
-              );
-            },
-          )
         else if (_items.isNotEmpty)
-          _buildCardsList(
-            itemCount: _items.length,
-            builder: (index) {
-              final item = _items[index];
-              return CourseCard(
-                title: item['title']?.toString() ?? '',
-                thumbnailId: item['thumbnailId']?.toString(),
-                backgroundColor: _cardColors[index % _cardColors.length],
-                showPlayBadge: widget.treeType == KavooshTreeType.video,
-                onTap: () => _openItemDetail(item),
-              );
-            },
+          SizedBox(
+            height: 190.h,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              padding: EdgeInsets.symmetric(horizontal: 16.w),
+              itemCount: _items.length,
+              itemBuilder: (context, index) {
+                final item = _items[index];
+                return CourseCard(
+                  title: item['title']?.toString() ?? '',
+                  thumbnailId: item['thumbnailId']?.toString(),
+                  backgroundColor: _cardColors[index % _cardColors.length],
+                  showPlayBadge: widget.treeType == KavooshTreeType.video,
+                  onTap: () => _openItemDetail(item),
+                );
+              },
+            ),
           )
         else
           Padding(
@@ -239,21 +193,6 @@ class _CategoryContentSectionState extends State<CategoryContentSection> {
           ),
         SizedBox(height: 16.h),
       ],
-    );
-  }
-
-  Widget _buildCardsList({
-    required int itemCount,
-    required Widget Function(int index) builder,
-  }) {
-    return SizedBox(
-      height: 190.h,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        padding: EdgeInsets.symmetric(horizontal: 16.w),
-        itemCount: itemCount,
-        itemBuilder: (context, index) => builder(index),
-      ),
     );
   }
 }
