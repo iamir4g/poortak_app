@@ -279,6 +279,7 @@ class _CourseListScreenState extends State<CourseListScreen> {
                           author: item['authorName']?.toString() ?? '',
                           date: date,
                           isPurchased: false,
+                          thumbnailId: item['thumbnailId']?.toString(),
                           backgroundColor: colors[index % colors.length],
                           onTap: () {
                             final id = item['id']?.toString() ?? '';

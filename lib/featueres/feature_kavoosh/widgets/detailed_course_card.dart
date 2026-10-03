@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/common/services/getImageUrl_service.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
@@ -10,6 +11,7 @@ class DetailedCourseCard extends StatelessWidget {
   final String date;
   final bool isPurchased;
   final String? imagePath;
+  final String? thumbnailId;
   final Color? backgroundColor;
   final VoidCallback? onTap;
 
@@ -20,6 +22,7 @@ class DetailedCourseCard extends StatelessWidget {
     required this.date,
     this.isPurchased = false,
     this.imagePath,
+    this.thumbnailId,
     this.backgroundColor,
     this.onTap,
   });
@@ -64,28 +67,18 @@ class DetailedCourseCard extends StatelessWidget {
                       : (backgroundColor ?? MyColors.background1),
                   borderRadius: BorderRadius.circular(16.r),
                 ),
-                child: imagePath != null
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.circular(16.r),
-                        child: Image.asset(
-                          imagePath!,
-                          fit: BoxFit.cover,
-                        ),
-                      )
-                    : Center(
-                        child: Icon(
-                          Icons.image,
-                          color: isDark ? MyColors.darkTextSecondary : Colors.grey,
-                          size: 40.r,
-                        ),
-                      ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16.r),
+                  child: _buildImage(isDark),
+                ),
               ),
             ),
 
             // Text Content
             Expanded(
               child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 16.0.h, horizontal: 8.0.w),
+                padding:
+                    EdgeInsets.symmetric(vertical: 16.0.h, horizontal: 8.0.w),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
@@ -94,26 +87,29 @@ class DetailedCourseCard extends StatelessWidget {
                     Text(
                       title,
                       style: MyTextStyle.textMatn16Bold.copyWith(
-                        color:
-                            isDark ? MyColors.darkTextPrimary : MyColors.textMatn2,
+                        color: isDark
+                            ? MyColors.darkTextPrimary
+                            : MyColors.textMatn2,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     SizedBox(height: 8.h),
-                    
+
                     // Author
                     Text(
                       author,
                       style: MyTextStyle.textMatn12W500.copyWith(
-                        color: isDark ? MyColors.darkTextSecondary : MyColors.text3,
+                        color: isDark
+                            ? MyColors.darkTextSecondary
+                            : MyColors.text3,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    
+
                     SizedBox(height: 12.h),
-                    
+
                     // Bottom Row: Date and Purchased Badge
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -126,8 +122,9 @@ class DetailedCourseCard extends StatelessWidget {
                               Icon(
                                 Icons.access_time,
                                 size: 14.r,
-                                color:
-                                    isDark ? MyColors.darkTextSecondary : MyColors.text4,
+                                color: isDark
+                                    ? MyColors.darkTextSecondary
+                                    : MyColors.text4,
                               ),
                               SizedBox(width: 4.w),
                               Flexible(
@@ -145,10 +142,11 @@ class DetailedCourseCard extends StatelessWidget {
                             ],
                           ),
                         ),
-                        
+
                         if (isPurchased)
                           Container(
-                            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 8.w, vertical: 4.h),
                             decoration: BoxDecoration(
                               color: MyColors.success.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(20.r),
@@ -184,5 +182,40 @@ class DetailedCourseCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget _buildImage(bool isDark) {
+    final placeholder = Center(
+      child: Icon(
+        Icons.image,
+        color: isDark ? MyColors.darkTextSecondary : Colors.grey,
+        size: 40.r,
+      ),
+    );
+
+    if (imagePath != null && imagePath!.isNotEmpty) {
+      return Image.asset(
+        imagePath!,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => placeholder,
+      );
+    }
+
+    if (thumbnailId != null && thumbnailId!.isNotEmpty) {
+      return FutureBuilder<String>(
+        future: GetImageUrlService().getImageUrl(thumbnailId!),
+        builder: (context, snapshot) {
+          final url = snapshot.data;
+          if (url == null || url.isEmpty) return placeholder;
+          return Image.network(
+            url,
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => placeholder,
+          );
+        },
+      );
+    }
+
+    return placeholder;
   }
 }

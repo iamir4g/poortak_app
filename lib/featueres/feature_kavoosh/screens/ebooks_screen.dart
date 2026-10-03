@@ -94,8 +94,7 @@ class _EBooksScreenState extends State<EBooksScreen> {
                   child: Text(
                     'دسته‌بندی‌ای یافت نشد',
                     style: MyTextStyle.textMatn14Bold.copyWith(
-                      color:
-                          isDark ? MyColors.darkTextSecondary : Colors.grey,
+                      color: isDark ? MyColors.darkTextSecondary : Colors.grey,
                     ),
                   ),
                 );
@@ -214,6 +213,14 @@ class _EBooksScreenState extends State<EBooksScreen> {
       },
       child: Row(
         children: [
+          Icon(
+            _tabIconFor(tab),
+            color: isSelected
+                ? MyColors.primary
+                : (isDark ? MyColors.darkTextSecondary : Colors.grey),
+            size: 20.sp,
+          ),
+          SizedBox(width: 8.w),
           Text(
             tab.title,
             style: MyTextStyle.textMatn14Bold.copyWith(
@@ -222,14 +229,6 @@ class _EBooksScreenState extends State<EBooksScreen> {
                   ? MyColors.primary
                   : (isDark ? MyColors.darkTextSecondary : Colors.grey),
             ),
-          ),
-          SizedBox(width: 8.w),
-          Icon(
-            _tabIconFor(tab),
-            color: isSelected
-                ? MyColors.primary
-                : (isDark ? MyColors.darkTextSecondary : Colors.grey),
-            size: 20.sp,
           ),
         ],
       ),
