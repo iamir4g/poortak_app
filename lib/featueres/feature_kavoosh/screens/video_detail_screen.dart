@@ -287,8 +287,7 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
       backgroundColor: isDark ? MyColors.darkBackground : MyColors.background1,
       appBar: PoortakAppBar(
         title: title,
-        foregroundColor:
-            isDark ? MyColors.darkTextPrimary : MyColors.textMatn2,
+        foregroundColor: isDark ? MyColors.darkTextPrimary : MyColors.textMatn2,
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
@@ -366,7 +365,7 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
 
   Widget _buildPlayerSection(bool isDark, VideoCourseInfo? course) {
     if (_playingLessonId == null) {
-      return _buildHero(isDark, course);
+      return _buildEmptyPlayerPlaceholder(isDark);
     }
 
     return BlocBuilder<VideoDownloadCubit, VideoDownloadState>(
@@ -383,8 +382,7 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
             downloadInfo?.isDownloading ?? _isDownloading;
         final currentDownloadProgress =
             downloadInfo?.downloadProgress ?? _downloadProgress;
-        final currentIsDecrypting =
-            downloadInfo?.isDecrypting ?? _isDecrypting;
+        final currentIsDecrypting = downloadInfo?.isDecrypting ?? _isDecrypting;
         final currentDecryptionProgress =
             downloadInfo?.decryptionProgress ?? _decryptionProgress;
         final currentLocalPath = downloadInfo?.localPath ?? _localVideoPath;
@@ -421,90 +419,39 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
     );
   }
 
-  Widget _buildHero(bool isDark, VideoCourseInfo? course) {
+  Widget _buildEmptyPlayerPlaceholder(bool isDark) {
     return Container(
-      height: 200.h,
+      height: 230.h,
       width: double.infinity,
       decoration: BoxDecoration(
-        color: isDark ? MyColors.termsBackgroundDark : Colors.white,
+        color: isDark ? MyColors.termsBackgroundDark : MyColors.background,
         borderRadius: BorderRadius.circular(20.r),
         border: isDark ? Border.all(color: MyColors.darkBorder) : null,
-        boxShadow: isDark
-            ? null
-            : [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 10.r,
-                  offset: Offset(0, 4.h),
-                ),
-              ],
       ),
       clipBehavior: Clip.antiAlias,
-      child: course?.thumbnailId == null
-          ? _buildHeroPlaceholder(isDark)
-          : FutureBuilder<String>(
-              future: GetImageUrlService().getImageUrl(course!.thumbnailId!),
-              builder: (context, snapshot) {
-                final url = snapshot.data;
-                if (url == null || url.isEmpty) {
-                  return _buildHeroPlaceholder(isDark);
-                }
-                return Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    Image.network(
-                      url,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) =>
-                          _buildHeroPlaceholder(isDark),
-                    ),
-                    Container(
-                      color: Colors.black.withValues(alpha: 0.25),
-                    ),
-                    Center(
-                      child: Icon(
-                        Icons.play_circle_outline,
-                        color: Colors.white,
-                        size: 56.r,
-                      ),
-                    ),
-                  ],
-                );
-              },
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Image.asset(
+            'assets/images/kavoosh/video_not_selected.png',
+            height: 100.h,
+            fit: BoxFit.contain,
+          ),
+          SizedBox(height: 12.h),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.w),
+            child: Text(
+              'برای تماشای ویدیو روی بخش مورد نظر کلیک کنید.',
+              textAlign: TextAlign.center,
+              style: MyTextStyle.textMatn14Bold.copyWith(
+                color: isDark ? MyColors.darkTextPrimary : MyColors.textMatn2,
+                fontWeight: FontWeight.normal,
+                height: 1.5,
+              ),
             ),
-    );
-  }
-
-  Widget _buildHeroPlaceholder(bool isDark) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Container(
-          width: 60.w,
-          height: 60.h,
-          decoration: BoxDecoration(
-            color: isDark
-                ? MyColors.darkBackgroundSecondary
-                : const Color(0xFFE3F2FD),
-            borderRadius: BorderRadius.circular(30.r),
           ),
-          child: Icon(
-            Icons.movie_creation_outlined,
-            color: isDark ? MyColors.secondary : const Color(0xFF2196F3),
-            size: 30.r,
-          ),
-        ),
-        SizedBox(height: 16.h),
-        Text(
-          'برای تماشای ویدئو روی بخش مورد نظر\nکلیک کنید.',
-          textAlign: TextAlign.center,
-          style: MyTextStyle.textMatn14Bold.copyWith(
-            color: isDark ? MyColors.darkTextSecondary : MyColors.text3,
-            fontWeight: FontWeight.normal,
-            height: 1.5,
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
