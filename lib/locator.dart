@@ -42,6 +42,9 @@ import 'package:poortak/featueres/feature_match/repositories/match_repository.da
 import 'package:poortak/featueres/feature_kavoosh/data/data_source/kavoosh_api_provider.dart';
 import 'package:poortak/featueres/feature_kavoosh/repositories/kavoosh_repository.dart';
 import 'package:poortak/featueres/feature_kavoosh/presentation/bloc/categories_bloc/categories_bloc.dart';
+import 'package:poortak/featueres/feature_kavoosh/presentation/bloc/quiz_categories_bloc/quiz_categories_bloc.dart';
+import 'package:poortak/featueres/feature_kavoosh/presentation/bloc/quiz_list_bloc/quiz_list_bloc.dart';
+import 'package:poortak/featueres/feature_kavoosh/presentation/bloc/quiz_session_bloc/quiz_session_bloc.dart';
 import 'package:poortak/featueres/feature_Menu/data/data_source/menu_api_provider.dart';
 import 'package:poortak/featueres/feature_Menu/repositories/menu_repository.dart';
 import 'package:poortak/featueres/feature_Menu/presentation/bloc/faq_bloc/faq_bloc.dart';
@@ -181,6 +184,12 @@ Future<void> initLocator() async {
       () => DictionaryBloc(repository: locator()));
   locator.registerFactory<CategoriesBloc>(
       () => CategoriesBloc(repository: locator()));
+  locator.registerFactory<QuizCategoriesBloc>(
+      () => QuizCategoriesBloc(repository: locator()));
+  locator.registerFactory<QuizListBloc>(
+      () => QuizListBloc(repository: locator()));
+  locator.registerFactory<QuizSessionBloc>(
+      () => QuizSessionBloc(repository: locator()));
   locator.registerFactory<FaqBloc>(() => FaqBloc(menuRepository: locator()));
   locator.registerFactory<ContactUsBloc>(
       () => ContactUsBloc(menuRepository: locator()));

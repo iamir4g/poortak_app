@@ -4,6 +4,7 @@ import 'package:poortak/featueres/feature_kavoosh/data/data_source/kavoosh_api_p
 import 'package:poortak/featueres/feature_kavoosh/data/models/category_nodes_summary_model.dart';
 import 'package:poortak/featueres/feature_kavoosh/data/models/kavoosh_book_detail_model.dart';
 import 'package:poortak/featueres/feature_kavoosh/data/models/kavoosh_tree_type.dart';
+import 'package:poortak/featueres/feature_kavoosh/data/models/quiz_models.dart';
 import 'package:poortak/featueres/feature_kavoosh/data/models/video_course_detail_model.dart';
 
 class KavooshRepository {
@@ -203,28 +204,294 @@ class KavooshRepository {
     }
   }
 
+  Future<DataState<List<QuizCategory>>> fetchQuizCategories() async {
+    try {
+      final response = await apiProvider.callGetQuizCategories();
+
+      if (_isHttpFailure(response.statusCode)) {
+        return DataFailed(_errorMessage(
+          response.data,
+          fallback: "خطا در دریافت دسته‌بندی آزمون‌ها",
+        ));
+      }
+
+      final data = response.data;
+      if (data is Map<String, dynamic> && data['ok'] == true) {
+        final items = data['data'];
+        if (items is List) {
+          return DataSuccess(
+            items
+                .whereType<Map>()
+                .map((e) => QuizCategory.fromJson(e.cast<String, dynamic>()))
+                .toList(),
+          );
+        }
+        return const DataFailed("فرمت پاسخ سرور نامعتبر است");
+      }
+
+      return DataFailed(_errorMessage(
+        data,
+        fallback: "خطا در دریافت دسته‌بندی آزمون‌ها",
+      ));
+    } on DioException catch (e) {
+      return DataFailed(
+          _dioErrorMessage(e, "خطا در دریافت دسته‌بندی آزمون‌ها"));
+    } catch (e) {
+      return DataFailed(e.toString());
+    }
+  }
+
+  Future<DataState<List<QuizSummary>>> fetchCategoryQuizzes({
+    required String categoryId,
+    int size = 20,
+    int page = 1,
+    String order = 'asc',
+    String query = '',
+  }) async {
+    try {
+      final response = await apiProvider.callGetCategoryQuizzes(
+        categoryId: categoryId,
+        size: size,
+        page: page,
+        order: order,
+        query: query.isEmpty ? null : query,
+      );
+
+      if (_isHttpFailure(response.statusCode)) {
+        return DataFailed(_errorMessage(
+          response.data,
+          fallback: "خطا در دریافت لیست آزمون‌ها",
+        ));
+      }
+
+      final data = response.data;
+      if (data is Map<String, dynamic> && data['ok'] == true) {
+        final items = data['data'];
+        if (items is List) {
+          return DataSuccess(
+            items
+                .whereType<Map>()
+                .map((e) => QuizSummary.fromJson(e.cast<String, dynamic>()))
+                .toList(),
+          );
+        }
+        return const DataFailed("فرمت پاسخ سرور نامعتبر است");
+      }
+
+      return DataFailed(_errorMessage(
+        data,
+        fallback: "خطا در دریافت لیست آزمون‌ها",
+      ));
+    } on DioException catch (e) {
+      return DataFailed(_dioErrorMessage(e, "خطا در دریافت لیست آزمون‌ها"));
+    } catch (e) {
+      return DataFailed(e.toString());
+    }
+  }
+
+  Future<DataState<QuizAttemptSession>> startQuiz({
+    required String quizId,
+    required int questionCount,
+  }) async {
+    try {
+      final response = await apiProvider.callStartQuiz(
+        quizId: quizId,
+        questionCount: questionCount,
+      );
+
+      if (_isHttpFailure(response.statusCode)) {
+        return DataFailed(_errorMessage(
+          response.data,
+          fallback: "خطا در شروع آزمون",
+        ));
+      }
+
+      final data = response.data;
+      if (data is Map<String, dynamic> && data['ok'] == true) {
+        final payload = data['data'];
+        if (payload is Map<String, dynamic>) {
+          return DataSuccess(QuizAttemptSession.fromJson(payload));
+        }
+        return const DataFailed("فرمت پاسخ سرور نامعتبر است");
+      }
+
+      return DataFailed(_errorMessage(
+        data,
+        fallback: "خطا در شروع آزمون",
+      ));
+    } on DioException catch (e) {
+      return DataFailed(_dioErrorMessage(e, "خطا در شروع آزمون"));
+    } catch (e) {
+      return DataFailed(e.toString());
+    }
+  }
+
+  Future<DataState<QuizAttemptSession>> fetchAttemptState({
+    required String attemptId,
+  }) async {
+    try {
+      final response =
+          await apiProvider.callGetAttemptState(attemptId: attemptId);
+
+      if (_isHttpFailure(response.statusCode)) {
+        return DataFailed(_errorMessage(
+          response.data,
+          fallback: "خطا در دریافت وضعیت آزمون",
+        ));
+      }
+
+      final data = response.data;
+      if (data is Map<String, dynamic> && data['ok'] == true) {
+        final payload = data['data'];
+        if (payload is Map<String, dynamic>) {
+          return DataSuccess(QuizAttemptSession.fromJson(payload));
+        }
+        return const DataFailed("فرمت پاسخ سرور نامعتبر است");
+      }
+
+      return DataFailed(_errorMessage(
+        data,
+        fallback: "خطا در دریافت وضعیت آزمون",
+      ));
+    } on DioException catch (e) {
+      return DataFailed(_dioErrorMessage(e, "خطا در دریافت وضعیت آزمون"));
+    } catch (e) {
+      return DataFailed(e.toString());
+    }
+  }
+
+  Future<DataState<QuizAnswerResult>> submitQuizAnswer({
+    required String attemptId,
+    required String questionId,
+    required String answerId,
+  }) async {
+    try {
+      final response = await apiProvider.callSubmitQuizAnswer(
+        attemptId: attemptId,
+        questionId: questionId,
+        answerId: answerId,
+      );
+
+      if (_isHttpFailure(response.statusCode)) {
+        return DataFailed(_errorMessage(
+          response.data,
+          fallback: "خطا در ثبت پاسخ",
+        ));
+      }
+
+      final data = response.data;
+      if (data is Map<String, dynamic> && data['ok'] == true) {
+        final payload = data['data'];
+        if (payload is Map<String, dynamic>) {
+          return DataSuccess(QuizAnswerResult.fromJson(payload));
+        }
+        return const DataFailed("فرمت پاسخ سرور نامعتبر است");
+      }
+
+      return DataFailed(_errorMessage(
+        data,
+        fallback: "خطا در ثبت پاسخ",
+      ));
+    } on DioException catch (e) {
+      return DataFailed(_dioErrorMessage(e, "خطا در ثبت پاسخ"));
+    } catch (e) {
+      return DataFailed(e.toString());
+    }
+  }
+
+  Future<DataState<QuizAttemptResult>> finishAttempt({
+    required String attemptId,
+  }) async {
+    try {
+      final response =
+          await apiProvider.callFinishAttempt(attemptId: attemptId);
+
+      if (_isHttpFailure(response.statusCode)) {
+        return DataFailed(_errorMessage(
+          response.data,
+          fallback: "خطا در اتمام آزمون",
+        ));
+      }
+
+      final data = response.data;
+      if (data is Map<String, dynamic> && data['ok'] == true) {
+        final payload = data['data'];
+        if (payload is Map<String, dynamic>) {
+          return DataSuccess(QuizAttemptResult.fromJson(payload));
+        }
+        return const DataFailed("فرمت پاسخ سرور نامعتبر است");
+      }
+
+      return DataFailed(_errorMessage(
+        data,
+        fallback: "خطا در اتمام آزمون",
+      ));
+    } on DioException catch (e) {
+      return DataFailed(_dioErrorMessage(e, "خطا در اتمام آزمون"));
+    } catch (e) {
+      return DataFailed(e.toString());
+    }
+  }
+
+  Future<DataState<QuizAttemptResult>> fetchQuizResult({
+    required String quizId,
+  }) async {
+    try {
+      final response = await apiProvider.callGetQuizResult(quizId: quizId);
+
+      if (_isHttpFailure(response.statusCode)) {
+        return DataFailed(_errorMessage(
+          response.data,
+          fallback: "خطا در دریافت نتیجه آزمون",
+        ));
+      }
+
+      final data = response.data;
+      if (data is Map<String, dynamic> && data['ok'] == true) {
+        final payload = data['data'];
+        if (payload is Map<String, dynamic>) {
+          return DataSuccess(QuizAttemptResult.fromJson(payload));
+        }
+        return const DataFailed("فرمت پاسخ سرور نامعتبر است");
+      }
+
+      return DataFailed(_errorMessage(
+        data,
+        fallback: "خطا در دریافت نتیجه آزمون",
+      ));
+    } on DioException catch (e) {
+      return DataFailed(_dioErrorMessage(e, "خطا در دریافت نتیجه آزمون"));
+    } catch (e) {
+      return DataFailed(e.toString());
+    }
+  }
+
   bool _isHttpFailure(int? statusCode) {
     return statusCode != null && statusCode >= 400;
   }
 
   String _dioErrorMessage(DioException e, String fallback) {
     final responseData = e.response?.data;
-    if (responseData is Map<String, dynamic>) {
-      final message = responseData['message']?.toString();
-      if (message != null && message.isNotEmpty) {
-        return message;
-      }
-    }
+    final parsed = _parseMessage(responseData);
+    if (parsed != null) return parsed;
     return e.message ?? fallback;
   }
 
   String _errorMessage(dynamic data, {required String fallback}) {
-    if (data is Map<String, dynamic>) {
-      final message = data['message']?.toString();
-      if (message != null && message.isNotEmpty) {
-        return message;
-      }
+    return _parseMessage(data) ?? fallback;
+  }
+
+  String? _parseMessage(dynamic data) {
+    if (data is! Map) return null;
+    final message = data['message'];
+    if (message is List) {
+      final joined = message.map((e) => e.toString()).where((e) => e.isNotEmpty);
+      if (joined.isNotEmpty) return joined.join('\n');
     }
-    return fallback;
+    if (message != null) {
+      final text = message.toString();
+      if (text.isNotEmpty) return text;
+    }
+    return null;
   }
 }

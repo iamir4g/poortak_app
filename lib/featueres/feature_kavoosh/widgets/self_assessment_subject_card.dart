@@ -1,20 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/common/services/getImageUrl_service.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 
 class SelfAssessmentSubjectCard extends StatelessWidget {
   final String title;
-  final String iconPath;
+  final String? iconPath;
+  final String? thumbnailId;
   final Color backgroundColor;
   final VoidCallback onTap;
 
   const SelfAssessmentSubjectCard({
     super.key,
     required this.title,
-    required this.iconPath,
     required this.backgroundColor,
     required this.onTap,
+    this.iconPath,
+    this.thumbnailId,
   });
 
   @override
@@ -48,11 +51,10 @@ class SelfAssessmentSubjectCard extends StatelessWidget {
                     : Colors.white.withValues(alpha: 0.5),
                 shape: BoxShape.circle,
               ),
-              child: Image.asset(
-                iconPath,
+              child: SizedBox(
                 width: 50.r,
                 height: 50.r,
-                fit: BoxFit.contain,
+                child: _buildIcon(),
               ),
             ),
             SizedBox(height: 12.h),
@@ -72,5 +74,45 @@ class SelfAssessmentSubjectCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget _buildIcon() {
+    final fallback = Icon(
+      Icons.quiz_outlined,
+      size: 32.r,
+      color: MyColors.primary,
+    );
+
+    if (thumbnailId != null && thumbnailId!.isNotEmpty) {
+      return FutureBuilder<String>(
+        future: GetImageUrlService().getImageUrl(thumbnailId!),
+        builder: (context, snapshot) {
+          final url = snapshot.data;
+          if (url == null || url.isEmpty) {
+            return _assetOrFallback(fallback);
+          }
+          return Image.network(
+            url,
+            fit: BoxFit.contain,
+            errorBuilder: (_, __, ___) => _assetOrFallback(fallback),
+          );
+        },
+      );
+    }
+
+    return _assetOrFallback(fallback);
+  }
+
+  Widget _assetOrFallback(Widget fallback) {
+    if (iconPath != null && iconPath!.isNotEmpty) {
+      return Image.asset(
+        iconPath!,
+        width: 50.r,
+        height: 50.r,
+        fit: BoxFit.contain,
+        errorBuilder: (_, __, ___) => fallback,
+      );
+    }
+    return fallback;
   }
 }

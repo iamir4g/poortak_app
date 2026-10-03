@@ -4952,7 +4952,8 @@
             "schema": {
               "enum": [
                 "VIDEO",
-                "BOOK"
+                "BOOK",
+                "QUIZ"
               ],
               "type": "string"
             }
@@ -6875,6 +6876,754 @@
           "Admin/Books"
         ]
       }
+    },
+    "/api/v1/quiz/categories": {
+      "get": {
+        "description": "Get the flat first-level quiz categories.",
+        "operationId": "QuizController_getQuizCategories_v1",
+        "parameters": [
+          {
+            "name": "x-lang",
+            "in": "header",
+            "allowEmptyValue": true,
+            "description": "Set the accept language for incoming messages",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Quiz Categories",
+        "tags": [
+          "Quiz"
+        ]
+      }
+    },
+    "/api/v1/quiz/categories/{categoryId}/quizzes": {
+      "get": {
+        "description": "Get a list of published quizzes of a category, including the current user's last attempt result, if any.",
+        "operationId": "QuizController_getCategoryQuizzes_v1",
+        "parameters": [
+          {
+            "name": "categoryId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "size",
+            "required": true,
+            "in": "query",
+            "description": "max number of returned records per page.",
+            "schema": {
+              "default": 10,
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": true,
+            "in": "query",
+            "description": "Page number.",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "order",
+            "required": true,
+            "in": "query",
+            "description": "Order of results.",
+            "schema": {
+              "default": "asc",
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          },
+          {
+            "name": "query",
+            "required": false,
+            "in": "query",
+            "description": "Optional query string to filter result.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-lang",
+            "in": "header",
+            "allowEmptyValue": true,
+            "description": "Set the accept language for incoming messages",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "List Category Quizzes",
+        "tags": [
+          "Quiz"
+        ]
+      }
+    },
+    "/api/v1/quiz/{quizId}": {
+      "get": {
+        "description": "Get a published quiz by its ID.",
+        "operationId": "QuizController_findQuizById_v1",
+        "parameters": [
+          {
+            "name": "quizId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-lang",
+            "in": "header",
+            "allowEmptyValue": true,
+            "description": "Set the accept language for incoming messages",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Get Quiz",
+        "tags": [
+          "Quiz"
+        ]
+      }
+    },
+    "/api/v1/quiz/{quizId}/start": {
+      "post": {
+        "description": "Start (or resume) an attempt with the selected number of questions and get the first question.",
+        "operationId": "QuizController_startQuiz_v1",
+        "parameters": [
+          {
+            "name": "quizId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-lang",
+            "in": "header",
+            "allowEmptyValue": true,
+            "description": "Set the accept language for incoming messages",
+            "schema": {}
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartQuizDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Start Quiz",
+        "tags": [
+          "Quiz"
+        ]
+      }
+    },
+    "/api/v1/quiz/attempt/{attemptId}": {
+      "get": {
+        "description": "Get the current state of an attempt: the pending question and progress stats.",
+        "operationId": "QuizController_getAttemptState_v1",
+        "parameters": [
+          {
+            "name": "attemptId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-lang",
+            "in": "header",
+            "allowEmptyValue": true,
+            "description": "Set the accept language for incoming messages",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Get Attempt State",
+        "tags": [
+          "Quiz"
+        ]
+      }
+    },
+    "/api/v1/quiz/attempt/{attemptId}/answer": {
+      "post": {
+        "description": "Submit an answer to a question of an attempt and get its correctness and progress stats.",
+        "operationId": "QuizController_submitAnswer_v1",
+        "parameters": [
+          {
+            "name": "attemptId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-lang",
+            "in": "header",
+            "allowEmptyValue": true,
+            "description": "Set the accept language for incoming messages",
+            "schema": {}
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitQuizAnswerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Submit Answer",
+        "tags": [
+          "Quiz"
+        ]
+      }
+    },
+    "/api/v1/quiz/attempt/{attemptId}/finish": {
+      "patch": {
+        "description": "Complete the attempt and get the final result: total, answered, correct and wrong counts.",
+        "operationId": "QuizController_finishAttempt_v1",
+        "parameters": [
+          {
+            "name": "attemptId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-lang",
+            "in": "header",
+            "allowEmptyValue": true,
+            "description": "Set the accept language for incoming messages",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Finish Attempt",
+        "tags": [
+          "Quiz"
+        ]
+      }
+    },
+    "/api/v1/quiz/{quizId}/result": {
+      "get": {
+        "description": "Get the result of the latest attempt of the quiz.",
+        "operationId": "QuizController_getQuizResult_v1",
+        "parameters": [
+          {
+            "name": "quizId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-lang",
+            "in": "header",
+            "allowEmptyValue": true,
+            "description": "Set the accept language for incoming messages",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Quiz Result",
+        "tags": [
+          "Quiz"
+        ]
+      }
+    },
+    "/api/admin/quiz": {
+      "post": {
+        "description": "Create a quiz in a quiz category.",
+        "operationId": "QuizAdminController_createQuiz",
+        "parameters": [
+          {
+            "name": "x-lang",
+            "in": "header",
+            "allowEmptyValue": true,
+            "description": "Set the accept language for incoming messages",
+            "schema": {}
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateQuizDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Create Quiz",
+        "tags": [
+          "Admin/Quiz"
+        ]
+      },
+      "get": {
+        "description": "Paginate all quizzes (including drafts).",
+        "operationId": "QuizAdminController_paginate",
+        "parameters": [
+          {
+            "name": "size",
+            "required": true,
+            "in": "query",
+            "description": "max number of returned records per page.",
+            "schema": {
+              "default": 10,
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": true,
+            "in": "query",
+            "description": "Page number.",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "order",
+            "required": true,
+            "in": "query",
+            "description": "Order of results.",
+            "schema": {
+              "default": "asc",
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          },
+          {
+            "name": "query",
+            "required": false,
+            "in": "query",
+            "description": "Optional query string to filter result.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "categoryId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-lang",
+            "in": "header",
+            "allowEmptyValue": true,
+            "description": "Set the accept language for incoming messages",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "List Quizzes",
+        "tags": [
+          "Admin/Quiz"
+        ]
+      }
+    },
+    "/api/admin/quiz/{quizId}": {
+      "get": {
+        "description": "Get a quiz with all of its questions and answers.",
+        "operationId": "QuizAdminController_getQuiz",
+        "parameters": [
+          {
+            "name": "quizId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-lang",
+            "in": "header",
+            "allowEmptyValue": true,
+            "description": "Set the accept language for incoming messages",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Get Quiz",
+        "tags": [
+          "Admin/Quiz"
+        ]
+      },
+      "patch": {
+        "description": "Update a quiz.",
+        "operationId": "QuizAdminController_updateQuiz",
+        "parameters": [
+          {
+            "name": "quizId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-lang",
+            "in": "header",
+            "allowEmptyValue": true,
+            "description": "Set the accept language for incoming messages",
+            "schema": {}
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateQuizDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Update Quiz",
+        "tags": [
+          "Admin/Quiz"
+        ]
+      },
+      "delete": {
+        "description": "Delete a quiz by its ID.",
+        "operationId": "QuizAdminController_deleteQuiz",
+        "parameters": [
+          {
+            "name": "quizId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-lang",
+            "in": "header",
+            "allowEmptyValue": true,
+            "description": "Set the accept language for incoming messages",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Delete Quiz",
+        "tags": [
+          "Admin/Quiz"
+        ]
+      }
+    },
+    "/api/admin/quiz/{quizId}/status": {
+      "patch": {
+        "description": "Change quiz status to published/draft.",
+        "operationId": "QuizAdminController_updateQuizStatus",
+        "parameters": [
+          {
+            "name": "quizId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "published",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "x-lang",
+            "in": "header",
+            "allowEmptyValue": true,
+            "description": "Set the accept language for incoming messages",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Update Quiz Status",
+        "tags": [
+          "Admin/Quiz"
+        ]
+      }
+    },
+    "/api/admin/quiz/order": {
+      "patch": {
+        "description": "Update order of quizzes.",
+        "operationId": "QuizAdminController_updateQuizOrder",
+        "parameters": [
+          {
+            "name": "x-lang",
+            "in": "header",
+            "allowEmptyValue": true,
+            "description": "Set the accept language for incoming messages",
+            "schema": {}
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Update Quiz Order",
+        "tags": [
+          "Admin/Quiz"
+        ]
+      }
+    },
+    "/api/admin/quiz/{quizId}/questions": {
+      "post": {
+        "description": "Create a quiz question with its answers.",
+        "operationId": "QuizAdminController_createQuestion",
+        "parameters": [
+          {
+            "name": "quizId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-lang",
+            "in": "header",
+            "allowEmptyValue": true,
+            "description": "Set the accept language for incoming messages",
+            "schema": {}
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateQuestionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Create Question",
+        "tags": [
+          "Admin/Quiz"
+        ]
+      }
+    },
+    "/api/admin/quiz/{quizId}/questions/{questionId}": {
+      "patch": {
+        "description": "Update a quiz question with its answers.",
+        "operationId": "QuizAdminController_updateQuestion",
+        "parameters": [
+          {
+            "name": "questionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-lang",
+            "in": "header",
+            "allowEmptyValue": true,
+            "description": "Set the accept language for incoming messages",
+            "schema": {}
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateQuestionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Update Question",
+        "tags": [
+          "Admin/Quiz"
+        ]
+      },
+      "delete": {
+        "description": "Delete a quiz question by its ID.",
+        "operationId": "QuizAdminController_deleteQuestion",
+        "parameters": [
+          {
+            "name": "questionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-lang",
+            "in": "header",
+            "allowEmptyValue": true,
+            "description": "Set the accept language for incoming messages",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Delete Question",
+        "tags": [
+          "Admin/Quiz"
+        ]
+      }
+    },
+    "/api/admin/quiz/{quizId}/questions/order": {
+      "patch": {
+        "description": "Update order of questions.",
+        "operationId": "QuizAdminController_updateQuestionsOrder",
+        "parameters": [
+          {
+            "name": "x-lang",
+            "in": "header",
+            "allowEmptyValue": true,
+            "description": "Set the accept language for incoming messages",
+            "schema": {}
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Update Question Order",
+        "tags": [
+          "Admin/Quiz"
+        ]
+      }
     }
   },
   "info": {
@@ -7786,46 +8535,52 @@
       "CreateQuizDto": {
         "type": "object",
         "properties": {
-          "courseId": {
-            "type": "string",
-            "description": "ID of IKnow course"
-          },
           "title": {
             "type": "string",
-            "description": "Quiz title"
+            "example": "Uppercase Letters Quiz"
           },
-          "thumbnail": {
+          "description": {
             "type": "string",
-            "description": "Quiz thumbnail"
+            "example": "A short quiz about uppercase letters."
           },
-          "difficulty": {
+          "categoryId": {
             "type": "string",
-            "description": "Quiz difficulty"
+            "example": "6c78b230-6eb2-4604-8836-10cd4370e1cb"
+          },
+          "thumbnailId": {
+            "type": "string"
+          },
+          "order": {
+            "type": "number",
+            "example": 1000
           }
         },
         "required": [
-          "courseId",
-          "title"
+          "title",
+          "categoryId"
         ]
       },
       "UpdateQuizDto": {
         "type": "object",
         "properties": {
-          "courseId": {
-            "type": "string",
-            "description": "ID of IKnow course"
-          },
           "title": {
             "type": "string",
-            "description": "Quiz title"
+            "example": "Uppercase Letters Quiz"
           },
-          "thumbnail": {
+          "description": {
             "type": "string",
-            "description": "Quiz thumbnail"
+            "example": "A short quiz about uppercase letters."
           },
-          "difficulty": {
+          "categoryId": {
             "type": "string",
-            "description": "Quiz difficulty"
+            "example": "6c78b230-6eb2-4604-8836-10cd4370e1cb"
+          },
+          "thumbnailId": {
+            "type": "string"
+          },
+          "order": {
+            "type": "number",
+            "example": 1000
           }
         }
       },
@@ -7848,25 +8603,27 @@
         "type": "object",
         "properties": {
           "title": {
-            "type": "string"
+            "type": "string",
+            "example": "Which letter is uppercase?"
           },
-          "explanation": {
-            "type": "string"
-          },
-          "quizId": {
-            "type": "string"
+          "description": {
+            "type": "string",
+            "example": "Choose the option that is an uppercase letter."
           },
           "answers": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/CreateAnswerDto"
             }
+          },
+          "quizId": {
+            "type": "string"
           }
         },
         "required": [
           "title",
-          "quizId",
-          "answers"
+          "answers",
+          "quizId"
         ]
       },
       "UpdateAnswerDto": {
@@ -7891,26 +8648,23 @@
         "type": "object",
         "properties": {
           "title": {
-            "type": "string"
+            "type": "string",
+            "example": "Which letter is uppercase?"
           },
-          "explanation": {
-            "type": "string"
-          },
-          "quizId": {
-            "type": "string"
+          "description": {
+            "type": "string",
+            "example": "Choose the option that is an uppercase letter."
           },
           "answers": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/UpdateAnswerDto"
+              "$ref": "#/components/schemas/CreateAnswerDto"
             }
+          },
+          "quizId": {
+            "type": "string"
           }
-        },
-        "required": [
-          "title",
-          "quizId",
-          "answers"
-        ]
+        }
       },
       "ConversationPlaybackDto": {
         "type": "object",
@@ -8217,7 +8971,8 @@
           "treeType": {
             "enum": [
               "VIDEO",
-              "BOOK"
+              "BOOK",
+              "QUIZ"
             ],
             "type": "string"
           },
@@ -8444,6 +9199,37 @@
         },
         "required": [
           "userId"
+        ]
+      },
+      "StartQuizDto": {
+        "type": "object",
+        "properties": {
+          "questionCount": {
+            "type": "number",
+            "description": "Number of questions the user wants to answer in this attempt.",
+            "example": 20,
+            "minimum": 1
+          }
+        },
+        "required": [
+          "questionCount"
+        ]
+      },
+      "SubmitQuizAnswerDto": {
+        "type": "object",
+        "properties": {
+          "questionId": {
+            "type": "string",
+            "description": "ID of the question to answer."
+          },
+          "answerId": {
+            "type": "string",
+            "description": "ID of the selected answer."
+          }
+        },
+        "required": [
+          "questionId",
+          "answerId"
         ]
       }
     }
