@@ -92,10 +92,7 @@ class _CategoryContentSectionState extends State<CategoryContentSection> {
     final data = payload['data'];
     setState(() {
       _items = data is List
-          ? data
-              .whereType<Map>()
-              .map((e) => e.cast<String, dynamic>())
-              .toList()
+          ? data.whereType<Map>().map((e) => e.cast<String, dynamic>()).toList()
           : const [];
       _loading = false;
     });
@@ -106,8 +103,7 @@ class _CategoryContentSectionState extends State<CategoryContentSection> {
       context,
       CourseListScreen.routeName,
       arguments: {
-        'title':
-            '${widget.seeAllTitlePrefix} ${widget.section.title}'.trim(),
+        'title': '${widget.seeAllTitlePrefix} ${widget.section.title}'.trim(),
         'categoryId': widget.section.id,
         'treeType': widget.treeType,
         if (widget.treeType == KavooshTreeType.book) 'type': 'book',
@@ -163,7 +159,7 @@ class _CategoryContentSectionState extends State<CategoryContentSection> {
           )
         else if (_items.isNotEmpty)
           SizedBox(
-            height: 190.h,
+            height: 125.h,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               padding: EdgeInsets.symmetric(horizontal: 16.w),

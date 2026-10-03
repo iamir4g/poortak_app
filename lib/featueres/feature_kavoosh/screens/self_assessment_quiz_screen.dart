@@ -236,41 +236,20 @@ class _SelfAssessmentQuizScreenState extends State<SelfAssessmentQuizScreen> {
   }) {
     return QuizQuestionLayout(
       progress: _buildProgress(stats, afterSubmit: showFeedback),
-      question: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          BidiText(
-            text: question.title,
-            forceEnglishDigits: true,
-            textAlign: TextAlign.center,
-            style: MyTextStyle.textHeader16Bold.copyWith(
-              color: isDark
-                  ? MyColors.profileTextPrimaryDark
-                  : MyColors.textMatn1,
-            ),
-          ),
-          if (question.description != null &&
-              question.description!.isNotEmpty) ...[
-            SizedBox(height: 8.h),
-            BidiText(
-              text: question.description!,
-              textAlign: TextAlign.center,
-              style: MyTextStyle.textMatn12Bold.copyWith(
-                color: isDark
-                    ? MyColors.darkTextSecondary
-                    : MyColors.textSecondary,
-              ),
-            ),
-          ],
-        ],
+      question: BidiText(
+        text: question.title,
+        forceEnglishDigits: true,
+        textAlign: TextAlign.center,
+        style: MyTextStyle.textHeader16Bold.copyWith(
+          color: isDark ? MyColors.profileTextPrimaryDark : MyColors.textMatn1,
+        ),
       ),
       options: QuizAnswerOptionsList(
         answerCount: question.answers.length,
         itemBuilder: (index, {required height, required large}) {
           final answer = question.answers[index];
           final isAnswerSelected = feedbackSelectedId == answer.id;
-          final isCorrectAnswer =
-              showFeedback && answer.id == correctAnswerId;
+          final isCorrectAnswer = showFeedback && answer.id == correctAnswerId;
           final isWrongSelected =
               showFeedback && isAnswerSelected && !isCorrect;
 
@@ -300,10 +279,13 @@ class _SelfAssessmentQuizScreenState extends State<SelfAssessmentQuizScreen> {
       feedback: showFeedback
           ? (isCorrect
               ? buildQuizCorrectFeedback(isDark: isDark)
-              : buildQuizWrongFeedback(
-                  isDark: isDark,
-                  explanation: 'پاسخ درست مشخص شد. ادامه دهید.',
-                ))
+              : (question.description != null &&
+                      question.description!.isNotEmpty
+                  ? buildQuizWrongFeedback(
+                      isDark: isDark,
+                      explanation: question.description!,
+                    )
+                  : null))
           : null,
       bottomButton: _buildBottomButton(
         state: state,

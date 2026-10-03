@@ -29,7 +29,8 @@ class CourseCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 140.w,
+        width: 135.w,
+        height: 125.h,
         margin: EdgeInsetsDirectional.only(end: Dimens.medium),
         constraints: BoxConstraints(minHeight: 180.h),
         decoration: BoxDecoration(
@@ -73,7 +74,7 @@ class CourseCard extends StatelessWidget {
                   if (showPlayBadge)
                     PositionedDirectional(
                       bottom: 8.h,
-                      end: 8.w,
+                      start: 8.w,
                       child: Container(
                         width: 28.r,
                         height: 28.r,
@@ -89,19 +90,6 @@ class CourseCard extends StatelessWidget {
                       ),
                     ),
                 ],
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(8.0.r),
-              child: Text(
-                title,
-                style: MyTextStyle.textMatn12Bold.copyWith(
-                  color:
-                      isDark ? MyColors.darkTextPrimary : MyColors.textMatn2,
-                ),
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],

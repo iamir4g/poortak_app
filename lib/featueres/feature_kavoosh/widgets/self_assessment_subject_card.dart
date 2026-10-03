@@ -52,12 +52,12 @@ class SelfAssessmentSubjectCard extends StatelessWidget {
                 shape: BoxShape.circle,
               ),
               child: SizedBox(
-                width: 50.r,
-                height: 50.r,
+                width: 80.r,
+                height: 80.r,
                 child: _buildIcon(),
               ),
             ),
-            SizedBox(height: 12.h),
+            SizedBox(height: 4.h),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 8.w),
               child: Text(
@@ -79,7 +79,7 @@ class SelfAssessmentSubjectCard extends StatelessWidget {
   Widget _buildIcon() {
     final fallback = Icon(
       Icons.quiz_outlined,
-      size: 32.r,
+      size: 80.r,
       color: MyColors.primary,
     );
 
@@ -93,6 +93,8 @@ class SelfAssessmentSubjectCard extends StatelessWidget {
           }
           return Image.network(
             url,
+            width: 80.r,
+            height: 80.r,
             fit: BoxFit.contain,
             errorBuilder: (_, __, ___) => _assetOrFallback(fallback),
           );

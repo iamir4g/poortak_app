@@ -188,6 +188,8 @@ class _EducationalVideosScreenState extends State<EducationalVideosScreen> {
           color: (isDark ? MyColors.darkBorder : Colors.grey)
               .withValues(alpha: 0.35),
           child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: List.generate(_rootTabs.length, (index) {
               return Expanded(
                 child: Container(
@@ -211,6 +213,14 @@ class _EducationalVideosScreenState extends State<EducationalVideosScreen> {
       },
       child: Row(
         children: [
+          Icon(
+            _tabIconFor(tab),
+            color: isSelected
+                ? MyColors.primary
+                : (isDark ? MyColors.darkTextSecondary : Colors.grey),
+            size: 20.sp,
+          ),
+          SizedBox(width: 8.w),
           Text(
             tab.title,
             style: MyTextStyle.textMatn14Bold.copyWith(
@@ -219,14 +229,6 @@ class _EducationalVideosScreenState extends State<EducationalVideosScreen> {
                   ? MyColors.primary
                   : (isDark ? MyColors.darkTextSecondary : Colors.grey),
             ),
-          ),
-          SizedBox(width: 8.w),
-          Icon(
-            _tabIconFor(tab),
-            color: isSelected
-                ? MyColors.primary
-                : (isDark ? MyColors.darkTextSecondary : Colors.grey),
-            size: 20.sp,
           ),
         ],
       ),
