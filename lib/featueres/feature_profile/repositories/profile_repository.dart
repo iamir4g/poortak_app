@@ -33,9 +33,33 @@ class ProfileRepository {
         log("Repository Error - Status: ${response.statusCode}, Data: ${response.data}");
         return DataFailed(response.data['message'] ?? "خطا در دریافت کد تایید");
       }
+    } on DioException catch (dioError) {
+      log("Request OTP DioException: $dioError");
+
+      if (dioError.response != null) {
+        final responseData = dioError.response!.data;
+        log("DioException Response Data: $responseData");
+
+        String errorMessage = "خطا در دریافت کد تایید";
+        if (responseData is Map) {
+          final message = responseData['message'];
+          if (message is String && message.isNotEmpty) {
+            errorMessage = message;
+          } else {
+            final error = responseData['error'];
+            if (error is String && error.isNotEmpty) {
+              errorMessage = error;
+            }
+          }
+        }
+
+        return DataFailed(errorMessage);
+      }
+
+      return DataFailed("خطا در اتصال به سرور");
     } catch (e) {
       log("Repository Error: $e");
-      return DataFailed(e.toString());
+      return DataFailed("خطا در دریافت کد تایید");
     }
   }
 
