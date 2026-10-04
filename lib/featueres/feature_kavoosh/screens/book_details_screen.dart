@@ -120,16 +120,16 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            forceTrial
-                ? 'نمونه کتاب در دسترس نیست'
-                : 'فایل کتاب در دسترس نیست',
+            forceTrial ? 'نمونه کتاب در دسترس نیست' : 'فایل کتاب در دسترس نیست',
           ),
         ),
       );
       return;
     }
 
-    if (!forceTrial && !target.usePublicUrl && target.decryptionFileId == null) {
+    if (!forceTrial &&
+        !target.usePublicUrl &&
+        target.decryptionFileId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('فایل کامل کتاب موجود نیست')),
       );
@@ -161,8 +161,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
       backgroundColor: isDark ? MyColors.darkBackground : Colors.white,
       appBar: PoortakAppBar(
         title: appBarTitle,
-        foregroundColor:
-            isDark ? MyColors.darkTextPrimary : MyColors.textMatn2,
+        foregroundColor: isDark ? MyColors.darkTextPrimary : MyColors.textMatn2,
       ),
       body: SafeArea(
         child: _loading
@@ -198,9 +197,8 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
   Widget _buildContent(bool isDark, KavooshBookDetail book) {
     final hasFullAccess = _hasFullAccess;
     final showSampleButton = _showSampleButton;
-    final title = book.title.isNotEmpty
-        ? book.title
-        : (widget.title ?? 'جزئیات کتاب');
+    final title =
+        book.title.isNotEmpty ? book.title : (widget.title ?? 'جزئیات کتاب');
 
     return Column(
       children: [
@@ -246,8 +244,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
                   'نسخه الکترونیکی',
                   style: TextStyle(
                     fontSize: Dimens.nsp(14),
-                    color:
-                        isDark ? MyColors.darkTextSecondary : MyColors.text5,
+                    color: isDark ? MyColors.darkTextSecondary : MyColors.text5,
                   ),
                 ),
                 if (!hasFullAccess) ...[
@@ -343,42 +340,46 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
                           textAlign: TextAlign.justify,
                         ),
                       ),
-                      Column(
-                        children: [
-                          _buildAttributeRow(
-                            'ناشر:',
-                            book.publisher.isNotEmpty ? book.publisher : '-',
-                          ),
-                          _buildAttributeRow(
-                            'نویسنده:',
-                            book.authorName.isNotEmpty ? book.authorName : '-',
-                          ),
-                          _buildAttributeRow(
-                            'فرمت:',
-                            book.formatLabel,
-                          ),
-                          _buildAttributeRow(
-                            'حجم:',
-                            _formatFileSize(book.size),
-                          ),
-                          _buildAttributeRow(
-                            'تعداد صفحه:',
-                            book.pages > 0
-                                ? toPersianDigits('${book.pages}')
-                                : '-',
-                          ),
-                          _buildAttributeRow(
-                            'تاریخ نشر:',
-                            book.publishDate.isNotEmpty
-                                ? toPersianDigits(book.publishDate)
-                                : '-',
-                          ),
-                        ],
+                      SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            _buildAttributeRow(
+                              'ناشر:',
+                              book.publisher.isNotEmpty ? book.publisher : '-',
+                            ),
+                            _buildAttributeRow(
+                              'نویسنده:',
+                              book.authorName.isNotEmpty
+                                  ? book.authorName
+                                  : '-',
+                            ),
+                            _buildAttributeRow(
+                              'فرمت:',
+                              book.formatLabel,
+                            ),
+                            _buildAttributeRow(
+                              'حجم:',
+                              _formatFileSize(book.size),
+                            ),
+                            _buildAttributeRow(
+                              'تعداد صفحه:',
+                              book.pages > 0
+                                  ? toPersianDigits('${book.pages}')
+                                  : '-',
+                            ),
+                            _buildAttributeRow(
+                              'تاریخ نشر:',
+                              book.publishDate.isNotEmpty
+                                  ? toPersianDigits(book.publishDate)
+                                  : '-',
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
                 ),
-                SizedBox(height: Dimens.nh(100)),
+                SizedBox(height: Dimens.nh(10)),
               ],
             ),
           ),
@@ -553,8 +554,7 @@ class _KavooshPdfReaderPageState extends State<_KavooshPdfReaderPage> {
       backgroundColor: isDark ? MyColors.darkBackground : MyColors.background1,
       appBar: PoortakAppBar(
         title: widget.title,
-        foregroundColor:
-            isDark ? MyColors.darkTextPrimary : MyColors.textMatn2,
+        foregroundColor: isDark ? MyColors.darkTextPrimary : MyColors.textMatn2,
       ),
       body: CustomPdfReader(
         fileName: widget.fileName,
