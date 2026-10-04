@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'myColors.dart';
 
@@ -284,6 +285,11 @@ class MyThemes {
           foregroundColor: MyColors.darkTextPrimary,
           elevation: 0,
           centerTitle: false,
+          systemOverlayStyle: SystemUiOverlayStyle(
+            statusBarColor: Colors.transparent,
+            statusBarIconBrightness: Brightness.light,
+            statusBarBrightness: Brightness.dark,
+          ),
         ),
         cardTheme: const CardThemeData(
           color: MyColors.darkCardBackground,
@@ -393,6 +399,11 @@ class MyThemes {
           foregroundColor: MyColors.textPrimary,
           elevation: 0,
           centerTitle: false,
+          systemOverlayStyle: SystemUiOverlayStyle(
+            statusBarColor: Colors.transparent,
+            statusBarIconBrightness: Brightness.dark,
+            statusBarBrightness: Brightness.light,
+          ),
         ),
         cardTheme: const CardThemeData(
           color: MyColors.cardBackground,

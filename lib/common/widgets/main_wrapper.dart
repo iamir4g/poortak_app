@@ -30,6 +30,7 @@ import 'package:poortak/featueres/feature_payment/presentation/screens/payment_r
 import 'package:poortak/locator.dart';
 import 'package:poortak/common/bloc/theme_cubit/theme_cubit.dart';
 import 'package:poortak/common/blocs/bottom_nav_cubit/bottom_nav_cubit.dart';
+import 'package:poortak/main.dart';
 
 class MainWrapper extends StatefulWidget {
   static const routeName = "/main_wrapper";
@@ -40,7 +41,7 @@ class MainWrapper extends StatefulWidget {
   State<MainWrapper> createState() => _MainWrapperState();
 }
 
-class _MainWrapperState extends State<MainWrapper> {
+class _MainWrapperState extends State<MainWrapper> with RouteAware {
   // Using late init to ensure PageController is created only once
   late final PageController controller;
   final PrefsOperator prefsOperator = locator<PrefsOperator>();
@@ -79,6 +80,8 @@ class _MainWrapperState extends State<MainWrapper> {
     _authNavigationManager.addListener(_authNavigationListener);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _restoreSystemUi();
       if (widget.initialIndex != null) {
         try {
           context
@@ -94,6 +97,25 @@ class _MainWrapperState extends State<MainWrapper> {
 
     // Initialize deep link handling for when app is already running
     _initDeepLinks();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route is PageRoute) {
+      routeObserver.subscribe(this, route);
+    }
+  }
+
+  @override
+  void didPopNext() {
+    _restoreSystemUi();
+  }
+
+  @override
+  void didPush() {
+    _restoreSystemUi();
   }
 
   void _showPendingPaymentResultIfNeeded() {
@@ -154,6 +176,7 @@ class _MainWrapperState extends State<MainWrapper> {
 
   @override
   void dispose() {
+    routeObserver.unsubscribe(this);
     _linkSubscription?.cancel();
     _authNavigationManager.removeListener(_authNavigationListener);
     controller.dispose();
@@ -284,10 +307,17 @@ class _MainWrapperState extends State<MainWrapper> {
     );
   }
 
+  void _restoreSystemUi() {
+    if (!mounted) return;
+    final isDark = context.read<ThemeCubit>().state.isDark;
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    _applyStatusBarStyle(isDark);
+  }
+
   void _applyStatusBarStyle(bool isDark) {
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
-        statusBarColor: isDark ? MyColors.darkBackground : MyColors.background,
+        statusBarColor: Colors.transparent,
         statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
         statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
         systemNavigationBarColor:
@@ -341,10 +371,12 @@ class _MainWrapperState extends State<MainWrapper> {
         //   create: (context) => locator<LitnerBloc>(),
         // ),
       ],
-      child: BlocBuilder<ThemeCubit, ThemeState>(
+      child: BlocConsumer<ThemeCubit, ThemeState>(
+        listenWhen: (previous, current) => previous.isDark != current.isDark,
+        listener: (context, themeState) {
+          _restoreSystemUi();
+        },
         builder: (context, themeState) {
-          _applyStatusBarStyle(themeState.isDark);
-
           return PopScope(
             canPop: false,
             onPopInvoked: (didPop) async {

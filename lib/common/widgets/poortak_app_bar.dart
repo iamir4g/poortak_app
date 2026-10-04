@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
@@ -66,6 +67,11 @@ class PoortakAppBar extends StatelessWidget implements PreferredSizeWidget {
       scrolledUnderElevation: 0,
       shadowColor: Colors.transparent,
       surfaceTintColor: Colors.transparent,
+      systemOverlayStyle: SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+        statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
+      ),
       shape: RoundedRectangleBorder(borderRadius: radius),
       flexibleSpace: Container(
         decoration: MyColors.headerDecoration(
