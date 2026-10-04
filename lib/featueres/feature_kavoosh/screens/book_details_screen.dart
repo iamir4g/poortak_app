@@ -8,6 +8,8 @@ import 'package:poortak/common/utils/digit_utils.dart';
 import 'package:poortak/common/utils/money_utils.dart';
 import 'package:poortak/common/widgets/custom_pdfReader.dart';
 import 'package:poortak/common/widgets/poortak_app_bar.dart';
+import 'package:poortak/common/widgets/primaryButton.dart';
+import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_kavoosh/data/models/kavoosh_book_detail_model.dart';
@@ -43,9 +45,6 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    _tabController.addListener(() {
-      if (mounted) setState(() {});
-    });
     _load();
   }
 
@@ -99,6 +98,11 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
     );
   }
 
+  bool get _showSampleButton {
+    final trialFile = _book?.demoFileId?.trim();
+    return trialFile != null && trialFile.isNotEmpty && !_hasFullAccess;
+  }
+
   void _openSample() => _openPdf(forceTrial: true);
 
   void _openFullBook() => _openPdf(forceTrial: false);
@@ -149,307 +153,327 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final book = _book;
-    final title = book?.title ?? widget.title ?? 'جزئیات کتاب';
     final appBarTitle = book?.category?.title.isNotEmpty == true
         ? 'کتاب ${book!.category!.title}'
         : 'کتاب الکترونیکی';
-    final priceLabel = book == null
-        ? ''
-        : '${MoneyUtils.formatTomanFromRial(book.price)} تومان';
 
     return Scaffold(
-      backgroundColor: isDark ? MyColors.darkBackground : MyColors.background1,
+      backgroundColor: isDark ? MyColors.darkBackground : Colors.white,
       appBar: PoortakAppBar(
         title: appBarTitle,
         foregroundColor:
             isDark ? MyColors.darkTextPrimary : MyColors.textMatn2,
       ),
-      body: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : _error != null
-              ? Center(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.w),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          _error!,
-                          style: MyTextStyle.textMatn14Bold.copyWith(
-                            color: Colors.red,
+      body: SafeArea(
+        child: _loading
+            ? const Center(child: CircularProgressIndicator())
+            : _error != null
+                ? Center(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16.w),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            _error!,
+                            style: MyTextStyle.textMatn14Bold.copyWith(
+                              color: Colors.red,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                        SizedBox(height: 12.h),
-                        TextButton(
-                          onPressed: _load,
-                          child: const Text('تلاش مجدد'),
-                        ),
-                      ],
+                          SizedBox(height: 12.h),
+                          TextButton(
+                            onPressed: _load,
+                            child: const Text('تلاش مجدد'),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                )
-              : SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      SizedBox(height: 24.h),
-                      Center(
-                        child: Column(
-                          children: [
-                            Container(
-                              width: 200.w,
-                              height: 280.h,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(16.r),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color:
-                                        Colors.black.withValues(alpha: 0.1),
-                                    blurRadius: 20.r,
-                                    offset: Offset(0, 10.h),
-                                  ),
-                                ],
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(16.r),
-                                child: _buildCover(isDark, book),
-                              ),
-                            ),
-                            SizedBox(height: 24.h),
-                            Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 16.w),
-                              child: Text(
-                                title,
-                                style: MyTextStyle.textMatn18Bold.copyWith(
-                                  fontSize: 20.sp,
-                                  color: isDark
-                                      ? MyColors.darkTextPrimary
-                                      : MyColors.textMatn2,
-                                ),
-                                textAlign: TextAlign.center,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            SizedBox(height: 8.h),
-                            Text(
-                              'نسخه الکترونیکی',
-                              style: MyTextStyle.textMatn14Bold.copyWith(
-                                color: isDark
-                                    ? MyColors.darkTextSecondary
-                                    : MyColors.text4,
-                                fontWeight: FontWeight.normal,
-                              ),
-                            ),
-                            SizedBox(height: 24.h),
-                            Padding(
-                              padding:
-                                  EdgeInsets.symmetric(horizontal: 16.w),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    'قیمت:',
-                                    style:
-                                        MyTextStyle.textHeader16Bold.copyWith(
-                                      color: isDark
-                                          ? MyColors.darkTextPrimary
-                                          : MyColors.textMatn2,
-                                    ),
-                                  ),
-                                  SizedBox(width: 8.w),
-                                  Flexible(
-                                    child: Text(
-                                      priceLabel,
-                                      style: MyTextStyle.textHeader16Bold
-                                          .copyWith(
-                                        color: isDark
-                                            ? MyColors.darkTextPrimary
-                                            : MyColors.textMatn2,
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 24.h),
-                      Container(
-                        margin: EdgeInsets.symmetric(horizontal: 16.w),
-                        decoration: BoxDecoration(
-                          border: Border(
-                            bottom: BorderSide(
-                              color: isDark
-                                  ? MyColors.darkBorder
-                                  : MyColors.divider,
-                              width: 1.h,
-                            ),
-                          ),
-                        ),
-                        child: TabBar(
-                          controller: _tabController,
-                          labelColor: MyColors.primary,
-                          unselectedLabelColor: isDark
-                              ? MyColors.darkTextSecondary
-                              : MyColors.text4,
-                          indicatorColor: MyColors.primary,
-                          indicatorWeight: 3.h,
-                          labelStyle: MyTextStyle.textMatn14Bold,
-                          tabs: const [
-                            Tab(text: 'درباره کالا'),
-                            Tab(text: 'ویژگی های کالا'),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(24.r),
-                        child: _tabController.index == 0
-                            ? Align(
-                                alignment: AlignmentDirectional.centerStart,
-                                child: Text(
-                                  (book?.description.isNotEmpty ?? false)
-                                      ? book!.description
-                                      : 'توضیحی ثبت نشده است.',
-                                  style: MyTextStyle.textMatn14Bold.copyWith(
-                                    fontWeight: FontWeight.normal,
-                                    height: 1.7,
-                                    color: isDark
-                                        ? MyColors.darkTextSecondary
-                                        : MyColors.text3,
-                                  ),
-                                  textAlign: TextAlign.start,
-                                ),
-                              )
-                            : Column(
-                                children: [
-                                  _buildDetailRow(
-                                    'ناشر:',
-                                    book?.publisher.isNotEmpty == true
-                                        ? book!.publisher
-                                        : '—',
-                                  ),
-                                  _buildDetailRow(
-                                    'نویسنده:',
-                                    book?.authorName.isNotEmpty == true
-                                        ? book!.authorName
-                                        : '—',
-                                  ),
-                                  _buildDetailRow(
-                                    'فرمت:',
-                                    book?.formatLabel ?? '—',
-                                  ),
-                                  _buildDetailRow(
-                                    'حجم:',
-                                    _formatFileSize(book?.size ?? 0),
-                                  ),
-                                  _buildDetailRow(
-                                    'تعداد صفحه:',
-                                    (book?.pages ?? 0) > 0
-                                        ? '${toPersianDigits('${book!.pages}')} صفحه'
-                                        : '—',
-                                  ),
-                                  _buildDetailRow(
-                                    'تاریخ نشر:',
-                                    book?.publishDate.isNotEmpty == true
-                                        ? toPersianDigits(book!.publishDate)
-                                        : '—',
-                                  ),
-                                ],
-                              ),
-                      ),
-                      SizedBox(height: 20.h),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 24.w),
-                        child: Column(
-                          children: [
-                            SizedBox(
-                              width: double.infinity,
-                              height: 50.h,
-                              child: OutlinedButton(
-                                onPressed: _openSample,
-                                style: OutlinedButton.styleFrom(
-                                  side: BorderSide(
-                                    color: isDark
-                                        ? MyColors.darkBorder
-                                        : MyColors.text4,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12.r),
-                                  ),
-                                ),
-                                child: Text(
-                                  'خواندن نمونه',
-                                  style: MyTextStyle.textHeader16Bold.copyWith(
-                                    color: isDark
-                                        ? MyColors.darkTextSecondary
-                                        : MyColors.text4,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            SizedBox(height: 12.h),
-                            SizedBox(
-                              width: double.infinity,
-                              height: 50.h,
-                              child: ElevatedButton(
-                                onPressed: _hasFullAccess
-                                    ? _openFullBook
-                                    : () {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          const SnackBar(
-                                            content: Text(
-                                              'افزودن به سبد خرید به‌زودی فعال می‌شود',
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: isDark
-                                      ? MyColors.primary
-                                      : MyColors.secondary,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12.r),
-                                  ),
-                                ),
-                                child: Text(
-                                  _hasFullAccess
-                                      ? 'خواندن کتاب'
-                                      : 'افزودن به سبد خرید',
-                                  style:
-                                      MyTextStyle.textHeader16Bold.copyWith(
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 40.h),
-                    ],
-                  ),
-                ),
+                  )
+                : _buildContent(isDark, book!),
+      ),
     );
   }
 
-  Widget _buildCover(bool isDark, KavooshBookDetail? book) {
+  Widget _buildContent(bool isDark, KavooshBookDetail book) {
+    final hasFullAccess = _hasFullAccess;
+    final showSampleButton = _showSampleButton;
+    final title = book.title.isNotEmpty
+        ? book.title
+        : (widget.title ?? 'جزئیات کتاب');
+
+    return Column(
+      children: [
+        Expanded(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.symmetric(horizontal: Dimens.nw(24)),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(height: Dimens.nh(20)),
+                Center(
+                  child: Container(
+                    width: Dimens.nw(261.0),
+                    height: Dimens.nh(216.0),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(Dimens.nr(12)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.1),
+                          blurRadius: 10,
+                          offset: const Offset(0, 5),
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(Dimens.nr(12)),
+                      child: _buildCover(isDark, book),
+                    ),
+                  ),
+                ),
+                SizedBox(height: Dimens.nh(24)),
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: Dimens.nsp(20),
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? MyColors.darkTextPrimary : MyColors.text2,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: Dimens.nh(8)),
+                Text(
+                  'نسخه الکترونیکی',
+                  style: TextStyle(
+                    fontSize: Dimens.nsp(14),
+                    color:
+                        isDark ? MyColors.darkTextSecondary : MyColors.text5,
+                  ),
+                ),
+                if (!hasFullAccess) ...[
+                  Divider(
+                    height: Dimens.nh(32),
+                    color: isDark ? MyColors.darkBorder : MyColors.dividerGray,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'قیمت:',
+                        style: TextStyle(
+                          fontSize: Dimens.nsp(16),
+                          fontWeight: FontWeight.bold,
+                          color: isDark
+                              ? MyColors.darkTextPrimary
+                              : MyColors.textMatn1,
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            MoneyUtils.formatTomanFromRial(book.price),
+                            style: TextStyle(
+                              fontSize: Dimens.nsp(16),
+                              fontWeight: FontWeight.bold,
+                              color: isDark
+                                  ? MyColors.darkTextPrimary
+                                  : MyColors.textMatn1,
+                            ),
+                          ),
+                          SizedBox(width: Dimens.nw(4)),
+                          Text(
+                            'تومان',
+                            style: TextStyle(
+                              fontSize: Dimens.nsp(14),
+                              color: isDark
+                                  ? MyColors.darkTextSecondary
+                                  : MyColors.text3,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+                SizedBox(height: Dimens.nh(32)),
+                SizedBox(
+                  height: Dimens.nh(40),
+                  child: TabBar(
+                    dividerColor:
+                        isDark ? MyColors.darkBorder : MyColors.dividerGray,
+                    controller: _tabController,
+                    isScrollable: true,
+                    labelStyle: MyTextStyle.tabLabel16.copyWith(
+                      color: isDark
+                          ? MyColors.darkTextPrimary
+                          : MyColors.activeTabBackground,
+                    ),
+                    unselectedLabelStyle: MyTextStyle.tabLabel16.copyWith(
+                      color: isDark
+                          ? MyColors.darkTextSecondary
+                          : MyColors.inactiveTabBackground,
+                    ),
+                    indicatorColor: MyColors.primary,
+                    indicatorSize: TabBarIndicatorSize.label,
+                    indicatorWeight: Dimens.nw(2),
+                    tabs: const [
+                      Tab(text: 'درباره کالا'),
+                      Tab(text: 'ویژگی های کالا'),
+                    ],
+                  ),
+                ),
+                SizedBox(height: Dimens.nh(16)),
+                SizedBox(
+                  height: Dimens.nh(200),
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: [
+                      SingleChildScrollView(
+                        child: Text(
+                          book.description.isNotEmpty
+                              ? book.description
+                              : 'توضیحاتی موجود نیست.',
+                          style: TextStyle(
+                            fontSize: Dimens.nsp(14),
+                            height: 1.5,
+                            color: isDark
+                                ? MyColors.darkTextPrimary
+                                : MyColors.textMatn1,
+                          ),
+                          textAlign: TextAlign.justify,
+                        ),
+                      ),
+                      Column(
+                        children: [
+                          _buildAttributeRow(
+                            'ناشر:',
+                            book.publisher.isNotEmpty ? book.publisher : '-',
+                          ),
+                          _buildAttributeRow(
+                            'نویسنده:',
+                            book.authorName.isNotEmpty ? book.authorName : '-',
+                          ),
+                          _buildAttributeRow(
+                            'فرمت:',
+                            book.formatLabel,
+                          ),
+                          _buildAttributeRow(
+                            'حجم:',
+                            _formatFileSize(book.size),
+                          ),
+                          _buildAttributeRow(
+                            'تعداد صفحه:',
+                            book.pages > 0
+                                ? toPersianDigits('${book.pages}')
+                                : '-',
+                          ),
+                          _buildAttributeRow(
+                            'تاریخ نشر:',
+                            book.publishDate.isNotEmpty
+                                ? toPersianDigits(book.publishDate)
+                                : '-',
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: Dimens.nh(100)),
+              ],
+            ),
+          ),
+        ),
+        Container(
+          padding: EdgeInsets.all(Dimens.medium),
+          decoration: BoxDecoration(
+            color: isDark ? MyColors.darkBackgroundSecondary : Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 10,
+                offset: const Offset(0, -5),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (showSampleButton) ...[
+                SizedBox(
+                  width: double.infinity,
+                  height: Dimens.buttonHeight,
+                  child: OutlinedButton(
+                    onPressed: _openSample,
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor:
+                          MyColors.bookSampleButtonBackgroundColor(isDark),
+                      foregroundColor:
+                          MyColors.bookSampleButtonTextColor(isDark),
+                      side: BorderSide(
+                        color: MyColors.bookSampleButtonBorderColor(isDark),
+                        width: 1,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(Dimens.radiusMedium),
+                      ),
+                      elevation: 0,
+                      padding: EdgeInsets.zero,
+                    ),
+                    child: Text(
+                      'خواندن نمونه',
+                      style: MyTextStyle.textHeader16Bold.copyWith(
+                        color: MyColors.bookSampleButtonTextColor(isDark),
+                        fontSize: Dimens.nsp(16),
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: Dimens.nh(12)),
+              ],
+              PrimaryButton(
+                width: double.infinity,
+                height: Dimens.buttonHeight,
+                backgroundColor: MyColors.secondary,
+                lable: hasFullAccess ? 'خواندن کتاب' : 'خرید کتاب',
+                onPressed: () {
+                  if (hasFullAccess) {
+                    _openFullBook();
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('افزودن به سبد خرید به‌زودی فعال می‌شود'),
+                      ),
+                    );
+                  }
+                },
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCover(bool isDark, KavooshBookDetail book) {
     final placeholder = Container(
       color: isDark ? MyColors.darkBackgroundSecondary : Colors.grey[200],
-      child: Icon(Icons.book, size: 80.r, color: Colors.grey),
+      child: Icon(Icons.book, size: 50.r, color: Colors.grey),
     );
 
-    if (book?.thumbnailId == null) return placeholder;
+    if (book.thumbnailId == null) return placeholder;
 
     return FutureBuilder<String>(
-      future: GetImageUrlService().getImageUrl(book!.thumbnailId!),
+      future: GetImageUrlService().getImageUrl(book.thumbnailId!),
       builder: (context, snapshot) {
         final url = snapshot.data;
-        if (url == null || url.isEmpty) return placeholder;
+        if (url == null || url.isEmpty) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          return placeholder;
+        }
         return Image.network(
           url,
           fit: BoxFit.cover,
@@ -459,34 +483,25 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
     );
   }
 
-  Widget _buildDetailRow(String label, String value) {
+  Widget _buildAttributeRow(String label, String value) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
-      padding: EdgeInsets.only(bottom: 16.h),
+      padding: EdgeInsets.symmetric(vertical: Dimens.nh(8)),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Flexible(
-            child: Text(
-              label,
-              style: MyTextStyle.textMatn14Bold.copyWith(
-                color: isDark ? MyColors.darkTextSecondary : MyColors.text4,
-                fontWeight: FontWeight.normal,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+          Text(
+            label,
+            style: TextStyle(
+              color: isDark ? MyColors.darkTextSecondary : Colors.grey,
+              fontSize: Dimens.nsp(14),
             ),
           ),
-          SizedBox(width: 8.w),
-          Flexible(
-            child: Text(
-              value,
-              style: MyTextStyle.textMatn14Bold.copyWith(
-                color: isDark ? MyColors.darkTextPrimary : MyColors.text3,
-              ),
-              textAlign: TextAlign.end,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+          Text(
+            value,
+            style: TextStyle(
+              color: isDark ? MyColors.darkTextPrimary : Colors.black,
+              fontSize: Dimens.nsp(14),
             ),
           ),
         ],
