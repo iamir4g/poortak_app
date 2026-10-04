@@ -29,7 +29,7 @@ class StepProgress extends StatelessWidget {
         borderRadius: BorderRadius.circular(20.r),
       ),
       child: Stack(
-        alignment: AlignmentDirectional.centerStart,
+        alignment: Alignment.centerLeft,
         children: [
           Container(
             decoration: BoxDecoration(
@@ -39,7 +39,7 @@ class StepProgress extends StatelessWidget {
           ),
           FractionallySizedBox(
             widthFactor: widthFactor,
-            alignment: AlignmentDirectional.centerStart,
+            alignment: Alignment.centerLeft,
             child: Container(
               decoration: BoxDecoration(
                 color: fillColor,
