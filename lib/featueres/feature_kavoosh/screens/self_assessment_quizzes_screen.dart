@@ -108,6 +108,7 @@ class _SelfAssessmentQuizzesScreenState
           title: quiz.title,
           maxQuestions: maxQuestions,
           initialCount: maxQuestions < 20 ? maxQuestions : 20,
+          thumbnailId: quiz.thumbnailId,
           onStart: (count) {
             Navigator.pop(dialogContext);
             _openQuiz(quiz, questionCount: count);

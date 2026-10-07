@@ -24,8 +24,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
         isDark ? MyColors.darkTextPrimary : MyColors.textMatn1;
     final secondaryTextColor =
         isDark ? MyColors.darkTextSecondary : MyColors.textSecondary;
-    final cardBackgroundColor =
-        isDark ? MyColors.darkCardBackground : MyColors.background2;
 
     return BlocBuilder<SettingsCubit, SettingsState>(
       builder: (context, state) {
@@ -164,15 +162,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ],
                         ),
 
-                        SizedBox(height: 40.h),
-
-                        // Test Text Box
-                        _buildTestTextBox(
-                          state.textSize,
-                          cardBackgroundColor,
-                          primaryTextColor,
-                        ),
-
                         SizedBox(height: 20.h),
                       ],
                     ),
@@ -289,30 +278,4 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildTestTextBox(
-    double textSize,
-    Color cardBackgroundColor,
-    Color primaryTextColor,
-  ) {
-    // محاسبه اندازه فونت بر اساس مقدار اسلایدر
-    // حداقل 12 و حداکثر 24 پیکسل
-    double fontSize = 12 + (textSize * 12);
-
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(16.r),
-      decoration: BoxDecoration(
-        color: cardBackgroundColor,
-        borderRadius: BorderRadius.circular(12.r),
-      ),
-      child: Text(
-        "این یک متن آزمایشی است",
-        textAlign: TextAlign.center,
-        style: MyTextStyle.textMatn14Bold.copyWith(
-          fontSize: fontSize.sp,
-          color: primaryTextColor,
-        ),
-      ),
-    );
-  }
 }

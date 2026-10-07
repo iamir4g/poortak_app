@@ -53,7 +53,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
   List<String> _currentMessageSentences = [];
 
   // مشخص می‌کند که آیا ترجمه‌ها باید نمایش داده شوند
-  final ValueNotifier<bool> showTranslationsNotifier = ValueNotifier(false);
+  final ValueNotifier<bool> showTranslationsNotifier = ValueNotifier(true);
 
   // شناسه جلسه پخش برای جلوگیری از تداخل پخش‌ها
   int _playbackSessionId = 0;

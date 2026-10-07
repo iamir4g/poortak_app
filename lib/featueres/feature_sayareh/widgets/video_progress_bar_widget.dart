@@ -92,7 +92,7 @@ class DecryptionProgressBarWidget extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'در حال رمزگشایی...',
+                'در حال پردازش ویدیو...',
                 style: TextStyle(
                   fontSize: 12.sp,
                   fontWeight: FontWeight.bold,

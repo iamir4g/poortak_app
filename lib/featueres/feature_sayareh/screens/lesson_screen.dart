@@ -458,26 +458,36 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
       _progress!.quiz == 100;
 
   Widget _buildContent(BuildContext context) {
-    return SingleChildScrollView(
-      padding: EdgeInsets.symmetric(horizontal: Dimens.medium),
-      child: Column(
-        children: [
-          SizedBox(height: Dimens.nh(15)), // Reduced from 28
-          if (_isLessonCompleted) ...[
-            _buildCompletionHeader(),
-            SizedBox(height: Dimens.nh(12)),
-          ],
-          _buildVideoSection(),
-          SizedBox(height: Dimens.nh(12)), // Reduced from 18
-          _buildConversationCard(),
-          SizedBox(height: Dimens.nh(12)), // Reduced from 12
-          _buildVocabularyCard(),
-          SizedBox(height: Dimens.nh(12)), // Reduced from 12
-          _buildQuizCard(),
-          SizedBox(height: Dimens.nh(60)), // Reduced from 88
-          _buildDictionaryButton(),
-        ],
-      ),
+    return Stack(
+      children: [
+        SingleChildScrollView(
+          padding: EdgeInsets.symmetric(horizontal: Dimens.medium),
+          child: Column(
+            children: [
+              SizedBox(height: Dimens.nh(15)), // Reduced from 28
+              if (_isLessonCompleted) ...[
+                _buildCompletionHeader(),
+                SizedBox(height: Dimens.nh(12)),
+              ],
+              _buildVideoSection(),
+              SizedBox(height: Dimens.nh(12)), // Reduced from 18
+              _buildConversationCard(),
+              SizedBox(height: Dimens.nh(12)), // Reduced from 12
+              _buildVocabularyCard(),
+              SizedBox(height: Dimens.nh(12)), // Reduced from 12
+              _buildQuizCard(),
+              SizedBox(
+                  height:
+                      Dimens.nh(80)), // Space for floating dictionary button
+            ],
+          ),
+        ),
+        Positioned(
+          left: Dimens.nw(20) + Dimens.medium,
+          bottom: Dimens.nh(2),
+          child: _buildDictionaryButton(),
+        ),
+      ],
     );
   }
 
@@ -757,39 +767,33 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
 
   Widget _buildDictionaryButton() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Padding(
-        padding: EdgeInsets.only(left: Dimens.nw(20)),
-        child: Container(
-          width: Dimens.nw(63),
-          height: Dimens.nh(63),
-          decoration: BoxDecoration(
-            color: isDark ? MyColors.profileHeaderDark : Colors.white,
-            borderRadius: BorderRadius.circular(Dimens.nr(50)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.04),
-                offset: const Offset(0, 0),
-                blurRadius: Dimens.nr(4),
-              ),
-            ],
+    return Container(
+      width: Dimens.nw(63),
+      height: Dimens.nh(63),
+      decoration: BoxDecoration(
+        color: isDark ? MyColors.profileHeaderDark : Colors.white,
+        borderRadius: BorderRadius.circular(Dimens.nr(50)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            offset: const Offset(0, 0),
+            blurRadius: Dimens.nr(4),
           ),
-          child: IconButton(
-            onPressed: () {
-              showModalBottomSheet(
-                context: context,
-                isScrollControlled: true,
-                backgroundColor: Colors.transparent,
-                builder: (context) => const DictionaryBottomSheet(),
-              );
-            },
-            icon: buildImageFromAssetOrEmbeddedSvg(
-              "assets/images/iknow/dictionary_icon.svg",
-              width: Dimens.nw(36),
-              height: Dimens.nh(36),
-            ),
-          ),
+        ],
+      ),
+      child: IconButton(
+        onPressed: () {
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
+            builder: (context) => const DictionaryBottomSheet(),
+          );
+        },
+        icon: buildImageFromAssetOrEmbeddedSvg(
+          "assets/images/iknow/dictionary_icon.svg",
+          width: Dimens.nw(36),
+          height: Dimens.nh(36),
         ),
       ),
     );

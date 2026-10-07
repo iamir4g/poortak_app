@@ -182,7 +182,7 @@ void main() {
     verify(() => mockTTSService.speak("Hello")).called(1);
   });
 
-  testWidgets('نمایش ترجمه با کلیک روی دکمه ترجمه', (tester) async {
+  testWidgets('ترجمه به صورت پیش‌فرض نمایش داده می‌شود', (tester) async {
     // Arrange
     when(() => mockSayarehRepository.fetchSayarehConversation(any()))
         .thenAnswer((_) async => DataSuccess(mockConversationModel));
@@ -191,12 +191,14 @@ void main() {
     await tester.pumpWidget(createWidgetUnderTest());
     await tester.pump(const Duration(seconds: 1)); // Wait for data
 
-    // Tap translate button
+    // Translation is on by default
+    expect(find.text("سلام"), findsOneWidget);
+
+    // Tap translate button to hide
     await tester.tap(find.byIcon(Icons.translate));
     await tester.pump();
 
-    // Check if "سلام" is visible/found.
-    expect(find.text("سلام"), findsOneWidget);
+    expect(find.text("سلام"), findsNothing);
   });
 
   testWidgets('پخش تمام مکالمه با دکمه پخش', (tester) async {

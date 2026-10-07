@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/common/services/getImageUrl_service.dart';
 import 'package:poortak/common/utils/digit_utils.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
@@ -9,6 +10,7 @@ class QuestionCountModal extends StatefulWidget {
   final int maxQuestions;
   final int initialCount;
   final String? thumbnailAsset;
+  final String? thumbnailId;
   final ValueChanged<int> onStart;
 
   const QuestionCountModal({
@@ -18,6 +20,7 @@ class QuestionCountModal extends StatefulWidget {
     required this.maxQuestions,
     this.initialCount = 20,
     this.thumbnailAsset,
+    this.thumbnailId,
   });
 
   @override
@@ -36,10 +39,49 @@ class _QuestionCountModalState extends State<QuestionCountModal> {
     _currentSliderValue = preferred.toDouble();
   }
 
+  Widget _buildThumbnail() {
+    final fallback = Icon(
+      Icons.quiz_outlined,
+      size: 36.r,
+      color: Colors.white,
+    );
+
+    final defaultAsset =
+        widget.thumbnailAsset ?? 'assets/images/kavoosh/khodsanji/reiazi_logo.png';
+
+    Widget assetImage() => Image.asset(
+          defaultAsset,
+          width: 50.r,
+          height: 50.r,
+          fit: BoxFit.contain,
+          errorBuilder: (_, __, ___) => fallback,
+        );
+
+    if (widget.thumbnailId != null && widget.thumbnailId!.isNotEmpty) {
+      return FutureBuilder<String>(
+        future: GetImageUrlService().getImageUrl(widget.thumbnailId!),
+        builder: (context, snapshot) {
+          final url = snapshot.data;
+          if (url == null || url.isEmpty) {
+            return assetImage();
+          }
+          return Image.network(
+            url,
+            width: 50.r,
+            height: 50.r,
+            fit: BoxFit.contain,
+            errorBuilder: (_, __, ___) => assetImage(),
+          );
+        },
+      );
+    }
+
+    return assetImage();
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final midLabel = (_max / 2).round();
 
     return Container(
       padding: EdgeInsets.all(24.r),
@@ -72,20 +114,7 @@ class _QuestionCountModalState extends State<QuestionCountModal> {
               shape: BoxShape.circle,
               color: Color(0xFFFF4081),
             ),
-            child: Center(
-              child: Image.asset(
-                widget.thumbnailAsset ??
-                    'assets/images/kavoosh/khodsanji/reiazi_logo.png',
-                width: 50.r,
-                height: 50.r,
-                fit: BoxFit.contain,
-                errorBuilder: (_, __, ___) => Icon(
-                  Icons.quiz_outlined,
-                  size: 36.r,
-                  color: Colors.white,
-                ),
-              ),
-            ),
+            child: Center(child: _buildThumbnail()),
           ),
           SizedBox(height: 16.h),
           Padding(
@@ -110,68 +139,30 @@ class _QuestionCountModalState extends State<QuestionCountModal> {
           SizedBox(height: 24.h),
           Directionality(
             textDirection: TextDirection.ltr,
-            child: Column(
-              children: [
-                SliderTheme(
-                  data: SliderTheme.of(context).copyWith(
-                    activeTrackColor: MyColors.primary,
-                    inactiveTrackColor: isDark
-                        ? MyColors.darkBorder.withValues(alpha: 0.6)
-                        : const Color(0xFFE0E0E0),
-                    thumbColor: MyColors.primary,
-                    overlayColor: MyColors.primary.withValues(alpha: 0.2),
-                    trackHeight: 4.0.h,
-                    thumbShape:
-                        RoundSliderThumbShape(enabledThumbRadius: 10.0.r),
-                    overlayShape:
-                        RoundSliderOverlayShape(overlayRadius: 20.0.r),
-                  ),
-                  child: Slider(
-                    value: _currentSliderValue.clamp(1, _max.toDouble()),
-                    min: 1,
-                    max: _max.toDouble(),
-                    divisions: _max > 1 ? _max - 1 : 1,
-                    label: _currentSliderValue.round().toString(),
-                    onChanged: (double value) {
-                      setState(() {
-                        _currentSliderValue = value;
-                      });
-                    },
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 10.0.w),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        toPersianDigits('1'),
-                        style: MyTextStyle.textMatn12Bold.copyWith(
-                          color: isDark
-                              ? MyColors.darkTextSecondary
-                              : MyColors.textSecondary,
-                        ),
-                      ),
-                      Text(
-                        toPersianDigits(midLabel.toString()),
-                        style: MyTextStyle.textMatn12Bold.copyWith(
-                          color: isDark
-                              ? MyColors.darkTextSecondary
-                              : MyColors.textSecondary,
-                        ),
-                      ),
-                      Text(
-                        toPersianDigits(_max.toString()),
-                        style: MyTextStyle.textMatn12Bold.copyWith(
-                          color: isDark
-                              ? MyColors.darkTextSecondary
-                              : MyColors.textSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+            child: SliderTheme(
+              data: SliderTheme.of(context).copyWith(
+                activeTrackColor: MyColors.primary,
+                inactiveTrackColor: isDark
+                    ? MyColors.darkBorder.withValues(alpha: 0.6)
+                    : const Color(0xFFE0E0E0),
+                thumbColor: MyColors.primary,
+                overlayColor: MyColors.primary.withValues(alpha: 0.2),
+                trackHeight: 4.0.h,
+                thumbShape: RoundSliderThumbShape(enabledThumbRadius: 10.0.r),
+                overlayShape: RoundSliderOverlayShape(overlayRadius: 20.0.r),
+              ),
+              child: Slider(
+                value: _currentSliderValue.clamp(1, _max.toDouble()),
+                min: 1,
+                max: _max.toDouble(),
+                divisions: _max > 1 ? _max - 1 : 1,
+                label: _currentSliderValue.round().toString(),
+                onChanged: (double value) {
+                  setState(() {
+                    _currentSliderValue = value;
+                  });
+                },
+              ),
             ),
           ),
           SizedBox(height: 32.h),
