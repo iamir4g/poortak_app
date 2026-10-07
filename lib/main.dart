@@ -312,6 +312,7 @@ void main() async {
                             quizId: args['quizId'],
                             courseId: args['courseId'],
                             title: args['title'],
+                            description: args['description'] as String?,
                           ),
                         );
                       },
@@ -344,6 +345,7 @@ void main() async {
                             quizId: args['quizId'],
                             courseId: args['courseId'],
                             title: args['title'],
+                            description: args['description'] as String?,
                             initialQuestion: args['initialQuestion'],
                           ),
                         );

@@ -230,6 +230,8 @@ class MyColors {
   static const Color quizAnswerWrongBackgroundDark = Color(0xFF351705);
   static const Color quizAnswerWrongBorderDark = Color(0xFFE96217);
   static const Color quizAnswerWrongTextDark = Color(0xFFE96216);
+  static const Color quizDescriptionBackground = Color(0xFFFBF6FB);
+  static const Color quizDescriptionBackgroundDark = termsBackgroundDark;
 
   // Progress Bar Colors
   static const Color progressBarColor = Color(0xFF5E85F2);

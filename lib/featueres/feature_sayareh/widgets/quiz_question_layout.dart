@@ -105,12 +105,14 @@ Widget buildQuizStepProgress({
   required BuildContext context,
   required int currentQuestion,
   required int totalSteps,
+  String? description,
 }) {
   final isDark = Theme.of(context).brightness == Brightness.dark;
   final steps = totalSteps <= 0 ? 1 : totalSteps;
   // `currentQuestion` is 1-based from API `answered`.
   final displayIndex = currentQuestion.clamp(1, steps);
   final currentIndex = displayIndex - 1;
+  final hasDescription = description != null && description.trim().isNotEmpty;
 
   return Column(
     mainAxisSize: MainAxisSize.min,
@@ -127,6 +129,31 @@ Widget buildQuizStepProgress({
           color: isDark ? MyColors.darkTextSecondary : MyColors.text4,
         ),
       ),
+      SizedBox(height: Dimens.nh(8)),
+      if (hasDescription) ...[
+        SizedBox(height: Dimens.nh(8)),
+        Container(
+          width: Dimens.nw(267),
+          height: Dimens.nh(45),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: isDark
+                ? MyColors.quizDescriptionBackgroundDark
+                : MyColors.quizDescriptionBackground,
+            borderRadius: BorderRadius.circular(Dimens.nr(20)),
+          ),
+          padding: EdgeInsets.symmetric(horizontal: Dimens.nw(12)),
+          child: Text(
+            description.trim(),
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: MyTextStyle.textMatn12W500.copyWith(
+              color: isDark ? MyColors.darkTextSecondary : MyColors.text4,
+            ),
+          ),
+        ),
+      ],
     ],
   );
 }

@@ -36,6 +36,7 @@ class QuizesList {
 class Datum {
   String id;
   String title;
+  String? description;
   String difficulty;
   String thumbnail;
   DateTime createdAt;
@@ -46,6 +47,7 @@ class Datum {
   Datum({
     required this.id,
     required this.title,
+    this.description,
     required this.difficulty,
     required this.thumbnail,
     required this.createdAt,
@@ -67,6 +69,7 @@ class Datum {
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
         id: json["id"] ?? "",
         title: json["title"] ?? "",
+        description: json["description"]?.toString(),
         difficulty: json["difficulty"] ?? "",
         thumbnail: json["thumbnail"] ?? "",
         createdAt: DateTime.parse(json["createdAt"]),
@@ -83,6 +86,7 @@ class Datum {
   Map<String, dynamic> toJson() => {
         "id": id,
         "title": title,
+        "description": description,
         "difficulty": difficulty,
         "thumbnail": thumbnail,
         "createdAt": createdAt.toIso8601String(),

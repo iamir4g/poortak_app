@@ -30,11 +30,13 @@ class FirstQuizScreen extends StatefulWidget {
   final String quizId;
   final String courseId;
   final String title;
+  final String? description;
   const FirstQuizScreen({
     super.key,
     required this.quizId,
     required this.courseId,
     required this.title,
+    this.description,
   });
 
   @override
@@ -137,6 +139,7 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
       context: context,
       currentQuestion: progressState.currentQuestion,
       totalSteps: progressState.totalQuestions,
+      description: widget.description,
     );
   }
 
@@ -269,6 +272,7 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
               'quizId': widget.quizId,
               'courseId': widget.courseId,
               'title': widget.title,
+              'description': widget.description,
               'initialQuestion': answerState.nextQuestion,
               'quizProgress': progressState is QuizProgressLoaded
                   ? progressState.progress

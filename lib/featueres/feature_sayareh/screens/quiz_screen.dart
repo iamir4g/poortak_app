@@ -28,6 +28,7 @@ class QuizScreen extends StatefulWidget {
   final String quizId;
   final String courseId;
   final String title;
+  final String? description;
   final QuizesQuestion initialQuestion;
 
   const QuizScreen({
@@ -36,6 +37,7 @@ class QuizScreen extends StatefulWidget {
     required this.courseId,
     required this.title,
     required this.initialQuestion,
+    this.description,
   });
 
   @override
@@ -105,6 +107,7 @@ class _QuizScreenState extends State<QuizScreen> {
         'quizId': widget.quizId,
         'courseId': widget.courseId,
         'title': widget.title,
+        'description': widget.description,
       },
     );
   }
@@ -128,6 +131,7 @@ class _QuizScreenState extends State<QuizScreen> {
       context: context,
       currentQuestion: progressState.currentQuestion,
       totalSteps: progressState.totalQuestions,
+      description: widget.description,
     );
   }
 

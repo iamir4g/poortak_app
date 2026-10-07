@@ -66,6 +66,7 @@ class _QuizzesScreenState extends State<QuizzesScreen> with RouteAware {
   Future<void> _openQuiz({
     required String quizId,
     required String title,
+    String? description,
   }) async {
     await Navigator.pushNamed(
       context,
@@ -74,6 +75,7 @@ class _QuizzesScreenState extends State<QuizzesScreen> with RouteAware {
         "quizId": quizId,
         "courseId": widget.courseId,
         "title": title,
+        "description": description,
       },
     );
     // Refresh is handled by didPopNext so progress updates after the last
@@ -120,6 +122,7 @@ class _QuizzesScreenState extends State<QuizzesScreen> with RouteAware {
                           onTap: () => _openQuiz(
                             quizId: quiz.id,
                             title: quiz.title,
+                            description: quiz.description,
                           ),
                         );
                       },
