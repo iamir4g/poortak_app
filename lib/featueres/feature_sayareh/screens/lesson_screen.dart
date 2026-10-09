@@ -5,6 +5,9 @@ import 'package:poortak/common/services/video_download_service.dart';
 import 'package:poortak/common/bloc/video_download_cubit/video_download_cubit.dart';
 import 'package:poortak/featueres/feature_sayareh/data/models/sayareh_home_model.dart';
 import 'package:poortak/featueres/feature_sayareh/data/models/course_progress_model.dart';
+import 'package:poortak/featueres/feature_bookmarks/data/models/bookmark_models.dart';
+import 'package:poortak/featueres/feature_bookmarks/presentation/cubit/bookmark_cubit.dart';
+import 'package:poortak/featueres/feature_bookmarks/presentation/widgets/bookmark_toggle_button.dart';
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/iknow_access_bloc/iknow_access_bloc.dart';
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/lesson_bloc/lesson_bloc.dart';
 import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
@@ -370,6 +373,12 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
                 });
               }
 
+              context.read<BookmarkCubit>().syncFromDetail(
+                    type: BookmarkType.IKnowCourse,
+                    itemId: state.lesson.id,
+                    isBookmarked: state.lesson.isBookmarked,
+                  );
+
               if (state.progress != null) {
                 final p = state.progress!;
                 final isCompleted = _vocabularyProgress == 100 &&
@@ -453,6 +462,15 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
           foregroundColor: Theme.of(context).brightness == Brightness.dark
               ? MyColors.profileTextPrimaryDark
               : MyColors.text2,
+          actions: [
+            BookmarkToggleButton(
+              type: BookmarkType.IKnowCourse,
+              itemId: widget.lessonId,
+              iconColor: Theme.of(context).brightness == Brightness.dark
+                  ? MyColors.profileTextPrimaryDark
+                  : MyColors.text2,
+            ),
+          ],
         ),
         body: SafeArea(child: _buildContent(context)),
       ),

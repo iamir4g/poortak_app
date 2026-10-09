@@ -17,6 +17,9 @@ import 'package:poortak/common/widgets/poortak_app_bar.dart';
 import 'package:poortak/common/widgets/reusable_modal.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
+import 'package:poortak/featueres/feature_bookmarks/data/models/bookmark_models.dart';
+import 'package:poortak/featueres/feature_bookmarks/presentation/cubit/bookmark_cubit.dart';
+import 'package:poortak/featueres/feature_bookmarks/presentation/widgets/bookmark_toggle_button.dart';
 import 'package:poortak/featueres/feature_kavoosh/data/models/video_course_detail_model.dart';
 import 'package:poortak/featueres/feature_kavoosh/repositories/kavoosh_repository.dart';
 import 'package:poortak/featueres/feature_kavoosh/utils/kavoosh_video_playback_resolver.dart';
@@ -111,10 +114,17 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
       return;
     }
 
+    final detail = (result as DataSuccess<VideoCourseDetailResponse>).data!;
     setState(() {
-      _detail = (result as DataSuccess<VideoCourseDetailResponse>).data;
+      _detail = detail;
       _loading = false;
     });
+    if (!mounted) return;
+    context.read<BookmarkCubit>().syncFromDetail(
+          type: BookmarkType.VideoCourse,
+          itemId: detail.course.id,
+          isBookmarked: detail.course.isBookmarked,
+        );
   }
 
   String _formatDurationMinutes(int minutes) {
@@ -363,6 +373,13 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
       appBar: PoortakAppBar(
         title: title,
         foregroundColor: isDark ? MyColors.darkTextPrimary : MyColors.textMatn2,
+        actions: [
+          BookmarkToggleButton(
+            type: BookmarkType.VideoCourse,
+            itemId: widget.courseId,
+            iconColor: isDark ? MyColors.darkTextPrimary : MyColors.textMatn2,
+          ),
+        ],
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())

@@ -51,6 +51,7 @@ class Lesson {
   DateTime updatedAt;
   DateTime? publishedAt;
   bool purchased;
+  bool isBookmarked;
 
   Lesson({
     required this.id,
@@ -68,6 +69,7 @@ class Lesson {
     required this.createdAt,
     required this.updatedAt,
     required this.publishedAt,
+    this.isBookmarked = false,
   });
 
   String get videoThumbnailOrThumbnail =>
@@ -91,6 +93,7 @@ class Lesson {
         publishedAt: json["publishedAt"] != null
             ? DateTime.parse(json["publishedAt"])
             : null,
+        isBookmarked: json["isBookmarked"] == true,
       );
 
   Map<String, dynamic> toJson() => {
@@ -109,6 +112,7 @@ class Lesson {
         "createdAt": createdAt.toIso8601String(),
         "updatedAt": updatedAt.toIso8601String(),
         "publishedAt": publishedAt?.toIso8601String(),
+        "isBookmarked": isBookmarked,
       };
 }
 

@@ -17,6 +17,9 @@ import 'package:poortak/common/widgets/reusable_modal.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
+import 'package:poortak/featueres/feature_bookmarks/data/models/bookmark_models.dart';
+import 'package:poortak/featueres/feature_bookmarks/presentation/cubit/bookmark_cubit.dart';
+import 'package:poortak/featueres/feature_bookmarks/presentation/widgets/bookmark_toggle_button.dart';
 import 'package:poortak/featueres/feature_kavoosh/data/models/kavoosh_book_detail_model.dart';
 import 'package:poortak/featueres/feature_kavoosh/repositories/kavoosh_repository.dart';
 import 'package:poortak/featueres/feature_kavoosh/utils/kavoosh_book_pdf_playback_resolver.dart';
@@ -81,10 +84,17 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
       return;
     }
 
+    final book = (result as DataSuccess<KavooshBookDetail>).data!;
     setState(() {
-      _book = (result as DataSuccess<KavooshBookDetail>).data;
+      _book = book;
       _loading = false;
     });
+    if (!mounted) return;
+    context.read<BookmarkCubit>().syncFromDetail(
+          type: BookmarkType.Book,
+          itemId: book.id,
+          isBookmarked: book.isBookmarked,
+        );
   }
 
   String _formatFileSize(int bytes) {
@@ -241,6 +251,13 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
       appBar: PoortakAppBar(
         title: appBarTitle,
         foregroundColor: isDark ? MyColors.darkTextPrimary : MyColors.textMatn2,
+        actions: [
+          BookmarkToggleButton(
+            type: BookmarkType.Book,
+            itemId: widget.bookId,
+            iconColor: isDark ? MyColors.darkTextPrimary : MyColors.textMatn2,
+          ),
+        ],
       ),
       body: SafeArea(
         child: _loading

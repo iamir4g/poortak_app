@@ -10,6 +10,9 @@ import 'package:poortak/common/widgets/primaryButton.dart';
 import 'package:poortak/common/widgets/reusable_modal.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
+import 'package:poortak/featueres/feature_bookmarks/data/models/bookmark_models.dart';
+import 'package:poortak/featueres/feature_bookmarks/presentation/cubit/bookmark_cubit.dart';
+import 'package:poortak/featueres/feature_bookmarks/presentation/widgets/bookmark_toggle_button.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/data_source/shopping_cart_api_provider.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/models/cart_enum.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
@@ -79,57 +82,70 @@ class _BookDetailScreenState extends State<BookDetailScreen>
             ? MyColors.darkBackground
             : Colors.white,
         appBar: PoortakAppBar(
-          leading: IconButton(
-            icon: Icon(
-              Icons.bookmark_border,
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? MyColors.darkTextPrimary
-                  : Colors.black,
-            ),
-            onPressed: () {},
+          leading: BookmarkToggleButton(
+            type: BookmarkType.IKnowBook,
+            itemId: bookId,
+            iconColor: Theme.of(context).brightness == Brightness.dark
+                ? MyColors.darkTextPrimary
+                : Colors.black,
           ),
         ),
         body: SafeArea(
-          child: BlocBuilder<IknowAccessBloc, IknowAccessState>(
-            bloc: locator<IknowAccessBloc>(),
-            builder: (context, accessState) {
-              return BlocBuilder<SingleBookCubit, SingleBookState>(
-                builder: (context, state) {
-                  if (state.singleBookDataStatus is SingleBookDataLoading) {
-                    return const Center(child: DotLoadingWidget());
-                  }
-
-                  if (state.singleBookDataStatus is SingleBookDataCompleted) {
-                    final bookData =
-                        (state.singleBookDataStatus as SingleBookDataCompleted)
-                            .data
-                            .data;
-                    return _buildContent(context, bookData);
-                  }
-
-                  if (state.singleBookDataStatus is SingleBookDataError) {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text('خطا در دریافت اطلاعات'),
-                          ElevatedButton(
-                            onPressed: () {
-                              context
-                                  .read<SingleBookCubit>()
-                                  .fetchBookById(bookId);
-                            },
-                            child: const Text('تلاش دوباره'),
-                          ),
-                        ],
-                      ),
+          child: BlocListener<SingleBookCubit, SingleBookState>(
+            listener: (context, state) {
+              if (state.singleBookDataStatus is SingleBookDataCompleted) {
+                final bookData =
+                    (state.singleBookDataStatus as SingleBookDataCompleted)
+                        .data
+                        .data;
+                context.read<BookmarkCubit>().syncFromDetail(
+                      type: BookmarkType.IKnowBook,
+                      itemId: bookData.id,
+                      isBookmarked: bookData.isBookmarked,
                     );
-                  }
-
-                  return const SizedBox();
-                },
-              );
+              }
             },
+            child: BlocBuilder<IknowAccessBloc, IknowAccessState>(
+              bloc: locator<IknowAccessBloc>(),
+              builder: (context, accessState) {
+                return BlocBuilder<SingleBookCubit, SingleBookState>(
+                  builder: (context, state) {
+                    if (state.singleBookDataStatus is SingleBookDataLoading) {
+                      return const Center(child: DotLoadingWidget());
+                    }
+
+                    if (state.singleBookDataStatus is SingleBookDataCompleted) {
+                      final bookData = (state.singleBookDataStatus
+                              as SingleBookDataCompleted)
+                          .data
+                          .data;
+                      return _buildContent(context, bookData);
+                    }
+
+                    if (state.singleBookDataStatus is SingleBookDataError) {
+                      return Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text('خطا در دریافت اطلاعات'),
+                            ElevatedButton(
+                              onPressed: () {
+                                context
+                                    .read<SingleBookCubit>()
+                                    .fetchBookById(bookId);
+                              },
+                              child: const Text('تلاش دوباره'),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+
+                    return const SizedBox();
+                  },
+                );
+              },
+            ),
           ),
         ),
       ),

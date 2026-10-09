@@ -24,6 +24,7 @@ import 'package:poortak/featueres/feature_sayareh/presentation/bloc/bloc_storage
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/iknow_access_bloc/iknow_access_bloc.dart';
 import 'package:poortak/featueres/feature_sayareh/repositories/sayareh_repository.dart';
 import 'package:poortak/featueres/feature_sayareh/screens/sayareh_screen.dart';
+import 'package:poortak/featueres/feature_bookmarks/presentation/cubit/bookmark_cubit.dart';
 import 'package:poortak/featueres/feature_shopping_cart/screens/shopping_cart_screen.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
@@ -313,6 +314,12 @@ class _MainWrapperState extends State<MainWrapper>
       context.read<ShoppingCartBloc>().add(ClearLocalCartEvent());
     } catch (e) {
       log("⚠️ Failed to clear shopping cart: $e");
+    }
+
+    try {
+      locator<BookmarkCubit>().clear();
+    } catch (e) {
+      log("⚠️ Failed to clear bookmarks: $e");
     }
 
     // Navigate to Sayareh screen (index 0) instead of login screen

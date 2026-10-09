@@ -27,6 +27,9 @@ import 'package:poortak/featueres/feature_profile/presentation/bloc/user_points_
 import 'package:poortak/featueres/feature_shopping_cart/repositories/shopping_cart_repository.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/data_source/shopping_cart_api_provider.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
+import 'package:poortak/featueres/feature_bookmarks/data/data_source/bookmark_api_provider.dart';
+import 'package:poortak/featueres/feature_bookmarks/repositories/bookmark_repository.dart';
+import 'package:poortak/featueres/feature_bookmarks/presentation/cubit/bookmark_cubit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_start_bloc/quiz_start_bloc.dart';
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_answer_bloc/quiz_answer_bloc.dart';
@@ -146,6 +149,8 @@ Future<void> initLocator() async {
       .registerSingleton<LitnerApiProvider>(LitnerApiProvider(dio: locator()));
   locator.registerSingleton<ShoppingCartApiProvider>(
       ShoppingCartApiProvider(dio: locator()));
+  locator.registerSingleton<BookmarkApiProvider>(
+      BookmarkApiProvider(dio: locator()));
   locator.registerSingleton<MatchApiProvider>(MatchApiProvider(locator()));
   locator.registerSingleton<KavooshApiProvider>(
       KavooshApiProvider(dio: locator()));
@@ -155,6 +160,8 @@ Future<void> initLocator() async {
   locator.registerSingleton<SayarehRepository>(SayarehRepository(locator()));
   locator.registerSingleton<ShoppingCartRepository>(
       ShoppingCartRepository(apiProvider: locator()));
+  locator.registerSingleton<BookmarkRepository>(
+      BookmarkRepository(locator()));
   locator.registerSingleton<ProfileRepository>(ProfileRepository(locator()));
   locator.registerSingleton<ProfileBloc>(ProfileBloc(repository: locator()));
   locator.registerSingleton<UserPointsTotalBloc>(
@@ -197,6 +204,8 @@ Future<void> initLocator() async {
   // Register ShoppingCartBloc
   locator.registerSingleton<ShoppingCartBloc>(
       ShoppingCartBloc(repository: locator()));
+  locator.registerSingleton<BookmarkCubit>(
+      BookmarkCubit(repository: locator()));
   locator.registerSingleton<CafeBazaarPurchaseService>(
       CafeBazaarPurchaseService());
   locator.registerSingleton<InAppPurchaseBloc>(

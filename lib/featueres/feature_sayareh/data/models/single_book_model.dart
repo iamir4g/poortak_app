@@ -54,6 +54,7 @@ class SingleBookData {
   bool? purchased;
   bool? isDemo;
   String? bazaarSku;
+  bool isBookmarked;
 
   SingleBookData({
     required this.id,
@@ -74,6 +75,7 @@ class SingleBookData {
     this.purchased,
     this.isDemo,
     this.bazaarSku,
+    this.isBookmarked = false,
   });
 
   factory SingleBookData.fromJson(Map<String, dynamic> json) => SingleBookData(
@@ -101,6 +103,7 @@ class SingleBookData {
         purchased: json["purchased"],
         isDemo: json["isDemo"],
         bazaarSku: json["bazaarSku"]?.toString(),
+        isBookmarked: json["isBookmarked"] == true,
       );
 
   Map<String, dynamic> toJson() => {
@@ -122,6 +125,7 @@ class SingleBookData {
         "purchased": purchased,
         "isDemo": isDemo,
         "bazaarSku": bazaarSku,
+        "isBookmarked": isBookmarked,
       };
 }
 

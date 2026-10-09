@@ -59,6 +59,7 @@ import 'package:poortak/featueres/feature_profile/presentation/bloc/user_points_
 import 'package:poortak/featueres/feature_profile/presentation/bloc/user_points_total_bloc/user_points_total_event.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
+import 'package:poortak/featueres/feature_bookmarks/presentation/cubit/bookmark_cubit.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/sayareh_bloc/sayareh_cubit.dart';
 import 'package:poortak/common/bloc/video_download_cubit/video_download_cubit.dart';
@@ -163,6 +164,9 @@ void main() async {
         BlocProvider(create: (_) => locator<VideoDownloadCubit>()),
         BlocProvider.value(
           value: locator<ShoppingCartBloc>(),
+        ),
+        BlocProvider.value(
+          value: locator<BookmarkCubit>(),
         ),
         BlocProvider.value(
           value: locator<InAppPurchaseBloc>()

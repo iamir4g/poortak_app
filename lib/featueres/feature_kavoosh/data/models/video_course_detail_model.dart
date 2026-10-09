@@ -40,6 +40,7 @@ class VideoCourseInfo {
   final int order;
   final bool purchased;
   final bool hasAccess;
+  final bool isBookmarked;
   final DateTime? publishedAt;
 
   VideoCourseInfo({
@@ -54,6 +55,7 @@ class VideoCourseInfo {
     this.instructorId,
     this.purchased = false,
     this.hasAccess = false,
+    this.isBookmarked = false,
     this.publishedAt,
   });
 
@@ -70,6 +72,7 @@ class VideoCourseInfo {
       order: _asInt(json['order']),
       purchased: _asBool(json['purchased']),
       hasAccess: _asBool(json['hasAccess'] ?? json['access']),
+      isBookmarked: _asBool(json['isBookmarked']),
       publishedAt: DateTime.tryParse(json['publishedAt']?.toString() ?? ''),
     );
   }

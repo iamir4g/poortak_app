@@ -17,6 +17,7 @@ class KavooshBookDetail {
   final String? thumbnailId;
   final bool purchased;
   final bool hasAccess;
+  final bool isBookmarked;
   final DateTime? publishedAt;
   final KavooshBookCategory? category;
 
@@ -39,6 +40,7 @@ class KavooshBookDetail {
     this.thumbnailId,
     this.purchased = false,
     this.hasAccess = false,
+    this.isBookmarked = false,
     this.publishedAt,
     this.category,
   });
@@ -67,6 +69,7 @@ class KavooshBookDetail {
       thumbnailId: _nullableString(data['thumbnailId']),
       purchased: _asBool(data['purchased']),
       hasAccess: _asBool(data['hasAccess'] ?? data['access']),
+      isBookmarked: _asBool(data['isBookmarked']),
       publishedAt: DateTime.tryParse(data['publishedAt']?.toString() ?? ''),
       category: data['category'] is Map
           ? KavooshBookCategory.fromJson(
