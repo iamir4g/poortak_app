@@ -175,6 +175,8 @@ class InviteFriendsModal extends StatelessWidget {
                               print('🔍 Copying referral code: $referralCode');
                               await Clipboard.setData(
                                   ClipboardData(text: referralCode));
+                              if (!context.mounted) return;
+                              Navigator.of(context).pop();
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text('کد معرف کپی شد'),
@@ -296,6 +298,8 @@ class InviteFriendsModal extends StatelessWidget {
                         print('🔍 Copying referral code: $referralCode');
                         await Clipboard.setData(
                             ClipboardData(text: referralCode));
+                        if (!context.mounted) return;
+                        Navigator.of(context).pop();
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('کد معرف کپی شد'),
