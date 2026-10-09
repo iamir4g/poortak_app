@@ -1,4 +1,6 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/common/resources/data_state.dart';
 import 'package:poortak/common/services/getImageUrl_service.dart';
@@ -6,15 +8,22 @@ import 'package:poortak/common/services/screen_security_service.dart';
 import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/common/utils/digit_utils.dart';
 import 'package:poortak/common/utils/money_utils.dart';
+import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/common/widgets/custom_pdfReader.dart';
+import 'package:poortak/common/widgets/main_wrapper.dart';
 import 'package:poortak/common/widgets/poortak_app_bar.dart';
 import 'package:poortak/common/widgets/primaryButton.dart';
+import 'package:poortak/common/widgets/reusable_modal.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_kavoosh/data/models/kavoosh_book_detail_model.dart';
 import 'package:poortak/featueres/feature_kavoosh/repositories/kavoosh_repository.dart';
 import 'package:poortak/featueres/feature_kavoosh/utils/kavoosh_book_pdf_playback_resolver.dart';
+import 'package:poortak/featueres/feature_shopping_cart/data/data_source/shopping_cart_api_provider.dart';
+import 'package:poortak/featueres/feature_shopping_cart/data/models/cart_enum.dart';
+import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
+import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
 import 'package:poortak/locator.dart';
 
 class BookDetailsScreen extends StatefulWidget {
@@ -106,6 +115,76 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
   void _openSample() => _openPdf(forceTrial: true);
 
   void _openFullBook() => _openPdf(forceTrial: false);
+
+  Future<void> _addItemToCart() async {
+    final book = _book;
+    if (book == null) return;
+
+    final prefsOperator = locator<PrefsOperator>();
+    final isLoggedIn = prefsOperator.isLoggedIn();
+    final type = CartType.Book.name;
+    final itemId = book.id;
+    final itemName = book.title;
+
+    if (isLoggedIn) {
+      try {
+        final apiProvider = locator<ShoppingCartApiProvider>();
+        await apiProvider.addToCart(CartType.Book, itemId);
+
+        if (!mounted) return;
+        context.read<ShoppingCartBloc>().add(GetCartEvent());
+        _showSuccessModal(itemName);
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(_extractErrorMessage(e)),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    } else {
+      context.read<ShoppingCartBloc>().add(AddToLocalCartEvent(type, itemId));
+      _showSuccessModal(itemName);
+    }
+  }
+
+  String _extractErrorMessage(dynamic error) {
+    if (error is DioException) {
+      if (error.response?.data != null) {
+        final data = error.response!.data;
+        if (data is Map && data.containsKey('message')) return data['message'];
+        if (data is Map && data.containsKey('error')) return data['error'];
+        if (data is String) return data;
+      }
+      return error.message ?? 'خطا در افزودن به سبد خرید';
+    }
+    return error.toString();
+  }
+
+  void _showSuccessModal(String itemName) {
+    ReusableModal.showSuccess(
+      context: context,
+      title: 'اضافه به سبد خرید',
+      message: '($itemName) به سبد خرید شما اضافه شد',
+      buttonText: 'مشاهده سبد خرید',
+      secondButtonText: 'بستن',
+      showSecondButton: true,
+      cartSuccessStyle: true,
+      onButtonPressed: () {
+        Navigator.of(context).pop();
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          MainWrapper.routeName,
+          (route) => false,
+          arguments: {'initialIndex': 2},
+        );
+      },
+      onSecondButtonPressed: () {
+        Navigator.of(context).pop();
+      },
+    );
+  }
 
   void _openPdf({required bool forceTrial}) {
     final book = _book;
@@ -442,11 +521,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
                   if (hasFullAccess) {
                     _openFullBook();
                   } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('افزودن به سبد خرید به‌زودی فعال می‌شود'),
-                      ),
-                    );
+                    _addItemToCart();
                   }
                 },
               ),

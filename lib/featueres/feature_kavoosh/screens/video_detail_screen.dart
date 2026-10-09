@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -10,7 +11,10 @@ import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/common/services/video_download_service.dart';
 import 'package:poortak/common/utils/digit_utils.dart';
 import 'package:poortak/common/utils/money_utils.dart';
+import 'package:poortak/common/utils/prefs_operator.dart';
+import 'package:poortak/common/widgets/main_wrapper.dart';
 import 'package:poortak/common/widgets/poortak_app_bar.dart';
+import 'package:poortak/common/widgets/reusable_modal.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_kavoosh/data/models/video_course_detail_model.dart';
@@ -20,6 +24,10 @@ import 'package:poortak/featueres/feature_kavoosh/widgets/session_item.dart';
 import 'package:poortak/featueres/feature_sayareh/widgets/custom_video_player.dart';
 import 'package:poortak/featueres/feature_sayareh/widgets/video_container_widget.dart';
 import 'package:poortak/featueres/feature_sayareh/widgets/video_progress_bar_widget.dart';
+import 'package:poortak/featueres/feature_shopping_cart/data/data_source/shopping_cart_api_provider.dart';
+import 'package:poortak/featueres/feature_shopping_cart/data/models/cart_enum.dart';
+import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
+import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
 import 'package:poortak/locator.dart';
 
 class VideoDetailScreen extends StatefulWidget {
@@ -126,6 +134,73 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
     return KavooshVideoPlaybackResolver.hasFullCourseAccess(
       purchasedFromApi: course.purchased,
       hasAccessFromApi: course.hasAccess,
+    );
+  }
+
+  Future<void> _addItemToCart(VideoCourseInfo course) async {
+    final prefsOperator = locator<PrefsOperator>();
+    final isLoggedIn = prefsOperator.isLoggedIn();
+    final type = CartType.VideoCourse.name;
+    final itemId = course.id;
+    final itemName = course.title;
+
+    if (isLoggedIn) {
+      try {
+        final apiProvider = locator<ShoppingCartApiProvider>();
+        await apiProvider.addToCart(CartType.VideoCourse, itemId);
+
+        if (!mounted) return;
+        context.read<ShoppingCartBloc>().add(GetCartEvent());
+        _showSuccessModal(itemName);
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(_extractErrorMessage(e)),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    } else {
+      context.read<ShoppingCartBloc>().add(AddToLocalCartEvent(type, itemId));
+      _showSuccessModal(itemName);
+    }
+  }
+
+  String _extractErrorMessage(dynamic error) {
+    if (error is DioException) {
+      if (error.response?.data != null) {
+        final data = error.response!.data;
+        if (data is Map && data.containsKey('message')) return data['message'];
+        if (data is Map && data.containsKey('error')) return data['error'];
+        if (data is String) return data;
+      }
+      return error.message ?? 'خطا در افزودن به سبد خرید';
+    }
+    return error.toString();
+  }
+
+  void _showSuccessModal(String itemName) {
+    ReusableModal.showSuccess(
+      context: context,
+      title: 'اضافه به سبد خرید',
+      message: '($itemName) به سبد خرید شما اضافه شد',
+      buttonText: 'مشاهده سبد خرید',
+      secondButtonText: 'بستن',
+      showSecondButton: true,
+      cartSuccessStyle: true,
+      onButtonPressed: () {
+        Navigator.of(context).pop();
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          MainWrapper.routeName,
+          (route) => false,
+          arguments: {'initialIndex': 2},
+        );
+      },
+      onSecondButtonPressed: () {
+        Navigator.of(context).pop();
+      },
     );
   }
 
@@ -337,11 +412,9 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
                 height: 56.h,
                 child: ElevatedButton(
                   onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('افزودن به سبد خرید به‌زودی فعال می‌شود'),
-                      ),
-                    );
+                    final course = _detail?.course;
+                    if (course == null) return;
+                    _addItemToCart(course);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor:

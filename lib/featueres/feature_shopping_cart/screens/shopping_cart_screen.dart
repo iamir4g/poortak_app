@@ -26,6 +26,9 @@ import 'package:poortak/featueres/feature_sayareh/data/models/iknow_summary_mode
 import 'package:poortak/featueres/feature_sayareh/data/models/sayareh_home_model.dart';
 import 'package:poortak/featueres/feature_sayareh/data/models/single_book_model.dart';
 import 'package:poortak/featueres/feature_sayareh/repositories/sayareh_repository.dart';
+import 'package:poortak/featueres/feature_kavoosh/data/models/kavoosh_book_detail_model.dart';
+import 'package:poortak/featueres/feature_kavoosh/data/models/video_course_detail_model.dart';
+import 'package:poortak/featueres/feature_kavoosh/repositories/kavoosh_repository.dart';
 import 'package:poortak/common/services/getImageUrl_service.dart';
 import 'package:poortak/featueres/feature_shopping_cart/widgets/cart_summary_section.dart';
 import 'package:poortak/featueres/feature_shopping_cart/widgets/cart_item_card.dart';
@@ -72,14 +75,15 @@ class ShoppingCartScreen extends StatefulWidget {
 
 class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
   final SayarehRepository _sayarehRepository = locator<SayarehRepository>();
+  final KavooshRepository _kavooshRepository = locator<KavooshRepository>();
   final Map<String, Future<_LocalCartDisplayItem>> _localCartItemCache = {};
   Future<IKnowSummaryModel>? _summaryFuture;
 
   String? _getCartItemOverlayIconPath(String type) {
-    if (type == 'IKnowBook') {
+    if (type == 'IKnowBook' || type == 'Book') {
       return 'assets/images/icons/arcticons--pdf-viewer.svg';
     }
-    if (type == 'IKnowCourse') {
+    if (type == 'IKnowCourse' || type == 'VideoCourse') {
       return 'assets/images/icons/carbon--play-outline.svg';
     }
     return null;
@@ -442,6 +446,34 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
           price: _calculateBundlePayableAmount(summary),
           type: itemType,
           bazaarSku: summary.data.settings.bazaarSku,
+        );
+      }
+    } else if (itemType == 'Book') {
+      final DataState<KavooshBookDetail> bookState =
+          await _kavooshRepository.fetchBookDetail(bookId: itemId);
+      if (bookState is DataSuccess<KavooshBookDetail> &&
+          bookState.data != null) {
+        final book = bookState.data!;
+        return _LocalCartDisplayItem(
+          title: book.title,
+          description: book.description,
+          price: MoneyUtils.parseRialToTomanInt(book.price),
+          thumbnailId: book.thumbnailId,
+          type: itemType,
+        );
+      }
+    } else if (itemType == 'VideoCourse') {
+      final DataState<VideoCourseDetailResponse> courseState =
+          await _kavooshRepository.fetchVideoCourseDetail(courseId: itemId);
+      if (courseState is DataSuccess<VideoCourseDetailResponse> &&
+          courseState.data != null) {
+        final course = courseState.data!.course;
+        return _LocalCartDisplayItem(
+          title: course.title,
+          description: course.description,
+          price: MoneyUtils.parseRialToTomanInt(course.price),
+          thumbnailId: course.thumbnailId,
+          type: itemType,
         );
       }
     }
@@ -1041,8 +1073,11 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
     if (itemType == 'IKnowCourse') {
       return 'دوره تکی';
     }
-    if (itemType == 'IKnowBook') {
+    if (itemType == 'IKnowBook' || itemType == 'Book') {
       return 'کتاب';
+    }
+    if (itemType == 'VideoCourse') {
+      return 'دوره ویدیویی';
     }
     if (itemType == 'IKnow') {
       return 'مجموعه کامل';
@@ -1090,9 +1125,9 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
   Widget _buildLocalCartFallbackImage(String itemType) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final IconData icon;
-    if (itemType == 'IKnowCourse') {
+    if (itemType == 'IKnowCourse' || itemType == 'VideoCourse') {
       icon = Icons.school;
-    } else if (itemType == 'IKnowBook') {
+    } else if (itemType == 'IKnowBook' || itemType == 'Book') {
       icon = Icons.menu_book;
     } else {
       icon = Icons.library_books;
@@ -1122,6 +1157,11 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
     final thumbnail = source['thumbnail']?.toString();
     if (thumbnail != null && thumbnail.isNotEmpty) {
       return thumbnail;
+    }
+
+    final thumbnailId = source['thumbnailId']?.toString();
+    if (thumbnailId != null && thumbnailId.isNotEmpty) {
+      return thumbnailId;
     }
 
     return null;

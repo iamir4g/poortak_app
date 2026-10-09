@@ -147,6 +147,7 @@ class CartItemSource {
   String? name;
   String? description;
   String? thumbnail;
+  String? thumbnailId;
   String? videoThumbnail;
   bool? isDemo;
   String? bazaarSku;
@@ -162,6 +163,7 @@ class CartItemSource {
     this.name,
     this.description,
     this.thumbnail,
+    this.thumbnailId,
     this.videoThumbnail,
     this.isDemo,
     this.bazaarSku,
@@ -173,27 +175,35 @@ class CartItemSource {
     this.discountAmount,
   });
 
-  factory CartItemSource.fromJson(Map<String, dynamic> json) => CartItemSource(
-        id: json["id"] ?? "",
-        name: json["name"],
-        description: json["description"],
-        thumbnail: json["thumbnail"],
-        videoThumbnail: json["videoThumbnail"]?.toString(),
-        isDemo: json["isDemo"],
-        bazaarSku: json["bazaarSku"]?.toString(),
-        price: json["price"] ?? "0",
-        video: json["video"],
-        trailerVideo: json["trailerVideo"],
-        order: json["order"],
-        discountType: json["discountType"],
-        discountAmount: json["discountAmount"],
-      );
+  factory CartItemSource.fromJson(Map<String, dynamic> json) {
+    final thumbnail = json["thumbnail"]?.toString();
+    final thumbnailId = json["thumbnailId"]?.toString();
+    return CartItemSource(
+      id: json["id"] ?? "",
+      name: json["name"] ?? json["title"],
+      description: json["description"],
+      thumbnail: (thumbnail != null && thumbnail.isNotEmpty)
+          ? thumbnail
+          : thumbnailId,
+      thumbnailId: thumbnailId,
+      videoThumbnail: json["videoThumbnail"]?.toString(),
+      isDemo: json["isDemo"],
+      bazaarSku: json["bazaarSku"]?.toString(),
+      price: json["price"] ?? "0",
+      video: json["video"],
+      trailerVideo: json["trailerVideo"],
+      order: json["order"],
+      discountType: json["discountType"],
+      discountAmount: json["discountAmount"],
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         "id": id,
         if (name != null) "name": name,
         if (description != null) "description": description,
         if (thumbnail != null) "thumbnail": thumbnail,
+        if (thumbnailId != null) "thumbnailId": thumbnailId,
         if (videoThumbnail != null) "videoThumbnail": videoThumbnail,
         if (isDemo != null) "isDemo": isDemo,
         if (bazaarSku != null) "bazaarSku": bazaarSku,

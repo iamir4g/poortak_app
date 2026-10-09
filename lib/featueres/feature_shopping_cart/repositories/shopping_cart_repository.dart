@@ -70,8 +70,11 @@ class ShoppingCartRepository {
           }
         }
 
-        // Use thumbnail from source if available
-        String imageUrl = cartItem.source.thumbnail ?? '';
+        // Use thumbnail / thumbnailId from source if available
+        final resolvedThumbnail = cartItem.source.thumbnail ??
+            cartItem.source.thumbnailId ??
+            '';
+        String imageUrl = resolvedThumbnail;
 
         final shoppingCartItem = ShoppingCartItem(
           title: displayTitle,
@@ -87,6 +90,7 @@ class ShoppingCartRepository {
             'name': cartItem.source.name,
             'description': cartItem.source.description,
             'thumbnail': cartItem.source.thumbnail,
+            'thumbnailId': cartItem.source.thumbnailId,
             'videoThumbnail': cartItem.source.videoThumbnail,
             'isDemo': cartItem.source.isDemo,
             'bazaarSku': cartItem.source.bazaarSku,
