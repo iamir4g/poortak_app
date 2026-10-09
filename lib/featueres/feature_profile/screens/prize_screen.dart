@@ -94,7 +94,7 @@ class _PrizeScreenState extends State<PrizeScreen> {
               width: 40.r,
               height: 40.r,
               child: Icon(
-                Icons.arrow_forward,
+                Icons.arrow_back,
                 size: 28.r,
                 color: const Color(0xFFFFA73F),
               ),
