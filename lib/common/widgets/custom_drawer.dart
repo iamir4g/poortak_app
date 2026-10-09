@@ -216,10 +216,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                                           onTap: () {
                                             Navigator.of(context).pop();
                                             if (isLoggedIn) {
-                                              AuthNavigationManager()
-                                                  .requestLoginAndReturn(
-                                                returnTabIndex: 4,
-                                              );
+                                              goToTab(4);
                                               return;
                                             }
                                             final currentIndex = context

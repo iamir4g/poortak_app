@@ -19,9 +19,11 @@ class AuthNavigationManager {
 
   final List<VoidCallback> _listeners = [];
   AuthNavigationRequest? _pendingRequest;
+  int? _requestedTabIndex;
 
   AuthNavigationRequest? get pendingRequest => _pendingRequest;
   int? get pendingReturnTabIndex => _pendingRequest?.returnTabIndex;
+  int? get requestedTabIndex => _requestedTabIndex;
 
   void requestLoginAndReturn({
     required int returnTabIndex,
@@ -36,8 +38,17 @@ class AuthNavigationManager {
     _notify();
   }
 
+  void requestTab(int tabIndex) {
+    _requestedTabIndex = tabIndex;
+    _notify();
+  }
+
   void clearPendingRequest() {
     _pendingRequest = null;
+  }
+
+  void clearRequestedTab() {
+    _requestedTabIndex = null;
   }
 
   void addListener(VoidCallback listener) {
@@ -65,4 +76,8 @@ void goToLoginAndReturn({
     returnRouteName: returnRouteName,
     returnRouteArguments: returnRouteArguments,
   );
+}
+
+void goToTab(int tabIndex) {
+  AuthNavigationManager().requestTab(tabIndex);
 }

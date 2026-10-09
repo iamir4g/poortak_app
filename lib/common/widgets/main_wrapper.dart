@@ -183,15 +183,36 @@ class _MainWrapperState extends State<MainWrapper> with RouteAware {
     super.dispose();
   }
 
+  void _clearPendingLoginIfLeavingLoginTab(int index) {
+    if (index == 4) return;
+    if (prefsOperator.isLoggedIn()) return;
+    if (_authNavigationManager.pendingRequest == null) return;
+    _authNavigationManager.clearPendingRequest();
+  }
+
   void _handleAuthNavigation() {
-    final pending = _authNavigationManager.pendingRequest;
-    if (pending == null) return;
+    if (_authNavigationManager.requestedTabIndex == null &&
+        _authNavigationManager.pendingRequest == null) {
+      return;
+    }
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
 
+      final requestedTab = _authNavigationManager.requestedTabIndex;
+      if (requestedTab != null) {
+        _animateToTab(requestedTab);
+        _authNavigationManager.clearRequestedTab();
+      }
+
+      final pending = _authNavigationManager.pendingRequest;
+      if (pending == null) return;
+
       if (!prefsOperator.isLoggedIn()) {
-        _animateToTab(4);
+        // Only navigate once to login tab; keep pending for successful login return.
+        if (currentPageIndex != 4) {
+          _animateToTab(4);
+        }
         return;
       }
 
@@ -227,7 +248,9 @@ class _MainWrapperState extends State<MainWrapper> with RouteAware {
   }
 
   void _animateToTab(int index) {
-    if (!mounted || index == currentPageIndex) return;
+    if (!mounted) return;
+    _clearPendingLoginIfLeavingLoginTab(index);
+    if (index == currentPageIndex) return;
 
     _isProgrammaticNavigation = true;
     _targetPageIndex = index;
@@ -256,6 +279,7 @@ class _MainWrapperState extends State<MainWrapper> with RouteAware {
       return;
     }
 
+    _clearPendingLoginIfLeavingLoginTab(index);
     context.read<BottomNavCubit>().changeSelectedIndex(index);
     if (currentPageIndex != index) {
       setState(() {
