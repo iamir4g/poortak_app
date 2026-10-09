@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/common/utils/bidi_text_helper.dart';
+import 'package:poortak/common/utils/font_size_helper.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
@@ -151,7 +152,10 @@ class _QuizAnswerItemState extends State<QuizAnswerItem> {
           text: widget.title,
           forceEnglishDigits: true,
           style: MyTextStyle.textMatn14Bold.copyWith(
-            fontSize: widget.large ? Dimens.nsp(16) : Dimens.nsp(14),
+            fontSize: FontSizeHelper.getScaledFontSize(
+              context,
+              widget.large ? Dimens.nsp(16) : Dimens.nsp(14),
+            ),
             fontWeight: FontWeight.w500,
             color: textColor,
           ),
@@ -224,7 +228,7 @@ class _PressableAnswerOptionButtonState extends State<PressableAnswerOptionButto
                 style: TextStyle(
                   fontFamily: 'IRANSans',
                   fontWeight: FontWeight.w700,
-                  fontSize: 14.sp,
+                  fontSize: FontSizeHelper.getScaledFontSize(context, 14.sp),
                   color: fg,
                 ),
                 textAlign: TextAlign.center,

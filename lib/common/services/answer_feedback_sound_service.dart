@@ -1,5 +1,7 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
+import 'package:poortak/common/bloc/settings_cubit/settings_cubit.dart';
+import 'package:poortak/locator.dart';
 
 class AnswerFeedbackSoundService {
   AnswerFeedbackSoundService._();
@@ -17,7 +19,12 @@ class AnswerFeedbackSoundService {
   static Future<void> play(bool isCorrect) =>
       isCorrect ? playCorrect() : playWrong();
 
+  static bool get _soundEffectsEnabled =>
+      !locator.isRegistered<SettingsCubit>() ||
+      locator<SettingsCubit>().state.playSoundEffects;
+
   static Future<void> _play(String assetPath) async {
+    if (!_soundEffectsEnabled) return;
     try {
       await _player.stop();
       await _player.play(AssetSource(assetPath), volume: _volume);

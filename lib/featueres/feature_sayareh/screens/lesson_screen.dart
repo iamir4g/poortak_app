@@ -236,13 +236,17 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
   void _showTrailerEndedModal() {
     if (_currentLesson == null) return;
 
+    final isGuestFirstLesson =
+        _isFirstLesson && !locator<PrefsOperator>().isLoggedIn();
+
     ReusableModal.show(
       context: context,
       title: 'پایان پیش‌نمایش',
-      message:
-          'برای مشاهده ویدیو کامل درس و استفاده از تمامی بخش‌های آموزشی، بسته‌های خرید را مشاهده کنید.',
+      message: isGuestFirstLesson
+          ? 'برای مشاهده کامل درس یک، لطفاً وارد حساب کاربری خود شوید.'
+          : 'برای مشاهده ویدیو کامل درس و استفاده از تمامی بخش‌های آموزشی، بسته‌های خرید را مشاهده کنید.',
       type: ModalType.info,
-      buttonText: 'مشاهده بسته های خرید',
+      buttonText: isGuestFirstLesson ? 'ورود' : 'مشاهده بسته های خرید',
       secondButtonText: 'بستن',
       showSecondButton: true,
       cartSuccessStyle: true,
@@ -251,6 +255,10 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
         Navigator.of(context).pop();
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (!mounted) return;
+          if (isGuestFirstLesson) {
+            Navigator.pushNamed(context, LoginScreen.routeName);
+            return;
+          }
           _showPurchaseDialog();
         });
       },

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:poortak/common/utils/system_ui_helper.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:video_player/video_player.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
@@ -551,7 +552,7 @@ class _FullscreenVideoPlayerState extends State<FullscreenVideoPlayer> {
     _setSecureFlag(false);
 
     // Restore system UI
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    applyAppSystemUiMode();
 
     // Restore portrait orientation
     SystemChrome.setPreferredOrientations([

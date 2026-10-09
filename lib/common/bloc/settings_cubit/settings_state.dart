@@ -11,9 +11,9 @@ class SettingsState {
 
   const SettingsState({
     this.fullScreenMode = false,
-    this.achievementNotifications = true,
-    this.generalNotifications = true,
-    this.autoPlayPronunciation = true,
+    this.achievementNotifications = false,
+    this.generalNotifications = false,
+    this.autoPlayPronunciation = false,
     this.autoPlayExerciseSounds = true,
     this.playSoundEffects = true,
     this.textSize = 0.67,

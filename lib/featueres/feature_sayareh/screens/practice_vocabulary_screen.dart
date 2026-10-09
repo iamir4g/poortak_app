@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:poortak/common/bloc/settings_cubit/settings_cubit.dart';
+import 'package:poortak/common/utils/font_size_helper.dart';
 import 'package:poortak/common/widgets/image_skeleton.dart';
 import 'package:poortak/common/widgets/step_progress.dart';
 import 'package:poortak/common/services/answer_feedback_sound_service.dart';
@@ -98,9 +100,19 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
       isCorrect = word == correctWord.word;
     });
 
+    final settings = locator<SettingsCubit>().state;
     unawaited(AnswerFeedbackSoundService.play(isCorrect));
     if (!isCorrect) {
       unawaited(HapticService.wrongAnswerFeedback());
+    }
+    if (settings.autoPlayExerciseSounds) {
+      _speakAfterAnswer(
+        correctWord.word,
+        questionId: correctWord.id,
+        delay: settings.playSoundEffects
+            ? const Duration(milliseconds: 700)
+            : Duration.zero,
+      );
     }
 
     // Save the answer (correct or wrong)
@@ -148,6 +160,16 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
 
   void _readWord(String word) async {
     await ttsService.speak(word, voice: 'male');
+  }
+
+  Future<void> _speakAfterAnswer(
+    String word, {
+    required String questionId,
+    required Duration delay,
+  }) async {
+    if (delay > Duration.zero) await Future.delayed(delay);
+    if (!mounted || _currentDisplayedWordId != questionId) return;
+    _readWord(word);
   }
 
   double _vocabularyImageSize(BuildContext context) {
@@ -455,6 +477,13 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
                                             selectedWord!,
                                             style: MyTextStyle.text14Wrong
                                                 .copyWith(
+                                              fontSize: FontSizeHelper
+                                                  .getScaledFontSize(
+                                                context,
+                                                MyTextStyle.text14Wrong
+                                                        .fontSize ??
+                                                    14.sp,
+                                              ),
                                               color: isDark
                                                   ? MyColors
                                                       .quizAnswerWrongTextDark
@@ -478,6 +507,13 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
                                               correctWord.word,
                                               style: MyTextStyle.text24Correct
                                                   .copyWith(
+                                                fontSize: FontSizeHelper
+                                                    .getScaledFontSize(
+                                                  context,
+                                                  MyTextStyle.text24Correct
+                                                          .fontSize ??
+                                                      24.sp,
+                                                ),
                                                 color: isDark
                                                     ? MyColors
                                                         .quizAnswerCorrectTextDark
@@ -490,7 +526,9 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
                                         Text(
                                           correctWord.translation,
                                           style: TextStyle(
-                                            fontSize: 18.sp,
+                                            fontSize: FontSizeHelper
+                                                .getScaledFontSize(
+                                                    context, 18.sp),
                                             color: secondaryTextColor,
                                           ),
                                         ),

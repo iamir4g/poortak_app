@@ -79,24 +79,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             _buildToggleOption(
                               title: "دریافت اعلان هنگام دستاورد جدید",
                               primaryTextColor: primaryTextColor,
-                              value: state.achievementNotifications,
-                              onChanged: (value) {
-                                context
-                                    .read<SettingsCubit>()
-                                    .updateAchievementNotifications(value);
-                              },
-                              activeColor: MyColors.primary,
+                              value: false,
+                              onChanged: (_) {},
+                              comingSoon: true,
                             ),
                             _buildToggleOption(
                               title: "دریافت اعلان های عمومی",
                               primaryTextColor: primaryTextColor,
-                              value: state.generalNotifications,
-                              onChanged: (value) {
-                                context
-                                    .read<SettingsCubit>()
-                                    .updateGeneralNotifications(value);
-                              },
-                              activeColor: MyColors.primary,
+                              value: false,
+                              onChanged: (_) {},
+                              comingSoon: true,
                             ),
                           ],
                         ),
@@ -113,13 +105,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             _buildToggleOption(
                               title: "پخش خودکار تلفظ در صفحه واژگان جدید",
                               primaryTextColor: primaryTextColor,
-                              value: state.autoPlayPronunciation,
-                              onChanged: (value) {
-                                context
-                                    .read<SettingsCubit>()
-                                    .updateAutoPlayPronunciation(value);
-                              },
-                              activeColor: MyColors.primary,
+                              value: false,
+                              onChanged: (_) {},
+                              comingSoon: true,
                             ),
                             _buildToggleOption(
                               title: "پخش خودکار صوت تمرین ها",
@@ -209,23 +197,51 @@ class _SettingsScreenState extends State<SettingsScreen> {
     required Color primaryTextColor,
     required ValueChanged<bool> onChanged,
     Color? activeColor,
+    bool comingSoon = false,
   }) {
     return Padding(
       padding: EdgeInsets.only(bottom: 16.h),
       child: Row(
         children: [
           Expanded(
-            child: Text(
-              title,
-              style: MyTextStyle.textMatn14Bold.copyWith(
-                color: primaryTextColor,
-                fontWeight: FontWeight.normal,
-              ),
+            child: Row(
+              children: [
+                Flexible(
+                  child: Text(
+                    title,
+                    style: MyTextStyle.textMatn14Bold.copyWith(
+                      color: comingSoon
+                          ? primaryTextColor.withValues(alpha: 0.5)
+                          : primaryTextColor,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                ),
+                if (comingSoon) ...[
+                  SizedBox(width: 8.w),
+                  Container(
+                    padding: EdgeInsetsDirectional.symmetric(
+                      horizontal: 8.w,
+                      vertical: 2.h,
+                    ),
+                    decoration: BoxDecoration(
+                      color: MyColors.primary.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
+                    child: Text(
+                      "به زودی",
+                      style: MyTextStyle.textMatn12W500.copyWith(
+                        color: MyColors.primary,
+                      ),
+                    ),
+                  ),
+                ],
+              ],
             ),
           ),
           Switch(
-            value: value,
-            onChanged: onChanged,
+            value: comingSoon ? false : value,
+            onChanged: comingSoon ? null : onChanged,
             activeThumbColor: activeColor ?? MyColors.primary,
             activeTrackColor: (activeColor ?? MyColors.primary)
                 .withValues(alpha: 0.3),

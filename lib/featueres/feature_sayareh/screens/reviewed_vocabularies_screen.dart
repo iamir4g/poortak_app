@@ -3,6 +3,7 @@ import 'package:poortak/common/resources/data_state.dart';
 import 'package:poortak/common/widgets/poortak_app_bar.dart';
 import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/common/services/tts_service.dart';
+import 'package:poortak/common/utils/font_size_helper.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
@@ -319,7 +320,11 @@ class _ReviewedVocabulariesScreenState
                                                       .textHeader16Bold
                                                       .copyWith(
                                                     color: primaryTextColor,
-                                                    fontSize: Dimens.nsp(18),
+                                                    fontSize: FontSizeHelper
+                                                        .getScaledFontSize(
+                                                      context,
+                                                      Dimens.nsp(18),
+                                                    ),
                                                   ),
                                                 ),
                                               ),
@@ -342,7 +347,11 @@ class _ReviewedVocabulariesScreenState
                                             style: MyTextStyle.textMatn14Bold
                                                 .copyWith(
                                               color: secondaryTextColor,
-                                              fontSize: Dimens.nsp(14),
+                                              fontSize: FontSizeHelper
+                                                  .getScaledFontSize(
+                                                context,
+                                                Dimens.nsp(14),
+                                              ),
                                             ),
                                           ),
                                         ],

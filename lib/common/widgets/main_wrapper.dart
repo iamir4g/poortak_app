@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
+import 'package:poortak/common/utils/system_ui_helper.dart';
 import 'package:poortak/common/widgets/main_tab_header.dart';
 import 'package:poortak/common/widgets/adaptive_safe_area.dart';
 import 'package:poortak/common/widgets/bottom_nav.dart';
@@ -41,7 +42,8 @@ class MainWrapper extends StatefulWidget {
   State<MainWrapper> createState() => _MainWrapperState();
 }
 
-class _MainWrapperState extends State<MainWrapper> with RouteAware {
+class _MainWrapperState extends State<MainWrapper>
+    with RouteAware, WidgetsBindingObserver {
   // Using late init to ensure PageController is created only once
   late final PageController controller;
   final PrefsOperator prefsOperator = locator<PrefsOperator>();
@@ -78,6 +80,7 @@ class _MainWrapperState extends State<MainWrapper> with RouteAware {
     controller = PageController(initialPage: currentPageIndex);
     _authNavigationListener = _handleAuthNavigation;
     _authNavigationManager.addListener(_authNavigationListener);
+    WidgetsBinding.instance.addObserver(this);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
@@ -105,6 +108,13 @@ class _MainWrapperState extends State<MainWrapper> with RouteAware {
     final route = ModalRoute.of(context);
     if (route is PageRoute) {
       routeObserver.subscribe(this, route);
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      applyAppSystemUiMode();
     }
   }
 
@@ -177,6 +187,7 @@ class _MainWrapperState extends State<MainWrapper> with RouteAware {
   @override
   void dispose() {
     routeObserver.unsubscribe(this);
+    WidgetsBinding.instance.removeObserver(this);
     _linkSubscription?.cancel();
     _authNavigationManager.removeListener(_authNavigationListener);
     controller.dispose();
@@ -334,7 +345,7 @@ class _MainWrapperState extends State<MainWrapper> with RouteAware {
   void _restoreSystemUi() {
     if (!mounted) return;
     final isDark = context.read<ThemeCubit>().state.isDark;
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    applyAppSystemUiMode();
     _applyStatusBarStyle(isDark);
   }
 

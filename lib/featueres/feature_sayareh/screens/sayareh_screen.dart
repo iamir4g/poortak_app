@@ -83,10 +83,8 @@ class _SayarehScreenState extends State<SayarehScreen> {
               }
               if (previous.sayarehDataStatus is SayarehDataCompleted &&
                   current.sayarehDataStatus is SayarehDataCompleted) {
-                final prev =
-                    previous.sayarehDataStatus as SayarehDataCompleted;
-                final curr =
-                    current.sayarehDataStatus as SayarehDataCompleted;
+                final prev = previous.sayarehDataStatus as SayarehDataCompleted;
+                final curr = current.sayarehDataStatus as SayarehDataCompleted;
                 return prev.progressData != curr.progressData ||
                     prev.data != curr.data ||
                     prev.bookListData != curr.bookListData ||
@@ -161,7 +159,7 @@ class _SayarehScreenState extends State<SayarehScreen> {
                         child: AdaptiveSafeArea(
                           child: Column(
                             children: [
-                              SizedBox(height: Dimens.nh(8.0)),
+                              SizedBox(height: Dimens.nh(16.0)),
                               Text(
                                 l10n?.sayareh ?? '',
                                 style: MyTextStyle.sayarehHeader12Bold.copyWith(

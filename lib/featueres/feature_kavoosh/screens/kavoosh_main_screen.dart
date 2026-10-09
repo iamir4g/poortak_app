@@ -51,8 +51,7 @@ class _KavooshMainScreenState extends State<KavooshMainScreen> {
                   SizedBox(height: Dimens.nh(13.0)),
                   _buildContentCard(
                     title: 'کتاب الکترونیکی',
-                    subtitle:
-                        'کتاب های آموزشی الکترونیکی برای پایه های تحصیلی',
+                    subtitle: 'کتاب های آموزشی الکترونیکی برای پایه های تحصیلی',
                     gradientColors: const [
                       Color(0xFFFBEBDF),
                       Color(0xFFFFDBDB),
@@ -163,7 +162,7 @@ class _KavooshMainScreenState extends State<KavooshMainScreen> {
                   ],
                 ),
               ),
-              SizedBox(width: Dimens.medium),
+              SizedBox(width: Dimens.large),
               SizedBox(
                 width: Dimens.nw(100.0),
                 child: Align(

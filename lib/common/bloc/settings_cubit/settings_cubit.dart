@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:poortak/common/utils/system_ui_helper.dart';
 import 'package:poortak/locator.dart';
 
 part 'settings_state.dart';
@@ -13,18 +14,16 @@ class SettingsCubit extends Cubit<SettingsState> {
 
   void _loadSettings() {
     final fullScreenMode = _prefs.getBool('fullScreenMode') ?? false;
-    final achievementNotifications = _prefs.getBool('achievementNotifications') ?? true;
-    final generalNotifications = _prefs.getBool('generalNotifications') ?? true;
-    final autoPlayPronunciation = _prefs.getBool('autoPlayPronunciation') ?? true;
     final autoPlayExerciseSounds = _prefs.getBool('autoPlayExerciseSounds') ?? true;
     final playSoundEffects = _prefs.getBool('playSoundEffects') ?? true;
     final textSize = _prefs.getDouble('textSize') ?? 0.67;
 
+    // Notifications and auto pronunciation are "coming soon" and always off.
     emit(SettingsState(
       fullScreenMode: fullScreenMode,
-      achievementNotifications: achievementNotifications,
-      generalNotifications: generalNotifications,
-      autoPlayPronunciation: autoPlayPronunciation,
+      achievementNotifications: false,
+      generalNotifications: false,
+      autoPlayPronunciation: false,
       autoPlayExerciseSounds: autoPlayExerciseSounds,
       playSoundEffects: playSoundEffects,
       textSize: textSize,
@@ -34,6 +33,7 @@ class SettingsCubit extends Cubit<SettingsState> {
   void updateFullScreenMode(bool value) {
     _prefs.setBool('fullScreenMode', value);
     emit(state.copyWith(fullScreenMode: value));
+    applyAppSystemUiMode();
   }
 
   void updateAchievementNotifications(bool value) {

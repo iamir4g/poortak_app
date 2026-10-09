@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:poortak/common/blocs/bottom_nav_cubit/bottom_nav_cubit.dart';
 import 'package:poortak/common/services/tts_service.dart';
+import 'package:poortak/common/utils/system_ui_helper.dart';
 import 'package:poortak/common/widgets/main_wrapper.dart';
 import 'package:poortak/config/my_theme.dart';
 import 'package:poortak/featueres/feature_Menu/screens/aboutUs_screen.dart';
@@ -143,7 +144,7 @@ void main() async {
   await ReminderNotificationService.initialize();
   _loadInitialShoppingCart();
 
-  await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  await applyAppSystemUiMode();
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,

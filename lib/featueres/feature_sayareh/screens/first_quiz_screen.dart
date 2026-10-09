@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/common/services/answer_feedback_sound_service.dart';
 import 'package:poortak/common/services/haptic_service.dart';
 import 'package:poortak/common/utils/bidi_text_helper.dart';
+import 'package:poortak/common/utils/font_size_helper.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_sayareh/data/models/answer_question_model.dart'
@@ -475,6 +476,13 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                                       textAlign: TextAlign.center,
                                       style:
                                           MyTextStyle.textHeader16Bold.copyWith(
+                                        fontSize:
+                                            FontSizeHelper.getScaledFontSize(
+                                          context,
+                                          MyTextStyle.textHeader16Bold
+                                                  .fontSize ??
+                                              16.sp,
+                                        ),
                                         color: isDark
                                             ? MyColors.profileTextPrimaryDark
                                             : MyColors.textMatn1,

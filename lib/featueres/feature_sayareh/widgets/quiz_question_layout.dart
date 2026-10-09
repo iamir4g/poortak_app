@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/common/utils/bidi_text_helper.dart';
 import 'package:poortak/common/utils/digit_utils.dart';
+import 'package:poortak/common/utils/font_size_helper.dart';
 import 'package:poortak/common/widgets/step_progress.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
@@ -180,12 +181,19 @@ Widget buildQuizCorrectFeedback({required bool isDark}) {
         ),
       ),
       SizedBox(height: Dimens.small),
-      Text(
-        'آفرین درست گفتی!🥳',
-        style: MyTextStyle.textMatn12W300.copyWith(
-          color: isDark ? MyColors.quizAnswerCorrectTextDark : MyColors.text2,
+      Builder(
+        builder: (context) => Text(
+          'آفرین درست گفتی!🥳',
+          style: MyTextStyle.textMatn12W300.copyWith(
+            fontSize: FontSizeHelper.getScaledFontSize(
+              context,
+              MyTextStyle.textMatn12W300.fontSize ?? 12.sp,
+            ),
+            color:
+                isDark ? MyColors.quizAnswerCorrectTextDark : MyColors.text2,
+          ),
+          textAlign: TextAlign.center,
         ),
-        textAlign: TextAlign.center,
       ),
     ],
   );
@@ -212,13 +220,15 @@ Widget buildQuizWrongFeedback({
         ),
       ],
     ),
-    child: BidiText(
-      text: explanation,
-      style: MyTextStyle.textMatn12W500.copyWith(
-        color: isDark ? MyColors.profileTextPrimaryDark : MyColors.textMatn1,
-        fontSize: Dimens.nsp(13),
+    child: Builder(
+      builder: (context) => BidiText(
+        text: explanation,
+        style: MyTextStyle.textMatn12W500.copyWith(
+          color: isDark ? MyColors.profileTextPrimaryDark : MyColors.textMatn1,
+          fontSize: FontSizeHelper.getScaledFontSize(context, Dimens.nsp(13)),
+        ),
+        textAlign: TextAlign.center,
       ),
-      textAlign: TextAlign.center,
     ),
   );
 }
