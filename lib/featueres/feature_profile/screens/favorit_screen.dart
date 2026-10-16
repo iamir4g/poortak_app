@@ -246,20 +246,39 @@ class _FavoritScreenState extends State<FavoritScreen> {
     );
   }
 
+  String _sourceLabel(BookmarkType type) {
+    switch (type) {
+      case BookmarkType.IKnowCourse:
+      case BookmarkType.IKnowBook:
+        return '(سیاره آی نو)';
+      case BookmarkType.Book:
+      case BookmarkType.VideoCourse:
+        return '(کاوش)';
+    }
+  }
+
+  bool _showPlayOverlay(BookmarkType type) {
+    return type == BookmarkType.IKnowCourse ||
+        type == BookmarkType.VideoCourse;
+  }
+
   Widget _buildFavoriteItem(bool isDarkMode, BookmarkItem item) {
+    final textColor = isDarkMode ? Colors.white : MyColors.textMatn1;
+    final showPlay = _showPlayOverlay(item.type);
+
     return Container(
       margin: EdgeInsets.only(bottom: 16.h),
       child: Stack(
         children: [
           InkWell(
             onTap: () => _openItem(item),
-            borderRadius: BorderRadius.circular(15.r),
+            borderRadius: BorderRadius.circular(20.r),
             child: Container(
               decoration: BoxDecoration(
                 color: isDarkMode
                     ? MyColors.darkBackgroundSecondary
                     : Colors.white,
-                borderRadius: BorderRadius.circular(15.r),
+                borderRadius: BorderRadius.circular(20.r),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.04),
@@ -268,82 +287,98 @@ class _FavoritScreenState extends State<FavoritScreen> {
                   ),
                 ],
               ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Padding(
-                      padding: EdgeInsets.all(16.r),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
+              child: Padding(
+                padding: EdgeInsets.all(12.r),
+                child: Row(
+                  children: [
+                    // In RTL, first child sits at start (right): thumbnail
+                    SizedBox(
+                      width: 110.r,
+                      height: 110.r,
+                      child: Stack(
                         children: [
-                          Text(
-                            item.displayTitle,
-                            style: MyTextStyle.textMatn13.copyWith(
-                              color: isDarkMode
-                                  ? Colors.white
-                                  : MyColors.textMatn1,
-                              fontWeight: FontWeight.w500,
-                            ),
-                            textAlign: TextAlign.right,
-                            maxLines: 3,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          SizedBox(height: 12.h),
-                          Container(
-                            width: 40.r,
-                            height: 40.r,
-                            decoration: BoxDecoration(
-                              color: MyColors.primary,
-                              borderRadius: BorderRadius.circular(20.r),
-                            ),
-                            child: Icon(
-                              item.type == BookmarkType.Book ||
-                                      item.type == BookmarkType.IKnowBook
-                                  ? Icons.menu_book
-                                  : Icons.play_arrow,
-                              color: Colors.white,
-                              size: 24.r,
+                          Positioned.fill(
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(10.r),
+                              child: ColoredBox(
+                                color: Colors.grey.shade300,
+                                child: _FavoriteThumbnail(
+                                  thumbnailId: item.displayThumbnailId,
+                                ),
+                              ),
                             ),
                           ),
+                          if (showPlay)
+                            PositionedDirectional(
+                              bottom: 6.h,
+                              start: 6.w,
+                              child: Icon(
+                                Icons.play_circle_outline,
+                                color: Colors.white,
+                                size: 28.r,
+                                shadows: const [
+                                  Shadow(
+                                    color: Colors.black54,
+                                    blurRadius: 4,
+                                  ),
+                                ],
+                              ),
+                            ),
                         ],
                       ),
                     ),
-                  ),
-                  Container(
-                    width: 110.r,
-                    height: 110.r,
-                    margin: EdgeInsets.all(17.r),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10.r),
-                      color: Colors.grey[300],
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(10.r),
-                      child: _FavoriteThumbnail(
-                        thumbnailId: item.displayThumbnailId,
+                    Expanded(
+                      child: Padding(
+                        padding: EdgeInsetsDirectional.only(
+                          start: 12.w,
+                          end: 28.w,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              item.displayTitle,
+                              style: MyTextStyle.textMatn13.copyWith(
+                                color: textColor,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              textAlign: TextAlign.start,
+                              maxLines: 3,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            SizedBox(height: 4.h),
+                            Text(
+                              _sourceLabel(item.type),
+                              style: MyTextStyle.textMatn13.copyWith(
+                                color: textColor,
+                                fontWeight: FontWeight.w400,
+                              ),
+                              textAlign: TextAlign.start,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
           Positioned(
             top: 8.h,
-            right: 8.w,
+            left: 8.w,
             child: GestureDetector(
               onTap: () => _removeItem(item),
-              child: Container(
-                width: 17.r,
-                height: 17.r,
-                decoration: BoxDecoration(
-                  color: MyColors.error,
-                  borderRadius: BorderRadius.circular(8.5.r),
-                ),
+              behavior: HitTestBehavior.opaque,
+              child: Padding(
+                padding: EdgeInsets.all(4.r),
                 child: Icon(
-                  Icons.favorite,
-                  color: Colors.white,
-                  size: 10.r,
+                  Icons.close,
+                  color: textColor,
+                  size: 18.r,
                 ),
               ),
             ),
