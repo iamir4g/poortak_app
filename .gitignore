@@ -36,6 +36,15 @@ migrate_working_dir/
 app.*.symbols
 app.*.map.json
 
+<<<<<<< HEAD
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
+/android/build/
+/android/gradle.local.properties
+/android/gradle/init.gradle
+=======
 # Android build outputs and local machine config
 .gradle/
 **/.cxx/
@@ -69,6 +78,7 @@ app.*.map.json
 **/ios/Runner/GeneratedPluginRegistrant.*
 
 # Project-specific local files
+>>>>>>> a79f110ddba91455c171ea7b0245f0c16e54d8f3
 .qodo
 test_deep_link_simple.html
 test_deeplink.html

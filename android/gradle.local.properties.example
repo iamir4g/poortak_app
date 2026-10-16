@@ -1,0 +1,7 @@
+# Machine-specific Gradle settings (copy to gradle.local.properties)
+# This file is NOT committed — each developer keeps their own local copy.
+#
+# Required on this machine: Java 17 for Gradle (Android Studio ships Java 25).
+# Alternative: flutter config --jdk-dir="/path/to/jdk17"
+
+org.gradle.java.home=/path/to/jdk17

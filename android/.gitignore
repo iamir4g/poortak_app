@@ -5,6 +5,17 @@ build/
 captures/
 local.properties
 
+<<<<<<< HEAD
+# Machine-specific Gradle config (each developer keeps their own copy)
+gradle.local.properties
+gradle/init.gradle
+
+# Build output
+/build/
+
+# Remember to never publicly share your keystore.
+# See https://flutter.dev/to/reference-keystore
+=======
 # Native / CMake build cache (machine-specific)
 **/.cxx/
 app/.cxx/
@@ -14,6 +25,7 @@ app/build/
 **/GeneratedPluginRegistrant.java
 
 # Release signing (each developer creates locally)
+>>>>>>> a79f110ddba91455c171ea7b0245f0c16e54d8f3
 key.properties
 **/*.keystore
 **/*.jks

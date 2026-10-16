@@ -42,6 +42,8 @@ android {
       
     }
 
+<<<<<<< HEAD
+=======
     flavorDimensions += "store"
     productFlavors {
         ipg {
@@ -53,12 +55,17 @@ android {
         }
     }
 
+>>>>>>> a79f110ddba91455c171ea7b0245f0c16e54d8f3
     signingConfigs {
         release {
             if (keystorePropertiesFile.exists()) {
                 keyAlias keystoreProperties["keyAlias"]
                 keyPassword keystoreProperties["keyPassword"]
+<<<<<<< HEAD
+                storeFile file(keystoreProperties["storeFile"])
+=======
                 storeFile file("${rootProject.projectDir}/${keystoreProperties["storeFile"]}")
+>>>>>>> a79f110ddba91455c171ea7b0245f0c16e54d8f3
                 storePassword keystoreProperties["storePassword"]
             }
         }
@@ -71,6 +78,11 @@ android {
             signingConfig = signingConfigs.debug
         }
         release {
+<<<<<<< HEAD
+            signingConfig = keystorePropertiesFile.exists()
+                    ? signingConfigs.release
+                    : signingConfigs.debug
+=======
             if (!keystorePropertiesFile.exists()) {
                 throw new GradleException(
                     "Missing android/key.properties. Release APKs must use the upload keystore; " +
@@ -78,6 +90,7 @@ android {
                 )
             }
             signingConfig = signingConfigs.release
+>>>>>>> a79f110ddba91455c171ea7b0245f0c16e54d8f3
 
             // Enable code shrinking, obfuscation, and optimization
             minifyEnabled true
