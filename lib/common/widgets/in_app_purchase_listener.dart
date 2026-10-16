@@ -32,9 +32,12 @@ class InAppPurchaseListener extends StatelessWidget {
           );
           locator<UserPointsTotalBloc>().add(LoadUserPointsTotalEvent());
 
-          final ref = state.purchases.isNotEmpty
-              ? state.purchases.first.purchaseToken
-              : null;
+          final paymentId = state.payment?.id;
+          final ref = (paymentId != null && paymentId.isNotEmpty)
+              ? paymentId
+              : (state.purchases.isNotEmpty
+                  ? state.purchases.first.purchaseToken
+                  : null);
           navigatorKey?.currentState?.pushNamed(
             PaymentResultScreen.routeName,
             arguments: {

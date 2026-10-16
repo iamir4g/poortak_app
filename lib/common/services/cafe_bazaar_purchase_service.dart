@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_poolakey/flutter_poolakey.dart';
 import 'package:poortak/common/models/bazaar_purchase_result.dart';
 import 'package:poortak/common/models/bazaar_sku_details.dart';
@@ -216,15 +217,16 @@ class CafeBazaarPurchaseService {
     String dynamicPriceToken = '',
   }) async {
     await ensureConnected();
+    final token = dynamicPriceToken.trim();
     debugPrint(
       '🛒 [Bazaar] purchase start — sku=$sku payload=$payload '
-      'dynamicPriceToken=${dynamicPriceToken.isEmpty ? "(none)" : "(set)"}',
+      'dynamicPriceToken=${token.isEmpty ? "(none)" : "(set len=${token.length} prefix=${token.length > 12 ? token.substring(0, 12) : token}…)"}',
     );
     try {
       final info = await FlutterPoolakey.purchase(
         sku,
         payload: payload,
-        dynamicPriceToken: dynamicPriceToken,
+        dynamicPriceToken: token,
       );
       _logPurchaseInfo('purchase result', info);
       final result = _mapPurchase(info);
@@ -236,7 +238,14 @@ class CafeBazaarPurchaseService {
       );
       return result;
     } catch (e, st) {
-      debugPrint('🛒 [Bazaar] purchase error sku=$sku: $e');
+      if (e is PlatformException) {
+        debugPrint(
+          '🛒 [Bazaar] purchase PlatformException sku=$sku '
+          'code=${e.code} message=${e.message} details=${e.details}',
+        );
+      } else {
+        debugPrint('🛒 [Bazaar] purchase error sku=$sku: $e');
+      }
       debugPrint('🛒 [Bazaar] purchase stack: $st');
       rethrow;
     }

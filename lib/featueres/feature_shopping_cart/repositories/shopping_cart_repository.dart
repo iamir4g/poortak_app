@@ -1,8 +1,11 @@
 import 'package:poortak/featueres/feature_shopping_cart/data/models/shopping_cart_model.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/models/cart_enum.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/models/get_cart_model.dart';
+import 'package:poortak/featueres/feature_shopping_cart/data/models/bazaar_quote_model.dart';
+import 'package:poortak/featueres/feature_shopping_cart/utils/cafebazaar_payment_errors.dart';
 import 'package:poortak/common/utils/money_utils.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
+import 'package:poortak/common/resources/data_state.dart';
 import 'package:poortak/locator.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/data_source/shopping_cart_api_provider.dart';
 import 'package:poortak/common/error_handling/app_exception.dart';
@@ -11,6 +14,7 @@ import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/models/checkout_cart_model.dart';
 import 'package:poortak/common/models/bazaar_purchase_result.dart';
+import 'package:poortak/featueres/feature_profile/data/models/payment_history_model.dart';
 
 class ShoppingCartRepository {
   ShoppingCart _cart = ShoppingCart();
@@ -238,18 +242,73 @@ class ShoppingCartRepository {
     }
   }
 
-  Future<void> verifyBazaarPurchase(
+  Future<DataState<BazaarQuoteData>> createBazaarQuote({
+    required String productType,
+    required String bazaarSku,
+    required int pointsToSpend,
+  }) async {
+    try {
+      final response = await _apiProvider.createBazaarQuote(
+        productType: productType.trim(),
+        bazaarSku: bazaarSku.trim(),
+        pointsToSpend: pointsToSpend,
+      );
+      final raw = response.data;
+      if ((response.statusCode == 200 || response.statusCode == 201) &&
+          raw is Map &&
+          raw['ok'] == true) {
+        final model = BazaarQuoteModel.fromJson(
+          Map<String, dynamic>.from(raw),
+        );
+        return DataSuccess(model.data);
+      }
+      return DataFailed(
+        CafeBazaarPaymentErrors.extractMessage(
+          raw,
+          fallback: 'خطا در محاسبه تخفیف امتیاز',
+        ),
+        errorCode: CafeBazaarPaymentErrors.extractCode(raw),
+      );
+    } on DioException catch (e) {
+      log("❌ [Bazaar] quote failed: $e "
+          "status=${e.response?.statusCode} data=${e.response?.data}");
+      final code = CafeBazaarPaymentErrors.extractCode(e.response?.data) ??
+          (e.response?.statusCode == 503
+              ? CafeBazaarPaymentErrors.serviceUnavailable
+              : null);
+      return DataFailed(
+        CafeBazaarPaymentErrors.userMessageFor(
+          code,
+          fallback: CafeBazaarPaymentErrors.extractMessage(
+            e.response?.data,
+            fallback: e.message ?? 'خطا در محاسبه تخفیف امتیاز',
+          ),
+        ),
+        errorCode: code,
+      );
+    } on AppException catch (e) {
+      return DataFailed(e.message?.toString() ?? 'خطا در محاسبه تخفیف امتیاز');
+    } catch (e) {
+      return DataFailed(e.toString());
+    }
+  }
+
+  /// Settles a CafeBazaar purchase. Retries once on transient network errors
+  /// with the same [purchaseToken] (and same [nonce] if provided).
+  Future<DataState<Datum?>> verifyBazaarPurchase(
     BazaarPurchaseResult purchase, {
     required String productType,
     String? referrerCode,
+    String? nonce,
+    int maxAttempts = 2,
   }) async {
     if (purchase.purchaseToken.isEmpty) {
       log("🛒 [Bazaar] verify skipped — empty purchaseToken "
           "bazaarSku=${purchase.productId}");
-      throw StateError('توکن خرید بازار خالی است');
+      return const DataFailed('توکن خرید بازار خالی است');
     }
     if (productType.trim().isEmpty) {
-      throw StateError('نوع محصول برای تأیید پرداخت مشخص نیست');
+      return const DataFailed('نوع محصول برای تأیید پرداخت مشخص نیست');
     }
     log(
       "🛒 [Bazaar] verifyBazaarPurchase → payments/direct — "
@@ -257,21 +316,94 @@ class ShoppingCartRepository {
       "productType=$productType "
       "purchaseToken=${purchase.purchaseToken} "
       "orderId=${purchase.orderId} "
-      "referrerCode=$referrerCode",
+      "referrerCode=$referrerCode "
+      "nonce=${nonce == null || nonce.isEmpty ? "(none)" : "(set)"}",
     );
-    try {
-      await _apiProvider.verifyBazaarPurchase(
-        bazaarSku: purchase.productId,
-        productType: productType.trim(),
-        purchaseToken: purchase.purchaseToken,
-        referrerCode: referrerCode,
-      );
-      log("✅ [Bazaar] purchase verified: ${purchase.productId}");
-    } on DioException catch (e) {
-      log("❌ [Bazaar] verify failed: $e "
-          "status=${e.response?.statusCode} data=${e.response?.data}");
-      rethrow;
+
+    Object? lastError;
+    for (var attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        final response = await _apiProvider.verifyBazaarPurchase(
+          bazaarSku: purchase.productId,
+          productType: productType.trim(),
+          purchaseToken: purchase.purchaseToken,
+          referrerCode: referrerCode,
+          nonce: nonce,
+        );
+        final raw = response.data;
+        if ((response.statusCode == 200 || response.statusCode == 201) &&
+            raw is Map &&
+            raw['ok'] == true) {
+          log("✅ [Bazaar] purchase verified: ${purchase.productId}");
+          Datum? payment;
+          final data = raw['data'];
+          if (data is Map) {
+            try {
+              payment = Datum.fromJson(Map<String, dynamic>.from(data));
+            } catch (e) {
+              log("⚠️ [Bazaar] could not parse payment datum: $e");
+            }
+          }
+          return DataSuccess(payment);
+        }
+        final code = CafeBazaarPaymentErrors.extractCode(raw);
+        return DataFailed(
+          CafeBazaarPaymentErrors.userMessageFor(
+            code,
+            fallback: CafeBazaarPaymentErrors.extractMessage(
+              raw,
+              fallback: 'تأیید خرید ناموفق بود',
+            ),
+          ),
+          errorCode: code,
+        );
+      } on DioException catch (e) {
+        lastError = e;
+        log("❌ [Bazaar] verify failed attempt=$attempt: $e "
+            "status=${e.response?.statusCode} data=${e.response?.data}");
+        final code = CafeBazaarPaymentErrors.extractCode(e.response?.data);
+        if (code == CafeBazaarPaymentErrors.dynamicPriceInvalid ||
+            code == CafeBazaarPaymentErrors.tokenAlreadyUsed ||
+            code == CafeBazaarPaymentErrors.verificationFailed) {
+          return DataFailed(
+            CafeBazaarPaymentErrors.userMessageFor(
+              code,
+              fallback: CafeBazaarPaymentErrors.extractMessage(
+                e.response?.data,
+                fallback: e.message ?? 'تأیید خرید ناموفق بود',
+              ),
+            ),
+            errorCode: code,
+          );
+        }
+        final isNetwork = e.type == DioExceptionType.connectionTimeout ||
+            e.type == DioExceptionType.sendTimeout ||
+            e.type == DioExceptionType.receiveTimeout ||
+            e.type == DioExceptionType.connectionError ||
+            e.response == null;
+        if (!isNetwork || attempt >= maxAttempts) {
+          return DataFailed(
+            CafeBazaarPaymentErrors.userMessageFor(
+              code,
+              fallback: CafeBazaarPaymentErrors.extractMessage(
+                e.response?.data,
+                fallback: e.message ?? 'تأیید خرید ناموفق بود',
+              ),
+            ),
+            errorCode: code,
+          );
+        }
+        await Future.delayed(Duration(milliseconds: 400 * attempt));
+      } on AppException catch (e) {
+        return DataFailed(e.message?.toString() ?? 'تأیید خرید ناموفق بود');
+      } catch (e) {
+        lastError = e;
+        if (attempt >= maxAttempts) {
+          return DataFailed(e.toString());
+        }
+      }
     }
+    return DataFailed(lastError?.toString() ?? 'تأیید خرید ناموفق بود');
   }
 
   // Sync Local Cart to Backend with retry mechanism

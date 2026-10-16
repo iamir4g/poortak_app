@@ -65,11 +65,32 @@ class ShoppingCartApiProvider {
     return response;
   }
 
+  Future<Response> createBazaarQuote({
+    required String productType,
+    required String bazaarSku,
+    required int pointsToSpend,
+  }) async {
+    final body = <String, dynamic>{
+      "productType": productType,
+      "bazaarSku": bazaarSku,
+      "pointsToSpend": pointsToSpend,
+    };
+    log("🛒 [Bazaar] quote request → payments/cafebazaar/quote body=$body");
+    final response = await _authService.post(
+      "${Constants.baseUrl}payments/cafebazaar/quote",
+      data: body,
+    );
+    log("🛒 [Bazaar] quote response status=${response.statusCode} "
+        "data=${response.data}");
+    return response;
+  }
+
   Future<Response> verifyBazaarPurchase({
     required String bazaarSku,
     required String productType,
     required String purchaseToken,
     String? referrerCode,
+    String? nonce,
   }) async {
     final body = <String, dynamic>{
       "bazaarSku": bazaarSku,
@@ -77,6 +98,7 @@ class ShoppingCartApiProvider {
       "purchaseToken": purchaseToken,
       if (referrerCode != null && referrerCode.isNotEmpty)
         "referrerCode": referrerCode,
+      if (nonce != null && nonce.isNotEmpty) "nonce": nonce,
     };
     log("🛒 [Bazaar] verify request → payments/direct");
     log(
@@ -84,7 +106,8 @@ class ShoppingCartApiProvider {
       "bazaarSku=$bazaarSku "
       "productType=$productType "
       "purchaseToken=$purchaseToken "
-      "referrerCode=$referrerCode",
+      "referrerCode=$referrerCode "
+      "nonce=${nonce == null || nonce.isEmpty ? "(none)" : "(set)"}",
     );
     log("🛒 [Bazaar] verify full body: $body");
     final response = await _authService.post(

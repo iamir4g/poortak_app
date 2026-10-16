@@ -230,6 +230,11 @@ class _PaymentResultScreenState extends State<PaymentResultScreen> {
                           _buildDetailRow(
                               'کد پیگیری', _getTrackingCode() ?? '—'),
                           _buildDetailRow('مبلغ', _getAmount()),
+                          if (_getDiscountAmount() != null)
+                            _buildDetailRow('تخفیف', _getDiscountAmount()!),
+                          if (_getPointsSpent() != null)
+                            _buildDetailRow(
+                                'امتیاز مصرف‌شده', _getPointsSpent()!),
                           _buildDetailRow('روش پرداخت', _getPaymentMethod()),
                           if (_getCardPan() != null)
                             _buildDetailRow('شماره کارت', _getCardPan()!),
@@ -393,12 +398,32 @@ class _PaymentResultScreenState extends State<PaymentResultScreen> {
     return '—';
   }
 
+  String? _getDiscountAmount() {
+    final raw = _payment?.discountAmount;
+    if (raw == null) return null;
+    final text = raw.toString().trim();
+    if (text.isEmpty || text == '0' || text == '0.0') return null;
+    return formatTomanAmount(text);
+  }
+
+  String? _getPointsSpent() {
+    final raw = _payment?.pointsSpent;
+    if (raw == null) return null;
+    final value = int.tryParse(raw.toString()) ?? 0;
+    if (value <= 0) return null;
+    return toPersianDigits('$value');
+  }
+
   String _getPaymentMethod() {
     switch (_payment?.source) {
       case 'IPG':
         return 'درگاه اینترنتی';
       case 'Card':
         return 'کارت بانکی';
+      case 'CafeBazaar':
+      case 'Bazaar':
+      case 'cafebazaar':
+        return 'کافه بازار';
       default:
         return 'درگاه پرداخت';
     }
