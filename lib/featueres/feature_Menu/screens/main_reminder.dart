@@ -189,7 +189,7 @@ class ReminderCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '${time.hour.toString().padLeft(2, '0').toPersianDigit()} : ${time.minute.toString().padLeft(2, '0').toPersianDigit()}',
+                    '${time.minute.toString().padLeft(2, '0').toPersianDigit()} : ${time.hour.toString().padLeft(2, '0').toPersianDigit()} ',
                     style: MyTextStyle.textMatn14Bold.copyWith(
                       color: textColor,
                       fontSize: 16.sp,
