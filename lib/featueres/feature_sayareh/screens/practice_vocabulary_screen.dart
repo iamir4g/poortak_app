@@ -172,10 +172,18 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
     _readWord(word);
   }
 
+  bool _isCompactHeight(BuildContext context) =>
+      MediaQuery.of(context).size.height < 700;
+
   double _vocabularyImageSize(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-    return screenHeight < 600 ? 180.h : 264.h;
+    if (_isCompactHeight(context)) {
+      return Dimens.nh(160);
+    }
+    return Dimens.nh(264);
   }
+
+  double _bottomSectionPadding(BuildContext context) =>
+      _isCompactHeight(context) ? Dimens.nh(24) : Dimens.nh(48);
 
   Widget _buildVocabularyImage(String thumbnail) {
     final imageSize = _vocabularyImageSize(context);
@@ -417,19 +425,26 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
                             )
                             .toList();
 
+                        final isCompact = _isCompactHeight(context);
+                        final bottomPad = _bottomSectionPadding(context);
+
                         return Column(
                           children: [
                             Expanded(
                               child: SingleChildScrollView(
                                 padding: EdgeInsets.only(
-                                  bottom: !showAnswer ? 120.h : 170.h,
+                                  bottom: showAnswer
+                                      ? Dimens.nh(24)
+                                      : Dimens.nh(100),
                                 ),
                                 child: Center(
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       SizedBox(
-                                        height: Dimens.nh(24),
+                                        height: isCompact
+                                            ? Dimens.nh(12)
+                                            : Dimens.nh(24),
                                       ),
                                       if (totalSteps > 0)
                                         StepProgress(
@@ -437,11 +452,13 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
                                           totalSteps: totalSteps,
                                         ),
                                       SizedBox(
-                                        height: Dimens.nh(24),
+                                        height: isCompact
+                                            ? Dimens.nh(12)
+                                            : Dimens.nh(24),
                                       ),
                                       Container(
                                         width: 268.w,
-                                        height: 45.h,
+                                        height: Dimens.nh(45),
                                         decoration: BoxDecoration(
                                           color: infoBoxBackgroundColor,
                                           borderRadius:
@@ -462,15 +479,17 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
                                         ),
                                       ),
                                       SizedBox(
-                                        height: 24.h,
+                                        height: isCompact
+                                            ? Dimens.nh(16)
+                                            : Dimens.nh(34),
                                       ),
-                                      SizedBox(height: 10.h),
                                       _buildVocabularyImage(
                                           correctWord.thumbnail),
                                       SizedBox(
-                                          height: showAnswer ? 20.h : 30.h),
-                                      SizedBox(
-                                          height: showAnswer ? 10.h : 30.h),
+                                        height: showAnswer
+                                            ? Dimens.nh(16)
+                                            : Dimens.nh(40),
+                                      ),
                                       if (showAnswer) ...[
                                         if (!isCorrect) ...[
                                           Text(
@@ -490,7 +509,7 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
                                                   : MyColors.error,
                                             ),
                                           ),
-                                          SizedBox(height: 5.h),
+                                          SizedBox(height: Dimens.nh(8)),
                                         ],
                                         Row(
                                           mainAxisAlignment:
@@ -522,17 +541,28 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
                                             ),
                                           ],
                                         ),
-                                        SizedBox(height: 2.h),
-                                        Text(
-                                          correctWord.translation,
-                                          style: TextStyle(
-                                            fontSize: FontSizeHelper
-                                                .getScaledFontSize(
-                                                    context, 18.sp),
-                                            color: secondaryTextColor,
+                                        SizedBox(height: Dimens.nh(10)),
+                                        Padding(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: Dimens.medium,
+                                            vertical: Dimens.nh(4),
+                                          ),
+                                          child: Text(
+                                            correctWord.translation,
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              fontSize: FontSizeHelper
+                                                  .getScaledFontSize(
+                                                context,
+                                                isCompact ? 16.sp : 18.sp,
+                                              ),
+                                              height: 1.5,
+                                              color: secondaryTextColor,
+                                              fontFamily: 'IranSans',
+                                            ),
                                           ),
                                         ),
-                                        SizedBox(height: 30.h),
+                                        SizedBox(height: Dimens.nh(12)),
                                       ],
                                     ],
                                   ),
@@ -545,7 +575,7 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
                                 child: Padding(
                                   padding: EdgeInsets.symmetric(
                                     horizontal: 18.w,
-                                    vertical: 64.h,
+                                    vertical: bottomPad,
                                   ),
                                   child: Row(
                                     children: optionButtons.length == 2
@@ -565,8 +595,8 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
                                   padding: EdgeInsets.only(
                                     left: 16.w,
                                     right: 16.w,
-                                    top: 8.h,
-                                    bottom: 64.h,
+                                    top: Dimens.nh(12),
+                                    bottom: bottomPad,
                                   ),
                                   child: Column(
                                     mainAxisSize: MainAxisSize.min,
@@ -611,7 +641,7 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
                                           ),
                                         ],
                                       ),
-                                      SizedBox(height: 15.h),
+                                      SizedBox(height: Dimens.nh(15)),
                                       ElevatedButton(
                                         onPressed: _nextQuestion,
                                         style: ElevatedButton.styleFrom(
