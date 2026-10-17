@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
-import 'package:poortak/config/myColors.dart';
 import 'package:poortak/common/utils/font_size_helper.dart';
+import 'package:poortak/common/utils/sentence_splitter.dart';
 import 'package:poortak/config/dimens.dart';
+import 'package:poortak/config/myColors.dart';
 import 'package:poortak/featueres/feature_sayareh/data/models/conversation_model.dart';
 
 /// Widget برای نمایش یک حباب پیام در صفحه مکالمه
@@ -66,12 +67,6 @@ class ConversationMessageBubble extends StatelessWidget {
     );
   }
 
-  /// تجزیه متن به جملات
-  List<String> _splitIntoSentences(String text) {
-    final RegExp regExp = RegExp(r'[^.!?]+[.!?]*');
-    return regExp.allMatches(text).map((m) => m.group(0)!).toList();
-  }
-
   double _sentenceOpacity(int index) {
     if (!isPlaybackActive || !isCurrentPlaying) return 1.0;
     if (index == currentSentenceIndex) return 1.0;
@@ -127,7 +122,7 @@ class ConversationMessageBubble extends StatelessWidget {
     required BuildContext context,
     required Color translationColor,
   }) {
-    final translationSentences = _splitIntoSentences(message.translation);
+    final translationSentences = splitIntoSentences(message.translation);
 
     return Directionality(
       textDirection: TextDirection.rtl,
@@ -212,7 +207,7 @@ class ConversationMessageBubble extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isFirstPerson = message.isMaleSpeaker;
     final avatarPath = message.conversationAvatarPath;
-    final sentences = _splitIntoSentences(message.text);
+    final sentences = splitIntoSentences(message.text);
 
     final bubbleColor = isDark
         ? (isFirstPerson
