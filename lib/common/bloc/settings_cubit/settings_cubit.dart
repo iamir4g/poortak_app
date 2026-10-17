@@ -14,16 +14,19 @@ class SettingsCubit extends Cubit<SettingsState> {
 
   void _loadSettings() {
     final fullScreenMode = _prefs.getBool('fullScreenMode') ?? false;
-    final autoPlayExerciseSounds = _prefs.getBool('autoPlayExerciseSounds') ?? true;
+    final autoPlayPronunciation =
+        _prefs.getBool('autoPlayPronunciation') ?? true;
+    final autoPlayExerciseSounds =
+        _prefs.getBool('autoPlayExerciseSounds') ?? true;
     final playSoundEffects = _prefs.getBool('playSoundEffects') ?? true;
     final textSize = _prefs.getDouble('textSize') ?? 0.67;
 
-    // Notifications and auto pronunciation are "coming soon" and always off.
+    // Notifications remain "coming soon" and always off.
     emit(SettingsState(
       fullScreenMode: fullScreenMode,
       achievementNotifications: false,
       generalNotifications: false,
-      autoPlayPronunciation: false,
+      autoPlayPronunciation: autoPlayPronunciation,
       autoPlayExerciseSounds: autoPlayExerciseSounds,
       playSoundEffects: playSoundEffects,
       textSize: textSize,
