@@ -28,7 +28,7 @@ class QuizQuestionLayout extends StatelessWidget {
     this.horizontalPadding = 24,
   });
 
-  static double feedbackSlotHeight() => Dimens.nh(120);
+  static double feedbackSlotHeight() => Dimens.nh(90);
 
   static double actionSlotHeight() => Dimens.nh(78);
 
@@ -62,7 +62,7 @@ class QuizQuestionLayout extends StatelessWidget {
                         question,
                         SizedBox(height: Dimens.nh(32)),
                         options,
-                        SizedBox(height: Dimens.nh(24)),
+                        SizedBox(height: Dimens.nh(20)),
                       ],
                     ),
                   ),
@@ -180,7 +180,7 @@ Widget buildQuizCorrectFeedback({required bool isDark}) {
           size: Dimens.nr(40),
         ),
       ),
-      SizedBox(height: Dimens.small),
+      SizedBox(height: Dimens.tiny),
       Builder(
         builder: (context) => Text(
           'آفرین درست گفتی!🥳',
@@ -189,8 +189,7 @@ Widget buildQuizCorrectFeedback({required bool isDark}) {
               context,
               MyTextStyle.textMatn12W300.fontSize ?? 12.sp,
             ),
-            color:
-                isDark ? MyColors.quizAnswerCorrectTextDark : MyColors.text2,
+            color: isDark ? MyColors.quizAnswerCorrectTextDark : MyColors.text2,
           ),
           textAlign: TextAlign.center,
         ),
