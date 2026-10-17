@@ -166,7 +166,7 @@ class ReminderNotificationService {
       'isActive': isActive,
     };
 
-    final index = reminders.indexWhere((r) => r['id'] == id);
+    final index = reminders.indexWhere((r) => _reminderId(r) == id);
     if (index >= 0) {
       reminders[index] = reminderData;
     } else {
@@ -176,6 +176,13 @@ class ReminderNotificationService {
     await prefs.setString('reminders', jsonEncode(reminders));
   }
 
+  static int _reminderId(Map<String, dynamic> reminder) {
+    final raw = reminder['id'];
+    if (raw is int) return raw;
+    if (raw is num) return raw.toInt();
+    return int.parse(raw.toString());
+  }
+
   static Future<List<Map<String, dynamic>>> getReminders() async {
     final prefs = locator<SharedPreferences>();
     final remindersJson = prefs.getString('reminders') ?? '[]';
@@ -183,8 +190,15 @@ class ReminderNotificationService {
   }
 
   static Future<void> cancelReminder(int id) async {
-    await _notifications.cancel(id);
+    // Always remove from storage first so the UI list stays correct even if
+    // the local-notifications plugin cancel fails (e.g. not initialized).
     await _removeReminder(id);
+    try {
+      await initialize();
+      await _notifications.cancel(id);
+    } catch (e) {
+      print('⚠️ Failed to cancel scheduled notification $id: $e');
+    }
   }
 
   static Future<void> _removeReminder(int id) async {
@@ -192,7 +206,7 @@ class ReminderNotificationService {
     final remindersJson = prefs.getString('reminders') ?? '[]';
     final reminders =
         List<Map<String, dynamic>>.from(jsonDecode(remindersJson));
-    reminders.removeWhere((r) => r['id'] == id);
+    reminders.removeWhere((r) => _reminderId(r) == id);
     await prefs.setString('reminders', jsonEncode(reminders));
   }
 
@@ -204,7 +218,7 @@ class ReminderNotificationService {
 
   static Future<void> updateReminderStatus(int id, bool isActive) async {
     final reminders = await getReminders();
-    final reminder = reminders.firstWhere((r) => r['id'] == id);
+    final reminder = reminders.firstWhere((r) => _reminderId(r) == id);
 
     await scheduleReminder(
       id: id,

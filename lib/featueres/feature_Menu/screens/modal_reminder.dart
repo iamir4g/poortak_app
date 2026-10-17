@@ -67,15 +67,27 @@ class _AddReminderModalState extends State<AddReminderModal> {
         ? 'زمان مطالعه لایتنر فرا رسیده است'
         : 'زمان مطالعه درس فرا رسیده است';
 
-    await ReminderNotificationService.scheduleReminder(
-      id: id,
-      title: title,
-      body: body,
-      time: _selectedTime,
-      type: _selectedType!,
-      isActive: true,
-    );
+    try {
+      await ReminderNotificationService.scheduleReminder(
+        id: id,
+        title: title,
+        body: body,
+        time: _selectedTime,
+        type: _selectedType!,
+        isActive: true,
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('ثبت یادآور ناموفق بود. دوباره تلاش کنید'),
+          duration: Duration(seconds: 3),
+        ),
+      );
+      return;
+    }
 
+    if (!mounted) return;
     widget.onReminderAdded();
     Navigator.pop(context);
     ScaffoldMessenger.of(context).showSnackBar(

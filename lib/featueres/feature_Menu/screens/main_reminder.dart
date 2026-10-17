@@ -109,17 +109,16 @@ class _ReminderScreenState extends State<ReminderScreen> {
                             return ReminderCard(
                               reminder: reminder,
                               onToggle: (isActive) async {
+                                final id = (reminder['id'] as num).toInt();
                                 await ReminderNotificationService
-                                    .updateReminderStatus(
-                                  reminder['id'],
-                                  isActive,
-                                );
-                                _loadReminders();
+                                    .updateReminderStatus(id, isActive);
+                                await _loadReminders();
                               },
                               onDelete: () async {
+                                final id = (reminder['id'] as num).toInt();
                                 await ReminderNotificationService
-                                    .cancelReminder(reminder['id']);
-                                _loadReminders();
+                                    .cancelReminder(id);
+                                await _loadReminders();
                               },
                             );
                           },
@@ -228,29 +227,33 @@ class ReminderCard extends StatelessWidget {
               ),
               // Delete Button
               IconButton(
-                onPressed: () {
-                  showDialog(
+                onPressed: () async {
+                  final confirmed = await showDialog<bool>(
                     context: context,
-                    builder: (context) => AlertDialog(
+                    builder: (dialogContext) => AlertDialog(
                       title: const Text('حذف یادآور'),
                       content:
                           const Text('آیا از حذف این یادآور اطمینان دارید؟'),
                       actions: [
                         TextButton(
-                          onPressed: () => Navigator.pop(context),
+                          onPressed: () =>
+                              Navigator.pop(dialogContext, false),
                           child: const Text('لغو'),
                         ),
                         TextButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                            onDelete();
-                          },
-                          child: const Text('حذف',
-                              style: TextStyle(color: Colors.red)),
+                          onPressed: () =>
+                              Navigator.pop(dialogContext, true),
+                          child: const Text(
+                            'حذف',
+                            style: TextStyle(color: Colors.red),
+                          ),
                         ),
                       ],
                     ),
                   );
+                  if (confirmed == true) {
+                    onDelete();
+                  }
                 },
                 icon: Icon(
                   Icons.delete_outline,
