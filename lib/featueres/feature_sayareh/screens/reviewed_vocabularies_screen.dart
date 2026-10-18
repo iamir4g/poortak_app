@@ -15,6 +15,7 @@ import 'package:poortak/featueres/feature_sayareh/repositories/sayareh_repositor
 import 'package:poortak/locator.dart';
 import 'package:poortak/featueres/feature_sayareh/screens/lesson_screen.dart';
 import 'package:poortak/featueres/feature_sayareh/screens/practice_vocabulary_screen.dart';
+import 'package:poortak/featueres/feature_sayareh/screens/vocabulary_screen.dart';
 
 class ReviewedVocabulariesScreen extends StatefulWidget {
   static const routeName = "/reviewed_vocabularies_screen";
@@ -429,7 +430,13 @@ class _ReviewedVocabulariesScreenState
                   children: [
                     Expanded(
                       child: ElevatedButton(
-                        onPressed: () => LessonScreen.popBackToLesson(context),
+                        onPressed: () {
+                          Navigator.pushReplacementNamed(
+                            context,
+                            VocabularyScreen.routeName,
+                            arguments: {'id': widget.courseId},
+                          );
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: MyColors.primary,
                           foregroundColor:
@@ -443,7 +450,7 @@ class _ReviewedVocabulariesScreenState
                           ),
                         ),
                         child: Text(
-                          'بازگشت به درس',
+                          'مرور دوباره',
                           style: MyTextStyle.textMatnBtn.copyWith(
                             color: MyColors.primaryButtonTextColor(isDark),
                             fontSize: Dimens.nsp(16),
@@ -480,7 +487,7 @@ class _ReviewedVocabulariesScreenState
                           ),
                         ),
                         child: Text(
-                          'تمرین دوباره',
+                          'تمرین ها',
                           style: MyTextStyle.textMatnBtn.copyWith(
                             fontWeight: FontWeight.w500,
                             fontSize: Dimens.nsp(16),
