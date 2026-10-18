@@ -32,8 +32,10 @@ import 'package:poortak/featueres/feature_kavoosh/repositories/kavoosh_repositor
 import 'package:poortak/common/services/getImageUrl_service.dart';
 import 'package:poortak/featueres/feature_shopping_cart/widgets/cart_summary_section.dart';
 import 'package:poortak/featueres/feature_shopping_cart/widgets/cart_item_card.dart';
+import 'package:poortak/featueres/feature_shopping_cart/widgets/cart_points_discount_panel.dart';
 import 'package:poortak/featueres/feature_shopping_cart/widgets/referral_code_card.dart';
 import 'package:poortak/featueres/feature_shopping_cart/utils/cart_item_pricing.dart';
+import 'package:poortak/featueres/feature_shopping_cart/presentation/cubit/cart_points_discount_cubit.dart';
 import 'package:poortak/l10n/app_localizations.dart';
 import 'package:poortak/locator.dart';
 // import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -78,6 +80,13 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
   final KavooshRepository _kavooshRepository = locator<KavooshRepository>();
   final Map<String, Future<_LocalCartDisplayItem>> _localCartItemCache = {};
   Future<IKnowSummaryModel>? _summaryFuture;
+  late final CartPointsDiscountCubit _pointsDiscountCubit;
+
+  @override
+  void dispose() {
+    _pointsDiscountCubit.close();
+    super.dispose();
+  }
 
   String? _getCartItemOverlayIconPath(String type) {
     if (type == 'IKnowBook' || type == 'Book') {
@@ -118,11 +127,55 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
   @override
   void initState() {
     super.initState();
+    _pointsDiscountCubit = CartPointsDiscountCubit(
+      repository: locator<ShoppingCartRepository>(),
+    );
     // Load appropriate cart when screen is initialized
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final bloc = context.read<ShoppingCartBloc>();
       _loadAppropriateCart(bloc);
     });
+  }
+
+  void _syncPointsDiscountEligibility(List<BazaarCheckoutItem> checkoutItems) {
+    if (!AppFlavor.useBazaarIap || !locator<PrefsOperator>().isLoggedIn()) {
+      _pointsDiscountCubit.configureEligibility(
+        eligible: false,
+        maxPoints: 0,
+      );
+      return;
+    }
+
+    final valid = checkoutItems
+        .where(
+          (e) => e.bazaarSku.trim().isNotEmpty && e.productType.trim().isNotEmpty,
+        )
+        .toList();
+    final pointsState = locator<UserPointsTotalBloc>().state;
+    final remaining = switch (pointsState) {
+      UserPointsTotalSuccess(:final data) => data.remaining,
+      _ => 0,
+    };
+    final eligible = valid.length == 1;
+    _pointsDiscountCubit.configureEligibility(
+      eligible: eligible,
+      item: eligible ? valid.first : null,
+      maxPoints: remaining < 0 ? 0 : remaining,
+    );
+  }
+
+  CartTotals _applyPointsDiscountToTotals(CartTotals base) {
+    final pointsState = _pointsDiscountCubit.state;
+    if (!pointsState.hasActiveDiscount || pointsState.quote == null) {
+      return base;
+    }
+    final payable = pointsState.quote!.finalPriceToman;
+    final discount = (base.subTotal - payable).clamp(0, base.subTotal);
+    return CartTotals(
+      subTotal: base.subTotal,
+      discount: discount,
+      payable: payable,
+    );
   }
 
   void _promptLogin() {
@@ -143,6 +196,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
     List<BazaarCheckoutItem> checkoutItems, {
     String? payload,
     String? referrerCode,
+    int? pointsToSpend,
   }) async {
     if (!locator<PrefsOperator>().isLoggedIn()) {
       _promptLogin();
@@ -157,7 +211,8 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
       '🛒 PayNow channel=${AppFlavor.paymentChannel} '
       'flavor=${AppFlavor.appFlavor} '
       'useBazaarIap=${AppFlavor.useBazaarIap} '
-      'items=$checkoutItems',
+      'items=$checkoutItems '
+      'pointsToSpend=$pointsToSpend',
     );
 
     if (AppFlavor.useBazaarIap) {
@@ -182,15 +237,42 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
         return;
       }
 
+      final pointsState = _pointsDiscountCubit.state;
+      final spend = pointsState.serviceUnavailable
+          ? 0
+          : (pointsToSpend ?? pointsState.pointsToSpend);
+
+      if (spend > 0 && pointsState.isQuoting) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('در حال محاسبه تخفیف امتیاز… کمی صبر کنید'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+        return;
+      }
+
+      final quote = pointsState.hasActiveDiscount ? pointsState.quote : null;
+      final reuseQuote = quote != null &&
+          !quote.isExpired &&
+          quote.token.trim().isNotEmpty &&
+          quote.nonce.trim().isNotEmpty;
+
       debugPrint(
         '🛒 Bazaar purchase, skipping IPG checkout. '
-        'items=${items.map((e) => '${e.productType}:${e.bazaarSku}').toList()}',
+        'items=${items.map((e) => '${e.productType}:${e.bazaarSku}').toList()} '
+        'points=$spend reuseQuote=$reuseQuote',
       );
       context.read<InAppPurchaseBloc>().add(
             PurchaseProductsEvent(
               items: items,
               payload: payload,
               referrerCode: referrerCode,
+              pointsToSpend: spend > 0 ? spend : null,
+              quoteNonce: reuseQuote ? quote.nonce.trim() : null,
+              quoteToken: reuseQuote ? quote.token.trim() : null,
+              quoteExpiresAt: reuseQuote ? quote.expiresAt : null,
             ),
           );
       return;
@@ -251,41 +333,53 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return BlocBuilder<ShoppingCartBloc, ShoppingCartState>(
-      builder: (context, state) {
-        log("🔄 Builder called with state: ${state.runtimeType}");
+    return BlocProvider<CartPointsDiscountCubit>.value(
+      value: _pointsDiscountCubit,
+      child: BlocBuilder<ShoppingCartBloc, ShoppingCartState>(
+        builder: (context, state) {
+          log("🔄 Builder called with state: ${state.runtimeType}");
 
-        if (state is ShoppingCartLoading) {
-          return _buildCartLoadingUI(isDark);
-        }
-
-        // Handle server cart (for logged-in users)
-        if (state is ShoppingCartLoaded) {
-          log("📦 Builder: ShoppingCartLoaded state - Cart has ${state.cart.items.length} items");
-          log("💰 Cart totals - SubTotal: ${state.cart.subTotal}, GrandTotal: ${state.cart.grandTotal}");
-          log("🆔 Cart ID: ${state.cart.id}");
-
-          if (state.cart.items.isEmpty) {
-            log("📭 Builder: Server cart is empty - showing empty UI");
-            return buildEmptyCartUI();
+          if (state is ShoppingCartLoading) {
+            return _buildCartLoadingUI(isDark);
           }
 
-          log("✅ Builder: Server cart has items - showing cart UI");
-          return _buildCartItemsUI(state.cart, l10n);
-        }
+          // Handle server cart (for logged-in users)
+          if (state is ShoppingCartLoaded) {
+            log("📦 Builder: ShoppingCartLoaded state - Cart has ${state.cart.items.length} items");
+            log("💰 Cart totals - SubTotal: ${state.cart.subTotal}, GrandTotal: ${state.cart.grandTotal}");
+            log("🆔 Cart ID: ${state.cart.id}");
 
-        // Handle local cart (for non-logged-in users)
-        if (state is LocalCartLoaded) {
-          log("📱 Builder: LocalCartLoaded state - Cart has ${state.items.length} items");
+            if (state.cart.items.isEmpty) {
+              log("📭 Builder: Server cart is empty - showing empty UI");
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (mounted) {
+                  _pointsDiscountCubit.reset();
+                }
+              });
+              return buildEmptyCartUI();
+            }
 
-          if (state.items.isEmpty) {
-            log("📭 Builder: Local cart is empty - showing empty UI");
-            return buildEmptyCartUI();
+            log("✅ Builder: Server cart has items - showing cart UI");
+            return _buildCartItemsUI(state.cart, l10n);
           }
 
-          log("✅ Builder: Local cart has items - showing local cart UI");
-          return _buildLocalCartItemsUI(state.items, l10n);
-        }
+          // Handle local cart (for non-logged-in users)
+          if (state is LocalCartLoaded) {
+            log("📱 Builder: LocalCartLoaded state - Cart has ${state.items.length} items");
+
+            if (state.items.isEmpty) {
+              log("📭 Builder: Local cart is empty - showing empty UI");
+              return buildEmptyCartUI();
+            }
+
+            log("✅ Builder: Local cart has items - showing local cart UI");
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) {
+                _pointsDiscountCubit.reset();
+              }
+            });
+            return _buildLocalCartItemsUI(state.items, l10n);
+          }
 
         // Handle local cart item added/removed states
         if (state is LocalCartItemAdded || state is LocalCartItemRemoved) {
@@ -354,7 +448,8 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
         }
 
         return Container();
-      },
+        },
+      ),
     );
   }
 
@@ -629,28 +724,70 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
               ),
               SizedBox(width: Dimens.small),
               Expanded(
-                child: Container(
-                  padding: EdgeInsets.symmetric(vertical: Dimens.nh(8)),
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: isDark
-                          ? MyColors.darkBorder
-                          : const Color(0xFFFFA73F),
-                    ),
-                    borderRadius: BorderRadius.circular(Dimens.nr(22)),
-                  ),
-                  child: Center(
-                    child: Text(
-                      'محاسبه امتیاز بر روی سبد خرید',
-                      style: TextStyle(
-                        fontSize: Dimens.nsp(14),
-                        fontWeight: FontWeight.bold,
-                        color: isDark
-                            ? MyColors.darkTextSecondary
-                            : const Color(0xFFFFA73F),
+                child: BlocBuilder<CartPointsDiscountCubit,
+                    CartPointsDiscountState>(
+                  builder: (context, pointsState) {
+                    final canUsePoints =
+                        pointsState.eligible && AppFlavor.useBazaarIap;
+                    final applied = pointsState.hasActiveDiscount ||
+                        pointsState.pointsToSpend > 0;
+                    final accent = isDark
+                        ? MyColors.darkTextSecondary
+                        : const Color(0xFFFFA73F);
+                    final label = !canUsePoints
+                        ? 'امتیاز فقط برای یک محصول بازار'
+                        : pointsState.isQuoting
+                            ? 'در حال محاسبه امتیاز…'
+                            : applied
+                                ? 'امتیاز اعمال شد (لغو)'
+                                : 'محاسبه امتیاز بر روی سبد خرید';
+                    return GestureDetector(
+                      onTap: !canUsePoints || pointsState.isQuoting
+                          ? null
+                          : () => context
+                              .read<CartPointsDiscountCubit>()
+                              .toggleApplyAllPoints(),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(vertical: Dimens.nh(8)),
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: canUsePoints
+                                ? (isDark
+                                    ? MyColors.darkBorder
+                                    : const Color(0xFFFFA73F))
+                                : (isDark
+                                    ? MyColors.darkBorder
+                                    : MyColors.text6),
+                          ),
+                          borderRadius: BorderRadius.circular(Dimens.nr(22)),
+                          color: applied && canUsePoints
+                              ? (isDark
+                                  ? MyColors.primary.withValues(alpha: 0.12)
+                                  : const Color(0xFFFFF3E0))
+                              : null,
+                        ),
+                        child: Center(
+                          child: pointsState.isQuoting
+                              ? SizedBox(
+                                  height: Dimens.nh(18),
+                                  width: Dimens.nw(18),
+                                  child: const CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : Text(
+                                  label,
+                                  style: TextStyle(
+                                    fontSize: Dimens.nsp(14),
+                                    fontWeight: FontWeight.bold,
+                                    color:
+                                        canUsePoints ? accent : MyColors.text6,
+                                  ),
+                                ),
+                        ),
                       ),
-                    ),
-                  ),
+                    );
+                  },
                 ),
               ),
             ],
@@ -755,152 +892,161 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
   // Build server cart items UI
   Widget _buildCartItemsUI(ShoppingCart cart, AppLocalizations? l10n) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final totals = resolveCartTotals(cart);
-    return Container(
-      decoration: BoxDecoration(
-        color:
-            isDark ? MyColors.darkBackground : MyColors.shoppingCartBackground,
-      ),
-      child: Column(
-        children: [
-          // Header section with points
-          _buildPointsHeader(),
-          Expanded(
-            child: ListView.builder(
-              padding: EdgeInsets.only(
-                bottom:
-                    MediaQuery.of(context).viewInsets.bottom + Dimens.nh(12),
-              ),
-              itemCount: cart.items.length + 1,
-              itemBuilder: (context, index) {
-                if (index == cart.items.length) {
-                  return CartSummarySection(
-                    subTotal: totals.subTotal,
-                    discount: totals.discount,
-                    payable: totals.payable,
-                    onReferralSubmit: _submitReferralCode,
-                  );
-                }
-                final item = cart.items[index];
-                final pricing = resolveServerCartItemPricing(item);
-                final typeLabel =
-                    item.type != null ? _getItemTypeLabel(item.type!) : null;
-                final subtitle = item.quantity != null && item.quantity! > 1
-                    ? 'تعداد: ${item.quantity}'
-                    : typeLabel;
-                return CartItemCard(
-                  title: item.title,
-                  subtitle: subtitle,
-                  pricing: pricing,
-                  onRemove: () {
-                    if (item.itemId != null) {
-                      context
-                          .read<ShoppingCartBloc>()
-                          .add(RemoveFromCartEvent(item.itemId!));
-                    }
-                  },
-                  image: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      _buildCartItemImage(item),
-                      if (item.type != null)
-                        _buildCartItemOverlayIcon(item.type!),
-                    ],
-                  ),
-                );
-              },
-            ),
+    final baseTotals = resolveCartTotals(cart);
+    final checkoutItems = cart.items
+        .map(
+          (item) => BazaarCheckoutItem(
+            bazaarSku: item.bazaarSku ?? '',
+            productType: item.type ?? '',
           ),
-          Container(
-            padding: EdgeInsets.all(Dimens.medium),
-            decoration: BoxDecoration(
-              color: isDark
-                  ? MyColors.darkBackgroundSecondary
-                  : MyColors.background,
-              borderRadius: BorderRadius.vertical(
-                top: Radius.circular(Dimens.nr(20)),
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                PrimaryButton(
-                  width: Dimens.nw(160),
-                  height: Dimens.nh(50),
-                  lable: l10n?.pay_now ?? "Pay Now",
-                  backgroundColor:
-                      isDark ? MyColors.primary : MyColors.secondary,
-                  onPressed: () async {
-                    await _handlePayNow(
-                      cart.items
-                          .map(
-                            (item) => BazaarCheckoutItem(
-                              bazaarSku: item.bazaarSku ?? '',
-                              productType: item.type ?? '',
-                            ),
-                          )
-                          .toList(),
-                      payload: cart.id,
+        )
+        .toList();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _syncPointsDiscountEligibility(checkoutItems);
+      }
+    });
+
+    return BlocListener<UserPointsTotalBloc, UserPointsTotalState>(
+      listener: (context, _) {
+        _syncPointsDiscountEligibility(checkoutItems);
+      },
+      child: BlocBuilder<CartPointsDiscountCubit, CartPointsDiscountState>(
+      builder: (context, pointsState) {
+        final totals = _applyPointsDiscountToTotals(baseTotals);
+        return Container(
+          decoration: BoxDecoration(
+            color: isDark
+                ? MyColors.darkBackground
+                : MyColors.shoppingCartBackground,
+          ),
+          child: Column(
+            children: [
+              _buildPointsHeader(),
+              // Points slider panel kept in codebase but disabled in cart UI.
+              // ignore: dead_code
+              if (false) const CartPointsDiscountPanel(),
+              Expanded(
+                child: ListView.builder(
+                  padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom +
+                        Dimens.nh(12),
+                  ),
+                  itemCount: cart.items.length + 1,
+                  itemBuilder: (context, index) {
+                    if (index == cart.items.length) {
+                      return CartSummarySection(
+                        subTotal: totals.subTotal,
+                        discount: totals.discount,
+                        payable: totals.payable,
+                        onReferralSubmit: _submitReferralCode,
+                      );
+                    }
+                    final item = cart.items[index];
+                    final pricing = resolveServerCartItemPricing(item);
+                    final typeLabel = item.type != null
+                        ? _getItemTypeLabel(item.type!)
+                        : null;
+                    final subtitle =
+                        item.quantity != null && item.quantity! > 1
+                            ? 'تعداد: ${item.quantity}'
+                            : typeLabel;
+                    return CartItemCard(
+                      title: item.title,
+                      subtitle: subtitle,
+                      pricing: pricing,
+                      onRemove: () {
+                        if (item.itemId != null) {
+                          context
+                              .read<ShoppingCartBloc>()
+                              .add(RemoveFromCartEvent(item.itemId!));
+                        }
+                      },
+                      image: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          _buildCartItemImage(item),
+                          if (item.type != null)
+                            _buildCartItemOverlayIcon(item.type!),
+                        ],
+                      ),
                     );
                   },
                 ),
-                // SizedBox(width: double.infinity),
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              ),
+              Container(
+                padding: EdgeInsets.all(Dimens.medium),
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? MyColors.darkBackgroundSecondary
+                      : MyColors.background,
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(Dimens.nr(20)),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    RichText(
-                      textDirection: TextDirection.rtl,
-                      text: TextSpan(
-                        style: DefaultTextStyle.of(context).style.copyWith(
-                              color: isDark
-                                  ? MyColors.darkTextPrimary
-                                  : MyColors.textMatn1,
-                              height: 1.0,
-                            ),
-                        children: [
-                          // TextSpan(
-                          //   text: '${l10n?.total_price ?? 'جمع کل: '}',
-                          //   style: TextStyle(
-                          //     fontSize: Dimens.nsp(14),
-                          //     fontWeight: FontWeight.w400,
-                          //   ),
-                          // ),
-                          TextSpan(
-                            text: MoneyUtils.formatTomanDisplay(totals.payable),
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: Dimens.nsp(18),
-                            ),
-                          ),
-                          TextSpan(
-                            text: ' ${l10n?.toman ?? 'تومان'}',
-                            style: TextStyle(
-                              fontSize: Dimens.nsp(12),
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ],
-                      ),
+                    PrimaryButton(
+                      width: Dimens.nw(160),
+                      height: Dimens.nh(50),
+                      lable: l10n?.pay_now ?? "Pay Now",
+                      backgroundColor:
+                          isDark ? MyColors.primary : MyColors.secondary,
+                      onPressed: () async {
+                        await _handlePayNow(
+                          checkoutItems,
+                          payload: cart.id,
+                          pointsToSpend: pointsState.serviceUnavailable
+                              ? 0
+                              : pointsState.pointsToSpend,
+                        );
+                      },
                     ),
-                    // if (totals.discount > 0)
-                    //   Text(
-                    //     'قیمت اصلی: ${MoneyUtils.formatTomanDisplay(totals.subTotal)} تومان',
-                    //     style: TextStyle(
-                    //       color: isDark
-                    //           ? MyColors.darkTextSecondary
-                    //           : Colors.grey[600],
-                    //       fontSize: Dimens.nsp(12),
-                    //       decoration: TextDecoration.lineThrough,
-                    //     ),
-                    //   ),
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        RichText(
+                          textDirection: TextDirection.rtl,
+                          text: TextSpan(
+                            style: DefaultTextStyle.of(context).style.copyWith(
+                                  color: isDark
+                                      ? MyColors.darkTextPrimary
+                                      : MyColors.textMatn1,
+                                  height: 1.0,
+                                ),
+                            children: [
+                              TextSpan(
+                                text: MoneyUtils.formatTomanDisplay(
+                                  totals.payable,
+                                ),
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: Dimens.nsp(18),
+                                ),
+                              ),
+                              TextSpan(
+                                text: ' ${l10n?.toman ?? 'تومان'}',
+                                style: TextStyle(
+                                  fontSize: Dimens.nsp(12),
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
+    ),
     );
   }
 

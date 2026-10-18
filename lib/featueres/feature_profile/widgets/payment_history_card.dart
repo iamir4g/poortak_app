@@ -98,6 +98,22 @@ class PaymentHistoryCard extends StatelessWidget {
                       ? _formatAmount(payment.grandTotal!)
                       : 'نامشخص',
                 ),
+                if (_pointsSpentLabel() != null) ...[
+                  SizedBox(height: 8.h),
+                  _buildDetailRow(
+                    context: context,
+                    label: 'امتیاز مصرف‌شده',
+                    value: _pointsSpentLabel()!,
+                  ),
+                ],
+                if (_discountLabel() != null) ...[
+                  SizedBox(height: 8.h),
+                  _buildDetailRow(
+                    context: context,
+                    label: 'تخفیف',
+                    value: _discountLabel()!,
+                  ),
+                ],
                 SizedBox(height: 8.h),
                 _buildDetailRow(
                   context: context,
@@ -112,6 +128,22 @@ class PaymentHistoryCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String? _pointsSpentLabel() {
+    final raw = payment.pointsSpent;
+    if (raw == null) return null;
+    final value = int.tryParse(raw.toString()) ?? 0;
+    if (value <= 0) return null;
+    return toPersianDigits('$value');
+  }
+
+  String? _discountLabel() {
+    final raw = payment.discountAmount;
+    if (raw == null) return null;
+    final text = raw.toString().trim();
+    if (text.isEmpty || text == '0' || text == '0.0') return null;
+    return _formatAmount(text);
   }
 
   Widget _buildStatusIcon() {

@@ -3,12 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:poortak/common/services/tts_service.dart';
+import 'package:poortak/common/utils/sentence_splitter.dart';
 import 'package:poortak/common/widgets/poortak_app_bar.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/locator.dart';
-import 'package:poortak/common/services/tts_service.dart';
 import 'package:poortak/featueres/feature_sayareh/data/models/conversation_model.dart';
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/converstion_bloc/converstion_bloc.dart';
 import 'package:poortak/featueres/feature_sayareh/widgets/conversation_message_bubble.dart';
@@ -186,14 +187,6 @@ class _ConversationScreenState extends State<ConversationScreen> {
     );
   }
 
-  /// تجزیه متن به جملات جداگانه
-  List<String> _splitIntoSentences(String text) {
-    // جدا کردن بر اساس نقطه، علامت سوال و علامت تعجب
-    // با حفظ خود علامت‌ها در انتهای هر جمله
-    final RegExp regExp = RegExp(r'[^.!?]+[.!?]*');
-    return regExp.allMatches(text).map((m) => m.group(0)!.trim()).toList();
-  }
-
   /// پخش تمام پیام‌های مکالمه به ترتیب
   /// در صورت فعال بودن پخش، با فراخوانی این متد پخش متوقف می‌شود
   Future<void> playAllConversations(List<Datum> messages) async {
@@ -237,7 +230,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
         currentPlayingIndexNotifier.value = i;
 
         // تجزیه پیام فعلی به جملات
-        _currentMessageSentences = _splitIntoSentences(message.text);
+        _currentMessageSentences =
+            splitIntoSentences(message.text, trim: true);
 
         var messageFinished = true;
 
@@ -343,7 +337,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
     }
 
     final currentMessage = sortedMessages![currentPlayingIndexNotifier.value];
-    final sentences = _splitIntoSentences(currentMessage.text);
+    final sentences = splitIntoSentences(currentMessage.text, trim: true);
 
     // اگر در پیام فعلی جملات بیشتری وجود دارد
     if (currentSentenceIndexNotifier.value < sentences.length - 1) {
@@ -384,7 +378,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
       currentPlayingIndexNotifier.value--;
       // رفتن به آخرین جمله پیام قبلی
       final prevMessage = sortedMessages![currentPlayingIndexNotifier.value];
-      final prevSentences = _splitIntoSentences(prevMessage.text);
+      final prevSentences =
+          splitIntoSentences(prevMessage.text, trim: true);
       currentSentenceIndexNotifier.value = prevSentences.length - 1;
     }
 
@@ -658,7 +653,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
                           itemBuilder: (context, index) {
                             final message = sortedMessages![index];
                             final sentenceCount =
-                                _splitIntoSentences(message.text).length;
+                                splitIntoSentences(message.text, trim: true)
+                                    .length;
                             final sentenceKeys = _getSentenceKeysForMessage(
                               index,
                               sentenceCount,

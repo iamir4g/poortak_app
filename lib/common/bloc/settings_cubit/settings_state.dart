@@ -13,7 +13,7 @@ class SettingsState {
     this.fullScreenMode = false,
     this.achievementNotifications = false,
     this.generalNotifications = false,
-    this.autoPlayPronunciation = false,
+    this.autoPlayPronunciation = true,
     this.autoPlayExerciseSounds = true,
     this.playSoundEffects = true,
     this.textSize = 0.67,

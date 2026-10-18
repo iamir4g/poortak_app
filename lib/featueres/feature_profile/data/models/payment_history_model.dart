@@ -50,6 +50,7 @@ class Datum {
   dynamic discountCode;
   dynamic discountAmount;
   dynamic discountType;
+  dynamic pointsSpent;
   String? subTotal;
   String? grandTotal;
   dynamic referenceId;
@@ -74,6 +75,7 @@ class Datum {
     this.discountCode,
     this.discountAmount,
     this.discountType,
+    this.pointsSpent,
     this.subTotal,
     this.grandTotal,
     this.referenceId,
@@ -99,6 +101,7 @@ class Datum {
         discountCode: json["discountCode"],
         discountAmount: json["discountAmount"],
         discountType: json["discountType"],
+        pointsSpent: json["pointsSpent"],
         subTotal: json["subTotal"],
         grandTotal: json["grandTotal"],
         referenceId: json["referenceId"],
@@ -132,6 +135,7 @@ class Datum {
         "discountCode": discountCode,
         "discountAmount": discountAmount,
         "discountType": discountType,
+        "pointsSpent": pointsSpent,
         "subTotal": subTotal,
         "grandTotal": grandTotal,
         "referenceId": referenceId,

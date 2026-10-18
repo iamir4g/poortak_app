@@ -74,3 +74,26 @@
 # Prevent warnings about the above rules
 -dontwarn j$.util.concurrent.**
 -dontwarn j$.util.**
+
+# ---------------------------------------------------------------------------
+# flutter_local_notifications + Gson
+# Without these, release/R8 builds throw:
+#   PlatformException(error, Missing type parameter.)
+# when calling zonedSchedule (Gson TypeToken loses generic type info).
+# ---------------------------------------------------------------------------
+-keep class com.dexterous.flutterlocalnotifications.** { *; }
+-dontwarn com.dexterous.flutterlocalnotifications.**
+
+-keep class com.google.gson.** { *; }
+-dontwarn com.google.gson.**
+-dontwarn sun.misc.**
+-keep class com.google.gson.reflect.TypeToken { *; }
+-keep class * extends com.google.gson.reflect.TypeToken
+-keep public class * implements java.lang.reflect.Type
+-keep class * extends com.google.gson.TypeAdapter
+-keep class * implements com.google.gson.TypeAdapterFactory
+-keep class * implements com.google.gson.JsonSerializer
+-keep class * implements com.google.gson.JsonDeserializer
+-keepclassmembers,allowobfuscation class * {
+  @com.google.gson.annotations.SerializedName <fields>;
+}

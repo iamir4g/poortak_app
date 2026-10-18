@@ -103,11 +103,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           secondaryTextColor: secondaryTextColor,
                           children: [
                             _buildToggleOption(
-                              title: "پخش خودکار تلفظ در صفحه واژگان جدید",
+                              title: "پخش خودکار تلفظ در صفحه واژگان",
                               primaryTextColor: primaryTextColor,
-                              value: false,
-                              onChanged: (_) {},
-                              comingSoon: true,
+                              value: state.autoPlayPronunciation,
+                              onChanged: (value) {
+                                context
+                                    .read<SettingsCubit>()
+                                    .updateAutoPlayPronunciation(value);
+                              },
+                              activeColor: MyColors.primary,
                             ),
                             _buildToggleOption(
                               title: "پخش خودکار صوت تمرین ها",

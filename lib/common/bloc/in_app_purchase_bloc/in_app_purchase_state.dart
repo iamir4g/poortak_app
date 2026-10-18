@@ -35,17 +35,21 @@ class InAppPurchasePurchasing extends InAppPurchaseState {
 class InAppPurchaseSuccess extends InAppPurchaseState {
   final List<BazaarPurchaseResult> purchases;
 
-  const InAppPurchaseSuccess(this.purchases);
+  /// Last settled payment from `/payments/direct` when available.
+  final Datum? payment;
+
+  const InAppPurchaseSuccess(this.purchases, {this.payment});
 
   @override
-  List<Object?> get props => [purchases];
+  List<Object?> get props => [purchases, payment];
 }
 
 class InAppPurchaseError extends InAppPurchaseState {
   final String message;
+  final String? errorCode;
 
-  const InAppPurchaseError(this.message);
+  const InAppPurchaseError(this.message, {this.errorCode});
 
   @override
-  List<Object?> get props => [message];
+  List<Object?> get props => [message, errorCode];
 }

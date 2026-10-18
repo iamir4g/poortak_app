@@ -1,11 +1,16 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poortak/common/models/bazaar_checkout_item.dart';
 import 'package:poortak/common/models/bazaar_purchase_result.dart';
+import 'package:poortak/common/resources/data_state.dart';
 import 'package:poortak/common/services/cafe_bazaar_purchase_service.dart';
 import 'package:poortak/config/app_flavor.dart';
+import 'package:poortak/featueres/feature_profile/data/models/payment_history_model.dart';
+import 'package:poortak/featueres/feature_shopping_cart/data/models/bazaar_quote_model.dart';
 import 'package:poortak/featueres/feature_shopping_cart/repositories/shopping_cart_repository.dart';
+import 'package:poortak/featueres/feature_shopping_cart/utils/cafebazaar_payment_errors.dart';
 
 part 'in_app_purchase_event.dart';
 part 'in_app_purchase_state.dart';
@@ -78,8 +83,11 @@ class InAppPurchaseBloc extends Bloc<InAppPurchaseEvent, InAppPurchaseState> {
       await _service.ensureConnected();
       final alreadyOwned = await _service.getPurchasedProducts();
       final purchases = <BazaarPurchaseResult>[];
+      Datum? lastPayment;
+      final requestedPoints = event.pointsToSpend ?? 0;
 
-      for (final item in items) {
+      for (var i = 0; i < items.length; i++) {
+        final item = items[i];
         final sku = item.bazaarSku;
         emit(InAppPurchasePurchasing(sku));
 
@@ -91,30 +99,153 @@ class InAppPurchaseBloc extends Bloc<InAppPurchaseEvent, InAppPurchaseState> {
           }
         }
 
-        final BazaarPurchaseResult result;
+        // Points discount only applies to the first line of a single-SKU checkout.
+        final usePoints = i == 0 && items.length == 1 && requestedPoints > 0;
+
+        String? nonce;
+        String dynamicPriceToken = '';
+
+        if (usePoints && existing == null) {
+          final reused = _tryReuseQuote(event);
+          if (reused != null) {
+            nonce = reused.$1;
+            dynamicPriceToken = reused.$2;
+            debugPrint(
+              '🛒 [Bazaar] reusing cart quote — '
+              'nonce=(set) tokenLen=${dynamicPriceToken.length} '
+              'tokenPrefix=${dynamicPriceToken.length > 12 ? dynamicPriceToken.substring(0, 12) : dynamicPriceToken}…',
+            );
+          } else {
+            final quoteResult = await _cartRepository.createBazaarQuote(
+              productType: item.productType,
+              bazaarSku: sku,
+              pointsToSpend: requestedPoints,
+            );
+            if (quoteResult is! DataSuccess<BazaarQuoteData> ||
+                quoteResult.data == null) {
+              final code = quoteResult.errorCode;
+              if (code == CafeBazaarPaymentErrors.serviceUnavailable) {
+                debugPrint(
+                  '🛒 [Bazaar] quote unavailable — falling back to full price',
+                );
+              } else {
+                emit(InAppPurchaseError(
+                  quoteResult.error ??
+                      CafeBazaarPaymentErrors.userMessageFor(code),
+                  errorCode: code,
+                ));
+                return;
+              }
+            } else {
+              final quoted = quoteResult.data!;
+              if (quoted.isExpired) {
+                emit(const InAppPurchaseError(
+                  'تخفیف امتیاز منقضی شد؛ دوباره محاسبه کنید',
+                  errorCode: CafeBazaarPaymentErrors.dynamicPriceInvalid,
+                ));
+                return;
+              }
+              nonce = quoted.nonce.trim();
+              dynamicPriceToken = quoted.token.trim();
+              debugPrint(
+                '🛒 [Bazaar] fresh quote — '
+                'tokenLen=${dynamicPriceToken.length} '
+                'tokenPrefix=${dynamicPriceToken.length > 12 ? dynamicPriceToken.substring(0, 12) : dynamicPriceToken}…',
+              );
+            }
+          }
+        }
+
+        late final BazaarPurchaseResult result;
         if (existing != null) {
           debugPrint('🛒 [Bazaar] already owned: $sku — fulfilling via direct');
           result = existing;
+          // Owned purchases cannot carry a fresh dynamic-price discount.
+          nonce = null;
+          dynamicPriceToken = '';
         } else {
-          result = await _service.purchase(
-            sku,
-            payload: event.payload ?? '',
-          );
+          try {
+            result = await _service.purchase(
+              sku,
+              payload: event.payload ?? '',
+              dynamicPriceToken: dynamicPriceToken,
+            );
+          } catch (e) {
+            if (dynamicPriceToken.isNotEmpty &&
+                CafeBazaarPaymentErrors.shouldFallbackFullPrice(e)) {
+              debugPrint(
+                '🛒 [Bazaar] dynamic price rejected/unsupported — '
+                'full-price fallback. error=$e',
+              );
+              nonce = null;
+              result = await _service.purchase(
+                sku,
+                payload: event.payload ?? '',
+              );
+            } else {
+              rethrow;
+            }
+          }
         }
 
-        await _cartRepository.verifyBazaarPurchase(
+        if (result.productId.trim() != sku) {
+          emit(InAppPurchaseError(
+            'محصول خریداری‌شده با سبد خرید مطابقت ندارد '
+            '(${result.productId} ≠ $sku)',
+          ));
+          return;
+        }
+
+        final settle = await _cartRepository.verifyBazaarPurchase(
           result,
           productType: item.productType,
           referrerCode: event.referrerCode,
+          nonce: nonce,
         );
+
+        if (settle is DataFailed<Datum?>) {
+          if (settle.errorCode ==
+                  CafeBazaarPaymentErrors.dynamicPriceInvalid &&
+              nonce != null) {
+            emit(InAppPurchaseError(
+              settle.error ??
+                  CafeBazaarPaymentErrors.userMessageFor(settle.errorCode),
+              errorCode: settle.errorCode,
+            ));
+            return;
+          }
+          emit(InAppPurchaseError(
+            settle.error ?? 'تأیید خرید ناموفق بود',
+            errorCode: settle.errorCode,
+          ));
+          return;
+        }
+
+        if (settle is DataSuccess<Datum?>) {
+          lastPayment = settle.data ?? lastPayment;
+        }
         purchases.add(result);
       }
 
-      emit(InAppPurchaseSuccess(purchases));
+      emit(InAppPurchaseSuccess(purchases, payment: lastPayment));
     } catch (e) {
       debugPrint('🛒 [Bazaar] purchase error: $e');
       emit(InAppPurchaseError(_friendlyError(e)));
     }
+  }
+
+  /// Returns `(nonce, token)` when the event carries a still-valid quote.
+  (String, String)? _tryReuseQuote(PurchaseProductsEvent event) {
+    final nonce = event.quoteNonce?.trim() ?? '';
+    final token = event.quoteToken?.trim() ?? '';
+    if (nonce.isEmpty || token.isEmpty) return null;
+    final expiresAt = event.quoteExpiresAt;
+    if (expiresAt != null &&
+        DateTime.now().toUtc().isAfter(expiresAt.toUtc())) {
+      debugPrint('🛒 [Bazaar] reused quote expired — will re-quote');
+      return null;
+    }
+    return (nonce, token);
   }
 
   Future<void> _onDisconnect(
@@ -127,11 +258,21 @@ class InAppPurchaseBloc extends Bloc<InAppPurchaseEvent, InAppPurchaseState> {
 
   String _friendlyError(Object error) {
     final text = error.toString().toLowerCase();
-    if (text.contains('cancel') || text.contains('لغو')) {
+    if (text.contains('cancel') ||
+        text.contains('لغو') ||
+        text.contains('purchase_cancelled')) {
       return 'خرید لغو شد';
+    }
+    if (text.contains('نامعتبر') ||
+        text.contains('failed_to_begin_flow') ||
+        text.contains('dynamic')) {
+      return 'توکن تخفیف بازار پذیرفته نشد';
     }
     if (text.contains('not connected') || text.contains('bazaar')) {
       return 'لطفا برنامه کافه بازار را نصب و وارد حساب شوید';
+    }
+    if (error is PlatformException) {
+      return error.message ?? error.code;
     }
     return error.toString();
   }
