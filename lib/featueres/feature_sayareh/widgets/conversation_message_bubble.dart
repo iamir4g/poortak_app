@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
 import 'package:poortak/common/services/storage_service.dart';
+import 'package:poortak/common/utils/digit_utils.dart';
 import 'package:poortak/common/utils/font_size_helper.dart';
 import 'package:poortak/common/utils/sentence_splitter.dart';
 import 'package:poortak/config/dimens.dart';
@@ -141,7 +142,8 @@ class ConversationMessageBubble extends StatelessWidget {
     required BuildContext context,
     required Color translationColor,
   }) {
-    final translationSentences = splitIntoSentences(message.translation);
+    final translationSentences =
+        splitIntoSentences(localizeDigits(message.translation));
 
     return Directionality(
       textDirection: TextDirection.rtl,
@@ -226,7 +228,7 @@ class ConversationMessageBubble extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isFirstPerson = message.isMaleSpeaker;
     final avatarPath = message.conversationAvatarPath;
-    final sentences = splitIntoSentences(message.text);
+    final sentences = splitIntoSentences(localizeDigits(message.text));
 
     final bubbleColor = isDark
         ? (isFirstPerson

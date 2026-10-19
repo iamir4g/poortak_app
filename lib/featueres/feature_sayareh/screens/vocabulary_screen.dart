@@ -388,7 +388,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                                   ),
                                   SizedBox(height: Dimens.nh(20)),
                                   Text(
-                                    toEnglishDigits(currentWord.word),
+                                    localizeDigits(currentWord.word),
                                     style: MyTextStyle.textMatn18Bold.copyWith(
                                       fontSize:
                                           FontSizeHelper.getScaledFontSize(
@@ -399,7 +399,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                                   ),
                                   SizedBox(height: 10.h),
                                   Text(
-                                    toEnglishDigits(currentWord.translation),
+                                    localizeDigits(currentWord.translation),
                                     style: MyTextStyle.textMatn16.copyWith(
                                       fontSize:
                                           FontSizeHelper.getScaledFontSize(

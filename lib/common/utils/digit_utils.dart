@@ -1,5 +1,18 @@
 import 'package:flutter/services.dart';
 
+final RegExp _persianScript = RegExp(
+  r'[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]',
+);
+
+bool hasPersianScript(String text) => _persianScript.hasMatch(text);
+
+/// Converts digits to Persian when [input] contains Persian/Arabic script,
+/// otherwise converts them to English (Latin) digits.
+String localizeDigits(String input) {
+  if (hasPersianScript(input)) return toPersianDigits(input);
+  return toEnglishDigits(input);
+}
+
 String toEnglishDigits(String input) {
   return input
       .replaceAll('۰', '0')

@@ -418,7 +418,6 @@ class _QuizScreenState extends State<QuizScreen> {
                                 progress: _buildQuizProgress(progressState),
                                 question: BidiText(
                                   text: questionData.title,
-                                  forceEnglishDigits: true,
                                   textAlign: TextAlign.center,
                                   style: FontSizeHelper.getContentTextStyle(
                                     context,

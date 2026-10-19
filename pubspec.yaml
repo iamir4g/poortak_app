@@ -170,9 +170,11 @@ flutter:
         - asset: assets/fonts/vazir.ttf
     - family: IranSans
       fonts:
-        - asset: assets/fonts/iransans.ttf
+        # TEMP test: English-digit variant (was iransans.ttf / FaNum)
+        - asset: assets/fonts/iransans_a.ttf
     - family: IRANSans
       fonts:
-        - asset: assets/fonts/iransans.ttf
+        # TEMP test: English-digit variant (was iransans.ttf / FaNum)
+        - asset: assets/fonts/iransans_a.ttf
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package

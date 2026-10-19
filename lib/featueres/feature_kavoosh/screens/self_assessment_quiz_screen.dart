@@ -238,7 +238,6 @@ class _SelfAssessmentQuizScreenState extends State<SelfAssessmentQuizScreen> {
       progress: _buildProgress(stats, afterSubmit: showFeedback),
       question: BidiText(
         text: question.title,
-        forceEnglishDigits: true,
         textAlign: TextAlign.center,
         style: MyTextStyle.textHeader16Bold.copyWith(
           color: isDark ? MyColors.profileTextPrimaryDark : MyColors.textMatn1,

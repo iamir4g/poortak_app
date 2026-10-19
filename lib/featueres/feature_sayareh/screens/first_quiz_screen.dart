@@ -472,7 +472,6 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                                     progress: _buildQuizProgress(progressState),
                                     question: BidiText(
                                       text: state.question.data.title,
-                                      forceEnglishDigits: true,
                                       textAlign: TextAlign.center,
                                       style:
                                           MyTextStyle.textHeader16Bold.copyWith(

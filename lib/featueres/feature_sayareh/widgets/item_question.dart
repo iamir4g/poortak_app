@@ -150,7 +150,6 @@ class _QuizAnswerItemState extends State<QuizAnswerItem> {
       child: Center(
         child: BidiText(
           text: widget.title,
-          forceEnglishDigits: true,
           style: MyTextStyle.textMatn14Bold.copyWith(
             fontSize: FontSizeHelper.getScaledFontSize(
               context,
