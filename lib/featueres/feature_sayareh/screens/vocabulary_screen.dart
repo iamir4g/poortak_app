@@ -394,6 +394,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                                           FontSizeHelper.getScaledFontSize(
                                               context, 24.sp),
                                       color: primaryTextColor,
+                                      fontFamily: 'IranSansEn',
                                       fontFamilyFallback: const ['sans-serif'],
                                     ),
                                   ),
@@ -405,7 +406,6 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                                           FontSizeHelper.getScaledFontSize(
                                               context, 18.sp),
                                       color: secondaryTextColor,
-                                      fontFamilyFallback: const ['sans-serif'],
                                     ),
                                   ),
                                   SizedBox(height: 20.h),

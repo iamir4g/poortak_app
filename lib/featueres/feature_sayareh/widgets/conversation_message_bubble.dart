@@ -129,7 +129,7 @@ class ConversationMessageBubble extends StatelessWidget {
                   color: baseTextColor.withValues(
                     alpha: _sentenceOpacity(index),
                   ),
-                ),
+                ).copyWith(fontFamily: 'IranSansEn'),
               ),
             ],
           ],
