@@ -40,6 +40,7 @@ class Datum {
   String text;
   String translation;
   String voice;
+  String? avatarId;
   int order;
   DateTime createdAt;
   DateTime updatedAt;
@@ -51,6 +52,7 @@ class Datum {
     required this.text,
     required this.translation,
     required this.voice,
+    this.avatarId,
     required this.order,
     required this.createdAt,
     required this.updatedAt,
@@ -63,6 +65,7 @@ class Datum {
         text: json["text"],
         translation: json["translation"],
         voice: json["voice"],
+        avatarId: json["avatarId"],
         order: json["order"],
         createdAt: DateTime.parse(json["createdAt"]),
         updatedAt: DateTime.parse(json["updatedAt"]),
@@ -75,6 +78,7 @@ class Datum {
         "text": text,
         "translation": translation,
         "voice": voice,
+        "avatarId": avatarId,
         "order": order,
         "createdAt": createdAt.toIso8601String(),
         "updatedAt": updatedAt.toIso8601String(),
