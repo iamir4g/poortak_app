@@ -390,8 +390,9 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                                   Text(
                                     toEnglishDigits(currentWord.word),
                                     style: MyTextStyle.textMatn18Bold.copyWith(
-                                      fontSize: FontSizeHelper.getScaledFontSize(
-                                          context, 24.sp),
+                                      fontSize:
+                                          FontSizeHelper.getScaledFontSize(
+                                              context, 24.sp),
                                       color: primaryTextColor,
                                       fontFamilyFallback: const ['sans-serif'],
                                     ),
@@ -400,8 +401,9 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                                   Text(
                                     toEnglishDigits(currentWord.translation),
                                     style: MyTextStyle.textMatn16.copyWith(
-                                      fontSize: FontSizeHelper.getScaledFontSize(
-                                          context, 18.sp),
+                                      fontSize:
+                                          FontSizeHelper.getScaledFontSize(
+                                              context, 18.sp),
                                       color: secondaryTextColor,
                                       fontFamilyFallback: const ['sans-serif'],
                                     ),
@@ -418,7 +420,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                           left: 16.w,
                           right: 16.w,
                           top: 16.h,
-                          bottom: Dimens.nh(90),
+                          bottom: Dimens.nh(70),
                         ),
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
