@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:lottie/lottie.dart';
 import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/common/utils/digit_utils.dart';
 import 'package:poortak/common/utils/font_size_helper.dart';
@@ -46,15 +45,7 @@ class ConversationMessageBubble extends StatelessWidget {
     required this.onTap,
   });
 
-  Widget _lottieFallback(String assetPath) {
-    return Lottie.asset(
-      assetPath,
-      fit: BoxFit.cover,
-    );
-  }
-
   Widget _sideAvatar({
-    required String assetPath,
     required Color backgroundColor,
     String? avatarId,
   }) {
@@ -77,10 +68,10 @@ class ConversationMessageBubble extends StatelessWidget {
                         locator<StorageService>().getDownloadPublicUrl(avatarId),
                     fit: BoxFit.cover,
                     fadeInDuration: const Duration(milliseconds: 150),
-                    placeholder: (_, __) => _lottieFallback(assetPath),
-                    errorWidget: (_, __, ___) => _lottieFallback(assetPath),
+                    placeholder: (_, __) => const SizedBox.expand(),
+                    errorWidget: (_, __, ___) => const SizedBox.expand(),
                   )
-                : _lottieFallback(assetPath),
+                : const SizedBox.expand(),
           ),
         ),
       ),
@@ -227,7 +218,6 @@ class ConversationMessageBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isFirstPerson = message.isMaleSpeaker;
-    final avatarPath = message.conversationAvatarPath;
     final sentences = splitIntoSentences(localizeDigits(message.text));
 
     final bubbleColor = isDark
@@ -284,7 +274,6 @@ class ConversationMessageBubble extends StatelessWidget {
                 children: isFirstPerson
                     ? [
                         _sideAvatar(
-                          assetPath: avatarPath,
                           backgroundColor: sideCircleColor,
                           avatarId: message.avatarId,
                         ),
@@ -315,7 +304,6 @@ class ConversationMessageBubble extends StatelessWidget {
                         ),
                         SizedBox(width: Dimens.small),
                         _sideAvatar(
-                          assetPath: avatarPath,
                           backgroundColor: sideCircleColor,
                           avatarId: message.avatarId,
                         ),

@@ -88,20 +88,14 @@ class Datum {
 }
 
 extension ConversationSpeaker on Datum {
-  static const mayaAvatarPath = 'assets/lottie/Talking_maya avatar.json';
-  static const robotAvatarPath = 'assets/lottie/talking-robot.json';
-
-  /// talking-robot.json → صدای آقا
+  /// صدای آقا
   bool get isMaleSpeaker {
     final v = voice.toLowerCase().trim();
     return v == 'male' || v == 'm' || v == 'man' || v.contains('robot');
   }
 
-  /// Talking_maya avatar.json → صدای خانم (هر چیزی غیر از male)
+  /// صدای خانم (هر چیزی غیر از male)
   bool get isFemaleSpeaker => !isMaleSpeaker;
-
-  String get conversationAvatarPath =>
-      isMaleSpeaker ? robotAvatarPath : mayaAvatarPath;
 
   String get playbackVoice => isMaleSpeaker ? 'male' : 'female';
 }
