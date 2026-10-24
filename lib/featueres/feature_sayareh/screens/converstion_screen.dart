@@ -59,7 +59,6 @@ class _ConversationScreenState extends State<ConversationScreen>
 
   // شناسه جلسه پخش برای جلوگیری از تداخل پخش‌ها
   int _playbackSessionId = 0;
-  int _speakTapId = 0;
 
   @override
   void initState() {
@@ -247,6 +246,13 @@ class _ConversationScreenState extends State<ConversationScreen>
         _currentMessageSentences =
             splitIntoSentences(message.text, trim: true);
 
+        // ذخیره در شروع خواندن پیام، نه بعد از اتمام
+        if (mounted &&
+            isPlayingNotifier.value &&
+            _playbackSessionId == mySessionId) {
+          _savePlayback(message.id);
+        }
+
         var messageFinished = true;
 
         // پخش جملات پیام فعلی
@@ -294,12 +300,10 @@ class _ConversationScreenState extends State<ConversationScreen>
           }
         }
 
-        // فقط وقتی کل پیام واقعاً پخش شد ذخیره کن؛ اسkip جلو/عقب ریکوئست نمی‌زند
         if (mounted &&
             isPlayingNotifier.value &&
             _playbackSessionId == mySessionId &&
             messageFinished) {
-          _savePlayback(message.id);
           currentSentenceIndexNotifier.value = 0;
         } else {
           // اگر کاربر متوقف کرده، ایندکس فعلی را حفظ کن تا دفعه بعد از همین‌جا ادامه دهد
@@ -333,11 +337,8 @@ class _ConversationScreenState extends State<ConversationScreen>
       isPlayingNotifier.value = false;
     }
 
-    final int tapId = ++_speakTapId;
+    _savePlayback(conversationId);
     await _speakWithAvatarVoice(text, message);
-    if (mounted && tapId == _speakTapId) {
-      _savePlayback(conversationId);
-    }
   }
 
   /// رفتن به جمله بعدی
