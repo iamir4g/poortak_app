@@ -29,7 +29,8 @@ class ConversationScreen extends StatefulWidget {
   State<ConversationScreen> createState() => _ConversationScreenState();
 }
 
-class _ConversationScreenState extends State<ConversationScreen> {
+class _ConversationScreenState extends State<ConversationScreen>
+    with WidgetsBindingObserver {
   // سرویس TTS برای پخش صوتی متن‌ها
   final TTSService ttsService = locator<TTSService>();
 
@@ -63,9 +64,21 @@ class _ConversationScreenState extends State<ConversationScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _converstionBloc = ConverstionBloc(
       sayarehRepository: locator(),
     )..add(GetConversationEvent(id: widget.conversationId));
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.detached) {
+      isPlayingNotifier.value = false;
+      _playbackSessionId++;
+      ttsService.stop();
+    }
   }
 
   final ScrollController _scrollController = ScrollController();
@@ -162,6 +175,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     // توقف پخش در صورت خروج از صفحه
     ttsService.stop();
     _converstionBloc.close();

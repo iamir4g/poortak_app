@@ -120,7 +120,14 @@ class ConversationMessageBubble extends StatelessWidget {
                   color: baseTextColor.withValues(
                     alpha: _sentenceOpacity(index),
                   ),
-                ).copyWith(fontFamily: 'IranSansEn'),
+                ).copyWith(
+                  fontFamily: 'IranSansEn',
+                  fontWeight: isPlaybackActive &&
+                          isCurrentPlaying &&
+                          index == currentSentenceIndex
+                      ? FontWeight.w700
+                      : FontWeight.w500,
+                ),
               ),
             ],
           ],
