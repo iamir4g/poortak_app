@@ -60,12 +60,12 @@ class ConversationMessageBubble extends StatelessWidget {
           shape: BoxShape.circle,
         ),
         child: Padding(
-          padding: EdgeInsets.all(4),
+          padding: EdgeInsets.all(0),
           child: ClipOval(
             child: hasRemoteAvatar
                 ? CachedNetworkImage(
-                    imageUrl:
-                        locator<StorageService>().getDownloadPublicUrl(avatarId),
+                    imageUrl: locator<StorageService>()
+                        .getDownloadPublicUrl(avatarId),
                     fit: BoxFit.cover,
                     fadeInDuration: const Duration(milliseconds: 150),
                     placeholder: (_, __) => const SizedBox.expand(),
