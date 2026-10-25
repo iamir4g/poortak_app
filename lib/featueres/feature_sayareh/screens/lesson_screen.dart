@@ -807,8 +807,8 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
           ),
         ],
       ),
-      child: IconButton(
-        onPressed: () {
+      child: GestureDetector(
+        onTap: () {
           showModalBottomSheet(
             context: context,
             isScrollControlled: true,
@@ -816,10 +816,13 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
             builder: (context) => const DictionaryBottomSheet(),
           );
         },
-        icon: buildImageFromAssetOrEmbeddedSvg(
-          "assets/images/iknow/dictionary_icon.svg",
-          width: Dimens.nw(36),
-          height: Dimens.nh(36),
+        behavior: HitTestBehavior.opaque,
+        child: Center(
+          child: buildImageFromAssetOrEmbeddedSvg(
+            "assets/images/iknow/dictionary_icon.svg",
+            width: Dimens.nw(36),
+            height: Dimens.nh(36),
+          ),
         ),
       ),
     );
