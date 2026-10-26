@@ -42,14 +42,71 @@ class _EducationalVideosScreenState extends State<EducationalVideosScreen> {
   }
 
   IconData _tabIconFor(CategoryNodeSummary tab) {
-    final title = tab.title;
-    if (title.contains('کوتاه')) return Icons.movie_outlined;
+    if (tab.isShortsTab) return Icons.movie_outlined;
     return Icons.play_circle_outline;
   }
 
   int _defaultTabIndex(List<CategoryNodeSummary> tabs) {
     final preferred = tabs.indexWhere((e) => e.title == 'دوره ها');
     return preferred >= 0 ? preferred : 0;
+  }
+
+  List<CategoryNodeSummary> _tabsFromSummary(
+    List<CategoryNodeSummary> roots,
+  ) {
+    final courseTabs = <CategoryNodeSummary>[];
+    CategoryNodeSummary? shortsTab;
+
+    for (final root in roots) {
+      if (root.looksLikeShortsTab) {
+        if (root.subtreeShortVideoCount > 0) {
+          shortsTab = root;
+        }
+        continue;
+      }
+      courseTabs.add(root);
+    }
+
+    if (shortsTab == null) {
+      final totalShorts = roots.fold<int>(
+        0,
+        (sum, root) => sum + root.subtreeShortVideoCount,
+      );
+      if (totalShorts > 0) {
+        shortsTab = CategoryNodeSummary.injectedShorts(
+          shortVideoCount: totalShorts,
+        );
+      }
+    }
+
+    if (shortsTab != null) {
+      courseTabs.add(shortsTab);
+    }
+    return courseTabs;
+  }
+
+  Widget _buildShortsTabContent(CategoryNodeSummary tab) {
+    final childSections = tab.children
+        .where((section) => section.subtreeShortVideoCount > 0)
+        .toList();
+    final sections = childSections.isNotEmpty ? childSections : [tab];
+
+    return SingleChildScrollView(
+      padding: EdgeInsets.only(top: 16.h, bottom: 20.h),
+      child: Column(
+        children: sections
+            .map(
+              (section) => CategoryContentSection(
+                key: ValueKey('short-${section.id}'),
+                section: section,
+                treeType: KavooshTreeType.video,
+                isShortVideo: true,
+                seeAllTitlePrefix: 'ویدیوهای کوتاه',
+              ),
+            )
+            .toList(),
+      ),
+    );
   }
 
   void _onTabSelected(int index) {
@@ -63,6 +120,10 @@ class _EducationalVideosScreenState extends State<EducationalVideosScreen> {
   }
 
   Widget _buildTabContent(CategoryNodeSummary tab, bool isDark) {
+    if (tab.isShortsTab) {
+      return _buildShortsTabContent(tab);
+    }
+
     if (tab.children.isEmpty) {
       return Center(
         child: Padding(
@@ -118,7 +179,7 @@ class _EducationalVideosScreenState extends State<EducationalVideosScreen> {
             listener: (context, state) {
               if (state is CategoriesLoaded) {
                 final wasEmpty = _rootTabs.isEmpty;
-                final nextTabs = state.categories;
+                final nextTabs = _tabsFromSummary(state.categories);
                 var nextIndex = _selectedTabIndex;
 
                 if (wasEmpty) {

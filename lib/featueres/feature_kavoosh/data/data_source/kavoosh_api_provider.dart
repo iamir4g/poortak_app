@@ -87,6 +87,50 @@ class KavooshApiProvider {
     );
   }
 
+  /// GET /short-videos
+  Future<Response> callGetShortVideos({
+    String? categoryId,
+    int size = 20,
+    int page = 1,
+    String order = 'asc',
+    String? query,
+  }) {
+    final queryParameters = <String, dynamic>{
+      'size': size,
+      'page': page,
+      'order': order,
+    };
+    if (categoryId != null && categoryId.isNotEmpty) {
+      queryParameters['categoryId'] = categoryId;
+    }
+    if (query != null && query.isNotEmpty) {
+      queryParameters['query'] = query;
+    }
+
+    return dio.get(
+      "${Constants.baseUrl}short-videos",
+      queryParameters: queryParameters,
+    );
+  }
+
+  /// GET /short-videos/:id
+  Future<Response> callGetShortVideoById({
+    required String shortVideoId,
+  }) {
+    return dio.get(
+      "${Constants.baseUrl}short-videos/$shortVideoId",
+    );
+  }
+
+  /// GET /short-videos/:id/download
+  Future<Response> callGetShortVideoDownload({
+    required String shortVideoId,
+  }) {
+    return dio.get(
+      "${Constants.baseUrl}short-videos/$shortVideoId/download",
+    );
+  }
+
   /// GET /books/:bookId
   Future<Response> callGetBookById({
     required String bookId,

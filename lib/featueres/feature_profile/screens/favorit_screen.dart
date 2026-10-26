@@ -10,6 +10,7 @@ import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_bookmarks/data/models/bookmark_models.dart';
 import 'package:poortak/featueres/feature_bookmarks/presentation/cubit/bookmark_cubit.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/book_details_screen.dart';
+import 'package:poortak/featueres/feature_kavoosh/screens/short_video_player_screen.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/video_detail_screen.dart';
 import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
 import 'package:poortak/featueres/feature_sayareh/screens/book_detail_screen.dart';
@@ -109,6 +110,13 @@ class _FavoritScreenState extends State<FavoritScreen> {
             'courseId': item.itemId,
             'title': item.displayTitle,
           },
+        );
+        break;
+      case BookmarkType.ShortVideo:
+        ShortVideoPlayerScreen.open(
+          context,
+          videoId: item.itemId,
+          title: item.displayTitle,
         );
         break;
     }
@@ -253,13 +261,15 @@ class _FavoritScreenState extends State<FavoritScreen> {
         return '(سیاره آی نو)';
       case BookmarkType.Book:
       case BookmarkType.VideoCourse:
+      case BookmarkType.ShortVideo:
         return '(کاوش)';
     }
   }
 
   bool _showPlayOverlay(BookmarkType type) {
     return type == BookmarkType.IKnowCourse ||
-        type == BookmarkType.VideoCourse;
+        type == BookmarkType.VideoCourse ||
+        type == BookmarkType.ShortVideo;
   }
 
   Widget _buildFavoriteItem(bool isDarkMode, BookmarkItem item) {

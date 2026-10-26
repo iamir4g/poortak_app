@@ -1,6 +1,7 @@
 enum BookmarkType {
   Book,
   VideoCourse,
+  ShortVideo,
   IKnowCourse,
   IKnowBook;
 
@@ -86,10 +87,13 @@ _NormalizedItem _normalizeItem(
   switch (type) {
     case BookmarkType.Book:
     case BookmarkType.VideoCourse:
+    case BookmarkType.ShortVideo:
       return _NormalizedItem(
         title: item['title']?.toString() ?? 'محصول',
         thumbnailId: _nonEmpty(item['thumbnailId']?.toString()),
-        price: item['price']?.toString(),
+        price: type == BookmarkType.ShortVideo
+            ? null
+            : item['price']?.toString(),
         description: item['description']?.toString(),
       );
     case BookmarkType.IKnowCourse:

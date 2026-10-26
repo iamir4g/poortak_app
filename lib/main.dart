@@ -26,6 +26,8 @@ import 'package:poortak/featueres/feature_kavoosh/screens/ebooks_screen.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/course_list_screen.dart';
 import 'package:poortak/featueres/feature_kavoosh/data/models/kavoosh_tree_type.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/video_detail_screen.dart';
+import 'package:poortak/featueres/feature_kavoosh/screens/short_video_player_screen.dart';
+import 'package:poortak/featueres/feature_kavoosh/screens/short_video_list_screen.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/book_details_screen.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/self_assessment_screen.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/self_assessment_quizzes_screen.dart';
@@ -406,6 +408,22 @@ void main() async {
                         return VideoDetailScreen(
                           courseId: args?['courseId']?.toString() ?? '',
                           title: args?['title']?.toString(),
+                        );
+                      },
+                      ShortVideoPlayerScreen.routeName: (context) {
+                        final args = ModalRoute.of(context)?.settings.arguments
+                            as Map<String, dynamic>?;
+                        return ShortVideoPlayerScreen(
+                          videoId: args?['videoId']?.toString() ?? '',
+                          title: args?['title']?.toString(),
+                        );
+                      },
+                      ShortVideoListScreen.routeName: (context) {
+                        final args = ModalRoute.of(context)?.settings.arguments
+                            as Map<String, dynamic>?;
+                        return ShortVideoListScreen(
+                          title: args?['title']?.toString() ?? 'ویدیوهای کوتاه',
+                          categoryId: args?['categoryId']?.toString(),
                         );
                       },
                       BookDetailsScreen.routeName: (context) {

@@ -80,6 +80,23 @@ class StorageService {
     return _extractDownloadUrl(response.data);
   }
 
+  /// Public short-video playback URL. Files are unencrypted.
+  Future<String> callDownloadShortVideo({
+    required String shortVideoId,
+  }) async {
+    try {
+      final response = await dio.get(
+        "${Constants.baseUrl}short-videos/$shortVideoId/download",
+      );
+
+      log("Short Video Download URL Response: ${response.data}");
+      return _extractDownloadUrl(response.data);
+    } catch (e) {
+      log("Error calling callDownloadShortVideo: $e");
+      rethrow;
+    }
+  }
+
   /// Kavoosh book download (requires book access).
   Future<String> callDownloadKavooshBook(String bookId) async {
     final response = await dio.get(
