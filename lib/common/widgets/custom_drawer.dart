@@ -34,6 +34,8 @@ class _CustomDrawerState extends State<CustomDrawer> {
   String? userLastName;
   String? userAvatar;
   String? userAvatarUrl;
+  final AuthNavigationManager _authNavigationManager = AuthNavigationManager();
+  late final VoidCallback _authNavigationListener;
 
   static const Map<String, String> _drawerIconAssets = {
     'tdesign:edit': 'assets/images/icons/tdesign--edit.svg',
@@ -119,7 +121,17 @@ class _CustomDrawerState extends State<CustomDrawer> {
   @override
   void initState() {
     super.initState();
+    _authNavigationListener = () {
+      _checkLoginStatus();
+    };
+    _authNavigationManager.addListener(_authNavigationListener);
     _checkLoginStatus();
+  }
+
+  @override
+  void dispose() {
+    _authNavigationManager.removeListener(_authNavigationListener);
+    super.dispose();
   }
 
   Future<void> _checkLoginStatus() async {

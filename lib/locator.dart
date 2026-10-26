@@ -60,10 +60,8 @@ import 'package:poortak/common/services/video_download_service.dart';
 
 GetIt locator = GetIt.instance;
 
-Future<void> initLocator() async {
+Dio _createDioClient() {
   final dio = Dio();
-
-  // Configure Dio to ignore bad certificates (SSL handshake errors)
   dio.httpClientAdapter = IOHttpClientAdapter(
     createHttpClient: () {
       final client = HttpClient();
@@ -72,9 +70,13 @@ Future<void> initLocator() async {
       return client;
     },
   );
-
-  // Set x-lang header as default for all requests
   dio.options.headers['x-lang'] = 'fa';
+  return dio;
+}
+
+Future<void> initLocator() async {
+  final dio = _createDioClient();
+  final refreshDio = _createDioClient();
 
   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
   locator.registerSingleton<SharedPreferences>(sharedPreferences);
@@ -126,7 +128,11 @@ Future<void> initLocator() async {
   ));
 
   dio.interceptors.add(
-    AuthInterceptor(prefsOperator: prefsOperator, dio: dio),
+    AuthInterceptor(
+      prefsOperator: prefsOperator,
+      dio: dio,
+      refreshDio: refreshDio,
+    ),
   );
 
   locator.registerSingleton<Dio>(dio);

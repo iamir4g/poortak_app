@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/common/blocs/bottom_nav_cubit/bottom_nav_cubit.dart';
+import 'package:poortak/common/services/auth_navigation_manager.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/config/myColors.dart';
@@ -36,11 +37,23 @@ class _ProfileScreenState extends State<ProfileScreen>
   String? userAvatar;
   String? userMobile;
   String? userAvatarUrl;
+  final AuthNavigationManager _authNavigationManager = AuthNavigationManager();
+  late final VoidCallback _authNavigationListener;
 
   @override
   void initState() {
     super.initState();
+    _authNavigationListener = () {
+      _checkLoginStatus();
+    };
+    _authNavigationManager.addListener(_authNavigationListener);
     _checkLoginStatus();
+  }
+
+  @override
+  void dispose() {
+    _authNavigationManager.removeListener(_authNavigationListener);
+    super.dispose();
   }
 
   Future<void> _checkLoginStatus() async {
