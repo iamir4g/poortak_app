@@ -6,6 +6,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poortak/common/services/tts_service.dart';
 import 'package:poortak/common/utils/sentence_splitter.dart';
 import 'package:poortak/common/widgets/poortak_app_bar.dart';
+import 'package:poortak/common/widgets/reusable_modal.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
@@ -59,6 +60,10 @@ class _ConversationScreenState extends State<ConversationScreen>
 
   // شناسه جلسه پخش برای جلوگیری از تداخل پخش‌ها
   int _playbackSessionId = 0;
+
+  // اگر مکالمه از وسط بازیابی شده، قبل از اولین پخش از کاربر بپرس
+  bool _shouldPromptPlaybackMode = false;
+  bool _isPlaybackChoiceDialogOpen = false;
 
   @override
   void initState() {
@@ -198,6 +203,48 @@ class _ConversationScreenState extends State<ConversationScreen>
         conversationId: conversationId,
       ),
     );
+  }
+
+  void _onPlayButtonPressed(List<Datum> messages) {
+    if (!isPlayingNotifier.value &&
+        _shouldPromptPlaybackMode &&
+        currentPlayingIndexNotifier.value > 0) {
+      _showPlaybackModeModal(messages);
+      return;
+    }
+    playAllConversations(messages);
+  }
+
+  void _showPlaybackModeModal(List<Datum> messages) {
+    if (_isPlaybackChoiceDialogOpen) return;
+    _isPlaybackChoiceDialogOpen = true;
+
+    ReusableModal.show(
+      context: context,
+      title: 'نحوه پخش مکالمه',
+      message: '',
+      type: ModalType.info,
+      customImagePath: 'assets/images/iknow/Frame 412.png',
+      buttonText: 'ادامه مکالمه',
+      secondButtonText: 'پخش از ابتدا',
+      showSecondButton: true,
+      onButtonPressed: () {
+        Navigator.of(context).pop();
+        _shouldPromptPlaybackMode = false;
+        playAllConversations(messages);
+      },
+      onSecondButtonPressed: () {
+        Navigator.of(context).pop();
+        _shouldPromptPlaybackMode = false;
+        currentPlayingIndexNotifier.value = 0;
+        currentSentenceIndexNotifier.value = 0;
+        _resetScrollTracking();
+        _scrollToCurrentSentence(0, 0, force: true);
+        playAllConversations(messages);
+      },
+    ).whenComplete(() {
+      _isPlaybackChoiceDialogOpen = false;
+    });
   }
 
   /// پخش تمام پیام‌های مکالمه به ترتیب
@@ -481,7 +528,7 @@ class _ConversationScreenState extends State<ConversationScreen>
                                 behavior: HitTestBehavior.opaque,
                                 onTap: () {
                                   if (sortedMessages != null) {
-                                    playAllConversations(sortedMessages!);
+                                    _onPlayButtonPressed(sortedMessages!);
                                   }
                                 },
                                 child: Center(
@@ -582,13 +629,18 @@ class _ConversationScreenState extends State<ConversationScreen>
 
                 if (index != -1) {
                   currentPlayingIndexNotifier.value = index;
+                  _shouldPromptPlaybackMode = index > 0;
                   _resetScrollTracking();
                   WidgetsBinding.instance.addPostFrameCallback((_) {
+                    if (!mounted) return;
                     _scrollToCurrentSentence(
                       index,
                       currentSentenceIndexNotifier.value,
                       force: true,
                     );
+                    if (_shouldPromptPlaybackMode) {
+                      _showPlaybackModeModal(messages);
+                    }
                   });
                 }
               }
