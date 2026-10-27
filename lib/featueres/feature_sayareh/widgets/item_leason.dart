@@ -3,17 +3,21 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poortak/common/services/getImageUrl_service.dart';
+import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/common/utils/svg_embedded_png.dart';
 import 'package:poortak/common/widgets/global_progress_bar.dart';
+import 'package:poortak/common/widgets/reusable_modal.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
+import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
 import 'package:poortak/featueres/feature_sayareh/data/models/all_courses_progress_model.dart';
 import 'package:poortak/featueres/feature_sayareh/data/models/iknow_summary_model.dart';
 import 'package:poortak/featueres/feature_sayareh/data/models/sayareh_home_model.dart';
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/sayareh_bloc/sayareh_cubit.dart';
 import 'package:poortak/featueres/feature_sayareh/screens/lesson_screen.dart';
 import 'package:poortak/featueres/feature_sayareh/widgets/dialog_cart.dart';
+import 'package:poortak/locator.dart';
 
 class ItemLeason extends StatelessWidget {
   final Lesson item;
@@ -34,6 +38,20 @@ class ItemLeason extends StatelessWidget {
   });
 
   bool get _isFirstLesson => index == 0;
+
+  void _promptLogin(BuildContext context) {
+    ReusableModal.show(
+      context: context,
+      title: '',
+      message: 'لطفا ابتدا وارد حساب کاربری خود شوید',
+      type: ModalType.info,
+      buttonText: 'ورود به حساب کاربری',
+      onButtonPressed: () {
+        Navigator.of(context).pop();
+        Navigator.pushNamed(context, LoginScreen.routeName);
+      },
+    );
+  }
 
   Future<void> _openLesson(BuildContext context) async {
     await Navigator.pushNamed(context, LessonScreen.routeName, arguments: {
@@ -62,6 +80,10 @@ class ItemLeason extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         if (_isFirstLesson) {
+          if (!locator<PrefsOperator>().isLoggedIn()) {
+            _promptLogin(context);
+            return;
+          }
           _openLesson(context);
           return;
         }

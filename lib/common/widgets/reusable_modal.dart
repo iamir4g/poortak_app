@@ -485,7 +485,7 @@ class ReusableModal extends StatelessWidget {
     );
   }
 
-  static void showSuccess({
+  static Future<T?> showSuccess<T>({
     required BuildContext context,
     required String title,
     required String message,
@@ -496,8 +496,9 @@ class ReusableModal extends StatelessWidget {
     bool showSecondButton = false,
     bool cartSuccessStyle = false,
     String? customLottiePath,
+    bool animatedEntrance = false,
   }) {
-    show(
+    return show(
       context: context,
       title: title,
       message: message,
@@ -509,6 +510,7 @@ class ReusableModal extends StatelessWidget {
       showSecondButton: showSecondButton,
       cartSuccessStyle: cartSuccessStyle,
       customLottiePath: customLottiePath,
+      animatedEntrance: animatedEntrance,
     );
   }
 
@@ -569,24 +571,72 @@ class ReusableModal extends StatelessWidget {
     String? customImagePath,
     String? customLottiePath,
     bool cartSuccessStyle = false,
+    bool animatedEntrance = false,
   }) {
-    return showDialog<T>(
+    Widget buildModal(BuildContext dialogContext) {
+      return ReusableModal(
+        title: title,
+        message: message,
+        buttonText: buttonText,
+        type: type,
+        onButtonPressed:
+            onButtonPressed ?? () => Navigator.of(dialogContext).pop(),
+        secondButtonText: secondButtonText,
+        onSecondButtonPressed: onSecondButtonPressed,
+        showSecondButton: showSecondButton,
+        showCloseButton: showCloseButton,
+        customImagePath: customImagePath,
+        customLottiePath: customLottiePath,
+        cartSuccessStyle: cartSuccessStyle,
+      );
+    }
+
+    if (!animatedEntrance) {
+      return showDialog<T>(
+        context: context,
+        barrierDismissible: barrierDismissible,
+        builder: buildModal,
+      );
+    }
+
+    final capturedThemes = InheritedTheme.capture(
+      from: context,
+      to: Navigator.of(context, rootNavigator: true).context,
+    );
+
+    return showGeneralDialog<T>(
       context: context,
       barrierDismissible: barrierDismissible,
-      builder: (BuildContext context) {
-        return ReusableModal(
-          title: title,
-          message: message,
-          buttonText: buttonText,
-          type: type,
-          onButtonPressed: onButtonPressed ?? () => Navigator.of(context).pop(),
-          secondButtonText: secondButtonText,
-          onSecondButtonPressed: onSecondButtonPressed,
-          showSecondButton: showSecondButton,
-          showCloseButton: showCloseButton,
-          customImagePath: customImagePath,
-          customLottiePath: customLottiePath,
-          cartSuccessStyle: cartSuccessStyle,
+      barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+      barrierColor: Colors.black.withValues(alpha: 0.54),
+      transitionDuration: const Duration(milliseconds: 520),
+      pageBuilder: (dialogContext, animation, secondaryAnimation) {
+        return capturedThemes.wrap(buildModal(dialogContext));
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        final fade = CurvedAnimation(
+          parent: animation,
+          curve: const Interval(0.0, 0.6, curve: Curves.easeOut),
+          reverseCurve: Curves.easeIn,
+        );
+        final appear = CurvedAnimation(
+          parent: animation,
+          curve: Curves.easeOutBack,
+          reverseCurve: Curves.easeInCubic,
+        );
+
+        return FadeTransition(
+          opacity: fade,
+          child: SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(0, 0.08),
+              end: Offset.zero,
+            ).animate(appear),
+            child: ScaleTransition(
+              scale: Tween<double>(begin: 0.84, end: 1.0).animate(appear),
+              child: child,
+            ),
+          ),
         );
       },
     );

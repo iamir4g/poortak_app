@@ -98,6 +98,20 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
     );
   }
 
+  void _showLessonCompletedModal() {
+    Future<void>.delayed(const Duration(milliseconds: 400), () {
+      if (!mounted || _isDisposed) return;
+      ReusableModal.showSuccess(
+        context: context,
+        title: 'تبریک!',
+        message: 'شما این درس را با موفقیت به پایان رساندید.',
+        customLottiePath: 'assets/lottie/Happy_Star.json',
+        buttonText: 'متوجه شدم',
+        animatedEntrance: true,
+      );
+    });
+  }
+
   bool _hasFullVideoAccess() {
     return LessonVideoPlaybackResolver.hasFullVideoAccess(
       isLoggedIn: locator<PrefsOperator>().isLoggedIn(),
@@ -387,17 +401,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
 
                 if (isCompleted && !_isCompletionPopupShown) {
                   _isCompletionPopupShown = true;
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    if (mounted) {
-                      ReusableModal.showSuccess(
-                        context: context,
-                        title: 'تبریک!',
-                        message: 'شما این درس را با موفقیت به پایان رساندید.',
-                        customLottiePath: 'assets/lottie/Happy_Star.json',
-                        buttonText: 'متوجه شدم',
-                      );
-                    }
-                  });
+                  _showLessonCompletedModal();
                 }
               }
 
