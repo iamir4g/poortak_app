@@ -280,9 +280,9 @@ class _FavoritScreenState extends State<FavoritScreen> {
       margin: EdgeInsets.only(bottom: 16.h),
       child: Stack(
         children: [
-          InkWell(
+          GestureDetector(
+            behavior: HitTestBehavior.opaque,
             onTap: () => _openItem(item),
-            borderRadius: BorderRadius.circular(20.r),
             child: Container(
               decoration: BoxDecoration(
                 color: isDarkMode

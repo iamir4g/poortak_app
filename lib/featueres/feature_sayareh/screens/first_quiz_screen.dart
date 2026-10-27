@@ -511,7 +511,8 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                                           isWrongSelected = isAnswerSelected &&
                                               !answerState.isCorrect;
                                         }
-                                        return InkWell(
+                                        return GestureDetector(
+                                          behavior: HitTestBehavior.opaque,
                                           onTap: answerState
                                                       is QuizAnswerLoading ||
                                                   answerState

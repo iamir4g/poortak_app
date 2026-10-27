@@ -477,8 +477,8 @@ class _ConversationScreenState extends State<ConversationScreen>
                             child: Material(
                               color: bgColor,
                               shape: const CircleBorder(),
-                              child: InkWell(
-                                customBorder: const CircleBorder(),
+                              child: GestureDetector(
+                                behavior: HitTestBehavior.opaque,
                                 onTap: () {
                                   if (sortedMessages != null) {
                                     playAllConversations(sortedMessages!);
@@ -527,12 +527,12 @@ class _ConversationScreenState extends State<ConversationScreen>
 
                         return Material(
                           color: Colors.transparent,
-                          child: InkWell(
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.opaque,
                             onTap: () {
                               showTranslationsNotifier.value =
                                   !showTranslationsNotifier.value;
                             },
-                            borderRadius: BorderRadius.circular(8.r),
                             child: Padding(
                               padding: EdgeInsets.symmetric(
                                 horizontal: Dimens.small,

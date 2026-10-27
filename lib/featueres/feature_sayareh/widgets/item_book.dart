@@ -40,8 +40,8 @@ class ItemBook extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Material(
       color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(20.r),
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTap: () => _handleTap(context),
         child: Container(
           height: Dimens.nh(104.0),

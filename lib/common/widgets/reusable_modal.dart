@@ -358,8 +358,6 @@ class ReusableModal extends StatelessWidget {
               child: Column(
                 children: [
                   _buildCartActionButton(
-                    context: context,
-                    isDarkMode: isDarkMode,
                     text: buttonText,
                     onTap: onPrimaryTap,
                     textStyle: TextStyle(
@@ -372,8 +370,6 @@ class ReusableModal extends StatelessWidget {
                   if (showSecondButton && secondButtonText != null) ...[
                     SizedBox(height: 10.h),
                     _buildCartActionButton(
-                      context: context,
-                      isDarkMode: isDarkMode,
                       text: secondButtonText!,
                       onTap: onSecondaryTap,
                       textStyle: TextStyle(
@@ -396,8 +392,6 @@ class ReusableModal extends StatelessWidget {
   }
 
   Widget _buildCartActionButton({
-    required BuildContext context,
-    required bool isDarkMode,
     required String text,
     required VoidCallback onTap,
     required TextStyle textStyle,
@@ -407,15 +401,9 @@ class ReusableModal extends StatelessWidget {
       width: double.infinity,
       child: Material(
         color: Colors.transparent,
-        child: InkWell(
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
           onTap: onTap,
-          hoverColor: Colors.transparent,
-          splashColor: isDarkMode
-              ? Colors.transparent
-              : MyColors.modalButtonPressedLight,
-          highlightColor: isDarkMode
-              ? Colors.transparent
-              : MyColors.modalButtonPressedLight,
           child: Center(
             child: Padding(
               padding: EdgeInsets.symmetric(vertical: 14.h),

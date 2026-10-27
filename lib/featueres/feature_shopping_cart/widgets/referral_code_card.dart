@@ -147,8 +147,8 @@ class _ReferralCodeCardState extends State<ReferralCodeCard> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            InkWell(
-              borderRadius: BorderRadius.circular(Dimens.nr(10.0)),
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
               onTap: _toggleExpanded,
               child: SizedBox(
                 height: Dimens.nh(40),

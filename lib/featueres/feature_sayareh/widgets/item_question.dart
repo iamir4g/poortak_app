@@ -213,8 +213,8 @@ class _PressableAnswerOptionButtonState extends State<PressableAnswerOptionButto
       child: Material(
         color: bg,
         borderRadius: BorderRadius.circular(16.r),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(16.r),
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
           onTap: widget.enabled ? widget.onTap : null,
           onTapDown: widget.enabled ? (_) => _setPressed(true) : null,
           onTapCancel: widget.enabled ? () => _setPressed(false) : null,

@@ -252,7 +252,8 @@ class _SelfAssessmentQuizScreenState extends State<SelfAssessmentQuizScreen> {
           final isWrongSelected =
               showFeedback && isAnswerSelected && !isCorrect;
 
-          return InkWell(
+          return GestureDetector(
+            behavior: HitTestBehavior.opaque,
             onTap: showFeedback || state is QuizSessionSubmitting
                 ? null
                 : () {

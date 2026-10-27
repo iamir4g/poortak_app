@@ -35,9 +35,9 @@ class PaymentHistoryCard extends StatelessWidget {
       ),
       child: Material(
         color: Colors.transparent,
-        child: InkWell(
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
           onTap: onTap,
-          borderRadius: BorderRadius.circular(10.r),
           child: Padding(
             padding: EdgeInsets.all(16.r),
             child: Column(

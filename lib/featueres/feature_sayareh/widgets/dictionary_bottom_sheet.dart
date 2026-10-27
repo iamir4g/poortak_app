@@ -369,7 +369,8 @@ class _DictionaryContentState extends State<_DictionaryContent> {
 
     return Material(
       color: Colors.transparent,
-      child: InkWell(
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTap: () {
           _dismissKeyboard();
           setState(() {

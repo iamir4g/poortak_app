@@ -280,8 +280,8 @@ class _MatchScreenState extends State<MatchScreen> {
                   ),
                   child: Material(
                     color: Colors.transparent,
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(Dimens.nr(56.5)),
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
                       onTap: _isAnswerSubmitted()
                           ? null
                           : () {
@@ -668,7 +668,8 @@ class _MatchScreenState extends State<MatchScreen> {
                 ),
                 Material(
                   color: Colors.transparent,
-                  child: InkWell(
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
                     onTap: () {
                       Navigator.of(dialogContext).pop();
                       Navigator.pushNamed(
@@ -702,7 +703,8 @@ class _MatchScreenState extends State<MatchScreen> {
                 ),
                 Material(
                   color: Colors.transparent,
-                  child: InkWell(
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
                     onTap: () => Navigator.of(dialogContext).pop(),
                     child: Container(
                       width: double.infinity,

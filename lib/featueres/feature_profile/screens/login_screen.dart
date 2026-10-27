@@ -740,8 +740,8 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Material(
             color: MyColors.primary,
             borderRadius: BorderRadius.circular(20.r),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(20.r),
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
               onTap: () {
                 if (showOtpForm) {
                   final otp = normalizeOtpForServer(
