@@ -21,13 +21,21 @@ class VocabularyModel {
     required this.data,
   });
 
-  factory VocabularyModel.fromJson(Map<String, dynamic> json) =>
-      VocabularyModel(
-        ok: json["ok"],
-        meta: Meta.fromJson(json["meta"]),
-        data: List<Vocabulary>.from(
-            json["data"].map((x) => Vocabulary.fromJson(x))),
-      );
+  factory VocabularyModel.fromJson(Map<String, dynamic> json) {
+    final rawData = json["data"];
+    final items = rawData is List ? rawData : const [];
+    return VocabularyModel(
+      ok: json["ok"] == true,
+      meta: Meta.fromJson(
+        (json["meta"] as Map?)?.cast<String, dynamic>() ?? {},
+      ),
+      data: List<Vocabulary>.from(
+        items.whereType<Map>().map(
+              (x) => Vocabulary.fromJson(x.cast<String, dynamic>()),
+            ),
+      ),
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         "ok": ok,
@@ -68,8 +76,10 @@ class Vocabulary {
         createdAt: DateTime.parse(json["createdAt"]),
         updatedAt: DateTime.parse(json["updatedAt"]),
         disabledAt: json["disabledAt"],
-        courseId: json["courseId"],
+        courseId: json["courseId"]?.toString() ?? "",
       );
+
+  bool get isDisabled => _hasDisabledAt(disabledAt);
 
   Map<String, dynamic> toJson() => {
         "id": id,
@@ -82,6 +92,12 @@ class Vocabulary {
         "disabledAt": disabledAt,
         "courseId": courseId,
       };
+}
+
+bool _hasDisabledAt(dynamic value) {
+  if (value == null) return false;
+  if (value is String && value.trim().isEmpty) return false;
+  return true;
 }
 
 class Meta {

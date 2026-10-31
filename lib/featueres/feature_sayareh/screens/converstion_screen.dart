@@ -192,6 +192,43 @@ class _ConversationScreenState extends State<ConversationScreen>
     super.dispose();
   }
 
+  List<Datum> _visibleMessages(List<Datum> messages) {
+    return messages.where((item) => !item.isDisabled).toList()
+      ..sort((a, b) => a.order.compareTo(b.order));
+  }
+
+  Widget _buildEmptyConversation(Color textColor) {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 24.w),
+        child: Text(
+          'مکالمه‌ای یافت نشد',
+          style: MyTextStyle.textMatn16.copyWith(color: textColor),
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
+  }
+
+  void _showForbiddenAccessModal() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      ReusableModal.show(
+      context: context,
+      title: 'دسترسی محدود',
+      message: 'برای مشاهده مکالمه باید این درس را خریده باشید.',
+      type: ModalType.info,
+      buttonText: 'بازگشت',
+      onButtonPressed: () {
+        Navigator.of(context).pop();
+        if (mounted && Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+        }
+      },
+    );
+    });
+  }
+
   /// ذخیره وضعیت پخش در سرور — همان لحظه، بدون debounce
   void _savePlayback(String conversationId) {
     debugPrint(
@@ -467,8 +504,6 @@ class _ConversationScreenState extends State<ConversationScreen>
         isDark ? MyColors.profileTextPrimaryDark : MyColors.textMatn1;
     final iconColor =
         isDark ? MyColors.profileTextPrimaryDark : MyColors.textPrimary;
-    final bottomBarColor =
-        isDark ? MyColors.profileHeaderDark : MyColors.background;
     return BlocProvider.value(
       value: _converstionBloc,
       child: Scaffold(
@@ -478,8 +513,14 @@ class _ConversationScreenState extends State<ConversationScreen>
           foregroundColor: primaryTextColor,
         ),
         // نوار پایین صفحه شامل دکمه‌های پخش و نمایش ترجمه
-        bottomNavigationBar: Container(
-          child: SafeArea(
+        bottomNavigationBar: BlocBuilder<ConverstionBloc, ConverstionState>(
+          builder: (context, state) {
+            final hasMessages = state is ConverstionSuccess &&
+                _visibleMessages(state.data.data).isNotEmpty;
+            if (!hasMessages) {
+              return const SizedBox.shrink();
+            }
+            return SafeArea(
             child: SizedBox(
               height: 94.h,
               child: Stack(
@@ -611,18 +652,23 @@ class _ConversationScreenState extends State<ConversationScreen>
                 ],
               ),
             ),
-          ),
+            );
+          },
         ),
         // بدنه صفحه که بر اساس وضعیت Bloc محتوا را نمایش می‌دهد
         body: SafeArea(
           top: false,
           child: BlocListener<ConverstionBloc, ConverstionState>(
             listener: (context, state) {
+              if (state is ConverstionError &&
+                  state.errorCode == 'forbidden') {
+                _showForbiddenAccessModal();
+                return;
+              }
               if (state is ConverstionSuccess &&
                   state.lastConversationId != null) {
                 // ابتدا پیام‌ها را استخراج و مرتب می‌کنیم تا بتوانیم ایندکس را پیدا کنیم
-                final messages = List<Datum>.from(state.data.data)
-                  ..sort((a, b) => a.order.compareTo(b.order));
+                final messages = _visibleMessages(state.data.data);
 
                 final index = messages
                     .indexWhere((m) => m.id == state.lastConversationId);
@@ -663,21 +709,25 @@ class _ConversationScreenState extends State<ConversationScreen>
                 // نمایش پیام خطا در صورت بروز مشکل
                 if (state is ConverstionError) {
                   return Center(
-                    child: Text(
-                      state.message,
-                      style: MyTextStyle.textMatn16.copyWith(
-                        color: primaryTextColor,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 24.w),
+                      child: Text(
+                        state.message,
+                        style: MyTextStyle.textMatn16.copyWith(
+                          color: primaryTextColor,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                      textAlign: TextAlign.center,
                     ),
                   );
                 }
 
                 // نمایش لیست مکالمه در صورت موفقیت‌آمیز بودن درخواست
                 if (state is ConverstionSuccess) {
-                  // مرتب‌سازی پیام‌ها بر اساس order
-                  sortedMessages = state.data.data
-                    ..sort((a, b) => a.order.compareTo(b.order));
+                  sortedMessages = _visibleMessages(state.data.data);
+                  if (sortedMessages!.isEmpty) {
+                    return _buildEmptyConversation(primaryTextColor);
+                  }
                   return _buildConversationList(context, state.data);
                 }
 

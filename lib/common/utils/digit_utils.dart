@@ -52,7 +52,7 @@ String toPersianDigits(String input) {
       .replaceAll('9', '۹');
 }
 
-String normalizeOtpForServer(String input, {int maxLength = 4}) {
+String normalizeOtpForServer(String input, {int maxLength = 5}) {
   final digits = toEnglishDigits(input).replaceAll(RegExp(r'[^0-9]'), '');
   return digits.length <= maxLength ? digits : digits.substring(0, maxLength);
 }

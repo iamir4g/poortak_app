@@ -238,6 +238,7 @@ class _QuizScreenState extends State<QuizScreen> {
                         quizId: widget.quizId,
                         questionId: questionId,
                         answerId: selectedAnswerId!,
+                        questionQuizId: currentQuestion.data.quizId,
                       ),
                     );
               },

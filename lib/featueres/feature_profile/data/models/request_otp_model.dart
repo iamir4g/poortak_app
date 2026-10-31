@@ -59,7 +59,7 @@ class Result {
   });
 
   factory Result.fromJson(Map<String, dynamic> json) => Result(
-        otpLength: json["otpLength"] ?? 4,
+        otpLength: json["otpLength"] ?? 5,
       );
 
   Map<String, dynamic> toJson() => {

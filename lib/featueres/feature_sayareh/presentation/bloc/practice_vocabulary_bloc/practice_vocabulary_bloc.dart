@@ -52,7 +52,8 @@ class PracticeVocabularyBloc
       );
 
       if (response is DataSuccess) {
-        if (response.data != null) {
+        if (response.data != null &&
+            !response.data!.data.correctWord.isDisabled) {
           emit(PracticeVocabularySuccess(
             practiceVocabulary: response.data!,
             correctWords: _previousVocabularyIds,
@@ -194,9 +195,11 @@ class PracticeVocabularyBloc
       }
 
       final submitResult = response.data;
-      if (submitResult?.nextPractice != null) {
-        _pendingNextPractice = submitResult!.nextPractice;
-      } else if (submitResult?.isCompleted == true) {
+      if (submitResult?.nextPractice != null &&
+          !submitResult!.nextPractice!.data.correctWord.isDisabled) {
+        _pendingNextPractice = submitResult.nextPractice;
+      } else if (submitResult?.isCompleted == true ||
+          submitResult?.nextPractice?.data.correctWord.isDisabled == true) {
         _pendingCompleted = true;
         await _persistReviewedVocabularies(replace: true);
       }

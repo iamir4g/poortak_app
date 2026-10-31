@@ -126,7 +126,7 @@ class _LoginScreenState extends State<LoginScreen> {
           if (mobileNumber != null && otp.length == _otpLength) {
             context.read<ProfileBloc>().add(
                   LoginWithOtpEvent(
-                    mobile: _localMobileFromInput(mobileNumber!),
+                    phone: _localMobileFromInput(mobileNumber!),
                     otp: otp,
                   ),
                 );
@@ -751,7 +751,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   if (otp.length == _otpLength && mobileNumber != null) {
                     context.read<ProfileBloc>().add(
                           LoginWithOtpEvent(
-                            mobile: _localMobileFromInput(mobileNumber!),
+                            phone: _localMobileFromInput(mobileNumber!),
                             otp: otp,
                           ),
                         );

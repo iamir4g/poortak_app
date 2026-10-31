@@ -132,8 +132,10 @@ class Word {
         createdAt: DateTime.parse(json["createdAt"]),
         updatedAt: DateTime.parse(json["updatedAt"]),
         disabledAt: json["disabledAt"],
-        courseId: json["courseId"],
+        courseId: json["courseId"]?.toString() ?? "",
       );
+
+  bool get isDisabled => _hasDisabledAt(disabledAt);
 
   Map<String, dynamic> toJson() => {
         "id": id,
@@ -146,6 +148,12 @@ class Word {
         "disabledAt": disabledAt,
         "courseId": courseId,
       };
+}
+
+bool _hasDisabledAt(dynamic value) {
+  if (value == null) return false;
+  if (value is String && value.trim().isEmpty) return false;
+  return true;
 }
 
 class Meta {

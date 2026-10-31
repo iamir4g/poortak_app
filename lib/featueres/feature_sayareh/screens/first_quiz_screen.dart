@@ -239,6 +239,7 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
     required QuizResultState resultState,
     required bool isDark,
     required String questionId,
+    required String questionQuizId,
   }) {
     if (selectedAnswerId != null && answerState is! QuizAnswerLoaded) {
       return _buildQuizActionButton(
@@ -254,6 +255,7 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                         quizId: widget.quizId,
                         questionId: questionId,
                         answerId: selectedAnswerId!,
+                        questionQuizId: questionQuizId,
                       ),
                     );
               },
@@ -396,6 +398,9 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                         duration: const Duration(seconds: 2),
                       ),
                     );
+                    if (state.errorCode == 'quizOrCourseNotFound') {
+                      _navigateBackToQuizList();
+                    }
                   }
                 }
               },
@@ -566,6 +571,8 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                                       resultState: resultState,
                                       isDark: isDark,
                                       questionId: state.question.data.id,
+                                      questionQuizId:
+                                          state.question.data.quizId,
                                     ),
                                   ),
                                   if (resultState is QuizResultLoading &&

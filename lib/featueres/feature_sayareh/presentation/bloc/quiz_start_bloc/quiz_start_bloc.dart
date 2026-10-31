@@ -42,7 +42,10 @@ class QuizStartBloc extends Bloc<QuizStartEvent, QuizStartState> {
     if (result is DataSuccess && result.data != null) {
       emit(QuizStartLoaded(result.data!));
     } else if (result is DataFailed) {
-      emit(QuizStartError(result.error ?? 'An error occurred'));
+      emit(QuizStartError(
+        result.error ?? 'An error occurred',
+        errorCode: result.errorCode,
+      ));
     }
   }
 }

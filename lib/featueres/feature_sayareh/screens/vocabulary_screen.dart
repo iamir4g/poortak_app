@@ -286,6 +286,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                         style: MyTextStyle.textMatn16.copyWith(
                           color: primaryTextColor,
                         ),
+                        textAlign: TextAlign.center,
                       ),
                     );
                   }

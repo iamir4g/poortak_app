@@ -21,12 +21,21 @@ class ConversationModel {
     required this.data,
   });
 
-  factory ConversationModel.fromJson(Map<String, dynamic> json) =>
-      ConversationModel(
-        ok: json["ok"],
-        meta: Meta.fromJson(json["meta"]),
-        data: List<Datum>.from(json["data"].map((x) => Datum.fromJson(x))),
-      );
+  factory ConversationModel.fromJson(Map<String, dynamic> json) {
+    final rawData = json["data"];
+    final items = rawData is List ? rawData : const [];
+    return ConversationModel(
+      ok: json["ok"] == true,
+      meta: Meta.fromJson(
+        (json["meta"] as Map?)?.cast<String, dynamic>() ?? {},
+      ),
+      data: List<Datum>.from(
+        items.whereType<Map>().map(
+              (x) => Datum.fromJson(x.cast<String, dynamic>()),
+            ),
+      ),
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         "ok": ok,
@@ -70,8 +79,10 @@ class Datum {
         createdAt: DateTime.parse(json["createdAt"]),
         updatedAt: DateTime.parse(json["updatedAt"]),
         disabledAt: json["disabledAt"],
-        courseId: json["courseId"],
+        courseId: json["courseId"]?.toString() ?? "",
       );
+
+  bool get isDisabled => _hasDisabledAt(disabledAt);
 
   Map<String, dynamic> toJson() => {
         "id": id,
@@ -98,6 +109,12 @@ extension ConversationSpeaker on Datum {
   bool get isFemaleSpeaker => !isMaleSpeaker;
 
   String get playbackVoice => isMaleSpeaker ? 'male' : 'female';
+}
+
+bool _hasDisabledAt(dynamic value) {
+  if (value == null) return false;
+  if (value is String && value.trim().isEmpty) return false;
+  return true;
 }
 
 class Meta {

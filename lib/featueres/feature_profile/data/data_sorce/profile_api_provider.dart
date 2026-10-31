@@ -31,10 +31,10 @@ class ProfileApiProvider {
     return response;
   }
 
-  dynamic callLoginWithOtp(String otp, String mobile) async {
+  dynamic callLoginWithOtp(String otp, String phone) async {
     final response = await dio.post(
       "${Constants.baseUrl}auth/otp/login",
-      data: {"otp": otp, "mobile": mobile},
+      data: {"otp": otp, "phone": phone},
     );
     return response;
   }
