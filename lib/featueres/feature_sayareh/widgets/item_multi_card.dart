@@ -11,11 +11,13 @@ class ItemMultiCard extends StatelessWidget {
   final String title;
   final String price;
   final bool isDemo;
+  final bool isOwned;
   const ItemMultiCard({
     super.key,
     required this.title,
     required this.price,
     this.isDemo = false,
+    this.isOwned = false,
   });
 
   @override
@@ -50,7 +52,13 @@ class ItemMultiCard extends StatelessWidget {
                 )
               ],
             ),
-            isDemo || price == "0"
+            isOwned
+                ? Text(
+                    "خریداری شده",
+                    style:
+                        MyTextStyle.textMatn12W500.copyWith(color: textColor),
+                  )
+                : isDemo || price == "0"
                 ? Text(
                     "رایگان",
                     style:

@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:poortak/common/bloc/in_app_purchase_bloc/bazaar_quote_policy.dart';
 import 'package:poortak/common/models/bazaar_checkout_item.dart';
 import 'package:poortak/common/models/bazaar_purchase_result.dart';
 import 'package:poortak/common/resources/data_state.dart';
@@ -99,13 +100,17 @@ class InAppPurchaseBloc extends Bloc<InAppPurchaseEvent, InAppPurchaseState> {
           }
         }
 
-        // Points discount only applies to the first line of a single-SKU checkout.
-        final usePoints = i == 0 && items.length == 1 && requestedPoints > 0;
+        final needsQuote = shouldRequestBazaarQuote(
+          pointsToSpend: requestedPoints,
+          requireOwnershipQuote: event.requireOwnershipQuote,
+          alreadyOwned: existing != null,
+          isSingleSkuFirstItem: i == 0 && items.length == 1,
+        );
 
         String? nonce;
         String dynamicPriceToken = '';
 
-        if (usePoints && existing == null) {
+        if (needsQuote) {
           final reused = _tryReuseQuote(event);
           if (reused != null) {
             nonce = reused.$1;
@@ -124,10 +129,26 @@ class InAppPurchaseBloc extends Bloc<InAppPurchaseEvent, InAppPurchaseState> {
             if (quoteResult is! DataSuccess<BazaarQuoteData> ||
                 quoteResult.data == null) {
               final code = quoteResult.errorCode;
-              if (code == CafeBazaarPaymentErrors.serviceUnavailable) {
+              if (shouldUseFreeCheckoutForQuoteFailure(
+                requireOwnershipQuote: event.requireOwnershipQuote,
+                pointsToSpend: requestedPoints,
+                errorCode: code,
+              )) {
+                emit(const InAppPurchaseFreeCheckoutRequired());
+                return;
+              }
+              if (code == CafeBazaarPaymentErrors.serviceUnavailable &&
+                  !event.requireOwnershipQuote) {
                 debugPrint(
                   '🛒 [Bazaar] quote unavailable — falling back to full price',
                 );
+              } else if (code == CafeBazaarPaymentErrors.serviceUnavailable &&
+                  event.requireOwnershipQuote) {
+                emit(InAppPurchaseError(
+                  'سرویس قیمت‌گذاری بازار در دسترس نیست. کمی بعد دوباره تلاش کنید',
+                  errorCode: code,
+                ));
+                return;
               } else {
                 emit(InAppPurchaseError(
                   quoteResult.error ??
@@ -138,6 +159,10 @@ class InAppPurchaseBloc extends Bloc<InAppPurchaseEvent, InAppPurchaseState> {
               }
             } else {
               final quoted = quoteResult.data!;
+              if (quoted.finalPrice <= 0) {
+                emit(const InAppPurchaseFreeCheckoutRequired());
+                return;
+              }
               if (quoted.isExpired) {
                 emit(const InAppPurchaseError(
                   'تخفیف امتیاز منقضی شد؛ دوباره محاسبه کنید',
@@ -172,7 +197,10 @@ class InAppPurchaseBloc extends Bloc<InAppPurchaseEvent, InAppPurchaseState> {
             );
           } catch (e) {
             if (dynamicPriceToken.isNotEmpty &&
-                CafeBazaarPaymentErrors.shouldFallbackFullPrice(e)) {
+                CafeBazaarPaymentErrors.shouldFallbackFullPrice(e) &&
+                shouldFallbackFullPriceOnDynamicPriceFailure(
+                  requireOwnershipQuote: event.requireOwnershipQuote,
+                )) {
               debugPrint(
                 '🛒 [Bazaar] dynamic price rejected/unsupported — '
                 'full-price fallback. error=$e',
@@ -182,6 +210,13 @@ class InAppPurchaseBloc extends Bloc<InAppPurchaseEvent, InAppPurchaseState> {
                 sku,
                 payload: event.payload ?? '',
               );
+            } else if (event.requireOwnershipQuote &&
+                dynamicPriceToken.isNotEmpty &&
+                CafeBazaarPaymentErrors.shouldFallbackFullPrice(e)) {
+              emit(const InAppPurchaseError(
+                'تخفیف مالکیت روی بازار اعمال نشد. دوباره تلاش کنید یا با پشتیبانی تماس بگیرید',
+              ));
+              return;
             } else {
               rethrow;
             }
@@ -204,18 +239,9 @@ class InAppPurchaseBloc extends Bloc<InAppPurchaseEvent, InAppPurchaseState> {
         );
 
         if (settle is DataFailed<Datum?>) {
-          if (settle.errorCode ==
-                  CafeBazaarPaymentErrors.dynamicPriceInvalid &&
-              nonce != null) {
-            emit(InAppPurchaseError(
-              settle.error ??
-                  CafeBazaarPaymentErrors.userMessageFor(settle.errorCode),
-              errorCode: settle.errorCode,
-            ));
-            return;
-          }
           emit(InAppPurchaseError(
-            settle.error ?? 'تأیید خرید ناموفق بود',
+            '${settle.error ?? CafeBazaarPaymentErrors.userMessageFor(settle.errorCode)}\n'
+            'در صورت کسر وجه با پشتیبانی تماس بگیرید.',
             errorCode: settle.errorCode,
           ));
           return;

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:poortak/featueres/feature_sayareh/data/models/iknow_package_pricing.dart';
 import 'package:poortak/featueres/feature_sayareh/data/models/sayareh_home_model.dart';
 
 IKnowSummaryModel iKnowSummaryModelFromJson(String str) =>
@@ -22,8 +23,16 @@ class IKnowSummaryModel {
   factory IKnowSummaryModel.fromJson(Map<String, dynamic> json) =>
       IKnowSummaryModel(
         ok: json["ok"] ?? false,
-        meta: Meta.fromJson(json["meta"] ?? {}),
-        data: IKnowSummaryData.fromJson(json["data"] ?? {}),
+        meta: Meta.fromJson(
+          json["meta"] is Map
+              ? Map<String, dynamic>.from(json["meta"] as Map)
+              : {},
+        ),
+        data: IKnowSummaryData.fromJson(
+          json["data"] is Map
+              ? Map<String, dynamic>.from(json["data"] as Map)
+              : {},
+        ),
       );
 
   Map<String, dynamic> toJson() => {
@@ -37,11 +46,13 @@ class IKnowSummaryData {
   List<IKnowSummaryCourse> courses;
   List<IKnowSummaryBook> books;
   IKnowSummarySettings settings;
+  IKnowPackagePricing? packageInfo;
 
   IKnowSummaryData({
     required this.courses,
     required this.books,
     required this.settings,
+    this.packageInfo,
   });
 
   factory IKnowSummaryData.fromJson(Map<String, dynamic> json) =>
@@ -56,14 +67,36 @@ class IKnowSummaryData {
                 json["books"].map((x) => IKnowSummaryBook.fromJson(x)),
               )
             : [],
-        settings: IKnowSummarySettings.fromJson(json["settings"] ?? {}),
+        settings: IKnowSummarySettings.fromJson(
+          json["settings"] is Map
+              ? Map<String, dynamic>.from(json["settings"] as Map)
+              : {},
+        ),
+        packageInfo: IKnowPackagePricing.tryParse(json["package"]),
       );
 
   Map<String, dynamic> toJson() => {
         "courses": List<dynamic>.from(courses.map((x) => x.toJson())),
         "books": List<dynamic>.from(books.map((x) => x.toJson())),
         "settings": settings.toJson(),
+        if (packageInfo != null) "package": packageInfo!.toJson(),
       };
+
+  String get resolvedPackageId {
+    final packageId = packageInfo?.packageId.trim() ?? '';
+    return packageId.isNotEmpty ? packageId : settings.id;
+  }
+
+  int get resolvedPayableToman => resolveIKnowPackagePayableToman(
+        packageInfo: packageInfo,
+        settingsPrice: settings.price,
+        discountType: settings.discountType,
+        discountAmount: settings.discountAmount,
+      );
+
+  bool get isFreePackage => resolvedPayableToman <= 0;
+
+  Set<String> get ownedItemIds => packageInfo?.ownedItemIds ?? const {};
 }
 
 class IKnowSummaryCourse {

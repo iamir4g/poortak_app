@@ -14,8 +14,12 @@ import 'package:poortak/featueres/feature_shopping_cart/data/models/cart_enum.da
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/data_source/shopping_cart_api_provider.dart';
+import 'package:poortak/common/resources/data_state.dart';
+import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
 import 'package:poortak/featueres/feature_sayareh/data/models/iknow_summary_model.dart';
 import 'package:poortak/featueres/feature_sayareh/data/models/sayareh_home_model.dart';
+import 'package:poortak/featueres/feature_sayareh/repositories/sayareh_repository.dart';
+import 'package:poortak/featueres/feature_sayareh/widgets/iknow_package_breakdown.dart';
 import 'package:poortak/featueres/feature_sayareh/widgets/item_multi_card.dart';
 import 'package:poortak/l10n/app_localizations.dart';
 import 'package:poortak/locator.dart';
@@ -35,12 +39,36 @@ class _DialogCartState extends State<DialogCart>
   final PrefsOperator _prefsOperator = locator<PrefsOperator>();
   static const String _bundleName = "مجموعه کامل سیاره آی نو";
   late TabController _tabController;
+  IKnowSummaryModel? _summaryData;
+  bool _summaryLoading = false;
+  String? _summaryError;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this, initialIndex: 1);
     _tabController.addListener(() => setState(() {}));
+    _summaryData = widget.summaryData;
+    if (_summaryData == null) {
+      _loadSummary();
+    }
+  }
+
+  Future<void> _loadSummary() async {
+    setState(() {
+      _summaryLoading = true;
+      _summaryError = null;
+    });
+    final result = await locator<SayarehRepository>().fetchIknowSummary();
+    if (!mounted) return;
+    setState(() {
+      _summaryLoading = false;
+      if (result is DataSuccess<IKnowSummaryModel> && result.data != null) {
+        _summaryData = result.data;
+      } else {
+        _summaryError = result.error ?? 'خطا در دریافت اطلاعات مجموعه';
+      }
+    });
   }
 
   @override
@@ -262,6 +290,10 @@ class _DialogCartState extends State<DialogCart>
   }
 
   int _calculateBundleSubtotal(IKnowSummaryModel summary) {
+    final package = summary.data.packageInfo;
+    if (package != null) {
+      return package.basePriceToman;
+    }
     final settingsPrice =
         MoneyUtils.parseRialToTomanInt(summary.data.settings.price);
     if (settingsPrice > 0) {
@@ -280,6 +312,10 @@ class _DialogCartState extends State<DialogCart>
   }
 
   int _calculateDiscountAmount(IKnowSummaryModel summary) {
+    final package = summary.data.packageInfo;
+    if (package != null) {
+      return package.packageDiscountToman + package.appliedDeductionToman;
+    }
     final subtotal = _calculateBundleSubtotal(summary);
     final settings = summary.data.settings;
     if (settings.discountType.toLowerCase() == "percent") {
@@ -297,9 +333,31 @@ class _DialogCartState extends State<DialogCart>
   }
 
   int _calculatePayableAmount(IKnowSummaryModel summary) {
-    final payable =
-        _calculateBundleSubtotal(summary) - _calculateDiscountAmount(summary);
-    return payable < 0 ? 0 : payable;
+    return summary.data.resolvedPayableToman;
+  }
+
+  void _promptLoginForPackage() {
+    ReusableModal.show(
+      context: context,
+      title: '',
+      message: 'لطفا ابتدا وارد حساب کاربری خود شوید',
+      type: ModalType.info,
+      buttonText: 'ورود به حساب کاربری',
+      onButtonPressed: () {
+        Navigator.of(context).pop();
+        Navigator.pushNamed(context, LoginScreen.routeName);
+      },
+    );
+  }
+
+  void _addPackageToCart(IKnowSummaryModel summary) {
+    final packageId = summary.data.resolvedPackageId;
+    if (packageId.isEmpty) return;
+    if (!_prefsOperator.isLoggedIn()) {
+      _promptLoginForPackage();
+      return;
+    }
+    _addItemToCart(CartType.IKnow.name, packageId, _bundleName);
   }
 
   List<IKnowSummaryCourse> _sortedCourses(IKnowSummaryModel summary) {
@@ -449,7 +507,7 @@ class _DialogCartState extends State<DialogCart>
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final summaryData = widget.summaryData;
+    final summaryData = _summaryData;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final primaryTextColor =
         isDark ? MyColors.darkTextPrimary : MyColors.textMatn1;
@@ -698,14 +756,31 @@ class _DialogCartState extends State<DialogCart>
                                 child: Column(
                                   children: [
                                     SizedBox(height: Dimens.nh(40.0)),
-                                    const CircularProgressIndicator(),
+                                    if (_summaryLoading)
+                                      const CircularProgressIndicator()
+                                    else
+                                      Icon(
+                                        Icons.error_outline,
+                                        color: MyColors.error,
+                                        size: Dimens.nr(32),
+                                      ),
                                     SizedBox(height: Dimens.nh(16.0)),
                                     Text(
-                                      "اطلاعات خرید مجموعه در حال بارگذاری است",
+                                      _summaryLoading
+                                          ? "اطلاعات خرید مجموعه در حال بارگذاری است"
+                                          : (_summaryError ??
+                                              "اطلاعات خرید مجموعه در دسترس نیست"),
                                       style: MyTextStyle.textMatn12W500
                                           .copyWith(color: primaryTextColor),
                                       textAlign: TextAlign.center,
                                     ),
+                                    if (!_summaryLoading) ...[
+                                      SizedBox(height: Dimens.nh(16.0)),
+                                      TextButton(
+                                        onPressed: _loadSummary,
+                                        child: const Text('تلاش مجدد'),
+                                      ),
+                                    ],
                                     SizedBox(height: Dimens.nh(24.0)),
                                   ],
                                 ),
@@ -715,6 +790,10 @@ class _DialogCartState extends State<DialogCart>
                                   final sortedCourses =
                                       _sortedCourses(summaryData);
                                   final sortedBooks = _sortedBooks(summaryData);
+                                  final packageInfo =
+                                      summaryData.data.packageInfo;
+                                  final ownedItemIds =
+                                      summaryData.data.ownedItemIds;
                                   final subtotal =
                                       _calculateBundleSubtotal(summaryData);
                                   final discountAmount =
@@ -723,8 +802,13 @@ class _DialogCartState extends State<DialogCart>
                                       _calculatePayableAmount(summaryData);
                                   final settings = summaryData.data.settings;
                                   final isPercentDiscount =
-                                      settings.discountType.toLowerCase() ==
-                                          "percent";
+                                      packageInfo == null &&
+                                          settings.discountType
+                                              .toLowerCase() ==
+                                              "percent";
+                                  final isFreePackage = payableAmount <= 0;
+                                  final isLoggedIn =
+                                      _prefsOperator.isLoggedIn();
 
                                   return Column(
                                     children: [
@@ -858,6 +942,8 @@ class _DialogCartState extends State<DialogCart>
                                                     title: course.name,
                                                     price: course.price,
                                                     isDemo: course.isDemo,
+                                                    isOwned: ownedItemIds
+                                                        .contains(course.id),
                                                   );
                                                 },
                                               ),
@@ -897,6 +983,8 @@ class _DialogCartState extends State<DialogCart>
                                                     title: book.title,
                                                     price: book.price,
                                                     isDemo: book.isDemo,
+                                                    isOwned: ownedItemIds
+                                                        .contains(book.id),
                                                   );
                                                 },
                                               ),
@@ -913,225 +1001,234 @@ class _DialogCartState extends State<DialogCart>
                                       Padding(
                                         padding: EdgeInsets.symmetric(
                                             horizontal: Dimens.medium),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: [
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.spaceAround,
-                                              children: [
-                                                Text(
-                                                  "جمع دروس و کتاب ها",
-                                                  style: MyTextStyle
-                                                      .textMatn12W300
-                                                      .copyWith(
-                                                          color:
-                                                              secondaryTextColor),
-                                                ),
-                                                Row(
-                                                  children: [
-                                                    Text(
-                                                      "${subtotal.toString().addComma} ",
-                                                      style: MyTextStyle
-                                                          .textMatn14Bold
-                                                          .copyWith(
-                                                              color:
-                                                                  primaryTextColor),
-                                                    ),
-                                                    Text(
-                                                      l10n.toman,
-                                                      style: MyTextStyle
-                                                          .textMatn10W300
-                                                          .copyWith(
-                                                              color:
-                                                                  primaryTextColor),
-                                                    )
-                                                  ],
-                                                )
-                                              ],
-                                            ),
-                                            SizedBox(
-                                              height: Dimens.nh(16.0),
-                                            ),
-                                            Container(
-                                              width: Dimens.nw(286.0),
-                                              height: Dimens.nh(42.0),
-                                              decoration: ShapeDecoration(
-                                                color: isDark
-                                                    ? MyColors
-                                                        .cartDiscountBackgroundDark
-                                                    : MyColors
-                                                        .discountBackground,
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          Dimens.nr(10.0)),
-                                                ),
-                                              ),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceAround,
+                                        child: packageInfo != null
+                                            ? IKnowPackageBreakdown(
+                                                pricing: packageInfo,
+                                              )
+                                            : Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
                                                 children: [
-                                                  Text(
-                                                    "تخفیف",
-                                                    style: MyTextStyle
-                                                        .textMatn12W300
-                                                        .copyWith(
-                                                            color:
-                                                                secondaryTextColor),
-                                                  ),
                                                   Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceAround,
                                                     children: [
-                                                      if (isPercentDiscount)
-                                                        Container(
-                                                          width:
-                                                              Dimens.nw(40.0),
-                                                          height:
-                                                              Dimens.nh(17.84),
-                                                          alignment:
-                                                              Alignment.center,
-                                                          decoration:
-                                                              ShapeDecoration(
-                                                            color: MyColors
-                                                                .darkErrorLight,
-                                                            shape:
-                                                                RoundedRectangleBorder(
-                                                              borderRadius:
-                                                                  BorderRadius.circular(
-                                                                      Dimens.nr(
-                                                                          11.50)),
-                                                            ),
-                                                          ),
-                                                          child: Text(
-                                                            "${settings.discountAmount}%",
-                                                            style: MyTextStyle
-                                                                .textMatn10W300
-                                                                .copyWith(
-                                                                    color: MyColors
-                                                                        .textLight),
-                                                          ),
-                                                        ),
-                                                      if (isPercentDiscount)
-                                                        SizedBox(
-                                                            width:
-                                                                Dimens.nw(4.0)),
                                                       Text(
-                                                        discountAmount
-                                                            .toString()
-                                                            .addComma,
+                                                        "جمع دروس و کتاب ها",
                                                         style: MyTextStyle
                                                             .textMatn12W300
                                                             .copyWith(
-                                                                color: isDark
-                                                                    ? MyColors
-                                                                        .darkTextAccent
-                                                                    : primaryTextColor),
-                                                      ),
-                                                      SizedBox(
-                                                        width: Dimens.nw(4.0),
-                                                      ),
-                                                      Text(
-                                                        l10n.toman,
-                                                        style: MyTextStyle
-                                                            .textMatn10W300
-                                                            .copyWith(
-                                                                color: isDark
-                                                                    ? MyColors
-                                                                        .darkTextAccent
-                                                                    : primaryTextColor),
-                                                      ),
-                                                    ],
-                                                  )
-                                                ],
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              height: Dimens.nh(16.0),
-                                            ),
-                                            Container(
-                                              width: Dimens.nw(286.0),
-                                              height: Dimens.nh(54.0),
-                                              decoration: ShapeDecoration(
-                                                color: isDark
-                                                    ? MyColors
-                                                        .cartPayableBackgroundDark
-                                                    : MyColors.background2,
-                                                shape: RoundedRectangleBorder(
-                                                  side: BorderSide(
-                                                    width: Dimens.nw(2.0),
-                                                    color: MyColors.primary,
-                                                  ),
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          Dimens.nr(10.0)),
-                                                ),
-                                              ),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceAround,
-                                                children: [
-                                                  Text(
-                                                    "مبلغ قابل پرداخت",
-                                                    style: MyTextStyle
-                                                        .textMatn12W300
-                                                        .copyWith(
-                                                            color:
-                                                                secondaryTextColor),
-                                                  ),
-                                                  Row(
-                                                    children: [
-                                                      Text(
-                                                        payableAmount
-                                                            .toString()
-                                                            .addComma,
-                                                        style: MyTextStyle
-                                                            .textMatn14Bold
-                                                            .copyWith(
                                                                 color:
-                                                                    primaryTextColor),
+                                                                    secondaryTextColor),
                                                       ),
-                                                      SizedBox(
-                                                        width: Dimens.nw(4.0),
-                                                      ),
-                                                      Text(
-                                                        l10n.toman,
-                                                        style: MyTextStyle
-                                                            .textMatn10W300
-                                                            .copyWith(
-                                                                color:
-                                                                    primaryTextColor),
+                                                      Row(
+                                                        children: [
+                                                          Text(
+                                                            "${subtotal.toString().addComma} ",
+                                                            style: MyTextStyle
+                                                                .textMatn14Bold
+                                                                .copyWith(
+                                                                    color:
+                                                                        primaryTextColor),
+                                                          ),
+                                                          Text(
+                                                            l10n.toman,
+                                                            style: MyTextStyle
+                                                                .textMatn10W300
+                                                                .copyWith(
+                                                                    color:
+                                                                        primaryTextColor),
+                                                          )
+                                                        ],
                                                       )
                                                     ],
-                                                  )
+                                                  ),
+                                                  SizedBox(
+                                                    height: Dimens.nh(16.0),
+                                                  ),
+                                                  Container(
+                                                    width: Dimens.nw(286.0),
+                                                    height: Dimens.nh(42.0),
+                                                    decoration: ShapeDecoration(
+                                                      color: isDark
+                                                          ? MyColors
+                                                              .cartDiscountBackgroundDark
+                                                          : MyColors
+                                                              .discountBackground,
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(
+                                                                    Dimens.nr(
+                                                                        10.0)),
+                                                      ),
+                                                    ),
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceAround,
+                                                      children: [
+                                                        Text(
+                                                          "تخفیف",
+                                                          style: MyTextStyle
+                                                              .textMatn12W300
+                                                              .copyWith(
+                                                                  color:
+                                                                      secondaryTextColor),
+                                                        ),
+                                                        Row(
+                                                          children: [
+                                                            if (isPercentDiscount)
+                                                              Container(
+                                                                width: Dimens
+                                                                    .nw(40.0),
+                                                                height: Dimens
+                                                                    .nh(17.84),
+                                                                alignment:
+                                                                    Alignment
+                                                                        .center,
+                                                                decoration:
+                                                                    ShapeDecoration(
+                                                                  color: MyColors
+                                                                      .darkErrorLight,
+                                                                  shape:
+                                                                      RoundedRectangleBorder(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            Dimens.nr(11.50)),
+                                                                  ),
+                                                                ),
+                                                                child: Text(
+                                                                  "${settings.discountAmount}%",
+                                                                  style: MyTextStyle
+                                                                      .textMatn10W300
+                                                                      .copyWith(
+                                                                          color:
+                                                                              MyColors.textLight),
+                                                                ),
+                                                              ),
+                                                            if (isPercentDiscount)
+                                                              SizedBox(
+                                                                  width: Dimens
+                                                                      .nw(4.0)),
+                                                            Text(
+                                                              discountAmount
+                                                                  .toString()
+                                                                  .addComma,
+                                                              style: MyTextStyle
+                                                                  .textMatn12W300
+                                                                  .copyWith(
+                                                                      color: isDark
+                                                                          ? MyColors
+                                                                              .darkTextAccent
+                                                                          : primaryTextColor),
+                                                            ),
+                                                            SizedBox(
+                                                              width: Dimens
+                                                                  .nw(4.0),
+                                                            ),
+                                                            Text(
+                                                              l10n.toman,
+                                                              style: MyTextStyle
+                                                                  .textMatn10W300
+                                                                  .copyWith(
+                                                                      color: isDark
+                                                                          ? MyColors
+                                                                              .darkTextAccent
+                                                                          : primaryTextColor),
+                                                            ),
+                                                          ],
+                                                        )
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  SizedBox(
+                                                    height: Dimens.nh(16.0),
+                                                  ),
+                                                  Container(
+                                                    width: Dimens.nw(286.0),
+                                                    height: Dimens.nh(54.0),
+                                                    decoration: ShapeDecoration(
+                                                      color: isDark
+                                                          ? MyColors
+                                                              .cartPayableBackgroundDark
+                                                          : MyColors
+                                                              .background2,
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        side: BorderSide(
+                                                          width: Dimens.nw(2.0),
+                                                          color:
+                                                              MyColors.primary,
+                                                        ),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(
+                                                                    Dimens.nr(
+                                                                        10.0)),
+                                                      ),
+                                                    ),
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceAround,
+                                                      children: [
+                                                        Text(
+                                                          "مبلغ قابل پرداخت",
+                                                          style: MyTextStyle
+                                                              .textMatn12W300
+                                                              .copyWith(
+                                                                  color:
+                                                                      secondaryTextColor),
+                                                        ),
+                                                        Row(
+                                                          children: [
+                                                            Text(
+                                                              payableAmount
+                                                                  .toString()
+                                                                  .addComma,
+                                                              style: MyTextStyle
+                                                                  .textMatn14Bold
+                                                                  .copyWith(
+                                                                      color:
+                                                                          primaryTextColor),
+                                                            ),
+                                                            SizedBox(
+                                                              width: Dimens
+                                                                  .nw(4.0),
+                                                            ),
+                                                            Text(
+                                                              l10n.toman,
+                                                              style: MyTextStyle
+                                                                  .textMatn10W300
+                                                                  .copyWith(
+                                                                      color:
+                                                                          primaryTextColor),
+                                                            )
+                                                          ],
+                                                        )
+                                                      ],
+                                                    ),
+                                                  ),
                                                 ],
                                               ),
-                                            ),
-                                            SizedBox(
-                                              height: Dimens.nh(16.0),
-                                            ),
-                                          ],
-                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: Dimens.nh(16.0),
                                       ),
                                       SizedBox(
                                         width: Dimens.nw(286.0),
                                         height: Dimens.nh(65.0),
                                         child: ElevatedButton(
-                                          onPressed: () {
-                                            if (settings.id.isEmpty) {
-                                              return;
-                                            }
-                                            _addItemToCart(
-                                              CartType.IKnow.name,
-                                              settings.id,
-                                              _bundleName,
-                                            );
-                                          },
+                                          onPressed: () =>
+                                              _addPackageToCart(summaryData),
                                           style: _cartButtonStyle(isDark),
                                           child: Text(
-                                            l10n.add_to_cart,
+                                            isFreePackage && isLoggedIn
+                                                ? 'دریافت رایگان'
+                                                : l10n.add_to_cart,
                                             style: MyTextStyle.textMatnBtn
                                                 .copyWith(
                                               color: isDark

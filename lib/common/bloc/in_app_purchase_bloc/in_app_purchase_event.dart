@@ -26,6 +26,10 @@ class PurchaseProductsEvent extends InAppPurchaseEvent {
   final String? quoteToken;
   final DateTime? quoteExpiresAt;
 
+  /// IKnow package ownership deduction requires a quote even when
+  /// [pointsToSpend] is 0, so CafeBazaar charges the reduced price.
+  final bool requireOwnershipQuote;
+
   const PurchaseProductsEvent({
     required this.items,
     this.payload,
@@ -34,6 +38,7 @@ class PurchaseProductsEvent extends InAppPurchaseEvent {
     this.quoteNonce,
     this.quoteToken,
     this.quoteExpiresAt,
+    this.requireOwnershipQuote = false,
   });
 
   @override
@@ -45,6 +50,7 @@ class PurchaseProductsEvent extends InAppPurchaseEvent {
         quoteNonce,
         quoteToken,
         quoteExpiresAt,
+        requireOwnershipQuote,
       ];
 }
 

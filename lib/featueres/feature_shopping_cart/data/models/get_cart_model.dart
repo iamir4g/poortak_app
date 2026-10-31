@@ -4,6 +4,9 @@
 
 import 'dart:convert';
 
+import 'package:poortak/common/utils/money_utils.dart';
+import 'package:poortak/featueres/feature_sayareh/data/models/iknow_package_pricing.dart';
+
 GetCartModel getCartModelFromJson(String str) =>
     GetCartModel.fromJson(json.decode(str));
 
@@ -22,8 +25,16 @@ class GetCartModel {
 
   factory GetCartModel.fromJson(Map<String, dynamic> json) => GetCartModel(
         ok: json["ok"],
-        meta: Meta.fromJson(json["meta"]),
-        data: Data.fromJson(json["data"]),
+        meta: Meta.fromJson(
+          json["meta"] is Map
+              ? Map<String, dynamic>.from(json["meta"] as Map)
+              : {},
+        ),
+        data: Data.fromJson(
+          json["data"] is Map
+              ? Map<String, dynamic>.from(json["data"] as Map)
+              : {},
+        ),
       );
 
   Map<String, dynamic> toJson() => {
@@ -45,9 +56,13 @@ class Data {
   });
 
   factory Data.fromJson(Map<String, dynamic> json) => Data(
-        cart: Cart.fromJson(json["cart"]),
-        subTotal: json["subTotal"],
-        grandTotal: json["grandTotal"],
+        cart: Cart.fromJson(
+          json["cart"] is Map
+              ? Map<String, dynamic>.from(json["cart"] as Map)
+              : {},
+        ),
+        subTotal: MoneyUtils.parseRial(json["subTotal"]),
+        grandTotal: MoneyUtils.parseRial(json["grandTotal"]),
       );
 
   Map<String, dynamic> toJson() => {
@@ -77,9 +92,12 @@ class Cart {
         userId: json["userId"],
         createdAt: DateTime.parse(json["createdAt"]),
         updatedAt: DateTime.parse(json["updatedAt"]),
-        items: json["items"] != null
+        items: json["items"] is List
             ? List<CartItem>.from(
-                json["items"].map((x) => CartItem.fromJson(x)))
+                (json["items"] as List).whereType<Map>().map(
+                      (x) => CartItem.fromJson(Map<String, dynamic>.from(x)),
+                    ),
+              )
             : null,
       );
 
@@ -104,6 +122,7 @@ class CartItem {
   DateTime createdAt;
   DateTime updatedAt;
   CartItemSource source;
+  IKnowPackagePricing? pricing;
 
   CartItem({
     required this.id,
@@ -115,6 +134,7 @@ class CartItem {
     required this.createdAt,
     required this.updatedAt,
     required this.source,
+    this.pricing,
   });
 
   factory CartItem.fromJson(Map<String, dynamic> json) => CartItem(
@@ -126,7 +146,12 @@ class CartItem {
         price: json["price"],
         createdAt: DateTime.parse(json["createdAt"]),
         updatedAt: DateTime.parse(json["updatedAt"]),
-        source: CartItemSource.fromJson(json["source"]),
+        source: CartItemSource.fromJson(
+          json["source"] is Map
+              ? Map<String, dynamic>.from(json["source"] as Map)
+              : {},
+        ),
+        pricing: IKnowPackagePricing.tryParse(json["pricing"]),
       );
 
   Map<String, dynamic> toJson() => {
@@ -139,6 +164,7 @@ class CartItem {
         "createdAt": createdAt.toIso8601String(),
         "updatedAt": updatedAt.toIso8601String(),
         "source": source.toJson(),
+        if (pricing != null) "pricing": pricing!.toJson(),
       };
 }
 

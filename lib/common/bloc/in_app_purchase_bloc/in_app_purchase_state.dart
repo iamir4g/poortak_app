@@ -53,3 +53,7 @@ class InAppPurchaseError extends InAppPurchaseState {
   @override
   List<Object?> get props => [message, errorCode];
 }
+
+class InAppPurchaseFreeCheckoutRequired extends InAppPurchaseState {
+  const InAppPurchaseFreeCheckoutRequired();
+}

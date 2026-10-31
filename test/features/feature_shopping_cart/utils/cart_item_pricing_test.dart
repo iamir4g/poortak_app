@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:poortak/featueres/feature_sayareh/data/models/iknow_package_pricing.dart';
 import 'package:poortak/featueres/feature_shopping_cart/data/models/shopping_cart_model.dart';
 import 'package:poortak/featueres/feature_shopping_cart/utils/cart_item_pricing.dart';
 
@@ -45,7 +46,7 @@ void main() {
   });
 
   group('resolveCartTotals', () {
-    test('derives discount from item pricing and grandTotal', () {
+    test('uses server subTotal and grandTotal when package pricing is absent', () {
       final cart = ShoppingCart(
         subTotal: 450000,
         grandTotal: 450000,
@@ -67,9 +68,52 @@ void main() {
 
       final totals = resolveCartTotals(cart);
 
-      expect(totals.subTotal, 500000);
+      expect(totals.subTotal, 450000);
       expect(totals.payable, 450000);
-      expect(totals.discount, 50000);
+      expect(totals.discount, 0);
+    });
+
+    test('uses package payablePrice instead of catalog item price', () {
+      final cart = ShoppingCart(
+        subTotal: 15,
+        grandTotal: 15,
+        items: [
+          ShoppingCartItem(
+            title: 'مجموعه کامل سیاره آی نو',
+            description: '',
+            image: '',
+            isLock: false,
+            price: 20,
+            type: 'IKnow',
+            packagePricing: const IKnowPackagePricing(
+              packageId: 'pkg',
+              basePrice: 200,
+              packageDiscount: 0,
+              priceAfterPackageDiscount: 200,
+              ownedItems: [
+                OwnedIKnowItem(
+                  type: 'IKnowBook',
+                  itemId: 'book-1',
+                  name: 'Book 1',
+                  price: 50,
+                ),
+              ],
+              ownedItemsTotal: 50,
+              appliedDeduction: 50,
+              payablePrice: 150,
+            ),
+          ),
+        ],
+      );
+
+      final line = resolveServerCartItemPricing(cart.items.first);
+      expect(line.finalPriceToman, 15);
+      expect(line.originalPriceToman, 20);
+
+      final totals = resolveCartTotals(cart);
+      expect(totals.payable, 15);
+      expect(totals.subTotal, 20);
+      expect(totals.discount, 5);
     });
 
     test('derives discount from subTotal and grandTotal when items empty', () {

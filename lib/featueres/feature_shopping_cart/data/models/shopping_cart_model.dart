@@ -1,3 +1,5 @@
+import 'package:poortak/featueres/feature_sayareh/data/models/iknow_package_pricing.dart';
+
 class ShoppingCartItem {
   final String title;
   final String description;
@@ -8,6 +10,7 @@ class ShoppingCartItem {
   final String? type;
   final int? quantity;
   final Map<String, dynamic>? source;
+  final IKnowPackagePricing? packagePricing;
 
   ShoppingCartItem({
     required this.title,
@@ -19,6 +22,7 @@ class ShoppingCartItem {
     this.type,
     this.quantity,
     this.source,
+    this.packagePricing,
   });
 
   /// Cafe Bazaar in-app product id (SKU from backend), not the backend itemId.
@@ -70,5 +74,14 @@ class ShoppingCart {
     if (index != -1) {
       // items[index].quantity = quantity;
     }
+  }
+
+  IKnowPackagePricing? get iknowPackagePricing {
+    for (final item in items) {
+      if (item.packagePricing != null) {
+        return item.packagePricing;
+      }
+    }
+    return null;
   }
 }
