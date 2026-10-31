@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poortak/common/bloc/theme_cubit/theme_cubit.dart';
+import 'package:poortak/common/services/answer_feedback_sound_service.dart';
 import 'package:poortak/common/widgets/poortak_app_bar.dart';
 import 'package:poortak/common/services/reminder_notification_service.dart';
 import 'package:poortak/config/myColors.dart';
@@ -36,6 +39,7 @@ class _ReminderScreenState extends State<ReminderScreen> {
   }
 
   void _showAddReminderModal() {
+    unawaited(AnswerFeedbackSoundService.playPopup());
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -228,6 +232,7 @@ class ReminderCard extends StatelessWidget {
               // Delete Button
               IconButton(
                 onPressed: () async {
+                  unawaited(AnswerFeedbackSoundService.playPopup());
                   final confirmed = await showDialog<bool>(
                     context: context,
                     builder: (dialogContext) => AlertDialog(

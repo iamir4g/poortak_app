@@ -148,6 +148,7 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
     if (_isResultModalOpen || !mounted) return;
     _isResultModalOpen = true;
 
+    unawaited(AnswerFeedbackSoundService.playPopup());
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -519,6 +520,10 @@ class _FirstQuizScreenState extends State<FirstQuizScreen> {
                                                       is QuizAnswerLoaded
                                               ? null
                                               : () {
+                                                  unawaited(
+                                                    AnswerFeedbackSoundService
+                                                        .playClick(),
+                                                  );
                                                   setState(() {
                                                     selectedAnswerId =
                                                         answer.id;

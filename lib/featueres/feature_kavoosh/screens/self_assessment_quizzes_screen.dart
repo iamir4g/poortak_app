@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/common/services/answer_feedback_sound_service.dart';
 import 'package:poortak/common/utils/digit_utils.dart';
 import 'package:poortak/common/widgets/poortak_app_bar.dart';
 import 'package:poortak/config/myColors.dart';
@@ -99,6 +102,7 @@ class _SelfAssessmentQuizzesScreenState
     }
 
     final maxQuestions = quiz.questionCount < 1 ? 1 : quiz.questionCount;
+    unawaited(AnswerFeedbackSoundService.playPopup());
     showDialog(
       context: context,
       builder: (dialogContext) => Dialog(

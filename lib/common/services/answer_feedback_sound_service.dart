@@ -8,8 +8,11 @@ class AnswerFeedbackSoundService {
 
   static final AudioPlayer _player = AudioPlayer();
 
-  static const String _correctAsset = 'sounds/dragon-studio-correct.mp3';
-  static const String _wrongAsset = 'sounds/freesound_community-wrong.mp3';
+  static const String _correctAsset = 'sounds/correctAnswer.mp3';
+  static const String _wrongAsset = 'sounds/wrongAnswer.mp3';
+  static const String _clickAsset = 'sounds/click.mp3';
+  static const String _cardSwipeAsset = 'sounds/cardSwip.mp3';
+  static const String _popupAsset = 'sounds/popUpModal.mp3';
   static const double _volume = 50.0;
 
   static Future<void> playCorrect() => _play(_correctAsset);
@@ -18,6 +21,12 @@ class AnswerFeedbackSoundService {
 
   static Future<void> play(bool isCorrect) =>
       isCorrect ? playCorrect() : playWrong();
+
+  static Future<void> playClick() => _play(_clickAsset);
+
+  static Future<void> playCardSwipe() => _play(_cardSwipeAsset);
+
+  static Future<void> playPopup() => _play(_popupAsset);
 
   static bool get _soundEffectsEnabled =>
       !locator.isRegistered<SettingsCubit>() ||

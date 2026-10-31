@@ -115,6 +115,7 @@ class _SelfAssessmentQuizScreenState extends State<SelfAssessmentQuizScreen> {
     if (_isResultModalOpen || !mounted) return;
     _isResultModalOpen = true;
 
+    unawaited(AnswerFeedbackSoundService.playPopup());
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -257,6 +258,7 @@ class _SelfAssessmentQuizScreenState extends State<SelfAssessmentQuizScreen> {
             onTap: showFeedback || state is QuizSessionSubmitting
                 ? null
                 : () {
+                    unawaited(AnswerFeedbackSoundService.playClick());
                     setState(() {
                       selectedAnswerId = answer.id;
                     });

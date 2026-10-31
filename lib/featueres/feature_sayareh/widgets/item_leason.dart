@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:poortak/common/services/answer_feedback_sound_service.dart';
 import 'package:poortak/common/services/getImageUrl_service.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/common/utils/svg_embedded_png.dart';
@@ -92,6 +95,7 @@ class ItemLeason extends StatelessWidget {
         if (item.isDemo || purchased || canPreviewTrailer) {
           _openLesson(context);
         } else {
+          unawaited(AnswerFeedbackSoundService.playPopup());
           showDialog(
             context: context,
             builder: (BuildContext context) =>

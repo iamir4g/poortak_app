@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:poortak/common/services/answer_feedback_sound_service.dart';
 import 'package:poortak/common/widgets/poortak_app_bar.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
@@ -121,6 +122,7 @@ class _LitnerWordsInprogressScreenState
   }
 
   void _showAddWordBottomSheet() {
+    unawaited(AnswerFeedbackSoundService.playPopup());
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,

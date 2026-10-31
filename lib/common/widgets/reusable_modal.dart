@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
+import 'package:poortak/common/services/answer_feedback_sound_service.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
@@ -573,6 +576,8 @@ class ReusableModal extends StatelessWidget {
     bool cartSuccessStyle = false,
     bool animatedEntrance = false,
   }) {
+    unawaited(AnswerFeedbackSoundService.playPopup());
+
     Widget buildModal(BuildContext dialogContext) {
       return ReusableModal(
         title: title,

@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:poortak/main.dart';
 import 'package:flutter/material.dart';
+import 'package:poortak/common/services/answer_feedback_sound_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poortak/common/services/video_download_service.dart';
 import 'package:poortak/common/bloc/video_download_cubit/video_download_cubit.dart';
@@ -244,6 +247,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
       debugPrint('No lesson data available for purchase dialog');
       return;
     }
+    unawaited(AnswerFeedbackSoundService.playPopup());
     showDialog(
       context: context,
       builder: (BuildContext context) => DialogCart(item: _currentLesson!),
@@ -813,6 +817,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
       ),
       child: GestureDetector(
         onTap: () {
+          unawaited(AnswerFeedbackSoundService.playPopup());
           showModalBottomSheet(
             context: context,
             isScrollControlled: true,

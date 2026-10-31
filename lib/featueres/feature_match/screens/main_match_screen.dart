@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:poortak/common/services/answer_feedback_sound_service.dart';
 import 'package:poortak/common/widgets/poortak_app_bar.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
@@ -159,6 +162,7 @@ class MainMatchScreen extends StatelessWidget {
 
   void _showComingSoonDialog(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    unawaited(AnswerFeedbackSoundService.playPopup());
     showDialog(
       context: context,
       builder: (BuildContext context) {
