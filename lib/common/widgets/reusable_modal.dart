@@ -68,19 +68,19 @@ class ReusableModal extends StatelessWidget {
 
     return Dialog(
       backgroundColor: Colors.transparent,
+      insetPadding: EdgeInsets.symmetric(horizontal: Dimens.nw(22)),
       child: Container(
-        width: 0.9.sw,
-        constraints: BoxConstraints(maxWidth: 350.w),
+        width: Dimens.nw(350),
+        height: Dimens.nh(365),
         decoration: BoxDecoration(
           color: modalBackgroundColor,
-          borderRadius: BorderRadius.circular(20.r),
+          borderRadius: BorderRadius.circular(Dimens.nr(20)),
         ),
         child: Stack(
           children: [
             Padding(
               padding: EdgeInsets.symmetric(vertical: Dimens.large),
               child: Column(
-                mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [

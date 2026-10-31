@@ -639,7 +639,10 @@ class _ConversationScreenState extends State<ConversationScreen>
                       force: true,
                     );
                     if (_shouldPromptPlaybackMode) {
-                      _showPlaybackModeModal(messages);
+                      Future.delayed(const Duration(milliseconds: 350), () {
+                        if (!mounted || !_shouldPromptPlaybackMode) return;
+                        _showPlaybackModeModal(messages);
+                      });
                     }
                   });
                 }
