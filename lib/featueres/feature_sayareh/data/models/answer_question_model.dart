@@ -101,7 +101,8 @@ class AnswerStats {
     this.correct = 0,
   });
 
-  /// Current question to show in the step progress (1-based).
+  /// 1-based number of the question that was just answered.
+  /// Start with `answered == 0` still maps to question 1.
   int get currentQuestion {
     if (all <= 0) return 1;
     if (answered <= 0) return 1;

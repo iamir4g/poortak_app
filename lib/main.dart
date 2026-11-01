@@ -73,6 +73,7 @@ import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_start_b
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_answer_bloc/quiz_answer_bloc.dart';
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_progress_bloc/quiz_progress_bloc.dart';
 import 'package:poortak/featueres/feature_sayareh/data/models/quiz_progress_model.dart';
+import 'package:poortak/featueres/feature_sayareh/data/models/quiz_question_model.dart';
 import 'package:poortak/featueres/feature_sayareh/screens/first_quiz_screen.dart';
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_result_bloc/quiz_result_bloc.dart';
 // For RouteAware
@@ -353,7 +354,8 @@ void main() async {
                             courseId: args['courseId'],
                             title: args['title'],
                             description: args['description'] as String?,
-                            initialQuestion: args['initialQuestion'],
+                            initialQuestion: args['initialQuestion']
+                                as QuizesQuestion?,
                           ),
                         );
                       },
