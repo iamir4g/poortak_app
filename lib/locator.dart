@@ -1,7 +1,10 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
-import 'dart:io';
 import 'package:flutter/foundation.dart';
+import 'package:poortak/common/services/answer_feedback_sound_service.dart';
 import 'package:poortak/featueres/feature_sayareh/repositories/dictionary_repository.dart';
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/dictionary_bloc/dictionary_bloc.dart';
 import 'package:get_it/get_it.dart';
@@ -232,6 +235,7 @@ Future<void> initLocator() async {
 
   // Register SettingsCubit
   locator.registerSingleton<SettingsCubit>(SettingsCubit());
+  unawaited(AnswerFeedbackSoundService.preload());
 
   // Register ConnectivityCubit
   locator.registerSingleton<ConnectivityCubit>(ConnectivityCubit());
