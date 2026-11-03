@@ -4,7 +4,7 @@ class OtpLoginSession {
   final int otpLength;
 
   static const int timeoutSeconds = 120;
-  static const int defaultOtpLength = 4;
+  static const int defaultOtpLength = 5;
 
   const OtpLoginSession({
     required this.mobileDigits,

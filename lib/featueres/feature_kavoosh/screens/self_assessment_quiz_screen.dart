@@ -115,6 +115,7 @@ class _SelfAssessmentQuizScreenState extends State<SelfAssessmentQuizScreen> {
     if (_isResultModalOpen || !mounted) return;
     _isResultModalOpen = true;
 
+    unawaited(AnswerFeedbackSoundService.playPopup());
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -238,7 +239,6 @@ class _SelfAssessmentQuizScreenState extends State<SelfAssessmentQuizScreen> {
       progress: _buildProgress(stats, afterSubmit: showFeedback),
       question: BidiText(
         text: question.title,
-        forceEnglishDigits: true,
         textAlign: TextAlign.center,
         style: MyTextStyle.textHeader16Bold.copyWith(
           color: isDark ? MyColors.profileTextPrimaryDark : MyColors.textMatn1,
@@ -253,10 +253,12 @@ class _SelfAssessmentQuizScreenState extends State<SelfAssessmentQuizScreen> {
           final isWrongSelected =
               showFeedback && isAnswerSelected && !isCorrect;
 
-          return InkWell(
+          return GestureDetector(
+            behavior: HitTestBehavior.opaque,
             onTap: showFeedback || state is QuizSessionSubmitting
                 ? null
                 : () {
+                    unawaited(AnswerFeedbackSoundService.playClick());
                     setState(() {
                       selectedAnswerId = answer.id;
                     });

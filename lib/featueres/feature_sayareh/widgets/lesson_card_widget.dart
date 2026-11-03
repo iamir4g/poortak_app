@@ -26,8 +26,9 @@ class LessonCardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final width = Dimens.nw(360); // Reduced from 359 to be more responsive
-    return InkWell(
+    return GestureDetector(
       onTap: onTap,
+      behavior: HitTestBehavior.opaque,
       child: Container(
         width: width,
         height: Dimens.nh(104),

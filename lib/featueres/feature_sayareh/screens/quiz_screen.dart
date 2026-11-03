@@ -2,26 +2,29 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:poortak/config/myColors.dart';
-import 'package:poortak/config/myTextStyle.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/common/services/answer_feedback_sound_service.dart';
 import 'package:poortak/common/services/haptic_service.dart';
 import 'package:poortak/common/utils/bidi_text_helper.dart';
 import 'package:poortak/common/utils/font_size_helper.dart';
+import 'package:poortak/common/widgets/poortak_app_bar.dart';
+import 'package:poortak/common/widgets/reusable_modal.dart';
+import 'package:poortak/config/myColors.dart';
+import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_profile/screens/login_screen.dart';
+import 'package:poortak/featueres/feature_sayareh/data/models/answer_question_model.dart'
+    show AnswerStats;
+import 'package:poortak/featueres/feature_sayareh/data/models/quiz_question_model.dart';
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_answer_bloc/quiz_answer_bloc.dart';
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_progress_bloc/quiz_progress_bloc.dart';
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_result_bloc/quiz_result_bloc.dart';
-import 'package:poortak/featueres/feature_sayareh/data/models/quiz_question_model.dart';
-import 'package:poortak/featueres/feature_sayareh/widgets/quiz_result_modal.dart';
-import 'package:poortak/featueres/feature_sayareh/widgets/quiz_question_layout.dart';
-import 'package:poortak/featueres/feature_sayareh/widgets/item_question.dart';
-import 'package:poortak/common/widgets/poortak_app_bar.dart';
-import 'package:poortak/common/widgets/reusable_modal.dart';
-import 'package:poortak/locator.dart';
+import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_start_bloc/quiz_start_bloc.dart';
 import 'package:poortak/featueres/feature_sayareh/repositories/sayareh_repository.dart';
-import 'package:poortak/featueres/feature_sayareh/screens/first_quiz_screen.dart';
 import 'package:poortak/featueres/feature_sayareh/screens/quizzes_screen.dart';
+import 'package:poortak/featueres/feature_sayareh/widgets/item_question.dart';
+import 'package:poortak/featueres/feature_sayareh/widgets/quiz_question_layout.dart';
+import 'package:poortak/featueres/feature_sayareh/widgets/quiz_result_modal.dart';
+import 'package:poortak/locator.dart';
 
 class QuizScreen extends StatefulWidget {
   static const routeName = "/quiz";
@@ -29,15 +32,15 @@ class QuizScreen extends StatefulWidget {
   final String courseId;
   final String title;
   final String? description;
-  final QuizesQuestion initialQuestion;
+  final QuizesQuestion? initialQuestion;
 
   const QuizScreen({
     super.key,
     required this.quizId,
     required this.courseId,
     required this.title,
-    required this.initialQuestion,
     this.description,
+    this.initialQuestion,
   });
 
   @override
@@ -46,10 +49,7 @@ class QuizScreen extends StatefulWidget {
 
 class _QuizScreenState extends State<QuizScreen> {
   String? selectedAnswerId;
-  bool isSelected = false;
-  bool isCorrectAnswer = false;
-  bool isWrongSelected = false;
-  late QuizesQuestion currentQuestion;
+  QuizesQuestion? currentQuestion;
   bool _isExitDialogOpen = false;
   bool _canPop = false;
   bool _isResultModalOpen = false;
@@ -72,6 +72,32 @@ class _QuizScreenState extends State<QuizScreen> {
         );
   }
 
+  void _startQuiz() {
+    context.read<QuizStartBloc>().add(
+          StartQuizEvent(
+            courseId: widget.courseId,
+            quizId: widget.quizId,
+          ),
+        );
+  }
+
+  /// Start `answered` is 0 for the first unseen question.
+  void _applyStartStats(AnswerStats? stats) {
+    if (stats == null || stats.all <= 0) {
+      _fetchQuizProgress();
+      return;
+    }
+    context.read<QuizProgressBloc>().add(
+          UpdateQuizProgressFromStatsEvent(
+            quizId: widget.quizId,
+            totalQuestions: stats.all,
+            currentQuestion: stats.currentQuestion,
+            correctAnswers: stats.correct,
+          ),
+        );
+  }
+
+  /// After submit, `answered` is the question that was just completed.
   void _applyAnswerStats(QuizAnswerLoaded answerState) {
     final stats = answerState.stats;
     if (stats == null || stats.all <= 0) {
@@ -88,38 +114,48 @@ class _QuizScreenState extends State<QuizScreen> {
         );
   }
 
-  void _handleAuthError() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('لطفا ابتدا وارد حساب کاربری خود شوید'),
-        duration: Duration(seconds: 2),
-      ),
-    );
-    Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+  void _advanceProgressToNextQuestion() {
+    final progressState = context.read<QuizProgressBloc>().state;
+    if (progressState is! QuizProgressLoaded ||
+        progressState.totalQuestions <= 0) {
+      return;
+    }
+    final nextQuestion = (progressState.currentQuestion + 1)
+        .clamp(1, progressState.totalQuestions);
+    context.read<QuizProgressBloc>().add(
+          UpdateQuizProgressFromStatsEvent(
+            quizId: widget.quizId,
+            totalQuestions: progressState.totalQuestions,
+            currentQuestion: nextQuestion,
+            correctAnswers: progressState.progress.correctAnswers,
+          ),
+        );
   }
 
-  void _restartQuizFromStart() {
-    context.read<QuizAnswerBloc>().add(const ResetQuizAnswerEvent());
-    Navigator.pushReplacementNamed(
-      context,
-      FirstQuizScreen.routeName,
-      arguments: {
-        'quizId': widget.quizId,
-        'courseId': widget.courseId,
-        'title': widget.title,
-        'description': widget.description,
-      },
-    );
-  }
-
-  void _resetLocalAnswerSelection() {
+  void _goToNextQuestion(QuizesQuestion nextQuestion) {
     setState(() {
+      currentQuestion = nextQuestion;
       selectedAnswerId = null;
-      isSelected = false;
-      isCorrectAnswer = false;
-      isWrongSelected = false;
     });
     context.read<QuizAnswerBloc>().add(const ResetQuizAnswerEvent());
+    _advanceProgressToNextQuestion();
+  }
+
+  void _reloadQuiz() {
+    setState(() {
+      selectedAnswerId = null;
+      currentQuestion = null;
+    });
+    context.read<QuizAnswerBloc>().add(const ResetQuizAnswerEvent());
+    _startQuiz();
+  }
+
+  void _resyncAfterAlreadyAnswered() => _reloadQuiz();
+
+  bool _isAuthErrorMessage(String message) {
+    return message.contains('Please login') ||
+        message.contains('Session expired') ||
+        message.contains('Unauthorized');
   }
 
   Widget? _buildQuizProgress(QuizProgressState progressState) {
@@ -139,6 +175,7 @@ class _QuizScreenState extends State<QuizScreen> {
     if (_isResultModalOpen || !mounted) return;
     _isResultModalOpen = true;
 
+    unawaited(AnswerFeedbackSoundService.playPopup());
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -156,17 +193,30 @@ class _QuizScreenState extends State<QuizScreen> {
   @override
   void initState() {
     super.initState();
-    // Initialize with the provided question
     currentQuestion = widget.initialQuestion;
-    // Keep the progress bar continuous when coming from FirstQuizScreen;
-    // only fetch if we were not seeded with the previous screen's state.
+    if (currentQuestion == null) {
+      _startQuiz();
+      return;
+    }
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       final progressState = context.read<QuizProgressBloc>().state;
       if (progressState is! QuizProgressLoaded) {
         _fetchQuizProgress();
+      } else {
+        _advanceProgressToNextQuestion();
       }
     });
+  }
+
+  void _handleAuthError(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('لطفا ابتدا وارد حساب کاربری خود شوید'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+    Navigator.pushReplacementNamed(context, LoginScreen.routeName);
   }
 
   Future<void> _leaveQuiz() async {
@@ -174,7 +224,7 @@ class _QuizScreenState extends State<QuizScreen> {
       await locator<SayarehRepository>()
           .deleteQuizResult(widget.courseId, widget.quizId);
     } catch (_) {
-      // Still leave the quiz even if delete fails.
+      // Still leave the quiz even if delete fails (e.g. 404 when no result exists).
     }
 
     if (!mounted) return;
@@ -223,6 +273,7 @@ class _QuizScreenState extends State<QuizScreen> {
     required QuizAnswerState answerState,
     required QuizResultState resultState,
     required String questionId,
+    required String questionQuizId,
   }) {
     if (selectedAnswerId != null && answerState is! QuizAnswerLoaded) {
       return _buildQuizActionButton(
@@ -237,6 +288,7 @@ class _QuizScreenState extends State<QuizScreen> {
                         quizId: widget.quizId,
                         questionId: questionId,
                         answerId: selectedAnswerId!,
+                        questionQuizId: questionQuizId,
                       ),
                     );
               },
@@ -247,16 +299,7 @@ class _QuizScreenState extends State<QuizScreen> {
       return _buildQuizActionButton(
         context: context,
         label: 'بعدی',
-        onPressed: () {
-          setState(() {
-            currentQuestion = answerState.nextQuestion!;
-            selectedAnswerId = null;
-            isSelected = false;
-            isCorrectAnswer = false;
-            isWrongSelected = false;
-          });
-          context.read<QuizAnswerBloc>().add(const ResetQuizAnswerEvent());
-        },
+        onPressed: () => _goToNextQuestion(answerState.nextQuestion!),
       );
     }
 
@@ -277,8 +320,8 @@ class _QuizScreenState extends State<QuizScreen> {
     required VoidCallback? onPressed,
   }) {
     return SizedBox(
-      width: 176,
-      height: 54,
+      width: 176.w,
+      height: 54.h,
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
@@ -287,7 +330,7 @@ class _QuizScreenState extends State<QuizScreen> {
           disabledForegroundColor:
               Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.5),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
+            borderRadius: BorderRadius.circular(30.r),
           ),
           elevation: 0,
           padding: EdgeInsets.zero,
@@ -298,15 +341,15 @@ class _QuizScreenState extends State<QuizScreen> {
             Text(
               label,
               style: MyTextStyle.textMatnBtnFor(context).copyWith(
-                fontSize: 14,
+                fontSize: 14.sp,
                 fontWeight: FontWeight.w700,
               ),
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: 8.w),
             Icon(
               Icons.arrow_forward_ios,
               color: Theme.of(context).colorScheme.onPrimary,
-              size: 18,
+              size: 18.r,
             ),
           ],
         ),
@@ -319,6 +362,7 @@ class _QuizScreenState extends State<QuizScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final pageBackgroundColor =
         isDark ? MyColors.profileBackgroundDark : Colors.white;
+
     return PopScope(
       canPop: _canPop,
       onPopInvokedWithResult: (didPop, result) {
@@ -336,191 +380,256 @@ class _QuizScreenState extends State<QuizScreen> {
           onBackPressed: _showExitModal,
         ),
         body: SafeArea(
-          child: BlocListener<QuizAnswerBloc, QuizAnswerState>(
-            listener: (context, answerState) {
-              if (answerState is QuizAnswerError) {
-                switch (answerState.failure) {
-                  case QuizAnswerFailure.unauthorized:
-                    _handleAuthError();
-                    return;
-                  case QuizAnswerFailure.alreadyAnswered:
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(answerState.message),
-                        duration: const Duration(seconds: 2),
-                      ),
-                    );
-                    _restartQuizFromStart();
-                    return;
-                  case QuizAnswerFailure.notFound:
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(answerState.message),
-                        duration: const Duration(seconds: 2),
-                      ),
-                    );
-                    _restartQuizFromStart();
-                    return;
-                  case QuizAnswerFailure.generic:
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(answerState.message),
-                        duration: const Duration(seconds: 2),
-                      ),
-                    );
-                    _resetLocalAnswerSelection();
-                    return;
-                }
-              } else if (answerState is QuizAnswerLoaded) {
-                if (answerState.isLastQuestion) {
-                  context
-                      .read<QuizResultBloc>()
-                      .add(const ResetQuizResultEvent());
-                }
-                _applyAnswerStats(answerState);
-                setState(() {});
-                unawaited(
-                  AnswerFeedbackSoundService.play(answerState.isCorrect),
+          child: BlocListener<QuizResultBloc, QuizResultState>(
+            listenWhen: (previous, current) =>
+                current is QuizResultLoaded || current is QuizResultError,
+            listener: (context, state) {
+              if (state is QuizResultError) {
+                setState(() => _hasRequestedResult = false);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(state.message),
+                    duration: const Duration(seconds: 2),
+                    backgroundColor: MyColors.error,
+                  ),
                 );
-                if (!answerState.isCorrect) {
-                  unawaited(HapticService.wrongAnswerFeedback());
-                }
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              } else if (state is QuizResultLoaded && _hasRequestedResult) {
+                _showQuizResultModal(state);
               }
             },
-            child: BlocListener<QuizResultBloc, QuizResultState>(
-              listenWhen: (previous, current) =>
-                  current is QuizResultLoaded || current is QuizResultError,
+            child: BlocConsumer<QuizStartBloc, QuizStartState>(
               listener: (context, state) {
-                if (state is QuizResultError) {
-                  setState(() => _hasRequestedResult = false);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(state.message),
-                      duration: const Duration(seconds: 2),
-                      backgroundColor: MyColors.error,
-                    ),
-                  );
-                  Navigator.of(context).popUntil((route) => route.isFirst);
-                } else if (state is QuizResultLoaded && _hasRequestedResult) {
-                  _showQuizResultModal(state);
+                if (state is QuizStartLoaded) {
+                  setState(() {
+                    currentQuestion ??= state.question;
+                  });
+                  _applyStartStats(state.question.stats);
+                } else if (state is QuizStartError) {
+                  if (_isAuthErrorMessage(state.message)) {
+                    _handleAuthError(context);
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(state.message),
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+                    if (state.errorCode == 'quizOrCourseNotFound') {
+                      _navigateBackToQuizList();
+                    }
+                  }
                 }
               },
-              child: BlocBuilder<QuizResultBloc, QuizResultState>(
-                builder: (context, resultState) {
-                  return BlocBuilder<QuizAnswerBloc, QuizAnswerState>(
-                    builder: (context, answerState) {
-                      return BlocBuilder<QuizProgressBloc, QuizProgressState>(
-                        builder: (context, progressState) {
-                          final questionData = currentQuestion.data;
-                          return Stack(
-                            children: [
-                              QuizQuestionLayout(
-                                progress: _buildQuizProgress(progressState),
-                                question: BidiText(
-                                  text: questionData.title,
-                                  forceEnglishDigits: true,
-                                  textAlign: TextAlign.center,
-                                  style: FontSizeHelper.getContentTextStyle(
-                                    context,
-                                    baseFontSize: 16.0,
-                                    fontWeight: FontWeight.bold,
-                                    color: isDark
-                                        ? MyColors.profileTextPrimaryDark
-                                        : MyColors.textMatn1,
+              builder: (context, startState) {
+                final question = currentQuestion ??
+                    (startState is QuizStartLoaded ? startState.question : null);
+
+                if (question == null) {
+                  if (startState is QuizStartError) {
+                    return Center(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 24.w),
+                        child: Text(
+                          startState.message,
+                          textAlign: TextAlign.center,
+                          style: MyTextStyle.textMatn15.copyWith(
+                            color: isDark
+                                ? MyColors.profileTextPrimaryDark
+                                : const Color(0xFF3D495C),
+                          ),
+                        ),
+                      ),
+                    );
+                  }
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                return BlocConsumer<QuizAnswerBloc, QuizAnswerState>(
+                  listener: (context, answerState) {
+                    if (answerState is QuizAnswerError) {
+                      switch (answerState.failure) {
+                        case QuizAnswerFailure.unauthorized:
+                          _handleAuthError(context);
+                          return;
+                        case QuizAnswerFailure.alreadyAnswered:
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(answerState.message),
+                              duration: const Duration(seconds: 2),
+                            ),
+                          );
+                          _resyncAfterAlreadyAnswered();
+                          return;
+                        case QuizAnswerFailure.notFound:
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(answerState.message),
+                              duration: const Duration(seconds: 2),
+                            ),
+                          );
+                          _reloadQuiz();
+                          return;
+                        case QuizAnswerFailure.generic:
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(answerState.message),
+                              duration: const Duration(seconds: 2),
+                            ),
+                          );
+                          setState(() {
+                            selectedAnswerId = null;
+                          });
+                          context
+                              .read<QuizAnswerBloc>()
+                              .add(const ResetQuizAnswerEvent());
+                          return;
+                      }
+                    } else if (answerState is QuizAnswerLoaded) {
+                      if (answerState.isLastQuestion) {
+                        context
+                            .read<QuizResultBloc>()
+                            .add(const ResetQuizResultEvent());
+                      }
+                      _applyAnswerStats(answerState);
+                      setState(() {});
+                      unawaited(
+                        AnswerFeedbackSoundService.play(
+                          answerState.isCorrect,
+                        ),
+                      );
+                      if (!answerState.isCorrect) {
+                        unawaited(HapticService.wrongAnswerFeedback());
+                      }
+                    }
+                  },
+                  builder: (context, answerState) {
+                    return BlocBuilder<QuizResultBloc, QuizResultState>(
+                      builder: (context, resultState) {
+                        return BlocBuilder<QuizProgressBloc, QuizProgressState>(
+                          builder: (context, progressState) {
+                            return Stack(
+                              children: [
+                                QuizQuestionLayout(
+                                  progress: _buildQuizProgress(progressState),
+                                  question: BidiText(
+                                    text: question.data.title,
+                                    textAlign: TextAlign.center,
+                                    style:
+                                        MyTextStyle.textHeader16Bold.copyWith(
+                                      fontSize:
+                                          FontSizeHelper.getScaledFontSize(
+                                        context,
+                                        MyTextStyle.textHeader16Bold.fontSize ??
+                                            16.sp,
+                                      ),
+                                      color: isDark
+                                          ? MyColors.profileTextPrimaryDark
+                                          : MyColors.textMatn1,
+                                    ),
+                                  ),
+                                  options: QuizAnswerOptionsList(
+                                    answerCount: question.data.answers.length,
+                                    itemBuilder: (
+                                      index, {
+                                      required height,
+                                      required large,
+                                    }) {
+                                      final answer =
+                                          question.data.answers[index];
+                                      final feedbackAnswerId =
+                                          answerState is QuizAnswerLoaded
+                                              ? answerState.selectedAnswerId
+                                              : selectedAnswerId;
+                                      final isAnswerSelected =
+                                          feedbackAnswerId == answer.id;
+                                      var isCorrectAnswer = false;
+                                      var isWrongSelected = false;
+                                      if (answerState is QuizAnswerLoaded) {
+                                        isCorrectAnswer = answer.id ==
+                                            answerState.correctAnswerId;
+                                        isWrongSelected = isAnswerSelected &&
+                                            !answerState.isCorrect;
+                                      }
+                                      return GestureDetector(
+                                        behavior: HitTestBehavior.opaque,
+                                        onTap: answerState
+                                                    is QuizAnswerLoading ||
+                                                answerState is QuizAnswerLoaded
+                                            ? null
+                                            : () {
+                                                unawaited(
+                                                  AnswerFeedbackSoundService
+                                                      .playClick(),
+                                                );
+                                                setState(() {
+                                                  selectedAnswerId = answer.id;
+                                                });
+                                              },
+                                        child: QuizAnswerItem(
+                                          key: ValueKey(answer.id),
+                                          title: answer.title,
+                                          id: answer.id,
+                                          isSelected: isAnswerSelected,
+                                          isCorrect: isCorrectAnswer,
+                                          isWrongSelected: isWrongSelected,
+                                          selectedAnswerId:
+                                              feedbackAnswerId ?? "",
+                                          showFeedback:
+                                              answerState is QuizAnswerLoaded,
+                                          height: height,
+                                          large: large,
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                  feedback: answerState is QuizAnswerLoaded
+                                      ? (!answerState.isCorrect &&
+                                              answerState.explanation != null
+                                          ? buildQuizWrongFeedback(
+                                              isDark: isDark,
+                                              explanation:
+                                                  answerState.explanation!,
+                                            )
+                                          : answerState.isCorrect
+                                              ? buildQuizCorrectFeedback(
+                                                  isDark: isDark,
+                                                )
+                                              : null)
+                                      : null,
+                                  bottomButton: _buildQuizBottomButton(
+                                    context: context,
+                                    answerState: answerState,
+                                    resultState: resultState,
+                                    questionId: question.data.id,
+                                    questionQuizId: question.data.quizId,
                                   ),
                                 ),
-                                options: QuizAnswerOptionsList(
-                                  answerCount: questionData.answers.length,
-                                  itemBuilder: (
-                                    index, {
-                                    required height,
-                                    required large,
-                                  }) {
-                                    final answer = questionData.answers[index];
-                                    final feedbackAnswerId =
-                                        answerState is QuizAnswerLoaded
-                                            ? answerState.selectedAnswerId
-                                            : selectedAnswerId;
-                                    final isAnswerSelected =
-                                        feedbackAnswerId == answer.id;
-                                    var isCorrectAnswer = false;
-                                    var isWrongSelected = false;
-                                    if (answerState is QuizAnswerLoaded) {
-                                      isCorrectAnswer = answer.id ==
-                                          answerState.correctAnswerId;
-                                      isWrongSelected = isAnswerSelected &&
-                                          !answerState.isCorrect;
-                                    }
-                                    return InkWell(
-                                      onTap: answerState is QuizAnswerLoading ||
-                                              answerState is QuizAnswerLoaded
-                                          ? null
-                                          : () {
-                                              setState(() {
-                                                selectedAnswerId = answer.id;
-                                              });
-                                            },
-                                      child: QuizAnswerItem(
-                                        key: ValueKey(answer.id),
-                                        title: answer.title,
-                                        id: answer.id,
-                                        isSelected: isAnswerSelected,
-                                        isCorrect: isCorrectAnswer,
-                                        isWrongSelected: isWrongSelected,
-                                        selectedAnswerId:
-                                            feedbackAnswerId ?? "",
-                                        showFeedback:
-                                            answerState is QuizAnswerLoaded,
-                                        height: height,
-                                        large: large,
-                                      ),
-                                    );
-                                  },
-                                ),
-                                feedback: answerState is QuizAnswerLoaded
-                                    ? (!answerState.isCorrect &&
-                                            answerState.explanation != null
-                                        ? buildQuizWrongFeedback(
-                                            isDark: isDark,
-                                            explanation:
-                                                answerState.explanation!,
-                                          )
-                                        : answerState.isCorrect
-                                            ? buildQuizCorrectFeedback(
-                                                isDark: isDark,
-                                              )
-                                            : null)
-                                    : null,
-                                bottomButton: _buildQuizBottomButton(
-                                  context: context,
-                                  answerState: answerState,
-                                  resultState: resultState,
-                                  questionId: questionData.id,
-                                ),
-                              ),
-                              if (resultState is QuizResultLoading &&
-                                  _hasRequestedResult)
-                                Positioned.fill(
-                                  child: ColoredBox(
-                                    color: Colors.black.withValues(alpha: 0.25),
-                                    child: const Center(
-                                      child: CircularProgressIndicator(
-                                        valueColor:
-                                            AlwaysStoppedAnimation<Color>(
-                                          MyColors.primary,
+                                if (resultState is QuizResultLoading &&
+                                    _hasRequestedResult)
+                                  Positioned.fill(
+                                    child: ColoredBox(
+                                      color:
+                                          Colors.black.withValues(alpha: 0.25),
+                                      child: const Center(
+                                        child: CircularProgressIndicator(
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                            MyColors.primary,
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
-                                ),
-                            ],
-                          );
-                        },
-                      );
-                    },
-                  );
-                },
-              ),
+                              ],
+                            );
+                          },
+                        );
+                      },
+                    );
+                  },
+                );
+              },
             ),
           ),
         ),

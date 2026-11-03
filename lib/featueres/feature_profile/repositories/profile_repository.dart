@@ -64,9 +64,9 @@ class ProfileRepository {
   }
 
   Future<DataState<AuthLoginOtpModel>> callLoginWithOtp(
-      String otp, String mobile) async {
+      String otp, String phone) async {
     try {
-      final response = await profileApiProvider.callLoginWithOtp(otp, mobile);
+      final response = await profileApiProvider.callLoginWithOtp(otp, phone);
       log("Login Response: ${response.data}");
 
       if ((response.statusCode == 200 || response.statusCode == 201) &&
@@ -77,41 +77,89 @@ class ProfileRepository {
         return DataSuccess(loginOtpModel);
       } else {
         log("Login Error - Status: ${response.statusCode}, Data: ${response.data}");
-        return DataFailed(response.data['message'] ?? "خطا در ورود");
+        return DataFailed(_loginErrorMessage(response.data));
       }
     } on DioException catch (dioError) {
       log("Login DioException: $dioError");
 
-      // Handle DioException with response data
       if (dioError.response != null) {
         final responseData = dioError.response!.data;
         log("DioException Response Data: $responseData");
-
-        // Extract error message from response
-        String errorMessage = "خطا در ورود";
-        if (responseData is Map<String, dynamic>) {
-          if (responseData.containsKey('message')) {
-            errorMessage = responseData['message'];
-          } else if (responseData.containsKey('error')) {
-            errorMessage = responseData['error'];
-          }
-        }
-
-        // Check for specific invalid OTP error
-        if (dioError.response!.statusCode == 400 &&
-            errorMessage.toLowerCase().contains('invalid otp')) {
-          errorMessage = "کد تایید اشتباه است. لطفاً کد صحیح را وارد کنید.";
-        }
-
-        return DataFailed(errorMessage);
-      } else {
-        // Handle DioException without response data
-        return DataFailed("خطا در اتصال به سرور");
+        return DataFailed(
+          _loginErrorMessage(
+            responseData,
+            statusCode: dioError.response!.statusCode,
+          ),
+        );
       }
+
+      return DataFailed("خطا در اتصال به سرور");
     } catch (e) {
       log("Login Error: $e");
       return DataFailed(e.toString());
     }
+  }
+
+  String _loginErrorMessage(dynamic responseData, {int? statusCode}) {
+    final raw = _extractLoginServerMessage(responseData);
+    final normalized = raw.toLowerCase();
+
+    if (statusCode == 400) {
+      if (_containsAny(normalized, const [
+        'expired',
+        'expire',
+        'منقضی',
+      ])) {
+        return "کد تایید منقضی شده است. دوباره درخواست کنید.";
+      }
+      if (_containsAny(normalized, const [
+        'invalid otp',
+        'otp',
+        'used',
+        'already',
+        'single-use',
+        'single use',
+      ])) {
+        return "کد تایید اشتباه است یا قبلاً استفاده شده است.";
+      }
+      if (_containsAny(normalized, const [
+        'phone',
+        'mobile',
+        'شماره',
+      ])) {
+        return "شماره موبایل نامعتبر است.";
+      }
+      return raw.isNotEmpty ? raw : "خطا در ورود";
+    }
+
+    return raw.isNotEmpty ? raw : "خطا در ورود";
+  }
+
+  String _extractLoginServerMessage(dynamic responseData) {
+    if (responseData is Map) {
+      final message = responseData['message'];
+      final extracted = _stringifyServerMessage(message);
+      if (extracted.isNotEmpty) return extracted;
+
+      final error = responseData['error'];
+      return _stringifyServerMessage(error);
+    }
+    return _stringifyServerMessage(responseData);
+  }
+
+  String _stringifyServerMessage(dynamic value) {
+    if (value is String) return value.trim();
+    if (value is List) {
+      return value
+          .map(_stringifyServerMessage)
+          .where((item) => item.isNotEmpty)
+          .join(' ');
+    }
+    return '';
+  }
+
+  bool _containsAny(String source, List<String> needles) {
+    return needles.any(source.contains);
   }
 
   Future<DataState<PaymentHistoryList>> callPaymentHistory(

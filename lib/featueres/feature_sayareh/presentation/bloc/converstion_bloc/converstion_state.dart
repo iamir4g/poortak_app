@@ -13,7 +13,11 @@ final class ConverstionLoading extends ConverstionState {}
 
 final class ConverstionError extends ConverstionState {
   final String message;
-  const ConverstionError(this.message);
+  final String? errorCode;
+  const ConverstionError(this.message, {this.errorCode});
+
+  @override
+  List<Object> get props => [message, errorCode ?? ''];
 }
 
 final class ConverstionSuccess extends ConverstionState {

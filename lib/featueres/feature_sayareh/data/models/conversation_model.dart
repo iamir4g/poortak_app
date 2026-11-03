@@ -21,12 +21,21 @@ class ConversationModel {
     required this.data,
   });
 
-  factory ConversationModel.fromJson(Map<String, dynamic> json) =>
-      ConversationModel(
-        ok: json["ok"],
-        meta: Meta.fromJson(json["meta"]),
-        data: List<Datum>.from(json["data"].map((x) => Datum.fromJson(x))),
-      );
+  factory ConversationModel.fromJson(Map<String, dynamic> json) {
+    final rawData = json["data"];
+    final items = rawData is List ? rawData : const [];
+    return ConversationModel(
+      ok: json["ok"] == true,
+      meta: Meta.fromJson(
+        (json["meta"] as Map?)?.cast<String, dynamic>() ?? {},
+      ),
+      data: List<Datum>.from(
+        items.whereType<Map>().map(
+              (x) => Datum.fromJson(x.cast<String, dynamic>()),
+            ),
+      ),
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         "ok": ok,
@@ -40,6 +49,7 @@ class Datum {
   String text;
   String translation;
   String voice;
+  String? avatarId;
   int order;
   DateTime createdAt;
   DateTime updatedAt;
@@ -51,6 +61,7 @@ class Datum {
     required this.text,
     required this.translation,
     required this.voice,
+    this.avatarId,
     required this.order,
     required this.createdAt,
     required this.updatedAt,
@@ -63,18 +74,22 @@ class Datum {
         text: json["text"],
         translation: json["translation"],
         voice: json["voice"],
+        avatarId: json["avatarId"],
         order: json["order"],
         createdAt: DateTime.parse(json["createdAt"]),
         updatedAt: DateTime.parse(json["updatedAt"]),
         disabledAt: json["disabledAt"],
-        courseId: json["courseId"],
+        courseId: json["courseId"]?.toString() ?? "",
       );
+
+  bool get isDisabled => _hasDisabledAt(disabledAt);
 
   Map<String, dynamic> toJson() => {
         "id": id,
         "text": text,
         "translation": translation,
         "voice": voice,
+        "avatarId": avatarId,
         "order": order,
         "createdAt": createdAt.toIso8601String(),
         "updatedAt": updatedAt.toIso8601String(),
@@ -84,22 +99,22 @@ class Datum {
 }
 
 extension ConversationSpeaker on Datum {
-  static const mayaAvatarPath = 'assets/lottie/Talking_maya avatar.json';
-  static const robotAvatarPath = 'assets/lottie/talking-robot.json';
-
-  /// talking-robot.json → صدای آقا
+  /// صدای آقا
   bool get isMaleSpeaker {
     final v = voice.toLowerCase().trim();
     return v == 'male' || v == 'm' || v == 'man' || v.contains('robot');
   }
 
-  /// Talking_maya avatar.json → صدای خانم (هر چیزی غیر از male)
+  /// صدای خانم (هر چیزی غیر از male)
   bool get isFemaleSpeaker => !isMaleSpeaker;
 
-  String get conversationAvatarPath =>
-      isMaleSpeaker ? robotAvatarPath : mayaAvatarPath;
-
   String get playbackVoice => isMaleSpeaker ? 'male' : 'female';
+}
+
+bool _hasDisabledAt(dynamic value) {
+  if (value == null) return false;
+  if (value is String && value.trim().isEmpty) return false;
+  return true;
 }
 
 class Meta {

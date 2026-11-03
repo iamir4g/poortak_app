@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/common/services/answer_feedback_sound_service.dart';
 import 'package:poortak/common/widgets/poortak_app_bar.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
@@ -377,6 +380,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   void _showAvatarSelectionModal() {
+    unawaited(AnswerFeedbackSoundService.playPopup());
     showDialog(
       context: context,
       builder: (BuildContext context) {

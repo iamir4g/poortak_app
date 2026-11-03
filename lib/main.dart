@@ -26,6 +26,8 @@ import 'package:poortak/featueres/feature_kavoosh/screens/ebooks_screen.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/course_list_screen.dart';
 import 'package:poortak/featueres/feature_kavoosh/data/models/kavoosh_tree_type.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/video_detail_screen.dart';
+import 'package:poortak/featueres/feature_kavoosh/screens/short_video_player_screen.dart';
+import 'package:poortak/featueres/feature_kavoosh/screens/short_video_list_screen.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/book_details_screen.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/self_assessment_screen.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/self_assessment_quizzes_screen.dart';
@@ -71,6 +73,7 @@ import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_start_b
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_answer_bloc/quiz_answer_bloc.dart';
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_progress_bloc/quiz_progress_bloc.dart';
 import 'package:poortak/featueres/feature_sayareh/data/models/quiz_progress_model.dart';
+import 'package:poortak/featueres/feature_sayareh/data/models/quiz_question_model.dart';
 import 'package:poortak/featueres/feature_sayareh/screens/first_quiz_screen.dart';
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/quiz_result_bloc/quiz_result_bloc.dart';
 // For RouteAware
@@ -351,7 +354,8 @@ void main() async {
                             courseId: args['courseId'],
                             title: args['title'],
                             description: args['description'] as String?,
-                            initialQuestion: args['initialQuestion'],
+                            initialQuestion: args['initialQuestion']
+                                as QuizesQuestion?,
                           ),
                         );
                       },
@@ -406,6 +410,22 @@ void main() async {
                         return VideoDetailScreen(
                           courseId: args?['courseId']?.toString() ?? '',
                           title: args?['title']?.toString(),
+                        );
+                      },
+                      ShortVideoPlayerScreen.routeName: (context) {
+                        final args = ModalRoute.of(context)?.settings.arguments
+                            as Map<String, dynamic>?;
+                        return ShortVideoPlayerScreen(
+                          videoId: args?['videoId']?.toString() ?? '',
+                          title: args?['title']?.toString(),
+                        );
+                      },
+                      ShortVideoListScreen.routeName: (context) {
+                        final args = ModalRoute.of(context)?.settings.arguments
+                            as Map<String, dynamic>?;
+                        return ShortVideoListScreen(
+                          title: args?['title']?.toString() ?? 'ویدیوهای کوتاه',
+                          categoryId: args?['categoryId']?.toString(),
                         );
                       },
                       BookDetailsScreen.routeName: (context) {

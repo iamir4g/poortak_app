@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mocktail/mocktail.dart';
@@ -96,22 +97,27 @@ void main() {
   });
 
   Widget createWidgetUnderTest() {
-    return MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [
-        Locale('fa'),
-        Locale('en'),
-      ],
-      locale: const Locale('fa'),
-      home: BlocProvider<SettingsCubit>.value(
-        value: mockSettingsCubit,
-        child: const ConversationScreen(conversationId: "course1"),
-      ),
+    return ScreenUtilInit(
+      designSize: const Size(390, 844),
+      builder: (_, __) {
+        return MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [
+            Locale('fa'),
+            Locale('en'),
+          ],
+          locale: const Locale('fa'),
+          home: BlocProvider<SettingsCubit>.value(
+            value: mockSettingsCubit,
+            child: const ConversationScreen(conversationId: "course1"),
+          ),
+        );
+      },
     );
   }
 
@@ -160,6 +166,78 @@ void main() {
 
     // Assert
     expect(find.text(errorMessage), findsOneWidget);
+  });
+
+  testWidgets('نمایش پیام خالی وقتی مکالمه‌ای نیست', (tester) async {
+    when(() => mockSayarehRepository.fetchSayarehConversation(any()))
+        .thenAnswer(
+      (_) async => DataSuccess(
+        ConversationModel(ok: true, meta: Meta(), data: const []),
+      ),
+    );
+
+    await tester.pumpWidget(createWidgetUnderTest());
+    await tester.pump(const Duration(seconds: 1));
+
+    expect(find.text('مکالمه‌ای یافت نشد'), findsOneWidget);
+    expect(find.byIcon(Icons.play_arrow), findsNothing);
+  });
+
+  testWidgets('آیتم غیرفعال از لیست مکالمه حذف می‌شود', (tester) async {
+    final now = DateTime.now();
+    when(() => mockSayarehRepository.fetchSayarehConversation(any()))
+        .thenAnswer(
+      (_) async => DataSuccess(
+        ConversationModel(
+          ok: true,
+          meta: Meta(),
+          data: [
+            Datum(
+              id: "1",
+              text: "Hello",
+              translation: "سلام",
+              voice: "male",
+              order: 1,
+              createdAt: now,
+              updatedAt: now,
+              disabledAt: null,
+              courseId: "course1",
+            ),
+            Datum(
+              id: "2",
+              text: "Disabled line",
+              translation: "غیرفعال",
+              voice: "female",
+              order: 2,
+              createdAt: now,
+              updatedAt: now,
+              disabledAt: now.toIso8601String(),
+              courseId: "course1",
+            ),
+          ],
+        ),
+      ),
+    );
+
+    await tester.pumpWidget(createWidgetUnderTest());
+    await tester.pump(const Duration(seconds: 1));
+
+    expect(find.text("Hello"), findsOneWidget);
+    expect(find.text("Disabled line"), findsNothing);
+  });
+
+  testWidgets('نمایش خطای دسترسی وقتی مکالمه خریداری نشده', (tester) async {
+    const errorMessage = "برای مشاهده مکالمه باید این درس را خریده باشید.";
+    when(() => mockSayarehRepository.fetchSayarehConversation(any()))
+        .thenAnswer(
+      (_) async => DataFailed(errorMessage, errorCode: 'forbidden'),
+    );
+
+    await tester.pumpWidget(createWidgetUnderTest());
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pump();
+
+    expect(find.text(errorMessage), findsWidgets);
   });
 
   testWidgets('پخش صدای پیام با کلیک روی آن', (tester) async {

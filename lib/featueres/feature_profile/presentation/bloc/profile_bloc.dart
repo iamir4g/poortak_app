@@ -48,24 +48,24 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       LoginWithOtpEvent event, Emitter<ProfileState> emit) async {
     emit(ProfileLoading());
     try {
-      log("🔄 Starting login process for mobile: ${event.mobile}");
+      log("🔄 Starting login process for phone: ${event.phone}");
       final response =
-          await repository.callLoginWithOtp(event.otp, event.mobile);
+          await repository.callLoginWithOtp(event.otp, event.phone);
       log("📡 Login Response: $response");
 
       if (response is DataSuccess) {
         if (response.data != null) {
           final loginData = response.data!;
           log("✅ Login successful! Saving user data...");
-          log("📱 User mobile: ${event.mobile}");
+          log("📱 User phone: ${event.phone}");
           log("🔑 Access token: ${loginData.data.result.accessToken.substring(0, 20)}...");
           log("🔄 Refresh token: ${loginData.data.result.refreshToken.substring(0, 20)}...");
 
           await prefsOperator.saveUserData(
             loginData.data.result.accessToken,
             loginData.data.result.refreshToken,
-            event.mobile,
-            event.mobile,
+            event.phone,
+            event.phone,
           );
           log("💾 User data saved successfully to local storage");
 

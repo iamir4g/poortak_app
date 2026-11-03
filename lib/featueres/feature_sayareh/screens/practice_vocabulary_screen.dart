@@ -292,6 +292,7 @@ class _PracticeVocabularyScreenState extends State<PracticeVocabularyScreen> {
     if (_hasShownResultModal || !mounted) return;
     _hasShownResultModal = true;
 
+    unawaited(AnswerFeedbackSoundService.playPopup());
     showDialog(
       context: context,
       barrierDismissible: false,

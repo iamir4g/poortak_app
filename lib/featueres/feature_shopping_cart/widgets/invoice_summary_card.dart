@@ -3,17 +3,21 @@ import 'package:poortak/common/utils/money_utils.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
+import 'package:poortak/featueres/feature_sayareh/data/models/iknow_package_pricing.dart';
+import 'package:poortak/featueres/feature_sayareh/widgets/iknow_package_breakdown.dart';
 
 class InvoiceSummaryCard extends StatelessWidget {
   final int subTotal;
   final int discount;
   final int payable;
+  final IKnowPackagePricing? packagePricing;
 
   const InvoiceSummaryCard({
     super.key,
     required this.subTotal,
     required this.discount,
     required this.payable,
+    this.packagePricing,
   });
 
   @override
@@ -90,6 +94,15 @@ class InvoiceSummaryCard extends StatelessWidget {
                 ),
               ),
             ),
+            if (packagePricing != null &&
+                (packagePricing!.ownedItems.isNotEmpty ||
+                    packagePricing!.appliedDeduction > 0)) ...[
+              SizedBox(height: Dimens.nh(12)),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: Dimens.medium),
+                child: IKnowOwnedItemsCaption(pricing: packagePricing!),
+              ),
+            ],
             SizedBox(height: Dimens.nh(12)),
             Container(
               width: double.infinity,

@@ -30,11 +30,17 @@ class LitnerMainScreen extends StatefulWidget {
 
 class _LitnerMainScreenState extends State<LitnerMainScreen> with RouteAware {
   final PrefsOperator prefsOperator = locator<PrefsOperator>();
+  final AuthNavigationManager _authNavigationManager = AuthNavigationManager();
+  late final VoidCallback _authNavigationListener;
   bool isLoggedIn = false;
 
   @override
   void initState() {
     super.initState();
+    _authNavigationListener = () {
+      _checkLoginStatus();
+    };
+    _authNavigationManager.addListener(_authNavigationListener);
     _checkLoginStatus();
     context.read<LitnerBloc>().add(FetchOverviewLitnerEvent());
   }
@@ -47,6 +53,7 @@ class _LitnerMainScreenState extends State<LitnerMainScreen> with RouteAware {
 
   @override
   void dispose() {
+    _authNavigationManager.removeListener(_authNavigationListener);
     routeObserver.unsubscribe(this);
     super.dispose();
   }

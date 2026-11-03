@@ -20,10 +20,12 @@ class AuthNavigationManager {
   final List<VoidCallback> _listeners = [];
   AuthNavigationRequest? _pendingRequest;
   int? _requestedTabIndex;
+  bool _sessionExpiredLogoutRequested = false;
 
   AuthNavigationRequest? get pendingRequest => _pendingRequest;
   int? get pendingReturnTabIndex => _pendingRequest?.returnTabIndex;
   int? get requestedTabIndex => _requestedTabIndex;
+  bool get sessionExpiredLogoutRequested => _sessionExpiredLogoutRequested;
 
   void requestLoginAndReturn({
     required int returnTabIndex,
@@ -43,12 +45,21 @@ class AuthNavigationManager {
     _notify();
   }
 
+  void requestSessionExpiredLogout() {
+    _sessionExpiredLogoutRequested = true;
+    _notify();
+  }
+
   void clearPendingRequest() {
     _pendingRequest = null;
   }
 
   void clearRequestedTab() {
     _requestedTabIndex = null;
+  }
+
+  void clearSessionExpiredLogout() {
+    _sessionExpiredLogoutRequested = false;
   }
 
   void addListener(VoidCallback listener) {

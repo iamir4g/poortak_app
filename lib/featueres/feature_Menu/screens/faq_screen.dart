@@ -231,7 +231,8 @@ class _FAQScreenState extends State<FAQScreen> {
       ),
       child: Column(
         children: [
-          InkWell(
+          GestureDetector(
+            behavior: HitTestBehavior.opaque,
             onTap: () {
               context.read<FaqBloc>().add(
                     ToggleFaqExpansionEvent(id: faqItem.id),

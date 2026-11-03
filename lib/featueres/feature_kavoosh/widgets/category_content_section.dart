@@ -6,8 +6,11 @@ import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/featueres/feature_kavoosh/data/models/category_nodes_summary_model.dart';
 import 'package:poortak/featueres/feature_kavoosh/data/models/kavoosh_tree_type.dart';
 import 'package:poortak/featueres/feature_kavoosh/repositories/kavoosh_repository.dart';
+import 'package:poortak/featueres/feature_kavoosh/data/models/short_video_model.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/book_details_screen.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/course_list_screen.dart';
+import 'package:poortak/featueres/feature_kavoosh/screens/short_video_list_screen.dart';
+import 'package:poortak/featueres/feature_kavoosh/screens/short_video_player_screen.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/video_detail_screen.dart';
 import 'package:poortak/featueres/feature_kavoosh/widgets/course_card.dart';
 import 'package:poortak/featueres/feature_kavoosh/widgets/section_header.dart';
@@ -19,12 +22,14 @@ class CategoryContentSection extends StatefulWidget {
   final CategoryNodeSummary section;
   final KavooshTreeType treeType;
   final String seeAllTitlePrefix;
+  final bool isShortVideo;
 
   const CategoryContentSection({
     super.key,
     required this.section,
     required this.treeType,
     required this.seeAllTitlePrefix,
+    this.isShortVideo = false,
   });
 
   @override
@@ -58,9 +63,16 @@ class _CategoryContentSectionState extends State<CategoryContentSection> {
   void didUpdateWidget(covariant CategoryContentSection oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.section.id != widget.section.id ||
-        oldWidget.treeType != widget.treeType) {
+        oldWidget.treeType != widget.treeType ||
+        oldWidget.isShortVideo != widget.isShortVideo) {
       _load();
     }
+  }
+
+  String? get _shortVideoCategoryId {
+    final id = widget.section.id;
+    if (id.isEmpty || widget.section.isInjectedShortsTab) return null;
+    return id;
   }
 
   Future<void> _load() async {
@@ -69,6 +81,38 @@ class _CategoryContentSectionState extends State<CategoryContentSection> {
       _error = null;
       _items = const [];
     });
+
+    if (widget.isShortVideo) {
+      final shortsResult = await _repository.fetchShortVideos(
+        categoryId: _shortVideoCategoryId,
+        size: _previewSize,
+        page: 1,
+      );
+
+      if (!mounted) return;
+
+      if (shortsResult is DataFailed) {
+        setState(() {
+          _loading = false;
+          _error = shortsResult.error;
+        });
+        return;
+      }
+
+      final page =
+          (shortsResult as DataSuccess<ShortVideoPage>).data;
+      setState(() {
+        _items = (page?.items ?? const [])
+            .map((item) => <String, dynamic>{
+                  'id': item.id,
+                  'title': item.title,
+                  'thumbnailId': item.thumbnailId,
+                })
+            .toList();
+        _loading = false;
+      });
+      return;
+    }
 
     final itemsResult = await _repository.fetchCategoryItems(
       treeType: widget.treeType,
@@ -98,12 +142,33 @@ class _CategoryContentSectionState extends State<CategoryContentSection> {
     });
   }
 
+  String get _seeAllTitle {
+    final prefix = widget.seeAllTitlePrefix.trim();
+    final title = widget.section.title.trim();
+    if (prefix.isEmpty || title.contains(prefix) || prefix.contains(title)) {
+      return title.isEmpty ? prefix : title;
+    }
+    return '$prefix $title'.trim();
+  }
+
   void _openCourseList() {
+    if (widget.isShortVideo) {
+      Navigator.pushNamed(
+        context,
+        ShortVideoListScreen.routeName,
+        arguments: {
+          'title': _seeAllTitle,
+          'categoryId': _shortVideoCategoryId,
+        },
+      );
+      return;
+    }
+
     Navigator.pushNamed(
       context,
       CourseListScreen.routeName,
       arguments: {
-        'title': '${widget.seeAllTitlePrefix} ${widget.section.title}'.trim(),
+        'title': _seeAllTitle,
         'categoryId': widget.section.id,
         'treeType': widget.treeType,
         if (widget.treeType == KavooshTreeType.book) 'type': 'book',
@@ -115,6 +180,15 @@ class _CategoryContentSectionState extends State<CategoryContentSection> {
     final id = item['id']?.toString() ?? '';
     final title = item['title']?.toString() ?? '';
     if (id.isEmpty) return;
+
+    if (widget.isShortVideo) {
+      ShortVideoPlayerScreen.open(
+        context,
+        videoId: id,
+        title: title,
+      );
+      return;
+    }
 
     if (widget.treeType == KavooshTreeType.book) {
       Navigator.pushNamed(
@@ -170,7 +244,8 @@ class _CategoryContentSectionState extends State<CategoryContentSection> {
                   title: item['title']?.toString() ?? '',
                   thumbnailId: item['thumbnailId']?.toString(),
                   backgroundColor: _cardColors[index % _cardColors.length],
-                  showPlayBadge: widget.treeType == KavooshTreeType.video,
+                  showPlayBadge: widget.isShortVideo ||
+                      widget.treeType == KavooshTreeType.video,
                   onTap: () => _openItemDetail(item),
                 );
               },

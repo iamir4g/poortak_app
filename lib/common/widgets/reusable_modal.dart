@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
+import 'package:poortak/common/services/answer_feedback_sound_service.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
@@ -68,19 +71,19 @@ class ReusableModal extends StatelessWidget {
 
     return Dialog(
       backgroundColor: Colors.transparent,
+      insetPadding: EdgeInsets.symmetric(horizontal: Dimens.nw(22)),
       child: Container(
-        width: 0.9.sw,
-        constraints: BoxConstraints(maxWidth: 350.w),
+        width: Dimens.nw(350),
+        height: Dimens.nh(365),
         decoration: BoxDecoration(
           color: modalBackgroundColor,
-          borderRadius: BorderRadius.circular(20.r),
+          borderRadius: BorderRadius.circular(Dimens.nr(20)),
         ),
         child: Stack(
           children: [
             Padding(
               padding: EdgeInsets.symmetric(vertical: Dimens.large),
               child: Column(
-                mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -358,8 +361,6 @@ class ReusableModal extends StatelessWidget {
               child: Column(
                 children: [
                   _buildCartActionButton(
-                    context: context,
-                    isDarkMode: isDarkMode,
                     text: buttonText,
                     onTap: onPrimaryTap,
                     textStyle: TextStyle(
@@ -372,8 +373,6 @@ class ReusableModal extends StatelessWidget {
                   if (showSecondButton && secondButtonText != null) ...[
                     SizedBox(height: 10.h),
                     _buildCartActionButton(
-                      context: context,
-                      isDarkMode: isDarkMode,
                       text: secondButtonText!,
                       onTap: onSecondaryTap,
                       textStyle: TextStyle(
@@ -396,8 +395,6 @@ class ReusableModal extends StatelessWidget {
   }
 
   Widget _buildCartActionButton({
-    required BuildContext context,
-    required bool isDarkMode,
     required String text,
     required VoidCallback onTap,
     required TextStyle textStyle,
@@ -407,15 +404,9 @@ class ReusableModal extends StatelessWidget {
       width: double.infinity,
       child: Material(
         color: Colors.transparent,
-        child: InkWell(
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
           onTap: onTap,
-          hoverColor: Colors.transparent,
-          splashColor: isDarkMode
-              ? Colors.transparent
-              : MyColors.modalButtonPressedLight,
-          highlightColor: isDarkMode
-              ? Colors.transparent
-              : MyColors.modalButtonPressedLight,
           child: Center(
             child: Padding(
               padding: EdgeInsets.symmetric(vertical: 14.h),
@@ -497,7 +488,7 @@ class ReusableModal extends StatelessWidget {
     );
   }
 
-  static void showSuccess({
+  static Future<T?> showSuccess<T>({
     required BuildContext context,
     required String title,
     required String message,
@@ -508,8 +499,9 @@ class ReusableModal extends StatelessWidget {
     bool showSecondButton = false,
     bool cartSuccessStyle = false,
     String? customLottiePath,
+    bool animatedEntrance = false,
   }) {
-    show(
+    return show(
       context: context,
       title: title,
       message: message,
@@ -521,6 +513,7 @@ class ReusableModal extends StatelessWidget {
       showSecondButton: showSecondButton,
       cartSuccessStyle: cartSuccessStyle,
       customLottiePath: customLottiePath,
+      animatedEntrance: animatedEntrance,
     );
   }
 
@@ -581,24 +574,74 @@ class ReusableModal extends StatelessWidget {
     String? customImagePath,
     String? customLottiePath,
     bool cartSuccessStyle = false,
+    bool animatedEntrance = false,
   }) {
-    return showDialog<T>(
+    unawaited(AnswerFeedbackSoundService.playPopup());
+
+    Widget buildModal(BuildContext dialogContext) {
+      return ReusableModal(
+        title: title,
+        message: message,
+        buttonText: buttonText,
+        type: type,
+        onButtonPressed:
+            onButtonPressed ?? () => Navigator.of(dialogContext).pop(),
+        secondButtonText: secondButtonText,
+        onSecondButtonPressed: onSecondButtonPressed,
+        showSecondButton: showSecondButton,
+        showCloseButton: showCloseButton,
+        customImagePath: customImagePath,
+        customLottiePath: customLottiePath,
+        cartSuccessStyle: cartSuccessStyle,
+      );
+    }
+
+    if (!animatedEntrance) {
+      return showDialog<T>(
+        context: context,
+        barrierDismissible: barrierDismissible,
+        builder: buildModal,
+      );
+    }
+
+    final capturedThemes = InheritedTheme.capture(
+      from: context,
+      to: Navigator.of(context, rootNavigator: true).context,
+    );
+
+    return showGeneralDialog<T>(
       context: context,
       barrierDismissible: barrierDismissible,
-      builder: (BuildContext context) {
-        return ReusableModal(
-          title: title,
-          message: message,
-          buttonText: buttonText,
-          type: type,
-          onButtonPressed: onButtonPressed ?? () => Navigator.of(context).pop(),
-          secondButtonText: secondButtonText,
-          onSecondButtonPressed: onSecondButtonPressed,
-          showSecondButton: showSecondButton,
-          showCloseButton: showCloseButton,
-          customImagePath: customImagePath,
-          customLottiePath: customLottiePath,
-          cartSuccessStyle: cartSuccessStyle,
+      barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+      barrierColor: Colors.black.withValues(alpha: 0.54),
+      transitionDuration: const Duration(milliseconds: 520),
+      pageBuilder: (dialogContext, animation, secondaryAnimation) {
+        return capturedThemes.wrap(buildModal(dialogContext));
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        final fade = CurvedAnimation(
+          parent: animation,
+          curve: const Interval(0.0, 0.6, curve: Curves.easeOut),
+          reverseCurve: Curves.easeIn,
+        );
+        final appear = CurvedAnimation(
+          parent: animation,
+          curve: Curves.easeOutBack,
+          reverseCurve: Curves.easeInCubic,
+        );
+
+        return FadeTransition(
+          opacity: fade,
+          child: SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(0, 0.08),
+              end: Offset.zero,
+            ).animate(appear),
+            child: ScaleTransition(
+              scale: Tween<double>(begin: 0.84, end: 1.0).animate(appear),
+              child: child,
+            ),
+          ),
         );
       },
     );

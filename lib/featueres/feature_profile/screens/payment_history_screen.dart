@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/common/services/answer_feedback_sound_service.dart';
 import 'package:poortak/common/utils/date_util.dart';
 import 'package:poortak/common/utils/digit_utils.dart';
 import 'package:poortak/common/widgets/poortak_app_bar.dart';
@@ -205,6 +208,7 @@ class _PaymentHistoryScreenState extends State<PaymentHistoryScreen> {
   void _onPaymentCardTap(payment) {
     // Handle payment card tap - you can navigate to payment details
     // or show a bottom sheet with more details
+    unawaited(AnswerFeedbackSoundService.playPopup());
     showModalBottomSheet(
       context: context,
       builder: (context) => Container(

@@ -28,7 +28,10 @@ class ConverstionBloc extends Bloc<ConverstionEvent, ConverstionState> {
 
         emit(ConverstionSuccess(response.data!, lastConversationId: lastId));
       } else {
-        emit(ConverstionError(response.error ?? "خطا در دریافت اطلاعات"));
+        emit(ConverstionError(
+          response.error ?? "خطا در دریافت اطلاعات",
+          errorCode: response.errorCode,
+        ));
       }
     });
 

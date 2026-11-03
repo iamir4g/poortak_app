@@ -105,6 +105,7 @@ class ShoppingCartRepository {
             'discountType': cartItem.source.discountType,
             'discountAmount': cartItem.source.discountAmount,
           },
+          packagePricing: cartItem.pricing,
         );
 
         shoppingCartItems.add(shoppingCartItem);
@@ -220,22 +221,29 @@ class ShoppingCartRepository {
     }
   }
 
-  Future<String> checkoutCart() async {
+  Future<CheckoutData> checkoutCart({bool allowOnBazaar = false}) async {
     log("💳 Checking out cart...");
     try {
-      final response = await _apiProvider.checkoutCart();
+      final response = await _apiProvider.checkoutCart(
+        allowOnBazaar: allowOnBazaar,
+      );
       log("📦 Checkout response received");
 
-      // Parse the checkout response
-      final checkoutModel = CheckoutCartModel.fromJson(response.data);
-      log("📊 Checkout successful: ${checkoutModel.ok}");
-
-      if (checkoutModel.ok && checkoutModel.data != null) {
-        log("🔗 Payment URL: ${checkoutModel.data!.url}");
-        return checkoutModel.data!.url;
-      } else {
+      final raw = response.data;
+      if (raw is! Map) {
         throw Exception('Checkout failed: Invalid response from server');
       }
+      final checkoutModel = CheckoutCartModel.fromJson(
+        Map<String, dynamic>.from(raw),
+      );
+      log("📊 Checkout successful: ${checkoutModel.ok} "
+          "isFree=${checkoutModel.data?.isFree} "
+          "amount=${checkoutModel.data?.amount}");
+
+      if (checkoutModel.ok && checkoutModel.data != null) {
+        return checkoutModel.data!;
+      }
+      throw Exception('Checkout failed: Invalid response from server');
     } catch (e) {
       log("❌ Error during checkout: $e");
       rethrow;

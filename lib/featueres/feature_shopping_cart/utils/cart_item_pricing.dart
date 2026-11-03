@@ -93,6 +93,16 @@ CartItemPricing resolveCartItemPricing({
 }
 
 CartItemPricing resolveServerCartItemPricing(ShoppingCartItem item) {
+  final package = item.packagePricing;
+  if (package != null) {
+    final payable = package.payablePriceToman;
+    final original = package.basePriceToman;
+    final hasDiscount = original > payable;
+    return CartItemPricing(
+      finalPriceToman: payable,
+      originalPriceToman: hasDiscount ? original : null,
+    );
+  }
   return resolveCartItemPricing(
     finalPriceToman: item.price,
     source: item.source,
@@ -112,11 +122,34 @@ class CartTotals {
 }
 
 CartTotals resolveCartTotals(ShoppingCart cart) {
-  final payable = cart.grandTotal ??
-      cart.items.fold<int>(
-        0,
-        (sum, item) => sum + resolveServerCartItemPricing(item).finalPriceToman,
+  final hasServerPayable = cart.grandTotal != null;
+  final payable = hasServerPayable
+      ? cart.grandTotal!
+      : cart.items.fold<int>(
+          0,
+          (sum, item) =>
+              sum + resolveServerCartItemPricing(item).finalPriceToman,
+        );
+
+  if (hasServerPayable) {
+    final package = cart.iknowPackagePricing;
+    if (package != null) {
+      final base = package.basePriceToman;
+      final subTotal = base > payable ? base : (cart.subTotal ?? payable);
+      return CartTotals(
+        subTotal: subTotal,
+        discount: (subTotal - payable).clamp(0, subTotal),
+        payable: payable,
       );
+    }
+
+    final serverSubTotal = cart.subTotal ?? payable;
+    return CartTotals(
+      subTotal: serverSubTotal,
+      discount: (serverSubTotal - payable).clamp(0, serverSubTotal),
+      payable: payable,
+    );
+  }
 
   final originalSubTotal = cart.items.fold<int>(
     0,

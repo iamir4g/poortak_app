@@ -101,6 +101,7 @@ class _ReviewedVocabulariesScreenState
 
     if (response is DataSuccess && response.data != null) {
       final items = response.data!.data
+          .where((vocabulary) => !vocabulary.isDisabled)
           .map(
             (vocabulary) => ReviewedVocabulary(
               word: _wordFromVocabulary(vocabulary),

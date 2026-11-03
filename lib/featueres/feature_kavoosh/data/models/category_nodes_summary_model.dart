@@ -35,10 +35,40 @@ class CategoryNodeSummary {
   final String? backgroundImageId;
   final int courseCount;
   final int bookCount;
+  final int shortVideoCount;
 
   /// Present on detail endpoint; null means root.
   final String? parentId;
   final List<CategoryNodeSummary> children;
+
+  static const injectedShortsTabId = '__injected_short_videos__';
+
+  bool get looksLikeShortsTab => title.contains('کوتاه');
+
+  bool get isInjectedShortsTab => id == injectedShortsTabId;
+
+  bool get isShortsTab => looksLikeShortsTab || isInjectedShortsTab;
+
+  int get subtreeShortVideoCount =>
+      shortVideoCount +
+      children.fold<int>(
+        0,
+        (sum, child) => sum + child.subtreeShortVideoCount,
+      );
+
+  factory CategoryNodeSummary.injectedShorts({required int shortVideoCount}) {
+    return CategoryNodeSummary(
+      id: injectedShortsTabId,
+      title: 'ویدیوهای کوتاه',
+      description: '',
+      type: 'VIDEO',
+      order: 999,
+      courseCount: 0,
+      bookCount: 0,
+      shortVideoCount: shortVideoCount,
+      children: const [],
+    );
+  }
 
   CategoryNodeSummary({
     required this.id,
@@ -49,6 +79,7 @@ class CategoryNodeSummary {
     required this.courseCount,
     required this.bookCount,
     required this.children,
+    this.shortVideoCount = 0,
     this.thumbnailId,
     this.backgroundImageId,
     this.parentId,
@@ -65,6 +96,7 @@ class CategoryNodeSummary {
       backgroundImageId: _asNullableString(json['backgroundImageId']),
       courseCount: _asInt(json['courseCount']),
       bookCount: _asInt(json['bookCount']),
+      shortVideoCount: _asInt(json['shortVideoCount']),
       parentId: _asNullableString(json['parentId']),
       children: (json['children'] as List? ?? [])
           .map((e) =>

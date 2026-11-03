@@ -126,7 +126,7 @@ class _LoginScreenState extends State<LoginScreen> {
           if (mobileNumber != null && otp.length == _otpLength) {
             context.read<ProfileBloc>().add(
                   LoginWithOtpEvent(
-                    mobile: _localMobileFromInput(mobileNumber!),
+                    phone: _localMobileFromInput(mobileNumber!),
                     otp: otp,
                   ),
                 );
@@ -740,8 +740,8 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Material(
             color: MyColors.primary,
             borderRadius: BorderRadius.circular(20.r),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(20.r),
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
               onTap: () {
                 if (showOtpForm) {
                   final otp = normalizeOtpForServer(
@@ -751,7 +751,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   if (otp.length == _otpLength && mobileNumber != null) {
                     context.read<ProfileBloc>().add(
                           LoginWithOtpEvent(
-                            mobile: _localMobileFromInput(mobileNumber!),
+                            phone: _localMobileFromInput(mobileNumber!),
                             otp: otp,
                           ),
                         );

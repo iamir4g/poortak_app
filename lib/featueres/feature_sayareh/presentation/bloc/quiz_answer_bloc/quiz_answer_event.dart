@@ -12,16 +12,19 @@ class SubmitAnswerEvent extends QuizAnswerEvent {
   final String quizId;
   final String questionId;
   final String answerId;
+  final String? questionQuizId;
 
   const SubmitAnswerEvent({
     required this.courseId,
     required this.quizId,
     required this.questionId,
     required this.answerId,
+    this.questionQuizId,
   });
 
   @override
-  List<Object> get props => [courseId, quizId, questionId, answerId];
+  List<Object> get props =>
+      [courseId, quizId, questionId, answerId, questionQuizId ?? ''];
 }
 
 class ResetQuizAnswerEvent extends QuizAnswerEvent {

@@ -323,10 +323,9 @@ class BottomNav extends StatelessWidget {
         return Expanded(
           child: Material(
             color: Colors.transparent,
-            child: InkWell(
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
               onTap: () => onTabSelected(index),
-              splashColor: MyColors.primary.withOpacity(0.08),
-              highlightColor: MyColors.primary.withOpacity(0.04),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,

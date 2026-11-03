@@ -59,8 +59,8 @@ class PrefsOperator {
 
   Future<void> logout() async {
     log("🚪 Logging out - clearing SharedPreferences");
-    sharedPreferences.clear();
-    sharedPreferences.setBool("showIntro", false);
+    await sharedPreferences.clear();
+    await sharedPreferences.setBool("showIntro", false);
     log("✅ Logout completed");
   }
 

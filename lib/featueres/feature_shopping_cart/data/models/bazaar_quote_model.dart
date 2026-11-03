@@ -1,4 +1,5 @@
 import 'package:poortak/common/utils/money_utils.dart';
+import 'package:poortak/featueres/feature_sayareh/data/models/iknow_package_pricing.dart';
 
 class BazaarQuoteModel {
   final bool ok;
@@ -29,6 +30,8 @@ class BazaarQuoteData {
   final int finalPrice;
   final int remainingPoints;
   final int pointValueInRials;
+  final int ownershipDeduction;
+  final List<OwnedIKnowItem> ownedItems;
 
   const BazaarQuoteData({
     required this.nonce,
@@ -40,9 +43,12 @@ class BazaarQuoteData {
     required this.finalPrice,
     required this.remainingPoints,
     required this.pointValueInRials,
+    this.ownershipDeduction = 0,
+    this.ownedItems = const [],
   });
 
   factory BazaarQuoteData.fromJson(Map<String, dynamic> json) {
+    final ownedRaw = json['ownedItems'];
     return BazaarQuoteData(
       nonce: json['nonce']?.toString() ?? '',
       token: json['token']?.toString() ?? '',
@@ -55,6 +61,17 @@ class BazaarQuoteData {
       finalPrice: MoneyUtils.parseRial(json['finalPrice']),
       remainingPoints: MoneyUtils.parseRial(json['remainingPoints']),
       pointValueInRials: MoneyUtils.parseRial(json['pointValueInRials']),
+      ownershipDeduction: MoneyUtils.parseRial(json['ownershipDeduction']),
+      ownedItems: ownedRaw is List
+          ? ownedRaw
+              .whereType<Map>()
+              .map(
+                (item) => OwnedIKnowItem.fromJson(
+                  Map<String, dynamic>.from(item),
+                ),
+              )
+              .toList()
+          : const [],
     );
   }
 

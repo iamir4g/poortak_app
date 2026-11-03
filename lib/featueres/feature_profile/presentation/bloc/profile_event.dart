@@ -8,9 +8,9 @@ class RequestOtpEvent extends ProfileEvent {
 }
 
 class LoginWithOtpEvent extends ProfileEvent {
-  final String mobile;
+  final String phone;
   final String otp;
-  LoginWithOtpEvent({required this.mobile, required this.otp});
+  LoginWithOtpEvent({required this.phone, required this.otp});
 }
 
 class GetMeProfileEvent extends ProfileEvent {}

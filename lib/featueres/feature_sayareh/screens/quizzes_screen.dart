@@ -183,7 +183,8 @@ class QuizItem extends StatelessWidget {
     final titleColor = isDark ? MyColors.darkTextPrimary : MyColors.textMatn1;
     final width = 350.w;
 
-    return InkWell(
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: onTap,
       child: Container(
         width: width,

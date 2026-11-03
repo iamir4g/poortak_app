@@ -37,8 +37,8 @@ class ProfileActionCard extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         borderRadius: BorderRadius.circular(Dimens.nr(22)),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(Dimens.nr(22)),
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
           onTap: onTap,
           child: Container(
             padding: EdgeInsets.symmetric(horizontal: Dimens.nw(24)),

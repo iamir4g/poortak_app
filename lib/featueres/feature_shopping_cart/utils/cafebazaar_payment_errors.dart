@@ -11,6 +11,7 @@ class CafeBazaarPaymentErrors {
   static const dynamicPriceInvalid = 'cafebazaarDynamicPriceInvalid';
   static const tokenAlreadyUsed = 'cafebazaarTokenAlreadyUsed';
   static const verificationFailed = 'cafebazaarVerificationFailed';
+  static const freePurchase = 'cafebazaarFreePurchase';
 
   static const knownCodes = <String>{
     insufficientPoints,
@@ -20,6 +21,7 @@ class CafeBazaarPaymentErrors {
     dynamicPriceInvalid,
     tokenAlreadyUsed,
     verificationFailed,
+    freePurchase,
   };
 
   static String? extractCode(dynamic responseData) {
@@ -78,6 +80,8 @@ class CafeBazaarPaymentErrors {
         return 'این خرید قبلاً ثبت شده است';
       case verificationFailed:
         return 'تأیید خرید از بازار ناموفق بود';
+      case freePurchase:
+        return 'این مجموعه رایگان است و از طریق سبد خرید تکمیل می‌شود';
       default:
         return fallback ?? 'خطا در پرداخت بازار';
     }

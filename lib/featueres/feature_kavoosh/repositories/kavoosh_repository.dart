@@ -5,6 +5,7 @@ import 'package:poortak/featueres/feature_kavoosh/data/models/category_nodes_sum
 import 'package:poortak/featueres/feature_kavoosh/data/models/kavoosh_book_detail_model.dart';
 import 'package:poortak/featueres/feature_kavoosh/data/models/kavoosh_tree_type.dart';
 import 'package:poortak/featueres/feature_kavoosh/data/models/quiz_models.dart';
+import 'package:poortak/featueres/feature_kavoosh/data/models/short_video_model.dart';
 import 'package:poortak/featueres/feature_kavoosh/data/models/video_course_detail_model.dart';
 
 class KavooshRepository {
@@ -139,6 +140,130 @@ class KavooshRepository {
       ));
     } on DioException catch (e) {
       return DataFailed(_dioErrorMessage(e, "خطا در دریافت لیست محتوا"));
+    } catch (e) {
+      return DataFailed(e.toString());
+    }
+  }
+
+  Future<DataState<ShortVideoPage>> fetchShortVideos({
+    String? categoryId,
+    int size = 20,
+    int page = 1,
+    String order = 'asc',
+    String query = '',
+  }) async {
+    try {
+      final response = await apiProvider.callGetShortVideos(
+        categoryId: categoryId,
+        size: size,
+        page: page,
+        order: order,
+        query: query.isEmpty ? null : query,
+      );
+
+      if (_isHttpFailure(response.statusCode)) {
+        return DataFailed(_errorMessage(
+          response.data,
+          fallback: "خطا در دریافت ویدیوهای کوتاه",
+        ));
+      }
+
+      final data = response.data;
+      if (data is Map<String, dynamic> && data['ok'] == true) {
+        final items = data['data'];
+        final meta = data['meta'];
+        final count = meta is Map ? _asInt(meta['count']) : 0;
+        final parsed = items is List
+            ? items
+                .whereType<Map>()
+                .map((e) =>
+                    ShortVideoSummary.fromJson(e.cast<String, dynamic>()))
+                .toList()
+            : <ShortVideoSummary>[];
+        return DataSuccess(ShortVideoPage(
+          items: parsed,
+          totalCount: count,
+        ));
+      }
+
+      return DataFailed(_errorMessage(
+        data,
+        fallback: "خطا در دریافت ویدیوهای کوتاه",
+      ));
+    } on DioException catch (e) {
+      return DataFailed(_dioErrorMessage(e, "خطا در دریافت ویدیوهای کوتاه"));
+    } catch (e) {
+      return DataFailed(e.toString());
+    }
+  }
+
+  Future<DataState<ShortVideoDetail>> fetchShortVideoDetail({
+    required String shortVideoId,
+  }) async {
+    try {
+      final response = await apiProvider.callGetShortVideoById(
+        shortVideoId: shortVideoId,
+      );
+
+      if (_isHttpFailure(response.statusCode)) {
+        return DataFailed(_errorMessage(
+          response.data,
+          fallback: "ویدیو کوتاه یافت نشد",
+        ));
+      }
+
+      final data = response.data;
+      if (data is Map<String, dynamic> && data['ok'] == true) {
+        final payload = data['data'];
+        if (payload is Map) {
+          return DataSuccess(
+            ShortVideoDetail.fromJson(payload.cast<String, dynamic>()),
+          );
+        }
+        return const DataFailed("فرمت پاسخ سرور نامعتبر است");
+      }
+
+      return DataFailed(_errorMessage(
+        data,
+        fallback: "ویدیو کوتاه یافت نشد",
+      ));
+    } on DioException catch (e) {
+      return DataFailed(_dioErrorMessage(e, "ویدیو کوتاه یافت نشد"));
+    } catch (e) {
+      return DataFailed(e.toString());
+    }
+  }
+
+  Future<DataState<String>> fetchShortVideoDownloadUrl({
+    required String shortVideoId,
+  }) async {
+    try {
+      final response = await apiProvider.callGetShortVideoDownload(
+        shortVideoId: shortVideoId,
+      );
+
+      if (_isHttpFailure(response.statusCode)) {
+        return DataFailed(_errorMessage(
+          response.data,
+          fallback: "ویدیو کوتاه یافت نشد",
+        ));
+      }
+
+      final data = response.data;
+      if (data is Map && data['ok'] == true && data['data'] is String) {
+        final url = (data['data'] as String).trim();
+        if (url.isEmpty) {
+          return const DataFailed("آدرس پخش ویدیو نامعتبر است");
+        }
+        return DataSuccess(url);
+      }
+
+      return DataFailed(_errorMessage(
+        data,
+        fallback: "خطا در دریافت آدرس پخش",
+      ));
+    } on DioException catch (e) {
+      return DataFailed(_dioErrorMessage(e, "خطا در دریافت آدرس پخش"));
     } catch (e) {
       return DataFailed(e.toString());
     }
@@ -479,6 +604,11 @@ class KavooshRepository {
 
   String _errorMessage(dynamic data, {required String fallback}) {
     return _parseMessage(data) ?? fallback;
+  }
+
+  int _asInt(dynamic value) {
+    if (value is int) return value;
+    return int.tryParse(value?.toString() ?? '') ?? 0;
   }
 
   String? _parseMessage(dynamic data) {

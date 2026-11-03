@@ -51,8 +51,8 @@ class _PressableCircleState extends State<PressableCircle> {
       child: Material(
         color: bg,
         shape: const CircleBorder(),
-        child: InkWell(
-          customBorder: const CircleBorder(),
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
           onTap: widget.enabled ? widget.onTap : null,
           onTapDown: widget.enabled ? (_) => _setPressed(true) : null,
           onTapCancel: widget.enabled ? () => _setPressed(false) : null,

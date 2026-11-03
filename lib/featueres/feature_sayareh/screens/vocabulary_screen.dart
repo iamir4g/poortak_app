@@ -286,6 +286,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                         style: MyTextStyle.textMatn16.copyWith(
                           color: primaryTextColor,
                         ),
+                        textAlign: TextAlign.center,
                       ),
                     );
                   }
@@ -388,22 +389,24 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                                   ),
                                   SizedBox(height: Dimens.nh(20)),
                                   Text(
-                                    toEnglishDigits(currentWord.word),
+                                    localizeDigits(currentWord.word),
                                     style: MyTextStyle.textMatn18Bold.copyWith(
-                                      fontSize: FontSizeHelper.getScaledFontSize(
-                                          context, 24.sp),
+                                      fontSize:
+                                          FontSizeHelper.getScaledFontSize(
+                                              context, 24.sp),
                                       color: primaryTextColor,
+                                      fontFamily: 'IranSansEn',
                                       fontFamilyFallback: const ['sans-serif'],
                                     ),
                                   ),
                                   SizedBox(height: 10.h),
                                   Text(
-                                    toEnglishDigits(currentWord.translation),
+                                    localizeDigits(currentWord.translation),
                                     style: MyTextStyle.textMatn16.copyWith(
-                                      fontSize: FontSizeHelper.getScaledFontSize(
-                                          context, 18.sp),
+                                      fontSize:
+                                          FontSizeHelper.getScaledFontSize(
+                                              context, 18.sp),
                                       color: secondaryTextColor,
-                                      fontFamilyFallback: const ['sans-serif'],
                                     ),
                                   ),
                                   SizedBox(height: 20.h),
@@ -418,7 +421,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                           left: 16.w,
                           right: 16.w,
                           top: 16.h,
-                          bottom: Dimens.nh(90),
+                          bottom: Dimens.nh(70),
                         ),
                         child: Column(
                           mainAxisSize: MainAxisSize.min,

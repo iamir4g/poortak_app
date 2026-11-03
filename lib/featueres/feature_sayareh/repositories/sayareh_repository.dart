@@ -41,19 +41,49 @@ class SayarehRepository {
     dynamic responseData, {
     required String fallbackMessage,
   }) {
-    if (responseData is Map<String, dynamic>) {
-      final message = responseData['message'];
-      if (message is String && message.trim().isNotEmpty) {
-        return message;
-      }
+    final extracted = _stringifyErrorValue(
+      responseData is Map ? responseData['message'] : responseData,
+    );
+    if (extracted.isNotEmpty) return extracted;
 
-      final error = responseData['error'];
-      if (error is String && error.trim().isNotEmpty) {
-        return error;
-      }
+    if (responseData is Map) {
+      final error = _stringifyErrorValue(responseData['error']);
+      if (error.isNotEmpty) return error;
     }
 
     return fallbackMessage;
+  }
+
+  String _stringifyErrorValue(dynamic value) {
+    if (value is String) return value.trim();
+    if (value is List) {
+      return value
+          .map(_stringifyErrorValue)
+          .where((item) => item.isNotEmpty)
+          .join(' ');
+    }
+    return '';
+  }
+
+  DataFailed<T> _mapConversationHttpError<T>(DioException e) {
+    final status = e.response?.statusCode;
+    final message = _extractErrorMessage(
+      e.response?.data,
+      fallbackMessage: "خطا در دریافت اطلاعات",
+    );
+    if (status == 401) {
+      return DataFailed(message, errorCode: 'unauthorized');
+    }
+    if (status == 403) {
+      return DataFailed(
+        "برای مشاهده مکالمه باید این درس را خریده باشید.",
+        errorCode: 'forbidden',
+      );
+    }
+    if (status == 400) {
+      return DataFailed(message, errorCode: 'badRequest');
+    }
+    return DataFailed(message);
   }
 
   Future<DataState<SayarehHomeModel>> fetchAllCourses() async {
@@ -133,11 +163,22 @@ class SayarehRepository {
     try {
       Response response = await sayarehApiProvider.callGetConversation(id);
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final data = ConversationModel.fromJson(response.data);
+        final raw = response.data;
+        final data = ConversationModel.fromJson(
+          raw is Map ? raw.cast<String, dynamic>() : <String, dynamic>{},
+        );
+        data.data.removeWhere((item) => item.isDisabled);
         return DataSuccess(data);
       } else {
-        return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
+        return DataFailed(
+          _extractErrorMessage(
+            response.data,
+            fallbackMessage: "خطا در دریافت اطلاعات",
+          ),
+        );
       }
+    } on DioException catch (e) {
+      return _mapConversationHttpError(e);
     } on AppException catch (e) {
       return CheckExceptions.getError<ConversationModel>(e);
     }
@@ -151,8 +192,15 @@ class SayarehRepository {
         final conversationId = response.data['data']?['iKnowConversationId'];
         return DataSuccess(conversationId);
       } else {
-        return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
+        return DataFailed(
+          _extractErrorMessage(
+            response.data,
+            fallbackMessage: "خطا در دریافت اطلاعات",
+          ),
+        );
       }
+    } on DioException catch (e) {
+      return _mapConversationHttpError(e);
     } on AppException catch (e) {
       return CheckExceptions.getError<String?>(e);
     }
@@ -166,8 +214,16 @@ class SayarehRepository {
       if (response.statusCode == 200 || response.statusCode == 201) {
         return DataSuccess(null);
       } else {
-        return DataFailed(response.data['message'] ?? "خطا در ذخیره اطلاعات");
+        return DataFailed(
+          _extractErrorMessage(
+            response.data,
+            fallbackMessage: "خطا در ذخیره اطلاعات",
+          ),
+        );
       }
+    } on DioException catch (e) {
+      log("Conversation playback POST failed: ${e.response?.statusCode} ${e.response?.data}");
+      return _mapConversationHttpError(e);
     } on AppException catch (e) {
       return CheckExceptions.getError<void>(e);
     }
@@ -237,11 +293,27 @@ class SayarehRepository {
     try {
       Response response = await sayarehApiProvider.callGetVocabulary(id);
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final data = VocabularyModel.fromJson(response.data);
+        final raw = response.data;
+        final data = VocabularyModel.fromJson(
+          raw is Map ? raw.cast<String, dynamic>() : <String, dynamic>{},
+        );
+        data.data.removeWhere((item) => item.isDisabled);
         return DataSuccess(data);
       } else {
-        return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
+        return DataFailed(
+          _extractErrorMessage(
+            response.data,
+            fallbackMessage: "خطا در دریافت اطلاعات",
+          ),
+        );
       }
+    } on DioException catch (e) {
+      return DataFailed(
+        _extractErrorMessage(
+          e.response?.data,
+          fallbackMessage: "خطا در دریافت اطلاعات",
+        ),
+      );
     } on AppException catch (e) {
       return CheckExceptions.getError<VocabularyModel>(e);
     }
@@ -293,6 +365,12 @@ class SayarehRepository {
           alreadySubmitted: true,
         );
       }
+      if (e.response?.statusCode == 400) {
+        return DataFailed(
+          "این واژه در این درس معتبر نیست.",
+          errorCode: 'vocabularyMismatch',
+        );
+      }
       return DataFailed(message);
     } on AppException catch (e) {
       return CheckExceptions.getError<SubmitVocabularyResult>(e);
@@ -308,7 +386,11 @@ class SayarehRepository {
       return const DataSuccess(null);
     }
     try {
-      return DataSuccess(_practiceModelFromJson(map));
+      final model = _practiceModelFromJson(map);
+      if (model.data.correctWord.isDisabled) {
+        return const DataSuccess(null);
+      }
+      return DataSuccess(model);
     } catch (_) {
       return const DataFailed("خطا در دریافت اطلاعات");
     }
@@ -335,14 +417,16 @@ class SayarehRepository {
     }
 
     try {
+      final nextPractice = PracticeVocabularyModel.fromJson({
+        'ok': map['ok'] ?? true,
+        'meta': map['meta'] ?? <String, dynamic>{},
+        'data': practiceData,
+      });
+      if (nextPractice.data.correctWord.isDisabled) {
+        return const DataSuccess(SubmitVocabularyResult(isCompleted: true));
+      }
       return DataSuccess(
-        SubmitVocabularyResult(
-          nextPractice: PracticeVocabularyModel.fromJson({
-            'ok': map['ok'] ?? true,
-            'meta': map['meta'] ?? <String, dynamic>{},
-            'data': practiceData,
-          }),
-        ),
+        SubmitVocabularyResult(nextPractice: nextPractice),
       );
     } catch (_) {
       if (alreadySubmitted) {
@@ -417,6 +501,12 @@ class SayarehRepository {
             fallbackMessage: "شما قبلا این آزمون را گذرانده اید.",
           ),
           errorCode: 'quizAlreadyCompleted',
+        );
+      }
+      if (e.response?.statusCode == 404) {
+        return DataFailed<QuizesQuestion>(
+          "آزمون در این درس یافت نشد.",
+          errorCode: 'quizOrCourseNotFound',
         );
       }
 
@@ -524,8 +614,26 @@ class SayarehRepository {
         final data = ResultQuestion.fromJson(response.data);
         return DataSuccess(data);
       } else {
-        return DataFailed(response.data['message'] ?? "خطا در دریافت اطلاعات");
+        return DataFailed(
+          _extractErrorMessage(
+            response.data,
+            fallbackMessage: "خطا در دریافت اطلاعات",
+          ),
+        );
       }
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 404) {
+        return DataFailed(
+          "آزمون در این درس یافت نشد.",
+          errorCode: 'quizOrCourseNotFound',
+        );
+      }
+      return DataFailed(
+        _extractErrorMessage(
+          e.response?.data,
+          fallbackMessage: "خطا در دریافت اطلاعات",
+        ),
+      );
     } on AppException catch (e) {
       return CheckExceptions.getError<ResultQuestion>(e);
     }

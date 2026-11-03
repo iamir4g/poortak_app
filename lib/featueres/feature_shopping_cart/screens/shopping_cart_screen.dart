@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -20,10 +21,15 @@ import 'package:poortak/featueres/feature_shopping_cart/data/models/shopping_car
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_event.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_state.dart';
-import 'package:poortak/featueres/feature_shopping_cart/data/data_source/shopping_cart_api_provider.dart';
+import 'package:poortak/featueres/feature_shopping_cart/data/models/checkout_cart_model.dart';
 import 'package:poortak/featueres/feature_shopping_cart/repositories/shopping_cart_repository.dart';
+import 'package:poortak/featueres/feature_shopping_cart/utils/cafebazaar_payment_errors.dart';
+import 'package:poortak/featueres/feature_payment/presentation/screens/payment_result_screen.dart';
+import 'package:poortak/featueres/feature_sayareh/data/models/iknow_package_pricing.dart';
 import 'package:poortak/featueres/feature_sayareh/data/models/iknow_summary_model.dart';
 import 'package:poortak/featueres/feature_sayareh/data/models/sayareh_home_model.dart';
+import 'package:poortak/featueres/feature_sayareh/presentation/bloc/iknow_access_bloc/iknow_access_bloc.dart';
+import 'package:poortak/featueres/feature_sayareh/widgets/iknow_package_breakdown.dart';
 import 'package:poortak/featueres/feature_sayareh/data/models/single_book_model.dart';
 import 'package:poortak/featueres/feature_sayareh/repositories/sayareh_repository.dart';
 import 'package:poortak/featueres/feature_kavoosh/data/models/kavoosh_book_detail_model.dart';
@@ -56,6 +62,7 @@ class _LocalCartDisplayItem {
   final String? thumbnailId;
   final String type;
   final String? bazaarSku;
+  final IKnowPackagePricing? packagePricing;
 
   const _LocalCartDisplayItem({
     required this.title,
@@ -64,6 +71,7 @@ class _LocalCartDisplayItem {
     required this.type,
     this.thumbnailId,
     this.bazaarSku,
+    this.packagePricing,
   });
 }
 
@@ -192,11 +200,22 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
     );
   }
 
+  void _invalidateSummaryCache() {
+    _summaryFuture = null;
+    _localCartItemCache.clear();
+  }
+
+  IKnowPackagePricing? _packagePricingFromCart(ShoppingCart? cart) {
+    return cart?.iknowPackagePricing;
+  }
+
   Future<void> _handlePayNow(
     List<BazaarCheckoutItem> checkoutItems, {
     String? payload,
     String? referrerCode,
     int? pointsToSpend,
+    ShoppingCart? cart,
+    IKnowPackagePricing? packagePricing,
   }) async {
     if (!locator<PrefsOperator>().isLoggedIn()) {
       _promptLogin();
@@ -207,13 +226,23 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
       return;
     }
 
+    final resolvedPackage =
+        packagePricing ?? _packagePricingFromCart(cart);
+
     debugPrint(
       '🛒 PayNow channel=${AppFlavor.paymentChannel} '
       'flavor=${AppFlavor.appFlavor} '
       'useBazaarIap=${AppFlavor.useBazaarIap} '
       'items=$checkoutItems '
-      'pointsToSpend=$pointsToSpend',
+      'pointsToSpend=$pointsToSpend '
+      'payable=${resolvedPackage?.payablePrice} '
+      'deduction=${resolvedPackage?.appliedDeduction}',
     );
+
+    if (resolvedPackage != null && resolvedPackage.isFree) {
+      await _completeServerCheckout(allowOnBazaar: true);
+      return;
+    }
 
     if (AppFlavor.useBazaarIap) {
       final items = <BazaarCheckoutItem>[];
@@ -262,7 +291,8 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
       debugPrint(
         '🛒 Bazaar purchase, skipping IPG checkout. '
         'items=${items.map((e) => '${e.productType}:${e.bazaarSku}').toList()} '
-        'points=$spend reuseQuote=$reuseQuote',
+        'points=$spend reuseQuote=$reuseQuote '
+        'requireOwnershipQuote=${resolvedPackage?.hasOwnershipDeduction == true}',
       );
       context.read<InAppPurchaseBloc>().add(
             PurchaseProductsEvent(
@@ -273,40 +303,87 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
               quoteNonce: reuseQuote ? quote.nonce.trim() : null,
               quoteToken: reuseQuote ? quote.token.trim() : null,
               quoteExpiresAt: reuseQuote ? quote.expiresAt : null,
+              requireOwnershipQuote:
+                  resolvedPackage?.hasOwnershipDeduction == true,
             ),
           );
       return;
     }
 
+    await _completeServerCheckout(allowOnBazaar: false);
+  }
+
+  Future<void> _completeServerCheckout({required bool allowOnBazaar}) async {
     try {
-      final apiProvider = locator<ShoppingCartApiProvider>();
-      final response = await apiProvider.checkoutCart();
+      final result = await locator<ShoppingCartRepository>().checkoutCart(
+        allowOnBazaar: allowOnBazaar,
+      );
+      log("✅ Checkout response isFree=${result.isFree} "
+          "amount=${result.amount} paymentId=${result.paymentId}");
 
-      log("✅ Checkout response: ${response.data}");
-
-      final url = response.data['data']['url'] as String;
-      log("🔗 Payment URL: $url");
+      if (result.isFree || result.amount <= 0 || !result.shouldOpenGateway) {
+        await _handleCheckoutSuccess(result);
+        return;
+      }
 
       await launchUrl(
-        Uri.parse(url),
+        Uri.parse(result.url!),
         mode: LaunchMode.externalApplication,
       );
     } catch (e) {
       log("❌ Checkout failed: $e");
-      if (mounted) {
-        if (e is UnauthorisedException) {
-          _promptLogin();
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('خطا در پردازش پرداخت: $e'),
-              backgroundColor: Colors.red,
-              duration: const Duration(seconds: 2),
-            ),
-          );
-        }
-      }
+      if (!mounted) return;
+      await _handleCheckoutError(e);
     }
+  }
+
+  Future<void> _handleCheckoutSuccess(CheckoutData result) async {
+    _invalidateSummaryCache();
+    locator<IknowAccessBloc>().add(
+      FetchIknowAccessEvent(forceRefresh: true),
+    );
+    await locator<ShoppingCartBloc>().clearAfterSuccessfulPayment();
+    if (!mounted) return;
+    Navigator.of(context).pushNamed(
+      PaymentResultScreen.routeName,
+      arguments: {
+        'status': 1,
+        'ref': result.paymentId.isNotEmpty ? result.paymentId : null,
+      },
+    );
+  }
+
+  Future<void> _handleCheckoutError(Object error) async {
+    if (error is UnauthorisedException) {
+      _promptLogin();
+      return;
+    }
+
+    String message = 'خطا در پردازش پرداخت';
+    var shouldRefreshCart = false;
+    if (error is DioException) {
+      message = CafeBazaarPaymentErrors.extractMessage(
+        error.response?.data,
+        fallback: error.message ?? message,
+      );
+      if (error.response?.statusCode == 422) {
+        shouldRefreshCart = true;
+      }
+    } else {
+      message = '$message: $error';
+    }
+
+    if (shouldRefreshCart && mounted) {
+      context.read<ShoppingCartBloc>().add(GetCartEvent());
+    }
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+        duration: const Duration(seconds: 2),
+      ),
+    );
   }
 
   Future<void> _submitReferralCode(String code) async {
@@ -333,7 +410,15 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return BlocProvider<CartPointsDiscountCubit>.value(
+    return BlocListener<InAppPurchaseBloc, InAppPurchaseState>(
+      listenWhen: (previous, current) =>
+          current is InAppPurchaseFreeCheckoutRequired,
+      listener: (context, state) {
+        if (state is InAppPurchaseFreeCheckoutRequired) {
+          _completeServerCheckout(allowOnBazaar: true);
+        }
+      },
+      child: BlocProvider<CartPointsDiscountCubit>.value(
       value: _pointsDiscountCubit,
       child: BlocBuilder<ShoppingCartBloc, ShoppingCartState>(
         builder: (context, state) {
@@ -450,6 +535,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
         return Container();
         },
       ),
+    ),
     );
   }
 
@@ -487,18 +573,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
   }
 
   int _calculateBundlePayableAmount(IKnowSummaryModel summary) {
-    final subtotal =
-        MoneyUtils.parseRialToTomanInt(summary.data.settings.price);
-    final isPercent =
-        summary.data.settings.discountType.toLowerCase() == 'percent';
-
-    final discountAmount = isPercent
-        ? subtotal *
-            MoneyUtils.parseRial(summary.data.settings.discountAmount) ~/
-            100
-        : MoneyUtils.parseRialToTomanInt(summary.data.settings.discountAmount);
-    final payable = subtotal - discountAmount;
-    return payable < 0 ? 0 : payable;
+    return summary.data.resolvedPayableToman;
   }
 
   Future<_LocalCartDisplayItem> _loadLocalCartItemData(
@@ -541,6 +616,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
           price: _calculateBundlePayableAmount(summary),
           type: itemType,
           bazaarSku: summary.data.settings.bazaarSku,
+          packagePricing: summary.data.packageInfo,
         );
       }
     } else if (itemType == 'Book') {
@@ -940,6 +1016,7 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                         subTotal: totals.subTotal,
                         discount: totals.discount,
                         payable: totals.payable,
+                        packagePricing: cart.iknowPackagePricing,
                         onReferralSubmit: _submitReferralCode,
                       );
                     }
@@ -952,25 +1029,43 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                         item.quantity != null && item.quantity! > 1
                             ? 'تعداد: ${item.quantity}'
                             : typeLabel;
-                    return CartItemCard(
-                      title: item.title,
-                      subtitle: subtitle,
-                      pricing: pricing,
-                      onRemove: () {
-                        if (item.itemId != null) {
-                          context
-                              .read<ShoppingCartBloc>()
-                              .add(RemoveFromCartEvent(item.itemId!));
-                        }
-                      },
-                      image: Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          _buildCartItemImage(item),
-                          if (item.type != null)
-                            _buildCartItemOverlayIcon(item.type!),
-                        ],
-                      ),
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        CartItemCard(
+                          title: item.title,
+                          subtitle: subtitle,
+                          pricing: pricing,
+                          onRemove: () {
+                            if (item.itemId != null) {
+                              context
+                                  .read<ShoppingCartBloc>()
+                                  .add(RemoveFromCartEvent(item.itemId!));
+                            }
+                          },
+                          image: Stack(
+                            fit: StackFit.expand,
+                            children: [
+                              _buildCartItemImage(item),
+                              if (item.type != null)
+                                _buildCartItemOverlayIcon(item.type!),
+                            ],
+                          ),
+                        ),
+                        if (item.packagePricing != null)
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(
+                              Dimens.medium,
+                              0,
+                              Dimens.medium,
+                              Dimens.small,
+                            ),
+                            child: IKnowPackageBreakdown(
+                              pricing: item.packagePricing!,
+                              compact: true,
+                            ),
+                          ),
+                      ],
                     );
                   },
                 ),
@@ -991,13 +1086,17 @@ class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
                     PrimaryButton(
                       width: Dimens.nw(160),
                       height: Dimens.nh(50),
-                      lable: l10n?.pay_now ?? "Pay Now",
+                      lable: totals.payable <= 0
+                          ? 'دریافت رایگان'
+                          : (l10n?.pay_now ?? "Pay Now"),
                       backgroundColor:
                           isDark ? MyColors.primary : MyColors.secondary,
                       onPressed: () async {
                         await _handlePayNow(
                           checkoutItems,
                           payload: cart.id,
+                          cart: cart,
+                          packagePricing: cart.iknowPackagePricing,
                           pointsToSpend: pointsState.serviceUnavailable
                               ? 0
                               : pointsState.pointsToSpend,

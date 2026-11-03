@@ -35,6 +35,17 @@ class QuizAnswerBloc extends Bloc<QuizAnswerEvent, QuizAnswerState> {
     log("Submitting answer...");
     emit(QuizAnswerLoading());
     try {
+      final questionQuizId = event.questionQuizId;
+      if (questionQuizId != null &&
+          questionQuizId.isNotEmpty &&
+          questionQuizId != event.quizId) {
+        emit(const QuizAnswerError(
+          "آزمون در این درس یافت نشد.",
+          failure: QuizAnswerFailure.notFound,
+        ));
+        return;
+      }
+
       log("Calling fetchAnswerQuestion...");
       final result = await _sayarehRepository.fetchAnswerQuestion(
         event.courseId,

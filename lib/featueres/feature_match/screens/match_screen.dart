@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:poortak/common/services/answer_feedback_sound_service.dart';
 import 'package:poortak/common/utils/svg_embedded_png.dart';
 import 'package:poortak/common/widgets/poortak_app_bar.dart';
 import 'package:poortak/config/dimens.dart';
@@ -280,8 +281,8 @@ class _MatchScreenState extends State<MatchScreen> {
                   ),
                   child: Material(
                     color: Colors.transparent,
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(Dimens.nr(56.5)),
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
                       onTap: _isAnswerSubmitted()
                           ? null
                           : () {
@@ -578,6 +579,7 @@ class _MatchScreenState extends State<MatchScreen> {
 
   void _showSuccessModal(bool isCorrect) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    unawaited(AnswerFeedbackSoundService.playPopup());
     showDialog<void>(
       context: context,
       barrierDismissible: true,
@@ -668,7 +670,8 @@ class _MatchScreenState extends State<MatchScreen> {
                 ),
                 Material(
                   color: Colors.transparent,
-                  child: InkWell(
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
                     onTap: () {
                       Navigator.of(dialogContext).pop();
                       Navigator.pushNamed(
@@ -702,7 +705,8 @@ class _MatchScreenState extends State<MatchScreen> {
                 ),
                 Material(
                   color: Colors.transparent,
-                  child: InkWell(
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
                     onTap: () => Navigator.of(dialogContext).pop(),
                     child: Container(
                       width: double.infinity,

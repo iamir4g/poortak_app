@@ -1,7 +1,10 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
-import 'dart:io';
 import 'package:flutter/foundation.dart';
+import 'package:poortak/common/services/answer_feedback_sound_service.dart';
 import 'package:poortak/featueres/feature_sayareh/repositories/dictionary_repository.dart';
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/dictionary_bloc/dictionary_bloc.dart';
 import 'package:get_it/get_it.dart';
@@ -60,10 +63,8 @@ import 'package:poortak/common/services/video_download_service.dart';
 
 GetIt locator = GetIt.instance;
 
-Future<void> initLocator() async {
+Dio _createDioClient() {
   final dio = Dio();
-
-  // Configure Dio to ignore bad certificates (SSL handshake errors)
   dio.httpClientAdapter = IOHttpClientAdapter(
     createHttpClient: () {
       final client = HttpClient();
@@ -72,9 +73,13 @@ Future<void> initLocator() async {
       return client;
     },
   );
-
-  // Set x-lang header as default for all requests
   dio.options.headers['x-lang'] = 'fa';
+  return dio;
+}
+
+Future<void> initLocator() async {
+  final dio = _createDioClient();
+  final refreshDio = _createDioClient();
 
   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
   locator.registerSingleton<SharedPreferences>(sharedPreferences);
@@ -126,7 +131,11 @@ Future<void> initLocator() async {
   ));
 
   dio.interceptors.add(
-    AuthInterceptor(prefsOperator: prefsOperator, dio: dio),
+    AuthInterceptor(
+      prefsOperator: prefsOperator,
+      dio: dio,
+      refreshDio: refreshDio,
+    ),
   );
 
   locator.registerSingleton<Dio>(dio);
@@ -226,6 +235,7 @@ Future<void> initLocator() async {
 
   // Register SettingsCubit
   locator.registerSingleton<SettingsCubit>(SettingsCubit());
+  unawaited(AnswerFeedbackSoundService.preload());
 
   // Register ConnectivityCubit
   locator.registerSingleton<ConnectivityCubit>(ConnectivityCubit());

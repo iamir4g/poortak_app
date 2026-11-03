@@ -16,6 +16,7 @@ import 'package:poortak/common/widgets/exit_confirmation_modal.dart';
 import 'package:poortak/common/services/payment_deep_link_service.dart';
 import 'package:poortak/common/services/auth_navigation_manager.dart';
 import 'package:poortak/common/services/otp_login_session_manager.dart';
+import 'package:poortak/common/utils/custom_snackbar.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/featueres/feature_kavoosh/screens/kavoosh_main_screen.dart';
 import 'package:poortak/featueres/feature_litner/screens/litner_main_screen.dart';
@@ -203,6 +204,11 @@ class _MainWrapperState extends State<MainWrapper>
   }
 
   void _handleAuthNavigation() {
+    if (_authNavigationManager.sessionExpiredLogoutRequested) {
+      _handleSessionExpiredLogout();
+      return;
+    }
+
     if (_authNavigationManager.requestedTabIndex == null &&
         _authNavigationManager.pendingRequest == null) {
       return;
@@ -241,6 +247,31 @@ class _MainWrapperState extends State<MainWrapper>
         });
       }
       _authNavigationManager.clearPendingRequest();
+    });
+  }
+
+  void _handleSessionExpiredLogout() {
+    _authNavigationManager.clearSessionExpiredLogout();
+    _authNavigationManager.clearPendingRequest();
+    _authNavigationManager.clearRequestedTab();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      final navigator = Navigator.of(context);
+      if (navigator.canPop()) {
+        navigator.popUntil((route) {
+          return route.settings.name == MainWrapper.routeName ||
+              route.isFirst;
+        });
+      }
+
+      _logout();
+      CustomSnackBar.showSnack(
+        context,
+        'نشست شما منقضی شده است. لطفا دوباره وارد شوید.',
+        MyColors.error,
+      );
     });
   }
 

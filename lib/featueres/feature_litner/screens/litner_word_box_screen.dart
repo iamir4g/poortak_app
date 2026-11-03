@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:poortak/common/services/answer_feedback_sound_service.dart';
 import 'package:poortak/common/widgets/poortak_app_bar.dart';
 import 'package:poortak/common/widgets/primaryButton.dart';
 import 'package:poortak/config/dimens.dart';
@@ -55,6 +58,7 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
   }
 
   void _flipToBack() {
+    unawaited(AnswerFeedbackSoundService.playCardSwipe());
     _flipController.flipcard();
     setState(() {
       isBack = true;
@@ -62,6 +66,7 @@ class _LitnerWordBoxViewState extends State<_LitnerWordBoxView> {
   }
 
   void _flipToFront() {
+    unawaited(AnswerFeedbackSoundService.playCardSwipe());
     _flipController.flipcard();
     setState(() {
       isBack = false;

@@ -52,8 +52,8 @@ class ShoppingCartApiProvider {
     return response;
   }
 
-  Future<Response> checkoutCart() async {
-    if (AppFlavor.useBazaarIap) {
+  Future<Response> checkoutCart({bool allowOnBazaar = false}) async {
+    if (AppFlavor.useBazaarIap && !allowOnBazaar) {
       throw StateError(
         'Android Bazaar builds must use FlutterPoolakey.purchase, not cart/checkout',
       );

@@ -83,16 +83,19 @@ class BidiText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final sourceText =
-        forceEnglishDigits ? toEnglishDigits(text) : text;
+        forceEnglishDigits ? toEnglishDigits(text) : localizeDigits(text);
     final direction = BidiTextHelper.detectDirection(sourceText);
     final displayText = BidiTextHelper.prepare(sourceText);
+    final useEnglishFont =
+        forceEnglishDigits || !hasPersianScript(sourceText);
 
     return Directionality(
       textDirection: direction,
       child: Text(
         displayText,
-        style: forceEnglishDigits
+        style: useEnglishFont
             ? (style ?? const TextStyle()).copyWith(
+                fontFamily: 'IranSansEn',
                 fontFamilyFallback: const ['sans-serif'],
               )
             : style,

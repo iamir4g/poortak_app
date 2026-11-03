@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
+import 'package:poortak/common/services/answer_feedback_sound_service.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/common/resources/data_state.dart';
 import 'package:poortak/featueres/feature_profile/repositories/profile_repository.dart';
@@ -13,6 +16,7 @@ class InviteFriendsModal extends StatelessWidget {
   const InviteFriendsModal({super.key});
 
   static void show(BuildContext context) {
+    unawaited(AnswerFeedbackSoundService.playPopup());
     showDialog(
       context: context,
       barrierDismissible: true,

@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:poortak/main.dart';
 import 'package:flutter/material.dart';
+import 'package:poortak/common/services/answer_feedback_sound_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:poortak/common/services/video_download_service.dart';
 import 'package:poortak/common/bloc/video_download_cubit/video_download_cubit.dart';
@@ -96,6 +99,20 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
         Navigator.pushNamed(context, LoginScreen.routeName);
       },
     );
+  }
+
+  void _showLessonCompletedModal() {
+    Future<void>.delayed(const Duration(milliseconds: 400), () {
+      if (!mounted || _isDisposed) return;
+      ReusableModal.showSuccess(
+        context: context,
+        title: 'تبریک!',
+        message: 'شما این درس را با موفقیت به پایان رساندید.',
+        customLottiePath: 'assets/lottie/Happy_Star.json',
+        buttonText: 'متوجه شدم',
+        animatedEntrance: true,
+      );
+    });
   }
 
   bool _hasFullVideoAccess() {
@@ -230,6 +247,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
       debugPrint('No lesson data available for purchase dialog');
       return;
     }
+    unawaited(AnswerFeedbackSoundService.playPopup());
     showDialog(
       context: context,
       builder: (BuildContext context) => DialogCart(item: _currentLesson!),
@@ -387,17 +405,7 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
 
                 if (isCompleted && !_isCompletionPopupShown) {
                   _isCompletionPopupShown = true;
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    if (mounted) {
-                      ReusableModal.showSuccess(
-                        context: context,
-                        title: 'تبریک!',
-                        message: 'شما این درس را با موفقیت به پایان رساندید.',
-                        customLottiePath: 'assets/lottie/Happy_Star.json',
-                        buttonText: 'متوجه شدم',
-                      );
-                    }
-                  });
+                  _showLessonCompletedModal();
                 }
               }
 
@@ -807,8 +815,9 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
           ),
         ],
       ),
-      child: IconButton(
-        onPressed: () {
+      child: GestureDetector(
+        onTap: () {
+          unawaited(AnswerFeedbackSoundService.playPopup());
           showModalBottomSheet(
             context: context,
             isScrollControlled: true,
@@ -816,10 +825,13 @@ class _LessonScreenState extends State<LessonScreen> with RouteAware {
             builder: (context) => const DictionaryBottomSheet(),
           );
         },
-        icon: buildImageFromAssetOrEmbeddedSvg(
-          "assets/images/iknow/dictionary_icon.svg",
-          width: Dimens.nw(36),
-          height: Dimens.nh(36),
+        behavior: HitTestBehavior.opaque,
+        child: Center(
+          child: buildImageFromAssetOrEmbeddedSvg(
+            "assets/images/iknow/dictionary_icon.svg",
+            width: Dimens.nw(36),
+            height: Dimens.nh(36),
+          ),
         ),
       ),
     );

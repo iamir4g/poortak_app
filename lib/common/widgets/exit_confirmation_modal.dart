@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:poortak/common/services/answer_feedback_sound_service.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
@@ -139,6 +142,7 @@ class ExitConfirmationModal extends StatelessWidget {
     required VoidCallback onExit,
     required VoidCallback onStay,
   }) {
+    unawaited(AnswerFeedbackSoundService.playPopup());
     showDialog(
       context: context,
       barrierDismissible: false,

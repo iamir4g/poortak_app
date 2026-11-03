@@ -4,6 +4,8 @@
 
 import 'dart:convert';
 
+import 'package:poortak/common/utils/money_utils.dart';
+
 CheckoutCartModel checkoutCartModelFromJson(String str) =>
     CheckoutCartModel.fromJson(json.decode(str));
 
@@ -13,7 +15,7 @@ String checkoutCartModelToJson(CheckoutCartModel data) =>
 class CheckoutCartModel {
   bool ok;
   Meta meta;
-  Data? data;
+  CheckoutData? data;
 
   CheckoutCartModel({
     required this.ok,
@@ -23,9 +25,15 @@ class CheckoutCartModel {
 
   factory CheckoutCartModel.fromJson(Map<String, dynamic> json) =>
       CheckoutCartModel(
-        ok: json["ok"],
-        meta: Meta.fromJson(json["meta"]),
-        data: Data.fromJson(json["data"]),
+        ok: json["ok"] == true,
+        meta: Meta.fromJson(
+          json["meta"] is Map
+              ? Map<String, dynamic>.from(json["meta"] as Map)
+              : {},
+        ),
+        data: json["data"] is Map
+            ? CheckoutData.fromJson(Map<String, dynamic>.from(json["data"] as Map))
+            : null,
       );
 
   Map<String, dynamic> toJson() => {
@@ -35,20 +43,38 @@ class CheckoutCartModel {
       };
 }
 
-class Data {
-  String url;
+class CheckoutData {
+  final String? url;
+  final String paymentId;
+  final int amount;
+  final bool isFree;
 
-  Data({
-    required this.url,
+  const CheckoutData({
+    this.url,
+    required this.paymentId,
+    required this.amount,
+    required this.isFree,
   });
 
-  factory Data.fromJson(Map<String, dynamic> json) => Data(
-        url: json["url"],
-      );
+  factory CheckoutData.fromJson(Map<String, dynamic> json) {
+    final rawUrl = json["url"]?.toString().trim();
+    return CheckoutData(
+      url: (rawUrl == null || rawUrl.isEmpty) ? null : rawUrl,
+      paymentId: json["paymentId"]?.toString() ?? '',
+      amount: MoneyUtils.parseRial(json["amount"]),
+      isFree: json["isFree"] == true,
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         "url": url,
+        "paymentId": paymentId,
+        "amount": amount,
+        "isFree": isFree,
       };
+
+  bool get shouldOpenGateway =>
+      !isFree && url != null && url!.isNotEmpty && amount > 0;
 }
 
 class Meta {

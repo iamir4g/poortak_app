@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/common/utils/digit_utils.dart';
 import 'package:poortak/common/widgets/poortak_app_bar.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
@@ -100,7 +101,7 @@ class SelfAssessmentScreen extends StatelessWidget {
                     itemBuilder: (context, index) {
                       final category = state.categories[index];
                       return SelfAssessmentSubjectCard(
-                        title: category.title,
+                        title: localizeDigits(category.title),
                         thumbnailId: category.thumbnailId,
                         backgroundColor: MyColors.background,
                         onTap: () {

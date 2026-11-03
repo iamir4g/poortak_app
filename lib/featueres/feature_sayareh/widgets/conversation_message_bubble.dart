@@ -1,11 +1,14 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:lottie/lottie.dart';
+import 'package:poortak/common/services/storage_service.dart';
+import 'package:poortak/common/utils/digit_utils.dart';
 import 'package:poortak/common/utils/font_size_helper.dart';
 import 'package:poortak/common/utils/sentence_splitter.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/featueres/feature_sayareh/data/models/conversation_model.dart';
+import 'package:poortak/locator.dart';
 
 /// Widget برای نمایش یک حباب پیام در صفحه مکالمه
 /// این widget شامل متن پیام، آیکون صوتی و ترجمه (در صورت فعال بودن) می‌باشد
@@ -43,9 +46,11 @@ class ConversationMessageBubble extends StatelessWidget {
   });
 
   Widget _sideAvatar({
-    required String assetPath,
     required Color backgroundColor,
+    String? avatarId,
   }) {
+    final hasRemoteAvatar = avatarId != null && avatarId.isNotEmpty;
+
     return SizedBox(
       width: Dimens.nw(50),
       height: Dimens.nh(50),
@@ -55,12 +60,18 @@ class ConversationMessageBubble extends StatelessWidget {
           shape: BoxShape.circle,
         ),
         child: Padding(
-          padding: EdgeInsets.all(4),
+          padding: EdgeInsets.all(0),
           child: ClipOval(
-            child: Lottie.asset(
-              assetPath,
-              fit: BoxFit.cover,
-            ),
+            child: hasRemoteAvatar
+                ? CachedNetworkImage(
+                    imageUrl: locator<StorageService>()
+                        .getDownloadPublicUrl(avatarId),
+                    fit: BoxFit.cover,
+                    fadeInDuration: const Duration(milliseconds: 150),
+                    placeholder: (_, __) => const SizedBox.expand(),
+                    errorWidget: (_, __, ___) => const SizedBox.expand(),
+                  )
+                : const SizedBox.expand(),
           ),
         ),
       ),
@@ -109,6 +120,13 @@ class ConversationMessageBubble extends StatelessWidget {
                   color: baseTextColor.withValues(
                     alpha: _sentenceOpacity(index),
                   ),
+                ).copyWith(
+                  fontFamily: 'IranSansEn',
+                  fontWeight: isPlaybackActive &&
+                          isCurrentPlaying &&
+                          index == currentSentenceIndex
+                      ? FontWeight.w700
+                      : FontWeight.w500,
                 ),
               ),
             ],
@@ -122,7 +140,8 @@ class ConversationMessageBubble extends StatelessWidget {
     required BuildContext context,
     required Color translationColor,
   }) {
-    final translationSentences = splitIntoSentences(message.translation);
+    final translationSentences =
+        splitIntoSentences(localizeDigits(message.translation));
 
     return Directionality(
       textDirection: TextDirection.rtl,
@@ -206,8 +225,7 @@ class ConversationMessageBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isFirstPerson = message.isMaleSpeaker;
-    final avatarPath = message.conversationAvatarPath;
-    final sentences = splitIntoSentences(message.text);
+    final sentences = splitIntoSentences(localizeDigits(message.text));
 
     final bubbleColor = isDark
         ? (isFirstPerson
@@ -263,8 +281,8 @@ class ConversationMessageBubble extends StatelessWidget {
                 children: isFirstPerson
                     ? [
                         _sideAvatar(
-                          assetPath: avatarPath,
                           backgroundColor: sideCircleColor,
+                          avatarId: message.avatarId,
                         ),
                         SizedBox(width: Dimens.small),
                         Flexible(
@@ -293,8 +311,8 @@ class ConversationMessageBubble extends StatelessWidget {
                         ),
                         SizedBox(width: Dimens.small),
                         _sideAvatar(
-                          assetPath: avatarPath,
                           backgroundColor: sideCircleColor,
+                          avatarId: message.avatarId,
                         ),
                       ],
               );

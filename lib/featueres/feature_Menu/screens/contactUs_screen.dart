@@ -306,9 +306,9 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
               padding: EdgeInsets.only(bottom: 12.h),
               child: Align(
                 alignment: AlignmentDirectional.centerStart,
-                child: InkWell(
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
                   onTap: () => _openWebsite(website),
-                  borderRadius: BorderRadius.circular(4.r),
                   child: Padding(
                     padding: EdgeInsets.symmetric(vertical: 2.h),
                     child: Text(
@@ -372,9 +372,9 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
               padding: EdgeInsets.only(bottom: 12.h),
               child: Align(
                 alignment: AlignmentDirectional.centerStart,
-                child: InkWell(
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
                   onTap: () => _openEmail(email),
-                  borderRadius: BorderRadius.circular(4.r),
                   child: Padding(
                     padding: EdgeInsets.symmetric(vertical: 2.h),
                     child: Text(

@@ -22,9 +22,10 @@ class QuizStartLoaded extends QuizStartState {
 
 class QuizStartError extends QuizStartState {
   final String message;
+  final String? errorCode;
 
-  const QuizStartError(this.message);
+  const QuizStartError(this.message, {this.errorCode});
 
   @override
-  List<Object> get props => [message];
+  List<Object> get props => [message, errorCode ?? ''];
 }
