@@ -39,14 +39,6 @@ class CategoryContentSection extends StatefulWidget {
 class _CategoryContentSectionState extends State<CategoryContentSection> {
   static const _previewSize = 10;
 
-  static const _cardColors = [
-    Color(0xFFFBEBDF),
-    Color(0xFFE8F5E9),
-    Color(0xFFFFF8E1),
-    Color(0xFFE3F2FD),
-    Color(0xFFF3E5F5),
-  ];
-
   final KavooshRepository _repository = locator<KavooshRepository>();
 
   bool _loading = true;
@@ -99,8 +91,7 @@ class _CategoryContentSectionState extends State<CategoryContentSection> {
         return;
       }
 
-      final page =
-          (shortsResult as DataSuccess<ShortVideoPage>).data;
+      final page = (shortsResult as DataSuccess<ShortVideoPage>).data;
       setState(() {
         _items = (page?.items ?? const [])
             .map((item) => <String, dynamic>{
@@ -243,7 +234,7 @@ class _CategoryContentSectionState extends State<CategoryContentSection> {
                 return CourseCard(
                   title: item['title']?.toString() ?? '',
                   thumbnailId: item['thumbnailId']?.toString(),
-                  backgroundColor: _cardColors[index % _cardColors.length],
+                  // backgroundColor: _cardColors[index % _cardColors.length],
                   showPlayBadge: widget.isShortVideo ||
                       widget.treeType == KavooshTreeType.video,
                   onTap: () => _openItemDetail(item),

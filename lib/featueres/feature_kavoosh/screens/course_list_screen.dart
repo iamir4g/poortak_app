@@ -280,7 +280,7 @@ class _CourseListScreenState extends State<CourseListScreen> {
                           date: date,
                           isPurchased: false,
                           thumbnailId: item['thumbnailId']?.toString(),
-                          backgroundColor: colors[index % colors.length],
+                          // backgroundColor: colors[index % colors.length],
                           onTap: () {
                             final id = item['id']?.toString() ?? '';
                             if (id.isEmpty) return;

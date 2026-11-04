@@ -28,6 +28,30 @@ class VideoCourseDetailResponse {
   }
 }
 
+class VideoCourseInstructor {
+  final String id;
+  final String name;
+
+  const VideoCourseInstructor({
+    required this.id,
+    required this.name,
+  });
+
+  factory VideoCourseInstructor.fromJson(Map<String, dynamic> json) {
+    final first = _nullableString(json['firstName']);
+    final last = _nullableString(json['lastName']);
+    final combined = [first, last].whereType<String>().join(' ').trim();
+
+    return VideoCourseInstructor(
+      id: json['id']?.toString() ?? '',
+      name: _nullableString(json['name']) ??
+          _nullableString(json['fullName']) ??
+          _nullableString(json['title']) ??
+          (combined.isEmpty ? '' : combined),
+    );
+  }
+}
+
 class VideoCourseInfo {
   final String id;
   final String title;
@@ -35,6 +59,8 @@ class VideoCourseInfo {
   final String price;
   final String? thumbnailId;
   final String? instructorId;
+  final String? authorName;
+  final VideoCourseInstructor? instructor;
   final int totalDuration;
   final String categoryId;
   final int order;
@@ -53,13 +79,24 @@ class VideoCourseInfo {
     required this.order,
     this.thumbnailId,
     this.instructorId,
+    this.authorName,
+    this.instructor,
     this.purchased = false,
     this.hasAccess = false,
     this.isBookmarked = false,
     this.publishedAt,
   });
 
+  /// نام نمایشی استاد از `instructor` یا `authorName`
+  String get instructorDisplayName {
+    final fromInstructor = instructor?.name.trim() ?? '';
+    if (fromInstructor.isNotEmpty) return fromInstructor;
+    return authorName?.trim() ?? '';
+  }
+
   factory VideoCourseInfo.fromJson(Map<String, dynamic> json) {
+    final instructorJson = json['instructor'];
+
     return VideoCourseInfo(
       id: json['id']?.toString() ?? '',
       title: json['title']?.toString() ?? '',
@@ -67,6 +104,12 @@ class VideoCourseInfo {
       price: json['price']?.toString() ?? '0',
       thumbnailId: _nullableString(json['thumbnailId']),
       instructorId: _nullableString(json['instructorId']),
+      authorName: _nullableString(json['authorName']),
+      instructor: instructorJson is Map
+          ? VideoCourseInstructor.fromJson(
+              instructorJson.cast<String, dynamic>(),
+            )
+          : null,
       totalDuration: _asInt(json['totalDuration']),
       categoryId: json['categoryId']?.toString() ?? '',
       order: _asInt(json['order']),

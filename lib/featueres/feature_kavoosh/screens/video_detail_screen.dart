@@ -415,7 +415,7 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
                       _buildInfoCard(isDark, course, priceLabel),
                       SizedBox(height: 16.h),
                       _buildLessonsCard(isDark),
-                      SizedBox(height: 80.h),
+                      SizedBox(height: 200.h),
                     ],
                   ),
                 ),
@@ -571,33 +571,65 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(16.r),
-                child: SizedBox(
-                  width: 60.w,
-                  height: 60.h,
-                  child: course?.thumbnailId == null
-                      ? ColoredBox(
-                          color: isDark
-                              ? MyColors.darkBackgroundSecondary
-                              : Colors.grey[200]!,
-                        )
-                      : FutureBuilder<String>(
-                          future: GetImageUrlService()
-                              .getImageUrl(course!.thumbnailId!),
-                          builder: (context, snapshot) {
-                            final url = snapshot.data;
-                            if (url == null || url.isEmpty) {
-                              return ColoredBox(
-                                color: isDark
-                                    ? MyColors.darkBackgroundSecondary
-                                    : Colors.grey[200]!,
-                              );
-                            }
-                            return Image.network(url, fit: BoxFit.cover);
-                          },
+              Column(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(16.r),
+                    child: SizedBox(
+                      width: 84.w,
+                      height: 84.h,
+                      child: course?.thumbnailId == null
+                          ? ColoredBox(
+                              color: isDark
+                                  ? MyColors.darkBackgroundSecondary
+                                  : Colors.grey[200]!,
+                            )
+                          : FutureBuilder<String>(
+                              future: GetImageUrlService()
+                                  .getImageUrl(course!.thumbnailId!),
+                              builder: (context, snapshot) {
+                                final url = snapshot.data;
+                                if (url == null || url.isEmpty) {
+                                  return ColoredBox(
+                                    color: isDark
+                                        ? MyColors.darkBackgroundSecondary
+                                        : Colors.grey[200]!,
+                                  );
+                                }
+                                return Image.network(url, fit: BoxFit.cover);
+                              },
+                            ),
+                    ),
+                  ),
+                  SizedBox(height: 12.h),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _isDescriptionExpanded = !_isDescriptionExpanded;
+                      });
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          _isDescriptionExpanded
+                              ? 'بستن اطلاعات'
+                              : 'اطلاعات دوره',
+                          style: MyTextStyle.textMatn12Bold.copyWith(
+                            color: MyColors.primary,
+                          ),
                         ),
-                ),
+                        Icon(
+                          _isDescriptionExpanded
+                              ? Icons.keyboard_arrow_up
+                              : Icons.keyboard_arrow_down,
+                          color: MyColors.primary,
+                          size: 20.r,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
               SizedBox(width: 16.w),
               Expanded(
@@ -614,6 +646,32 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
+                    if ((course?.instructorDisplayName ?? '').isNotEmpty) ...[
+                      SizedBox(height: 6.h),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "نام استاد:",
+                            style: MyTextStyle.textMatn12W500.copyWith(
+                              color: isDark
+                                  ? MyColors.darkTextSecondary
+                                  : MyColors.text3,
+                            ),
+                          ),
+                          Text(
+                            course!.instructorDisplayName,
+                            style: MyTextStyle.textMatn14Bold.copyWith(
+                              color: isDark
+                                  ? MyColors.darkTextSecondary
+                                  : MyColors.textMatn2,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      )
+                    ],
                     SizedBox(height: 8.h),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -632,7 +690,7 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
                         Flexible(
                           child: Text(
                             priceLabel,
-                            style: MyTextStyle.textMatn12Bold.copyWith(
+                            style: MyTextStyle.textMatn14Bold.copyWith(
                               color: isDark
                                   ? MyColors.darkTextPrimary
                                   : MyColors.textMatn2,
@@ -706,32 +764,6 @@ class _VideoDetailScreenState extends State<VideoDetailScreen> {
               ),
             ),
           ],
-          SizedBox(height: 8.h),
-          GestureDetector(
-            onTap: () {
-              setState(() {
-                _isDescriptionExpanded = !_isDescriptionExpanded;
-              });
-            },
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  _isDescriptionExpanded ? 'بستن اطلاعات' : 'اطلاعات دوره',
-                  style: MyTextStyle.textMatn12Bold.copyWith(
-                    color: MyColors.primary,
-                  ),
-                ),
-                Icon(
-                  _isDescriptionExpanded
-                      ? Icons.keyboard_arrow_up
-                      : Icons.keyboard_arrow_left,
-                  color: MyColors.primary,
-                  size: 20.r,
-                ),
-              ],
-            ),
-          ),
         ],
       ),
     );

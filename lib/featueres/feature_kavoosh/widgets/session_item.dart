@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/common/utils/svg_embedded_png.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 
@@ -38,18 +39,8 @@ class SessionItem extends StatelessWidget {
         ),
         child: Row(
           children: [
-            // Lock/Status Icon
-            Icon(
-              isLocked ? Icons.lock : Icons.play_circle_outline,
-              color: isLocked
-                  ? Colors.amber
-                  : (isDark ? MyColors.darkTextSecondary : MyColors.textMatn2),
-              size: 20.r,
-            ),
-
-            SizedBox(width: 12.w),
-
-            // Title
+            Icon(Icons.arrow_right, size: 20.r, color: MyColors.background5),
+            // Title (سمت راست در RTL)
             Expanded(
               child: Text(
                 title,
@@ -59,16 +50,47 @@ class SessionItem extends StatelessWidget {
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.start,
               ),
             ),
 
-            // Play Arrow Icon
-            if (!isLocked)
-              Icon(
-                Icons.play_arrow,
-                size: 16.r,
-                color: isDark ? MyColors.darkTextSecondary : MyColors.text4,
-              ),
+            SizedBox(width: 12.w),
+
+            // قفل / پخش — سمت چپ در RTL
+            if (isLocked)
+              SizedBox(
+                width: 20.r,
+                height: 20.r,
+                child: buildImageFromAssetOrEmbeddedSvg(
+                  'assets/images/lock_image.svg',
+                  width: 20.r,
+                  height: 20.r,
+                  fit: BoxFit.contain,
+                ),
+              )
+            else
+              Container(
+                decoration: BoxDecoration(
+                  color: MyColors.brandPrimary.withValues(alpha: 0.1),
+                  border: Border.all(color: MyColors.brandPrimary),
+                  borderRadius: BorderRadius.circular(4.r),
+                ),
+                width: 60.r,
+                height: 30.r,
+                child: Center(
+                  child: Text(
+                    "تماشا",
+                    style: MyTextStyle.textMatn12W500.copyWith(
+                      color: MyColors.primary,
+                    ),
+                  ),
+                ),
+              )
+            // Icon(
+            //   Icons.play_arrow,
+            //   size: 20.r,
+            //   color: isDark ? MyColors.darkTextSecondary : MyColors.text4,
+            // ),
           ],
         ),
       ),

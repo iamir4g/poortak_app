@@ -43,15 +43,15 @@ class DetailedCourseCard extends StatelessWidget {
           color: isDark ? MyColors.termsBackgroundDark : Colors.white,
           borderRadius: BorderRadius.circular(20.r),
           border: isDark ? Border.all(color: MyColors.darkBorder) : null,
-          boxShadow: isDark
-              ? null
-              : [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
-                    blurRadius: 10.r,
-                    offset: Offset(0, 4.h),
-                  ),
-                ],
+          // boxShadow: isDark
+          //     ? null
+          //     : [
+          //         BoxShadow(
+          //           color: Colors.black.withValues(alpha: 0.05),
+          //           blurRadius: 10.r,
+          //           offset: Offset(0, 4.h),
+          //         ),
+          //       ],
         ),
         child: Row(
           children: [

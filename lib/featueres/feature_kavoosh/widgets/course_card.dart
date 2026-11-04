@@ -30,24 +30,15 @@ class CourseCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         width: 135.w,
-        height: 125.h,
+        height: 135.h,
         margin: EdgeInsetsDirectional.only(end: Dimens.medium),
         constraints: BoxConstraints(minHeight: 180.h),
         decoration: BoxDecoration(
           color: isDark
               ? MyColors.termsBackgroundDark
               : (backgroundColor ?? Colors.white),
-          borderRadius: BorderRadius.circular(20.r),
+          borderRadius: BorderRadius.circular(8.r),
           border: isDark ? Border.all(color: MyColors.darkBorder) : null,
-          boxShadow: isDark
-              ? null
-              : [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
-                    blurRadius: 10.r,
-                    offset: Offset(0, 4.h),
-                  ),
-                ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -55,6 +46,7 @@ class CourseCard extends StatelessWidget {
           children: [
             SizedBox(
               height: 120.h,
+              width: 120.w,
               child: Stack(
                 children: [
                   Positioned.fill(
@@ -63,10 +55,10 @@ class CourseCard extends StatelessWidget {
                         color: isDark
                             ? MyColors.darkBackgroundSecondary
                             : Colors.grey[200],
-                        borderRadius: BorderRadius.all(Radius.circular(20.r)),
+                        borderRadius: BorderRadius.all(Radius.circular(8.r)),
                       ),
                       child: ClipRRect(
-                        borderRadius: BorderRadius.all(Radius.circular(20.r)),
+                        borderRadius: BorderRadius.all(Radius.circular(8.r)),
                         child: _buildImage(isDark),
                       ),
                     ),
