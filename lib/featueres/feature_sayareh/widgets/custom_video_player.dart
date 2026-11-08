@@ -859,23 +859,32 @@ class _FullscreenVideoPlayerState extends State<FullscreenVideoPlayer> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          GestureDetector(
-            onTap: _toggleControlsVisibility,
-            behavior: HitTestBehavior.opaque,
-            child: _buildFullscreenVideo(),
-          ),
-          IgnorePointer(
-            ignoring: !_showControls,
-            child: AnimatedOpacity(
-              opacity: _showControls ? 1.0 : 0.0,
-              duration: const Duration(milliseconds: 300),
-              child: _buildFullscreenControls(),
+      body: MediaQuery.removePadding(
+        context: context,
+        removeTop: true,
+        removeBottom: true,
+        removeLeft: true,
+        removeRight: true,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            GestureDetector(
+              onTap: _toggleControlsVisibility,
+              behavior: HitTestBehavior.opaque,
+              child: _buildFullscreenVideo(),
             ),
-          ),
-        ],
+            IgnorePointer(
+              ignoring: !_showControls,
+              child: AnimatedOpacity(
+                opacity: _showControls ? 1.0 : 0.0,
+                duration: const Duration(milliseconds: 300),
+                child: SafeArea(
+                  child: _buildFullscreenControls(),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -55,6 +55,8 @@ class MyColors {
   static const Color error = Color(0xFFE53935); // Red
   static const Color warning = Color(0xFFFFC107); // Amber
   static const Color info = Color(0xFF2196F3); // Light Blue
+  /// Purchased item row background (#59E59A1C as RRGGBBAA)
+  static const Color ownedItemBackground = Color(0x1C59E59A);
 
   static const Color infoBg = Color(0xFFFBF6FB);
 

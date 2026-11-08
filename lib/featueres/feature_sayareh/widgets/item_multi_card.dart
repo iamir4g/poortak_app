@@ -25,17 +25,11 @@ class ItemMultiCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isFree = isDemo || price == "0";
-    final isHighlighted = isOwned || isFree;
     final textColor = isDark ? MyColors.darkTextPrimary : MyColors.textMatn1;
     final secondaryTextColor =
         isDark ? MyColors.darkTextSecondary : MyColors.textMatn1;
-    final statusColor = isDark
-        ? MyColors.quizAnswerCorrectTextDark
-        : MyColors.quizAnswerCorrectBorderLight;
-    final backgroundColor = isHighlighted
-        ? (isDark
-            ? MyColors.quizAnswerCorrectBackgroundDark
-            : MyColors.quizAnswerCorrectBackgroundLight)
+    final backgroundColor = (isOwned || isFree)
+        ? MyColors.ownedItemBackground
         : (isDark ? MyColors.cartItemCardDark : MyColors.background);
 
     return Container(

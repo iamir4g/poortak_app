@@ -407,7 +407,8 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
               child: Text(
                 _errorMessage!,
                 textAlign: TextAlign.center,
-                style: MyTextStyle.body16For(context).copyWith(color: errorColor),
+                style:
+                    MyTextStyle.body16For(context).copyWith(color: errorColor),
               ),
             ),
             if (_canDownload() && !widget.autoDownload) ...[
@@ -540,9 +541,8 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
                                   focusedBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8.r),
                                     borderSide: BorderSide(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .primary,
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
                                     ),
                                   ),
                                   contentPadding: EdgeInsets.symmetric(
@@ -574,7 +574,6 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
                           ],
                         ),
                       ),
-
                       IconButton(
                         onPressed:
                             _currentPage < _totalPages ? _goToNextPage : null,
@@ -591,29 +590,33 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
               // PDF content
               Expanded(
                 child: Stack(
+                  fit: StackFit.expand,
+                  alignment: Alignment.center,
                   children: [
-                    PdfView(
-                      controller: _pdfController!,
-                      onPageChanged: (page) {
-                        setState(() {
-                          _currentPage = page;
-                        });
-                      },
-                      builders: PdfViewBuilders<DefaultBuilderOptions>(
-                        options: const DefaultBuilderOptions(
-                          loaderSwitchDuration: Duration(milliseconds: 500),
-                        ),
-                        documentLoaderBuilder: (_) => const Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                        pageLoaderBuilder: (_) => const Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                        errorBuilder: (_, error) => Center(
-                          child: Text(
-                            'Error loading PDF: $error',
-                            style: MyTextStyle.body16For(context).copyWith(
-                              color: errorColor,
+                    Positioned.fill(
+                      child: PdfView(
+                        controller: _pdfController!,
+                        onPageChanged: (page) {
+                          setState(() {
+                            _currentPage = page;
+                          });
+                        },
+                        builders: PdfViewBuilders<DefaultBuilderOptions>(
+                          options: const DefaultBuilderOptions(
+                            loaderSwitchDuration: Duration(milliseconds: 500),
+                          ),
+                          documentLoaderBuilder: (_) => const Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                          pageLoaderBuilder: (_) => const Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                          errorBuilder: (_, error) => Center(
+                            child: Text(
+                              'Error loading PDF: $error',
+                              style: MyTextStyle.body16For(context).copyWith(
+                                color: errorColor,
+                              ),
                             ),
                           ),
                         ),
@@ -623,7 +626,7 @@ class _CustomPdfReaderState extends State<CustomPdfReader> {
                     // Page loading indicator
                     if (_isPageLoading)
                       Positioned(
-                        top: 16.h,
+                        top: 10.h,
                         right: 16.w,
                         child: Container(
                           padding: EdgeInsets.all(8.r),

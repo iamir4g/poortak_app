@@ -30,14 +30,16 @@ class IKnowPackageBreakdown extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _PriceRow(
-          label: 'قیمت پایه',
-          amountToman: pricing.basePriceToman,
-          unit: toman,
-          labelColor: secondaryTextColor,
-          amountColor: primaryTextColor,
-          emphasize: false,
-        ),
+        Padding(
+            padding: EdgeInsetsGeometry.symmetric(horizontal: Dimens.nw(12.0)),
+            child: _PriceRow(
+              label: 'قیمت پایه',
+              amountToman: pricing.basePriceToman,
+              unit: toman,
+              labelColor: secondaryTextColor,
+              amountColor: primaryTextColor,
+              emphasize: false,
+            )),
         if (pricing.packageDiscount > 0) ...[
           SizedBox(height: Dimens.nh(compact ? 8.0 : 12.0)),
           _DiscountChip(
@@ -153,9 +155,10 @@ class _OwnedCountChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final statusColor = isDark
         ? MyColors.quizAnswerCorrectTextDark
-        : MyColors.quizAnswerCorrectBorderLight;
-    final label =
-        '${convertEnToFa(count.toString())} آیتم قبلاً خریداری شده است.';
+        : MyColors.quizAnswerCorrectBorderDark;
+    final baseLabelStyle = MyTextStyle.textMatn12W300;
+    final boldCountStyle =
+        MyTextStyle.textMatn12W700.copyWith(color: statusColor);
 
     return Container(
       width: double.infinity,
@@ -169,13 +172,41 @@ class _OwnedCountChip extends StatelessWidget {
           borderRadius: BorderRadius.circular(Dimens.nr(10.0)),
         ),
       ),
-      child: _PriceRow(
-        label: label,
-        amountToman: amountToman,
-        unit: unit,
-        labelColor: statusColor,
-        amountColor: statusColor,
-        emphasize: false,
+      child: Row(
+        textDirection: TextDirection.rtl,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Flexible(
+            child: Text.rich(
+              TextSpan(
+                style: baseLabelStyle,
+                children: [
+                  TextSpan(
+                    text: convertEnToFa(count.toString()),
+                    style: boldCountStyle,
+                  ),
+                  const TextSpan(text: ' آیتم قبلاً خریداری شده است.'),
+                ],
+              ),
+              textAlign: TextAlign.right,
+            ),
+          ),
+          SizedBox(width: Dimens.nw(8.0)),
+          Row(
+            textDirection: TextDirection.rtl,
+            children: [
+              Text(
+                amountToman.toString().addComma,
+                style: MyTextStyle.textMatn14Bold,
+              ),
+              SizedBox(width: Dimens.nw(4.0)),
+              Text(
+                unit,
+                style: MyTextStyle.textMatn10W300,
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
