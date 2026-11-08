@@ -24,15 +24,25 @@ class ItemMultiCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isFree = isDemo || price == "0";
+    final isHighlighted = isOwned || isFree;
     final textColor = isDark ? MyColors.darkTextPrimary : MyColors.textMatn1;
     final secondaryTextColor =
         isDark ? MyColors.darkTextSecondary : MyColors.textMatn1;
+    final statusColor = isDark
+        ? MyColors.quizAnswerCorrectTextDark
+        : MyColors.quizAnswerCorrectBorderLight;
+    final backgroundColor = isHighlighted
+        ? (isDark
+            ? MyColors.quizAnswerCorrectBackgroundDark
+            : MyColors.quizAnswerCorrectBackgroundLight)
+        : (isDark ? MyColors.cartItemCardDark : MyColors.background);
 
     return Container(
       width: 248.w,
       height: 25.h,
       decoration: BoxDecoration(
-        color: isDark ? MyColors.cartItemCardDark : MyColors.background,
+        color: backgroundColor,
         borderRadius: BorderRadius.all(Radius.circular(10.r)),
       ),
       child: Padding(
@@ -55,29 +65,28 @@ class ItemMultiCard extends StatelessWidget {
             isOwned
                 ? Text(
                     "خریداری شده",
-                    style:
-                        MyTextStyle.textMatn12W500.copyWith(color: textColor),
+                    style: MyTextStyle.textMatn12W500,
                   )
-                : isDemo || price == "0"
-                ? Text(
-                    "رایگان",
-                    style:
-                        MyTextStyle.textMatn12W500.copyWith(color: textColor),
-                  )
-                : Row(
-                    children: [
-                      Text(
-                        convertEnToFa(MoneyUtils.formatTomanFromRial(price)),
-                        style: MyTextStyle.textMatn12W500
-                            .copyWith(color: textColor),
-                      ),
-                      Text(
-                        l10n?.toman ?? "",
-                        style: MyTextStyle.textMatn12W300
-                            .copyWith(color: secondaryTextColor),
+                : isFree
+                    ? Text(
+                        "رایگان",
+                        style: MyTextStyle.textMatn12W500,
                       )
-                    ],
-                  )
+                    : Row(
+                        children: [
+                          Text(
+                            convertEnToFa(
+                                MoneyUtils.formatTomanFromRial(price)),
+                            style: MyTextStyle.textMatn12W500
+                                .copyWith(color: textColor),
+                          ),
+                          Text(
+                            l10n?.toman ?? "",
+                            style: MyTextStyle.textMatn12W300
+                                .copyWith(color: secondaryTextColor),
+                          )
+                        ],
+                      )
           ],
         ),
       ),

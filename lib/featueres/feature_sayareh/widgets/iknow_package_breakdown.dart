@@ -49,37 +49,14 @@ class IKnowPackageBreakdown extends StatelessWidget {
             amountColor: primaryTextColor,
           ),
         ],
-        if (pricing.ownedItems.isNotEmpty) ...[
+        if (pricing.ownedItems.isNotEmpty || pricing.appliedDeduction > 0) ...[
           SizedBox(height: Dimens.nh(compact ? 8.0 : 12.0)),
-          Text(
-            'اقلام شما',
-            textAlign: TextAlign.right,
-            style: MyTextStyle.textMatn12W300.copyWith(color: secondaryTextColor),
-          ),
-          SizedBox(height: Dimens.nh(6.0)),
-          ...pricing.ownedItems.map(
-            (item) => Padding(
-              padding: EdgeInsets.only(bottom: Dimens.nh(4.0)),
-              child: _PriceRow(
-                label: item.name,
-                amountToman: item.priceToman,
-                unit: toman,
-                labelColor: secondaryTextColor,
-                amountColor: primaryTextColor,
-                emphasize: false,
-              ),
-            ),
-          ),
-        ],
-        if (pricing.appliedDeduction > 0) ...[
-          SizedBox(height: Dimens.nh(compact ? 8.0 : 12.0)),
-          _DiscountChip(
-            label: 'کسر مالکیت',
+          _OwnedCountChip(
+            count:
+                pricing.ownedItems.isNotEmpty ? pricing.ownedItems.length : 1,
             amountToman: pricing.appliedDeductionToman,
             unit: toman,
             isDark: isDark,
-            labelColor: secondaryTextColor,
-            amountColor: primaryTextColor,
           ),
         ],
         SizedBox(height: Dimens.nh(compact ? 8.0 : 16.0)),
@@ -159,6 +136,51 @@ class _DiscountChip extends StatelessWidget {
   }
 }
 
+class _OwnedCountChip extends StatelessWidget {
+  final int count;
+  final int amountToman;
+  final String unit;
+  final bool isDark;
+
+  const _OwnedCountChip({
+    required this.count,
+    required this.amountToman,
+    required this.unit,
+    required this.isDark,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final statusColor = isDark
+        ? MyColors.quizAnswerCorrectTextDark
+        : MyColors.quizAnswerCorrectBorderLight;
+    final label =
+        '${convertEnToFa(count.toString())} آیتم قبلاً خریداری شده است.';
+
+    return Container(
+      width: double.infinity,
+      constraints: BoxConstraints(minHeight: Dimens.nh(42.0)),
+      padding: EdgeInsets.symmetric(horizontal: Dimens.nw(12.0)),
+      decoration: ShapeDecoration(
+        color: isDark
+            ? MyColors.quizAnswerCorrectBackgroundDark
+            : MyColors.quizAnswerCorrectBackgroundLight,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(Dimens.nr(10.0)),
+        ),
+      ),
+      child: _PriceRow(
+        label: label,
+        amountToman: amountToman,
+        unit: unit,
+        labelColor: statusColor,
+        amountColor: statusColor,
+        emphasize: false,
+      ),
+    );
+  }
+}
+
 class _PriceRow extends StatelessWidget {
   final String label;
   final int amountToman;
@@ -187,9 +209,8 @@ class _PriceRow extends StatelessWidget {
             label,
             textAlign: TextAlign.right,
             style: (emphasize
-                    ? MyTextStyle.textMatn12W300
-                    : MyTextStyle.textMatn12W300)
-                .copyWith(color: labelColor),
+                ? MyTextStyle.textMatn12W300
+                : MyTextStyle.textMatn12W300),
           ),
         ),
         SizedBox(width: Dimens.nw(8.0)),
@@ -199,14 +220,13 @@ class _PriceRow extends StatelessWidget {
             Text(
               amountToman.toString().addComma,
               style: (emphasize
-                      ? MyTextStyle.textMatn14Bold
-                      : MyTextStyle.textMatn14Bold)
-                  .copyWith(color: amountColor),
+                  ? MyTextStyle.textMatn14Bold
+                  : MyTextStyle.textMatn14Bold),
             ),
             SizedBox(width: Dimens.nw(4.0)),
             Text(
               unit,
-              style: MyTextStyle.textMatn10W300.copyWith(color: amountColor),
+              style: MyTextStyle.textMatn10W300,
             ),
           ],
         ),
