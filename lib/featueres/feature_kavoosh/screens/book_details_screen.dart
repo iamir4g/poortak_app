@@ -233,7 +233,6 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
           title: '$titlePrefix${book.title}',
           fileName: book.title,
           target: target,
-          enableScreenSecurity: !target.usePublicUrl,
         ),
       ),
     );
@@ -608,13 +607,11 @@ class _KavooshPdfReaderPage extends StatefulWidget {
   final String title;
   final String fileName;
   final KavooshBookPdfPlaybackTarget target;
-  final bool enableScreenSecurity;
 
   const _KavooshPdfReaderPage({
     required this.title,
     required this.fileName,
     required this.target,
-    required this.enableScreenSecurity,
   });
 
   @override
@@ -625,16 +622,12 @@ class _KavooshPdfReaderPageState extends State<_KavooshPdfReaderPage> {
   @override
   void initState() {
     super.initState();
-    if (widget.enableScreenSecurity) {
-      ScreenSecurityService.setEnabled(true);
-    }
+    ScreenSecurityService.setEnabled(true);
   }
 
   @override
   void dispose() {
-    if (widget.enableScreenSecurity) {
-      ScreenSecurityService.setEnabled(false);
-    }
+    ScreenSecurityService.setEnabled(false);
     super.dispose();
   }
 
