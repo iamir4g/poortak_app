@@ -483,11 +483,12 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
                     ],
                   ),
                 ),
-                SizedBox(height: Dimens.nh(10)),
+                SizedBox(height: Dimens.nh(50)),
               ],
             ),
           ),
         ),
+        SizedBox(height: Dimens.nh(10)),
         Container(
           padding: EdgeInsets.all(Dimens.medium),
           decoration: BoxDecoration(
@@ -496,7 +497,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 10,
-                offset: const Offset(0, -5),
+                offset: const Offset(0, -3),
               ),
             ],
           ),
@@ -588,9 +589,8 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final Color backgroundColor;
     if (isDark) {
-      backgroundColor = index.isEven
-          ? Colors.transparent
-          : MyColors.darkBackgroundSecondary;
+      backgroundColor =
+          index.isEven ? Colors.transparent : MyColors.darkBackgroundSecondary;
     } else {
       backgroundColor =
           index.isEven ? MyColors.background : MyColors.attributeRowAlt;

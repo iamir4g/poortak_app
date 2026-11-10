@@ -340,15 +340,18 @@ class _BookDetailScreenState extends State<BookDetailScreen>
                       // ویژگی های کالا
                       Column(
                         children: [
-                          _buildAttributeRow(
-                              "ناشر:", bookData.publisher ?? "-"),
-                          _buildAttributeRow(
-                              "نویسنده:", bookData.author ?? "-"),
-                          _buildAttributeRow("فرمت:", "PDF"), // Assumed
+                          _buildAttributeRow("ناشر:", bookData.publisher ?? "-",
+                              index: 0),
+                          _buildAttributeRow("نویسنده:", bookData.author ?? "-",
+                              index: 1),
+                          _buildAttributeRow("فرمت:", "PDF",
+                              index: 2), // Assumed
                           _buildAttributeRow("تعداد صفحه:",
-                              bookData.pageCount?.toString() ?? "-"),
+                              bookData.pageCount?.toString() ?? "-",
+                              index: 3),
                           _buildAttributeRow("تاریخ نشر:",
-                              bookData.publishDate?.toString() ?? "-"),
+                              bookData.publishDate?.toString() ?? "-",
+                              index: 4),
                         ],
                       ),
                     ],
@@ -445,10 +448,11 @@ class _BookDetailScreenState extends State<BookDetailScreen>
     );
   }
 
-  Widget _buildAttributeRow(String label, String value) {
+  Widget _buildAttributeRow(String label, String value, {required int index}) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: Dimens.nh(8)),
+      padding: EdgeInsets.symmetric(
+          vertical: index == 0 ? Dimens.nh(8) : Dimens.nh(0)),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
