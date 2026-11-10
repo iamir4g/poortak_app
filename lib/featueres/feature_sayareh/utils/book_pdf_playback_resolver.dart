@@ -1,3 +1,4 @@
+import 'package:poortak/common/utils/money_utils.dart';
 import 'package:poortak/featueres/feature_sayareh/data/models/single_book_model.dart';
 
 class BookPdfPlaybackTarget {
@@ -24,28 +25,37 @@ class BookPdfPlaybackResolver {
   static bool canOpenReaderDirectly({
     required bool purchasedFromApi,
     required bool hasBookAccess,
+    dynamic price,
   }) {
-    return purchasedFromApi || hasBookAccess;
+    return purchasedFromApi ||
+        hasBookAccess ||
+        MoneyUtils.isFreePrice(price);
   }
 
-  /// User can read the encrypted full book when purchased or listed in access.
+  /// User can read the encrypted full book when purchased, listed in access,
+  /// or the book is free (price <= 0).
   static bool canDecryptFullBook({
     required bool hasBookAccess,
     required bool purchasedFromApi,
     required bool isDemo,
+    dynamic price,
   }) {
-    return purchasedFromApi || hasBookAccess;
+    return purchasedFromApi ||
+        hasBookAccess ||
+        MoneyUtils.isFreePrice(price);
   }
 
   static bool hasFullBookAccess({
     required bool hasBookAccess,
     required bool purchasedFromApi,
     required bool isDemo,
+    dynamic price,
   }) {
     return canDecryptFullBook(
       hasBookAccess: hasBookAccess,
       purchasedFromApi: purchasedFromApi,
       isDemo: isDemo,
+      price: price,
     );
   }
 
@@ -59,6 +69,7 @@ class BookPdfPlaybackResolver {
       hasBookAccess: hasBookAccess,
       purchasedFromApi: book.purchased ?? false,
       isDemo: book.isDemo ?? false,
+      price: book.price,
     );
 
     if (forceTrial || !hasFullAccess) {

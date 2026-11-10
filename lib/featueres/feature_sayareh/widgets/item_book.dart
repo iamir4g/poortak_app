@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/common/services/getImageUrl_service.dart';
+import 'package:poortak/common/utils/money_utils.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
@@ -151,14 +152,17 @@ class ItemBook extends StatelessWidget {
     final canOpen = BookPdfPlaybackResolver.canOpenReaderDirectly(
       purchasedFromApi: purchasedFromApi,
       hasBookAccess: hasBookAccess,
+      price: price,
     );
     final canDecrypt = BookPdfPlaybackResolver.canDecryptFullBook(
       hasBookAccess: hasBookAccess,
       purchasedFromApi: purchasedFromApi,
       isDemo: isDemo,
+      price: price,
     );
+    final isFree = MoneyUtils.isFreePrice(price);
 
-    if (isLoggedIn && canOpen) {
+    if ((isLoggedIn || isFree) && canOpen) {
       Navigator.pushNamed(
         context,
         PdfReaderScreen.routeName,

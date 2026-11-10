@@ -6,6 +6,7 @@ import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/config/dimens.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
+import 'package:poortak/common/utils/money_utils.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/featueres/feature_shopping_cart/presentation/bloc/shopping_cart_bloc.dart';
 import 'package:poortak/locator.dart';
@@ -201,12 +202,15 @@ class _PdfReaderScreenState extends State<PdfReaderScreen> {
     final isLoggedIn = locator<PrefsOperator>().isLoggedIn();
     final hasBookAccess =
         isLoggedIn && locator<IknowAccessBloc>().hasBookAccess(bookData.id);
-    final canDecrypt = isLoggedIn &&
-        BookPdfPlaybackResolver.canDecryptFullBook(
-          hasBookAccess: hasBookAccess,
-          purchasedFromApi: bookData.purchased ?? false,
-          isDemo: bookData.isDemo ?? false,
-        );
+    final isFree = MoneyUtils.isFreePrice(bookData.price);
+    final canDecrypt = isFree ||
+        (isLoggedIn &&
+            BookPdfPlaybackResolver.canDecryptFullBook(
+              hasBookAccess: hasBookAccess,
+              purchasedFromApi: bookData.purchased ?? false,
+              isDemo: bookData.isDemo ?? false,
+              price: bookData.price,
+            ));
     final effectiveTrialRead = isTrialRead || !canDecrypt;
 
     final playbackTarget = BookPdfPlaybackResolver.resolve(

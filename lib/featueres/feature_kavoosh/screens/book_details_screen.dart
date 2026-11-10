@@ -114,6 +114,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
     return KavooshBookPdfPlaybackResolver.hasFullBookAccess(
       purchasedFromApi: book.purchased,
       hasAccessFromApi: book.hasAccess,
+      price: book.price,
     );
   }
 

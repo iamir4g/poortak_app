@@ -1,3 +1,4 @@
+import 'package:poortak/common/utils/money_utils.dart';
 import 'package:poortak/featueres/feature_kavoosh/data/models/kavoosh_book_detail_model.dart';
 
 class KavooshBookPdfPlaybackTarget {
@@ -24,8 +25,11 @@ class KavooshBookPdfPlaybackResolver {
   static bool hasFullBookAccess({
     required bool purchasedFromApi,
     required bool hasAccessFromApi,
+    dynamic price,
   }) {
-    return purchasedFromApi || hasAccessFromApi;
+    return purchasedFromApi ||
+        hasAccessFromApi ||
+        MoneyUtils.isFreePrice(price);
   }
 
   /// [forceTrial] is true when user taps "خواندن نمونه".
@@ -36,6 +40,7 @@ class KavooshBookPdfPlaybackResolver {
     final hasFullAccess = hasFullBookAccess(
       purchasedFromApi: book.purchased,
       hasAccessFromApi: book.hasAccess,
+      price: book.price,
     );
 
     if (forceTrial || !hasFullAccess) {

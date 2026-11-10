@@ -11,13 +11,14 @@ void main() {
     String? file,
     String? trialFileValue,
     bool purchased = false,
+    String price = '850000',
   }) {
     return SingleBookData(
       id: bookId,
       title: 'فرهنگ لغات پورتک',
       order: 0,
       thumbnail: 'thumb',
-      price: '850000',
+      price: price,
       pageCount: 171,
       publishDate: '1404',
       file: file,
@@ -73,6 +74,18 @@ void main() {
         isFalse,
       );
     });
+
+    test('کتاب رایگان با قیمت ۰ بدون خرید دسترسی کامل دارد', () {
+      expect(
+        BookPdfPlaybackResolver.canDecryptFullBook(
+          hasBookAccess: false,
+          purchasedFromApi: false,
+          isDemo: false,
+          price: '0',
+        ),
+        isTrue,
+      );
+    });
   });
 
   group('BookPdfPlaybackResolver.canOpenReaderDirectly', () {
@@ -81,6 +94,17 @@ void main() {
         BookPdfPlaybackResolver.canOpenReaderDirectly(
           hasBookAccess: true,
           purchasedFromApi: false,
+        ),
+        isTrue,
+      );
+    });
+
+    test('کتاب رایگان مستقیم باز می‌شود', () {
+      expect(
+        BookPdfPlaybackResolver.canOpenReaderDirectly(
+          hasBookAccess: false,
+          purchasedFromApi: false,
+          price: '0',
         ),
         isTrue,
       );
@@ -193,6 +217,20 @@ void main() {
       );
 
       expect(target, isNull);
+    });
+
+    test('کتاب رایگان بدون خرید، نسخه کامل', () {
+      final target = BookPdfPlaybackResolver.resolve(
+        book: sampleBook(file: fullFile, price: '0'),
+        forceTrial: false,
+        hasBookAccess: false,
+      );
+
+      expect(target, isNotNull);
+      expect(target!.usePublicUrl, isFalse);
+      expect(target.requiresDecryption, isTrue);
+      expect(target.decryptionFileId, fullFile);
+      expect(target.cacheFileId, 'book_full_$bookId');
     });
   });
 

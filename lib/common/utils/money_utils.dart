@@ -14,6 +14,13 @@ class MoneyUtils {
     return int.tryParse(normalized) ?? 0;
   }
 
+  static bool isFreePrice(dynamic value) {
+    if (value == null) return false;
+    final raw = value.toString().trim();
+    if (raw.isEmpty) return false;
+    return parseRial(value) <= 0;
+  }
+
   static int rialToTomanInt(int rial) {
     if (rial == 0) return 0;
     return rial ~/ 10;

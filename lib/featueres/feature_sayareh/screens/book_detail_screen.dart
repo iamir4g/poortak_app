@@ -158,12 +158,15 @@ class _BookDetailScreenState extends State<BookDetailScreen>
     final bool hasBookAccess =
         isLoggedIn && locator<IknowAccessBloc>().hasBookAccess(bookData.id);
     final bool hasDemo = bookData.isDemo ?? false;
-    final bool hasFullAccess = isLoggedIn &&
-        BookPdfPlaybackResolver.canDecryptFullBook(
-          hasBookAccess: hasBookAccess,
-          purchasedFromApi: purchased,
-          isDemo: hasDemo,
-        );
+    final bool isFree = MoneyUtils.isFreePrice(bookData.price);
+    final bool hasFullAccess = isFree ||
+        (isLoggedIn &&
+            BookPdfPlaybackResolver.canDecryptFullBook(
+              hasBookAccess: hasBookAccess,
+              purchasedFromApi: purchased,
+              isDemo: hasDemo,
+              price: bookData.price,
+            ));
     final String? trialFile = bookData.trialFile;
     final bool showSampleButton =
         trialFile != null && trialFile.isNotEmpty && !hasFullAccess;
