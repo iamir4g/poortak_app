@@ -396,10 +396,10 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
                         isDark ? MyColors.darkBorder : MyColors.dividerGray,
                     controller: _tabController,
                     isScrollable: true,
+                    tabAlignment: TabAlignment.start,
                     labelStyle: MyTextStyle.tabLabel16.copyWith(
-                      color: isDark
-                          ? MyColors.darkTextPrimary
-                          : MyColors.activeTabBackground,
+                      color:
+                          isDark ? MyColors.darkTextPrimary : MyColors.primary,
                     ),
                     unselectedLabelStyle: MyTextStyle.tabLabel16.copyWith(
                       color: isDark
@@ -410,7 +410,9 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
                     indicatorSize: TabBarIndicatorSize.label,
                     indicatorWeight: Dimens.nw(2),
                     tabs: const [
-                      Tab(text: 'درباره کالا'),
+                      Tab(
+                        text: 'درباره کالا',
+                      ),
                       Tab(text: 'ویژگی های کالا'),
                     ],
                   ),
@@ -442,32 +444,38 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
                             _buildAttributeRow(
                               'ناشر:',
                               book.publisher.isNotEmpty ? book.publisher : '-',
+                              index: 0,
                             ),
                             _buildAttributeRow(
                               'نویسنده:',
                               book.authorName.isNotEmpty
                                   ? book.authorName
                                   : '-',
+                              index: 1,
                             ),
                             _buildAttributeRow(
                               'فرمت:',
                               book.formatLabel,
+                              index: 2,
                             ),
                             _buildAttributeRow(
                               'حجم:',
                               _formatFileSize(book.size),
+                              index: 3,
                             ),
                             _buildAttributeRow(
                               'تعداد صفحه:',
                               book.pages > 0
                                   ? toPersianDigits('${book.pages}')
                                   : '-',
+                              index: 4,
                             ),
                             _buildAttributeRow(
                               'تاریخ نشر:',
                               book.publishDate.isNotEmpty
                                   ? toPersianDigits(book.publishDate)
                                   : '-',
+                              index: 5,
                             ),
                           ],
                         ),
@@ -576,28 +584,44 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
     );
   }
 
-  Widget _buildAttributeRow(String label, String value) {
+  Widget _buildAttributeRow(String label, String value, {required int index}) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: Dimens.nh(8)),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              color: isDark ? MyColors.darkTextSecondary : Colors.grey,
-              fontSize: Dimens.nsp(14),
+    final Color backgroundColor;
+    if (isDark) {
+      backgroundColor = index.isEven
+          ? Colors.transparent
+          : MyColors.darkBackgroundSecondary;
+    } else {
+      backgroundColor =
+          index.isEven ? MyColors.background : MyColors.attributeRowAlt;
+    }
+
+    return ColoredBox(
+      color: backgroundColor,
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          vertical: Dimens.nh(8),
+          horizontal: Dimens.nw(8),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                color: isDark ? MyColors.darkTextSecondary : Colors.grey,
+                fontSize: Dimens.nsp(14),
+              ),
             ),
-          ),
-          Text(
-            value,
-            style: TextStyle(
-              color: isDark ? MyColors.darkTextPrimary : Colors.black,
-              fontSize: Dimens.nsp(14),
+            Text(
+              value,
+              style: TextStyle(
+                color: isDark ? MyColors.darkTextPrimary : Colors.black,
+                fontSize: Dimens.nsp(14),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

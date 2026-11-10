@@ -30,6 +30,7 @@ class MyColors {
 
   // Background Colors
   static const Color background = Color(0xFFFFFFFF); // White
+  static const Color attributeRowAlt = Color(0xFFF9FBFF);
   static const Color shoppingCartBackground = Color(0xFFF4F6FB);
   static const Color lightDarkBackground = Color(0xFF121212); // Dark background
   static const Color modalHeaderBackground = Color(0xFFF3F4F7);

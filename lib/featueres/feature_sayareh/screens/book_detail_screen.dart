@@ -296,6 +296,7 @@ class _BookDetailScreenState extends State<BookDetailScreen>
                         isDark ? MyColors.darkBorder : MyColors.dividerGray,
                     controller: _tabController,
                     isScrollable: true,
+                    tabAlignment: TabAlignment.start,
                     labelStyle: MyTextStyle.tabLabel16.copyWith(
                       color: isDark
                           ? MyColors.darkTextPrimary
@@ -399,7 +400,8 @@ class _BookDetailScreenState extends State<BookDetailScreen>
                         width: 1,
                       ),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(Dimens.radiusMedium),
+                        borderRadius:
+                            BorderRadius.circular(Dimens.radiusMedium),
                       ),
                       elevation: 0,
                       padding: EdgeInsets.zero,
