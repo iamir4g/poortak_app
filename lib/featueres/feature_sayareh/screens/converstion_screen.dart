@@ -5,6 +5,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poortak/common/services/iknow_voice_cache_service.dart';
 import 'package:poortak/common/services/iknow_voice_player.dart';
+import 'package:poortak/common/utils/audio_text_highlight.dart';
+import 'package:poortak/common/utils/digit_utils.dart';
 import 'package:poortak/common/utils/sentence_splitter.dart';
 import 'package:poortak/common/widgets/dot_loading_widget.dart';
 import 'package:poortak/common/widgets/poortak_app_bar.dart';
@@ -42,6 +44,8 @@ class _ConversationScreenState extends State<ConversationScreen>
   final ValueNotifier<bool> isPlayingNotifier = ValueNotifier(false);
   final ValueNotifier<int> currentPlayingIndexNotifier = ValueNotifier(0);
   final ValueNotifier<int> currentSentenceIndexNotifier = ValueNotifier(0);
+  final ValueNotifier<AudioHighlightState> highlightStateNotifier =
+      ValueNotifier(AudioHighlightState.idle);
   final ValueNotifier<bool> _sentenceFocusNotifier = ValueNotifier(false);
 
   List<Datum>? sortedMessages;
@@ -49,6 +53,7 @@ class _ConversationScreenState extends State<ConversationScreen>
   final ValueNotifier<bool> showTranslationsNotifier = ValueNotifier(true);
 
   int _playbackSessionId = 0;
+  StreamSubscription<double>? _progressSub;
 
   bool _shouldPromptPlaybackMode = false;
   bool _isPlaybackChoiceDialogOpen = false;
@@ -74,7 +79,30 @@ class _ConversationScreenState extends State<ConversationScreen>
         state == AppLifecycleState.detached) {
       isPlayingNotifier.value = false;
       _playbackSessionId++;
+      unawaited(_cancelProgressTracking());
       unawaited(_voicePlayer.stop());
+      highlightStateNotifier.value = AudioHighlightState.idle;
+    }
+  }
+
+  Future<void> _cancelProgressTracking() async {
+    await _progressSub?.cancel();
+    _progressSub = null;
+  }
+
+  void _resetHighlight() {
+    highlightStateNotifier.value = AudioHighlightState.idle;
+    currentSentenceIndexNotifier.value = 0;
+  }
+
+  void _applyHighlightForMessage(Datum message, double progress) {
+    final state = highlightStateForText(
+      localizeDigits(message.text),
+      progress,
+    );
+    highlightStateNotifier.value = state;
+    if (currentSentenceIndexNotifier.value != state.sentenceIndex) {
+      currentSentenceIndexNotifier.value = state.sentenceIndex;
     }
   }
 
@@ -171,11 +199,13 @@ class _ConversationScreenState extends State<ConversationScreen>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    unawaited(_cancelProgressTracking());
     unawaited(_voicePlayer.dispose());
     _converstionBloc.close();
     isPlayingNotifier.dispose();
     currentPlayingIndexNotifier.dispose();
     currentSentenceIndexNotifier.dispose();
+    highlightStateNotifier.dispose();
     showTranslationsNotifier.dispose();
     _sentenceFocusNotifier.dispose();
     _scrollController.dispose();
@@ -338,7 +368,9 @@ class _ConversationScreenState extends State<ConversationScreen>
   Future<void> playAllConversations(List<Datum> messages) async {
     if (isPlayingNotifier.value) {
       isPlayingNotifier.value = false;
+      await _cancelProgressTracking();
       await _voicePlayer.stop();
+      _resetHighlight();
       return;
     }
 
@@ -349,13 +381,13 @@ class _ConversationScreenState extends State<ConversationScreen>
 
     _scrollToCurrentSentence(
       currentPlayingIndexNotifier.value,
-      0,
+      currentSentenceIndexNotifier.value,
       force: true,
     );
 
     if (currentPlayingIndexNotifier.value >= messages.length) {
       currentPlayingIndexNotifier.value = 0;
-      currentSentenceIndexNotifier.value = 0;
+      _resetHighlight();
     }
 
     try {
@@ -369,7 +401,8 @@ class _ConversationScreenState extends State<ConversationScreen>
 
         final message = messages[i];
         currentPlayingIndexNotifier.value = i;
-        currentSentenceIndexNotifier.value = 0;
+        _resetHighlight();
+        _applyHighlightForMessage(message, 0);
 
         if (mounted &&
             isPlayingNotifier.value &&
@@ -397,12 +430,13 @@ class _ConversationScreenState extends State<ConversationScreen>
         }
       }
     } finally {
+      await _cancelProgressTracking();
       if (mounted &&
           isPlayingNotifier.value &&
           _playbackSessionId == mySessionId) {
         isPlayingNotifier.value = false;
         currentPlayingIndexNotifier.value = 0;
-        currentSentenceIndexNotifier.value = 0;
+        _resetHighlight();
       }
     }
   }
@@ -416,17 +450,53 @@ class _ConversationScreenState extends State<ConversationScreen>
       checksum: message.voiceChecksum,
     );
     if (path == null) return;
-    await _voicePlayer.playFile(path);
+
+    await _cancelProgressTracking();
+    _applyHighlightForMessage(message, 0);
+
+    try {
+      await _voicePlayer.playFile(
+        path,
+        onStarted: () {
+          final previous = _progressSub;
+          _progressSub = _voicePlayer.watchProgress().listen(
+            (progress) {
+              if (!mounted) return;
+              _applyHighlightForMessage(message, progress);
+            },
+            onError: (Object e) {
+              debugPrint('voice progress error: $e');
+            },
+          );
+          unawaited(previous?.cancel());
+        },
+      );
+    } finally {
+      await _cancelProgressTracking();
+      if (mounted) {
+        _applyHighlightForMessage(message, 1);
+      }
+    }
   }
 
   Future<void> speakText(Datum message, String conversationId) async {
     if (isPlayingNotifier.value) {
       isPlayingNotifier.value = false;
+      await _cancelProgressTracking();
       await _voicePlayer.stop();
     }
 
+    final index = sortedMessages?.indexWhere((m) => m.id == message.id) ?? -1;
+    if (index != -1) {
+      currentPlayingIndexNotifier.value = index;
+    }
+    _sentenceFocusNotifier.value = true;
     _savePlayback(conversationId);
     await _playMessageVoice(message);
+    if (mounted && !isPlayingNotifier.value) {
+      _resetHighlight();
+      _sentenceFocusNotifier.value = false;
+    }
   }
 
   Future<void> _playNext() async {
@@ -434,13 +504,14 @@ class _ConversationScreenState extends State<ConversationScreen>
 
     bool wasPlaying = isPlayingNotifier.value;
     if (wasPlaying) {
+      await _cancelProgressTracking();
       await _voicePlayer.stop();
       isPlayingNotifier.value = false;
     }
 
     if (currentPlayingIndexNotifier.value < sortedMessages!.length - 1) {
       currentPlayingIndexNotifier.value++;
-      currentSentenceIndexNotifier.value = 0;
+      _resetHighlight();
     }
 
     _scrollToCurrentSentence(
@@ -460,13 +531,14 @@ class _ConversationScreenState extends State<ConversationScreen>
 
     bool wasPlaying = isPlayingNotifier.value;
     if (wasPlaying) {
+      await _cancelProgressTracking();
       await _voicePlayer.stop();
       isPlayingNotifier.value = false;
     }
 
     if (currentPlayingIndexNotifier.value > 0) {
       currentPlayingIndexNotifier.value--;
-      currentSentenceIndexNotifier.value = 0;
+      _resetHighlight();
     }
 
     _scrollToCurrentSentence(
@@ -738,9 +810,11 @@ class _ConversationScreenState extends State<ConversationScreen>
                 return ValueListenableBuilder<int>(
                   valueListenable: currentPlayingIndexNotifier,
                   builder: (context, currentPlayingIndex, _) {
-                    return ValueListenableBuilder<int>(
-                      valueListenable: currentSentenceIndexNotifier,
-                      builder: (context, currentSentenceIndex, _) {
+                    return ValueListenableBuilder<AudioHighlightState>(
+                      valueListenable: highlightStateNotifier,
+                      builder: (context, highlightState, _) {
+                        final currentSentenceIndex =
+                            highlightState.sentenceIndex;
                         if (highlightCurrentSentence) {
                           _scrollToCurrentSentence(
                             currentPlayingIndex,
@@ -773,9 +847,9 @@ class _ConversationScreenState extends State<ConversationScreen>
                               message: message,
                               isCurrentPlaying: isCurrentPlaying,
                               isPlaybackActive: highlightCurrentSentence,
-                              currentSentenceIndex: isCurrentPlaying
-                                  ? currentSentenceIndex
-                                  : 0,
+                              highlightState: isCurrentPlaying
+                                  ? highlightState
+                                  : AudioHighlightState.idle,
                               sentenceKeys: sentenceKeys,
                               showTranslations: showTranslations,
                               onTap: () {

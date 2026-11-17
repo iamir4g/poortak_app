@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/common/services/storage_service.dart';
+import 'package:poortak/common/utils/audio_text_highlight.dart';
 import 'package:poortak/common/utils/digit_utils.dart';
 import 'package:poortak/common/utils/font_size_helper.dart';
 import 'package:poortak/common/utils/sentence_splitter.dart';
@@ -22,8 +23,8 @@ class ConversationMessageBubble extends StatelessWidget {
   /// مشخص می‌کند که آیا پخش خودکار فعال است
   final bool isPlaybackActive;
 
-  /// ایندکس جمله فعلی که در حال پخش است (برای Shadowing)
-  final int currentSentenceIndex;
+  /// Karaoke highlight synced to audio progress for the current message.
+  final AudioHighlightState highlightState;
 
   /// کلیدهای هر جمله برای اسکرول دقیق به جمله در حال پخش
   final Map<int, GlobalKey>? sentenceKeys;
@@ -39,7 +40,7 @@ class ConversationMessageBubble extends StatelessWidget {
     required this.message,
     required this.isCurrentPlaying,
     this.isPlaybackActive = false,
-    this.currentSentenceIndex = 0,
+    this.highlightState = AudioHighlightState.idle,
     this.sentenceKeys,
     required this.showTranslations,
     required this.onTap,
@@ -80,7 +81,8 @@ class ConversationMessageBubble extends StatelessWidget {
 
   double _sentenceOpacity(int index) {
     if (!isPlaybackActive || !isCurrentPlaying) return 1.0;
-    if (index == currentSentenceIndex) return 1.0;
+    if (index == highlightState.sentenceIndex) return 1.0;
+    if (index < highlightState.sentenceIndex) return 0.72;
     return 0.18;
   }
 
@@ -90,47 +92,113 @@ class ConversationMessageBubble extends StatelessWidget {
     return 0.35;
   }
 
+  TextStyle _baseWordStyle(BuildContext context, Color baseTextColor) {
+    return FontSizeHelper.getContentTextStyle(
+      context,
+      baseFontSize: 16.0.sp,
+      color: baseTextColor,
+    ).copyWith(
+      fontFamily: 'IranSansEn',
+      fontWeight: FontWeight.w500,
+    );
+  }
+
+  InlineSpan _wordSpan({
+    required HighlightWord word,
+    required TextStyle baseStyle,
+    required Color baseTextColor,
+    required Color activeColor,
+  }) {
+    if (!isPlaybackActive || !isCurrentPlaying) {
+      return TextSpan(text: word.text, style: baseStyle);
+    }
+
+    final activeIndex = highlightState.globalWordIndex;
+    if (word.globalWordIndex < activeIndex) {
+      return TextSpan(
+        text: word.text,
+        style: baseStyle.copyWith(
+          color: baseTextColor.withValues(alpha: 1.0),
+          fontWeight: FontWeight.w600,
+        ),
+      );
+    }
+
+    if (word.globalWordIndex > activeIndex) {
+      return TextSpan(
+        text: word.text,
+        style: baseStyle.copyWith(
+          color: baseTextColor.withValues(alpha: 0.18),
+          fontWeight: FontWeight.w500,
+        ),
+      );
+    }
+
+    // Current word — animate emphasis with wordProgress.
+    final t = highlightState.wordProgress.clamp(0.0, 1.0);
+    final weight = FontWeight.lerp(FontWeight.w600, FontWeight.w800, t)!;
+    final color = Color.lerp(
+      baseTextColor,
+      activeColor,
+      0.35 + (0.65 * t),
+    )!;
+
+    return TextSpan(
+      text: word.text,
+      style: baseStyle.copyWith(
+        color: color,
+        fontWeight: weight,
+      ),
+    );
+  }
+
   Widget _buildMessageText({
     required BuildContext context,
-    required List<String> sentences,
+    required HighlightTimeline timeline,
     required Color baseTextColor,
   }) {
+    final baseStyle = _baseWordStyle(context, baseTextColor);
+    final activeColor = MyColors.secondary;
+    final children = <InlineSpan>[];
+
+    var lastSentence = -1;
+    for (final word in timeline.words) {
+      if (word.sentenceIndex != lastSentence) {
+        lastSentence = word.sentenceIndex;
+        if (sentenceKeys?[word.sentenceIndex] != null) {
+          children.add(
+            WidgetSpan(
+              alignment: PlaceholderAlignment.baseline,
+              baseline: TextBaseline.alphabetic,
+              child: SizedBox(
+                key: sentenceKeys![word.sentenceIndex],
+                width: 0,
+                height: 0,
+              ),
+            ),
+          );
+        }
+      }
+
+      children.add(
+        _wordSpan(
+          word: word,
+          baseStyle: baseStyle,
+          baseTextColor: baseTextColor,
+          activeColor: activeColor,
+        ),
+      );
+    }
+
     return Directionality(
       textDirection: TextDirection.ltr,
-      child: Text.rich(
-        textDirection: TextDirection.ltr,
-        TextSpan(
-          children: [
-            for (var index = 0; index < sentences.length; index++) ...[
-              if (sentenceKeys?[index] != null)
-                WidgetSpan(
-                  alignment: PlaceholderAlignment.baseline,
-                  baseline: TextBaseline.alphabetic,
-                  child: SizedBox(
-                    key: sentenceKeys![index],
-                    width: 0,
-                    height: 0,
-                  ),
-                ),
-              TextSpan(
-                text: sentences[index],
-                style: FontSizeHelper.getContentTextStyle(
-                  context,
-                  baseFontSize: 16.0.sp,
-                  color: baseTextColor.withValues(
-                    alpha: _sentenceOpacity(index),
-                  ),
-                ).copyWith(
-                  fontFamily: 'IranSansEn',
-                  fontWeight: isPlaybackActive &&
-                          isCurrentPlaying &&
-                          index == currentSentenceIndex
-                      ? FontWeight.w700
-                      : FontWeight.w500,
-                ),
-              ),
-            ],
-          ],
+      child: AnimatedDefaultTextStyle(
+        duration: const Duration(milliseconds: 120),
+        curve: Curves.easeOut,
+        style: baseStyle,
+        child: Text.rich(
+          textDirection: TextDirection.ltr,
+          TextSpan(children: children),
         ),
       ),
     );
@@ -159,6 +227,11 @@ class ConversationMessageBubble extends StatelessWidget {
                   color: translationColor.withValues(
                     alpha: _sentenceOpacity(index),
                   ),
+                  fontWeight: isPlaybackActive &&
+                          isCurrentPlaying &&
+                          index == highlightState.sentenceIndex
+                      ? FontWeight.w600
+                      : FontWeight.w400,
                 ),
               ),
           ],
@@ -179,7 +252,7 @@ class ConversationMessageBubble extends StatelessWidget {
     required Color bubbleColor,
     required BorderRadius borderRadius,
     required BuildContext context,
-    required List<String> sentences,
+    required HighlightTimeline timeline,
     required Color baseTextColor,
     required Color translationColor,
   }) {
@@ -204,7 +277,7 @@ class ConversationMessageBubble extends StatelessWidget {
             children: [
               _buildMessageText(
                 context: context,
-                sentences: sentences,
+                timeline: timeline,
                 baseTextColor: baseTextColor,
               ),
               if (showTranslations) ...[
@@ -225,7 +298,8 @@ class ConversationMessageBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isFirstPerson = message.isMaleSpeaker;
-    final sentences = splitIntoSentences(localizeDigits(message.text));
+    final displayText = localizeDigits(message.text);
+    final timeline = buildHighlightTimeline(displayText);
 
     final bubbleColor = isDark
         ? (isFirstPerson
@@ -291,7 +365,7 @@ class ConversationMessageBubble extends StatelessWidget {
                             bubbleColor: bubbleColor,
                             borderRadius: bubbleRadiusLeftPerson,
                             context: context,
-                            sentences: sentences,
+                            timeline: timeline,
                             baseTextColor: baseTextColor,
                             translationColor: translationColor,
                           ),
@@ -304,7 +378,7 @@ class ConversationMessageBubble extends StatelessWidget {
                             bubbleColor: bubbleColor,
                             borderRadius: bubbleRadiusRightPerson,
                             context: context,
-                            sentences: sentences,
+                            timeline: timeline,
                             baseTextColor: baseTextColor,
                             translationColor: translationColor,
                           ),
