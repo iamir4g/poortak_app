@@ -49,6 +49,8 @@ class Vocabulary {
   String word;
   String translation;
   String thumbnail;
+  String? voiceFileId;
+  String? voiceChecksum;
   int order;
   DateTime createdAt;
   DateTime updatedAt;
@@ -60,6 +62,8 @@ class Vocabulary {
     required this.word,
     required this.translation,
     required this.thumbnail,
+    this.voiceFileId,
+    this.voiceChecksum,
     required this.order,
     required this.createdAt,
     required this.updatedAt,
@@ -72,6 +76,8 @@ class Vocabulary {
         word: json["word"],
         translation: json["translation"],
         thumbnail: json["thumbnail"],
+        voiceFileId: json["voiceFileId"]?.toString(),
+        voiceChecksum: json["voiceChecksum"]?.toString(),
         order: json["order"],
         createdAt: DateTime.parse(json["createdAt"]),
         updatedAt: DateTime.parse(json["updatedAt"]),
@@ -86,6 +92,8 @@ class Vocabulary {
         "word": word,
         "translation": translation,
         "thumbnail": thumbnail,
+        "voiceFileId": voiceFileId,
+        "voiceChecksum": voiceChecksum,
         "order": order,
         "createdAt": createdAt.toIso8601String(),
         "updatedAt": updatedAt.toIso8601String(),
@@ -101,9 +109,15 @@ bool _hasDisabledAt(dynamic value) {
 }
 
 class Meta {
-  Meta();
+  String? checksum;
 
-  factory Meta.fromJson(Map<String, dynamic> json) => Meta();
+  Meta({this.checksum});
 
-  Map<String, dynamic> toJson() => {};
+  factory Meta.fromJson(Map<String, dynamic> json) => Meta(
+        checksum: json["checksum"]?.toString(),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "checksum": checksum,
+      };
 }

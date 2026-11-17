@@ -49,6 +49,8 @@ class Datum {
   String text;
   String translation;
   String voice;
+  String? voiceFileId;
+  String? voiceChecksum;
   String? avatarId;
   int order;
   DateTime createdAt;
@@ -61,6 +63,8 @@ class Datum {
     required this.text,
     required this.translation,
     required this.voice,
+    this.voiceFileId,
+    this.voiceChecksum,
     this.avatarId,
     required this.order,
     required this.createdAt,
@@ -74,6 +78,8 @@ class Datum {
         text: json["text"],
         translation: json["translation"],
         voice: json["voice"],
+        voiceFileId: json["voiceFileId"]?.toString(),
+        voiceChecksum: json["voiceChecksum"]?.toString(),
         avatarId: json["avatarId"],
         order: json["order"],
         createdAt: DateTime.parse(json["createdAt"]),
@@ -89,6 +95,8 @@ class Datum {
         "text": text,
         "translation": translation,
         "voice": voice,
+        "voiceFileId": voiceFileId,
+        "voiceChecksum": voiceChecksum,
         "avatarId": avatarId,
         "order": order,
         "createdAt": createdAt.toIso8601String(),
@@ -118,9 +126,15 @@ bool _hasDisabledAt(dynamic value) {
 }
 
 class Meta {
-  Meta();
+  String? checksum;
 
-  factory Meta.fromJson(Map<String, dynamic> json) => Meta();
+  Meta({this.checksum});
 
-  Map<String, dynamic> toJson() => {};
+  factory Meta.fromJson(Map<String, dynamic> json) => Meta(
+        checksum: json["checksum"]?.toString(),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "checksum": checksum,
+      };
 }

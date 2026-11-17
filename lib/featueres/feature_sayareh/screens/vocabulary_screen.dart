@@ -4,7 +4,6 @@ import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:poortak/common/bloc/settings_cubit/settings_cubit.dart';
 import 'package:poortak/common/utils/digit_utils.dart';
 import 'package:poortak/common/utils/font_size_helper.dart';
@@ -19,10 +18,12 @@ import 'package:poortak/featueres/feature_litner/presentation/bloc/litner_state.
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/vocabulary_bloc/vocabulary_bloc.dart';
 import 'package:poortak/featueres/feature_sayareh/screens/practice_vocabulary_screen.dart';
 import 'package:poortak/locator.dart';
+import 'package:poortak/common/services/iknow_voice_cache_service.dart';
+import 'package:poortak/common/services/iknow_voice_player.dart';
 import 'package:poortak/common/services/storage_service.dart';
-import 'package:poortak/common/services/tts_service.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poortak/config/dimens.dart';
+import 'package:poortak/featueres/feature_sayareh/data/models/vocabulary_model.dart';
 import 'package:poortak/featueres/feature_sayareh/widgets/vocabulary_bottom_controls.dart';
 
 class VocabularyScreen extends StatefulWidget {
@@ -35,7 +36,6 @@ class VocabularyScreen extends StatefulWidget {
 }
 
 class _VocabularyScreenState extends State<VocabularyScreen> {
-  static const double _vocabularySpeechRate = 0.3;
   int currentIndex = 0;
   int totalWords = 0;
   String? lastPlayedWord;
@@ -43,20 +43,12 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
   String? currentImageUrl;
   bool isCurrentImageReady = false;
   final Map<String, String> imageUrlCache = {};
-  final TTSService ttsService = locator<TTSService>();
+  final IKnowVoiceCacheService _voiceCache = locator<IKnowVoiceCacheService>();
+  final IKnowVoicePlayer _voicePlayer = IKnowVoicePlayer();
   final StorageService storageService = locator<StorageService>();
   final PrefsOperator prefsOperator = locator<PrefsOperator>();
   final LitnerResultToastController _litnerToastController =
       LitnerResultToastController();
-  @override
-  void initState() {
-    super.initState();
-    _initializeTTS();
-  }
-
-  void _initializeTTS() async {
-    await ttsService.setMaleVoice();
-  }
 
   void _addToLitner(String word, String translation) async {
     final isLoggedIn = await prefsOperator.getLoggedIn();
@@ -83,35 +75,64 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
         ));
   }
 
-  String _wordKeyAt(int index, List<dynamic> words) {
+  String _wordKeyAt(int index, List<Vocabulary> words) {
     final word = words[index];
     return '${index}_${word.word}';
   }
 
-  Future<void> _readWord(String word, {String? wordKey}) async {
+  Future<void> _readWord(Vocabulary word, {String? wordKey}) async {
     final activeKey = wordKey ?? currentWordKey;
-    await ttsService.stop();
-    await ttsService.setMaleVoice();
-    await ttsService.speak(
-      word,
-      speechRate: _vocabularySpeechRate,
+    await _voicePlayer.stop();
+
+    final fileId = word.voiceFileId?.trim();
+    if (fileId == null || fileId.isEmpty) {
+      if (!mounted || activeKey == null || currentWordKey != activeKey) return;
+      setState(() => lastPlayedWord = word.word);
+      return;
+    }
+
+    final path = await _voiceCache.ensureVoice(
+      fileId: fileId,
+      checksum: word.voiceChecksum,
     );
     if (!mounted || activeKey == null || currentWordKey != activeKey) return;
+    if (path != null) {
+      await _voicePlayer.playFile(path);
+    }
+    if (!mounted || activeKey == null || currentWordKey != activeKey) return;
     setState(() {
-      lastPlayedWord = word;
+      lastPlayedWord = word.word;
     });
   }
 
-  void _autoReadCurrentWord(List<dynamic> words, int index) {
+  void _prefetchNearbyVoices(List<Vocabulary> words, int index) {
+    final items = <VoicePrefetchItem>[];
+    for (final nearbyIndex in [index + 1, index + 2, index - 1]) {
+      if (nearbyIndex < 0 || nearbyIndex >= words.length) continue;
+      final nearby = words[nearbyIndex];
+      final fileId = nearby.voiceFileId?.trim();
+      if (fileId == null || fileId.isEmpty) continue;
+      items.add(VoicePrefetchItem(
+        fileId: fileId,
+        checksum: nearby.voiceChecksum,
+      ));
+    }
+    if (items.isNotEmpty) {
+      unawaited(_voiceCache.prefetchVoices(items));
+    }
+  }
+
+  void _autoReadCurrentWord(List<Vocabulary> words, int index) {
     if (!locator<SettingsCubit>().state.autoPlayPronunciation) return;
     final wordKey = _wordKeyAt(index, words);
-    final word = words[index].word;
-    if (lastPlayedWord == word) return;
+    final word = words[index];
+    if (lastPlayedWord == word.word) return;
 
     unawaited(_readWord(word, wordKey: wordKey));
   }
 
   void _nextWord(int totalWords, String word) {
+    unawaited(_voicePlayer.stop());
     setState(() {
       if (currentIndex < totalWords - 1) {
         currentIndex++;
@@ -123,6 +144,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
   }
 
   void _previousWord(int totalWords, String word) {
+    unawaited(_voicePlayer.stop());
     setState(() {
       if (currentIndex > 0) {
         currentIndex--;
@@ -133,13 +155,13 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
     });
   }
 
-  void _goToNextWord(List<dynamic> words) {
+  void _goToNextWord(List<Vocabulary> words) {
     if (currentIndex >= words.length - 1) return;
     final nextWord = words[currentIndex + 1].word;
     _nextWord(words.length, nextWord);
   }
 
-  void _goToPreviousWord(List<dynamic> words) {
+  void _goToPreviousWord(List<Vocabulary> words) {
     if (currentIndex <= 0) return;
     final previousWord = words[currentIndex - 1].word;
     _previousWord(words.length, previousWord);
@@ -148,7 +170,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
   void _handleVocabularyAreaTap(
     TapUpDetails details,
     BuildContext context,
-    List<dynamic> words,
+    List<Vocabulary> words,
   ) {
     final screenWidth = MediaQuery.of(context).size.width;
     final tappedOnLeftHalf = details.localPosition.dx < screenWidth / 2;
@@ -175,7 +197,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
   }
 
   Future<void> _prepareCurrentWordImage(
-    List<dynamic> words,
+    List<Vocabulary> words,
     int index,
   ) async {
     final currentWord = words[index];
@@ -207,7 +229,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
     _prefetchNearbyImages(words, index);
   }
 
-  void _prefetchNearbyImages(List<dynamic> words, int index) {
+  void _prefetchNearbyImages(List<Vocabulary> words, int index) {
     for (final nearbyIndex in [index + 1, index - 1]) {
       if (nearbyIndex < 0 || nearbyIndex >= words.length) continue;
 
@@ -291,22 +313,17 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                     );
                   }
 
-                  final currentWord = state.vocabulary.data[currentIndex];
-                  totalWords = state.vocabulary.data.length;
+                  final words = state.vocabulary.data;
+                  final currentWord = words[currentIndex];
+                  totalWords = words.length;
 
-                  final wordKey =
-                      _wordKeyAt(currentIndex, state.vocabulary.data);
+                  final wordKey = _wordKeyAt(currentIndex, words);
                   if (currentWordKey != wordKey) {
                     currentWordKey = wordKey;
                     WidgetsBinding.instance.addPostFrameCallback((_) {
-                      _autoReadCurrentWord(
-                        state.vocabulary.data,
-                        currentIndex,
-                      );
-                      _prepareCurrentWordImage(
-                        state.vocabulary.data,
-                        currentIndex,
-                      );
+                      _autoReadCurrentWord(words, currentIndex);
+                      _prepareCurrentWordImage(words, currentIndex);
+                      _prefetchNearbyVoices(words, currentIndex);
                     });
                   }
 
@@ -435,8 +452,8 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                                       _goToPreviousWord(state.vocabulary.data),
                                   isNextEnabled: currentIndex < totalWords - 1,
                                   isPreviousEnabled: currentIndex > 0,
-                                  onReadWord: () => _readWord(currentWord.word,
-                                      wordKey: wordKey),
+                                  onReadWord: () =>
+                                      _readWord(currentWord, wordKey: wordKey),
                                   onAddToLitner: () => _addToLitner(
                                     currentWord.word,
                                     currentWord.translation,
@@ -498,6 +515,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
 
   @override
   void dispose() {
+    unawaited(_voicePlayer.dispose());
     _litnerToastController.dispose();
     super.dispose();
   }
