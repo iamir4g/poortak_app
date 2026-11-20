@@ -81,6 +81,8 @@ class ConversationMessageBubble extends StatelessWidget {
 
   double _sentenceOpacity(int index) {
     if (!isPlaybackActive || !isCurrentPlaying) return 1.0;
+    // Whole message stays fully lit while playing (even if multi-sentence / long).
+    if (!kEnableWordKaraokeHighlight) return 1.0;
     if (index == highlightState.sentenceIndex) return 1.0;
     if (index < highlightState.sentenceIndex) return 0.72;
     return 0.18;
@@ -113,17 +115,13 @@ class ConversationMessageBubble extends StatelessWidget {
       return TextSpan(text: word.text, style: baseStyle);
     }
 
-    // Whole-sentence highlight (karaoke disabled via flag).
+    // Whole-message highlight (karaoke disabled via flag).
     if (!kEnableWordKaraokeHighlight) {
-      final isActiveSentence =
-          word.sentenceIndex == highlightState.sentenceIndex;
       return TextSpan(
         text: word.text,
         style: baseStyle.copyWith(
-          color: baseTextColor.withValues(
-            alpha: _sentenceOpacity(word.sentenceIndex),
-          ),
-          fontWeight: isActiveSentence ? FontWeight.w600 : FontWeight.w500,
+          color: baseTextColor.withValues(alpha: 1.0),
+          fontWeight: FontWeight.w600,
         ),
       );
     }
@@ -244,7 +242,8 @@ class ConversationMessageBubble extends StatelessWidget {
                   ),
                   fontWeight: isPlaybackActive &&
                           isCurrentPlaying &&
-                          index == highlightState.sentenceIndex
+                          (!kEnableWordKaraokeHighlight ||
+                              index == highlightState.sentenceIndex)
                       ? FontWeight.w600
                       : FontWeight.w400,
                 ),
