@@ -1,5 +1,8 @@
 import 'package:poortak/common/utils/sentence_splitter.dart';
 
+/// Word-by-word karaoke; keep false to highlight whole sentences only.
+const bool kEnableWordKaraokeHighlight = false;
+
 /// Karaoke-style highlight state derived from audio progress.
 class AudioHighlightState {
   final double progress;

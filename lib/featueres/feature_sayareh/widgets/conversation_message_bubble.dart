@@ -113,6 +113,21 @@ class ConversationMessageBubble extends StatelessWidget {
       return TextSpan(text: word.text, style: baseStyle);
     }
 
+    // Whole-sentence highlight (karaoke disabled via flag).
+    if (!kEnableWordKaraokeHighlight) {
+      final isActiveSentence =
+          word.sentenceIndex == highlightState.sentenceIndex;
+      return TextSpan(
+        text: word.text,
+        style: baseStyle.copyWith(
+          color: baseTextColor.withValues(
+            alpha: _sentenceOpacity(word.sentenceIndex),
+          ),
+          fontWeight: isActiveSentence ? FontWeight.w600 : FontWeight.w500,
+        ),
+      );
+    }
+
     final activeIndex = highlightState.globalWordIndex;
     if (word.globalWordIndex < activeIndex) {
       return TextSpan(
