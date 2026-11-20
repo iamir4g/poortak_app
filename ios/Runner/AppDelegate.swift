@@ -4,6 +4,7 @@ import UIKit
 @main
 @objc class AppDelegate: FlutterAppDelegate {
   private var secureField: UITextField?
+  private var aesCbcDecryptPlugin: AesCbcDecryptPlugin?
 
   override func application(
     _ application: UIApplication,
@@ -33,6 +34,11 @@ import UIKit
           result(FlutterMethodNotImplemented)
         }
       }
+
+      // Native AES-256-CBC file decrypt (hardware-accelerated when available)
+      aesCbcDecryptPlugin = AesCbcDecryptPlugin.register(
+        with: controller.binaryMessenger
+      )
     }
 
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)

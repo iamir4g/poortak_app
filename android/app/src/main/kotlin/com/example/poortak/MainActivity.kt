@@ -16,6 +16,7 @@ class MainActivity: FlutterActivity() {
     private val SECURITY_CHANNEL = "poortak.security.flutter.dev/channel"
     private var startString: String? = null
     private var linksReceiver: BroadcastReceiver? = null
+    private var aesCbcDecryptPlugin: AesCbcDecryptPlugin? = null
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         // FLAG_SECURE removed to allow screenshots
@@ -67,6 +68,10 @@ class MainActivity: FlutterActivity() {
                 }
             }
         )
+
+        // Native AES-256-CBC file decrypt (hardware-accelerated when available)
+        aesCbcDecryptPlugin =
+            AesCbcDecryptPlugin.registerWith(flutterEngine.dartExecutor.binaryMessenger)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
