@@ -1,7 +1,9 @@
-import 'dart:io';
-import 'dart:typed_data';
-import 'dart:convert';
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:pointycastle/export.dart' as pc;
 
 /// تنظیمات
@@ -10,12 +12,99 @@ const int _readChunkSize =
     256 * 1024; // 256 KB per read (must be multiple of 16)
 const int _progressUpdateInterval = 50; // Update progress every N chunks
 
+const MethodChannel _nativeDecryptChannel =
+    MethodChannel('poortak/aes_cbc_decrypt');
+const EventChannel _nativeProgressChannel =
+    EventChannel('poortak/aes_cbc_decrypt/progress');
+
 /// Decrypt a file encrypted with Node's crypto.createCipheriv('aes-256-cbc', key, ivZero)
 /// - encryptionKey: base64 string of 32 bytes (server stores encryptionKey.toString('base64'))
 /// - iv assumed to be 16 zero bytes (as backend told us)
+/// - Prefers native AES (Android/iOS) for speed; falls back to PointyCastle
 /// - Always decrypt from scratch (no caching)
-/// - Optimized for real devices with async I/O and UI thread yielding
 Future<String> decryptFile(
+  String filePath,
+  String outputPath,
+  String encryptionKey, {
+  void Function(double progress)? onProgress,
+}) async {
+  try {
+    return await _decryptFileNative(
+      filePath,
+      outputPath,
+      encryptionKey,
+      onProgress: onProgress,
+    );
+  } on MissingPluginException catch (e) {
+    debugPrint('Native AES decrypt unavailable, using PointyCastle: $e');
+  } on PlatformException catch (e) {
+    debugPrint('Native AES decrypt failed, using PointyCastle: $e');
+  } catch (e) {
+    debugPrint('Native AES decrypt error, using PointyCastle: $e');
+  }
+
+  return _decryptFilePointyCastle(
+    filePath,
+    outputPath,
+    encryptionKey,
+    onProgress: onProgress,
+  );
+}
+
+Future<String> _decryptFileNative(
+  String filePath,
+  String outputPath,
+  String encryptionKey, {
+  void Function(double progress)? onProgress,
+}) async {
+  final inputFile = File(filePath);
+  if (!await inputFile.exists()) {
+    throw FileSystemException('Encrypted file not found', filePath);
+  }
+
+  StreamSubscription<dynamic>? progressSub;
+  try {
+    if (onProgress != null) {
+      progressSub = _nativeProgressChannel.receiveBroadcastStream().listen(
+        (event) {
+          if (event is num) {
+            onProgress(event.toDouble().clamp(0.0, 1.0));
+          }
+        },
+        onError: (Object e) {
+          debugPrint('Native decrypt progress error: $e');
+        },
+      );
+    }
+
+    final result = await _nativeDecryptChannel.invokeMethod<String>(
+      'decryptFile',
+      <String, dynamic>{
+        'inputPath': filePath,
+        'outputPath': outputPath,
+        'keyBase64': encryptionKey,
+      },
+    );
+
+    onProgress?.call(1.0);
+    final path = result ?? outputPath;
+    debugPrint('✅ File decrypted natively: $path');
+    return path;
+  } catch (_) {
+    final out = File(outputPath);
+    if (await out.exists()) {
+      try {
+        await out.delete();
+      } catch (_) {}
+    }
+    rethrow;
+  } finally {
+    await progressSub?.cancel();
+  }
+}
+
+/// Pure-Dart fallback (PointyCastle) — kept for desktop / missing plugin / native errors.
+Future<String> _decryptFilePointyCastle(
   String filePath,
   String outputPath,
   String encryptionKey, {
@@ -29,7 +118,8 @@ Future<String> decryptFile(
   }
 
   final fileSize = await inputFile.length();
-  print('📁 File size: ${(fileSize / 1024 / 1024).toStringAsFixed(2)} MB');
+  debugPrint(
+      '📁 File size: ${(fileSize / 1024 / 1024).toStringAsFixed(2)} MB');
 
   // file size must be multiple of block size (CBC produces whole blocks after final)
   if (fileSize % _aesBlockSize != 0) {
@@ -142,7 +232,7 @@ Future<String> decryptFile(
     await outSink.close();
     await raf.close();
 
-    print('✅ File decrypted successfully: ${outputFile.path}');
+    debugPrint('✅ File decrypted successfully (PointyCastle): ${outputFile.path}');
     return outputFile.path;
   } catch (e) {
     try {

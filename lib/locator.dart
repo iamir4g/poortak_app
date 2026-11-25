@@ -9,6 +9,7 @@ import 'package:poortak/featueres/feature_sayareh/repositories/dictionary_reposi
 import 'package:poortak/featueres/feature_sayareh/presentation/bloc/dictionary_bloc/dictionary_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:poortak/common/services/storage_service.dart';
+import 'package:poortak/common/services/iknow_voice_cache_service.dart';
 import 'package:poortak/common/services/tts_service.dart';
 import 'package:poortak/common/services/auth_interceptor.dart';
 import 'package:poortak/common/services/auth_service.dart';
@@ -142,6 +143,15 @@ Future<void> initLocator() async {
 
   // Register StorageService
   locator.registerSingleton<StorageService>(StorageService(dio: locator()));
+
+  // Register IKnow voice cache (server audio for conversation/vocabulary)
+  locator.registerSingleton<IKnowVoiceCacheService>(
+    IKnowVoiceCacheService(
+      dio: locator(),
+      storageService: locator(),
+      prefs: locator(),
+    ),
+  );
 
   // Register TTSService
   locator.registerSingleton<TTSService>(TTSService());

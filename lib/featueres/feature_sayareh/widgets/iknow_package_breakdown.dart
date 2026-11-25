@@ -133,6 +133,7 @@ class _DiscountChip extends StatelessWidget {
         labelColor: labelColor,
         amountColor: isDark ? MyColors.darkTextAccent : amountColor,
         emphasize: false,
+        showMinus: true,
       ),
     );
   }
@@ -196,7 +197,7 @@ class _OwnedCountChip extends StatelessWidget {
             textDirection: TextDirection.rtl,
             children: [
               Text(
-                amountToman.toString().addComma,
+                MoneyUtils.formatTomanDisplay(amountToman) + " - ",
                 style: MyTextStyle.textMatn14Bold,
               ),
               SizedBox(width: Dimens.nw(4.0)),
@@ -219,6 +220,7 @@ class _PriceRow extends StatelessWidget {
   final Color labelColor;
   final Color amountColor;
   final bool emphasize;
+  final bool showMinus;
 
   const _PriceRow({
     required this.label,
@@ -227,10 +229,15 @@ class _PriceRow extends StatelessWidget {
     required this.labelColor,
     required this.amountColor,
     required this.emphasize,
+    this.showMinus = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    final amountText = showMinus
+        ? '${amountToman.toString().addComma} - '
+        : amountToman.toString().addComma;
+
     return Row(
       textDirection: TextDirection.rtl,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -249,7 +256,7 @@ class _PriceRow extends StatelessWidget {
           textDirection: TextDirection.rtl,
           children: [
             Text(
-              amountToman.toString().addComma,
+              amountText,
               style: (emphasize
                   ? MyTextStyle.textMatn14Bold
                   : MyTextStyle.textMatn14Bold),
