@@ -53,10 +53,10 @@ packages:
     dependency: transitive
     description:
       name: asn1lib
-      sha256: "9a8f69025044eb466b9b60ef3bc3ac99b4dc6c158ae9c56d25eeccf5bc56d024"
+      sha256: ee77cac69a65f809e24c902f68c0e7c733312d301b367cc698cc3aed8b6c884a
       url: "https://pub.dev"
     source: hosted
-    version: "1.6.5"
+    version: "1.6.9"
   async:
     dependency: transitive
     description:
