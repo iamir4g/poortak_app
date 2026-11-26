@@ -7,6 +7,7 @@ import 'package:poortak/common/services/tts_service.dart';
 import 'package:poortak/common/utils/system_ui_helper.dart';
 import 'package:poortak/common/widgets/main_wrapper.dart';
 import 'package:poortak/config/my_theme.dart';
+import 'package:poortak/common/bloc/long_caption_bloc/long_caption_bloc.dart';
 import 'package:poortak/featueres/feature_Menu/screens/aboutUs_screen.dart';
 import 'package:poortak/featueres/feature_Menu/screens/contactUs_screen.dart';
 import 'package:poortak/featueres/feature_Menu/presentation/bloc/contact_us_bloc/contact_us_bloc.dart';
@@ -210,7 +211,10 @@ void main() async {
                       Locale("fa", "")
                     ],
                     routes: {
-                      AboutUsScreen.routeName: (context) => AboutUsScreen(),
+                      AboutUsScreen.routeName: (context) => BlocProvider(
+                            create: (context) => locator<LongCaptionBloc>(),
+                            child: const AboutUsScreen(),
+                          ),
                       ContactUsScreen.routeName: (context) => BlocProvider(
                             create: (context) => locator<ContactUsBloc>(),
                             child: const ContactUsScreen(),

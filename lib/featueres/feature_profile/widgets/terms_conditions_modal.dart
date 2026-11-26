@@ -1,11 +1,16 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:poortak/common/bloc/long_caption_bloc/long_caption_bloc.dart';
+import 'package:poortak/common/models/long_caption_model.dart';
 import 'package:poortak/common/services/answer_feedback_sound_service.dart';
+import 'package:poortak/common/widgets/dot_loading_widget.dart';
 import 'package:poortak/config/myColors.dart';
 import 'package:poortak/config/myTextStyle.dart';
 import 'package:poortak/config/my_theme.dart';
+import 'package:poortak/locator.dart';
 
 class TermsConditionsModal extends StatelessWidget {
   const TermsConditionsModal({super.key});
@@ -91,64 +96,69 @@ class TermsConditionsModal extends StatelessWidget {
             ),
             // Content
             Expanded(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(horizontal: 19.w),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: 12.h),
-                    Text(
-                      'اطلاعات شخصی کاربران همانند ایمیل، شماره همراه و… با حفظ حریم شخصی در اپلیکیشن ثبت می‌شود. علاوه‌ بر آن به منظور اطلاع رسانی بهتر تخفیفات ویژه و سایر تخفیفات مناسبتی سایت، ایمیل یا پیامک به آدرس الکترونیک و یا شماره‌ همراه ثبت شده‌ کاربر ارسال خواهد شد.',
-                      style: MyTextStyle.textMatn13.copyWith(
-                        fontSize: 14.sp,
-                        color: termsTheme.textColor,
-                        height: 1.5,
+              child: BlocBuilder<LongCaptionBloc, LongCaptionState>(
+                builder: (context, state) {
+                  if (state is LongCaptionLoading ||
+                      state is LongCaptionInitial) {
+                    return const Center(child: DotLoadingWidget());
+                  }
+
+                  if (state is LongCaptionError) {
+                    return Center(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 24.w),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              state.message,
+                              style: MyTextStyle.textMatn14Bold.copyWith(
+                                color: MyColors.error,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            SizedBox(height: 16.h),
+                            TextButton(
+                              onPressed: () {
+                                context.read<LongCaptionBloc>().add(
+                                    const GetLongCaptionEvent(
+                                        LongCaptionKey.tos));
+                              },
+                              child: const Text('تلاش مجدد'),
+                            ),
+                          ],
+                        ),
                       ),
-                      textAlign: TextAlign.right,
+                    );
+                  }
+
+                  final paragraphs = state is LongCaptionSuccess
+                      ? state.caption.paragraphs
+                      : const <String>[];
+
+                  return SingleChildScrollView(
+                    padding: EdgeInsets.symmetric(horizontal: 19.w),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: 12.h),
+                        for (var i = 0; i < paragraphs.length; i++) ...[
+                          if (i > 0) SizedBox(height: 16.h),
+                          Text(
+                            paragraphs[i],
+                            style: MyTextStyle.textMatn13.copyWith(
+                              fontSize: 14.sp,
+                              color: termsTheme.textColor,
+                              height: 1.5,
+                            ),
+                            textAlign: TextAlign.right,
+                          ),
+                        ],
+                        SizedBox(height: 20.h),
+                      ],
                     ),
-                    SizedBox(height: 16.h),
-                    Text(
-                      'کلیه حقوق و امتیازات مجموعه آموزشی سیاره آی نو متعلق به انتشارات تاجیک می باشد و هر گونه کپی برداری و تکثیر از آن غیر مجاز بوده و پیگرد قانونی به همراه خواهد داشت.',
-                      style: MyTextStyle.textMatn13.copyWith(
-                        fontSize: 14.sp,
-                        color: termsTheme.textColor,
-                        height: 1.5,
-                      ),
-                      textAlign: TextAlign.right,
-                    ),
-                    SizedBox(height: 16.h),
-                    Text(
-                      'ثبت، پردازش و ارسال سفارش سفارش های فبزیکی ثبت شده در طول روزهای کاری و اولین روز پس از تعطیلات پردازش می شوند، و ارسال از طریق پست به تهران و شهرستان ها میسر می باشد.',
-                      style: MyTextStyle.textMatn13.copyWith(
-                        fontSize: 14.sp,
-                        color: termsTheme.textColor,
-                        height: 1.5,
-                      ),
-                      textAlign: TextAlign.right,
-                    ),
-                    SizedBox(height: 16.h),
-                    Text(
-                      'کاربران باید هنگام سفارش کالای مورد نظر خود، فرم سفارش را با اطلاعات صحیح و به طور کامل تکمیل کنند. بدیهی است درصورت ورود اطلاعات ناقص یا نادرست، سفارش کاربر قابل پیگیری و تحویل نخواهد بود. بنابراین درج آدرس، ایمیل و شماره تماس همراه مشتری، به منزله مورد تایید بودن صحت آنها است و در صورتی که این موارد به صورت صحیح یا کامل درج نشده باشد،همچنین، مشتریان می‌توانند نام، آدرس و تلفن شخص دیگری را برای تحویل گرفتن سفارش وارد کنند و تحویل گیرنده سفارش هنگام دریافت کالا باید کارت شناسایی همراه داشته باشد.',
-                      style: MyTextStyle.textMatn13.copyWith(
-                        fontSize: 14.sp,
-                        color: termsTheme.textColor,
-                        height: 1.5,
-                      ),
-                      textAlign: TextAlign.right,
-                    ),
-                    SizedBox(height: 16.h),
-                    Text(
-                      'برای سفارش یک کالا به تعداد بالا، لازم است پیش از ارسال، سفارش مشتریان ابتدا توسط پشتیبان بررسی و در صورت تایید، پردازش گردد. در صورت عدم تایید سفارشات با هماهنگی مشتری کنسل شده و در صورت واریز وجه، مبلغ پرداخت شده طی 5 الی 7 روز کاری به حساب مشتری عودت داده خواهد شد.',
-                      style: MyTextStyle.textMatn13.copyWith(
-                        fontSize: 14.sp,
-                        color: termsTheme.textColor,
-                        height: 1.5,
-                      ),
-                      textAlign: TextAlign.right,
-                    ),
-                    SizedBox(height: 20.h),
-                  ],
-                ),
+                  );
+                },
               ),
             ),
           ],
@@ -163,7 +173,11 @@ class TermsConditionsModal extends StatelessWidget {
       context: context,
       barrierDismissible: true,
       builder: (BuildContext context) {
-        return const TermsConditionsModal();
+        return BlocProvider(
+          create: (_) => locator<LongCaptionBloc>()
+            ..add(const GetLongCaptionEvent(LongCaptionKey.tos)),
+          child: const TermsConditionsModal(),
+        );
       },
     );
   }

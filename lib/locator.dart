@@ -57,6 +57,9 @@ import 'package:poortak/featueres/feature_Menu/repositories/menu_repository.dart
 import 'package:poortak/featueres/feature_Menu/presentation/bloc/faq_bloc/faq_bloc.dart';
 import 'package:poortak/featueres/feature_Menu/presentation/bloc/contact_us_bloc/contact_us_bloc.dart';
 import 'package:poortak/common/bloc/connectivity_cubit/connectivity_cubit.dart';
+import 'package:poortak/common/bloc/long_caption_bloc/long_caption_bloc.dart';
+import 'package:poortak/common/data/data_source/constants_api_provider.dart';
+import 'package:poortak/common/repositories/constants_repository.dart';
 
 import 'package:poortak/common/bloc/video_download_cubit/video_download_cubit.dart';
 import 'package:poortak/common/services/payment_deep_link_service.dart';
@@ -174,6 +177,8 @@ Future<void> initLocator() async {
   locator.registerSingleton<KavooshApiProvider>(
       KavooshApiProvider(dio: locator()));
   locator.registerSingleton<MenuApiProvider>(MenuApiProvider(dio: locator()));
+  locator.registerSingleton<ConstantsApiProvider>(
+      ConstantsApiProvider(dio: locator()));
 
   //repository
   locator.registerSingleton<SayarehRepository>(SayarehRepository(locator()));
@@ -190,6 +195,8 @@ Future<void> initLocator() async {
   locator.registerSingleton<MatchRepository>(MatchRepository(locator()));
   locator.registerSingleton<KavooshRepository>(KavooshRepository(locator()));
   locator.registerSingleton<MenuRepository>(MenuRepository(locator()));
+  locator.registerSingleton<ConstantsRepository>(
+      ConstantsRepository(locator()));
   locator.registerSingleton<DictionaryRepository>(
       DictionaryRepository(dio: locator()));
   locator.registerSingleton<BlocStorageBloc>(
@@ -219,6 +226,8 @@ Future<void> initLocator() async {
   locator.registerFactory<FaqBloc>(() => FaqBloc(menuRepository: locator()));
   locator.registerFactory<ContactUsBloc>(
       () => ContactUsBloc(menuRepository: locator()));
+  locator.registerFactory<LongCaptionBloc>(
+      () => LongCaptionBloc(constantsRepository: locator()));
 
   // Register ShoppingCartBloc
   locator.registerSingleton<ShoppingCartBloc>(
