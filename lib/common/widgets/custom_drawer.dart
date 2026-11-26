@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:poortak/common/utils/cafebazaar_utils.dart';
 import 'package:poortak/common/utils/prefs_operator.dart';
 import 'package:poortak/common/services/storage_service.dart';
 import 'package:poortak/config/dimens.dart';
@@ -478,24 +479,14 @@ class _CustomDrawerState extends State<CustomDrawer> {
                                   icon: "mynaui:share",
                                   title: "اشتراک گذاری به دوستان",
                                   onTap: () {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text("به زودی."),
-                                        duration: Duration(seconds: 2),
-                                      ),
-                                    );
+                                    CafeBazaarUtils.shareApp();
                                   },
                                 ),
                                 _buildListTile(
                                   icon: "fluent:heart-28-regular",
                                   title: "ثبت نظر درباره برنامه",
                                   onTap: () {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text("به زودی."),
-                                        duration: Duration(seconds: 2),
-                                      ),
-                                    );
+                                    CafeBazaarUtils.openCommentPage();
                                   },
                                 )
                               ],
