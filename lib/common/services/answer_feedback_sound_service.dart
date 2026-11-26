@@ -37,6 +37,8 @@ class AnswerFeedbackSoundService {
   }
 
   static Future<void> playPopup() async {
+    // TODO: Temporarily disabled. Remove this return to restore popup sound.
+    return;
     if (!_soundEffectsEnabled) return;
     try {
       if (!_popupReady) {
