@@ -70,7 +70,13 @@ class ReminderNotificationService {
     required bool isActive,
   }) async {
     if (!isActive) {
-      await cancelReminder(id);
+      try {
+        await initialize();
+        await _notifications.cancel(id);
+      } catch (e) {
+        print('⚠️ Failed to cancel scheduled notification $id: $e');
+      }
+      await _saveReminder(id, title, body, time, type, isActive);
       return;
     }
 
