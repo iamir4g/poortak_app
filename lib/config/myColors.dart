@@ -51,6 +51,16 @@ class MyColors {
   static const Color textLight = Color(0xFFFFFFFF); // White
   static const Color textMatn1 = Color(0xFF363A53);
   static const Color textMatn2 = Color(0xFF212937);
+
+  static const Color supportModalBackground = Color(0xFFFFFFFF);
+  static const Color supportBaleBackground = Color(0xFFD7FFF5);
+  static const Color supportBaleText = Color(0xFF16C28F);
+  static const Color supportTelegramBackground = Color(0xFFE2F5FC);
+  static const Color supportTelegramText = Color(0xFF1AA7E0);
+  static const Color supportWhatsappBackground = Color(0xFFE8FFE8);
+  static const Color supportWhatsappText = Color(0xFF34B35A);
+  static const Color supportHoursBackground = Color(0xFFF1F1F1);
+  static const Color supportHoursBorder = Color(0xFFD9DCE0);
   // Status Colors
   static const Color success = Color(0xFF4CAF50); // Green
   static const Color error = Color(0xFFE53935); // Red

@@ -78,6 +78,13 @@ class MyTextStyle {
         color: MyColors.textMatn1,
       );
 
+  static TextStyle get textMatn20Bold => TextStyle(
+        fontFamily: "IranSans",
+        fontSize: 20.sp,
+        fontWeight: FontWeight.bold,
+        color: MyColors.textMatn1,
+      );
+
   static TextStyle textMatn14BoldFor(BuildContext context) =>
       textMatn14Bold.copyWith(
         color: Theme.of(context).brightness == Brightness.dark
@@ -328,7 +335,9 @@ class MyTextStyle {
         fontFamily: "IranSans",
         fontSize: 12.sp,
         fontWeight: FontWeight.w500,
-        color: isDark ? MyColors.referralSuccessDark : MyColors.referralSuccessLight,
+        color: isDark
+            ? MyColors.referralSuccessDark
+            : MyColors.referralSuccessLight,
         height: 1.0,
       );
 
@@ -337,7 +346,8 @@ class MyTextStyle {
         fontFamily: "IranSans",
         fontSize: 12.sp,
         fontWeight: FontWeight.w500,
-        color: isDark ? MyColors.referralErrorDark : MyColors.referralErrorLight,
+        color:
+            isDark ? MyColors.referralErrorDark : MyColors.referralErrorLight,
         height: 1.0,
       );
 
@@ -455,7 +465,8 @@ class MyTextStyle {
         color: MyColors.scoreGuidePointsBadgeTextColor(isDark),
       );
 
-  static TextStyle scoreGuideInviteButtonFor(bool isDark) => textMatn15.copyWith(
+  static TextStyle scoreGuideInviteButtonFor(bool isDark) =>
+      textMatn15.copyWith(
         color: MyColors.textLight,
         fontWeight: FontWeight.w500,
       );

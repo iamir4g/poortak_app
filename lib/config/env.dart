@@ -10,6 +10,10 @@ class Env {
     }
   }
 
+  static const String supportBaleUrl = 'https://ble.ir/example';
+  static const String supportTelegramUrl = 'https://t.me/example';
+  static const String supportWhatsappUrl = 'https://wa.me/example';
+
   static String get cafeBazaarRsaKey {
     final value = dotenv.env['CAFEBAZAAR_RSA_KEY']?.trim() ?? '';
     if (value.length >= 2 && value.startsWith('"') && value.endsWith('"')) {

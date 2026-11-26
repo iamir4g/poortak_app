@@ -13,6 +13,7 @@ import 'package:poortak/featueres/feature_Menu/screens/faq_screen.dart';
 import 'package:poortak/featueres/feature_Menu/screens/contactUs_screen.dart';
 import 'package:poortak/featueres/feature_Menu/screens/settings_screen.dart';
 import 'package:poortak/featueres/feature_Menu/screens/main_reminder.dart';
+import 'package:poortak/featueres/feature_Menu/widgets/support_help_modal.dart';
 import 'package:poortak/featueres/feature_profile/screens/profile_screen.dart';
 import 'package:poortak/locator.dart';
 import 'package:poortak/common/blocs/bottom_nav_cubit/bottom_nav_cubit.dart';
@@ -450,12 +451,9 @@ class _CustomDrawerState extends State<CustomDrawer> {
                                   icon: "lsicon:circle-more-outline",
                                   title: "پشتیبانی",
                                   onTap: () {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text("به زودی"),
-                                        duration: Duration(seconds: 2),
-                                      ),
-                                    );
+                                    final navigator = Navigator.of(context);
+                                    navigator.pop();
+                                    SupportHelpModal.show(navigator.context);
                                   },
                                 ),
                                 _buildListTile(

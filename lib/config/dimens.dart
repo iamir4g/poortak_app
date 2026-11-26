@@ -40,6 +40,16 @@ class Dimens {
   static double get buttonSmallWidth => nw(100.0);
   static double get loginButtonWidth => nw(156.0);
 
+  // Support help modal
+  static double get supportModalWidth => nw(360.0);
+  static double get supportCardWidth => nw(320.0);
+  static double get supportCardHeight => nh(92.0);
+  static double get supportCardRadius => nr(40.0);
+  static double get supportCardIconSize => nr(76.0);
+  static double get supportCardLogoSize => nr(40.0);
+  static double get supportHoursHeight => nh(42.0);
+  static double get supportHoursRadius => nr(20.0);
+
   // Specific
   static double get cardElevation => nr(4.0);
   static double get dividerHeight => nh(1.0);
